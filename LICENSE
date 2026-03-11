@@ -1,0 +1,127 @@
+Pxlkit License v1.0
+
+Copyright (c) 2026 Joangel De La Rosa and Pxlkit Contributors
+
+This license governs the use of all software, icon data, artwork, and
+documentation contained in this repository (collectively, the "Software").
+
+By using, copying, modifying, or distributing the Software, you agree to
+the terms of this license.
+
+1. DEFINITIONS
+
+a. "Attribution" means a clearly visible credit stating "Powered by Pxlkit"
+or "Icons by Pxlkit" that includes a hyperlink to https://pxlkit.xyz in
+any web-based project, or a plain-text mention in non-web projects. The
+credit must be placed in a location reasonably visible to end users (e.g.,
+footer, about page, credits section, README).
+
+b. "Project" means a single deployed application, website, product, or
+service identified by a unique domain, app store listing, or product name.
+
+c. "Commercial Use" means any use of the Software in a project that is
+intended to generate revenue, directly or indirectly, including but not
+limited to SaaS products, e-commerce sites, paid applications, client
+work, and advertising-supported projects.
+
+d. "Redistribution" means distributing the icon data files, icon packs,
+or rendered icon assets as a standalone icon library, icon set,
+design kit, or component library that competes with or substitutes for
+the original Software.
+
+2. GRANT OF RIGHTS — COMMUNITY LICENSE (FREE)
+
+Subject to the Attribution requirement, permission is hereby granted, free
+of charge, to any person obtaining a copy of the Software, to:
+
+    - Use, copy, modify, and integrate the Software into any project,
+      including Commercial Use.
+    - Create derivative works based on the Software.
+    - Distribute projects that incorporate the Software.
+
+The above rights are granted provided that:
+
+    i.   Attribution is maintained in all copies and derivative works.
+    ii.  This license notice is included in all copies or substantial
+         portions of the Software source code.
+    iii. The Software is not Redistributed (see Section 5).
+
+3. COMMERCIAL LICENSES (PAID — REMOVES ATTRIBUTION)
+
+Commercial licenses are available to remove the Attribution requirement:
+
+a. "Indie License" — A one-time payment grants the licensee the right to
+use the Software without Attribution in a single Project, including
+Commercial Use. The license is perpetual and includes all updates
+available at the time of purchase.
+
+b. "Team License" — A one-time payment grants the licensee the right to
+use the Software without Attribution in unlimited Projects, including
+Commercial Use. The license is perpetual and includes all current and
+future icon packs and updates.
+
+Commercial license terms and pricing are available at https://pxlkit.xyz/pricing.
+
+4. CONTRIBUTIONS
+
+By submitting code, icons, or other material to this project (a
+"Contribution"), you grant the copyright holder a perpetual, worldwide,
+non-exclusive, royalty-free, irrevocable license to use, reproduce, modify,
+display, distribute, and sublicense your Contribution as part of the
+Software, under any license terms the copyright holder chooses, including
+commercial licenses.
+
+You represent that you have the right to grant this license and that your
+Contribution does not violate any third-party rights.
+
+5. RESTRICTIONS
+
+The following restrictions apply to all license tiers:
+
+a. NO REDISTRIBUTION AS ICON LIBRARY — You may NOT Redistribute the
+Software or any substantial portion of the icon data as a standalone
+icon library, icon pack, design asset kit, or competing product. You
+may, however, include the icons as part of a larger application or
+project that provides distinct functionality beyond the icons
+themselves.
+
+b. NO SUBLICENSING — You may not sublicense the Software to third parties
+as a standalone product. End users of your application do not need
+their own license.
+
+c. NO TRADEMARK USE — This license does not grant permission to use the
+trade names, trademarks, service marks, or product names of the
+licensor, except as required for Attribution or as needed for
+reasonable and customary use in describing the origin of the Software.
+
+6. DISCLAIMER OF WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+7. TERMINATION
+
+This license is effective until terminated. Your rights under this license
+will terminate automatically without notice if you fail to comply with any
+of its terms. Upon termination, you must cease all use and destroy all
+copies of the Software in your possession.
+
+Paid commercial licenses, once validly purchased, survive termination of the
+free Community License and remain perpetual, provided the licensee continues
+to comply with Sections 5 and 6.
+
+8. GOVERNING LAW
+
+This license shall be governed by and construed in accordance with the laws
+of the jurisdiction of the copyright holder's residence, without regard to
+its conflict of law provisions.
+
+---
+
+For questions about licensing, contact: info@pxlkit.xyz
+For commercial license purchases, visit: https://pxlkit.xyz/pricing

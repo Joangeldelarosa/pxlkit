@@ -1,0 +1,67 @@
+Arguments: 
+  /Users/macbook/.nvm/versions/node/v22.19.0/bin/node /Users/macbook/.yarn/bin/yarn.js isntall
+
+PATH: 
+  /Users/macbook/.antigravity/antigravity/bin:/Users/macbook/.console-ninja/.bin:/opt/homebrew/opt/php@8.2/bin:/opt/homebrew/opt/php@5.6/sbin:/opt/homebrew/opt/php@5.6/bin:/Users/macbook/.config/herd-lite/bin:/Users/macbook/.yarn/bin:/Users/macbook/.config/yarn/global/node_modules/.bin:/Users/macbook/.deno/bin:/Users/macbook/.bun/bin:/Users/macbook/.nvm/versions/node/v22.19.0/bin:/Users/macbook/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand:/Users/macbook/Library/Application Support/Code/User/globalStorage/github.copilot-chat/copilotCli:/Library/Frameworks/Python.framework/Versions/3.10/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/opt/postgresql@14/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/Library/TeX/texbin:/usr/local/go/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Users/macbook/Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand:/Users/macbook/Library/Application Support/Code/User/globalStorage/github.copilot-chat/copilotCli:/Users/macbook/.antigravity/antigravity/bin:/Users/macbook/.console-ninja/.bin:/opt/homebrew/opt/php@8.2/bin:/opt/homebrew/opt/php@5.6/sbin:/opt/homebrew/opt/php@5.6/bin:/Users/macbook/.config/herd-lite/bin:/Users/macbook/.local/bin:/Users/macbook/.yarn/bin:/Users/macbook/.config/yarn/global/node_modules/.bin:/Users/macbook/.deno/bin:/Users/macbook/.bun/bin:/Users/macbook/.nvm/versions/node/v22.19.0/bin:/Library/Frameworks/Python.framework/Versions/3.10/bin:/Users/macbook/.cargo/bin:/Users/macbook/.rvm/bin:/Users/macbook/Library/Android/sdk/emulator:/Users/macbook/Library/Android/sdk/tools:/Users/macbook/Library/Android/sdk/tools/bin:/Users/macbook/Library/Android/sdk/platform-tools:/Users/macbook/.lmstudio/bin:/Users/macbook/.rvm/bin:/Users/macbook/Library/Android/sdk/emulator:/Users/macbook/Library/Android/sdk/tools:/Users/macbook/Library/Android/sdk/tools/bin:/Users/macbook/Library/Android/sdk/platform-tools:/Users/macbook/.lmstudio/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  22.19.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  Error: Failed to replace env in config: ${NPM_TOKEN}
+      at /Users/macbook/.yarn/lib/cli.js:94933:13
+      at String.replace (<anonymous>)
+      at envReplace (/Users/macbook/.yarn/lib/cli.js:94928:16)
+      at Function.normalizeConfig (/Users/macbook/.yarn/lib/cli.js:31938:69)
+      at NpmRegistry.<anonymous> (/Users/macbook/.yarn/lib/cli.js:31968:34)
+      at Generator.next (<anonymous>)
+      at step (/Users/macbook/.yarn/lib/cli.js:310:30)
+      at /Users/macbook/.yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "pxlkit-monorepo",
+    "private": true,
+    "version": "1.0.0",
+    "author": {
+      "name": "Joangel De La Rosa",
+      "url": "https://github.com/joangeldelarosa"
+    },
+    "description": "Open source retro pixel art icon library",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/joangeldelarosa/pxlkit"
+    },
+    "homepage": "https://pxlkit.xyz",
+    "license": "SEE LICENSE IN LICENSE",
+    "workspaces": [
+      "packages/*",
+      "apps/*"
+    ],
+    "scripts": {
+      "dev": "turbo dev",
+      "build": "turbo build",
+      "lint": "turbo lint",
+      "clean": "turbo clean"
+    },
+    "devDependencies": {
+      "turbo": "^2.4.0",
+      "typescript": "^5.7.0"
+    },
+    "packageManager": "npm@10.9.0",
+    "engines": {
+      "node": ">=20"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

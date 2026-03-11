@@ -1,0 +1,34 @@
+{
+  "name": "pxlkit-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "author": {
+    "name": "Joangel De La Rosa",
+    "url": "https://github.com/joangeldelarosa"
+  },
+  "description": "Open source retro pixel art icon library",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joangeldelarosa/pxlkit"
+  },
+  "homepage": "https://pxlkit.xyz",
+  "license": "SEE LICENSE IN LICENSE",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "clean": "turbo clean"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "npm@10.9.0",
+  "engines": {
+    "node": ">=20"
+  }
+}
