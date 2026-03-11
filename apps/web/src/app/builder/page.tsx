@@ -1,7 +1,7 @@
 'use client';
 
 import { useReducer, useCallback, useState, useRef, useEffect, useMemo } from 'react';
-import { PxlKitIcon, AnimatedPxlKitIcon, generateIconCode, gridToSvg, generateAnimatedSvg, parseIconCode, parseAnyIconCode, isAnimatedIcon, RETRO_PALETTES } from '@pxlkit/core';
+import { PxlKitIcon, AnimatedPxlKitIcon, generateIconCode, gridToSvg, generateAnimatedSvg, parseIconCode, RETRO_PALETTES } from '@pxlkit/core';
 import type { PxlKitData, AnimatedPxlKitData, GridSize } from '@pxlkit/core';
 import { Pencil, Eraser, PaintBucket, Eyedropper, Play, Pause, Undo, Redo, Close, Check, SparkleSmall } from '@pxlkit/ui';
 import { PixelBareButton, PixelBareInput, PixelBareTextarea } from '../../components/ui-kit';
@@ -534,6 +534,7 @@ export default function BuilderPage() {
 
   // Load collection on mount + restore last editor state + detect incoming icon
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCollection(loadCollection());
 
     // Check for incoming icon from landing/icons page
@@ -595,14 +596,14 @@ export default function BuilderPage() {
   }, [state.animationMode, state.isPlaying, state.fps, state.frames.length]);
 
   // Build the PxlKitData from current state
-  const currentIcon: PxlKitData = {
+  const currentIcon: PxlKitData = useMemo(() => ({
     name: state.iconName || 'unnamed',
     size: state.size,
     category: state.category || 'custom',
     grid: state.grid.map((row) => row.join('')),
     palette: state.palette,
     tags: state.tags.split(',').map((t) => t.trim()).filter(Boolean),
-  };
+  }), [state.iconName, state.size, state.category, state.grid, state.palette, state.tags]);
 
   // Animated icon data (when in animation mode)
   const animatedIcon: AnimatedPxlKitData | null = useMemo(() => {
@@ -669,28 +670,7 @@ export default function BuilderPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Handle cell interaction
-  const handleCellDown = useCallback(
-    (x: number, y: number) => {
-      setIsPainting(true);
-      applyTool(x, y);
-    },
-    [state.tool, state.activeChar, state.grid]
-  );
-
-  const handleCellEnter = useCallback(
-    (x: number, y: number) => {
-      if (!isPainting) return;
-      if (state.tool === 'pencil') {
-        dispatch({ type: 'SET_PIXEL', x, y });
-      } else if (state.tool === 'eraser') {
-        dispatch({ type: 'ERASE_PIXEL', x, y });
-      }
-    },
-    [isPainting, state.tool]
-  );
-
-  function applyTool(x: number, y: number) {
+  const applyTool = useCallback((x: number, y: number) => {
     switch (state.tool) {
       case 'pencil':
         dispatch({ type: 'SET_PIXEL', x, y });
@@ -710,7 +690,30 @@ export default function BuilderPage() {
         break;
       }
     }
-  }
+  }, [state.tool, state.grid, state.palette]);
+
+  // Handle cell interaction
+  const handleCellDown = useCallback(
+    (x: number, y: number) => {
+      setIsPainting(true);
+      applyTool(x, y);
+    },
+    [applyTool]
+  );
+
+  const handleCellEnter = useCallback(
+    (x: number, y: number) => {
+      if (!isPainting) return;
+      if (state.tool === 'pencil') {
+        dispatch({ type: 'SET_PIXEL', x, y });
+      } else if (state.tool === 'eraser') {
+        dispatch({ type: 'ERASE_PIXEL', x, y });
+      }
+    },
+    [isPainting, state.tool]
+  );
+
+
 
   // Import handler
   function handleImport() {
@@ -879,6 +882,7 @@ export default function BuilderPage() {
   // Responsive viewport tracking
   const [vpWidth, setVpWidth] = useState(768);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVpWidth(window.innerWidth);
     const onResize = () => setVpWidth(window.innerWidth);
     window.addEventListener('resize', onResize);

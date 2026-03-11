@@ -68,7 +68,7 @@ export async function POST(request: Request) {
 
     let buyerEmail = buyerData?.email || 'customer@example.com';
     let buyerName = buyerData?.name || 'Developer';
-    let projectName = buyerData?.projectName || 'N/A';
+    const projectName = buyerData?.projectName || 'N/A';
     
     // DEV MODE OVERRIDE: Si estamos en local y forzamos el ID 'DEV_ORDER_ID' simularemos el éxito
     if (process.env.NODE_ENV === 'development' && orderID === 'DEV_ORDER_ID') {
@@ -157,8 +157,9 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, license: licenseKey });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('PayPal Capture Error:', error);
-    return NextResponse.json({ error: error.message || 'An error occurred during capture' }, { status: 500 });
+    const msg = error instanceof Error ? error.message : 'An error occurred during capture';
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

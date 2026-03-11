@@ -127,12 +127,12 @@ export function HeroCollage() {
   }, [iconPool]);
 
   /* ── Physics loop ── */
-  const tick = useCallback(() => {
+  const tick = useCallback(function tickFunc() {
     const icons = iconsRef.current;
     const mouse = mouseRef.current;
     const el = containerRef.current;
     if (!el || icons.length === 0) {
-      rafRef.current = requestAnimationFrame(tick);
+      rafRef.current = requestAnimationFrame(tickFunc);
       return;
     }
 
@@ -184,7 +184,7 @@ export function HeroCollage() {
     }
 
     forceRender((n) => n + 1);
-    rafRef.current = requestAnimationFrame(tick);
+    rafRef.current = requestAnimationFrame(tickFunc);
   }, []);
 
   /* ── Mouse tracking (relative to container) ── */

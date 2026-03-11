@@ -1540,7 +1540,10 @@ function useAnimationTrigger(trigger: AnimationTrigger = 'mount', onComplete?: (
   const [iv, setIV] = useState(false);
   const [clicking, setClicking] = useState(false);
   const wasClickRef = useRef(false);
-  wasClickRef.current = clicking;
+
+  useEffect(() => {
+    wasClickRef.current = clicking;
+  }, [clicking]);
 
   // IntersectionObserver for inView trigger
   useEffect(() => {

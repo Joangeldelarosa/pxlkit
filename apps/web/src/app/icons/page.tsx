@@ -3,13 +3,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { PxlKitIcon, AnimatedPxlKitIcon, gridToSvg, generateAnimatedSvg, isAnimatedIcon } from '@pxlkit/core';
-import type { PxlKitData, IconPack, AnimatedPxlKitData, AnyIcon, AnimationTrigger } from '@pxlkit/core';
+import type { PxlKitData, IconPack, AnimatedPxlKitData, AnimationTrigger } from '@pxlkit/core';
 import { GamificationPack } from '@pxlkit/gamification';
 import { FeedbackPack, Bell, CheckCircle, XCircle } from '@pxlkit/feedback';
 import { SocialPack } from '@pxlkit/social';
 import { WeatherPack } from '@pxlkit/weather';
 import { EffectsPack } from '@pxlkit/effects';
-import { Close, SparkleSmall, UiPack } from '@pxlkit/ui';
+import { Close, UiPack } from '@pxlkit/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ToastProvider';
 import type { ToastTone } from '@/components/ToastProvider';
@@ -51,6 +51,7 @@ export default function IconsPage() {
   // Reset anim controls when icon changes
   useEffect(() => {
     if (selectedIcon && isAnimatedIcon(selectedIcon)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAnimTrigger(selectedIcon.trigger ?? 'loop');
       setAnimSpeed(1);
       setAnimPlaying(true);
