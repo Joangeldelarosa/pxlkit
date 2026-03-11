@@ -1,0 +1,146 @@
+import type { AnimatedPxlKitData } from '@pxlkit/core';
+
+export const Hourglass: AnimatedPxlKitData = {
+  name: 'hourglass',
+  size: 16,
+  category: 'feedback',
+  palette: {
+    F: '#DAA520', // frame gold
+    S: '#F4D03F', // sand
+    E: '#FFF8DC', // empty glass
+    D: '#B8860B', // frame dark
+  },
+  frames: [
+    {
+      // Full top, empty bottom
+      grid: [
+        '..FFFFFFFFFF....',
+        '..FSSSSSSSSF....',
+        '...FSSSSSSSF....',
+        '...FSSSSSSSF....',
+        '....FSSSSF......',
+        '.....FSSF.......',
+        '......FF........',
+        '......FF........',
+        '.....F..F.......',
+        '....F....F......',
+        '...F......F.....',
+        '...F......F.....',
+        '..F........F....',
+        '..F........F....',
+        '..DDDDDDDDDD....',
+        '................',
+      ],
+    },
+    {
+      // Sand starting to fall
+      grid: [
+        '..FFFFFFFFFF....',
+        '..FSSSSSSSSF....',
+        '...FSSSSSEF.....',
+        '...FSSSSSEF.....',
+        '....FSSSSF......',
+        '.....FSSF.......',
+        '......FS........',
+        '......SF........',
+        '.....F..F.......',
+        '....F....F......',
+        '...F......F.....',
+        '...F......F.....',
+        '..F....SS..F....',
+        '..F...SSSS.F....',
+        '..DDDDDDDDDD....',
+        '................',
+      ],
+    },
+    {
+      // Half drained
+      grid: [
+        '..FFFFFFFFFF....',
+        '..FSSSSSSSSF....',
+        '...FE.SSSE.F....',
+        '...FE..SS..F....',
+        '....FE.S.F......',
+        '.....FESF.......',
+        '......FS........',
+        '......SF........',
+        '.....F..F.......',
+        '....F.SS.F......',
+        '...F.SSSS.F.....',
+        '...FSSSSSSF.....',
+        '..FSSSSSSSSF....',
+        '..FSSSSSSSSF....',
+        '..DDDDDDDDDD....',
+        '................',
+      ],
+    },
+    {
+      // Mostly drained
+      grid: [
+        '..FFFFFFFFFF....',
+        '..FE..SSS..F....',
+        '...FE..S..EF....',
+        '...FE..S..EF....',
+        '....FE.S.F......',
+        '.....FESF.......',
+        '......FS........',
+        '......SF........',
+        '.....FSSF.......',
+        '....FSSSSF......',
+        '...FSSSSSSF.....',
+        '...FSSSSSSF.....',
+        '..FSSSSSSSSF....',
+        '..FSSSSSSSSF....',
+        '..DDDDDDDDDD....',
+        '................',
+      ],
+    },
+    {
+      // Almost empty
+      grid: [
+        '..FFFFFFFFFF....',
+        '..FE.......F....',
+        '...FE..S..EF....',
+        '...FE.....EF....',
+        '....FE...F......',
+        '.....FEEF.......',
+        '......FE........',
+        '......SF........',
+        '.....FSSF.......',
+        '....FSSSSF......',
+        '...FSSSSSSF.....',
+        '...FSSSSSSF.....',
+        '..FSSSSSSSSF....',
+        '..FSSSSSSSSF....',
+        '..DDDDDDDDDD....',
+        '................',
+      ],
+    },
+    {
+      // Empty top, full bottom
+      grid: [
+        '..FFFFFFFFFF....',
+        '..FE.......F....',
+        '...FE.....EF....',
+        '...FE.....EF....',
+        '....FE..EF......',
+        '.....FEEF.......',
+        '......FE........',
+        '......EF........',
+        '.....FSSF.......',
+        '....FSSSSF......',
+        '...FSSSSSSF.....',
+        '...FSSSSSSF.....',
+        '..FSSSSSSSSF....',
+        '..FSSSSSSSSF....',
+        '..DDDDDDDDDD....',
+        '................',
+      ],
+    },
+  ],
+  frameDuration: 300,
+  loop: true,
+  trigger: 'loop',
+  tags: ['hourglass', 'time', 'timer', 'wait', 'animated', 'sand'],
+  author: 'pxlkit',
+};

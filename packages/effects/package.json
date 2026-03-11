@@ -1,0 +1,46 @@
+{
+  "name": "@pxlkit/effects",
+  "version": "1.0.1",
+  "description": "Animated visual effect icons — explosions, signals, particles, glows, and VFX",
+  "author": {
+    "name": "Joangel De La Rosa",
+    "url": "https://github.com/joangeldelarosa"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joangeldelarosa/pxlkit",
+    "directory": "packages/effects"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@pxlkit/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.7.0",
+    "rimraf": "^6.0.0"
+  }
+}

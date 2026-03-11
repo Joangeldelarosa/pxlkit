@@ -1,0 +1,97 @@
+{
+  "version": 3,
+  "skills": {
+    "remotion-resemble-ai": {
+      "source": "resemble-ai/remotion-resemble-skill",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/resemble-ai/remotion-resemble-skill.git",
+      "skillPath": "remotion-resemble-ai/SKILL.md",
+      "skillFolderHash": "d2ced2d3da906f1e0329bed39bb300fd5902eb7c",
+      "installedAt": "2026-02-07T21:35:59.031Z",
+      "updatedAt": "2026-02-07T21:35:59.031Z"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/skills.git",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "skillFolderHash": "c2f31172b6f256272305a5e6e7228b258446899f",
+      "installedAt": "2026-02-07T21:36:06.494Z",
+      "updatedAt": "2026-02-07T21:36:06.494Z"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/agent-skills.git",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "skillFolderHash": "079b06a135401704ea94ab74c7c9d86c92ba259f",
+      "installedAt": "2026-02-07T21:37:41.316Z",
+      "updatedAt": "2026-02-07T21:37:41.316Z"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/anthropics/skills.git",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "skillFolderHash": "928950704df8a8b885c03de5da626331e6f29cf8",
+      "installedAt": "2026-02-07T21:37:55.209Z",
+      "updatedAt": "2026-02-07T21:37:55.209Z"
+    },
+    "remotion-best-practices": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/remotion-dev/skills.git",
+      "skillPath": "skills/remotion/SKILL.md",
+      "skillFolderHash": "a468c65bb3901b1afb95c1587e035f0fc5bb674a",
+      "installedAt": "2026-02-07T21:38:45.187Z",
+      "updatedAt": "2026-02-07T21:38:45.187Z"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "skillFolderHash": "986c64ad9b8e196a4a737c01872c2eda790daba1",
+      "installedAt": "2026-02-07T21:39:16.337Z",
+      "updatedAt": "2026-02-07T21:39:16.337Z"
+    },
+    "marketing-psychology": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/coreyhaines31/marketingskills.git",
+      "skillPath": "skills/marketing-psychology/SKILL.md",
+      "skillFolderHash": "d571ffd2d18cc5f5d4300a0fb1f6595cfbdad5c9",
+      "installedAt": "2026-02-07T21:40:14.134Z",
+      "updatedAt": "2026-02-07T21:40:14.134Z"
+    },
+    "using-superpowers": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/using-superpowers/SKILL.md",
+      "skillFolderHash": "986738c8d463796edec77e86824e53c6b03e61da",
+      "installedAt": "2026-02-07T21:41:18.942Z",
+      "updatedAt": "2026-02-07T21:41:18.942Z"
+    },
+    "enhance-prompt": {
+      "source": "google-labs-code/stitch-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/google-labs-code/stitch-skills.git",
+      "skillPath": "skills/enhance-prompt/SKILL.md",
+      "skillFolderHash": "a11a8be47c56a2e84bf4ff737c98364129a7a9a7",
+      "installedAt": "2026-02-07T21:44:02.704Z",
+      "updatedAt": "2026-02-07T21:44:02.704Z"
+    }
+  },
+  "dismissed": {
+    "findSkillsPrompt": true
+  },
+  "lastSelectedAgents": [
+    "amp",
+    "codex",
+    "gemini-cli",
+    "github-copilot",
+    "kimi-cli",
+    "opencode"
+  ]
+}
