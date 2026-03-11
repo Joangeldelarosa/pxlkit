@@ -5,10 +5,6 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useToast } from '../../components/ToastProvider';
-import { PxlKitIcon } from '@pxlkit/core';
-import { Trophy, Lightning } from '@pxlkit/gamification';
-import { Heart } from '@pxlkit/social';
-import { CheckCircle } from '@pxlkit/feedback';
 import { PixelButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
 
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
@@ -347,9 +343,9 @@ function PlanCard({ plan }: { plan: Plan }) {
         {plan.features.map((f) => (
           <li key={f.text} className="flex items-start gap-2.5">
             {f.included ? (
-              <PixelCheck className={`w-3.5 h-3.5 mt-0.5 flex-shrink-0 ${f.highlight ? c.text : 'text-retro-green/70'}`} />
+              <PixelCheck className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${f.highlight ? c.text : 'text-retro-green/70'}`} />
             ) : (
-              <PixelX className="w-3 h-3 mt-0.5 flex-shrink-0 text-retro-muted/30" />
+              <PixelX className="w-3 h-3 mt-0.5 shrink-0 text-retro-muted/30" />
             )}
             <span
               className={`text-sm font-mono ${
@@ -450,7 +446,7 @@ function PurchaseCheckout({ plan, buttonClass }: { plan: Plan, buttonClass: stri
 
             {!isProcessing && <button onClick={() => setIsOpen(false)} className="absolute top-4 right-4 text-retro-muted hover:text-retro-text text-xl">&times;</button>}
             
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <h3 className="font-pixel text-lg text-retro-text mb-2 tracking-wide uppercase">{plan.name} CHECKOUT</h3>
               <p className="text-retro-muted font-mono text-xs mb-6">Complete your details to secure your license.</p>
             </div>
@@ -495,7 +491,7 @@ function PurchaseCheckout({ plan, buttonClass }: { plan: Plan, buttonClass: stri
                         }],
                       });
                     }}
-                    onApprove={async (data, actions) => {
+                    onApprove={async (data) => {
                       await capturePayment(data.orderID);
                     }}
                     onError={(err) => {
@@ -679,7 +675,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
       >
         <span className="text-sm sm:text-base text-retro-text font-mono pr-4">{question}</span>
         <span
-          className={`text-retro-muted font-pixel text-xs flex-shrink-0 transition-transform duration-200 ${
+          className={`text-retro-muted font-pixel text-xs shrink-0 transition-transform duration-200 ${
             open ? 'rotate-45' : ''
           }`}
         >

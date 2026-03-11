@@ -1,7 +1,7 @@
 'use client';
 
 import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon, parseAnyIconCode } from '@pxlkit/core';
-import type { PxlKitData, AnimatedPxlKitData, AnyIcon } from '@pxlkit/core';
+import type { PxlKitData, AnyIcon } from '@pxlkit/core';
 import {
   Trophy, Lightning, GamificationPack, FireSword,
 } from '@pxlkit/gamification';
@@ -31,7 +31,6 @@ import {
   PixelSection,
   PixelTextarea,
   PixelParallaxLayer,
-  PixelParallaxGroup,
   PixelMouseParallax,
   UI_KIT_COMPONENTS,
 } from '@pxlkit/ui-kit';

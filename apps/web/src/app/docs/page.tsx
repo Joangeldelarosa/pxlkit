@@ -8,9 +8,9 @@ import { Sun, WeatherPack } from '@pxlkit/weather';
 import { EffectsPack } from '@pxlkit/effects';
 import { UiPack, Pencil } from '@pxlkit/ui';
 import { FireSword } from '@pxlkit/gamification';
-import { SparkleSmall, Menu } from '@pxlkit/ui';
+import { Menu } from '@pxlkit/ui';
 import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/core';
-import type { IconPack, PxlKitData, AnyIcon } from '@pxlkit/core';
+import type { IconPack, AnyIcon } from '@pxlkit/core';
 import { PixelTextLink, PxlKitButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
 
 /* ─── Dynamic pack registry ─── */
