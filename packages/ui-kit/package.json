@@ -1,0 +1,61 @@
+{
+  "name": "@pxlkit/ui-kit",
+  "version": "1.0.3",
+  "description": "Retro pixel art UI kit and React components for pxlkit",
+  "author": {
+    "name": "Joangel De La Rosa",
+    "url": "https://github.com/joangeldelarosa"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joangeldelarosa/pxlkit",
+    "directory": "packages/ui-kit"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./styles.css"
+  },
+  "files": [
+    "dist",
+    "styles.css"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "lint": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
+  },
+  "dependencies": {
+    "@pxlkit/core": "^1.0.0",
+    "@pxlkit/ui": "^1.0.1",
+    "clsx": "^2.1.0",
+    "tailwind-merge": "^2.2.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0 || ^19.0.0",
+    "@types/react-dom": "^18.2.0 || ^19.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "pixel-art",
+    "ui-kit",
+    "react",
+    "components",
+    "retro",
+    "pxlkit"
+  ]
+}

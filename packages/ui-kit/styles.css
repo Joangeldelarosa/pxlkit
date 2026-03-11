@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --color-retro-bg: #F2F0EB;
+  --color-retro-surface: #E6E2DC;
+  --color-retro-card: #DCD8D0;
+  --color-retro-text: #1A1A2E;
+  --color-retro-border: #BEBAA2;
+  --color-retro-primary: #4F46E5;
+  --color-retro-secondary: #FBBF24;
+  --color-retro-accent: #10B981;
+  --color-retro-muted: #646478;
+
+  /* UI Kit specific colors */
+  --color-retro-green: #008C4B;
+  --color-retro-green-hover: #006E3A;
+  --color-retro-cyan: #24827A;
+  --color-retro-red: #C83741;
+  --color-retro-gold: #B48700;
+  --color-retro-purple: #8237C8;
+  --color-retro-pink: #C84678;
+
+  --font-pixel: "Press Start 2P", monospace;
+  --font-sans: "Inter", sans-serif;
+
+  --shadow-retro: 4px 4px 0px 0px currentColor;
+  --shadow-retro-hover: 2px 2px 0px 0px currentColor;
+}
+
+@layer utilities {
+  .pixel-corners {
+    clip-path: polygon(
+      4px 0, calc(100% - 4px) 0, 
+      100% 4px, 100% calc(100% - 4px), 
+      calc(100% - 4px) 100%, 4px 100%, 
+      0 calc(100% - 4px), 0 4px
+    );
+  }
+
+  .btn-retro {
+    @apply px-6 py-3 font-pixel tracking-wider border-2 transition-all duration-150;
+    box-shadow: 4px 4px 0px 0px currentColor;
+  }
+  .btn-retro:hover {
+    box-shadow: 2px 2px 0px 0px currentColor;
+    transform: translate(2px, 2px);
+  }
+  .btn-retro:active {
+    box-shadow: 0px 0px 0px 0px currentColor;
+    transform: translate(4px, 4px);
+  }
+
+  .pixel-border {
+    box-shadow:
+      inset -4px -4px 0px 0px rgba(0, 0, 0, 0.3),
+      inset 4px 4px 0px 0px rgba(255, 255, 255, 0.1),
+      0 0 0 2px var(--color-retro-border);
+  }
+}

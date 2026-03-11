@@ -54,7 +54,7 @@ import {
   PixelParallaxGroup,
   PixelMouseParallax,
   UI_KIT_COMPONENTS,
-} from '../../components/ui-kit';
+} from '@pxlkit/ui-kit';
 import {
   Package, Search, Check, Grid, Edit, Robot, Copy, Gear, Menu, Home, ArrowRight, SparkleSmall, Clock, Lock,
 } from '@pxlkit/ui';
@@ -622,7 +622,13 @@ export default function UIKitPage() {
                 and icon props for consistent theming. See <CompLink id="pixel-button">PixelButton</CompLink>, <CompLink id="pixel-input">PixelInput</CompLink>, and <CompLink id="pixel-select">PixelSelect</CompLink> for examples.
               </p>
               <CodeBlock
-                code={`import { PixelButton, PixelCard, PixelInput } from '@/components/ui-kit';
+                // 1. Setup your Tailwind CSS file (e.g., index.css)
+// @import "tailwindcss";
+// @import "@pxlkit/ui-kit/styles.css";
+// @source "../node_modules/@pxlkit/ui-kit";
+
+// 2. Import components in your React app
+import { PixelButton, PixelCard, PixelInput } from '@pxlkit/ui-kit';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Trophy } from '@pxlkit/gamification';
 import { Search } from '@pxlkit/ui';

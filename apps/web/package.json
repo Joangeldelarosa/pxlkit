@@ -16,6 +16,7 @@
     "@pxlkit/gamification": "^1.0.1",
     "@pxlkit/social": "^1.0.1",
     "@pxlkit/ui": "^1.0.1",
+    "@pxlkit/ui-kit": "^1.0.1",
     "@pxlkit/weather": "^1.0.1",
     "@vercel/analytics": "^2.0.0",
     "@vercel/kv": "^3.0.0",

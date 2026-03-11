@@ -34,7 +34,7 @@ import {
   PixelParallaxGroup,
   PixelMouseParallax,
   UI_KIT_COMPONENTS,
-} from '../components/ui-kit';
+} from '@pxlkit/ui-kit';
 
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
 

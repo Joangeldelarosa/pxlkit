@@ -4,7 +4,7 @@ import { useReducer, useCallback, useState, useRef, useEffect, useMemo } from 'r
 import { PxlKitIcon, AnimatedPxlKitIcon, generateIconCode, gridToSvg, generateAnimatedSvg, parseIconCode, RETRO_PALETTES } from '@pxlkit/core';
 import type { PxlKitData, AnimatedPxlKitData, GridSize } from '@pxlkit/core';
 import { Pencil, Eraser, PaintBucket, Eyedropper, Play, Pause, Undo, Redo, Close, Check, SparkleSmall } from '@pxlkit/ui';
-import { PixelBareButton, PixelBareInput, PixelBareTextarea } from '../../components/ui-kit';
+import { PixelBareButton, PixelBareInput, PixelBareTextarea } from '@pxlkit/ui-kit';
 
 // ────────────────────────────────────────────
 // Types

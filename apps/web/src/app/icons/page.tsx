@@ -13,7 +13,7 @@ import { Close, UiPack } from '@pxlkit/ui';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ToastProvider';
 import type { ToastTone } from '@/components/ToastProvider';
-import { PixelButton, PxlKitButton, PixelInput, PixelSlider } from '../../components/ui-kit';
+import { PixelButton, PxlKitButton, PixelInput, PixelSlider } from '@pxlkit/ui-kit';
 
 // ─── Registry ───────────────────────────────
 const ALL_PACKS: IconPack[] = [GamificationPack, FeedbackPack, SocialPack, WeatherPack, UiPack, EffectsPack];

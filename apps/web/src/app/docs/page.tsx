@@ -11,7 +11,7 @@ import { FireSword } from '@pxlkit/gamification';
 import { SparkleSmall, Menu } from '@pxlkit/ui';
 import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/core';
 import type { IconPack, PxlKitData, AnyIcon } from '@pxlkit/core';
-import { PixelTextLink, PxlKitButton, UI_KIT_COMPONENTS } from '../../components/ui-kit';
+import { PixelTextLink, PxlKitButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
 
 /* ─── Dynamic pack registry ─── */
 const ALL_PACKS: { pack: IconPack; previewIcon: AnyIcon; accent: string }[] = [
@@ -541,7 +541,7 @@ const monoSvg = generateAnimatedSvg(FireSword, {
               and supports tones, positions, durations, and animated icons.
             </P>
             <CodeBlock title="Quick Usage">{`import { useToast } from '@/components/ToastProvider';
-import { PixelButton } from '@/components/ui-kit';
+import { PixelButton } from '@pxlkit/ui-kit';
 import { CheckCircle } from '@pxlkit/feedback';
 
 function App() {
@@ -667,7 +667,14 @@ if (icon) {
               selects, modals, toasts, tables, badges, avatars, skeletons, layout primitives, and animation wrappers.
             </P>
             <CodeBlock title="UI Kit Route">{`/ui-kit#getting-started`}</CodeBlock>
-            <CodeBlock title="Import Components">{`import { PixelButton, PixelCard, PixelInput, PixelSelect } from '@/components/ui-kit';
+            <CodeBlock title="Install UI Kit">{`npm install @pxlkit/core @pxlkit/ui-kit tailwindcss`}</CodeBlock>
+            <CodeBlock title="CSS Setup (Tailwind v4)">{`/* Add this to your global stylesheet (e.g., globals.css or index.css) /
+@import "tailwindcss";
+@import "@pxlkit/ui-kit/styles.css";
+
+/* Tell Tailwind to scan the package for its utility classes /
+@source "../node_modules/@pxlkit/ui-kit";`}</CodeBlock>
+            <CodeBlock title="Import Components">{`import { PixelButton, PixelCard, PixelInput, PixelSelect } from '@pxlkit/ui-kit';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Trophy } from '@pxlkit/gamification';
 

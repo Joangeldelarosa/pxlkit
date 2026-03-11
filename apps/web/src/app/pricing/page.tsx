@@ -9,8 +9,7 @@ import { PxlKitIcon } from '@pxlkit/core';
 import { Trophy, Lightning } from '@pxlkit/gamification';
 import { Heart } from '@pxlkit/social';
 import { CheckCircle } from '@pxlkit/feedback';
-import { PixelButton } from '../../components/ui-kit';
-import { UI_KIT_COMPONENTS } from '../../components/ui-kit';
+import { PixelButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
 
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
 
