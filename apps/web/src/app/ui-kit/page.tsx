@@ -2476,7 +2476,7 @@ const [active, setActive] = useState(false);
 
             {/* ══════════════════ COMPONENT INVENTORY ══════════════════ */}
             <section className="pt-10">
-              <PixelDivider label="Full Inventory" tone="green" />
+              <PixelDivider label="Full Inventory" tone="green" spacing="lg" />
               <div className="mt-6 rounded-xl border border-retro-border/40 bg-retro-card/40 p-5">
                 <div className="mb-3 flex items-center justify-between">
                   <h3 className="font-pixel text-[10px] text-retro-green">ALL COMPONENTS ({UI_KIT_COMPONENTS.length}) + PIXELTOAST DOCS</h3>

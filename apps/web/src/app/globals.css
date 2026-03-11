@@ -1,43 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "@pxlkit/ui-kit/styles.css";
+
+/* Tell Tailwind to scan the package for its utility classes */
+@source "../../../../packages/ui-kit";
 
 @layer base {
-  /* ─── Light theme (default) ─── */
   :root {
-    --retro-bg: 242 240 235;
-    --retro-surface: 230 226 220;
-    --retro-card: 220 216 208;
-    --retro-border: 190 186 178;
-    --retro-green: 0 140 75;
-    --retro-green-dim: 0 110 58;
-    --retro-cyan: 36 130 122;
-    --retro-red: 200 55 65;
-    --retro-gold: 180 135 0;
-    --retro-purple: 130 55 200;
-    --retro-pink: 200 70 120;
-    --retro-text: 26 26 46;
-    --retro-muted: 100 100 120;
     --grid-line: rgba(0, 0, 0, 0.06);
   }
 
-  /* ─── Dark theme ─── */
   .dark {
-    --retro-bg: 10 10 15;
-    --retro-surface: 18 18 26;
-    --retro-card: 26 26 46;
-    --retro-border: 42 42 62;
-    --retro-green: 0 255 136;
-    --retro-green-dim: 0 204 106;
-    --retro-cyan: 78 205 196;
-    --retro-red: 255 107 107;
-    --retro-gold: 255 215 0;
-    --retro-purple: 168 85 247;
-    --retro-pink: 255 119 168;
-    --retro-text: 232 230 227;
-    --retro-muted: 136 136 170;
     --grid-line: rgba(255, 255, 255, 0.04);
   }
 
@@ -58,7 +32,10 @@
   }
 
   body {
-    @apply bg-retro-bg text-retro-text font-body antialiased;
+    background-color: var(--color-retro-bg);
+    color: var(--color-retro-text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
@@ -84,7 +61,8 @@
   }
 
   ::selection {
-    @apply bg-retro-green/20 text-retro-green;
+    background-color: color-mix(in srgb, var(--color-retro-green-base) 20%, transparent);
+    color: var(--color-retro-green);
   }
 
   /* Custom scrollbar */
@@ -93,17 +71,18 @@
     height: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-retro-bg;
+    background-color: var(--color-retro-bg);
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-retro-border rounded;
+    background-color: var(--color-retro-border);
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-retro-muted;
+    background-color: var(--color-retro-muted);
   }
 }
 
-@layer components {
+@layer utilities {
   /* Scanline overlay effect */
   .scanlines::after {
     content: '';
@@ -128,40 +107,26 @@
     background-size: 32px 32px;
   }
 
-  /* Pixel border utility */
-  .pixel-border {
-    box-shadow:
-      inset -4px -4px 0px 0px rgba(0, 0, 0, 0.3),
-      inset 4px 4px 0px 0px rgba(255, 255, 255, 0.1),
-      0 0 0 2px rgb(var(--retro-border));
-  }
-
-  /* Retro button style */
-  .btn-retro {
-    @apply px-6 py-3 font-pixel text-xs uppercase tracking-wider border-2 transition-all duration-150;
-    box-shadow: 4px 4px 0px 0px currentColor;
-  }
-  .btn-retro:hover {
-    box-shadow: 2px 2px 0px 0px currentColor;
-    transform: translate(2px, 2px);
-  }
-  .btn-retro:active {
-    box-shadow: 0px 0px 0px 0px currentColor;
-    transform: translate(4px, 4px);
-  }
-
   /* Code block styling */
   .code-block {
-    @apply bg-retro-bg border border-retro-border rounded-lg p-4 font-mono text-sm overflow-x-auto;
+    background-color: var(--color-retro-bg);
+    border: 1px solid var(--color-retro-border);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    overflow-x: auto;
     tab-size: 2;
   }
 
   /* Pixel grid cell */
   .grid-cell {
-    @apply border border-retro-border/30 transition-colors duration-75 cursor-pointer;
+    border: 1px solid color-mix(in srgb, var(--color-retro-border-base) 30%, transparent);
+    transition: border-color 75ms linear;
+    cursor: pointer;
   }
   .grid-cell:hover {
-    @apply border-retro-green/50;
+    border-color: color-mix(in srgb, var(--color-retro-green-base) 50%, transparent);
   }
 
   /* Glow text */
@@ -178,9 +143,7 @@
   .theme-transition {
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
-}
 
-@layer utilities {
   .text-balance {
     text-wrap: balance;
   }

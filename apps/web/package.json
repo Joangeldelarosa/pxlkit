@@ -16,8 +16,9 @@
     "@pxlkit/gamification": "^1.0.1",
     "@pxlkit/social": "^1.0.1",
     "@pxlkit/ui": "^1.0.1",
-    "@pxlkit/ui-kit": "^1.0.1",
+    "@pxlkit/ui-kit": "^1.0.5",
     "@pxlkit/weather": "^1.0.1",
+    "@tailwindcss/postcss": "^4.2.1",
     "@vercel/analytics": "^2.0.0",
     "@vercel/kv": "^3.0.0",
     "framer-motion": "^11.15.0",
@@ -36,7 +37,7 @@
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.1.6",
     "postcss": "^8.4.0",
-    "tailwindcss": "^3.4.0",
+    "tailwindcss": "^4.2.1",
     "typescript": "^5.7.0"
   }
 }

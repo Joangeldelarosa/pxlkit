@@ -254,7 +254,7 @@ export function PixelKbd({ children }: { children: React.ReactNode }) {
 export function PixelColorSwatch({ name, cssVar }: { name: string; cssVar: string }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="h-8 w-8 rounded-md border border-retro-border/50" style={{ backgroundColor: `rgb(var(${cssVar}))` }} />
+      <div className="h-8 w-8 rounded-md border border-retro-border/50" style={{ backgroundColor: `var(${cssVar})` }} />
       <div>
         <p className="text-xs font-mono text-retro-text">{name}</p>
         <p className="text-[10px] font-mono text-retro-muted">{cssVar}</p>

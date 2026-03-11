@@ -1,30 +1,89 @@
 @import "tailwindcss";
 
 @theme {
-  --color-retro-bg: #F2F0EB;
-  --color-retro-surface: #E6E2DC;
-  --color-retro-card: #DCD8D0;
-  --color-retro-text: #1A1A2E;
-  --color-retro-border: #BEBAA2;
-  --color-retro-primary: #4F46E5;
-  --color-retro-secondary: #FBBF24;
-  --color-retro-accent: #10B981;
-  --color-retro-muted: #646478;
+  --color-retro-bg: var(--retro-bg);
+  --color-retro-surface: var(--retro-surface);
+  --color-retro-card: var(--retro-card);
+  --color-retro-text: var(--retro-text);
+  --color-retro-border: var(--retro-border);
+  --color-retro-primary: var(--retro-primary);
+  --color-retro-secondary: var(--retro-secondary);
+  --color-retro-accent: var(--retro-accent);
+  --color-retro-muted: var(--retro-muted);
 
-  /* UI Kit specific colors */
-  --color-retro-green: #008C4B;
-  --color-retro-green-hover: #006E3A;
-  --color-retro-cyan: #24827A;
-  --color-retro-red: #C83741;
-  --color-retro-gold: #B48700;
-  --color-retro-purple: #8237C8;
-  --color-retro-pink: #C84678;
+  --color-retro-green: var(--retro-green);
+  --color-retro-green-hover: var(--retro-green-hover);
+  --color-retro-cyan: var(--retro-cyan);
+  --color-retro-red: var(--retro-red);
+  --color-retro-gold: var(--retro-gold);
+  --color-retro-purple: var(--retro-purple);
+  --color-retro-pink: var(--retro-pink);
 
   --font-pixel: "Press Start 2P", monospace;
   --font-sans: "Inter", sans-serif;
-
+  
   --shadow-retro: 4px 4px 0px 0px currentColor;
   --shadow-retro-hover: 2px 2px 0px 0px currentColor;
+  --shadow-pixel: 4px 4px 0px 0px rgba(0, 255, 136, 0.3);
+  --shadow-pixel-lg: 6px 6px 0px 0px rgba(0, 255, 136, 0.2);
+  --shadow-pixel-gold: 4px 4px 0px 0px rgba(255, 215, 0, 0.3);
+
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-scanlines: scanlines 8s linear infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes scanlines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+  }
+}
+
+@layer base {
+  :root, :host {
+    /* Light Theme Hex Colors */
+    --retro-bg: #F2F0EB;
+    --retro-surface: #E6E2DC;
+    --retro-card: #DCD8D0;
+    --retro-text: #1A1A2E;
+    --retro-border: #BEBAA2;
+    --retro-primary: #4F46E5;
+    --retro-secondary: #FBBF24;
+    --retro-accent: #10B981;
+    --retro-muted: #646478;
+    
+    --retro-green: #008C4B;
+    --retro-green-hover: #006E3A;
+    --retro-cyan: #24827A;
+    --retro-red: #C83741;
+    --retro-gold: #B48700;
+    --retro-purple: #8237C8;
+    --retro-pink: #C84678;
+  }
+
+  .dark {
+    /* Dark Theme Hex Colors */
+    --retro-bg: #0A0A0F;
+    --retro-surface: #12121A;
+    --retro-card: #1A1A2E;
+    --retro-border: #2A2A3E;
+    --retro-text: #E8E6E3;
+    --retro-primary: #818CF8;
+    --retro-secondary: #FCD34D;
+    --retro-accent: #34D399;
+    --retro-muted: #8888AA;
+    
+    --retro-green: #00FF88;
+    --retro-green-hover: #00CC6A;
+    --retro-cyan: #4ECDC4;
+    --retro-red: #FF6B6B;
+    --retro-gold: #FFD700;
+    --retro-purple: #A855F7;
+    --retro-pink: #FF77A8;
+  }
 }
 
 @layer utilities {
@@ -38,7 +97,13 @@
   }
 
   .btn-retro {
-    @apply px-6 py-3 font-pixel tracking-wider border-2 transition-all duration-150;
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-pixel);
+    letter-spacing: 0.05em;
+    border-width: 2px;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
     box-shadow: 4px 4px 0px 0px currentColor;
   }
   .btn-retro:hover {
@@ -54,6 +119,6 @@
     box-shadow:
       inset -4px -4px 0px 0px rgba(0, 0, 0, 0.3),
       inset 4px 4px 0px 0px rgba(255, 255, 255, 0.1),
-      0 0 0 2px var(--color-retro-border);
+      0 0 0 2px var(--color-retro-border-base);
   }
 }

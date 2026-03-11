@@ -276,7 +276,7 @@ function App() {
               Pxlkit ships with {ALL_PACKS.length} icon packs. Each pack can contain
               both static and animated icons. Install only the ones you need &mdash; they&apos;re fully tree-shakeable.
             </P>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {ALL_PACKS.map(({ pack, previewIcon, accent }) => {
                 const animated = isAnimatedIcon(previewIcon);
                 return (
@@ -791,17 +791,19 @@ function Section({
 }) {
   return (
     <section id={id} className="scroll-mt-24">
-      <h2 className="font-pixel text-sm text-retro-gold mb-4 pb-2 border-b border-retro-border/30">
+      <h2 className="font-pixel text-sm text-retro-gold mb-6 pb-2 border-b border-retro-border/30">
         {title}
       </h2>
-      {children}
+      <div className="space-y-6">
+        {children}
+      </div>
     </section>
   );
 }
 
 function P({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-sm text-retro-muted leading-relaxed mb-4">{children}</p>
+    <p className="text-sm text-retro-muted leading-relaxed">{children}</p>
   );
 }
 
