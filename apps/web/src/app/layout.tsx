@@ -4,6 +4,7 @@ import { Footer } from '../components/Footer';
 import { ThemeProvider } from '../components/ThemeProvider';
 import { ToastProvider } from '../components/ToastProvider';
 import './globals.css';
+import { Analytics } from "@vercel/analytics/next";
 
 /* ─── SEO Constants ─── */
 const SITE_NAME = 'Pxlkit';
@@ -199,6 +200,7 @@ export default function RootLayout({
             </div>
           </ToastProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );

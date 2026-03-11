@@ -17,6 +17,7 @@
     "@pxlkit/social": "^1.0.1",
     "@pxlkit/ui": "^1.0.1",
     "@pxlkit/weather": "^1.0.1",
+    "@vercel/analytics": "^2.0.0",
     "@vercel/kv": "^3.0.0",
     "framer-motion": "^11.15.0",
     "next": "^15.1.0",
