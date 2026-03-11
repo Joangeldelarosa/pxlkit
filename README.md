@@ -5,12 +5,12 @@
 <h1 align="center">Pxlkit</h1>
 
 <p align="center">
-  <strong>Open-source retro React UI kit &amp; pixel art icon library</strong><br/>
-  40+ components, 204+ hand-crafted 16×16 icons, visual builder, toast system &mdash; all in TypeScript.
+  <strong>Bring retro aesthetics to the modern web.</strong><br/>
+  Pxlkit is a comprehensive React UI toolkit and icon library featuring over 200 pixel art icons divided into 6 themed packs. Includes 40+ styled components, animated SVGs, a visual builder, and a robust toast system.
 </p>
 
 <p align="center">
-  <a href="https://pxlkit.xyz"><img src="https://img.shields.io/badge/docs-pxlkit.xyz-00FF88?style=flat" alt="Documentation" /></a>
+  <a href="https://pxlkit.xyz"><img src="https://img.shields.io/badge/docs-pxlkit.xyz-00FF88?style=flat&logo=vercel&logoColor=black" alt="Documentation" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Pxlkit%20v1.0-blue.svg" alt="Pxlkit License" /></a>
   <img src="https://img.shields.io/badge/icons-204%2B-FFD700?style=flat" alt="204+ icons" />
   <img src="https://img.shields.io/badge/react-%E2%89%A518-61DAFB?logo=react&logoColor=white" alt="React ≥18" />
@@ -21,7 +21,7 @@
 
 ## Overview
 
-**Pxlkit** is a monorepo containing **204+ pixel art icons** organized into themed packs, a retro React UI kit with **40+ components**, a core rendering engine, and a Next.js showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly.
+**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **204+ pixel art icons** organized into themed packs, a retro React UI kit with **40+ components**, a core rendering engine, and a Next.js showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. You can browse and visually edit all icons at the [official website](https://pxlkit.xyz).
 
 ```
 pxlkit/
