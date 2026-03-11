@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import {
   PixelAccordion,
@@ -56,11 +56,11 @@ import {
   UI_KIT_COMPONENTS,
 } from '@pxlkit/ui-kit';
 import {
-  Package, Search, Check, Grid, Edit, Robot, Copy, Gear, Menu, Home, ArrowRight, SparkleSmall, Clock, Lock,
+  Package, Search, Check, Grid, Edit, Robot, Copy, Gear, Menu, Home, ArrowRight, SparkleSmall,
 } from '@pxlkit/ui';
-import { Trophy, Lightning, FireSword, Crown, Sword, Shield, Coin, Star } from '@pxlkit/gamification';
+import { Trophy, Lightning, FireSword, Crown, Shield, Coin, Star } from '@pxlkit/gamification';
 import { Bell, CheckCircle, WarningTriangle, InfoCircle } from '@pxlkit/feedback';
-import { Heart, Message, Smile, ThumbsUp } from '@pxlkit/social';
+import { Heart, Message } from '@pxlkit/social';
 import { CodeBlock } from '../../components/CodeBlock';
 import { useToast, type ToastPosition, type ToastTone } from '../../components/ToastProvider';
 
