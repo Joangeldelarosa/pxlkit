@@ -622,7 +622,7 @@ export default function UIKitPage() {
                 and icon props for consistent theming. See <CompLink id="pixel-button">PixelButton</CompLink>, <CompLink id="pixel-input">PixelInput</CompLink>, and <CompLink id="pixel-select">PixelSelect</CompLink> for examples.
               </p>
               <CodeBlock
-                // 1. Setup your Tailwind CSS file (e.g., index.css)
+                code={`// 1. Setup your Tailwind CSS file (e.g., index.css)
 // @import "tailwindcss";
 // @import "@pxlkit/ui-kit/styles.css";
 // @source "../node_modules/@pxlkit/ui-kit";
