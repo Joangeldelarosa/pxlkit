@@ -1,0 +1,81 @@
+name: Feature Request
+description: Suggest a new feature or improvement for pxlkit
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please fill out the sections below to help us understand your request.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: A clear and concise description of the feature you'd like to see.
+      placeholder: Describe the feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe the problem this feature would solve or the use case it enables.
+      placeholder: |
+        As a developer, I need to...
+        Because...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe how you'd like this feature to work. Include API designs, examples, or mockups if possible.
+      placeholder: |
+        I would like a new function/component that...
+        Example usage:
+        ```ts
+        import { newFeature } from '@pxlkit/core';
+        newFeature({ ... });
+        ```
+    validations:
+      required: true
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Target Package
+      description: Which pxlkit package should this feature be added to?
+      options:
+        - "@pxlkit/core"
+        - "@pxlkit/ui-kit"
+        - "@pxlkit/ui"
+        - "New Package"
+        - "Other / Multiple"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - "Nice to have"
+        - "Would significantly improve my workflow"
+        - "Blocking my use of pxlkit"
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+      placeholder: I've tried... but it doesn't work because...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or references about the feature request here.
