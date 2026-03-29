@@ -1,8 +1,15 @@
 name: Publish to npm
 
 on:
+  push:
+    tags:
+      - "v*"
   release:
     types: [published]
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -30,37 +37,51 @@ jobs:
       - name: Validate icons
         run: node validate-icons.js
 
+      # Publish @pxlkit/core first — other packages depend on it
       - name: Publish @pxlkit/core
         run: npm publish --workspace=packages/core --provenance --access public
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @pxlkit/gamification
         run: npm publish --workspace=packages/gamification --provenance --access public
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @pxlkit/feedback
         run: npm publish --workspace=packages/feedback --provenance --access public
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @pxlkit/social
         run: npm publish --workspace=packages/social --provenance --access public
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @pxlkit/weather
         run: npm publish --workspace=packages/weather --provenance --access public
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @pxlkit/ui
         run: npm publish --workspace=packages/ui --provenance --access public
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @pxlkit/effects
         run: npm publish --workspace=packages/effects --provenance --access public
+        continue-on-error: true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish @pxlkit/ui-kit
+        run: npm publish --workspace=packages/ui-kit --provenance --access public
+        continue-on-error: true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
