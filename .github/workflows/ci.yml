@@ -33,3 +33,9 @@ jobs:
 
       - name: Type check
         run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run test coverage
+        run: npx turbo test:coverage --filter=@pxlkit/core

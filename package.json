@@ -21,9 +21,18 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "clean": "turbo clean"
+    "clean": "turbo clean",
+    "test": "turbo test",
+    "test:coverage": "turbo test:coverage",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^8.6.18",
+    "@storybook/addon-essentials": "^8.6.18",
+    "@storybook/addon-interactions": "^8.6.18",
+    "@storybook/react-vite": "^8.6.18",
+    "storybook": "^8.6.18",
     "turbo": "^2.4.0",
     "typescript": "^5.7.0"
   },
