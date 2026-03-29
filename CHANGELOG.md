@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-03-29
+
+### Changed
+
+- **CI/CD** — Automated npm publishing on merge to `main`
+  - Publish workflow now triggers on push to `main`, tag push (`v*`), and GitHub Releases
+  - Added **quality gate** job: build → type-check → tests → icon validation must all pass before publishing
+  - Smart version detection compares local `package.json` versions against the npm registry; only packages with new versions are published
+  - `@pxlkit/core` is always published first (other packages depend on it)
+  - Workflow fails if any publish step fails (no silent `continue-on-error`)
+
+### Bumped
+
+- All packages bumped to **1.1.0**: `@pxlkit/core`, `@pxlkit/effects`, `@pxlkit/feedback`, `@pxlkit/gamification`, `@pxlkit/social`, `@pxlkit/ui`, `@pxlkit/weather`, `@pxlkit/ui-kit`
+
 ## [1.0.0] - 2026-03-09
 
 ### Added
