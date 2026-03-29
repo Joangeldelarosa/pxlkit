@@ -24,11 +24,13 @@ function readIconFiles() {
 }
 
 function extractPaletteKeys(content) {
-  const paletteMatch = content.match(/palette:\s*\{([\s\S]*?)\}/);
-  if (!paletteMatch) return new Set();
   const keys = new Set();
-  for (const m of paletteMatch[1].matchAll(/["']?([A-Za-z0-9])["']?\s*:/g)) {
-    keys.add(m[1]);
+  const re = /palette:\s*\{([\s\S]*?)\}/g;
+  let paletteMatch;
+  while ((paletteMatch = re.exec(content)) !== null) {
+    for (const m of paletteMatch[1].matchAll(/["']?([A-Za-z0-9])["']?\s*:/g)) {
+      keys.add(m[1]);
+    }
   }
   return keys;
 }
