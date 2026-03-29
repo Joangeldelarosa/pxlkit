@@ -93,8 +93,8 @@ describe('ParallaxPxlKitIcon', () => {
       <ParallaxPxlKitIcon icon={testParallaxIcon} size={100} />
     );
     const wrapper = container.firstChild as HTMLElement;
-    // default = size * 4 = 400
-    expect(wrapper.style.perspective).toBe('400px');
+    // default = max(200, size * 2.5) = 250
+    expect(wrapper.style.perspective).toBe('250px');
   });
 
   it('applies className to container', () => {
