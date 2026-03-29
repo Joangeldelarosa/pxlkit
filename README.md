@@ -335,16 +335,22 @@ Checks grid dimensions (16×16), palette usage, and detects unused/missing palet
 
 ## Automated npm Publishing (CI/CD)
 
-All packages are published automatically to npm via GitHub Actions whenever a new **version tag** is pushed or a **GitHub Release** is created.
+All packages are published automatically to npm via GitHub Actions. The workflow supports **three triggers** and includes a **quality gate** (build + lint + test) that must pass before any publish.
 
 ### How It Works
 
 The workflow (`.github/workflows/publish.yml`) runs on:
 
+- **Push to `main`** — automatically publishes when a PR is merged (most common)
 - **Tag push** — pushing a tag matching `v*` (e.g. `v1.2.0`)
 - **GitHub Release** — creating/publishing a release in the GitHub UI
 
-It builds every workspace package, validates icons, and publishes all `@pxlkit/*` packages to npm with [provenance](https://docs.npmjs.com/generating-provenance-statements) enabled. Packages whose version is already on npm are safely skipped (`continue-on-error`).
+**Pipeline:**
+
+1. **Quality gate** — installs, builds, type-checks, runs all tests, and validates icons
+2. **Publish** (only if quality gate passes) — compares each package's local version against the npm registry and publishes only the packages whose version has changed. Packages already at the same version on npm are safely skipped.
+
+> `@pxlkit/core` is always published first because other packages depend on it.
 
 ### Setup
 
@@ -361,18 +367,24 @@ It builds every workspace package, validates icons, and publishes all `@pxlkit/*
 
 ### How to Release
 
+**Automatic (recommended):** Simply bump the version in the relevant `packages/*/package.json` files, commit, and merge your PR into `main`. The workflow detects the version change and publishes automatically.
+
 ```bash
 # 1. Bump versions in the packages you changed
-# 2. Commit the version bumps
+# 2. Commit and push to your PR branch
 git add .
-git commit -m "chore: bump versions to 1.1.0"
+git commit -m "chore: bump versions to 1.2.0"
+git push
 
-# 3. Create and push a tag
-git tag v1.1.0
-git push origin main --follow-tags
+# 3. Merge the PR — publish triggers automatically on main
 ```
 
-Alternatively, create a **Release** from the GitHub UI (which also creates a tag) — the workflow triggers on both events.
+**Manual (tag-based):** Create and push a version tag, or create a GitHub Release.
+
+```bash
+git tag v1.2.0
+git push origin main --follow-tags
+```
 
 ### Published Packages
 
