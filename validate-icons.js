@@ -8,6 +8,7 @@ const ICON_DIRS = [
   'packages/weather/src/icons',
   'packages/ui/src/icons',
   'packages/effects/src/icons',
+  'packages/parallax/src/icons',
 ];
 
 function readIconFiles() {

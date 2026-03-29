@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-29
+
+### Added
+
+- **New Package** — `@pxlkit/parallax` v1.2.0
+  - 10 multi-layer 3D parallax pixel icons with interactive mouse-tracking depth effects
+  - Icons: CoolEmoji, PixelHeart, RetroTV, PixelRocket, GhostFriend, NeonSkull, MagicOrb, PixelCrown, RetroJoystick, CyberEye
+  - Each icon features 3–5 depth layers combining static (`PxlKitData`) and animated (`AnimatedPxlKitData`) sub-layers
+  - Uses the `ParallaxPxlKitData` type from `@pxlkit/core` for multi-layer parallax composition
+  - Designed for use with the `ParallaxPxlKitIcon` component from `@pxlkit/core`
+  - ESM + CJS dual build with full TypeScript declarations
+  - Tree-shakeable — import individual icons or the full `ParallaxPack` array
+
+### Bumped
+
+- All packages bumped to **1.2.0**: `@pxlkit/core`, `@pxlkit/effects`, `@pxlkit/feedback`, `@pxlkit/gamification`, `@pxlkit/social`, `@pxlkit/ui`, `@pxlkit/weather`, `@pxlkit/ui-kit`, `@pxlkit/parallax`
+
 ## [1.1.0] - 2026-03-29
 
 ### Changed
