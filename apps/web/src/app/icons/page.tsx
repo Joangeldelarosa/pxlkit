@@ -2,14 +2,15 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { PxlKitIcon, AnimatedPxlKitIcon, gridToSvg, generateAnimatedSvg, isAnimatedIcon } from '@pxlkit/core';
-import type { PxlKitData, IconPack, AnimatedPxlKitData, AnimationTrigger } from '@pxlkit/core';
+import { PxlKitIcon, AnimatedPxlKitIcon, gridToSvg, generateAnimatedSvg, isAnimatedIcon, ParallaxPxlKitIcon } from '@pxlkit/core';
+import type { PxlKitData, IconPack, AnimatedPxlKitData, AnimationTrigger, ParallaxPxlKitData } from '@pxlkit/core';
 import { GamificationPack } from '@pxlkit/gamification';
 import { FeedbackPack, Bell, CheckCircle, XCircle } from '@pxlkit/feedback';
 import { SocialPack } from '@pxlkit/social';
 import { WeatherPack } from '@pxlkit/weather';
 import { EffectsPack } from '@pxlkit/effects';
 import { Close, UiPack } from '@pxlkit/ui';
+import { ParallaxPack } from '@pxlkit/parallax';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ToastProvider';
 import type { ToastTone } from '@/components/ToastProvider';
@@ -139,7 +140,7 @@ export default function IconsPage() {
       <div className="text-center mb-8">
         <h1 className="font-pixel text-xl text-retro-gold mb-3">ICON GALLERY</h1>
         <p className="text-retro-muted font-mono text-sm">
-          {TOTAL_COUNT} pixel art icons in {ALL_PACKS.length} packs — click any icon for details
+          {TOTAL_COUNT + ParallaxPack.length} pixel art icons in {ALL_PACKS.length + 1} packs — click any icon for details
         </p>
       </div>
 
@@ -214,6 +215,19 @@ export default function IconsPage() {
               {pack.name} ({pack.icons.length})
             </PixelButton>
           ))}
+          <PixelButton
+            onClick={() => setActivePack(activePack === 'parallax' ? null : 'parallax')}
+            size="sm"
+            variant="ghost"
+            tone={activePack === 'parallax' ? 'cyan' : 'neutral'}
+            className={`rounded-full ${
+              activePack === 'parallax'
+                ? 'border-retro-gold/50 bg-retro-gold/10 text-retro-gold'
+                : 'border-retro-border/40 text-retro-muted hover:text-retro-text hover:border-retro-border'
+            }`}
+          >
+            3D Parallax ({ParallaxPack.length})
+          </PixelButton>
         </div>
 
         {(query || activePack) && (
@@ -264,7 +278,68 @@ export default function IconsPage() {
         </section>
       ))}
 
-      {filteredPacks.length === 0 && (
+      {/* ─── Parallax 3D Pack ─── */}
+      {(!activePack || activePack === 'parallax') && (!query || ParallaxPack.some(
+        (icon) => icon.name.includes(query) || icon.tags.some((tag) => tag.includes(query)) || 'parallax'.includes(query)
+      )) && (
+        <section className="mb-16">
+          <div className="flex items-center gap-4 mb-6">
+            <h2 className="font-pixel text-sm text-retro-gold">3D Parallax Pack</h2>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[8px] font-mono bg-retro-gold/10 text-retro-gold border border-retro-gold/30 rounded">
+              NEW · INTERACTIVE
+            </span>
+            <span className="text-retro-muted/50 font-mono text-xs">
+              {ParallaxPack.length} icon{ParallaxPack.length !== 1 ? 's' : ''}
+            </span>
+            <span className="text-retro-muted/30 font-mono text-xs">v1.2.0</span>
+          </div>
+
+          <p className="text-sm text-retro-muted mb-6 max-w-2xl">
+            Multi-layer 3D parallax icons with interactive mouse tracking and click effects.
+            Move your mouse to rotate — click any icon to trigger particle bursts and layer explosions.
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {ParallaxPack.filter(
+              (icon) => !query || icon.name.includes(query) || icon.tags.some((tag) => tag.includes(query))
+            ).map((icon) => (
+              <motion.div
+                key={icon.name}
+                whileHover={{ scale: 1.05 }}
+                className="relative flex flex-col items-center gap-2 p-4 rounded-lg border border-retro-gold/20 bg-retro-surface/30 hover:bg-retro-card transition-colors group"
+              >
+                <ParallaxPxlKitIcon
+                  icon={icon}
+                  size={64}
+                  strength={16}
+                  interactive
+                  colorful
+                />
+                <span className="font-mono text-[9px] text-retro-muted truncate w-full text-center group-hover:text-retro-gold transition-colors">
+                  {icon.name}
+                </span>
+                <span className="font-mono text-[8px] text-retro-gold/50">
+                  {icon.layers.length} layers
+                </span>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-4 p-3 rounded-lg border border-retro-gold/15 bg-retro-surface/20">
+            <p className="font-mono text-[10px] text-retro-muted">
+              <span className="text-retro-gold">npm i @pxlkit/core @pxlkit/parallax</span>
+              {' · '}
+              Uses <span className="text-retro-cyan">ParallaxPxlKitIcon</span> from @pxlkit/core
+              {' · '}
+              <a href="/docs#parallax-icons" className="text-retro-gold hover:underline">View docs →</a>
+            </p>
+          </div>
+        </section>
+      )}
+
+      {filteredPacks.length === 0 && (!query || !ParallaxPack.some(
+        (icon) => icon.name.includes(query) || icon.tags.some((tag) => tag.includes(query)) || 'parallax'.includes(query)
+      )) && (
         <div className="text-center py-20 text-retro-muted">
           <p className="font-pixel text-sm mb-2">No icons found</p>
           <p className="font-mono text-xs">Try a different search term</p>

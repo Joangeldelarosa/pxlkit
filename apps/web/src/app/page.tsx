@@ -15,7 +15,7 @@ import {
 import { SocialPack, Heart } from '@pxlkit/social';
 import { WeatherPack, Sun } from '@pxlkit/weather';
 import { EffectsPack } from '@pxlkit/effects';
-import { ParallaxPack } from '@pxlkit/parallax';
+import { ParallaxPack, GhostFriend } from '@pxlkit/parallax';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -97,22 +97,47 @@ function HeroSection() {
                 <PixelBadge tone="cyan">Open Source</PixelBadge>
                 <PixelBadge tone="gold">{UI_COMPONENTS_COUNT} Components</PixelBadge>
                 <PixelBadge tone="purple">{TOTAL_ICON_COUNT}+ Icons</PixelBadge>
+                <PixelBadge tone="red">NEW: 3D Parallax</PixelBadge>
               </div>
+
+              {/* ── GhostFriend parallax hero icon ── */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.7, delay: 0.2 }}
+                className="flex justify-center py-2"
+              >
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-2xl bg-retro-purple/10 blur-[60px] pointer-events-none" />
+                  <ParallaxPxlKitIcon
+                    icon={GhostFriend}
+                    size={140}
+                    strength={22}
+                    layerGap={28}
+                    interactive
+                    colorful
+                  />
+                  <p className="mt-2 text-center font-mono text-[9px] text-retro-muted/60">
+                    ↕ Move mouse to rotate · Click to interact
+                  </p>
+                </div>
+              </motion.div>
 
               <h1 className="font-pixel text-2xl sm:text-4xl md:text-5xl text-retro-green leading-relaxed text-glow">
                 BUILD RETRO INTERFACES FAST
               </h1>
 
               <p className="text-base sm:text-lg text-retro-muted max-w-2xl mx-auto">
-                Components, pixel icons, toasts, and animations with one consistent API.
-                Everything matches the same visual language and TypeScript-first DX.
+                Components, pixel icons, toasts, animations, and{' '}
+                <span className="text-retro-gold font-bold">3D parallax icons</span> with one consistent API.
+                Now featuring interactive multi-layer pixel art with real CSS 3D perspective and mouse tracking.
               </p>
 
               <p className="text-sm text-retro-muted/80 font-mono">
                 <PixelCodeInline>{UI_COMPONENTS_COUNT} components</PixelCodeInline>{' '}
                 <PixelCodeInline tone="green">{TOTAL_ICON_COUNT}+ icons</PixelCodeInline>{' '}
-                <PixelCodeInline tone="purple">6 packs</PixelCodeInline>{' '}
-                <PixelCodeInline tone="gold">React + SVG</PixelCodeInline>
+                <PixelCodeInline tone="purple">7 packs</PixelCodeInline>{' '}
+                <PixelCodeInline tone="gold">React + SVG + 3D</PixelCodeInline>
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -129,7 +154,7 @@ function HeroSection() {
 
               <div className="rounded-lg border border-retro-border bg-retro-bg/80 px-4 py-3 font-mono text-xs text-retro-muted overflow-x-auto">
                 <span className="text-retro-green mr-2">$</span>
-                npm i @pxlkit/core @pxlkit/ui @pxlkit/gamification
+                npm i @pxlkit/core @pxlkit/ui @pxlkit/parallax
               </div>
 
               <PixelDivider label="Packs" tone="neutral" />
@@ -140,6 +165,7 @@ function HeroSection() {
                 <PixelBadge tone="purple">weather ({WeatherPack.icons.length})</PixelBadge>
                 <PixelBadge tone="neutral">ui ({UiPack.icons.length})</PixelBadge>
                 <PixelBadge tone="green">effects ({EffectsPack.icons.length})</PixelBadge>
+                <PixelBadge tone="gold">parallax ({ParallaxPack.length})</PixelBadge>
               </div>
             </div>
           </PixelSection>
