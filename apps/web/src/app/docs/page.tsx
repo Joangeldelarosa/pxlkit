@@ -9,8 +9,9 @@ import { EffectsPack } from '@pxlkit/effects';
 import { UiPack, Pencil } from '@pxlkit/ui';
 import { FireSword } from '@pxlkit/gamification';
 import { Menu } from '@pxlkit/ui';
-import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/core';
+import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon, ParallaxPxlKitIcon } from '@pxlkit/core';
 import type { IconPack, AnyIcon } from '@pxlkit/core';
+import { ParallaxPack, GhostFriend, CoolEmoji } from '@pxlkit/parallax';
 import { PixelTextLink, PxlKitButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
 
 /* ─── Dynamic pack registry ─── */
@@ -36,6 +37,7 @@ const sections = [
   { id: 'opacity', label: 'Opacity / Alpha' },
   { id: 'react-component', label: 'React Component' },
   { id: 'animated-icons', label: 'Animated Icons' },
+  { id: 'parallax-icons', label: 'Parallax 3D Icons' },
   { id: 'toast-notifications', label: 'Toast Notifications' },
   { id: 'svg-generation', label: 'SVG Generation' },
   { id: 'ai-generation', label: 'AI Generation' },
@@ -209,7 +211,7 @@ export default function DocsPage() {
               Everything you need to use Pxlkit — the open source retro React UI kit + icon library
             </p>
             <p className="font-mono text-[10px] text-retro-muted/50 mt-2">
-              {UI_COMPONENTS_COUNT} components · PixelToast guide · {TOTAL_ICONS} icons across {ALL_PACKS.length} packs
+              {UI_COMPONENTS_COUNT} components · PixelToast guide · {TOTAL_ICONS} icons across {ALL_PACKS.length} packs · 3D Parallax
             </p>
           </div>
 
@@ -529,6 +531,140 @@ const monoSvg = generateAnimatedSvg(FireSword, {
                 <p className="font-mono text-[10px] text-retro-muted">FireSword &mdash; 4 frames &middot; 150ms</p>
                 <p className="font-mono text-[10px] text-retro-muted/50 mt-0.5">hover center icon to trigger it</p>
               </div>
+            </div>
+          </Section>
+
+          {/* Parallax 3D Icons */}
+          <Section id="parallax-icons" title="Parallax 3D Icons">
+            <P>
+              The <Code>@pxlkit/parallax</Code> pack introduces <strong className="text-retro-gold">multi-layer 3D parallax pixel icons</strong> —
+              interactive depth-based icons where each layer floats at a different Z-depth. Mouse movement across the
+              viewport rotates the entire scene, creating a true 3D effect. Click interactions trigger particle bursts,
+              layer explosions, and color shifts.
+            </P>
+            <CodeBlock title="Install">{`npm install @pxlkit/core @pxlkit/parallax`}</CodeBlock>
+            <CodeBlock title="Basic Usage">{`import { ParallaxPxlKitIcon } from '@pxlkit/core';
+import { GhostFriend, CoolEmoji } from '@pxlkit/parallax';
+
+// Basic 3D parallax icon
+<ParallaxPxlKitIcon icon={GhostFriend} size={64} colorful />
+
+// Large interactive icon with custom strength
+<ParallaxPxlKitIcon
+  icon={CoolEmoji}
+  size={128}
+  strength={20}
+  interactive
+  colorful
+/>`}</CodeBlock>
+
+            <P>
+              <strong className="text-retro-gold">How it works:</strong> Each parallax icon is composed
+              of multiple animated layers stacked at different Z-depths using CSS <Code>perspective</Code>{' '}
+              + <Code>preserve-3d</Code> + per-layer <Code>translateZ</Code>. The component tracks mouse
+              position across the entire viewport and applies <Code>rotateX</Code>/<Code>rotateY</Code>{' '}
+              transforms to the scene with smooth lerp interpolation.
+            </P>
+
+            <CodeBlock title="ParallaxPxlKitData Type">{`interface ParallaxPxlKitData {
+  name: string;              // kebab-case identifier
+  size: GridSize;            // grid dimensions (e.g. 16)
+  category: string;          // always 'parallax'
+  layers: ParallaxLayer[];   // ordered back→front (first = deepest)
+  tags: string[];            // searchable tags
+  author?: string;
+}
+
+interface ParallaxLayer {
+  icon: AnimatedPxlKitData;  // each layer is an animated icon
+  depth: number;             // Z-depth: positive = far, negative = near
+  // depth: 3.0  → far background (shadow, trail)
+  // depth: 0    → center baseline (body)
+  // depth: -2.0 → near foreground (face details, blush)
+}`}</CodeBlock>
+
+            <CodeBlock title="ParallaxPxlKitIcon Props">{`interface ParallaxPxlKitProps {
+  icon: ParallaxPxlKitData;   // The parallax icon data (required)
+  size?: number;               // Container size in px (default: 64)
+  strength?: number;           // Mouse reaction intensity (default: 18)
+  colorful?: boolean;          // Full color mode (default: true)
+  smoothing?: number;          // Lerp factor 0–1 (default: 0.06)
+  perspective?: number;        // CSS perspective in px (default: max(200, size×2.5))
+  layerGap?: number;           // Z spacing between layers (default: max(12, size×0.2))
+  shadow?: boolean;            // Depth shadow between layers (default: true)
+  interactive?: boolean;       // Click effects enabled (default: true)
+  onActivate?: (active: boolean) => void;  // Click toggle callback
+  className?: string;
+  style?: React.CSSProperties;
+  'aria-label'?: string;
+}`}</CodeBlock>
+
+            <P>
+              <strong className="text-retro-cyan">Key features:</strong>
+            </P>
+            <ul className="space-y-2 text-sm text-retro-muted ml-4 list-disc list-outside mb-4">
+              <li><strong className="text-retro-text">True 3D Depth</strong> — CSS perspective + preserve-3d + per-layer translateZ for real depth</li>
+              <li><strong className="text-retro-text">Page-Wide Tracking</strong> — Mouse rotation works across the entire viewport, not just the icon</li>
+              <li><strong className="text-retro-text">Click Interactions</strong> — Particle bursts, layer explosions, random rotation jolt, color hue-shift on click</li>
+              <li><strong className="text-retro-text">Animated Layers</strong> — Each layer is a full <Code>AnimatedPxlKitData</Code> with frame-based animation (e.g., blinking eyes, flickering shadows)</li>
+              <li><strong className="text-retro-text">Peel-Apart Intro</strong> — Layers spread out in a dramatic animation on mount</li>
+              <li><strong className="text-retro-text">Depth Shadows</strong> — Soft CSS shadows between layers for visual depth</li>
+            </ul>
+
+            <CodeBlock title="Example: GhostFriend Layers">{`// GhostFriend has 5 animated layers at different depths:
+const GhostFriend: ParallaxPxlKitData = {
+  name: 'ghost-friend',
+  size: 16,
+  category: 'parallax',
+  layers: [
+    { icon: GhostShadow, depth: 3.0 },   // far background shadow
+    { icon: GhostTrail,  depth: 1.5 },   // wispy trail behind
+    { icon: GhostBody,   depth: 0 },     // main body (center)
+    { icon: GhostFace,   depth: -1.0 },  // eyes + mouth (closer)
+    { icon: GhostBlush,  depth: -2.0 },  // blush cheeks (nearest)
+  ],
+  tags: ['ghost', 'cute', 'friendly', '3d', 'parallax'],
+};`}</CodeBlock>
+
+            <CodeBlock title="Available Icons ({ParallaxPack.length})">{`import { ParallaxPack } from '@pxlkit/parallax';
+import {
+  CoolEmoji,     // Sunglasses emoji with sparkle layers
+  PixelHeart,    // Beating heart with glow + particles
+  RetroTV,       // CRT monitor with scan lines
+  PixelRocket,   // Rocket ship with exhaust + stars
+  GhostFriend,   // Cute ghost with blush + trail
+  NeonSkull,     // Glowing skull with neon effects
+  MagicOrb,      // Floating orb with energy rings
+  PixelCrown,    // Crown with sparkles
+  RetroJoystick, // Gamepad with button highlights
+  CyberEye,      // Cyberpunk eye with scan effects
+} from '@pxlkit/parallax';`}</CodeBlock>
+
+            <div className="flex flex-wrap items-end gap-6 p-4 bg-retro-surface rounded-lg border border-retro-gold/30 mt-4">
+              <div className="text-center">
+                <ParallaxPxlKitIcon icon={GhostFriend} size={72} strength={16} interactive colorful />
+                <p className="font-mono text-[9px] text-retro-muted mt-2">GhostFriend</p>
+              </div>
+              <div className="text-center">
+                <ParallaxPxlKitIcon icon={CoolEmoji} size={72} strength={16} interactive colorful />
+                <p className="font-mono text-[9px] text-retro-muted mt-2">CoolEmoji</p>
+              </div>
+              <div className="ml-auto text-right">
+                <p className="font-pixel text-[9px] text-retro-gold mb-1">LIVE 3D PREVIEW</p>
+                <p className="font-mono text-[10px] text-retro-muted">{ParallaxPack.length} parallax icons</p>
+                <p className="font-mono text-[10px] text-retro-muted/50 mt-0.5">move mouse to rotate · click to interact</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-retro-surface rounded-lg border border-retro-gold/20 mt-4">
+              <p className="font-pixel text-[8px] text-retro-gold mb-2">UI KIT PARALLAX COMPONENTS</p>
+              <P>
+                The UI Kit also includes scroll-based and cursor-tracking parallax wrapper components:
+                <Code>PixelParallaxLayer</Code> (scroll-based), <Code>PixelParallaxGroup</Code> (clipped container),
+                and <Code>PixelMouseParallax</Code> (cursor-tracking). See the{' '}
+                <PixelTextLink href="/ui-kit#pixel-parallax-layer">UI Kit Parallax docs</PixelTextLink>{' '}
+                for details.
+              </P>
             </div>
           </Section>
 
