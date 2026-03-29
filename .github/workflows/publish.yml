@@ -2,6 +2,7 @@ name: Publish to npm
 
 on:
   push:
+    branches: [main]
     tags:
       - "v*"
   release:
@@ -37,51 +38,48 @@ jobs:
       - name: Validate icons
         run: node validate-icons.js
 
-      # Publish @pxlkit/core first — other packages depend on it
-      - name: Publish @pxlkit/core
-        run: npm publish --workspace=packages/core --provenance --access public
-        continue-on-error: true
+      - name: Detect changed packages and publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          PACKAGES=(
+            "packages/core"
+            "packages/gamification"
+            "packages/feedback"
+            "packages/social"
+            "packages/weather"
+            "packages/ui"
+            "packages/effects"
+            "packages/ui-kit"
+          )
 
-      - name: Publish @pxlkit/gamification
-        run: npm publish --workspace=packages/gamification --provenance --access public
-        continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          published=0
+          skipped=0
+          failed=0
 
-      - name: Publish @pxlkit/feedback
-        run: npm publish --workspace=packages/feedback --provenance --access public
-        continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          for pkg in "${PACKAGES[@]}"; do
+            name=$(node -p "require('./$pkg/package.json').name")
+            local_version=$(node -p "require('./$pkg/package.json').version")
+            npm_version=$(npm view "$name" version 2>/dev/null || echo "0.0.0")
 
-      - name: Publish @pxlkit/social
-        run: npm publish --workspace=packages/social --provenance --access public
-        continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+            if [ "$local_version" = "$npm_version" ]; then
+              echo "⏭️  $name@$local_version — already on npm, skipping"
+              skipped=$((skipped + 1))
+            else
+              echo "📦 $name@$local_version — new version (npm has $npm_version), publishing..."
+              if npm publish --workspace="$pkg" --provenance --access public; then
+                echo "✅ $name@$local_version published successfully"
+                published=$((published + 1))
+              else
+                echo "❌ $name@$local_version failed to publish"
+                failed=$((failed + 1))
+              fi
+            fi
+          done
 
-      - name: Publish @pxlkit/weather
-        run: npm publish --workspace=packages/weather --provenance --access public
-        continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          echo ""
+          echo "📊 Summary: $published published, $skipped skipped, $failed failed"
 
-      - name: Publish @pxlkit/ui
-        run: npm publish --workspace=packages/ui --provenance --access public
-        continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish @pxlkit/effects
-        run: npm publish --workspace=packages/effects --provenance --access public
-        continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish @pxlkit/ui-kit
-        run: npm publish --workspace=packages/ui-kit --provenance --access public
-        continue-on-error: true
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          if [ "$failed" -gt 0 ]; then
+            echo "::warning::$failed package(s) failed to publish"
+          fi
