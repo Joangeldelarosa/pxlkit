@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import type { ParallaxPxlKitProps } from '../types';
 import { PxlKitIcon } from './PxlKitIcon';
 import { AnimatedPxlKitIcon } from './AnimatedPxlKitIcon';
@@ -12,20 +12,28 @@ function hasFrames(
   return 'frames' in icon;
 }
 
+/** Clamp a value between min and max. */
+function clamp(v: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, v));
+}
+
 /**
- * Renders a multi-layer pixel art icon with mouse-tracking parallax.
+ * Renders a multi-layer pixel art icon with true CSS 3D parallax.
  *
- * Each layer in the icon is rendered as a separate SVG and positioned
- * absolutely within a shared container.  As the user moves their mouse,
- * each layer translates by `depth × strength` pixels, creating a 3D
- * parallax effect.
+ * The component creates a real 3D scene using CSS `perspective`.  Each layer
+ * is placed at a different `translateZ` depth so they are physically separated
+ * in 3D space.  As the user moves their mouse, the whole scene rotates via
+ * `rotateX` / `rotateY`, revealing the depth separation between layers.
  *
- * - Layers with `depth > 0` move *with* the mouse (background feel).
- * - Layers with `depth < 0` move *opposite* to the mouse (foreground pop).
- * - Layers with `depth === 0` remain stationary (anchor).
- *
- * The component uses `requestAnimationFrame` for smooth frame-rate-adaptive
- * updates and a configurable lerp `smoothing` factor for fluid motion.
+ * **How it works:**
+ * 1. The outer container sets `perspective` (camera distance).
+ * 2. An inner "scene" div preserves 3D children (`transform-style: preserve-3d`).
+ * 3. The scene rotates based on normalized mouse position (smooth lerp).
+ * 4. Each layer lives at `translateZ(depth × layerGap)` — front layers have
+ *    positive Z (closer), back layers have negative Z (farther).
+ * 5. Optional soft `box-shadow` on each layer enhances depth perception.
+ * 6. On mount, layers animate from `translateZ(0)` to their final depths
+ *    (a "peel-apart" intro effect).
  *
  * @example
  * ```tsx
@@ -41,130 +49,191 @@ export function ParallaxPxlKitIcon({
   strength = 8,
   colorful = true,
   smoothing = 0.08,
+  perspective: perspectiveProp,
+  layerGap: layerGapProp,
+  shadow = true,
   className = '',
   style,
   'aria-label': ariaLabel,
 }: ParallaxPxlKitProps) {
+  // Derive sensible defaults from size
+  const perspective = perspectiveProp ?? size * 4;
+  const layerGap = layerGapProp ?? Math.max(8, size * 0.12);
+
   const containerRef = useRef<HTMLDivElement>(null);
-  const layerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const posRef = useRef<{ x: number; y: number }[]>(
-    icon.layers.map(() => ({ x: 0, y: 0 })),
-  );
-  const targetRef = useRef<{ x: number; y: number }[]>(
-    icon.layers.map(() => ({ x: 0, y: 0 })),
-  );
+  const sceneRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef(0);
 
+  // Current & target rotation (degrees)
+  const rotRef = useRef({ x: 0, y: 0 });
+  const targetRotRef = useRef({ x: 0, y: 0 });
+
+  // Intro animation progress (0 = flat, 1 = fully spread)
+  const [introProgress, setIntroProgress] = useState(0);
+  const introRef = useRef(0); // 0..1
+  const introStartRef = useRef(0);
+
+  // Max tilt angle in degrees — derived from strength
+  const maxTilt = clamp(strength * 1.5, 2, 35);
+
   const setLayerRef = useCallback(
-    (index: number) => (el: HTMLDivElement | null) => {
-      layerRefs.current[index] = el;
+    (index: number, el: HTMLDivElement | null) => {
+      // We don't need individual layer refs for 3D — the scene rotation
+      // handles everything.  Kept for shadow updates.
+      layerEls.current[index] = el;
     },
     [],
   );
+  const layerEls = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+    const container = containerRef.current;
+    const scene = sceneRef.current;
+    if (!container || !scene) return;
 
-    // Reset refs when layers change
-    posRef.current = icon.layers.map(() => ({ x: 0, y: 0 }));
-    targetRef.current = icon.layers.map(() => ({ x: 0, y: 0 }));
+    rotRef.current = { x: 0, y: 0 };
+    targetRotRef.current = { x: 0, y: 0 };
+    introRef.current = 0;
+    introStartRef.current = performance.now();
 
     function handleMouse(e: MouseEvent) {
-      const rect = el!.getBoundingClientRect();
-      // Normalize mouse position to -1..1 relative to container center
-      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-
-      icon.layers.forEach((layer, i) => {
-        targetRef.current[i] = {
-          x: nx * strength * layer.depth,
-          y: ny * strength * layer.depth,
-        };
-      });
+      const rect = container!.getBoundingClientRect();
+      // Normalize to -1..1
+      const nx = clamp(((e.clientX - rect.left) / rect.width) * 2 - 1, -1, 1);
+      const ny = clamp(((e.clientY - rect.top) / rect.height) * 2 - 1, -1, 1);
+      // rotateY follows horizontal mouse, rotateX follows vertical (inverted)
+      targetRotRef.current = {
+        x: -ny * maxTilt,
+        y: nx * maxTilt,
+      };
     }
 
     function handleMouseLeave() {
-      // Smoothly return to center when mouse leaves
-      icon.layers.forEach((_, i) => {
-        targetRef.current[i] = { x: 0, y: 0 };
-      });
+      targetRotRef.current = { x: 0, y: 0 };
     }
 
-    function animate() {
-      const layers = layerRefs.current;
-      icon.layers.forEach((layer, i) => {
-        const pos = posRef.current[i];
-        const tgt = targetRef.current[i];
-        pos.x += (tgt.x - pos.x) * smoothing;
-        pos.y += (tgt.y - pos.y) * smoothing;
+    const INTRO_DURATION = 600; // ms
 
-        const layerEl = layers[i];
-        if (layerEl) {
-          const ox = (layer.offsetX ?? 0) * (size / icon.size);
-          const oy = (layer.offsetY ?? 0) * (size / icon.size);
-          layerEl.style.transform = `translate3d(${pos.x + ox}px, ${pos.y + oy}px, 0)`;
-        }
-      });
+    function animate(now: number) {
+      // Intro ease-out
+      const elapsed = now - introStartRef.current;
+      const t = clamp(elapsed / INTRO_DURATION, 0, 1);
+      const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      introRef.current = eased;
+      if (t < 1) {
+        setIntroProgress(eased);
+      } else if (introRef.current !== 1) {
+        setIntroProgress(1);
+      }
+
+      // Smooth lerp rotation
+      const rot = rotRef.current;
+      const tgt = targetRotRef.current;
+      rot.x += (tgt.x - rot.x) * smoothing;
+      rot.y += (tgt.y - rot.y) * smoothing;
+
+      // Apply rotation to the scene
+      if (scene) {
+        scene.style.transform =
+          `rotateX(${rot.x}deg) rotateY(${rot.y}deg)`;
+      }
+
       rafRef.current = requestAnimationFrame(animate);
     }
 
-    el.addEventListener('mousemove', handleMouse);
-    el.addEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('mousemove', handleMouse);
+    container.addEventListener('mouseleave', handleMouseLeave);
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
-      el.removeEventListener('mousemove', handleMouse);
-      el.removeEventListener('mouseleave', handleMouseLeave);
+      container.removeEventListener('mousemove', handleMouse);
+      container.removeEventListener('mouseleave', handleMouseLeave);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [icon, size, strength, smoothing]);
+  }, [icon, size, strength, smoothing, maxTilt]);
+
+  // Compute Z position for each layer.
+  // Layers are ordered back-to-front.  We distribute them so the middle
+  // layer is at Z=0, back layers at negative Z, front at positive Z.
+  const layerCount = icon.layers.length;
+  const midIndex = (layerCount - 1) / 2;
 
   return (
     <div
       ref={containerRef}
       className={className}
       style={{
-        position: 'relative',
-        width: size,
-        height: size,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
+        width: size,
+        height: size,
+        perspective: perspective,
         ...style,
       }}
       role="img"
       aria-label={ariaLabel || icon.name}
     >
-      {icon.layers.map((layer, i) => (
-        <div
-          key={`${icon.name}-layer-${i}`}
-          ref={setLayerRef(i)}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            willChange: 'transform',
-            pointerEvents: 'none',
-          }}
-        >
-          {hasFrames(layer.icon) ? (
-            <AnimatedPxlKitIcon
-              icon={layer.icon}
-              size={size}
-              colorful={colorful}
-            />
-          ) : (
-            <PxlKitIcon
-              icon={layer.icon}
-              size={size}
-              colorful={colorful}
-            />
-          )}
-        </div>
-      ))}
+      {/* 3D scene — rotates as a whole */}
+      <div
+        ref={sceneRef}
+        style={{
+          position: 'relative',
+          width: size,
+          height: size,
+          transformStyle: 'preserve-3d',
+          willChange: 'transform',
+        }}
+      >
+        {icon.layers.map((layer, i) => {
+          // Z offset: first layer (back) is negative, last (front) is positive
+          const zNorm = i - midIndex; // e.g. for 3 layers: -1, 0, 1
+          const zFinal = zNorm * layerGap;
+          const zCurrent = zFinal * introProgress;
+
+          // Soft shadow: layers closer to viewer cast shadow on layers behind.
+          // Shadow intensity and offset based on distance from back.
+          const shadowStyle: React.CSSProperties = {};
+          if (shadow && i > 0) {
+            const shadowDepth = Math.abs(zNorm) * 2;
+            const shadowBlur = Math.max(3, layerGap * 0.5);
+            shadowStyle.filter =
+              `drop-shadow(0px ${shadowDepth}px ${shadowBlur}px rgba(0,0,0,0.25))`;
+          }
+
+          return (
+            <div
+              key={`${icon.name}-layer-${i}`}
+              ref={(el) => setLayerRef(i, el)}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transform: `translateZ(${zCurrent}px)`,
+                willChange: 'transform',
+                pointerEvents: 'none',
+                ...shadowStyle,
+              }}
+            >
+              {hasFrames(layer.icon) ? (
+                <AnimatedPxlKitIcon
+                  icon={layer.icon}
+                  size={size}
+                  colorful={colorful}
+                />
+              ) : (
+                <PxlKitIcon
+                  icon={layer.icon}
+                  size={size}
+                  colorful={colorful}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

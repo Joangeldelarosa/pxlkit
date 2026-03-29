@@ -260,15 +260,15 @@ function ParallaxShowcase() {
         >
           <div className="inline-flex items-center gap-2 mb-4">
             <PixelBadge tone="gold">NEW</PixelBadge>
-            <PixelBadge tone="purple">Experimental</PixelBadge>
+            <PixelBadge tone="purple">3D CSS Transforms</PixelBadge>
           </div>
           <h2 className="font-pixel text-lg text-retro-gold mb-3">
-            PARALLAX 3D ICONS
+            TRUE 3D PARALLAX ICONS
           </h2>
           <p className="text-retro-muted max-w-xl mx-auto text-sm">
-            Multi-layer pixel art icons with mouse-tracking parallax.
-            Each layer sits at a different depth, creating a real 3D effect.
-            Move your mouse over the icon to see it in action.
+            Multi-layer pixel art icons with real CSS 3D perspective. Each layer
+            floats at a different Z-depth — move your mouse to rotate the scene
+            and see the layers separate in true 3D space.
           </p>
         </motion.div>
 
@@ -280,28 +280,29 @@ function ParallaxShowcase() {
             viewport={{ once: true }}
             className="flex flex-col items-center"
           >
-            <div className="relative p-8 rounded-2xl border border-retro-gold/20 bg-retro-bg/60 backdrop-blur-sm">
+            <div className="relative p-10 rounded-2xl border border-retro-gold/20 bg-retro-bg/60 backdrop-blur-sm">
               {/* Subtle animated ring */}
               <div className="absolute inset-0 rounded-2xl border border-retro-gold/10 animate-pulse pointer-events-none" />
 
               <ParallaxPxlKitIcon
                 icon={CoolEmoji}
-                size={160}
-                strength={12}
+                size={180}
+                strength={14}
+                layerGap={24}
                 colorful
               />
 
-              <p className="mt-4 text-center font-mono text-[10px] text-retro-muted">
-                ↕ Move your mouse over the icon
+              <p className="mt-5 text-center font-mono text-[10px] text-retro-muted">
+                ↕ Move your mouse to rotate in 3D
               </p>
             </div>
 
             {/* Size variants */}
             <div className="flex items-end gap-6 mt-8">
-              {[48, 72, 96].map((s) => (
+              {[56, 80, 112].map((s) => (
                 <div key={s} className="text-center">
                   <div className="p-3 rounded-lg border border-retro-border/30 bg-retro-surface/30">
-                    <ParallaxPxlKitIcon icon={CoolEmoji} size={s} strength={6} colorful />
+                    <ParallaxPxlKitIcon icon={CoolEmoji} size={s} strength={8} colorful />
                   </div>
                   <span className="font-mono text-[9px] text-retro-muted mt-1 block">{s}px</span>
                 </div>
@@ -319,23 +320,23 @@ function ParallaxShowcase() {
             <div className="space-y-4">
               {[
                 {
-                  label: 'Multi-Layer Composition',
-                  desc: 'Each icon is composed of 3–5 separate pixel art layers — face, glasses, chain, effects — stacked with depth separation.',
+                  label: 'True 3D Depth — CSS Perspective',
+                  desc: 'Each layer lives at a real Z-depth via translateZ. The container uses CSS perspective and preserve-3d, so rotating the scene reveals actual depth separation between layers.',
                   color: 'text-retro-gold',
                 },
                 {
-                  label: 'Mouse Parallax',
-                  desc: 'Layers translate at different rates based on their depth value, creating an interactive 3D effect that follows the cursor.',
+                  label: '3D Mouse Rotation',
+                  desc: 'Mouse movement rotates the entire scene with rotateX/rotateY. Combined with Z-separated layers, this creates a convincing 3D card-stack effect.',
                   color: 'text-retro-cyan',
                 },
                 {
-                  label: 'Animated Layer Support',
-                  desc: 'Each layer can be static or animated (frame-based). Mix and match animated effects with static elements.',
+                  label: 'Intro Peel-Apart Animation',
+                  desc: 'On mount, layers animate from flat (Z=0) to their final depths with an ease-out curve — a "peel apart" effect that reveals the 3D structure.',
                   color: 'text-retro-green',
                 },
                 {
-                  label: 'GPU-Accelerated',
-                  desc: 'Uses translate3d transforms and requestAnimationFrame for smooth 60fps parallax with configurable lerp smoothing.',
+                  label: 'Depth Shadows & GPU Compositing',
+                  desc: 'Soft drop-shadows between layers enhance depth perception. All transforms use GPU-accelerated compositing for smooth performance.',
                   color: 'text-retro-purple',
                 },
               ].map((item) => (
@@ -359,7 +360,9 @@ import { CoolEmoji } from './icons/cool-emoji';
 <ParallaxPxlKitIcon
   icon={CoolEmoji}
   size={128}
-  strength={10}
+  strength={12}
+  layerGap={20}
+  shadow
   colorful
 />`}</code>
               </pre>
@@ -367,9 +370,9 @@ import { CoolEmoji } from './icons/cool-emoji';
 
             {/* Layer breakdown badges */}
             <div className="flex flex-wrap gap-2">
-              <PixelBadge tone="gold">Layer 1: Chain (depth: 2.5)</PixelBadge>
-              <PixelBadge tone="neutral">Layer 2: Face (depth: 0)</PixelBadge>
-              <PixelBadge tone="cyan">Layer 3: Glasses (depth: −1.5)</PixelBadge>
+              <PixelBadge tone="gold">Back: Chain (Z−)</PixelBadge>
+              <PixelBadge tone="neutral">Mid: Face (Z=0)</PixelBadge>
+              <PixelBadge tone="cyan">Front: Glasses (Z+)</PixelBadge>
             </div>
           </motion.div>
         </div>
