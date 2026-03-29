@@ -1,4 +1,4 @@
-import type { PxlKitData, AnimatedPxlKitData } from '../types';
+import type { PxlKitData, AnimatedPxlKitData, ParallaxPxlKitData } from '../types';
 
 /** Minimal valid 4×4 icon for testing */
 export const testIcon: PxlKitData = {
@@ -83,4 +83,58 @@ export const testIconWithAlpha: PxlKitData = {
     A: '#FF000080', // Red at ~50% opacity
   },
   tags: ['test', 'alpha'],
+};
+
+/** Minimal parallax icon for testing */
+export const testParallaxIcon: ParallaxPxlKitData = {
+  name: 'test-parallax',
+  size: 8,
+  category: 'test',
+  layers: [
+    {
+      icon: {
+        name: 'back-layer',
+        size: 8,
+        category: 'test',
+        grid: [
+          '........',
+          '........',
+          '........',
+          '........',
+          '........',
+          '..AA....',
+          '..AA....',
+          '........',
+        ],
+        palette: { A: '#FFD700' },
+        tags: [],
+      },
+      depth: 2,
+    },
+    {
+      icon: testIcon,
+      depth: 0,
+    },
+    {
+      icon: {
+        name: 'front-layer',
+        size: 8,
+        category: 'test',
+        grid: [
+          '........',
+          '....CC..',
+          '....CC..',
+          '........',
+          '........',
+          '........',
+          '........',
+          '........',
+        ],
+        palette: { C: '#1A1A2E' },
+        tags: [],
+      },
+      depth: -1.5,
+    },
+  ],
+  tags: ['test', 'parallax'],
 };

@@ -24,8 +24,8 @@ function hasFrames(
  * - Layers with `depth < 0` move *opposite* to the mouse (foreground pop).
  * - Layers with `depth === 0` remain stationary (anchor).
  *
- * The component uses `requestAnimationFrame` for smooth 60fps updates
- * and a configurable lerp `smoothing` factor for fluid motion.
+ * The component uses `requestAnimationFrame` for smooth frame-rate-adaptive
+ * updates and a configurable lerp `smoothing` factor for fluid motion.
  *
  * @example
  * ```tsx
