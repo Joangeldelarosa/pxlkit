@@ -279,8 +279,8 @@ export default function IconsPage() {
       ))}
 
       {/* ─── Parallax 3D Pack ─── */}
-      {(!activePack || activePack === 'parallax') && (!query || ParallaxPack.some(
-        (icon) => icon.name.includes(query) || icon.tags.some((tag) => tag.includes(query)) || 'parallax'.includes(query)
+      {(!activePack || activePack === 'parallax') && (!query || 'parallax'.includes(query) || '3d parallax'.includes(query) || ParallaxPack.some(
+        (icon) => icon.name.includes(query) || icon.tags.some((tag) => tag.includes(query))
       )) && (
         <section className="mb-16">
           <div className="flex items-center gap-4 mb-6">
@@ -337,9 +337,9 @@ export default function IconsPage() {
         </section>
       )}
 
-      {filteredPacks.length === 0 && (!query || !ParallaxPack.some(
-        (icon) => icon.name.includes(query) || icon.tags.some((tag) => tag.includes(query)) || 'parallax'.includes(query)
-      )) && (
+      {filteredPacks.length === 0 && (!query || !('parallax'.includes(query) || '3d parallax'.includes(query) || ParallaxPack.some(
+        (icon) => icon.name.includes(query) || icon.tags.some((tag) => tag.includes(query))
+      ))) && (
         <div className="text-center py-20 text-retro-muted">
           <p className="font-pixel text-sm mb-2">No icons found</p>
           <p className="font-mono text-xs">Try a different search term</p>

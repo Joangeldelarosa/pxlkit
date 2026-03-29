@@ -118,7 +118,7 @@ function HeroSection() {
                     colorful
                   />
                   <p className="mt-2 text-center font-mono text-[9px] text-retro-muted/60">
-                    ↕ Move mouse to rotate · Click to interact
+                    Move mouse to rotate · Click to interact
                   </p>
                 </div>
               </motion.div>
