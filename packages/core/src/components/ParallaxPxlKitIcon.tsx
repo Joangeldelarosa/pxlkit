@@ -22,33 +22,36 @@ function clamp(v: number, min: number, max: number): number {
  *
  * The component creates a real 3D scene using CSS `perspective`.  Each layer
  * is placed at a different `translateZ` depth so they are physically separated
- * in 3D space.  As the user moves their mouse, the whole scene rotates via
- * `rotateX` / `rotateY`, revealing the depth separation between layers.
+ * in 3D space.  As the user moves their mouse **anywhere on the page**, the
+ * scene rotates via `rotateX` / `rotateY`, revealing the depth separation.
  *
  * **How it works:**
  * 1. The outer container sets `perspective` (camera distance).
  * 2. An inner "scene" div preserves 3D children (`transform-style: preserve-3d`).
- * 3. The scene rotates based on normalized mouse position (smooth lerp).
+ * 3. The scene rotates based on mouse position relative to the icon center.
  * 4. Each layer lives at `translateZ(depth × layerGap)` — front layers have
  *    positive Z (closer), back layers have negative Z (farther).
- * 5. Optional soft `box-shadow` on each layer enhances depth perception.
+ * 5. Optional soft `drop-shadow` on each layer enhances depth perception.
  * 6. On mount, layers animate from `translateZ(0)` to their final depths
  *    (a "peel-apart" intro effect).
+ *
+ * Mouse tracking is **page-wide** — the icon reacts to cursor movement
+ * across the entire viewport, not just when hovering directly over it.
  *
  * @example
  * ```tsx
  * import { ParallaxPxlKitIcon } from '@pxlkit/core';
  * import { CoolEmoji } from './icons/cool-emoji';
  *
- * <ParallaxPxlKitIcon icon={CoolEmoji} size={128} strength={12} />
+ * <ParallaxPxlKitIcon icon={CoolEmoji} size={128} strength={20} />
  * ```
  */
 export function ParallaxPxlKitIcon({
   icon,
   size = 64,
-  strength = 8,
+  strength = 18,
   colorful = true,
-  smoothing = 0.08,
+  smoothing = 0.06,
   perspective: perspectiveProp,
   layerGap: layerGapProp,
   shadow = true,
@@ -56,9 +59,9 @@ export function ParallaxPxlKitIcon({
   style,
   'aria-label': ariaLabel,
 }: ParallaxPxlKitProps) {
-  // Derive sensible defaults from size
-  const perspective = perspectiveProp ?? size * 4;
-  const layerGap = layerGapProp ?? Math.max(8, size * 0.12);
+  // Derive sensible defaults — more dramatic than before
+  const perspective = perspectiveProp ?? Math.max(200, size * 2.5);
+  const layerGap = layerGapProp ?? Math.max(12, size * 0.2);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -73,8 +76,8 @@ export function ParallaxPxlKitIcon({
   const introRef = useRef(0); // 0..1
   const introStartRef = useRef(0);
 
-  // Max tilt angle in degrees — derived from strength
-  const maxTilt = clamp(strength * 1.5, 2, 35);
+  // Max tilt angle in degrees — more dramatic range
+  const maxTilt = clamp(strength * 2, 4, 45);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -87,10 +90,14 @@ export function ParallaxPxlKitIcon({
     introStartRef.current = performance.now();
 
     function handleMouse(e: MouseEvent) {
+      // Page-wide tracking: normalize mouse relative to icon center on screen
       const rect = container!.getBoundingClientRect();
-      // Normalize to -1..1
-      const nx = clamp(((e.clientX - rect.left) / rect.width) * 2 - 1, -1, 1);
-      const ny = clamp(((e.clientY - rect.top) / rect.height) * 2 - 1, -1, 1);
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      // Use a radius equal to half the viewport diagonal for smooth fall-off
+      const radius = Math.max(window.innerWidth, window.innerHeight) * 0.5;
+      const nx = clamp((e.clientX - cx) / radius, -1, 1);
+      const ny = clamp((e.clientY - cy) / radius, -1, 1);
       // rotateY follows horizontal mouse, rotateX follows vertical (inverted)
       targetRotRef.current = {
         x: -ny * maxTilt,
@@ -98,11 +105,7 @@ export function ParallaxPxlKitIcon({
       };
     }
 
-    function handleMouseLeave() {
-      targetRotRef.current = { x: 0, y: 0 };
-    }
-
-    const INTRO_DURATION = 600; // ms
+    const INTRO_DURATION = 700; // ms
 
     function animate(now: number) {
       // Intro ease-out
@@ -131,13 +134,12 @@ export function ParallaxPxlKitIcon({
       rafRef.current = requestAnimationFrame(animate);
     }
 
-    container.addEventListener('mousemove', handleMouse);
-    container.addEventListener('mouseleave', handleMouseLeave);
+    // Listen on window for page-wide mouse tracking
+    window.addEventListener('mousemove', handleMouse);
     rafRef.current = requestAnimationFrame(animate);
 
     return () => {
-      container.removeEventListener('mousemove', handleMouse);
-      container.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('mousemove', handleMouse);
       cancelAnimationFrame(rafRef.current);
     };
   }, [icon, size, strength, smoothing, maxTilt]);
@@ -182,13 +184,12 @@ export function ParallaxPxlKitIcon({
           const zCurrent = zFinal * introProgress;
 
           // Soft shadow: layers closer to viewer cast shadow on layers behind.
-          // Shadow intensity and offset based on distance from back.
           const shadowStyle: React.CSSProperties = {};
           if (shadow && i > 0) {
-            const shadowDepth = Math.abs(zNorm) * 2;
-            const shadowBlur = Math.max(3, layerGap * 0.5);
+            const shadowDepth = Math.abs(zNorm) * 3;
+            const shadowBlur = Math.max(4, layerGap * 0.6);
             shadowStyle.filter =
-              `drop-shadow(0px ${shadowDepth}px ${shadowBlur}px rgba(0,0,0,0.25))`;
+              `drop-shadow(0px ${shadowDepth}px ${shadowBlur}px rgba(0,0,0,0.3))`;
           }
 
           return (
