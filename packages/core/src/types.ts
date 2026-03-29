@@ -346,12 +346,32 @@ export interface ParallaxPxlKitProps {
   icon: ParallaxPxlKitData;
   /** Container size in px (default: 64) */
   size?: number;
-  /** Max parallax travel in px (default: 8) */
+  /**
+   * Controls how strongly the icon reacts to mouse movement.
+   * Higher = more dramatic 3D tilt. (default: 8)
+   */
   strength?: number;
   /** Renders layers in full color (default: true) */
   colorful?: boolean;
   /** Smooth lerp factor 0–1 (default: 0.08) */
   smoothing?: number;
+  /**
+   * CSS perspective distance in px.
+   * Controls how pronounced the 3D effect is — smaller = more dramatic.
+   * Default: `size × 4`.
+   */
+  perspective?: number;
+  /**
+   * Spacing between layers along the Z axis in px.
+   * Higher values spread layers farther apart.
+   * Default: `max(8, size × 0.12)`.
+   */
+  layerGap?: number;
+  /**
+   * Whether to render soft drop-shadows between layers for depth.
+   * Default: true.
+   */
+  shadow?: boolean;
   /** Additional CSS class names */
   className?: string;
   /** Accessible label */

@@ -19,12 +19,23 @@ describe('ParallaxPxlKitIcon', () => {
     expect(wrapper.getAttribute('role')).toBe('img');
   });
 
-  it('renders one child div per layer', () => {
+  it('renders an inner scene div with preserve-3d', () => {
     const { container } = render(
       <ParallaxPxlKitIcon icon={testParallaxIcon} />
     );
     const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper.children.length).toBe(testParallaxIcon.layers.length);
+    const scene = wrapper.children[0] as HTMLElement;
+    expect(scene.tagName).toBe('DIV');
+    expect(scene.style.transformStyle).toBe('preserve-3d');
+  });
+
+  it('renders one child div per layer inside the scene', () => {
+    const { container } = render(
+      <ParallaxPxlKitIcon icon={testParallaxIcon} />
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    const scene = wrapper.children[0] as HTMLElement;
+    expect(scene.children.length).toBe(testParallaxIcon.layers.length);
   });
 
   it('renders SVGs inside layer divs', () => {
@@ -69,6 +80,23 @@ describe('ParallaxPxlKitIcon', () => {
     expect(wrapper.style.height).toBe('64px');
   });
 
+  it('applies perspective to container', () => {
+    const { container } = render(
+      <ParallaxPxlKitIcon icon={testParallaxIcon} perspective={500} />
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper.style.perspective).toBe('500px');
+  });
+
+  it('applies default perspective based on size', () => {
+    const { container } = render(
+      <ParallaxPxlKitIcon icon={testParallaxIcon} size={100} />
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    // default = size * 4 = 400
+    expect(wrapper.style.perspective).toBe('400px');
+  });
+
   it('applies className to container', () => {
     const { container } = render(
       <ParallaxPxlKitIcon icon={testParallaxIcon} className="my-parallax" />
@@ -89,8 +117,8 @@ describe('ParallaxPxlKitIcon', () => {
     const { container } = render(
       <ParallaxPxlKitIcon icon={testParallaxIcon} />
     );
-    const wrapper = container.firstChild as HTMLElement;
-    const layerDiv = wrapper.children[0] as HTMLElement;
+    const scene = (container.firstChild as HTMLElement).children[0] as HTMLElement;
+    const layerDiv = scene.children[0] as HTMLElement;
     expect(layerDiv.style.pointerEvents).toBe('none');
   });
 
@@ -98,9 +126,23 @@ describe('ParallaxPxlKitIcon', () => {
     const { container } = render(
       <ParallaxPxlKitIcon icon={testParallaxIcon} />
     );
-    const wrapper = container.firstChild as HTMLElement;
-    const layerDiv = wrapper.children[0] as HTMLElement;
+    const scene = (container.firstChild as HTMLElement).children[0] as HTMLElement;
+    const layerDiv = scene.children[0] as HTMLElement;
     expect(layerDiv.style.willChange).toBe('transform');
+  });
+
+  it('layer divs have translateZ transforms for 3D depth', () => {
+    const { container } = render(
+      <ParallaxPxlKitIcon icon={testParallaxIcon} layerGap={20} />
+    );
+    const scene = (container.firstChild as HTMLElement).children[0] as HTMLElement;
+    // Layers: 3 layers, midIndex = 1.
+    // layer 0: zNorm = 0 - 1 = -1, z = -20 * introProgress (starts at 0)
+    // layer 1: zNorm = 1 - 1 = 0, z = 0
+    // layer 2: zNorm = 2 - 1 = 1, z = 20 * introProgress (starts at 0)
+    // At mount, introProgress starts at 0, so all should be translateZ(0px)
+    const firstLayer = scene.children[0] as HTMLElement;
+    expect(firstLayer.style.transform).toContain('translateZ');
   });
 
   it('renders animated layers with AnimatedPxlKitIcon', () => {
@@ -120,6 +162,28 @@ describe('ParallaxPxlKitIcon', () => {
     // Should render without errors
     const svgs = container.querySelectorAll('svg');
     expect(svgs.length).toBe(2);
+  });
+
+  it('applies drop-shadow filter on non-back layers when shadow=true', () => {
+    const { container } = render(
+      <ParallaxPxlKitIcon icon={testParallaxIcon} shadow={true} />
+    );
+    const scene = (container.firstChild as HTMLElement).children[0] as HTMLElement;
+    // First layer (back) should NOT have shadow
+    const backLayer = scene.children[0] as HTMLElement;
+    expect(backLayer.style.filter).toBe('');
+    // Second layer should have shadow
+    const midLayer = scene.children[1] as HTMLElement;
+    expect(midLayer.style.filter).toContain('drop-shadow');
+  });
+
+  it('does not apply shadow filter when shadow=false', () => {
+    const { container } = render(
+      <ParallaxPxlKitIcon icon={testParallaxIcon} shadow={false} />
+    );
+    const scene = (container.firstChild as HTMLElement).children[0] as HTMLElement;
+    const midLayer = scene.children[1] as HTMLElement;
+    expect(midLayer.style.filter).toBe('');
   });
 
   it('handles mousemove and mouseleave events without crashing', () => {
