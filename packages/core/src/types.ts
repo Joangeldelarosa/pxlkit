@@ -278,6 +278,119 @@ export interface AnimatedPxlKitProps {
   style?: React.CSSProperties;
 }
 
+// ─── Parallax Layer Types ────────────────────
+
+/**
+ * A single layer in a parallax multi-layer icon.
+ * Each layer is a separate PxlKitData or AnimatedPxlKitData
+ * positioned at a specific depth for 3D parallax effects.
+ */
+export interface ParallaxLayer {
+  /** The icon data for this layer (static or animated) */
+  icon: PxlKitData | AnimatedPxlKitData;
+  /**
+   * Depth multiplier controlling parallax movement intensity.
+   * - `0`  = no movement (anchor layer)
+   * - `>0` = moves with mouse (higher = more movement, farther back)
+   * - `<0` = moves opposite to mouse (foreground pop-out feel)
+   */
+  depth: number;
+  /** Optional horizontal offset in grid units (default: 0) */
+  offsetX?: number;
+  /** Optional vertical offset in grid units (default: 0) */
+  offsetY?: number;
+}
+
+/**
+ * A multi-layer parallax icon composed of stacked pixel art layers.
+ *
+ * When rendered with the ParallaxPxlKitIcon component, each layer
+ * translates based on mouse position multiplied by its depth value,
+ * creating a 3D parallax effect.
+ *
+ * @example
+ * ```ts
+ * const coolEmoji: ParallaxPxlKitData = {
+ *   name: 'cool-emoji',
+ *   size: 32,
+ *   category: 'parallax',
+ *   layers: [
+ *     { icon: chainIcon,      depth: 3 },   // back: moves most
+ *     { icon: faceIcon,       depth: 0 },   // anchor: no movement
+ *     { icon: sunglassesIcon, depth: -2 },  // front: moves opposite
+ *   ],
+ *   tags: ['emoji', 'cool', '3d', 'parallax'],
+ * };
+ * ```
+ */
+export interface ParallaxPxlKitData {
+  /** Unique icon name in kebab-case */
+  name: string;
+  /** Base grid size — all layers should use this same size */
+  size: GridSize;
+  /** Category / pack name */
+  category: string;
+  /** Layers ordered from back to front (first = deepest, last = closest) */
+  layers: ParallaxLayer[];
+  /** Searchable tags */
+  tags: string[];
+  /** Optional author */
+  author?: string;
+}
+
+/**
+ * Props for the ParallaxPxlKitIcon React component.
+ */
+export interface ParallaxPxlKitProps {
+  /** The parallax icon data */
+  icon: ParallaxPxlKitData;
+  /** Container size in px (default: 64) */
+  size?: number;
+  /**
+   * Controls how strongly the icon reacts to mouse movement.
+   * Higher = more dramatic 3D tilt. (default: 18)
+   */
+  strength?: number;
+  /** Renders layers in full color (default: true) */
+  colorful?: boolean;
+  /** Smooth lerp factor 0–1 (default: 0.06) */
+  smoothing?: number;
+  /**
+   * CSS perspective distance in px.
+   * Controls how pronounced the 3D effect is — smaller = more dramatic.
+   * Default: `max(200, size × 2.5)`.
+   */
+  perspective?: number;
+  /**
+   * Spacing between layers along the Z axis in px.
+   * Higher values spread layers farther apart.
+   * Default: `max(12, size × 0.2)`.
+   */
+  layerGap?: number;
+  /**
+   * Whether to render soft drop-shadows between layers for depth.
+   * Default: true.
+   */
+  shadow?: boolean;
+  /**
+   * Enable click interactions — on click the icon explodes layers apart,
+   * adds a random rotation jolt, and emits pixel particles.
+   * Default: true.
+   */
+  interactive?: boolean;
+  /**
+   * Callback fired when the icon is clicked / activated.
+   * Receives the current `active` state (toggled on each click).
+   */
+  onActivate?: (active: boolean) => void;
+  /** Additional CSS class names */
+  className?: string;
+  /** Accessible label */
+  'aria-label'?: string;
+  /** Inline styles */
+  style?: React.CSSProperties;
+}
+
 /**
  * Props for the PixelToast React component
  */
