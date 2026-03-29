@@ -76,7 +76,7 @@ describe('gridToPixels', () => {
   it('returns empty array for all-transparent grid', () => {
     const emptyIcon = {
       name: 'empty',
-      size: 8,
+      size: 8 as const,
       category: 'test',
       grid: Array(8).fill('........'),
       palette: {},
@@ -95,7 +95,7 @@ describe('gridToPixels', () => {
   it('excludes pixels with opacity 0', () => {
     const iconWithZeroOpacity = {
       name: 'zero-opacity',
-      size: 8,
+      size: 8 as const,
       category: 'test',
       grid: [
         'AA......',
@@ -116,7 +116,7 @@ describe('gridToPixels', () => {
   it('returns exactly 1 pixel for single-pixel icon', () => {
     const singlePixel = {
       name: 'single',
-      size: 8,
+      size: 8 as const,
       category: 'test',
       grid: [
         'A.......',
