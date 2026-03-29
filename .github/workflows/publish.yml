@@ -78,6 +78,7 @@ jobs:
             "packages/weather"
             "packages/ui"
             "packages/effects"
+            "packages/parallax"
             "packages/ui-kit"
           )
 

@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Bring retro aesthetics to the modern web.</strong><br/>
-  Pxlkit is a comprehensive React UI toolkit and icon library featuring over 200 pixel art icons divided into 6 themed packs. Includes 40+ styled components, animated SVGs, a visual builder, and a robust toast system.
+  Pxlkit is a comprehensive React UI toolkit and icon library featuring over 200 pixel art icons divided into 7 themed packs, including interactive 3D parallax icons. Includes 40+ styled components, animated SVGs, a visual builder, and a robust toast system.
 </p>
 
 <p align="center">
@@ -32,7 +32,8 @@ pxlkit/
 │   ├── social/         → 43 icons — community, emojis, messaging
 │   ├── weather/        → 34 icons — climate, moon phases, temperature
 │   ├── ui/             → 40 icons — interface controls, navigation
-│   └── effects/        →  6 icons — animated VFX, particles
+│   ├── effects/        →  6 icons — animated VFX, particles
+│   └── parallax/       → 10 icons — multi-layer 3D parallax
 └── apps/
     └── web/            → Next.js 15 showcase & documentation site
 ```
@@ -47,6 +48,7 @@ pxlkit/
 | **Weather**      | `@pxlkit/weather`      |     29 |        5 | **34** | Sun, moon, storms, temperature, night sky  |
 | **UI**           | `@pxlkit/ui`           |     35 |        5 | **40** | Home, search, settings, navigation, layout |
 | **Effects**      | `@pxlkit/effects`      |      0 |        6 |  **6** | Explosions, radar ping, flame, shockwave   |
+| **Parallax**     | `@pxlkit/parallax`     |      — |        — | **10** | Multi-layer 3D parallax icons (3–5 layers) |
 
 ## Quick Start
 
@@ -60,6 +62,12 @@ Install only the packs you need:
 
 ```bash
 npm install @pxlkit/core @pxlkit/feedback @pxlkit/social
+```
+
+For parallax 3D icons:
+
+```bash
+npm install @pxlkit/core @pxlkit/parallax
 ```
 
 ### Use in React
@@ -92,6 +100,22 @@ import { FireSword } from '@pxlkit/gamification';
 
 // Half speed
 <AnimatedPxlKitIcon icon={FireSword} size={48} colorful speed={0.5} />
+```
+
+### Parallax 3D Icons
+
+```tsx
+import { ParallaxPxlKitIcon } from '@pxlkit/core';
+import { CoolEmoji } from '@pxlkit/parallax';
+
+// Interactive parallax — layers move with mouse
+<ParallaxPxlKitIcon icon={CoolEmoji} size={64} colorful />
+
+// Custom depth strength and perspective
+<ParallaxPxlKitIcon icon={CoolEmoji} size={96} strength={24} perspective={300} />
+
+// Non-interactive (static 3D)
+<ParallaxPxlKitIcon icon={CoolEmoji} size={64} interactive={false} />
 ```
 
 ### Toast Notifications
@@ -205,11 +229,12 @@ export const FireSword: AnimatedPxlKitData = {
 
 ### React Components
 
-| Component          | Description                                  |
-| ------------------ | -------------------------------------------- |
-| `<PxlKitIcon>`         | Renders a static icon as crisp inline SVG    |
-| `<AnimatedPxlKitIcon>` | Renders an animated icon with frame playback |
-| `<PixelToast>`     | Pixel-art styled toast notification          |
+| Component                | Description                                            |
+| ------------------------ | ------------------------------------------------------ |
+| `<PxlKitIcon>`           | Renders a static icon as crisp inline SVG              |
+| `<AnimatedPxlKitIcon>`   | Renders an animated icon with frame playback           |
+| `<ParallaxPxlKitIcon>`   | Renders a multi-layer 3D parallax icon with mouse tracking |
+| `<PixelToast>`           | Pixel-art styled toast notification                    |
 
 ### Utilities
 
@@ -223,6 +248,7 @@ export const FireSword: AnimatedPxlKitData = {
 | `svgToBase64(svg)`                   | Converts SVG to base64 data URI           |
 | `validateIconData(icon)`             | Validates icon structure, returns errors  |
 | `isAnimatedIcon(icon)`               | Type guard for `AnimatedPxlKitData`       |
+| `isParallaxIcon(icon)`               | Type guard for `ParallaxPxlKitData`       |
 | `parseIconCode(code)`                | Parses icon code string → `PxlKitData`    |
 | `generateIconCode(icon)`             | Generates TypeScript code from icon data  |
 | `hexToRgb(hex)` / `rgbToHex(r,g,b)`  | Color conversion utilities                |
@@ -271,8 +297,8 @@ The web app runs on **http://localhost:3333**.
 packages/
   core/                 → @pxlkit/core
     src/
-      types.ts          → PxlKitData, AnimatedPxlKitData, IconPack, etc.
-      components/       → PxlKitIcon, AnimatedPxlKitIcon, PixelToast
+      types.ts          → PxlKitData, AnimatedPxlKitData, ParallaxPxlKitData, IconPack, etc.
+      components/       → PxlKitIcon, AnimatedPxlKitIcon, ParallaxPxlKitIcon, PixelToast
       utils/            → gridToPixels, gridToSvg, colorUtils, validateIconData
   gamification/         → @pxlkit/gamification
     src/icons/          → One .ts file per icon (trophy.ts, sword.ts, ...)
@@ -282,6 +308,9 @@ packages/
   weather/              → @pxlkit/weather
   ui/                   → @pxlkit/ui
   effects/              → @pxlkit/effects
+  parallax/             → @pxlkit/parallax
+    src/icons/          → One .ts file per parallax icon (cool-emoji.ts, pixel-heart.ts, ...)
+    src/index.ts        → Re-exports + ParallaxPack
 apps/
   web/                  → @pxlkit/web (Next.js 15 + Tailwind + Framer Motion)
     src/app/            → Home, icons browser, builder, toast playground, docs
@@ -332,6 +361,7 @@ Checks grid dimensions (16×16), palette usage, and detects unused/missing palet
 | `@pxlkit/weather`      | [![npm](https://img.shields.io/npm/v/@pxlkit/weather?color=blue)](https://www.npmjs.com/package/@pxlkit/weather)           | Climate, moon, temperature     |
 | `@pxlkit/ui`           | [![npm](https://img.shields.io/npm/v/@pxlkit/ui?color=blue)](https://www.npmjs.com/package/@pxlkit/ui)                     | Interface controls, navigation |
 | `@pxlkit/effects`      | [![npm](https://img.shields.io/npm/v/@pxlkit/effects?color=blue)](https://www.npmjs.com/package/@pxlkit/effects)           | Animated VFX, particles        |
+| `@pxlkit/parallax`     | [![npm](https://img.shields.io/npm/v/@pxlkit/parallax?color=blue)](https://www.npmjs.com/package/@pxlkit/parallax)         | Multi-layer 3D parallax icons  |
 
 ## Automated npm Publishing (CI/CD)
 
@@ -397,6 +427,7 @@ git push origin main --follow-tags
 | `@pxlkit/weather` | `packages/weather` |
 | `@pxlkit/ui` | `packages/ui` |
 | `@pxlkit/effects` | `packages/effects` |
+| `@pxlkit/parallax` | `packages/parallax` |
 | `@pxlkit/ui-kit` | `packages/ui-kit` |
 
 > Private packages (`apps/web`, `example-page`) are **not** published.

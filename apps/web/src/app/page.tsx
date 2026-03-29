@@ -15,6 +15,7 @@ import {
 import { SocialPack, Heart } from '@pxlkit/social';
 import { WeatherPack, Sun } from '@pxlkit/weather';
 import { EffectsPack } from '@pxlkit/effects';
+import { ParallaxPack } from '@pxlkit/parallax';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -23,7 +24,6 @@ import { HeroCollage, TOTAL_ICON_COUNT } from '../components/HeroCollage';
 import { useToast } from '../components/ToastProvider';
 import type { ToastTone } from '../components/ToastProvider';
 import { CoolEmoji } from '../data/cool-emoji';
-import { PARALLAX_ICONS } from '../data/parallax-icons';
 import {
   PixelBadge,
   PixelButton,
@@ -262,7 +262,7 @@ function ParallaxShowcase() {
           <div className="inline-flex items-center gap-2 mb-4">
             <PixelBadge tone="gold">NEW</PixelBadge>
             <PixelBadge tone="purple">Interactive 3D</PixelBadge>
-            <PixelBadge tone="green">{PARALLAX_ICONS.length} Icons</PixelBadge>
+            <PixelBadge tone="green">{ParallaxPack.length} Icons</PixelBadge>
           </div>
           <h2 className="font-pixel text-lg text-retro-gold mb-3">
             3D PARALLAX ICON PACK
@@ -308,14 +308,14 @@ function ParallaxShowcase() {
           <div className="flex items-center gap-2 sm:gap-3 mb-5 min-w-0">
             <h3 className="font-pixel text-[11px] shrink-0 text-retro-gold">3D Parallax Pack</h3>
             <span className="font-mono text-[10px] text-retro-muted/60 shrink-0">
-              {PARALLAX_ICONS.length} interactive icons
+              {ParallaxPack.length} interactive icons
             </span>
             <div className="flex-1 border-t border-retro-border/20 min-w-[12px]" />
             <span className="hidden sm:block font-mono text-[10px] text-retro-muted/40 truncate">animated · 3-layer · click-reactive</span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {PARALLAX_ICONS.map((icon) => (
+            {ParallaxPack.map((icon) => (
               <motion.div
                 key={icon.name}
                 whileHover={{ scale: 1.05 }}
