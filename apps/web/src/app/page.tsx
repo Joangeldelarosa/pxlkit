@@ -23,6 +23,7 @@ import { HeroCollage, TOTAL_ICON_COUNT } from '../components/HeroCollage';
 import { useToast } from '../components/ToastProvider';
 import type { ToastTone } from '../components/ToastProvider';
 import { CoolEmoji } from '../data/cool-emoji';
+import { PARALLAX_ICONS } from '../data/parallax-icons';
 import {
   PixelBadge,
   PixelButton,
@@ -251,7 +252,7 @@ function ParallaxShowcase() {
       {/* Decorative background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-retro-gold/5 rounded-full blur-[150px] pointer-events-none" />
 
-      <div className="relative max-w-5xl mx-auto">
+      <div className="relative max-w-6xl mx-auto">
         <motion.div
           className="text-center mb-6"
           initial={{ opacity: 0, y: 20 }}
@@ -260,121 +261,94 @@ function ParallaxShowcase() {
         >
           <div className="inline-flex items-center gap-2 mb-4">
             <PixelBadge tone="gold">NEW</PixelBadge>
-            <PixelBadge tone="purple">3D CSS Transforms</PixelBadge>
+            <PixelBadge tone="purple">Interactive 3D</PixelBadge>
+            <PixelBadge tone="green">{PARALLAX_ICONS.length} Icons</PixelBadge>
           </div>
           <h2 className="font-pixel text-lg text-retro-gold mb-3">
-            TRUE 3D PARALLAX ICONS
+            3D PARALLAX ICON PACK
           </h2>
-          <p className="text-retro-muted max-w-xl mx-auto text-sm">
-            Multi-layer pixel art icons with real CSS 3D perspective. Each layer
-            floats at a different Z-depth — move your mouse to rotate the scene
-            and see the layers separate in true 3D space.
+          <p className="text-retro-muted max-w-2xl mx-auto text-sm">
+            Animated multi-layer pixel art with real CSS 3D perspective.
+            Each layer floats at a different Z-depth. Move your mouse anywhere
+            to rotate —<span className="text-retro-gold font-bold"> click any icon</span> to
+            trigger particle bursts, layer explosions, and color shifts.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-10 items-center mt-12">
-          {/* Interactive demo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="flex flex-col items-center"
-          >
-            <div className="relative p-10 rounded-2xl border border-retro-gold/20 bg-retro-bg/60 backdrop-blur-sm">
-              {/* Subtle animated ring */}
-              <div className="absolute inset-0 rounded-2xl border border-retro-gold/10 animate-pulse pointer-events-none" />
+        {/* Hero icon — large CoolEmoji demo */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="flex justify-center mb-12"
+        >
+          <div className="relative p-10 rounded-2xl border border-retro-gold/20 bg-retro-bg/60 backdrop-blur-sm">
+            <div className="absolute inset-0 rounded-2xl border border-retro-gold/10 animate-pulse pointer-events-none" />
+            <ParallaxPxlKitIcon
+              icon={CoolEmoji}
+              size={180}
+              strength={20}
+              layerGap={30}
+              interactive
+              colorful
+            />
+            <p className="mt-5 text-center font-mono text-[10px] text-retro-muted">
+              ↕ Move mouse to rotate · Click to interact
+            </p>
+          </div>
+        </motion.div>
 
-              <ParallaxPxlKitIcon
-                icon={CoolEmoji}
-                size={180}
-                strength={14}
-                layerGap={24}
-                colorful
-              />
+        {/* Full collection grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+        >
+          {/* Pack header */}
+          <div className="flex items-center gap-2 sm:gap-3 mb-5 min-w-0">
+            <h3 className="font-pixel text-[11px] shrink-0 text-retro-gold">3D Parallax Pack</h3>
+            <span className="font-mono text-[10px] text-retro-muted/60 shrink-0">
+              {PARALLAX_ICONS.length} interactive icons
+            </span>
+            <div className="flex-1 border-t border-retro-border/20 min-w-[12px]" />
+            <span className="hidden sm:block font-mono text-[10px] text-retro-muted/40 truncate">animated · 3-layer · click-reactive</span>
+          </div>
 
-              <p className="mt-5 text-center font-mono text-[10px] text-retro-muted">
-                ↕ Move your mouse to rotate in 3D
-              </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {PARALLAX_ICONS.map((icon) => (
+              <motion.div
+                key={icon.name}
+                whileHover={{ scale: 1.05 }}
+                className="relative flex flex-col items-center gap-2 p-4 rounded-lg border border-retro-gold/20 bg-retro-surface/30 hover:bg-retro-card transition-colors group"
+              >
+                <ParallaxPxlKitIcon
+                  icon={icon}
+                  size={64}
+                  strength={16}
+                  interactive
+                  colorful
+                />
+                <span className="font-mono text-[9px] text-retro-muted truncate w-full text-center group-hover:text-retro-gold transition-colors">
+                  {icon.name}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Info row below grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-10">
+          {[
+            { label: 'True 3D Depth', desc: 'CSS perspective + preserve-3d + per-layer translateZ', color: 'text-retro-gold' },
+            { label: 'Page-Wide Tracking', desc: 'Mouse rotation works across the entire viewport', color: 'text-retro-cyan' },
+            { label: 'Click Interactions', desc: 'Particle bursts, layer explosions, color shifts on click', color: 'text-retro-green' },
+            { label: 'Animated Layers', desc: 'Frame-based animation per layer — glints, pulses, sparkles', color: 'text-retro-purple' },
+          ].map((item) => (
+            <div key={item.label} className="p-3 rounded-lg border border-retro-border/20 bg-retro-surface/20">
+              <h4 className={`font-pixel text-[10px] ${item.color} mb-1`}>{item.label}</h4>
+              <p className="text-retro-muted text-[10px] leading-relaxed">{item.desc}</p>
             </div>
-
-            {/* Size variants */}
-            <div className="flex items-end gap-6 mt-8">
-              {[56, 80, 112].map((s) => (
-                <div key={s} className="text-center">
-                  <div className="p-3 rounded-lg border border-retro-border/30 bg-retro-surface/30">
-                    <ParallaxPxlKitIcon icon={CoolEmoji} size={s} strength={8} colorful />
-                  </div>
-                  <span className="font-mono text-[9px] text-retro-muted mt-1 block">{s}px</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Info panel */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="space-y-5"
-          >
-            <div className="space-y-4">
-              {[
-                {
-                  label: 'True 3D Depth — CSS Perspective',
-                  desc: 'Each layer lives at a real Z-depth via translateZ. The container uses CSS perspective and preserve-3d, so rotating the scene reveals actual depth separation between layers.',
-                  color: 'text-retro-gold',
-                },
-                {
-                  label: '3D Mouse Rotation',
-                  desc: 'Mouse movement rotates the entire scene with rotateX/rotateY. Combined with Z-separated layers, this creates a convincing 3D card-stack effect.',
-                  color: 'text-retro-cyan',
-                },
-                {
-                  label: 'Intro Peel-Apart Animation',
-                  desc: 'On mount, layers animate from flat (Z=0) to their final depths with an ease-out curve — a "peel apart" effect that reveals the 3D structure.',
-                  color: 'text-retro-green',
-                },
-                {
-                  label: 'Depth Shadows & GPU Compositing',
-                  desc: 'Soft drop-shadows between layers enhance depth perception. All transforms use GPU-accelerated compositing for smooth performance.',
-                  color: 'text-retro-purple',
-                },
-              ].map((item) => (
-                <div key={item.label} className="p-3 rounded-lg border border-retro-border/20 bg-retro-surface/20">
-                  <h4 className={`font-pixel text-[11px] ${item.color} mb-1`}>{item.label}</h4>
-                  <p className="text-retro-muted text-xs leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Code example */}
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="w-2 h-2 rounded-full bg-retro-gold" />
-                <span className="font-mono text-[10px] text-retro-muted">Usage</span>
-              </div>
-              <pre className="code-block text-[11px] leading-relaxed overflow-x-auto">
-                <code className="text-retro-text/90">{`import { ParallaxPxlKitIcon } from '@pxlkit/core';
-import { CoolEmoji } from './icons/cool-emoji';
-
-<ParallaxPxlKitIcon
-  icon={CoolEmoji}
-  size={128}
-  strength={12}
-  layerGap={20}
-  shadow
-  colorful
-/>`}</code>
-              </pre>
-            </div>
-
-            {/* Layer breakdown badges */}
-            <div className="flex flex-wrap gap-2">
-              <PixelBadge tone="gold">Back: Chain (Z−)</PixelBadge>
-              <PixelBadge tone="neutral">Mid: Face (Z=0)</PixelBadge>
-              <PixelBadge tone="cyan">Front: Glasses (Z+)</PixelBadge>
-            </div>
-          </motion.div>
+          ))}
         </div>
       </div>
     </section>

@@ -348,23 +348,23 @@ export interface ParallaxPxlKitProps {
   size?: number;
   /**
    * Controls how strongly the icon reacts to mouse movement.
-   * Higher = more dramatic 3D tilt. (default: 8)
+   * Higher = more dramatic 3D tilt. (default: 18)
    */
   strength?: number;
   /** Renders layers in full color (default: true) */
   colorful?: boolean;
-  /** Smooth lerp factor 0–1 (default: 0.08) */
+  /** Smooth lerp factor 0–1 (default: 0.06) */
   smoothing?: number;
   /**
    * CSS perspective distance in px.
    * Controls how pronounced the 3D effect is — smaller = more dramatic.
-   * Default: `size × 4`.
+   * Default: `max(200, size × 2.5)`.
    */
   perspective?: number;
   /**
    * Spacing between layers along the Z axis in px.
    * Higher values spread layers farther apart.
-   * Default: `max(8, size × 0.12)`.
+   * Default: `max(12, size × 0.2)`.
    */
   layerGap?: number;
   /**
@@ -372,6 +372,17 @@ export interface ParallaxPxlKitProps {
    * Default: true.
    */
   shadow?: boolean;
+  /**
+   * Enable click interactions — on click the icon explodes layers apart,
+   * adds a random rotation jolt, and emits pixel particles.
+   * Default: true.
+   */
+  interactive?: boolean;
+  /**
+   * Callback fired when the icon is clicked / activated.
+   * Receives the current `active` state (toggled on each click).
+   */
+  onActivate?: (active: boolean) => void;
   /** Additional CSS class names */
   className?: string;
   /** Accessible label */
