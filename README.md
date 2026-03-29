@@ -333,6 +333,77 @@ Checks grid dimensions (16×16), palette usage, and detects unused/missing palet
 | `@pxlkit/ui`           | [![npm](https://img.shields.io/npm/v/@pxlkit/ui?color=blue)](https://www.npmjs.com/package/@pxlkit/ui)                     | Interface controls, navigation |
 | `@pxlkit/effects`      | [![npm](https://img.shields.io/npm/v/@pxlkit/effects?color=blue)](https://www.npmjs.com/package/@pxlkit/effects)           | Animated VFX, particles        |
 
+## Automated npm Publishing (CI/CD)
+
+All packages are published automatically to npm via GitHub Actions whenever a new **version tag** is pushed or a **GitHub Release** is created.
+
+### How It Works
+
+The workflow (`.github/workflows/publish.yml`) runs on:
+
+- **Tag push** — pushing a tag matching `v*` (e.g. `v1.2.0`)
+- **GitHub Release** — creating/publishing a release in the GitHub UI
+
+It builds every workspace package, validates icons, and publishes all `@pxlkit/*` packages to npm with [provenance](https://docs.npmjs.com/generating-provenance-statements) enabled. Packages whose version is already on npm are safely skipped (`continue-on-error`).
+
+### Setup
+
+1. **Generate an npm access token**
+   - Go to [npmjs.com → Access Tokens](https://www.npmjs.com/settings/~/tokens) and create a **Granular Access Token** with read/write permission for packages under the `@pxlkit` scope.
+
+2. **Add the token to GitHub Secrets**
+   - In the repository, go to **Settings → Secrets and variables → Actions → New repository secret**.
+   - Name: `NPM_TOKEN`
+   - Value: paste the token from step 1.
+
+3. **Verify package versions**
+   - Before releasing, bump the `version` field in every `packages/*/package.json` that you want to publish. npm rejects publishes when the version already exists on the registry.
+
+### How to Release
+
+```bash
+# 1. Bump versions in the packages you changed
+# 2. Commit the version bumps
+git add .
+git commit -m "chore: bump versions to 1.1.0"
+
+# 3. Create and push a tag
+git tag v1.1.0
+git push origin main --follow-tags
+```
+
+Alternatively, create a **Release** from the GitHub UI (which also creates a tag) — the workflow triggers on both events.
+
+### Published Packages
+
+| Package | Workspace path |
+| --- | --- |
+| `@pxlkit/core` | `packages/core` |
+| `@pxlkit/gamification` | `packages/gamification` |
+| `@pxlkit/feedback` | `packages/feedback` |
+| `@pxlkit/social` | `packages/social` |
+| `@pxlkit/weather` | `packages/weather` |
+| `@pxlkit/ui` | `packages/ui` |
+| `@pxlkit/effects` | `packages/effects` |
+| `@pxlkit/ui-kit` | `packages/ui-kit` |
+
+> Private packages (`apps/web`, `example-page`) are **not** published.
+
+### Common Errors
+
+| Error | Cause | Fix |
+| --- | --- | --- |
+| `403 Forbidden` | Invalid or expired `NPM_TOKEN` | Regenerate the token on npmjs.com and update the GitHub secret |
+| `402 Payment Required` | Publishing a scoped package as private | Ensure `--access public` is used (already set in the workflow) |
+| `EPUBLISHCONFLICT` / `You cannot publish over the previously published versions` | Version already exists on npm | Bump the `version` field in the package's `package.json` before tagging |
+| `npm ERR! Workspaces: ...` | Incorrect `--workspace` path | Verify that the workspace path in the workflow matches the actual directory |
+
+### Secrets Reference
+
+| Secret | Required | Description |
+| --- | --- | --- |
+| `NPM_TOKEN` | **Yes** | npm access token with publish permissions for the `@pxlkit` scope |
+
 ## Contributing
 
 Contributions are welcome! Whether it's new icons, bug fixes, or documentation improvements.
