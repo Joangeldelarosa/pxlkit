@@ -54,10 +54,7 @@
     "pxlkit"
   ],
   "homepage": "https://pxlkit.xyz",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/joangeldelarosa/pxlkit"
-  },
+  "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
