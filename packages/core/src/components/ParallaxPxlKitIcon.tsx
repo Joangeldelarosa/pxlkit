@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { ParallaxPxlKitProps } from '../types';
 import { PxlKitIcon } from './PxlKitIcon';
 import { AnimatedPxlKitIcon } from './AnimatedPxlKitIcon';
@@ -76,16 +76,6 @@ export function ParallaxPxlKitIcon({
   // Max tilt angle in degrees — derived from strength
   const maxTilt = clamp(strength * 1.5, 2, 35);
 
-  const setLayerRef = useCallback(
-    (index: number, el: HTMLDivElement | null) => {
-      // We don't need individual layer refs for 3D — the scene rotation
-      // handles everything.  Kept for shadow updates.
-      layerEls.current[index] = el;
-    },
-    [],
-  );
-  const layerEls = useRef<(HTMLDivElement | null)[]>([]);
-
   useEffect(() => {
     const container = containerRef.current;
     const scene = sceneRef.current;
@@ -122,7 +112,7 @@ export function ParallaxPxlKitIcon({
       introRef.current = eased;
       if (t < 1) {
         setIntroProgress(eased);
-      } else if (introRef.current !== 1) {
+      } else {
         setIntroProgress(1);
       }
 
@@ -204,7 +194,6 @@ export function ParallaxPxlKitIcon({
           return (
             <div
               key={`${icon.name}-layer-${i}`}
-              ref={(el) => setLayerRef(i, el)}
               style={{
                 position: 'absolute',
                 inset: 0,
