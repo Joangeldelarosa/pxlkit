@@ -7,11 +7,7 @@
     "url": "https://github.com/joangeldelarosa"
   },
   "license": "SEE LICENSE IN LICENSE",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/joangeldelarosa/pxlkit",
-    "directory": "packages/ui-kit"
-  },
+  "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

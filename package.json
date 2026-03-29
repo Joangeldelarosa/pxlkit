@@ -7,10 +7,7 @@
     "url": "https://github.com/joangeldelarosa"
   },
   "description": "Open source retro pixel art icon library",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/joangeldelarosa/pxlkit"
-  },
+  "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "homepage": "https://pxlkit.xyz",
   "license": "SEE LICENSE IN LICENSE",
   "workspaces": [
