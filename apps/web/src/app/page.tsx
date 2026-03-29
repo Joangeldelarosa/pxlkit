@@ -1,6 +1,6 @@
 'use client';
 
-import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon, parseAnyIconCode } from '@pxlkit/core';
+import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon, parseAnyIconCode, ParallaxPxlKitIcon } from '@pxlkit/core';
 import type { PxlKitData, AnyIcon } from '@pxlkit/core';
 import {
   Trophy, Lightning, GamificationPack, FireSword,
@@ -22,6 +22,7 @@ import { useState, useCallback } from 'react';
 import { HeroCollage, TOTAL_ICON_COUNT } from '../components/HeroCollage';
 import { useToast } from '../components/ToastProvider';
 import type { ToastTone } from '../components/ToastProvider';
+import { CoolEmoji } from '../data/cool-emoji';
 import {
   PixelBadge,
   PixelButton,
@@ -52,10 +53,12 @@ export default function HomePage() {
     <div className="relative overflow-x-hidden w-full max-w-[100vw]">
       <HeroSection />
       <FeaturesSection />
+      <ParallaxShowcase />
       <IconShowcase />
       <ToastSection />
       <HowItWorks />
       <AISection />
+      <PricingPreview />
       <CTASection />
     </div>
   );
@@ -236,6 +239,140 @@ function FeaturesSection() {
             </motion.div>
           ))}
         </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ──────────────────── PARALLAX 3D ICONS (NEW) ──────────────────── */
+function ParallaxShowcase() {
+  return (
+    <section className="py-20 px-4 border-t border-retro-border/30 bg-retro-surface/20 relative overflow-hidden">
+      {/* Decorative background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-retro-gold/5 rounded-full blur-[150px] pointer-events-none" />
+
+      <div className="relative max-w-5xl mx-auto">
+        <motion.div
+          className="text-center mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <div className="inline-flex items-center gap-2 mb-4">
+            <PixelBadge tone="gold">NEW</PixelBadge>
+            <PixelBadge tone="purple">Experimental</PixelBadge>
+          </div>
+          <h2 className="font-pixel text-lg text-retro-gold mb-3">
+            PARALLAX 3D ICONS
+          </h2>
+          <p className="text-retro-muted max-w-xl mx-auto text-sm">
+            Multi-layer pixel art icons with mouse-tracking parallax.
+            Each layer sits at a different depth, creating a real 3D effect.
+            Move your mouse over the icon to see it in action.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-10 items-center mt-12">
+          {/* Interactive demo */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="flex flex-col items-center"
+          >
+            <div className="relative p-8 rounded-2xl border border-retro-gold/20 bg-retro-bg/60 backdrop-blur-sm">
+              {/* Subtle animated ring */}
+              <div className="absolute inset-0 rounded-2xl border border-retro-gold/10 animate-pulse pointer-events-none" />
+
+              <ParallaxPxlKitIcon
+                icon={CoolEmoji}
+                size={160}
+                strength={12}
+                colorful
+              />
+
+              <p className="mt-4 text-center font-mono text-[10px] text-retro-muted">
+                ↕ Move your mouse over the icon
+              </p>
+            </div>
+
+            {/* Size variants */}
+            <div className="flex items-end gap-6 mt-8">
+              {[48, 72, 96].map((s) => (
+                <div key={s} className="text-center">
+                  <div className="p-3 rounded-lg border border-retro-border/30 bg-retro-surface/30">
+                    <ParallaxPxlKitIcon icon={CoolEmoji} size={s} strength={6} colorful />
+                  </div>
+                  <span className="font-mono text-[9px] text-retro-muted mt-1 block">{s}px</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Info panel */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="space-y-5"
+          >
+            <div className="space-y-4">
+              {[
+                {
+                  label: 'Multi-Layer Composition',
+                  desc: 'Each icon is composed of 3–5 separate pixel art layers — face, glasses, chain, effects — stacked with depth separation.',
+                  color: 'text-retro-gold',
+                },
+                {
+                  label: 'Mouse Parallax',
+                  desc: 'Layers translate at different rates based on their depth value, creating an interactive 3D effect that follows the cursor.',
+                  color: 'text-retro-cyan',
+                },
+                {
+                  label: 'Animated Layer Support',
+                  desc: 'Each layer can be static or animated (frame-based). Mix and match animated effects with static elements.',
+                  color: 'text-retro-green',
+                },
+                {
+                  label: 'GPU-Accelerated',
+                  desc: 'Uses translate3d transforms and requestAnimationFrame for smooth 60fps parallax with configurable lerp smoothing.',
+                  color: 'text-retro-purple',
+                },
+              ].map((item) => (
+                <div key={item.label} className="p-3 rounded-lg border border-retro-border/20 bg-retro-surface/20">
+                  <h4 className={`font-pixel text-[11px] ${item.color} mb-1`}>{item.label}</h4>
+                  <p className="text-retro-muted text-xs leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Code example */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-2 h-2 rounded-full bg-retro-gold" />
+                <span className="font-mono text-[10px] text-retro-muted">Usage</span>
+              </div>
+              <pre className="code-block text-[11px] leading-relaxed overflow-x-auto">
+                <code className="text-retro-text/90">{`import { ParallaxPxlKitIcon } from '@pxlkit/core';
+import { CoolEmoji } from './icons/cool-emoji';
+
+<ParallaxPxlKitIcon
+  icon={CoolEmoji}
+  size={128}
+  strength={10}
+  colorful
+/>`}</code>
+              </pre>
+            </div>
+
+            {/* Layer breakdown badges */}
+            <div className="flex flex-wrap gap-2">
+              <PixelBadge tone="gold">Layer 1: Chain (depth: 2.5)</PixelBadge>
+              <PixelBadge tone="neutral">Layer 2: Face (depth: 0)</PixelBadge>
+              <PixelBadge tone="cyan">Layer 3: Glasses (depth: −1.5)</PixelBadge>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -843,6 +980,123 @@ Create an animated [DESCRIBE YOUR ICON HERE] icon.`;
             )}
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ──────────────────── PRICING PREVIEW ──────────────────── */
+function PricingPreview() {
+  const router = useRouter();
+
+  const plans = [
+    {
+      name: 'Community',
+      price: 'Free',
+      suffix: 'forever',
+      color: 'green' as const,
+      features: ['204+ pixel art icons', '6 thematic packs', 'React UI kit', 'Attribution required'],
+    },
+    {
+      name: 'Indie',
+      price: '$9.50',
+      originalPrice: '$19',
+      suffix: 'one-time · 1 project',
+      color: 'gold' as const,
+      popular: true,
+      features: ['No attribution', '1 commercial project', 'Lifetime license', 'All current packs'],
+    },
+    {
+      name: 'Team',
+      price: '$24.50',
+      originalPrice: '$49',
+      suffix: 'one-time · unlimited',
+      color: 'cyan' as const,
+      features: ['Unlimited projects', 'All future packs', 'Priority support', 'Sponsor logo'],
+    },
+  ];
+
+  const toneColors = {
+    green: { border: 'border-retro-green/30', text: 'text-retro-green', bg: 'bg-retro-green/5' },
+    gold: { border: 'border-retro-gold/30', text: 'text-retro-gold', bg: 'bg-retro-gold/5' },
+    cyan: { border: 'border-retro-cyan/30', text: 'text-retro-cyan', bg: 'bg-retro-cyan/5' },
+  };
+
+  return (
+    <section className="py-20 px-4 border-t border-retro-border/30">
+      <div className="max-w-5xl mx-auto">
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <div className="inline-flex items-center gap-2 mb-4">
+            <PixelBadge tone="red">50% OFF</PixelBadge>
+            <PixelBadge tone="gold">Launch Special</PixelBadge>
+          </div>
+          <h2 className="font-pixel text-lg text-retro-green mb-3">
+            SIMPLE PRICING
+          </h2>
+          <p className="text-retro-muted max-w-lg mx-auto text-sm">
+            Free for everyone with attribution. Remove it with a one-time payment.
+            All licenses are <span className="text-retro-gold">50% off</span> during launch.
+          </p>
+        </motion.div>
+
+        <motion.div
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, margin: '-80px' }}
+        >
+          {plans.map((plan) => {
+            const tc = toneColors[plan.color];
+            return (
+              <motion.div
+                key={plan.name}
+                variants={fadeInUp}
+                className={`relative rounded-xl border ${tc.border} ${tc.bg} p-5 transition-all hover:scale-[1.02] ${
+                  plan.popular ? 'ring-1 ring-retro-gold/30' : ''
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
+                    <PixelBadge tone="gold">Most Popular</PixelBadge>
+                  </div>
+                )}
+                <h3 className={`font-pixel text-sm ${tc.text} mb-1 ${plan.popular ? 'mt-2' : ''}`}>
+                  {plan.name}
+                </h3>
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="font-pixel text-2xl text-retro-text">{plan.price}</span>
+                  {plan.originalPrice && (
+                    <span className="font-mono text-xs text-retro-muted line-through">{plan.originalPrice}</span>
+                  )}
+                </div>
+                <p className="font-mono text-[10px] text-retro-muted mb-4">{plan.suffix}</p>
+                <ul className="space-y-1.5 mb-5">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-xs text-retro-muted">
+                      <span className={`w-1.5 h-1.5 rounded-full ${tc.text} bg-current shrink-0`} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <PixelButton
+                  tone={plan.color}
+                  size="sm"
+                  variant={plan.popular ? 'solid' : 'ghost'}
+                  onClick={() => router.push('/pricing')}
+                  className="w-full"
+                >
+                  {plan.price === 'Free' ? 'Get Started' : 'View Details'}
+                </PixelButton>
+              </motion.div>
+            );
+          })}
+        </motion.div>
       </div>
     </section>
   );

@@ -61,6 +61,8 @@ interface PlanFeature {
 interface Plan {
   name: string;
   price: string;
+  /** Original price before discount (shown with strikethrough) */
+  originalPrice?: string;
   priceSuffix: string;
   description: string;
   features: PlanFeature[];
@@ -93,7 +95,8 @@ const PLANS: Plan[] = [
   },
   {
     name: 'Indie',
-    price: '$19',
+    price: '$9.50',
+    originalPrice: '$19',
     priceSuffix: 'one-time · 1 project',
     description: 'Ship your product without attribution. One project, lifetime license, all current icons.',
     color: 'gold',
@@ -113,7 +116,8 @@ const PLANS: Plan[] = [
   },
   {
     name: 'Team',
-    price: '$49',
+    price: '$24.50',
+    originalPrice: '$49',
     priceSuffix: 'one-time · unlimited projects',
     description: 'The ultimate license for agencies and teams. Unlimited projects, all future packs, priority support.',
     color: 'cyan',
@@ -231,6 +235,10 @@ function HeroSection() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-retro-gold/6 rounded-full blur-[120px] pointer-events-none" />
 
       <motion.div className="relative z-10" {...fadeInUp}>
+        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-retro-red/40 bg-retro-red/10 backdrop-blur-sm text-retro-red font-mono text-xs mb-3 animate-pulse">
+          🔥 50% OFF — Launch Special
+        </span>
+        <br />
         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-retro-gold/30 bg-retro-bg/80 backdrop-blur-sm text-retro-gold font-mono text-xs mb-6">
           <span className="w-2 h-2 bg-retro-gold rounded-full animate-pulse" />
           Open Source · Fair Pricing
@@ -329,7 +337,17 @@ function PlanCard({ plan }: { plan: Plan }) {
           <span className={`text-4xl sm:text-5xl font-bold ${c.text} font-mono`}>
             {plan.price}
           </span>
+          {plan.originalPrice && (
+            <span className="text-lg font-mono text-retro-muted/50 line-through">
+              {plan.originalPrice}
+            </span>
+          )}
         </div>
+        {plan.originalPrice && (
+          <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-mono font-bold rounded border border-retro-red/40 bg-retro-red/10 text-retro-red">
+            50% OFF — Launch Special
+          </span>
+        )}
         <p className="text-retro-muted/60 text-xs font-mono mt-1">
           {plan.priceSuffix}
         </p>
