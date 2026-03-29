@@ -348,7 +348,7 @@ export interface ParallaxPxlKitProps {
   size?: number;
   /** Max parallax travel in px (default: 8) */
   strength?: number;
-  /** Render layers in full color (default: true) */
+  /** Renders layers in full color (default: true) */
   colorful?: boolean;
   /** Smooth lerp factor 0–1 (default: 0.08) */
   smoothing?: number;
