@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { PxlKitIcon, AnimatedPxlKitIcon, gridToSvg, generateAnimatedSvg, isAnimatedIcon, ParallaxPxlKitIcon } from '@pxlkit/core';
-import type { PxlKitData, IconPack, AnimatedPxlKitData, AnimationTrigger, ParallaxPxlKitData } from '@pxlkit/core';
+import type { PxlKitData, IconPack, AnimatedPxlKitData, AnimationTrigger } from '@pxlkit/core';
 import { GamificationPack } from '@pxlkit/gamification';
 import { FeedbackPack, Bell, CheckCircle, XCircle } from '@pxlkit/feedback';
 import { SocialPack } from '@pxlkit/social';
