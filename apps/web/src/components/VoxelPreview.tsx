@@ -808,7 +808,7 @@ function generatePineTree(bx: number, bz: number, h = 7): Voxel3D[] {
       for (let dx = -r; dx <= r; dx++) {
         for (let dz = -r; dz <= r; dz++) {
           if (Math.abs(dx) + Math.abs(dz) > r + 1) continue;
-          voxels.push({ x: bx + dx, y: baseY + dy, z: bz + dz, color: PINE_LEAF[(dx + dz + layer) % 3 < 0 ? 0 : (dx + dz + layer) % 3] });
+          voxels.push({ x: bx + dx, y: baseY + dy, z: bz + dz, color: PINE_LEAF[Math.abs(dx + dz + layer) % 3] });
         }
       }
     }
@@ -822,7 +822,7 @@ function generateBridge(x1: number, x2: number, z: number, y: number): Voxel3D[]
   for (let x = x1; x <= x2; x++) {
     // Deck
     for (let dz = -1; dz <= 1; dz++) {
-      voxels.push({ x, y, z: z + dz, color: BRIDGE_WOOD[(x + dz) % 3 < 0 ? 0 : (x + dz) % 3] });
+      voxels.push({ x, y, z: z + dz, color: BRIDGE_WOOD[Math.abs(x + dz) % 3] });
     }
     // Rails on sides
     if (x % 2 === 0) {
