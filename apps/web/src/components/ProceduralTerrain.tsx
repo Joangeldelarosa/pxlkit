@@ -22,6 +22,8 @@ interface WorldConfig {
   cityFrequency: number;     // 0-1
   pickupDensity: number;     // 0-1
   fogDensity: number;        // 0-1
+  biomeVariation: number;    // 0-1  how much each biome instance varies
+  terrainRoughness: number;  // 0-1  extra detail noise amplitude
 }
 
 const DEFAULT_CONFIG: WorldConfig = {
@@ -32,6 +34,8 @@ const DEFAULT_CONFIG: WorldConfig = {
   cityFrequency: 0.4,
   pickupDensity: 0.5,
   fogDensity: 0.5,
+  biomeVariation: 0.5,
+  terrainRoughness: 0.5,
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -198,6 +202,73 @@ const BIOMES: Record<BiomeType, BiomeConfig> = {
     colors: { top: '#888888', mid: '#666666', bottom: '#444444', accent: '#ffdd44', water: '#88ddff' },
   },
 };
+
+/* ═══════════════════════════════════════════════════════════════
+ *  Biome Variation — makes each biome region unique
+ *
+ *  Uses a low-frequency "region" noise to shift every numeric
+ *  and colour parameter of the base biome.  7 base types ×
+ *  continuous noise = hundreds of perceptually distinct variants.
+ *
+ *  regionId: deterministic hash of the region the column falls in.
+ *  variation: 0-1 intensity from config.biomeVariation.
+ * ═══════════════════════════════════════════════════════════════ */
+
+/** Region scale — how large a single biome "patch" is in voxels */
+const REGION_SCALE = 0.003;
+
+const _bvc = new THREE.Color();
+
+/** Shift a hex colour by HSL deltas */
+function shiftColor(hex: string, dh: number, ds: number, dl: number): string {
+  _bvc.set(hex);
+  const hsl = { h: 0, s: 0, l: 0 };
+  _bvc.getHSL(hsl);
+  hsl.h = (hsl.h + dh + 1) % 1;
+  hsl.s = Math.max(0, Math.min(1, hsl.s + ds));
+  hsl.l = Math.max(0, Math.min(1, hsl.l + dl));
+  _bvc.setHSL(hsl.h, hsl.s, hsl.l);
+  return '#' + _bvc.getHexString();
+}
+
+function getVariedBiome(
+  base: BiomeConfig,
+  wx: number, wz: number,
+  regionN: (x: number, y: number) => number,
+  variation: number,
+  roughness: number,
+): BiomeConfig {
+  if (variation < 0.01) return base;
+
+  const r1 = regionN(wx * REGION_SCALE + 200, wz * REGION_SCALE + 200);
+  const r2 = regionN(wx * REGION_SCALE + 400, wz * REGION_SCALE + 400);
+  const r3 = regionN(wx * REGION_SCALE + 600, wz * REGION_SCALE + 600);
+
+  const v = variation;
+  // Shift height parameters
+  const heightScaleShift = r1 * v * 4;                         // ±4
+  const heightBaseShift = Math.round(r2 * v * 2);             // ±2
+  const waterLevelShift = Math.round(r3 * v * 1.5);           // ±1-2
+
+  // Color hue/sat/lightness shifts (small, keeps biome identity)
+  const hueShift = r1 * v * 0.06;   // ±6% of colour wheel
+  const satShift = r2 * v * 0.12;   // ±12% saturation
+  const litShift = r3 * v * 0.08;   // ±8% lightness
+
+  return {
+    name: base.name,
+    heightScale: Math.max(1, base.heightScale + heightScaleShift + roughness * 3),
+    heightBase: Math.max(1, Math.min(MAX_HEIGHT - 10, base.heightBase + heightBaseShift)),
+    waterLevel: Math.max(0, Math.min(12, base.waterLevel + waterLevelShift)),
+    colors: {
+      top: shiftColor(base.colors.top, hueShift, satShift, litShift),
+      mid: shiftColor(base.colors.mid, hueShift * 0.5, satShift * 0.5, litShift * 0.7),
+      bottom: shiftColor(base.colors.bottom, hueShift * 0.3, satShift * 0.3, litShift * 0.5),
+      accent: shiftColor(base.colors.accent, hueShift * 0.8, satShift, litShift),
+      water: shiftColor(base.colors.water, hueShift * 0.4, satShift * 0.3, litShift * 0.3),
+    },
+  };
+}
 
 /* ═══════════════════════════════════════════════════════════════
  *  Constants
@@ -410,6 +481,7 @@ function generateChunkData(
   tempN: (x: number, y: number) => number,
   treeN: (x: number, y: number) => number,
   structN: (x: number, y: number) => number,
+  regionN: (x: number, y: number) => number,
   cfg: WorldConfig,
 ): ChunkVoxelData {
   const maxV = CHUNK_SIZE * CHUNK_SIZE * 16;
@@ -430,26 +502,33 @@ function generateChunkData(
   const hMap = new Int32Array(gW * gW);
   const bMap = new Uint8Array(gW * gW);
   const bTypes: BiomeType[] = ['plains', 'desert', 'tundra', 'forest', 'mountains', 'ocean', 'city'];
+  // Store per-column varied biome config (only for inner cells, indexed by lx*CHUNK_SIZE+lz)
+  const variedConfigs: BiomeConfig[] = new Array(CHUNK_SIZE * CHUNK_SIZE);
 
   for (let lx = -1; lx <= CHUNK_SIZE; lx++) {
     for (let lz = -1; lz <= CHUNK_SIZE; lz++) {
       const wx = bX + lx, wz = bZ + lz;
       const idx = (lx + 1) * gW + (lz + 1);
       const biome = getBiome(biomeN, tempN, wx, wz, cfg.cityFrequency);
-      const c = BIOMES[biome];
+      const base = BIOMES[biome];
+      const c = biome === 'city' ? base : getVariedBiome(base, wx, wz, regionN, cfg.biomeVariation, cfg.terrainRoughness);
+
+      // Store varied config for inner cells
+      if (lx >= 0 && lx < CHUNK_SIZE && lz >= 0 && lz < CHUNK_SIZE) {
+        variedConfigs[lx * CHUNK_SIZE + lz] = c;
+      }
 
       let h: number;
       if (biome === 'city') {
-        // City terrain is FLAT so roads are always level
         h = c.heightBase;
       } else {
-        const base = fbm(heightN, wx * 0.02, wz * 0.02, 4, 2.0, 0.5);
-        const det = detailN(wx * 0.08, wz * 0.08) * 0.25;
+        const base2 = fbm(heightN, wx * 0.02, wz * 0.02, 4, 2.0, 0.5);
+        const det = detailN(wx * 0.08, wz * 0.08) * (0.2 + cfg.terrainRoughness * 0.3);
         let extra = 0;
         if (biome === 'mountains') {
-          extra = Math.abs(fbm(detailN, wx * 0.015 + 200, wz * 0.015 + 200, 2)) * 6;
+          extra = Math.abs(fbm(detailN, wx * 0.015 + 200, wz * 0.015 + 200, 2)) * (4 + cfg.terrainRoughness * 4);
         }
-        h = Math.max(0, Math.min(MAX_HEIGHT, Math.floor(c.heightBase + (base + det) * c.heightScale + extra)));
+        h = Math.max(0, Math.min(MAX_HEIGHT, Math.floor(c.heightBase + (base2 + det) * c.heightScale + extra)));
       }
       hMap[idx] = h;
       bMap[idx] = bTypes.indexOf(biome);
@@ -489,7 +568,7 @@ function generateChunkData(
       const idx = (lx + 1) * gW + (lz + 1);
       const h = hMap[idx];
       const biome = bTypes[bMap[idx]] as BiomeType;
-      const c = BIOMES[biome];
+      const c = variedConfigs[lx * CHUNK_SIZE + lz] || BIOMES[biome];
       const wx = bX + lx, wz = bZ + lz;
 
       // Neighbor heights
@@ -1032,12 +1111,87 @@ function SkyGradient() {
   const meshRef = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
   useFrame(() => { if (meshRef.current) meshRef.current.position.copy(camera.position); });
+
+  /* Shader that renders:
+   * 1) A sky gradient (top blue → horizon warm → bottom light blue)
+   * 2) Procedural distant mountain silhouettes at the horizon
+   *    using layered sine-wave ridgelines (parallax-like depth)
+   *    with atmospheric haze. Zero voxel cost — pure GPU math. */
   const mat = useMemo(() => new THREE.ShaderMaterial({
-    vertexShader: `varying vec3 vWP;void main(){vec4 w=modelMatrix*vec4(position,1.0);vWP=w.xyz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
-    fragmentShader: `varying vec3 vWP;void main(){float h=normalize(vWP).y;vec3 top=vec3(0.2,0.35,0.65);vec3 bot=vec3(0.6,0.75,0.9);vec3 hor=vec3(0.85,0.75,0.6);vec3 c=h>0.0?mix(hor,top,smoothstep(0.0,0.5,h)):mix(hor,bot,smoothstep(0.0,-0.3,h));gl_FragColor=vec4(c,1.0);}`,
+    vertexShader: `
+      varying vec3 vWP;
+      void main() {
+        vec4 w = modelMatrix * vec4(position, 1.0);
+        vWP = w.xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }`,
+    fragmentShader: `
+      varying vec3 vWP;
+
+      /* Simple pseudo-random hash for ridgeline variation */
+      float hash(float n) { return fract(sin(n) * 43758.5453); }
+
+      /* Smooth noise from hash */
+      float snoise(float x) {
+        float i = floor(x);
+        float f = fract(x);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(hash(i), hash(i + 1.0), f);
+      }
+
+      void main() {
+        vec3 dir = normalize(vWP);
+        float h = dir.y;
+
+        /* Sky gradient */
+        vec3 topSky  = vec3(0.20, 0.35, 0.65);
+        vec3 horizon = vec3(0.75, 0.68, 0.58);
+        vec3 botSky  = vec3(0.55, 0.70, 0.85);
+        vec3 sky = h > 0.0
+          ? mix(horizon, topSky, smoothstep(0.0, 0.5, h))
+          : mix(horizon, botSky, smoothstep(0.0, -0.3, h));
+
+        /* Distant mountains — 3 layered ridgelines with parallax depth */
+        float angle = atan(dir.z, dir.x); /* horizontal angle around Y axis */
+
+        /* Layer 1 — far mountains (large, soft, darkest/haziest) */
+        float ridge1 = 0.0;
+        ridge1 += sin(angle * 3.0) * 0.04;
+        ridge1 += sin(angle * 7.0 + 1.5) * 0.025;
+        ridge1 += snoise(angle * 5.0) * 0.03;
+        ridge1 += snoise(angle * 12.0 + 3.0) * 0.015;
+        ridge1 += 0.06;
+
+        /* Layer 2 — mid mountains */
+        float ridge2 = 0.0;
+        ridge2 += sin(angle * 4.0 + 2.0) * 0.035;
+        ridge2 += sin(angle * 9.0 + 0.7) * 0.02;
+        ridge2 += snoise(angle * 8.0 + 10.0) * 0.025;
+        ridge2 += 0.04;
+
+        /* Layer 3 — near hills (smaller, sharper, darkest) */
+        float ridge3 = 0.0;
+        ridge3 += sin(angle * 6.0 + 4.0) * 0.025;
+        ridge3 += sin(angle * 14.0 + 2.3) * 0.012;
+        ridge3 += snoise(angle * 15.0 + 20.0) * 0.018;
+        ridge3 += 0.02;
+
+        /* Mountain colours — each layer has atmospheric perspective */
+        vec3 mtnFar  = mix(horizon, vec3(0.45, 0.50, 0.58), 0.4);
+        vec3 mtnMid  = mix(horizon, vec3(0.35, 0.42, 0.50), 0.55);
+        vec3 mtnNear = mix(horizon, vec3(0.25, 0.33, 0.42), 0.7);
+
+        vec3 col = sky;
+        /* Paint mountains only near the horizon (h close to 0) */
+        if (h < ridge1 && h > -0.05) col = mix(col, mtnFar,  smoothstep(ridge1, ridge1 - 0.01, h));
+        if (h < ridge2 && h > -0.05) col = mix(col, mtnMid,  smoothstep(ridge2, ridge2 - 0.008, h));
+        if (h < ridge3 && h > -0.05) col = mix(col, mtnNear, smoothstep(ridge3, ridge3 - 0.006, h));
+
+        gl_FragColor = vec4(col, 1.0);
+      }`,
     side: THREE.BackSide, depthWrite: false,
   }), []);
-  return <mesh ref={meshRef} material={mat}><sphereGeometry args={[500, 16, 16]} /></mesh>;
+  return <mesh ref={meshRef} material={mat}><sphereGeometry args={[500, 32, 32]} /></mesh>;
 }
 
 function FogEffect({ density }: { density: number }) {
@@ -1141,6 +1295,7 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
     height: createNoise2D(seed), detail: createNoise2D(seed + 1),
     biome: createNoise2D(seed + 2), temp: createNoise2D(seed + 3),
     tree: createNoise2D(seed + 4), struct: createNoise2D(seed + 5),
+    region: createNoise2D(seed + 6),
   }), [seed]);
 
   useFrame(() => {
@@ -1169,7 +1324,7 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
       const pk = pendingKeys.current.shift()!;
       if (chunkCacheRef.current.has(pk)) continue;
       const [pcx, pcz] = pk.split(',').map(Number);
-      const data = generateChunkData(pcx, pcz, noises.height, noises.detail, noises.biome, noises.temp, noises.tree, noises.struct, config);
+      const data = generateChunkData(pcx, pcz, noises.height, noises.detail, noises.biome, noises.temp, noises.tree, noises.struct, noises.region, config);
       chunkCacheRef.current.set(pk, data);
       generated++;
     }
@@ -1379,6 +1534,8 @@ export default function ProceduralTerrain() {
                 <ConfigSlider label="Structure Density" value={config.structureDensity} onChange={v => updateConfig('structureDensity', v)} min={0} max={1} step={0.1} color="text-retro-gold/80" displayValue={`${Math.round(config.structureDensity * 100)}%`} />
                 <ConfigSlider label="City Frequency" value={config.cityFrequency} onChange={v => updateConfig('cityFrequency', v)} min={0} max={1} step={0.1} color="text-retro-purple/80" displayValue={`${Math.round(config.cityFrequency * 100)}%`} />
                 <ConfigSlider label="Pickup Density" value={config.pickupDensity} onChange={v => updateConfig('pickupDensity', v)} min={0} max={1} step={0.1} color="text-retro-cyan/80" displayValue={`${Math.round(config.pickupDensity * 100)}%`} />
+                <ConfigSlider label="Biome Variation" value={config.biomeVariation} onChange={v => updateConfig('biomeVariation', v)} min={0} max={1} step={0.1} color="text-retro-green/80" displayValue={`${Math.round(config.biomeVariation * 100)}%`} />
+                <ConfigSlider label="Terrain Roughness" value={config.terrainRoughness} onChange={v => updateConfig('terrainRoughness', v)} min={0} max={1} step={0.1} color="text-retro-gold/80" displayValue={`${Math.round(config.terrainRoughness * 100)}%`} />
                 <ConfigSlider label="Fog Density" value={config.fogDensity} onChange={v => updateConfig('fogDensity', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.fogDensity * 100)}%`} />
               </div>
             )}
