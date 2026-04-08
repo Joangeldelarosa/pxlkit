@@ -209,8 +209,11 @@ interface ChunkVoxelData {
   waterPositions: Float32Array;
   waterColors: Float32Array;
   waterCount: number;
-  // Pickup positions for this chunk (world space, icon index)
   pickups: { wx: number; wy: number; wz: number; iconIdx: number }[];
+  // Heightmap for collision: max solid height at each (lx,lz) including structures
+  solidHeightMap: Int32Array; // CHUNK_SIZE * CHUNK_SIZE, indexed [lx * CHUNK_SIZE + lz]
+  chunkX: number;
+  chunkZ: number;
 }
 
 const _tc = new THREE.Color();
@@ -225,15 +228,17 @@ function generateChunkData(
   structN: (x: number, y: number) => number,
   cfg: WorldConfig,
 ): ChunkVoxelData {
-  const maxV = CHUNK_SIZE * CHUNK_SIZE * 12;
+  const maxV = CHUNK_SIZE * CHUNK_SIZE * 14;
   const posA = new Float32Array(maxV * 3);
   const colA = new Float32Array(maxV * 3);
   let sc = 0;
-  const maxW = CHUNK_SIZE * CHUNK_SIZE * 2;
+  const maxW = CHUNK_SIZE * CHUNK_SIZE * 10;
   const wPosA = new Float32Array(maxW * 3);
   const wColA = new Float32Array(maxW * 3);
   let wc = 0;
   const pickups: ChunkVoxelData['pickups'] = [];
+  // Track max solid height at each column for collision
+  const solidHeightMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
   const gW = CHUNK_SIZE + 2;
@@ -269,6 +274,13 @@ function generateChunkData(
     _tc.set(hex); colA[i3] = _tc.r; colA[i3 + 1] = _tc.g; colA[i3 + 2] = _tc.b;
     sc++;
   }
+  // Track the tallest solid voxel placed at each column (for collision)
+  function trackHeight(lx: number, lz: number, yTop: number) {
+    if (lx >= 0 && lx < CHUNK_SIZE && lz >= 0 && lz < CHUNK_SIZE) {
+      const idx2 = lx * CHUNK_SIZE + lz;
+      if (yTop > solidHeightMap[idx2]) solidHeightMap[idx2] = yTop;
+    }
+  }
   function pushW(px: number, py: number, pz: number, hex: string) {
     if (wc >= maxW) return;
     const i3 = wc * 3;
@@ -292,10 +304,21 @@ function generateChunkData(
       const hE = hMap[(lx + 2) * gW + (lz + 1)];
       const hW = hMap[lx * gW + (lz + 1)];
 
-      // ── Terrain voxels (surface only) ──
+      // ── Terrain voxels ──
+      // Render surface + any voxel exposed to air, water, or chunk edge.
+      // This ensures no hollow gaps are visible.
+      const wl = c.waterLevel;
+      const effectiveTop = Math.max(h, wl); // columns under water need walls visible through water
       for (let y = 0; y <= h; y++) {
         const isTop = y === h;
-        if (!isTop && y !== 0 && y <= hN && y <= hS && y <= hE && y <= hW) continue;
+        // A voxel is exposed if it's the top, bottom, or any neighbor is shorter
+        // For underwater columns, also expose sides that face water
+        const exposedN = y > hN || (y > h && y <= wl);
+        const exposedS = y > hS || (y > h && y <= wl);
+        const exposedE = y > hE || (y > h && y <= wl);
+        const exposedW2 = y > hW || (y > h && y <= wl);
+        const hasExposed = isTop || y === 0 || exposedN || exposedS || exposedE || exposedW2;
+        if (!hasExposed) continue;
         let col: string;
         if (isTop) {
           col = (biome === 'mountains' && y > 16) ? c.colors.accent[Math.abs(wx + wz) % c.colors.accent.length]
@@ -307,10 +330,25 @@ function generateChunkData(
         }
         push((bX + lx) * VOXEL_SIZE, y * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, col);
       }
+      trackHeight(lx, lz, h);
 
-      // ── Water (top surface only) ──
-      if (h < c.waterLevel) {
-        pushW((bX + lx) * VOXEL_SIZE, c.waterLevel * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, c.colors.water);
+      // ── Water — fill ALL voxels from terrain surface+1 to waterLevel ──
+      // This creates solid water with no gaps. Edges cascade naturally because
+      // neighboring columns with lower terrain will also have water voxels.
+      if (h < wl) {
+        for (let wy = h + 1; wy <= wl; wy++) {
+          // Only render water voxels that have an exposed face
+          const isWTop = wy === wl;
+          const wExpN = wy > hN && hN < wl;  // neighbor is lower → side exposed
+          const wExpS = wy > hS && hS < wl;
+          const wExpE = wy > hE && hE < wl;
+          const wExpW = wy > hW && hW < wl;
+          const wExposed = isWTop || wy === h + 1 || wExpN || wExpS || wExpE || wExpW;
+          if (!wExposed) continue;
+          pushW((bX + lx) * VOXEL_SIZE, wy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, c.colors.water);
+        }
+        // Water counts as collision surface too
+        trackHeight(lx, lz, wl);
       }
 
       // ── CITY BIOME — roads, buildings, lampposts ──
@@ -325,6 +363,7 @@ function generateChunkData(
           // Road surface — dark asphalt
           push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
             isIntersection ? '#555555' : '#444444');
+          trackHeight(lx, lz, h + 1);
           // Road markings — center line (dashed yellow) for Z-roads
           if (roadZ && !roadX && (((wz % 8) + 8) % 8) === 0 && (((wx % 4) + 4) % 4) < 2) {
             push((bX + lx) * VOXEL_SIZE, (h + 1.1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
@@ -334,10 +373,10 @@ function generateChunkData(
             for (let ly = 2; ly <= 6; ly++) {
               push((bX + lx) * VOXEL_SIZE, (h + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#666666');
             }
-            // Light
             push((bX + lx) * VOXEL_SIZE, (h + 7) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffee88');
             push((bX + lx + 1) * VOXEL_SIZE, (h + 6) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#666666');
             push((bX + lx + 1) * VOXEL_SIZE, (h + 7) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffee88');
+            trackHeight(lx, lz, h + 7);
           }
         } else {
           // Building lot — use noise to determine building type
@@ -385,6 +424,7 @@ function generateChunkData(
                 }
                 push((bX + lx) * VOXEL_SIZE, (h + by) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, isWindow ? windowColor : color);
               }
+              trackHeight(lx, lz, h + bh);
             }
           }
         }
@@ -408,6 +448,7 @@ function generateChunkData(
             if (d2 > cr * cr + 0.5 || (cr > 1 && d2 < (cr - 1) * (cr - 1))) continue;
             push((bX + lx + dx) * VOXEL_SIZE, (cy2 + dy) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, lc);
           }
+          trackHeight(lx, lz, cy2 + cr);
         }
       }
 
@@ -416,6 +457,7 @@ function generateChunkData(
         if (treeN(wx * 0.7 + 50, wz * 0.7 + 50) > 0.46) {
           const ch2 = 3 + (Math.abs(wx * 11 + wz * 3) % 3);
           for (let cy = 1; cy <= ch2; cy++) push((bX + lx) * VOXEL_SIZE, (h + cy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#55aa44');
+          trackHeight(lx, lz, h + ch2);
           if (ch2 > 3) {
             push((bX + lx + 1) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#66bb55');
             push((bX + lx + 1) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#66bb55');
@@ -435,6 +477,7 @@ function generateChunkData(
                 layer === pyrSize - 1 ? '#FFD700' : '#ddbb77');
             }
           }
+          trackHeight(lx, lz, h + pyrSize);
         }
       }
 
@@ -454,6 +497,7 @@ function generateChunkData(
             push((bX + lx + rx) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE, rc);
           for (let rx = 0; rx <= 2; rx++) for (let rz = 0; rz <= 2; rz++)
             push((bX + lx + rx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE, rc);
+          trackHeight(lx, lz, h + 5);
         }
       }
 
@@ -463,6 +507,7 @@ function generateChunkData(
           const rh = 1 + (Math.abs(wx * 7 + wz * 3) % 3);
           const rc = biome === 'tundra' ? '#8899aa' : '#667788';
           for (let ry = 1; ry <= rh; ry++) push((bX + lx) * VOXEL_SIZE, (h + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, rc);
+          trackHeight(lx, lz, h + rh);
           if (rh > 1) {
             push((bX + lx + 1) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, rc);
             push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz + 1) * VOXEL_SIZE, rc);
@@ -489,7 +534,7 @@ function generateChunkData(
   return {
     positions: posA.subarray(0, sc * 3), colors: colA.subarray(0, sc * 3), count: sc,
     waterPositions: wPosA.subarray(0, wc * 3), waterColors: wColA.subarray(0, wc * 3), waterCount: wc,
-    pickups,
+    pickups, solidHeightMap, chunkX: cx, chunkZ: cz,
   };
 }
 
@@ -603,16 +648,40 @@ function FloatingPickup({ position, iconIdx }: { position: [number, number, numb
 }
 
 /* ═══════════════════════════════════════════════════════════
- *  Fly Camera
+ *  Collision helper — query solid height from chunk cache
  * ═══════════════════════════════════════════════════════════ */
 
-function FlyCamera({ keysRef, speedRef }: {
+// Height of player's collision capsule above terrain in voxel-space
+const PLAYER_HEIGHT = 1.5;
+
+function getSolidHeight(chunkCache: Map<string, ChunkVoxelData>, worldX: number, worldZ: number): number {
+  // Convert world position to voxel grid coordinates
+  const vx = worldX / VOXEL_SIZE;
+  const vz = worldZ / VOXEL_SIZE;
+  const cx = Math.floor(vx / CHUNK_SIZE);
+  const cz = Math.floor(vz / CHUNK_SIZE);
+  const key = chunkKey(cx, cz);
+  const data = chunkCache.get(key);
+  if (!data) return 0;
+  const lx = Math.floor(vx - cx * CHUNK_SIZE);
+  const lz = Math.floor(vz - cz * CHUNK_SIZE);
+  if (lx < 0 || lx >= CHUNK_SIZE || lz < 0 || lz >= CHUNK_SIZE) return 0;
+  return data.solidHeightMap[lx * CHUNK_SIZE + lz];
+}
+
+/* ═══════════════════════════════════════════════════════════
+ *  Fly Camera — with collision detection
+ * ═══════════════════════════════════════════════════════════ */
+
+function FlyCamera({ keysRef, speedRef, chunkCacheRef }: {
   keysRef: React.RefObject<Set<string>>;
   speedRef: React.RefObject<number>;
+  chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
 }) {
   const { camera } = useThree();
   const _d = useMemo(() => new THREE.Vector3(), []);
   const _r = useMemo(() => new THREE.Vector3(), []);
+  const _prevPos = useMemo(() => new THREE.Vector3(), []);
 
   useEffect(() => { camera.position.set(0, 12, 20); camera.lookAt(0, 6, 0); }, [camera]);
 
@@ -620,6 +689,10 @@ function FlyCamera({ keysRef, speedRef }: {
     const keys = keysRef.current;
     if (!keys || keys.size === 0) return;
     const spd = (speedRef.current ?? 12) * delta;
+
+    // Save previous position for rollback
+    _prevPos.copy(camera.position);
+
     camera.getWorldDirection(_d);
     _r.crossVectors(_d, camera.up).normalize();
     if (keys.has('w') || keys.has('arrowup')) camera.position.addScaledVector(_d, spd);
@@ -628,6 +701,32 @@ function FlyCamera({ keysRef, speedRef }: {
     if (keys.has('d') || keys.has('arrowright')) camera.position.addScaledVector(_r, spd);
     if (keys.has(' ')) camera.position.addScaledVector(camera.up, spd);
     if (keys.has('shift')) camera.position.addScaledVector(camera.up, -spd);
+
+    // Collision: don't let camera go below solid terrain + player height
+    const cache = chunkCacheRef.current;
+    if (cache && cache.size > 0) {
+      const terrainH = getSolidHeight(cache, camera.position.x, camera.position.z);
+      const minY = (terrainH + PLAYER_HEIGHT) * VOXEL_SIZE;
+      if (camera.position.y < minY) {
+        camera.position.y = minY;
+      }
+      // Also check horizontal collision: if the new X/Z position is inside a tall column,
+      // push back to previous position on that axis
+      const newTerrainH = getSolidHeight(cache, camera.position.x, camera.position.z);
+      const newMinY = (newTerrainH + PLAYER_HEIGHT) * VOXEL_SIZE;
+      if (camera.position.y < newMinY) {
+        // Try sliding along X only
+        const hAtOldX = getSolidHeight(cache, _prevPos.x, camera.position.z);
+        const hAtOldZ = getSolidHeight(cache, camera.position.x, _prevPos.z);
+        if ((hAtOldX + PLAYER_HEIGHT) * VOXEL_SIZE <= camera.position.y) {
+          camera.position.x = _prevPos.x; // slide along Z
+        } else if ((hAtOldZ + PLAYER_HEIGHT) * VOXEL_SIZE <= camera.position.y) {
+          camera.position.z = _prevPos.z; // slide along X
+        } else {
+          camera.position.y = newMinY; // push up
+        }
+      }
+    }
   });
   return null;
 }
