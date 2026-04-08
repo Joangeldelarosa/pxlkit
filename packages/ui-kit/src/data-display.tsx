@@ -5,6 +5,7 @@ import {
   ChevronDownIcon, CheckIcon, CloseIcon, FieldShell
 } from './common';
 import { PixelButton } from './actions';
+import { usePxlKitLocale } from './locale';
 
 
 
@@ -110,8 +111,9 @@ export function PixelAvatar({
   size?: Size;
   tone?: Tone;
 }) {
+  const { upper } = usePxlKitLocale();
   const dim = size === 'sm' ? 'h-8 w-8 text-[9px]' : size === 'lg' ? 'h-12 w-12 text-xs' : 'h-10 w-10 text-[10px]';
-  const initials = name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+  const initials = upper(name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2));
   return (
     <div
       className={cn('inline-flex items-center justify-center rounded-lg border font-pixel', dim, toneMap[tone].border, toneMap[tone].soft, toneMap[tone].text)}
