@@ -54,6 +54,11 @@ import {
   PixelParallaxGroup,
   PixelMouseParallax,
   UI_KIT_COMPONENTS,
+  PxlKitLocaleProvider,
+  toLocaleUpper,
+  TURKISH_CHARACTERS,
+  PXLKIT_FONTS,
+  buildGoogleFontsUrl,
 } from '@pxlkit/ui-kit';
 import {
   Package, Search, Check, Grid, Edit, Robot, Copy, Gear, Menu, Home, ArrowRight, SparkleSmall,
@@ -78,6 +83,7 @@ const CATEGORIES = [
     items: [
       { id: 'getting-started', name: 'Getting Started' },
       { id: 'design-tokens', name: 'Design Tokens' },
+      { id: 'locale-support', name: 'Locale / Turkish' },
     ],
   },
   {
@@ -705,6 +711,215 @@ import { Search } from '@pxlkit/ui';
                   </div>
                 </div>
               </div>
+            </section>
+
+            {/* ══════════════════ LOCALE / TURKISH SUPPORT ══════════════════ */}
+            <section data-section="locale-support" id="locale-support" className="scroll-mt-20 space-y-4 pt-10">
+              <div className="flex items-center gap-2.5">
+                <h2 className="font-pixel text-xs text-retro-green">LOCALE / TURKISH SUPPORT</h2>
+                <PixelBadge tone="cyan">v1.3.0</PixelBadge>
+              </div>
+              <p className="text-sm text-retro-muted">
+                PxlKit includes built-in locale support for <strong>Turkish (tr)</strong> and <strong>English (en)</strong>.
+                Turkish requires special handling because of the dotted/dotless <PixelCodeInline>i</PixelCodeInline> distinction,
+                and the <PixelCodeInline>latin-ext</PixelCodeInline> Google Fonts subset for characters like ğ, ş, ı, İ, ç, ö, ü.
+              </p>
+
+              {/* ── Why Turkish needs special handling ── */}
+              <div className="rounded-lg border border-retro-border/30 bg-retro-surface/30 p-4 space-y-3">
+                <h3 className="font-mono text-xs font-semibold text-retro-text">Why Turkish Needs Special Handling</h3>
+                <div className="overflow-x-auto rounded-lg border border-retro-border/40">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-retro-border bg-retro-surface/40">
+                        <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Input</th>
+                        <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">English Uppercase</th>
+                        <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Turkish Uppercase</th>
+                        <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Note</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-retro-border/20">
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-cyan">i</td>
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-gold">I</td>
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-green">İ (U+0130)</td>
+                        <td className="px-3 py-2 text-retro-muted">Dotted uppercase İ in Turkish</td>
+                      </tr>
+                      <tr className="border-b border-retro-border/20">
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-cyan">ı (U+0131)</td>
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-gold">I</td>
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-green">I</td>
+                        <td className="px-3 py-2 text-retro-muted">Dotless ı is unique to Turkish</td>
+                      </tr>
+                      <tr className="border-b border-retro-border/20">
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-cyan">istanbul</td>
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-gold">{toLocaleUpper('istanbul', 'en')}</td>
+                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-green">{toLocaleUpper('istanbul', 'tr')}</td>
+                        <td className="px-3 py-2 text-retro-muted">Complete word difference</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* ── Live demo ── */}
+              <div className="rounded-lg border border-retro-border/30 bg-retro-surface/30 p-4 space-y-4">
+                <h3 className="font-mono text-xs font-semibold text-retro-text">Live Demo — Turkish vs English</h3>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* English locale */}
+                  <div className="rounded-lg border border-retro-border/40 p-3 space-y-2">
+                    <PixelBadge tone="neutral">locale=&quot;en&quot;</PixelBadge>
+                    <PxlKitLocaleProvider locale="en">
+                      <PixelSection title="istanbul işlemleri">
+                        <div className="flex gap-2 flex-wrap">
+                          <PixelAvatar name="işıl gündüz" size="sm" tone="cyan" />
+                          <PixelAvatar name="John Doe" size="sm" tone="green" />
+                        </div>
+                      </PixelSection>
+                    </PxlKitLocaleProvider>
+                  </div>
+
+                  {/* Turkish locale */}
+                  <div className="rounded-lg border border-retro-border/40 p-3 space-y-2">
+                    <PixelBadge tone="green">locale=&quot;tr&quot;</PixelBadge>
+                    <PxlKitLocaleProvider locale="tr">
+                      <PixelSection title="istanbul işlemleri">
+                        <div className="flex gap-2 flex-wrap">
+                          <PixelAvatar name="işıl gündüz" size="sm" tone="cyan" />
+                          <PixelAvatar name="John Doe" size="sm" tone="green" />
+                        </div>
+                      </PixelSection>
+                    </PxlKitLocaleProvider>
+                  </div>
+                </div>
+
+                <p className="text-xs text-retro-muted">
+                  Notice how the section title &quot;istanbul işlemleri&quot; renders differently:
+                  English shows <PixelCodeInline>ISTANBUL ISLEMLERI</PixelCodeInline> while Turkish correctly shows <PixelCodeInline>İSTANBUL İŞLEMLERİ</PixelCodeInline>.
+                  The avatar initials also change — &quot;İG&quot; (Turkish) vs &quot;IG&quot; (English) for &quot;işıl gündüz&quot;.
+                </p>
+              </div>
+
+              {/* ── Turkish special characters preview ── */}
+              <div className="rounded-lg border border-retro-border/30 bg-retro-surface/30 p-4 space-y-3">
+                <h3 className="font-mono text-xs font-semibold text-retro-text">Turkish Characters — Font Preview</h3>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-[10px] font-mono text-retro-muted mb-1">Press Start 2P (font-pixel)</p>
+                    <p className="font-pixel text-xs text-retro-green">{TURKISH_CHARACTERS.uppercase}</p>
+                    <p className="font-pixel text-xs text-retro-cyan">{TURKISH_CHARACTERS.lowercase}</p>
+                  </div>
+                  <PixelDivider />
+                  <div>
+                    <p className="text-[10px] font-mono text-retro-muted mb-1">JetBrains Mono (font-mono)</p>
+                    <p className="font-mono text-sm text-retro-green">{TURKISH_CHARACTERS.uppercase}</p>
+                    <p className="font-mono text-sm text-retro-cyan">{TURKISH_CHARACTERS.lowercase}</p>
+                  </div>
+                  <PixelDivider />
+                  <div>
+                    <p className="text-[10px] font-mono text-retro-muted mb-1">Inter (font-body)</p>
+                    <p className="text-sm text-retro-green">{TURKISH_CHARACTERS.uppercase}</p>
+                    <p className="text-sm text-retro-cyan">{TURKISH_CHARACTERS.lowercase}</p>
+                  </div>
+                  <PixelDivider />
+                  <div>
+                    <p className="text-[10px] font-mono text-retro-muted mb-1">Turkish Pangram (font-pixel)</p>
+                    <p className="font-pixel text-[8px] text-retro-gold leading-relaxed">{TURKISH_CHARACTERS.pangram}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Props reference ── */}
+              <PixelCollapsible label="PxlKitLocaleProvider — Props reference (2)">
+                <div>
+                  <PropsTable data={[
+                    { name: 'locale', type: '"en" | "tr"', default: '"en"', description: 'BCP 47 locale tag. Controls font subsets, text-transform behavior, and JS string casing.' },
+                    { name: 'children', type: 'ReactNode', default: '—', description: 'Your app or component tree.' },
+                  ]} />
+                </div>
+              </PixelCollapsible>
+
+              {/* ── Exports reference ── */}
+              <PixelCollapsible label="Exported utilities (6)">
+                <div>
+                  <PropsTable data={[
+                    { name: 'PxlKitLocaleProvider', type: 'Component', default: '—', description: 'Wraps your app with locale context. Sets lang attribute and provides upper/lower helpers.' },
+                    { name: 'usePxlKitLocale()', type: 'Hook', default: '—', description: 'Returns { locale, upper, lower, fontsUrl } from the nearest provider.' },
+                    { name: 'toLocaleUpper(text, locale)', type: 'Function', default: '—', description: 'Locale-aware uppercase. Turkish: i→İ, ı→I. English: i→I.' },
+                    { name: 'toLocaleLower(text, locale)', type: 'Function', default: '—', description: 'Locale-aware lowercase. Turkish: İ→i, I→ı. English: I→i.' },
+                    { name: 'buildGoogleFontsUrl(locale)', type: 'Function', default: '—', description: 'Generates a Google Fonts CSS2 URL with locale-appropriate subsets (latin-ext for Turkish).' },
+                    { name: 'PXLKIT_FONTS', type: 'Object', default: '—', description: 'Font configuration for pixel (Press Start 2P), sans (Inter), and mono (JetBrains Mono).' },
+                  ]} />
+                </div>
+              </PixelCollapsible>
+
+              {/* ── Setup guide ── */}
+              <CodeBlock
+                code={`// === STEP 1: Install & import ===
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
+
+// === STEP 2: Wrap your app (React / Next.js) ===
+
+// For a standard React app (Vite, CRA, etc.):
+function App() {
+  return (
+    <PxlKitLocaleProvider locale="tr">
+      <MyApp />
+    </PxlKitLocaleProvider>
+  );
+}
+
+// For Next.js App Router — also set lang on <html>:
+// app/layout.tsx
+export default function RootLayout({ children }) {
+  return (
+    <html lang="tr">
+      <body>
+        <PxlKitLocaleProvider locale="tr">
+          {children}
+        </PxlKitLocaleProvider>
+      </body>
+    </html>
+  );
+}
+
+// === STEP 3: Google Fonts — ensure latin-ext subset ===
+// In your CSS file or HTML <head>:
+// @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&subset=latin,latin-ext&display=swap');
+
+// Or generate the URL dynamically:
+import { buildGoogleFontsUrl } from '@pxlkit/ui-kit';
+const fontsUrl = buildGoogleFontsUrl('tr');
+// → includes &subset=latin,latin-ext
+
+// === STEP 4: Use locale-aware text in custom components ===
+import { usePxlKitLocale, toLocaleUpper } from '@pxlkit/ui-kit';
+
+function MyTitle({ text }: { text: string }) {
+  const { upper } = usePxlKitLocale();
+  return <h1 className="font-pixel">{upper(text)}</h1>;
+  // "istanbul" → "İSTANBUL" when locale is "tr"
+}
+
+// Or use the standalone function:
+toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"
+toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
+                language="tsx"
+                title="Turkish Locale — Complete Setup Guide"
+              />
+
+              {/* ── Important notes ── */}
+              <PixelAlert
+                title="Important: CSS text-transform"
+                message="CSS text-transform: uppercase is automatically locale-aware when the lang attribute is set. PxlKitLocaleProvider sets lang on a wrapper div. For full page coverage, also set lang=&quot;tr&quot; on your <html> tag."
+                tone="gold"
+              />
+              <PixelAlert
+                title="All three fonts support Turkish"
+                message="Press Start 2P, Inter, and JetBrains Mono all include Latin Extended characters (ğ, Ğ, ı, İ, ş, Ş, ç, Ç, ö, Ö, ü, Ü). The latin-ext subset in the Google Fonts URL ensures these glyphs are downloaded."
+                tone="green"
+              />
             </section>
 
             <PixelDivider label="Actions" tone="cyan" spacing="lg" />

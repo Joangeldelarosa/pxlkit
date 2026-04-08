@@ -52,4 +52,5 @@ export const UI_KIT_COMPONENTS = [
   'PixelParallaxLayer',
   'PixelParallaxGroup',
   'PixelMouseParallax',
+  'PxlKitLocaleProvider',
 ] as const;
