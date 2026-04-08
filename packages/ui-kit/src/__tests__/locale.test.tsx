@@ -385,7 +385,7 @@ describe('PxlKitLocaleProvider', () => {
           <span data-testid="child">Test</span>
         </PxlKitLocaleProvider>,
       );
-      const langDiv = container.querySelector('[lang="tr"]');
+      const langDiv = container.querySelector('[lang="tr"]') as HTMLElement | null;
       expect(langDiv).not.toBeNull();
       expect(langDiv!.tagName.toLowerCase()).toBe('div');
       expect(langDiv!.style.display).toBe('contents');

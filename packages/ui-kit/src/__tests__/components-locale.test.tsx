@@ -314,7 +314,7 @@ describe('PxlKitLocaleProvider lang attribute', () => {
         <span>Test</span>
       </PxlKitLocaleProvider>,
     );
-    const wrapper = container.querySelector('div[lang="tr"]');
+    const wrapper = container.querySelector('div[lang="tr"]') as HTMLElement | null;
     expect(wrapper).not.toBeNull();
     expect(wrapper!.style.display).toBe('contents');
   });
@@ -335,7 +335,7 @@ describe('PxlKitLocaleProvider lang attribute', () => {
         <span data-testid="child">Content</span>
       </PxlKitLocaleProvider>,
     );
-    const wrapper = container.querySelector('div[lang="tr"]');
+    const wrapper = container.querySelector('div[lang="tr"]') as HTMLElement | null;
     expect(wrapper!.style.display).toBe('contents');
     // The child should still be accessible
     expect(screen.getByTestId('child')).not.toBeNull();
