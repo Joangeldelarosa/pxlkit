@@ -929,23 +929,6 @@ function generateLamp(bx: number, bz: number, by: number): Voxel3D[] {
   ];
 }
 
-/** Simple fence line */
-function generateFence(x1: number, x2: number, z: number, by: number): Voxel3D[] {
-  const voxels: Voxel3D[] = [];
-  for (let x = x1; x <= x2; x++) {
-    voxels.push({ x, y: by, z, color: FENCE_C });
-    if (x % 2 === 0) voxels.push({ x, y: by + 1, z, color: FENCE_C });
-  }
-  return voxels;
-}
-
-/** Dirt/stone path */
-function generatePath(positions: [number, number][], by: number): Voxel3D[] {
-  return positions.map(([x, z], i) => ({
-    x, y: by, z, color: PATH_C[i % PATH_C.length],
-  }));
-}
-
 /* ═══════════════════════════════════════════════════════════
  *  SCENE 4: World — large coherent landscape
  * ═══════════════════════════════════════════════════════════ */
