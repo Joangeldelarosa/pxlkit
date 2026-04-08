@@ -8,3 +8,4 @@ export * from './overlay';
 export * from './animations';
 export * from './registry';
 export * from './parallax';
+export * from './locale';

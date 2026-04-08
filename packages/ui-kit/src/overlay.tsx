@@ -5,6 +5,7 @@ import {
   ChevronDownIcon, CheckIcon, CloseIcon, FieldShell
 } from './common';
 import { PixelButton } from './actions';
+import { usePxlKitLocale } from './locale';
 
 
 
@@ -21,6 +22,7 @@ export function PixelModal({
   onClose: () => void;
   size?: 'sm' | 'md' | 'lg';
 }) {
+  const { upper } = usePxlKitLocale();
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -41,7 +43,7 @@ export function PixelModal({
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
       <div className={cn('relative w-full rounded-xl border border-retro-border bg-retro-bg p-5 shadow-2xl', maxW)}>
         <div className="mb-4 flex items-center justify-between">
-          <h4 className="font-pixel text-[11px] text-retro-green">{title.toUpperCase()}</h4>
+          <h4 className="font-pixel text-[11px] text-retro-green">{upper(title)}</h4>
           <button
             type="button"
             onClick={onClose}
