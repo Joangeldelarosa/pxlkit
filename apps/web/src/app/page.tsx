@@ -113,7 +113,7 @@ function HeroSection() {
                 }}
               />
 
-              <div className="w-full aspect-square sm:aspect-[4/3] min-h-[260px] sm:min-h-[320px] md:min-h-[380px]">
+              <div className="w-full aspect-square sm:aspect-[4/3] min-h-[240px]">
                 <Suspense
                   fallback={
                     <div className="w-full h-full flex items-center justify-center">
@@ -285,7 +285,7 @@ function VoxelComingSoon() {
             />
 
             {/* Canvas — tabs are inside the VoxelPreview component */}
-            <div className="w-full aspect-square sm:aspect-[16/10] min-h-[280px] sm:min-h-[360px] md:min-h-[440px]">
+            <div className="w-full aspect-square sm:aspect-[16/10] min-h-[260px]">
               <Suspense
                 fallback={
                   <div className="w-full h-full flex items-center justify-center">
