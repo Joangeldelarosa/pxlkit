@@ -205,11 +205,11 @@ export const Trophy: PxlKitData = {
 
 | Package | Description |
 | --- | --- |
-| [`@pxlkit/gamification`](https://www.npmjs.com/package/@pxlkit/gamification) | 48 icons — RPG, achievements, rewards |
+| [`@pxlkit/gamification`](https://www.npmjs.com/package/@pxlkit/gamification) | 51 icons — RPG, achievements, rewards |
 | [`@pxlkit/feedback`](https://www.npmjs.com/package/@pxlkit/feedback) | 33 icons — alerts, status, notifications |
 | [`@pxlkit/social`](https://www.npmjs.com/package/@pxlkit/social) | 43 icons — community, emojis, messaging |
-| [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | 34 icons — climate, moon, temperature |
-| [`@pxlkit/ui`](https://www.npmjs.com/package/@pxlkit/ui) | 40 icons — interface controls, navigation |
+| [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | 36 icons — climate, moon, temperature |
+| [`@pxlkit/ui`](https://www.npmjs.com/package/@pxlkit/ui) | 41 icons — interface controls, navigation |
 | [`@pxlkit/effects`](https://www.npmjs.com/package/@pxlkit/effects) | 12 animated VFX icons |
 | [`@pxlkit/parallax`](https://www.npmjs.com/package/@pxlkit/parallax) | 10 multi-layer 3D parallax icons |
 | [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | 40+ retro React UI components |
