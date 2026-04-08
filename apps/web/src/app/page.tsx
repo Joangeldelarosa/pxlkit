@@ -147,7 +147,7 @@ function HeroSection() {
               {/* Status badges */}
               <div className="flex flex-wrap justify-center lg:justify-start gap-2">
                 <PixelBadge tone="green">Free &amp; Open Source</PixelBadge>
-                <PixelBadge tone="gold">🔥 50% Off Launch</PixelBadge>
+                <PixelBadge tone="gold"><span aria-label="50 percent off launch price">🔥 50% Off Launch</span></PixelBadge>
               </div>
 
               {/* Title — benefit-driven H1 */}
@@ -193,7 +193,7 @@ function HeroSection() {
               <div className="rounded-lg border border-retro-border bg-retro-bg/80 px-3 sm:px-4 py-2 sm:py-3 font-mono text-[10px] sm:text-xs text-retro-muted overflow-x-auto max-w-md mx-auto lg:mx-0">
                 <span className="text-retro-green mr-2">$</span>
                 npm i @pxlkit/core @pxlkit/ui @pxlkit/parallax
-                <span className="text-retro-muted/40 ml-2">← ready in seconds</span>
+                <span className="text-retro-muted/40 ml-2" aria-label="ready in seconds">— ready in seconds</span>
               </div>
             </div>
           </motion.div>
@@ -1248,7 +1248,7 @@ function PricingPreview() {
           viewport={{ once: true }}
         >
           <div className="inline-flex items-center gap-2 mb-3 sm:mb-4">
-            <PixelBadge tone="red">🔥 50% OFF — Launch Price</PixelBadge>
+            <PixelBadge tone="red"><span aria-label="50% off launch price">🔥 50% OFF — Launch Price</span></PixelBadge>
           </div>
           <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-green mb-2 sm:mb-3">
             PAY ONCE, USE FOREVER
