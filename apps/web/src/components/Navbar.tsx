@@ -55,6 +55,25 @@ function MoonIcon({ className }: { className?: string }) {
   );
 }
 
+/**
+ * Pixel-art star icon (8×8)
+ */
+function StarIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 8 8" className={className} shapeRendering="crispEdges" fill="currentColor">
+      <rect x="3" y="0" width="2" height="1" />
+      <rect x="3" y="1" width="2" height="1" />
+      <rect x="0" y="2" width="8" height="1" />
+      <rect x="1" y="3" width="6" height="1" />
+      <rect x="2" y="4" width="4" height="1" />
+      <rect x="2" y="5" width="1" height="1" />
+      <rect x="5" y="5" width="1" height="1" />
+      <rect x="1" y="6" width="1" height="1" />
+      <rect x="6" y="6" width="1" height="1" />
+    </svg>
+  );
+}
+
 export function Navbar() {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
@@ -129,33 +148,18 @@ export function Navbar() {
             )}
           </button>
 
-          {/* GitHub link */}
+          {/* Star on GitHub */}
           <a
             href="https://github.com/joangeldelarosa/pxlkit"
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-1 px-3 py-2 text-retro-muted hover:text-retro-text transition-colors"
-            aria-label="GitHub"
+            className="ml-1 flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded border border-retro-gold/30 text-retro-gold/80 hover:text-retro-gold hover:border-retro-gold/60 hover:bg-retro-gold/10 transition-all"
+            aria-label="Star on GitHub"
+            title="Star on GitHub"
           >
-            <svg viewBox="0 0 16 16" className="w-5 h-5 fill-current" shapeRendering="crispEdges">
-              <rect x="3" y="0" width="10" height="1" />
-              <rect x="2" y="1" width="1" height="1" />
-              <rect x="13" y="1" width="1" height="1" />
-              <rect x="1" y="2" width="1" height="1" />
-              <rect x="14" y="2" width="1" height="1" />
-              <rect x="0" y="3" width="1" height="7" />
-              <rect x="15" y="3" width="1" height="7" />
-              <rect x="1" y="10" width="1" height="1" />
-              <rect x="14" y="10" width="1" height="1" />
-              <rect x="2" y="11" width="2" height="1" />
-              <rect x="12" y="11" width="2" height="1" />
-              <rect x="4" y="12" width="3" height="1" />
-              <rect x="9" y="12" width="3" height="1" />
-              <rect x="5" y="13" width="6" height="1" />
-              <rect x="4" y="4" width="2" height="2" />
-              <rect x="10" y="4" width="2" height="2" />
-              <rect x="6" y="8" width="4" height="1" />
-            </svg>
+            <StarIcon className="w-3.5 h-3.5" />
+            <span className="hidden lg:inline">Star on GitHub</span>
+            <span className="lg:hidden">Star</span>
           </a>
         </div>
 
@@ -232,28 +236,10 @@ export function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-mono text-retro-muted hover:text-retro-text rounded transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-mono text-retro-gold/80 hover:text-retro-gold rounded transition-all"
               >
-                <svg viewBox="0 0 16 16" className="w-4 h-4 fill-current" shapeRendering="crispEdges">
-                  <rect x="3" y="0" width="10" height="1" />
-                  <rect x="2" y="1" width="1" height="1" />
-                  <rect x="13" y="1" width="1" height="1" />
-                  <rect x="1" y="2" width="1" height="1" />
-                  <rect x="14" y="2" width="1" height="1" />
-                  <rect x="0" y="3" width="1" height="7" />
-                  <rect x="15" y="3" width="1" height="7" />
-                  <rect x="1" y="10" width="1" height="1" />
-                  <rect x="14" y="10" width="1" height="1" />
-                  <rect x="2" y="11" width="2" height="1" />
-                  <rect x="12" y="11" width="2" height="1" />
-                  <rect x="4" y="12" width="3" height="1" />
-                  <rect x="9" y="12" width="3" height="1" />
-                  <rect x="5" y="13" width="6" height="1" />
-                  <rect x="4" y="4" width="2" height="2" />
-                  <rect x="10" y="4" width="2" height="2" />
-                  <rect x="6" y="8" width="4" height="1" />
-                </svg>
-                GitHub
+                <StarIcon className="w-4 h-4" />
+                Star on GitHub
               </a>
             </div>
           </div>
