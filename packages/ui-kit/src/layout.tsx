@@ -4,6 +4,7 @@ import {
   toneMap, sizeClass, focusRing, inputBase,
   ChevronDownIcon, CheckIcon, CloseIcon, FieldShell
 } from './common';
+import { usePxlKitLocale } from './locale';
 
 
 
@@ -16,10 +17,11 @@ export function PixelSection({
   subtitle?: string;
   children: React.ReactNode;
 }) {
+  const { upper } = usePxlKitLocale();
   return (
     <section className="rounded-xl border border-retro-border/40 bg-retro-card/40 p-4 sm:p-6">
       <div className="mb-4">
-        <h3 className="font-pixel text-xs text-retro-green">{title.toUpperCase()}</h3>
+        <h3 className="font-pixel text-xs text-retro-green">{upper(title)}</h3>
         {subtitle && <p className="mt-2 text-sm text-retro-muted">{subtitle}</p>}
       </div>
       {children}

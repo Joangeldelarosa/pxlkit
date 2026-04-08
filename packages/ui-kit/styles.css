@@ -84,6 +84,21 @@
     --retro-purple: #A855F7;
     --retro-pink: #FF77A8;
   }
+
+  /*
+   * Turkish locale support — when `lang="tr"` is set on any ancestor,
+   * CSS `text-transform: uppercase` will correctly convert:
+   *   i → İ (dotted capital I)
+   *   ı → I (dotless capital I)
+   *
+   * Browsers read the `lang` attribute to apply locale-specific rules.
+   * See: https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform
+   *
+   * Usage:
+   *   <html lang="tr">           — applies globally
+   *   <div lang="tr">            — applies to subtree
+   *   <PxlKitLocaleProvider locale="tr">  — sets lang + JS context
+   */
 }
 
 @layer utilities {
