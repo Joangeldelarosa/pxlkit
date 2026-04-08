@@ -1,6 +1,6 @@
 {
   "name": "@pxlkit/core",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Core utilities and React components for pxlkit",
   "license": "SEE LICENSE IN LICENSE",
   "type": "module",
