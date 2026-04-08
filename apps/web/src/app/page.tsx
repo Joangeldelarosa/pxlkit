@@ -87,22 +87,22 @@ function HeroSection() {
       </div>
 
       {/* ── Content ── */}
-      <div className="relative z-10 flex items-center justify-center px-4 py-12 sm:py-16" style={{ minHeight: '90vh' }}>
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div className="relative z-10 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 md:py-16" style={{ minHeight: '90vh' }}>
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
 
           {/* ── Left: 3D Voxel World ── */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="relative order-2 lg:order-1"
+            className="relative order-2 lg:order-1 w-full max-w-lg mx-auto lg:max-w-none"
           >
             <div className="relative rounded-xl border border-retro-border/30 overflow-hidden bg-[#0d1117]/60 backdrop-blur-sm">
               {/* Corner accents */}
-              <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-retro-green/50 rounded-tl-xl" />
-              <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-retro-green/50 rounded-tr-xl" />
-              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-retro-purple/50 rounded-bl-xl" />
-              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-retro-purple/50 rounded-br-xl" />
+              <div className="absolute top-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-l-2 border-retro-green/50 rounded-tl-xl" />
+              <div className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-r-2 border-retro-green/50 rounded-tr-xl" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-l-2 border-retro-purple/50 rounded-bl-xl" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-b-2 border-r-2 border-retro-purple/50 rounded-br-xl" />
 
               {/* Scanline overlay */}
               <div
@@ -113,7 +113,7 @@ function HeroSection() {
                 }}
               />
 
-              <div className="w-full aspect-[4/3] min-h-[280px] sm:min-h-[380px]">
+              <div className="w-full aspect-square sm:aspect-[4/3] min-h-[260px] sm:min-h-[320px] md:min-h-[380px]">
                 <Suspense
                   fallback={
                     <div className="w-full h-full flex items-center justify-center">
@@ -126,8 +126,8 @@ function HeroSection() {
               </div>
 
               {/* Label */}
-              <div className="absolute bottom-3 left-0 right-0 flex justify-center pointer-events-none">
-                <span className="bg-retro-bg/80 backdrop-blur-sm border border-retro-border/40 rounded px-3 py-1 font-mono text-[10px] text-retro-muted/60">
+              <div className="absolute bottom-2 sm:bottom-3 left-0 right-0 flex justify-center pointer-events-none">
+                <span className="bg-retro-bg/80 backdrop-blur-sm border border-retro-border/40 rounded px-2 sm:px-3 py-0.5 sm:py-1 font-mono text-[8px] sm:text-[10px] text-retro-muted/60">
                   🎮 Drag to orbit · @pxlkit/voxel
                 </span>
               </div>
@@ -141,7 +141,7 @@ function HeroSection() {
             transition={{ duration: 0.7 }}
             className="order-1 lg:order-2 text-center lg:text-left"
           >
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-5 md:space-y-6">
               {/* Status badges */}
               <div className="flex flex-wrap justify-center lg:justify-start gap-2">
                 <PixelBadge tone="green">Open Source</PixelBadge>
@@ -160,23 +160,23 @@ function HeroSection() {
 
               {/* Title */}
               <div>
-                <h1 className="font-pixel text-3xl sm:text-4xl md:text-5xl text-retro-green leading-tight text-glow">
+                <h1 className="font-pixel text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-retro-green leading-tight text-glow">
                   PXLKIT
                 </h1>
-                <p className="font-pixel text-sm sm:text-base text-retro-gold mt-2">
+                <p className="font-pixel text-xs sm:text-sm md:text-base text-retro-gold mt-1.5 sm:mt-2">
                   From Pixels to Worlds.
                 </p>
               </div>
 
               {/* Description */}
-              <p className="text-base sm:text-lg text-retro-muted max-w-lg leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-retro-muted max-w-lg mx-auto lg:mx-0 leading-relaxed">
                 The open-source retro React toolkit — {UI_COMPONENTS_COUNT} UI components,{' '}
                 {TOTAL_ICON_COUNT}+ pixel icons, 3D parallax, toast notifications, and a visual builder.{' '}
                 Now building a <span className="text-retro-purple font-bold">3D voxel engine</span> to bring your pixel art into full three dimensions.
               </p>
 
               {/* Stats */}
-              <div className="flex flex-wrap justify-center lg:justify-start gap-3 text-sm font-mono">
+              <div className="flex flex-wrap justify-center lg:justify-start gap-2 sm:gap-3 text-xs sm:text-sm font-mono">
                 <PixelCodeInline>{UI_COMPONENTS_COUNT} components</PixelCodeInline>
                 <PixelCodeInline tone="green">{TOTAL_ICON_COUNT}+ icons</PixelCodeInline>
                 <PixelCodeInline tone="purple">7 packs</PixelCodeInline>
@@ -184,7 +184,7 @@ function HeroSection() {
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-3">
+              <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-2 sm:gap-3">
                 <PixelButton tone="green" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />} onClick={() => router.push('/ui-kit')}>
                   Explore UI Kit
                 </PixelButton>
@@ -197,7 +197,7 @@ function HeroSection() {
               </div>
 
               {/* Install command */}
-              <div className="rounded-lg border border-retro-border bg-retro-bg/80 px-4 py-3 font-mono text-xs text-retro-muted overflow-x-auto max-w-md mx-auto lg:mx-0">
+              <div className="rounded-lg border border-retro-border bg-retro-bg/80 px-3 sm:px-4 py-2 sm:py-3 font-mono text-[10px] sm:text-xs text-retro-muted overflow-x-auto max-w-md mx-auto lg:mx-0">
                 <span className="text-retro-green mr-2">$</span>
                 npm i @pxlkit/core @pxlkit/ui @pxlkit/parallax
               </div>
@@ -220,7 +220,7 @@ const VOXEL_CAPABILITIES: { icon: string; title: string; desc: string }[] = [
 
 function VoxelComingSoon() {
   return (
-    <section className="relative py-20 px-4 border-t border-retro-border/20 overflow-hidden">
+    <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/20 overflow-hidden">
       {/* Background glows */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-retro-purple/5 rounded-full blur-[140px]" />
@@ -230,14 +230,14 @@ function VoxelComingSoon() {
       <div className="relative z-10 max-w-6xl mx-auto">
         {/* ── Header ── */}
         <motion.div
-          className="text-center mb-10"
+          className="text-center mb-8 sm:mb-10"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
           <motion.div
-            className="inline-flex items-center gap-2 mb-5"
+            className="inline-flex items-center gap-2 mb-4 sm:mb-5"
             animate={{ scale: [1, 1.03, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           >
@@ -248,10 +248,10 @@ function VoxelComingSoon() {
             <PixelBadge tone="green">COMING SOON</PixelBadge>
           </motion.div>
 
-          <h2 className="font-pixel text-xl sm:text-2xl text-retro-purple mb-2 text-glow">
+          <h2 className="font-pixel text-base sm:text-xl md:text-2xl text-retro-purple mb-2 text-glow">
             @pxlkit/voxel
           </h2>
-          <p className="text-retro-muted max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+          <p className="text-retro-muted max-w-2xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed px-2">
             Craft immersive{' '}
             <span className="text-retro-green font-bold">voxel worlds</span>,
             sculpt <span className="text-retro-purple font-bold">3D characters</span>,
@@ -270,10 +270,10 @@ function VoxelComingSoon() {
         >
           <div className="relative rounded-xl border border-retro-border/40 overflow-hidden bg-[#0d1117]/80 backdrop-blur-sm">
             {/* Corner accents */}
-            <div className="absolute top-0 left-0 w-10 h-10 border-t-2 border-l-2 border-retro-green/60 rounded-tl-xl" />
-            <div className="absolute top-0 right-0 w-10 h-10 border-t-2 border-r-2 border-retro-green/60 rounded-tr-xl" />
-            <div className="absolute bottom-0 left-0 w-10 h-10 border-b-2 border-l-2 border-retro-purple/60 rounded-bl-xl" />
-            <div className="absolute bottom-0 right-0 w-10 h-10 border-b-2 border-r-2 border-retro-purple/60 rounded-br-xl" />
+            <div className="absolute top-0 left-0 w-6 h-6 sm:w-10 sm:h-10 border-t-2 border-l-2 border-retro-green/60 rounded-tl-xl" />
+            <div className="absolute top-0 right-0 w-6 h-6 sm:w-10 sm:h-10 border-t-2 border-r-2 border-retro-green/60 rounded-tr-xl" />
+            <div className="absolute bottom-0 left-0 w-6 h-6 sm:w-10 sm:h-10 border-b-2 border-l-2 border-retro-purple/60 rounded-bl-xl" />
+            <div className="absolute bottom-0 right-0 w-6 h-6 sm:w-10 sm:h-10 border-b-2 border-r-2 border-retro-purple/60 rounded-br-xl" />
 
             {/* Scanline overlay */}
             <div
@@ -285,7 +285,7 @@ function VoxelComingSoon() {
             />
 
             {/* Canvas — tabs are inside the VoxelPreview component */}
-            <div className="w-full aspect-[16/10] min-h-[320px] sm:min-h-[440px]">
+            <div className="w-full aspect-square sm:aspect-[16/10] min-h-[280px] sm:min-h-[360px] md:min-h-[440px]">
               <Suspense
                 fallback={
                   <div className="w-full h-full flex items-center justify-center">
@@ -298,8 +298,8 @@ function VoxelComingSoon() {
             </div>
 
             {/* Bottom label */}
-            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 pointer-events-none">
-              <span className="bg-retro-bg/80 backdrop-blur-sm border border-retro-border/40 rounded px-3 py-1 font-mono text-[10px] text-retro-muted/70">
+            <div className="absolute bottom-2 sm:bottom-3 left-0 right-0 flex justify-center gap-3 pointer-events-none">
+              <span className="bg-retro-bg/80 backdrop-blur-sm border border-retro-border/40 rounded px-2 sm:px-3 py-0.5 sm:py-1 font-mono text-[8px] sm:text-[10px] text-retro-muted/70">
                 🎮 Drag to orbit · Switch tabs to explore
               </span>
             </div>
@@ -308,7 +308,7 @@ function VoxelComingSoon() {
 
         {/* ── Capability Cards ── */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10 max-w-4xl mx-auto"
+          className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-8 sm:mt-10 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -317,18 +317,18 @@ function VoxelComingSoon() {
           {VOXEL_CAPABILITIES.map((cap) => (
             <div
               key={cap.title}
-              className="rounded-lg border border-retro-border/30 bg-retro-bg/40 backdrop-blur-sm p-4 text-center hover:border-retro-green/40 transition-colors duration-200"
+              className="rounded-lg border border-retro-border/30 bg-retro-bg/40 backdrop-blur-sm p-3 sm:p-4 text-center hover:border-retro-green/40 transition-colors duration-200"
             >
-              <div className="text-2xl mb-2">{cap.icon}</div>
-              <h4 className="font-pixel text-[11px] text-retro-green mb-1">{cap.title}</h4>
-              <p className="text-retro-muted/70 text-[11px] leading-relaxed">{cap.desc}</p>
+              <div className="text-xl sm:text-2xl mb-1.5 sm:mb-2">{cap.icon}</div>
+              <h4 className="font-pixel text-[9px] sm:text-[11px] text-retro-green mb-1">{cap.title}</h4>
+              <p className="text-retro-muted/70 text-[9px] sm:text-[11px] leading-relaxed">{cap.desc}</p>
             </div>
           ))}
         </motion.div>
 
         {/* ── Feature pills ── */}
         <motion.div
-          className="flex flex-wrap justify-center gap-2 mt-8"
+          className="flex flex-wrap justify-center gap-1.5 sm:gap-2 mt-6 sm:mt-8 px-2"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -344,16 +344,16 @@ function VoxelComingSoon() {
 
         {/* ── Install hint ── */}
         <motion.div
-          className="mt-6 text-center"
+          className="mt-5 sm:mt-6 text-center"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <div className="inline-block rounded-lg border border-retro-border/30 bg-retro-bg/60 px-4 py-2 font-mono text-xs text-retro-muted/70">
+          <div className="inline-block rounded-lg border border-retro-border/30 bg-retro-bg/60 px-3 sm:px-4 py-1.5 sm:py-2 font-mono text-[10px] sm:text-xs text-retro-muted/70">
             <span className="text-retro-green mr-2">$</span>
             npm i @pxlkit/voxel @react-three/fiber three{' '}
-            <span className="text-retro-muted/40 ml-2">← coming soon</span>
+            <span className="text-retro-muted/40 ml-1 sm:ml-2">← coming soon</span>
           </div>
         </motion.div>
       </div>
@@ -410,23 +410,23 @@ const FEATURES: { icon: PxlKitData | AnyIcon; title: string; description: string
 
 function FeaturesSection() {
   return (
-    <section className="py-20 px-4 border-t border-retro-border/30">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30">
       <div className="max-w-6xl mx-auto">
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
         >
           <PixelParallaxLayer speed={-0.03}>
-            <h2 className="font-pixel text-lg text-retro-green mb-3">EVERYTHING YOU NEED</h2>
-            <p className="text-retro-muted max-w-lg mx-auto text-sm">
+            <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-green mb-2 sm:mb-3">EVERYTHING YOU NEED</h2>
+            <p className="text-retro-muted max-w-lg mx-auto text-xs sm:text-sm px-2">
               A complete React UI kit with pixel art icons, animated components, toast notifications, and a visual builder — all open source.
             </p>
           </PixelParallaxLayer>
         </motion.div>
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
           variants={staggerContainer}
           initial="initial"
           whileInView="animate"
@@ -459,26 +459,26 @@ function FeaturesSection() {
 /* ──────────────────── PARALLAX 3D ICONS (NEW) ──────────────────── */
 function ParallaxShowcase() {
   return (
-    <section className="py-20 px-4 border-t border-retro-border/30 bg-retro-surface/20 relative overflow-hidden">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 bg-retro-surface/20 relative overflow-hidden">
       {/* Decorative background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-retro-gold/5 rounded-full blur-[150px] pointer-events-none" />
 
       <div className="relative max-w-6xl mx-auto">
         <motion.div
-          className="text-center mb-6"
+          className="text-center mb-4 sm:mb-6"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center gap-2 mb-4">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 flex-wrap justify-center">
             <PixelBadge tone="gold">NEW</PixelBadge>
             <PixelBadge tone="purple">Interactive 3D</PixelBadge>
             <PixelBadge tone="green">{ParallaxPack.length} Icons</PixelBadge>
           </div>
-          <h2 className="font-pixel text-lg text-retro-gold mb-3">
+          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-gold mb-2 sm:mb-3">
             3D PARALLAX ICON PACK
           </h2>
-          <p className="text-retro-muted max-w-2xl mx-auto text-sm">
+          <p className="text-retro-muted max-w-2xl mx-auto text-xs sm:text-sm px-2">
             Animated multi-layer pixel art with real CSS 3D perspective.
             Each layer floats at a different Z-depth. Move your mouse anywhere
             to rotate —<span className="text-retro-gold font-bold"> click any icon</span> to
@@ -491,9 +491,9 @@ function ParallaxShowcase() {
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="flex justify-center mb-12"
+          className="flex justify-center mb-8 sm:mb-12"
         >
-          <div className="relative p-10 rounded-2xl border border-retro-gold/20 bg-retro-bg/60 backdrop-blur-sm">
+          <div className="relative p-6 sm:p-10 rounded-2xl border border-retro-gold/20 bg-retro-bg/60 backdrop-blur-sm">
             <div className="absolute inset-0 rounded-2xl border border-retro-gold/10 animate-pulse pointer-events-none" />
             <ParallaxPxlKitIcon
               icon={CoolEmoji}
@@ -503,7 +503,7 @@ function ParallaxShowcase() {
               interactive
               colorful
             />
-            <p className="mt-5 text-center font-mono text-[10px] text-retro-muted">
+            <p className="mt-3 sm:mt-5 text-center font-mono text-[9px] sm:text-[10px] text-retro-muted">
               ↕ Move mouse to rotate · Click to interact
             </p>
           </div>
@@ -516,8 +516,8 @@ function ParallaxShowcase() {
           viewport={{ once: true, margin: '-50px' }}
         >
           {/* Pack header */}
-          <div className="flex items-center gap-2 sm:gap-3 mb-5 min-w-0">
-            <h3 className="font-pixel text-[11px] shrink-0 text-retro-gold">3D Parallax Pack</h3>
+          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5 min-w-0">
+            <h3 className="font-pixel text-[10px] sm:text-[11px] shrink-0 text-retro-gold">3D Parallax Pack</h3>
             <span className="font-mono text-[10px] text-retro-muted/60 shrink-0">
               {ParallaxPack.length} interactive icons
             </span>
@@ -525,12 +525,12 @@ function ParallaxShowcase() {
             <span className="hidden sm:block font-mono text-[10px] text-retro-muted/40 truncate">animated · 3-layer · click-reactive</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
             {ParallaxPack.map((icon) => (
               <motion.div
                 key={icon.name}
                 whileHover={{ scale: 1.05 }}
-                className="relative flex flex-col items-center gap-2 p-4 rounded-lg border border-retro-gold/20 bg-retro-surface/30 hover:bg-retro-card transition-colors group"
+                className="relative flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 rounded-lg border border-retro-gold/20 bg-retro-surface/30 hover:bg-retro-card transition-colors group"
               >
                 <ParallaxPxlKitIcon
                   icon={icon}
@@ -548,16 +548,16 @@ function ParallaxShowcase() {
         </motion.div>
 
         {/* Info row below grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-10">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mt-6 sm:mt-10">
           {[
             { label: 'True 3D Depth', desc: 'CSS perspective + preserve-3d + per-layer translateZ', color: 'text-retro-gold' },
             { label: 'Page-Wide Tracking', desc: 'Mouse rotation works across the entire viewport', color: 'text-retro-cyan' },
             { label: 'Click Interactions', desc: 'Particle bursts, layer explosions, color shifts on click', color: 'text-retro-green' },
             { label: 'Animated Layers', desc: 'Frame-based animation per layer — glints, pulses, sparkles', color: 'text-retro-purple' },
           ].map((item) => (
-            <div key={item.label} className="p-3 rounded-lg border border-retro-border/20 bg-retro-surface/20">
-              <h4 className={`font-pixel text-[10px] ${item.color} mb-1`}>{item.label}</h4>
-              <p className="text-retro-muted text-[10px] leading-relaxed">{item.desc}</p>
+            <div key={item.label} className="p-2.5 sm:p-3 rounded-lg border border-retro-border/20 bg-retro-surface/20">
+              <h4 className={`font-pixel text-[8px] sm:text-[10px] ${item.color} mb-1`}>{item.label}</h4>
+              <p className="text-retro-muted text-[8px] sm:text-[10px] leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -585,21 +585,21 @@ function IconShowcase() {
   const router = useRouter();
 
   return (
-    <section className="py-20 px-4 border-t border-retro-border/30">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30">
       <div className="max-w-6xl mx-auto">
         <motion.div
-          className="text-center mb-14"
+          className="text-center mb-8 sm:mb-14"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
         >
-          <h2 className="font-pixel text-lg text-retro-gold mb-3">ICON PACKS</h2>
-          <p className="text-retro-muted font-mono text-sm max-w-lg mx-auto">
+          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-gold mb-2 sm:mb-3">ICON PACKS</h2>
+          <p className="text-retro-muted font-mono text-xs sm:text-sm max-w-lg mx-auto px-2">
             {TOTAL_ICON_COUNT} hand-crafted icons across 6 themed packs — including animated effects.
           </p>
         </motion.div>
 
-        <div className="space-y-12">
+        <div className="space-y-8 sm:space-y-12">
           {SHOWCASE_PACKS.map(({ pack, color, borderColor, limit }) => (
             <motion.div
               key={pack.id}
@@ -608,9 +608,9 @@ function IconShowcase() {
               viewport={{ once: true, margin: '-80px' }}
             >
               {/* Pack header */}
-              <div className="flex items-center gap-2 sm:gap-3 mb-5 min-w-0">
-                <h3 className={`font-pixel text-[11px] shrink-0 ${color}`}>{pack.name}</h3>
-                <span className="font-mono text-[10px] text-retro-muted/60 shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-5 min-w-0">
+                <h3 className={`font-pixel text-[10px] sm:text-[11px] shrink-0 ${color}`}>{pack.name}</h3>
+                <span className="font-mono text-[9px] sm:text-[10px] text-retro-muted/60 shrink-0">
                   {pack.icons.length} icons
                 </span>
                 <div className="flex-1 border-t border-retro-border/20 min-w-[12px]" />
@@ -618,13 +618,13 @@ function IconShowcase() {
               </div>
 
               {/* Icons grid */}
-              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2.5">
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-2.5">
                 {pack.icons.slice(0, limit).map((icon) => {
                   const animated = isAnimatedIcon(icon);
                   return (
                     <div
                       key={icon.name}
-                      className={`relative flex flex-col items-center gap-1.5 p-3 rounded-lg border ${borderColor} bg-retro-surface/30 hover:bg-retro-card transition-colors group cursor-pointer`}
+                      className={`relative flex flex-col items-center gap-1 sm:gap-1.5 p-2 sm:p-3 rounded-lg border ${borderColor} bg-retro-surface/30 hover:bg-retro-card transition-colors group cursor-pointer`}
                     >
                       {animated ? (
                         <AnimatedPxlKitIcon icon={icon} size={36} colorful className="group-hover:scale-110 transition-transform" />
@@ -642,10 +642,10 @@ function IconShowcase() {
                 {pack.icons.length > limit && (
                   <Link
                     href={`/icons`}
-                    className={`flex flex-col items-center justify-center gap-1 p-3 rounded-lg border border-dashed ${borderColor} hover:bg-retro-surface/50 transition-colors`}
+                    className={`flex flex-col items-center justify-center gap-1 p-2 sm:p-3 rounded-lg border border-dashed ${borderColor} hover:bg-retro-surface/50 transition-colors`}
                   >
-                    <span className={`font-pixel text-xs ${color}`}>+{pack.icons.length - limit}</span>
-                    <span className="font-mono text-[9px] text-retro-muted">more</span>
+                    <span className={`font-pixel text-[10px] sm:text-xs ${color}`}>+{pack.icons.length - limit}</span>
+                    <span className="font-mono text-[8px] sm:text-[9px] text-retro-muted">more</span>
                   </Link>
                 )}
               </div>
@@ -653,7 +653,7 @@ function IconShowcase() {
           ))}
         </div>
 
-        <div className="text-center mt-12">
+        <div className="text-center mt-8 sm:mt-12">
           <PixelButton
             tone="green"
             iconRight={<PxlKitIcon icon={ArrowRight} size={14} className="inline-block" />}
@@ -692,22 +692,22 @@ function ToastSection() {
   }, [toast]);
 
   return (
-    <section className="py-20 px-4 border-t border-retro-border/30 bg-retro-surface/20">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 bg-retro-surface/20">
       <div className="max-w-5xl mx-auto">
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="font-pixel text-lg text-retro-purple mb-3">PIXEL TOASTS</h2>
-          <p className="text-retro-muted max-w-lg mx-auto text-sm">
+          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-purple mb-2 sm:mb-3">PIXEL TOASTS</h2>
+          <p className="text-retro-muted max-w-lg mx-auto text-xs sm:text-sm px-2">
             Retro-styled notifications with pixel art icons, animated progress bars,
             configurable positions, and smooth stacking. Click to try them live.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {TOAST_DEMOS.map((d) => (
             <motion.div
               key={d.tone}
@@ -794,24 +794,24 @@ import { Trophy } from '@pxlkit/gamification';
 <PxlKitIcon icon={Trophy} size={48} color="#FF0000" />`;
 
   return (
-    <section className="py-20 px-4 border-t border-retro-border/30">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30">
       <div className="max-w-6xl mx-auto">
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="font-pixel text-lg text-retro-cyan mb-3">
+          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-cyan mb-2 sm:mb-3">
             HOW IT WORKS
           </h2>
-          <p className="text-retro-muted max-w-xl mx-auto">
+          <p className="text-retro-muted max-w-xl mx-auto text-xs sm:text-sm px-2">
             Icons are defined as simple character grids. Each character maps to a
             color. That&apos;s it.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8 items-start">
+        <div className="grid md:grid-cols-2 gap-6 sm:gap-8 items-start">
           {/* Definition code */}
           <PixelParallaxLayer speed={0.04}>
             <motion.div
@@ -1057,18 +1057,18 @@ Create an animated [DESCRIBE YOUR ICON HERE] icon.`;
   const activePrompt = mode === 'static' ? staticPrompt : animatedPrompt;
 
   return (
-    <section className="py-20 px-4 border-t border-retro-border/30 bg-retro-surface/30">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 bg-retro-surface/30">
       <div className="max-w-6xl mx-auto">
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="font-pixel text-lg text-retro-purple mb-3">
+          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-purple mb-2 sm:mb-3">
             AI GENERATION
           </h2>
-          <p className="text-retro-muted max-w-xl mx-auto">
+          <p className="text-retro-muted max-w-xl mx-auto text-xs sm:text-sm px-2">
             The grid format is designed to be generated by AI. Copy the prompt
             template, ask any LLM, and paste the result here.
           </p>
@@ -1097,7 +1097,7 @@ Create an animated [DESCRIBE YOUR ICON HERE] icon.`;
           </div>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
           {/* Prompt template */}
           <div>
             <h3 className="font-mono text-sm text-retro-green mb-3 flex items-center gap-2">
@@ -1211,29 +1211,29 @@ function PricingPreview() {
   };
 
   return (
-    <section className="py-20 px-4 border-t border-retro-border/30">
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30">
       <div className="max-w-5xl mx-auto">
         <motion.div
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center gap-2 mb-4">
+          <div className="inline-flex items-center gap-2 mb-3 sm:mb-4">
             <PixelBadge tone="red">50% OFF</PixelBadge>
             <PixelBadge tone="gold">Launch Special</PixelBadge>
           </div>
-          <h2 className="font-pixel text-lg text-retro-green mb-3">
+          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-green mb-2 sm:mb-3">
             SIMPLE PRICING
           </h2>
-          <p className="text-retro-muted max-w-lg mx-auto text-sm">
+          <p className="text-retro-muted max-w-lg mx-auto text-xs sm:text-sm px-2">
             Free for everyone with attribution. Remove it with a one-time payment.
             All licenses are <span className="text-retro-gold">50% off</span> during launch.
           </p>
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
           variants={staggerContainer}
           initial="initial"
           whileInView="animate"
@@ -1295,7 +1295,7 @@ function CTASection() {
   const router = useRouter();
 
   return (
-    <section className="relative py-20 px-4 border-t border-retro-border/30 overflow-hidden">
+    <section className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 overflow-hidden">
       {/* Decorative parallax background elements */}
       <PixelMouseParallax strength={40} invert>
         <div className="absolute top-10 left-[10%] opacity-10 pointer-events-none">
@@ -1318,10 +1318,10 @@ function CTASection() {
           viewport={{ once: true }}
         >
           <PixelParallaxLayer speed={-0.03}>
-            <h2 className="font-pixel text-lg text-retro-green mb-4">
+            <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-green mb-3 sm:mb-4">
               START BUILDING TODAY
             </h2>
-            <p className="text-retro-muted mb-8 max-w-md mx-auto">
+            <p className="text-retro-muted mb-6 sm:mb-8 max-w-md mx-auto text-xs sm:text-sm px-2">
               Pxlkit is free and open source. Use the UI kit and icons in your products,
               contribute icons, or help grow the component library.
             </p>

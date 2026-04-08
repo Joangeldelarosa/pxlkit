@@ -1048,22 +1048,22 @@ export default function VoxelPreview({ onTabChange, initialTab = 'island', showT
     <div className="w-full h-full relative">
       {/* Tab buttons */}
       {showTabs && (
-        <div className="absolute top-3 left-0 right-0 z-10 flex justify-center gap-2 pointer-events-auto">
+        <div className="absolute top-2 sm:top-3 left-0 right-0 z-10 flex justify-center gap-1 sm:gap-2 px-2 pointer-events-auto">
           {TABS.map((t) => (
             <button
               key={t.id}
               onClick={() => handleTab(t.id)}
               className={`
-                font-pixel text-[9px] sm:text-[10px] px-2.5 py-1 rounded border transition-all duration-200 cursor-pointer
-                backdrop-blur-sm select-none
+                font-pixel text-[7px] sm:text-[9px] md:text-[10px] px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded border transition-all duration-200 cursor-pointer
+                backdrop-blur-sm select-none whitespace-nowrap
                 ${tab === t.id
                   ? 'bg-retro-green/20 border-retro-green/60 text-retro-green shadow-[0_0_8px_rgba(74,222,128,0.15)]'
                   : 'bg-retro-bg/60 border-retro-border/40 text-retro-muted/60 hover:text-retro-muted hover:border-retro-border/60'
                 }
               `}
             >
-              <span className="mr-1">{t.icon}</span>
-              {t.label}
+              <span className="mr-0.5 sm:mr-1">{t.icon}</span>
+              <span className="hidden xs:inline sm:inline">{t.label}</span>
             </button>
           ))}
         </div>
