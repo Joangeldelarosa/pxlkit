@@ -208,6 +208,13 @@ const VOXEL_SIZE = 0.5;
 const MAX_HEIGHT = 32;
 const MAX_CHUNKS_PER_FRAME = 2;
 const PLAYER_HEIGHT = 1.5; // collision offset in voxel units
+/** Sentinel for water face culling — any value larger than MAX_HEIGHT */
+const NO_FACE = MAX_HEIGHT + 1;
+/** Precision for camera direction change detection (rounded to 1/SCALE) */
+const DIR_PRECISION = 10;
+/** Weight factors for chunk loading priority: in-view vs distance */
+const VIEW_DIR_WEIGHT = 2;
+const DIST_PENALTY = 0.5;
 
 function chunkKey(cx: number, cz: number): string { return `${cx},${cz}`; }
 function worldToChunk(wx: number, wz: number): [number, number] {
@@ -489,14 +496,14 @@ function generateChunkData(
       const hN = hMap[(lx + 1) * gW + lz];
       const hS = hMap[(lx + 1) * gW + (lz + 2)];
       const hE = hMap[(lx + 2) * gW + (lz + 1)];
-      const hW2 = hMap[lx * gW + (lz + 1)];
+      const hWest = hMap[lx * gW + (lz + 1)];
       const wl = c.waterLevel;
 
       /* ── 1. TERRAIN — render every voxel with an exposed face ── */
       for (let y = 0; y <= h; y++) {
         const isTop = y === h;
         const exposed = isTop || y === 0
-          || y > hN || y > hS || y > hE || y > hW2;
+          || y > hN || y > hS || y > hE || y > hWest;
         if (!exposed) continue;
 
         let baseCol: string;
@@ -520,10 +527,10 @@ function generateChunkData(
           const isWTop = wy === wl;
           // An underwater voxel is exposed if a horizontal neighbor's terrain
           // is lower than this water voxel's Y, creating a visible face.
-          const wExpN = wy > Math.max(hN, hN >= wl ? 999 : 0);
-          const wExpS = wy > Math.max(hS, hS >= wl ? 999 : 0);
-          const wExpE = wy > Math.max(hE, hE >= wl ? 999 : 0);
-          const wExpW = wy > Math.max(hW2, hW2 >= wl ? 999 : 0);
+          const wExpN = wy > Math.max(hN, hN >= wl ? NO_FACE : 0);
+          const wExpS = wy > Math.max(hS, hS >= wl ? NO_FACE : 0);
+          const wExpE = wy > Math.max(hE, hE >= wl ? NO_FACE : 0);
+          const wExpW = wy > Math.max(hWest, hWest >= wl ? NO_FACE : 0);
           const wExposed = isWTop || wy === h + 1 || wExpN || wExpS || wExpE || wExpW;
           if (!wExposed) continue;
           pushW((bX + lx) * VOXEL_SIZE, wy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
@@ -1151,10 +1158,10 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
 
     // Detect camera rotation changes — round direction to avoid micro-jitter
     camera.getWorldDirection(_dir);
-    const dx10 = Math.round(_dir.x * 10);
-    const dz10 = Math.round(_dir.z * 10);
-    const dirChanged = dx10 !== Math.round(lastCamDir.current.x * 10)
-                    || dz10 !== Math.round(lastCamDir.current.z * 10);
+    const dx10 = Math.round(_dir.x * DIR_PRECISION);
+    const dz10 = Math.round(_dir.z * DIR_PRECISION);
+    const dirChanged = dx10 !== Math.round(lastCamDir.current.x * DIR_PRECISION)
+                    || dz10 !== Math.round(lastCamDir.current.z * DIR_PRECISION);
 
     // Throttled generation
     let generated = 0;
@@ -1188,7 +1195,7 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
       if (d2 > rd * rd) continue;
       // Priority: dot product with camera direction (higher = more in-view) + distance penalty
       const dot = ddx * camDirX + ddz * camDirZ;
-      const priority = dot * 2 - d2 * 0.5; // favour chunks in view direction
+      const priority = dot * VIEW_DIR_WEIGHT - d2 * DIST_PENALTY; // favour chunks in view direction
       cands.push({ cx: ccx + ddx, cz: ccz + ddz, priority });
     }
     cands.sort((a, b) => b.priority - a.priority);
