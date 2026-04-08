@@ -36,14 +36,14 @@ export default function ExplorePage() {
   // Hide footer and background grid for immersive experience
   useEffect(() => {
     const footer = document.querySelector('footer');
-    const gridBg = document.querySelector('.bg-grid-pattern');
+    const gridBg = document.querySelector('[data-pxlkit="grid-bg"]') as HTMLElement | null;
 
     if (footer) footer.style.display = 'none';
-    if (gridBg) (gridBg as HTMLElement).style.display = 'none';
+    if (gridBg) gridBg.style.display = 'none';
 
     return () => {
       if (footer) footer.style.display = '';
-      if (gridBg) (gridBg as HTMLElement).style.display = '';
+      if (gridBg) gridBg.style.display = '';
     };
   }, []);
 

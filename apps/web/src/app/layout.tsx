@@ -191,7 +191,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ToastProvider defaultPosition="top-right" maxToasts={6}>
             {/* Subtle grid background — adapts to theme via CSS variable */}
-            <div className="fixed inset-0 pointer-events-none opacity-60 bg-grid-pattern" />
+            <div className="fixed inset-0 pointer-events-none opacity-60 bg-grid-pattern" data-pxlkit="grid-bg" />
 
             <div className="relative z-10 flex flex-col min-h-screen">
               <Navbar />

@@ -857,8 +857,8 @@ export default function ProceduralTerrain() {
 
   const applySeed = useCallback(() => {
     const parsed = parseInt(seedInput, 10);
-    if (!isNaN(parsed) && parsed >= 0) {
-      setSeed(parsed);
+    if (!isNaN(parsed)) {
+      setSeed(Math.abs(parsed));
     }
   }, [seedInput]);
 
@@ -922,12 +922,13 @@ export default function ProceduralTerrain() {
               <label className="font-pixel text-[8px] sm:text-[9px] text-retro-green/80 uppercase tracking-wider">World Seed</label>
               <div className="flex gap-2">
                 <input
-                  type="number"
+                  type="text"
                   inputMode="numeric"
+                  pattern="[0-9]*"
                   value={seedInput}
                   onChange={(e) => setSeedInput(e.target.value.replace(/[^0-9]/g, ''))}
                   onKeyDown={(e) => e.key === 'Enter' && applySeed()}
-                  className="flex-1 bg-retro-surface/80 border border-retro-border/50 rounded px-2 sm:px-3 py-1.5 font-mono text-xs sm:text-sm text-retro-text focus:border-retro-green/60 focus:outline-none transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="flex-1 bg-retro-surface/80 border border-retro-border/50 rounded px-2 sm:px-3 py-1.5 font-mono text-xs sm:text-sm text-retro-text focus:border-retro-green/60 focus:outline-none transition-colors"
                   placeholder="Enter seed..."
                 />
                 <button
@@ -1199,7 +1200,10 @@ function ChunkManagerWithCounter({
       }
     }
 
-    // Memory management — prune distant chunks
+    // Memory management — prune distant chunks.
+    // maxCache estimates the area of a square bounding the render circle
+    // (diameter = renderDistance*2, +2 for border padding). We allow 2× that
+    // before pruning, keeping a warm cache ring around the visible area.
     const maxCache = (renderDistance * 2 + 2) ** 2;
     if (chunkCache.current.size > maxCache * 2) {
       const toDelete: string[] = [];
