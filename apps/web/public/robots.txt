@@ -1,5 +1,0 @@
-# Pxlkit — https://pxlkit.xyz
-User-agent: *
-Allow: /
-
-Sitemap: https://pxlkit.xyz/sitemap.xml
