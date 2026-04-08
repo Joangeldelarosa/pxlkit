@@ -12,14 +12,14 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/@pxlkit/weather"><img src="https://img.shields.io/npm/v/@pxlkit/weather?color=blue" alt="npm version" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Pxlkit%20v1.0-blue.svg" alt="Pxlkit License" /></a>
-  <img src="https://img.shields.io/badge/icons-34-FFD700?style=flat" alt="34 icons" />
+  <img src="https://img.shields.io/badge/icons-36-FFD700?style=flat" alt="36 icons" />
 </p>
 
 ---
 
 ## Overview
 
-`@pxlkit/weather` is a themed icon pack for the [Pxlkit](https://pxlkit.xyz) ecosystem containing **34 icons** (29 static + 5 animated) designed for weather conditions, seasons, temperature, and natural phenomena.
+`@pxlkit/weather` is a themed icon pack for the [Pxlkit](https://pxlkit.xyz) ecosystem containing **36 icons** (30 static + 6 animated) designed for weather conditions, seasons, temperature, and natural phenomena.
 
 ## Installation
 
@@ -44,7 +44,7 @@ import { Sun, SpinningTornado } from '@pxlkit/weather';
 
 ## Icons
 
-### Static Icons (29)
+### Static Icons (30)
 
 | Icon | Name | Description |
 | --- | --- | --- |
@@ -79,7 +79,7 @@ import { Sun, SpinningTornado } from '@pxlkit/weather';
 | 🌃 | `StarryNight` | Starry night sky |
 | 🌦️ | `Drizzle` | Light rain / drizzle |
 
-### Animated Icons (5)
+### Animated Icons (6)
 
 | Icon | Name | Description |
 | --- | --- | --- |

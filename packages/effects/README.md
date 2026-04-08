@@ -12,14 +12,14 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/@pxlkit/effects"><img src="https://img.shields.io/npm/v/@pxlkit/effects?color=blue" alt="npm version" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Pxlkit%20v1.0-blue.svg" alt="Pxlkit License" /></a>
-  <img src="https://img.shields.io/badge/icons-6%20animated-FFD700?style=flat" alt="6 animated icons" />
+  <img src="https://img.shields.io/badge/icons-12%20animated-FFD700?style=flat" alt="12 animated icons" />
 </p>
 
 ---
 
 ## Overview
 
-`@pxlkit/effects` is a themed icon pack for the [Pxlkit](https://pxlkit.xyz) ecosystem containing **6 animated visual effect icons**. Each icon is a multi-frame animated SVG rendered at pixel-perfect quality.
+`@pxlkit/effects` is a themed icon pack for the [Pxlkit](https://pxlkit.xyz) ecosystem containing **12 animated visual effect icons**. Each icon is a multi-frame animated SVG rendered at pixel-perfect quality.
 
 This pack focuses on VFX and particle-style effects — explosions, radar pings, flames, shockwaves, and more.
 
