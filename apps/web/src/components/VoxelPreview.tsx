@@ -23,39 +23,39 @@ export type SceneTab = 'island' | 'terrain' | 'character';
  * ═══════════════════════════════════════════════════════════ */
 
 const BOMB_BODY = [
-  '#353550', '#424264', '#505076', '#5c5c84',
-  '#6b6b96', '#7e7eaa', '#9292be', '#acace0',
+  '#5a5a7a', '#6868a8', '#7878b0', '#8585c0',
+  '#9494d0', '#a4a4dd', '#b8b8e8', '#d0d0f5',
 ];
-const X_RED = '#dd3333';
-const X_RED_D = '#aa2222';
-const RING = ['#6a5530', '#887044', '#aa9060'];
-const FUSE_C = ['#8a6820', '#c8a848', '#e8c850'];
+const X_RED = '#ff4444';
+const X_RED_D = '#cc2222';
+const RING = ['#997744', '#bbaa66', '#ddcc88'];
+const FUSE_C = ['#bb9933', '#ddbb55', '#ffdd66'];
 
-const GRASS = ['#3ba85c', '#45c76e', '#4ade80'];
-const DIRT = ['#7a3d10', '#92400e', '#8a4a20'];
-const DEEP_DIRT = ['#653010', '#78350f', '#6a3818'];
-const STONE = ['#4a4a4a', '#57534e', '#5a5a5a'];
+const GRASS = ['#55cc77', '#66dd88', '#77ee99'];
+const DIRT = ['#aa6622', '#bb7733', '#cc8844'];
+const DEEP_DIRT = ['#885520', '#996630', '#887744'];
+const STONE = ['#778888', '#889999', '#99aaaa'];
 
-const TRUNK = ['#6B4226', '#7B5B3A', '#5B3B1A'];
-const LEAF = ['#1B6B30', '#2D8B46', '#3DAA56'];
+const TRUNK = ['#8B5A2B', '#9B6B3B', '#7B4A1B'];
+const LEAF = ['#33aa55', '#44cc66', '#55dd77'];
 
-const WATER_C = '#4A90D9';
-const SAND = ['#E8CDA0', '#F0D9B5', '#D4B88C'];
-const WALL = ['#D4C1A3', '#E8D5B7'];
-const ROOF = ['#A93226', '#C0392B'];
-const WINDOW_C = '#5DADE2';
-const DOOR_C = '#6B4226';
+const WATER_C = '#66bbff';
+const SAND = ['#f0ddb0', '#f8e8cc', '#ffe8d0'];
+const WALL = ['#eed8bb', '#f8e8d0'];
+const ROOF = ['#cc4433', '#dd5544'];
+const WINDOW_C = '#88ccff';
+const DOOR_C = '#8B5A2B';
 
-const ROBOT_BODY = ['#4A5568', '#6B7B8D', '#8899AA'];
-const ROBOT_EYE = '#00FF88';
-const ROBOT_SCREEN = '#1A2A3A';
-const ROBOT_JOINT = '#3D4A5A';
-const ROBOT_LIGHT = '#FF4444';
-const ROBOT_CHEST = '#4488FF';
-const ROBOT_ANTENNA = '#888888';
+const ROBOT_BODY = ['#7788aa', '#8899bb', '#99aacc'];
+const ROBOT_EYE = '#44ffaa';
+const ROBOT_SCREEN = '#334455';
+const ROBOT_JOINT = '#667788';
+const ROBOT_LIGHT = '#ff6666';
+const ROBOT_CHEST = '#66aaff';
+const ROBOT_ANTENNA = '#aabbcc';
 
-const FLOWER_COLORS = ['#FF6B6B', '#FBBF24', '#A78BFA', '#F472B6', '#60A5FA'];
-const ROCK_COLORS = ['#6B7280', '#7B8494', '#9CA3AF'];
+const FLOWER_COLORS = ['#ff8888', '#ffcc44', '#bb99ff', '#ff88bb', '#77bbff'];
+const ROCK_COLORS = ['#8899aa', '#99aabb', '#aabbcc'];
 
 /* ═══════════════════════════════════════════════════════════
  *  GENERATOR: 3D Spherical Bomb
@@ -396,7 +396,7 @@ function Voxel3DModel({
   voxels,
   position = [0, 0, 0],
   cubeSize = 0.5,
-  roughness = 0.65,
+  roughness = 0.45,
   metalness = 0.05,
   opacity = 1,
   transparent = false,
@@ -440,6 +440,7 @@ function Voxel3DModel({
         transparent={transparent}
         opacity={opacity}
         depthWrite={!transparent}
+        envMapIntensity={0.5}
       />
     </instancedMesh>
   );
@@ -554,12 +555,15 @@ function Sparkles({ count = 30, range = 18, color = '#FFD700' }: { count?: numbe
 function SharedLighting() {
   return (
     <>
-      <ambientLight intensity={0.35} color="#c4b5fd" />
-      <hemisphereLight color="#87ceeb" groundColor="#4ade80" intensity={0.4} />
+      {/* Strong ambient fill — prevents any surface from being pure black */}
+      <ambientLight intensity={1.0} color="#e8e0f0" />
+      {/* Hemisphere: sky blue above, warm green below — natural outdoor feel */}
+      <hemisphereLight color="#aaddff" groundColor="#88cc88" intensity={0.8} />
+      {/* Key light — warm sunlight from upper-right-front */}
       <directionalLight
-        position={[15, 25, 10]}
-        intensity={1.2}
-        color="#fff5e6"
+        position={[15, 25, 15]}
+        intensity={2.0}
+        color="#fff8ee"
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -569,8 +573,12 @@ function SharedLighting() {
         shadow-camera-top={25}
         shadow-camera-bottom={-25}
       />
-      <directionalLight position={[-10, 8, -10]} intensity={0.3} color="#a78bfa" />
-      <fog attach="fog" args={['#0d1117', 30, 80]} />
+      {/* Fill light — cooler from the left-back to soften shadows */}
+      <directionalLight position={[-12, 10, -8]} intensity={0.8} color="#bbccff" />
+      {/* Rim/back light — subtle purple tint for depth */}
+      <directionalLight position={[0, 5, -15]} intensity={0.5} color="#ccaaff" />
+      {/* Gentle fog — pushed far back so scene stays bright */}
+      <fog attach="fog" args={['#0d1117', 50, 100]} />
     </>
   );
 }
@@ -608,12 +616,12 @@ function IslandScene() {
   return (
     <AutoRotate speed={0.12}>
       {/* Island terrain */}
-      <Voxel3DModel voxels={islandVoxels} position={[0, -3, 0]} cubeSize={CS} roughness={0.8} />
+      <Voxel3DModel voxels={islandVoxels} position={[0, -3, 0]} cubeSize={CS} roughness={0.5} />
       {/* Trees + decorations on island */}
-      <Voxel3DModel voxels={[...treeVoxels, ...decoVoxels]} position={[0, -3, 0]} cubeSize={CS} roughness={0.75} />
+      <Voxel3DModel voxels={[...treeVoxels, ...decoVoxels]} position={[0, -3, 0]} cubeSize={CS} roughness={0.45} />
       {/* 3D Bomb floating above island */}
       <Float speed={1.5} rotationIntensity={0.1} floatIntensity={1.2} floatingRange={[-0.3, 0.3]}>
-        <Voxel3DModel voxels={bombData.voxels} position={[0, bombY - 3, 0]} cubeSize={CS} roughness={0.55} metalness={0.08} />
+        <Voxel3DModel voxels={bombData.voxels} position={[0, bombY - 3, 0]} cubeSize={CS} roughness={0.4} metalness={0.1} />
         <FuseSpark position={[sparkPos[0], sparkPos[1] - 3, sparkPos[2]]} />
       </Float>
       <Sparkles count={25} range={16} />
@@ -648,10 +656,10 @@ function TerrainScene() {
   return (
     <AutoRotate speed={0.1}>
       <group position={[0, -4, 0]}>
-        <Voxel3DModel voxels={solidVoxels} cubeSize={CS} roughness={0.8} />
-        <Voxel3DModel voxels={extras} cubeSize={CS} roughness={0.75} />
+        <Voxel3DModel voxels={solidVoxels} cubeSize={CS} roughness={0.5} />
+        <Voxel3DModel voxels={extras} cubeSize={CS} roughness={0.45} />
         {waterVoxels.length > 0 && (
-          <Voxel3DModel voxels={waterVoxels} cubeSize={CS} roughness={0.2} metalness={0.1} transparent opacity={0.55} />
+          <Voxel3DModel voxels={waterVoxels} cubeSize={CS} roughness={0.15} metalness={0.15} transparent opacity={0.6} />
         )}
       </group>
       <Sparkles count={15} range={14} color="#88CCFF" />
@@ -677,10 +685,10 @@ function CharacterScene() {
     <AutoRotate speed={0.15}>
       <group position={[0, -4, 0]}>
         {/* Platform */}
-        <Voxel3DModel voxels={platformVoxels} cubeSize={CS} roughness={0.9} metalness={0.1} />
+        <Voxel3DModel voxels={platformVoxels} cubeSize={CS} roughness={0.6} metalness={0.1} />
         {/* Robot (sits on platform at y=1) */}
         <Float speed={2} rotationIntensity={0.05} floatIntensity={0.6} floatingRange={[-0.15, 0.15]}>
-          <Voxel3DModel voxels={robotVoxels} position={[0, CS, 0]} cubeSize={CS} roughness={0.5} metalness={0.15} />
+          <Voxel3DModel voxels={robotVoxels} position={[0, CS, 0]} cubeSize={CS} roughness={0.35} metalness={0.2} />
           <AntennaLight position={[antennaPos[0], antennaPos[1], antennaPos[2]]} />
         </Float>
       </group>
@@ -734,7 +742,7 @@ export default function VoxelPreview({ onTabChange }: { onTabChange?: (tab: Scen
         camera={{ position: [0, 10, 24], fov: 42, near: 0.1, far: 100 }}
         shadows
         dpr={[1, 1.5]}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ antialias: true, alpha: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.6 }}
         style={{ background: 'transparent' }}
       >
         <SharedLighting />
