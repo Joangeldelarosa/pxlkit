@@ -109,7 +109,7 @@ function HeroSection() {
                 <PixelBadge tone="gold">{UI_COMPONENTS_COUNT} Components</PixelBadge>
                 <PixelBadge tone="purple">{TOTAL_ICON_COUNT}+ Icons</PixelBadge>
                 <PixelBadge tone="red">NEW: 3D Parallax</PixelBadge>
-                <PixelBadge tone="purple">🔮 SOON: 3D Voxels</PixelBadge>
+                <PixelBadge tone="purple">🔮 SOON: Voxel Worlds</PixelBadge>
               </div>
 
               {/* ── GhostFriend parallax hero icon ── */}
@@ -189,27 +189,35 @@ function HeroSection() {
 }
 
 /* ──────────────────── VOXEL COMING SOON ──────────────────── */
+
+const VOXEL_CAPABILITIES: { icon: string; title: string; desc: string }[] = [
+  { icon: '🌍', title: 'Voxel Worlds', desc: 'Build floating islands, caves, biomes, and entire worlds from voxel blocks with procedural terrain.' },
+  { icon: '🤖', title: '3D Characters', desc: 'Design and animate voxel characters, NPCs, and creatures with per-voxel control.' },
+  { icon: '⛰️', title: 'Terrain Engine', desc: 'Heightmap-based terrain with grass, dirt, stone layers, water systems, and biome blending.' },
+  { icon: '🎮', title: 'Interactive Scenes', desc: 'Orbit controls, real-time lighting, physics-ready, and full React Three Fiber integration.' },
+];
+
 function VoxelComingSoon() {
   return (
-    <section className="relative py-16 px-4 border-t border-retro-border/20 overflow-hidden">
-      {/* Subtle background glow */}
+    <section className="relative py-20 px-4 border-t border-retro-border/20 overflow-hidden">
+      {/* Background glows */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-retro-purple/5 rounded-full blur-[120px]" />
-        <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-retro-green/5 rounded-full blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-retro-purple/5 rounded-full blur-[140px]" />
+        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-retro-green/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-retro-gold/3 rounded-full blur-[80px]" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Header */}
+        {/* ── Header ── */}
         <motion.div
-          className="text-center mb-8"
+          className="text-center mb-10"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          {/* Pulsing Coming Soon badge */}
           <motion.div
-            className="inline-flex items-center gap-2 mb-4"
+            className="inline-flex items-center gap-2 mb-5"
             animate={{ scale: [1, 1.03, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           >
@@ -220,71 +228,107 @@ function VoxelComingSoon() {
             <PixelBadge tone="green">COMING SOON</PixelBadge>
           </motion.div>
 
-          <h2 className="font-pixel text-lg sm:text-xl text-retro-purple mb-3 text-glow">
+          <h2 className="font-pixel text-xl sm:text-2xl text-retro-purple mb-2 text-glow">
             @pxlkit/voxel
           </h2>
-          <p className="text-retro-muted max-w-xl mx-auto text-sm leading-relaxed">
-            A new dimension for pixel art.{' '}
-            <span className="text-retro-gold font-bold">3D voxel icons</span> built with React Three Fiber —
-            transform any PxlKit icon into interactive, animated voxel models on floating islands.
+          <p className="font-pixel text-sm sm:text-base text-retro-gold mb-4">
+            From Pixels to Worlds.
+          </p>
+          <p className="text-retro-muted max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+            A new dimension is loading. Craft immersive{' '}
+            <span className="text-retro-green font-bold">voxel worlds</span>,
+            sculpt <span className="text-retro-purple font-bold">3D characters</span>,
+            generate <span className="text-retro-gold font-bold">dynamic terrains</span>{' '}
+            with water and biomes, and bring pixel art to life in full three dimensions.
+            The same retro aesthetic you love — now in 3D.
           </p>
         </motion.div>
 
-        {/* 3D Preview */}
+        {/* ── 3D Preview with Tabs ── */}
         <motion.div
-          className="relative mx-auto max-w-3xl"
+          className="relative mx-auto max-w-4xl"
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
         >
-          {/* Glowing border frame */}
           <div className="relative rounded-xl border border-retro-border/40 overflow-hidden bg-[#0d1117]/80 backdrop-blur-sm">
             {/* Corner accents */}
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-retro-green/60 rounded-tl-xl" />
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-retro-green/60 rounded-tr-xl" />
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-retro-purple/60 rounded-bl-xl" />
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-retro-purple/60 rounded-br-xl" />
+            <div className="absolute top-0 left-0 w-10 h-10 border-t-2 border-l-2 border-retro-green/60 rounded-tl-xl" />
+            <div className="absolute top-0 right-0 w-10 h-10 border-t-2 border-r-2 border-retro-green/60 rounded-tr-xl" />
+            <div className="absolute bottom-0 left-0 w-10 h-10 border-b-2 border-l-2 border-retro-purple/60 rounded-bl-xl" />
+            <div className="absolute bottom-0 right-0 w-10 h-10 border-b-2 border-r-2 border-retro-purple/60 rounded-br-xl" />
 
             {/* Scanline overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+            <div
+              className="absolute inset-0 pointer-events-none opacity-[0.03]"
               style={{
-                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)',
+                backgroundImage:
+                  'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)',
               }}
             />
 
-            {/* Canvas container */}
-            <div className="w-full aspect-[16/10] min-h-[300px] sm:min-h-[400px]">
-              <VoxelPreview />
+            {/* Canvas — tabs are inside the VoxelPreview component */}
+            <div className="w-full aspect-[16/10] min-h-[320px] sm:min-h-[440px]">
+              <Suspense
+                fallback={
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="font-pixel text-xs text-retro-muted animate-pulse">Loading 3D…</div>
+                  </div>
+                }
+              >
+                <VoxelPreview />
+              </Suspense>
             </div>
 
             {/* Bottom label */}
             <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 pointer-events-none">
               <span className="bg-retro-bg/80 backdrop-blur-sm border border-retro-border/40 rounded px-3 py-1 font-mono text-[10px] text-retro-muted/70">
-                🎮 Drag to orbit • Auto-rotating
+                🎮 Drag to orbit · Switch tabs to explore
               </span>
             </div>
           </div>
         </motion.div>
 
-        {/* Feature pills */}
+        {/* ── Capability Cards ── */}
         <motion.div
-          className="flex flex-wrap justify-center gap-2 mt-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10 max-w-4xl mx-auto"
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <PixelBadge tone="purple">Voxel Engine</PixelBadge>
-          <PixelBadge tone="green">React Three Fiber</PixelBadge>
-          <PixelBadge tone="gold">Floating Islands</PixelBadge>
-          <PixelBadge tone="cyan">Animated Icons</PixelBadge>
-          <PixelBadge tone="red">Interactive 3D</PixelBadge>
+          {VOXEL_CAPABILITIES.map((cap) => (
+            <div
+              key={cap.title}
+              className="rounded-lg border border-retro-border/30 bg-retro-bg/40 backdrop-blur-sm p-4 text-center hover:border-retro-green/40 transition-colors duration-200"
+            >
+              <div className="text-2xl mb-2">{cap.icon}</div>
+              <h4 className="font-pixel text-[11px] text-retro-green mb-1">{cap.title}</h4>
+              <p className="text-retro-muted/70 text-[11px] leading-relaxed">{cap.desc}</p>
+            </div>
+          ))}
         </motion.div>
 
-        {/* Install hint */}
+        {/* ── Feature pills ── */}
         <motion.div
-          className="mt-5 text-center"
+          className="flex flex-wrap justify-center gap-2 mt-8"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <PixelBadge tone="purple">Voxel Engine</PixelBadge>
+          <PixelBadge tone="green">React Three Fiber</PixelBadge>
+          <PixelBadge tone="gold">Terrain Generation</PixelBadge>
+          <PixelBadge tone="cyan">3D Characters</PixelBadge>
+          <PixelBadge tone="red">Interactive Scenes</PixelBadge>
+          <PixelBadge tone="purple">Procedural Worlds</PixelBadge>
+        </motion.div>
+
+        {/* ── Install hint ── */}
+        <motion.div
+          className="mt-6 text-center"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -292,8 +336,8 @@ function VoxelComingSoon() {
         >
           <div className="inline-block rounded-lg border border-retro-border/30 bg-retro-bg/60 px-4 py-2 font-mono text-xs text-retro-muted/70">
             <span className="text-retro-green mr-2">$</span>
-            npm i @pxlkit/voxel{' '}
-            <span className="text-retro-muted/40 ml-2">← soon</span>
+            npm i @pxlkit/voxel @react-three/fiber three{' '}
+            <span className="text-retro-muted/40 ml-2">← coming soon</span>
           </div>
         </motion.div>
       </div>
