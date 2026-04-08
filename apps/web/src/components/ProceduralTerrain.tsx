@@ -14,7 +14,11 @@ import type { PxlKitData } from '@pxlkit/core';
  *  World Configuration — user-adjustable from the settings panel
  * ═══════════════════════════════════════════════════════════════ */
 
+type WorldMode = 'infinite' | 'finite';
+
 interface WorldConfig {
+  worldMode: WorldMode;
+  worldSize: number;           // finite mode: world width/depth in voxels (16-512)
   renderDistance: number;
   flySpeed: number;
   treeDensity: number;       // 0-1
@@ -27,6 +31,8 @@ interface WorldConfig {
 }
 
 const DEFAULT_CONFIG: WorldConfig = {
+  worldMode: 'infinite',
+  worldSize: 128,
   renderDistance: 5,
   flySpeed: 12,
   treeDensity: 0.5,
@@ -497,6 +503,23 @@ function generateChunkData(
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
 
+  /* ── Finite world edge taper — creates floating island effect ── */
+  const isFinite = cfg.worldMode === 'finite';
+  const halfW = isFinite ? cfg.worldSize / 2 : 0;
+  // Taper zone: outer 20% of radius
+  const taperStart = isFinite ? halfW * 0.8 : 0;
+
+  /** Returns 0-1 multiplier: 1 at centre, fades to 0 at edges */
+  function edgeFade(wx2: number, wz2: number): number {
+    if (!isFinite) return 1;
+    const dx2 = Math.abs(wx2 - halfW);
+    const dz2 = Math.abs(wz2 - halfW);
+    const maxDist = Math.max(dx2, dz2);
+    if (maxDist >= halfW) return 0;            // outside world
+    if (maxDist <= taperStart) return 1;       // fully inside
+    return 1 - (maxDist - taperStart) / (halfW - taperStart); // smooth fade
+  }
+
   /* ── Pre-compute height map + biome for chunk + 1-cell border ── */
   const gW = CHUNK_SIZE + 2;
   const hMap = new Int32Array(gW * gW);
@@ -530,6 +553,10 @@ function generateChunkData(
         }
         h = Math.max(0, Math.min(MAX_HEIGHT, Math.floor(c.heightBase + (base2 + det) * c.heightScale + extra)));
       }
+      // Apply edge taper for finite worlds
+      const fade = edgeFade(wx, wz);
+      if (fade <= 0) { hMap[idx] = -1; bMap[idx] = bTypes.indexOf(biome); continue; }
+      if (fade < 1) h = Math.max(0, Math.floor(h * fade));
       hMap[idx] = h;
       bMap[idx] = bTypes.indexOf(biome);
     }
@@ -567,6 +594,7 @@ function generateChunkData(
     for (let lz = 0; lz < CHUNK_SIZE; lz++) {
       const idx = (lx + 1) * gW + (lz + 1);
       const h = hMap[idx];
+      if (h < 0) continue; // outside finite world bounds
       const biome = bTypes[bMap[idx]] as BiomeType;
       const c = variedConfigs[lx * CHUNK_SIZE + lz] || BIOMES[biome];
       const wx = bX + lx, wz = bZ + lz;
@@ -976,17 +1004,27 @@ function getSolidHeight(cache: Map<string, ChunkVoxelData>, worldX: number, worl
  *  Fly Camera — with per-frame collision against solid terrain
  * ═══════════════════════════════════════════════════════════════ */
 
-function FlyCamera({ keysRef, speedRef, chunkCacheRef }: {
+function FlyCamera({ keysRef, speedRef, chunkCacheRef, worldConfig }: {
   keysRef: React.RefObject<Set<string>>;
   speedRef: React.RefObject<number>;
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
+  worldConfig: WorldConfig;
 }) {
   const { camera } = useThree();
   const _d = useMemo(() => new THREE.Vector3(), []);
   const _r = useMemo(() => new THREE.Vector3(), []);
   const _prev = useMemo(() => new THREE.Vector3(), []);
 
-  useEffect(() => { camera.position.set(0, 12, 20); camera.lookAt(0, 6, 0); }, [camera]);
+  useEffect(() => {
+    if (worldConfig.worldMode === 'finite') {
+      const centre = worldConfig.worldSize * VOXEL_SIZE * 0.5;
+      camera.position.set(centre, 12, centre + 10);
+      camera.lookAt(centre, 6, centre);
+    } else {
+      camera.position.set(0, 12, 20);
+      camera.lookAt(0, 6, 0);
+    }
+  }, [camera, worldConfig.worldMode, worldConfig.worldSize]);
 
   useFrame((_, delta) => {
     const keys = keysRef.current;
@@ -1004,6 +1042,15 @@ function FlyCamera({ keysRef, speedRef, chunkCacheRef }: {
     if (keys.has(' '))     camera.position.addScaledVector(camera.up, spd);
     if (keys.has('shift')) camera.position.addScaledVector(camera.up, -spd);
 
+    /* Boundary clamping for finite worlds */
+    if (worldConfig.worldMode === 'finite') {
+      const maxBound = worldConfig.worldSize * VOXEL_SIZE;
+      const px = Math.max(-2, Math.min(maxBound + 2, camera.position.x));
+      const pz = Math.max(-2, Math.min(maxBound + 2, camera.position.z));
+      const py = Math.max(0.5, Math.min(MAX_HEIGHT * VOXEL_SIZE * 2, camera.position.y));
+      camera.position.set(px, py, pz);
+    }
+
     /* Collision resolution */
     const cache = chunkCacheRef.current;
     if (!cache || cache.size === 0) return;
@@ -1011,7 +1058,6 @@ function FlyCamera({ keysRef, speedRef, chunkCacheRef }: {
     const th = getSolidHeight(cache, camera.position.x, camera.position.z);
     const minY = (th + PLAYER_HEIGHT) * VOXEL_SIZE;
     if (camera.position.y < minY) {
-      // Try sliding: revert X, check; revert Z, check
       const hOldX = getSolidHeight(cache, _prev.x, camera.position.z);
       const hOldZ = getSolidHeight(cache, camera.position.x, _prev.z);
       if ((hOldX + PLAYER_HEIGHT) * VOXEL_SIZE <= camera.position.y) {
@@ -1199,11 +1245,97 @@ function FogEffect({ density }: { density: number }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+ *  Biome-Aware Ambient Particles
+ *
+ *  Each biome gets its own atmospheric particles:
+ *  ‣ Forest  → fireflies (warm yellow, slow drift, glow)
+ *  ‣ Desert  → sand wisps (tan, horizontal drift)
+ *  ‣ Tundra  → snowflakes (white, gentle fall)
+ *  ‣ Ocean   → sea spray (pale blue, upward mist)
+ *  ‣ Plains  → dandelion seeds (white, float up)
+ *  ‣ Mountains → mist wisps (grey-blue, slow swirl)
+ *  ‣ City    → dust motes (warm, gentle float)
+ *
+ *  Uses THREE.Points for near-zero GPU cost. Particles follow
+ *  the camera and recycle when they drift out of range.
+ * ═══════════════════════════════════════════════════════════════ */
+
+const BIOME_PARTICLE_CONFIG: Record<string, { color: string; count: number; size: number; speed: number; drift: [number, number, number]; opacity: number }> = {
+  Forest:    { color: '#ddee55', count: 40, size: 0.12, speed: 0.3, drift: [0.2, 0.4, 0.2], opacity: 0.7 },
+  Desert:    { color: '#eeddaa', count: 25, size: 0.08, speed: 0.8, drift: [1.2, 0.1, 0.4], opacity: 0.4 },
+  Tundra:    { color: '#ffffff', count: 50, size: 0.10, speed: 0.5, drift: [0.3, -0.6, 0.3], opacity: 0.6 },
+  Ocean:     { color: '#aaddee', count: 20, size: 0.06, speed: 0.4, drift: [0.1, 0.5, 0.1], opacity: 0.35 },
+  Plains:    { color: '#ffffee', count: 15, size: 0.07, speed: 0.2, drift: [0.15, 0.3, 0.15], opacity: 0.45 },
+  Mountains: { color: '#bbccdd', count: 30, size: 0.09, speed: 0.15, drift: [0.4, 0.1, 0.4], opacity: 0.3 },
+  City:      { color: '#ffeecc', count: 12, size: 0.05, speed: 0.1, drift: [0.1, 0.15, 0.1], opacity: 0.25 },
+};
+
+function AmbientParticles({ biome }: { biome: string }) {
+  const ref = useRef<THREE.Points>(null);
+  const { camera } = useThree();
+  const cfg = BIOME_PARTICLE_CONFIG[biome] || BIOME_PARTICLE_CONFIG.Plains;
+  const RANGE = 12;
+
+  const geo = useMemo(() => {
+    let seed2 = 42;
+    const rand = () => { seed2 = (seed2 + 0x6D2B79F5) | 0; let t = Math.imul(seed2 ^ (seed2 >>> 15), 1 | seed2); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const maxC = 50; // allocate max, use count via drawRange
+    const pos = new Float32Array(maxC * 3);
+    for (let i = 0; i < maxC; i++) {
+      pos[i * 3]     = (rand() - 0.5) * RANGE * 2;
+      pos[i * 3 + 1] = rand() * 8 + 2;
+      pos[i * 3 + 2] = (rand() - 0.5) * RANGE * 2;
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    return g;
+  }, [RANGE]);
+
+  const mat = useMemo(() => new THREE.PointsMaterial({
+    color: cfg.color, size: cfg.size, transparent: true, opacity: cfg.opacity,
+    sizeAttenuation: true, depthWrite: false,
+  }), [cfg.color, cfg.size, cfg.opacity]);
+
+  useEffect(() => { geo.setDrawRange(0, cfg.count); }, [geo, cfg.count]);
+
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    const t = clock.getElapsedTime();
+    const attr = ref.current.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const arr = attr.array as Float32Array;
+
+    // Move particles + recycle when out of range
+    for (let i = 0; i < cfg.count; i++) {
+      const i3 = i * 3;
+      arr[i3]     += Math.sin(t * cfg.speed + i * 1.7) * cfg.drift[0] * 0.02;
+      arr[i3 + 1] += cfg.drift[1] * 0.01 + Math.sin(t * 0.3 + i * 2.3) * 0.005;
+      arr[i3 + 2] += Math.cos(t * cfg.speed + i * 2.1) * cfg.drift[2] * 0.02;
+
+      // Recycle: if drifted too far from camera, reset near camera
+      const dx2 = arr[i3] - (camera.position.x - ref.current.position.x);
+      const dz2 = arr[i3 + 2] - (camera.position.z - ref.current.position.z);
+      if (dx2 * dx2 + dz2 * dz2 > RANGE * RANGE * 4 || arr[i3 + 1] > 14 || arr[i3 + 1] < 0) {
+        arr[i3]     = (Math.random() - 0.5) * RANGE * 2;
+        arr[i3 + 1] = Math.random() * 8 + 2;
+        arr[i3 + 2] = (Math.random() - 0.5) * RANGE * 2;
+      }
+    }
+    attr.needsUpdate = true;
+
+    // Follow camera
+    ref.current.position.copy(camera.position);
+  });
+
+  return <points ref={ref} geometry={geo} material={mat} />;
+}
+
+/* ═══════════════════════════════════════════════════════════════
  *  HUD Components
  * ═══════════════════════════════════════════════════════════════ */
 
-function OverlayStats({ seed, chunkCount, position, biome }: {
+function OverlayStats({ seed, chunkCount, position, biome, worldMode, worldSize }: {
   seed: number; chunkCount: number; position: [number, number, number]; biome: string;
+  worldMode: WorldMode; worldSize: number;
 }) {
   return (
     <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 font-mono text-[9px] sm:text-[10px] space-y-0.5 pointer-events-none select-none">
@@ -1211,6 +1343,7 @@ function OverlayStats({ seed, chunkCount, position, biome }: {
       <div className="text-retro-cyan/70">BIOME: <span className="text-retro-cyan">{biome}</span></div>
       <div className="text-retro-gold/70">POS: <span className="text-retro-gold">{position[0].toFixed(0)}, {position[1].toFixed(0)}, {position[2].toFixed(0)}</span></div>
       <div className="text-retro-purple/70">CHUNKS: <span className="text-retro-purple">{chunkCount}</span></div>
+      <div className="text-retro-muted/50">{worldMode === 'infinite' ? '∞ INFINITE' : `◻ ${worldSize}×${worldSize}`}</div>
     </div>
   );
 }
@@ -1288,7 +1421,10 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
   const frustum = useRef(new THREE.Frustum());
   const projMat = useRef(new THREE.Matrix4());
   const prevSeed = useRef(seed);
+  const prevMode = useRef(config.worldMode);
+  const prevSize = useRef(config.worldSize);
   const pendingKeys = useRef<string[]>([]);
+  const finiteGenDone = useRef(false);
   const _dir = useMemo(() => new THREE.Vector3(), []);
 
   const noises = useMemo(() => ({
@@ -1298,20 +1434,75 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
     region: createNoise2D(seed + 6),
   }), [seed]);
 
+  /* Helper: generate a single chunk and cache it */
+  const genChunk = useCallback((ck: string) => {
+    if (chunkCacheRef.current.has(ck)) return;
+    const [pcx, pcz] = ck.split(',').map(Number);
+    const data = generateChunkData(pcx, pcz, noises.height, noises.detail, noises.biome, noises.temp, noises.tree, noises.struct, noises.region, config);
+    chunkCacheRef.current.set(ck, data);
+  }, [noises, config, chunkCacheRef]);
+
   useFrame(() => {
-    if (prevSeed.current !== seed) {
+    const seedChanged = prevSeed.current !== seed;
+    const modeChanged = prevMode.current !== config.worldMode;
+    const sizeChanged = prevSize.current !== config.worldSize;
+    if (seedChanged || modeChanged || sizeChanged) {
       prevSeed.current = seed;
+      prevMode.current = config.worldMode;
+      prevSize.current = config.worldSize;
       chunkCacheRef.current.clear();
       lastCamChunk.current = '';
       lastCamDir.current.set(0, 0, 0);
       pendingKeys.current = [];
+      finiteGenDone.current = false;
     }
 
-    const [ccx, ccz] = worldToChunk(camera.position.x, camera.position.z);
-    const curKey = `${ccx},${ccz}`;
+    const isFiniteMode = config.worldMode === 'finite';
     const rd = config.renderDistance;
 
-    // Detect camera rotation changes — round direction to avoid micro-jitter
+    /* ═══════ FINITE MODE ═══════ */
+    if (isFiniteMode) {
+      // Queue all chunks in the world bounds (once)
+      if (!finiteGenDone.current) {
+        const chunksPerSide = Math.ceil(config.worldSize / CHUNK_SIZE);
+        const allKeys: string[] = [];
+        for (let cx2 = 0; cx2 < chunksPerSide; cx2++) {
+          for (let cz2 = 0; cz2 < chunksPerSide; cz2++) {
+            allKeys.push(chunkKey(cx2, cz2));
+          }
+        }
+        // Sort by distance from centre for progressive loading
+        const centre = chunksPerSide / 2;
+        allKeys.sort((a, b) => {
+          const [ax, az] = a.split(',').map(Number);
+          const [bx2, bz2] = b.split(',').map(Number);
+          return ((ax - centre) ** 2 + (az - centre) ** 2) - ((bx2 - centre) ** 2 + (bz2 - centre) ** 2);
+        });
+        pendingKeys.current = allKeys;
+        finiteGenDone.current = true;
+      }
+
+      // Generate throttled
+      let generated = 0;
+      while (pendingKeys.current.length > 0 && generated < MAX_CHUNKS_PER_FRAME) {
+        genChunk(pendingKeys.current.shift()!);
+        generated++;
+      }
+
+      // Show ALL generated chunks (no frustum culling for finite — it's small)
+      const all = new Map<string, ChunkVoxelData>(chunkCacheRef.current);
+      if (all.size !== visibleChunks.size || generated > 0) {
+        setVisibleChunks(all);
+        onChunkCount(all.size);
+      }
+      return;
+    }
+
+    /* ═══════ INFINITE MODE ═══════ */
+    const [ccx, ccz] = worldToChunk(camera.position.x, camera.position.z);
+    const curKey = `${ccx},${ccz}`;
+
+    // Detect camera rotation changes
     camera.getWorldDirection(_dir);
     const dx10 = Math.round(_dir.x * DIR_PRECISION);
     const dz10 = Math.round(_dir.z * DIR_PRECISION);
@@ -1319,18 +1510,13 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
                     || dz10 !== Math.round(lastCamDir.current.z * DIR_PRECISION);
 
     // Throttled generation
-    let generated = 0;
-    while (pendingKeys.current.length > 0 && generated < MAX_CHUNKS_PER_FRAME) {
-      const pk = pendingKeys.current.shift()!;
-      if (chunkCacheRef.current.has(pk)) continue;
-      const [pcx, pcz] = pk.split(',').map(Number);
-      const data = generateChunkData(pcx, pcz, noises.height, noises.detail, noises.biome, noises.temp, noises.tree, noises.struct, noises.region, config);
-      chunkCacheRef.current.set(pk, data);
-      generated++;
+    let generated2 = 0;
+    while (pendingKeys.current.length > 0 && generated2 < MAX_CHUNKS_PER_FRAME) {
+      genChunk(pendingKeys.current.shift()!);
+      generated2++;
     }
 
-    // Recalculate visible chunks when position OR direction changes OR new chunks were generated
-    if (curKey === lastCamChunk.current && !dirChanged && generated === 0) return;
+    if (curKey === lastCamChunk.current && !dirChanged && generated2 === 0) return;
     lastCamChunk.current = curKey;
     lastCamDir.current.copy(_dir);
 
@@ -1341,16 +1527,13 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
     const cws = CHUNK_SIZE * VOXEL_SIZE;
     const newPending: string[] = [];
 
-    // Sort by PRIORITY: chunks in camera direction first, then by distance
-    // This ensures the user never sees holes in their field of view
     const camDirX = _dir.x, camDirZ = _dir.z;
     const cands: { cx: number; cz: number; priority: number }[] = [];
     for (let ddx = -rd; ddx <= rd; ddx++) for (let ddz = -rd; ddz <= rd; ddz++) {
       const d2 = ddx * ddx + ddz * ddz;
       if (d2 > rd * rd) continue;
-      // Priority: dot product with camera direction (higher = more in-view) + distance penalty
       const dot = ddx * camDirX + ddz * camDirZ;
-      const priority = dot * VIEW_DIR_WEIGHT - d2 * DIST_PENALTY; // favour chunks in view direction
+      const priority = dot * VIEW_DIR_WEIGHT - d2 * DIST_PENALTY;
       cands.push({ cx: ccx + ddx, cz: ccz + ddz, priority });
     }
     cands.sort((a, b) => b.priority - a.priority);
@@ -1368,7 +1551,6 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
       else { newPending.push(key); }
     }
 
-    // Pending queue: new in-view chunks first, then existing pending
     pendingKeys.current = [...newPending, ...pendingKeys.current.filter(k => !newPending.includes(k))];
 
     // Prune distant cache
@@ -1506,7 +1688,9 @@ export default function ProceduralTerrain() {
             <h1 className="font-pixel text-lg sm:text-2xl md:text-3xl lg:text-4xl text-retro-green text-glow mb-2 sm:mb-3 drop-shadow-lg select-none">PROCEDURAL WORLDS</h1>
             <p className="font-pixel text-[8px] sm:text-[10px] md:text-xs text-retro-purple/80 mb-1 drop-shadow select-none">@pxlkit/voxel — Coming Soon</p>
             <p className="text-retro-muted/70 text-[10px] sm:text-xs md:text-sm max-w-md mx-auto px-4 leading-relaxed select-none">
-              Infinite procedural voxel worlds with cities, biomes, and floating icon pickups.
+              {config.worldMode === 'infinite'
+                ? 'Infinite procedural voxel worlds with cities, biomes, and ambient particles.'
+                : `Floating ${config.worldSize}×${config.worldSize} island with tapered edges and full biome variety.`}
               <span className="text-retro-gold font-bold">{isMobile ? ' Tap to fly.' : ' Click to fly.'}</span>
             </p>
           </div>
@@ -1522,7 +1706,29 @@ export default function ProceduralTerrain() {
               </div>
             </div>
             <button onClick={generateNewSeed} className="w-full py-2 bg-retro-purple/20 hover:bg-retro-purple/30 border border-retro-purple/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-purple transition-all cursor-pointer select-none">🎲 RANDOM WORLD</button>
-            <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => updateConfig('renderDistance', v)} min={2} max={10} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
+            {/* World Mode Toggle */}
+            <div className="space-y-1">
+              <label className="font-pixel text-[8px] sm:text-[9px] text-retro-purple/80 uppercase tracking-wider select-none">World Mode</label>
+              <div className="flex gap-2">
+                <button onClick={() => setConfig(prev => ({ ...prev, worldMode: 'infinite' as WorldMode }))}
+                  className={`flex-1 py-1.5 rounded font-pixel text-[8px] sm:text-[9px] transition-all cursor-pointer select-none border ${config.worldMode === 'infinite' ? 'bg-retro-purple/30 border-retro-purple/60 text-retro-purple' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/60 hover:bg-retro-surface/60'}`}>
+                  ∞ INFINITE
+                </button>
+                <button onClick={() => setConfig(prev => ({ ...prev, worldMode: 'finite' as WorldMode }))}
+                  className={`flex-1 py-1.5 rounded font-pixel text-[8px] sm:text-[9px] transition-all cursor-pointer select-none border ${config.worldMode === 'finite' ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/60 hover:bg-retro-surface/60'}`}>
+                  ◻ FINITE
+                </button>
+              </div>
+              <p className="font-mono text-[7px] text-retro-muted/40 select-none">
+                {config.worldMode === 'infinite' ? 'Endless terrain, chunks loaded on demand' : `Island of ${config.worldSize}×${config.worldSize} voxels`}
+              </p>
+            </div>
+            {config.worldMode === 'finite' && (
+              <ConfigSlider label="World Size" value={config.worldSize} onChange={v => updateConfig('worldSize', v)} min={32} max={512} step={16} color="text-retro-cyan/80" displayValue={`${config.worldSize}×${config.worldSize}`} />
+            )}
+            {config.worldMode === 'infinite' && (
+              <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => updateConfig('renderDistance', v)} min={2} max={10} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
+            )}
             <ConfigSlider label="Fly Speed" value={config.flySpeed} onChange={v => updateConfig('flySpeed', v)} min={4} max={40} step={1} color="text-retro-gold/80" displayValue={String(config.flySpeed)} />
             <button onClick={() => setShowAdvanced(!showAdvanced)}
               className="w-full py-1.5 bg-retro-surface/40 hover:bg-retro-surface/60 border border-retro-border/30 rounded font-pixel text-[7px] sm:text-[8px] text-retro-muted/70 transition-all cursor-pointer select-none">
@@ -1568,7 +1774,7 @@ export default function ProceduralTerrain() {
               </div>
             </div>
           )}
-          <OverlayStats seed={seed} chunkCount={chunkCount} position={cameraPos} biome={currentBiome} />
+          <OverlayStats seed={seed} chunkCount={chunkCount} position={cameraPos} biome={currentBiome} worldMode={config.worldMode} worldSize={config.worldSize} />
           <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 select-none" style={{ touchAction: 'none' }}>
             {isMobile ? (
               <button onClick={exitImmersive} className="p-2 bg-retro-bg/70 backdrop-blur-sm border border-retro-border/30 rounded font-pixel text-[9px] text-retro-muted/60 hover:text-retro-red transition-all cursor-pointer select-none" style={{ touchAction: 'none' }}>✕</button>
@@ -1595,10 +1801,11 @@ export default function ProceduralTerrain() {
           <SkyGradient />
           <FogEffect density={config.fogDensity} />
           <WorldLighting />
-          <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} />
+          <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} worldConfig={config} />
           <CameraLook isLocked={isLocked} isMobile={isMobile} />
           <ChunkManagerWithCounter seed={seed} config={config} onChunkCount={handleChunkCount} chunkCacheRef={chunkCacheRef} />
           <CameraTracker onUpdate={handleCameraUpdate} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} />
+          <AmbientParticles biome={currentBiome} />
         </Canvas>
       </div>
     </div>
