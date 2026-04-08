@@ -3,6 +3,7 @@
 import { useRef, useMemo, useEffect, useState, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import Link from 'next/link';
 
 /* ═══════════════════════════════════════════════════════════
  *  Seeded PRNG — mulberry32
@@ -765,6 +766,7 @@ export default function ProceduralTerrain() {
   const [chunkCount, setChunkCount] = useState(0);
   const [seedInput, setSeedInput] = useState('42');
   const [flySpeed, setFlySpeed] = useState(12);
+  const [isMobile, setIsMobile] = useState(false);
 
   const keysRef = useRef<Set<string>>(new Set());
   const speedRef = useRef(flySpeed);
@@ -780,6 +782,14 @@ export default function ProceduralTerrain() {
     speedRef.current = flySpeed;
   }, [flySpeed]);
 
+  // Detect mobile
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
   // Recreate noise references when seed changes
   useEffect(() => {
     setNoises({
@@ -791,11 +801,12 @@ export default function ProceduralTerrain() {
   // Keyboard handlers
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
       // Prevent default for game keys
-      if (['w', 'a', 's', 'd', ' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(e.key.toLowerCase())) {
+      if (['w', 'a', 's', 'd', ' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
         e.preventDefault();
       }
-      keysRef.current.add(e.key.toLowerCase());
+      keysRef.current.add(key);
     };
     const onKeyUp = (e: KeyboardEvent) => {
       keysRef.current.delete(e.key.toLowerCase());
@@ -811,15 +822,23 @@ export default function ProceduralTerrain() {
 
   // Pointer lock
   const requestPointerLock = useCallback(() => {
+    if (isMobile) {
+      // On mobile, skip pointer lock — just hide controls
+      setShowControls(false);
+      setIsLocked(true);
+      return;
+    }
     const canvas = canvasRef.current?.querySelector('canvas');
     if (canvas) {
       canvas.requestPointerLock();
     }
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     const onLockChange = () => {
-      setIsLocked(!!document.pointerLockElement);
+      const locked = !!document.pointerLockElement;
+      setIsLocked(locked);
+      if (locked) setShowControls(false);
     };
     document.addEventListener('pointerlockchange', onLockChange);
     return () => document.removeEventListener('pointerlockchange', onLockChange);
@@ -838,7 +857,7 @@ export default function ProceduralTerrain() {
 
   const applySeed = useCallback(() => {
     const parsed = parseInt(seedInput, 10);
-    if (!isNaN(parsed)) {
+    if (!isNaN(parsed) && parsed >= 0) {
       setSeed(parsed);
     }
   }, [seedInput]);
@@ -848,11 +867,40 @@ export default function ProceduralTerrain() {
     setChunkCount(count);
   }, []);
 
+  // Mobile: exit immersive mode
+  const exitImmersive = useCallback(() => {
+    if (isMobile) {
+      setIsLocked(false);
+      setShowControls(true);
+    } else {
+      document.exitPointerLock();
+    }
+  }, [isMobile]);
+
+  // Touch handler helpers for mobile joystick
+  const handleTouchKey = useCallback((key: string, active: boolean) => {
+    if (active) {
+      keysRef.current.add(key);
+    } else {
+      keysRef.current.delete(key);
+    }
+  }, []);
+
   return (
     <div className="relative w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] overflow-hidden bg-black">
       {/* ── Hero Overlay ── */}
       {showControls && !isLocked && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
+          {/* Back link */}
+          <div className="absolute top-3 left-3 sm:top-4 sm:left-4 pointer-events-auto">
+            <Link
+              href="/"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-muted hover:text-retro-green hover:border-retro-green/40 transition-all"
+            >
+              ← Back
+            </Link>
+          </div>
+
           {/* Title */}
           <div className="text-center pointer-events-auto mb-4 sm:mb-6">
             <h1 className="font-pixel text-lg sm:text-2xl md:text-3xl lg:text-4xl text-retro-green text-glow mb-2 sm:mb-3 drop-shadow-lg">
@@ -863,7 +911,7 @@ export default function ProceduralTerrain() {
             </p>
             <p className="text-retro-muted/70 text-[10px] sm:text-xs md:text-sm max-w-md mx-auto px-4 leading-relaxed">
               Infinite procedural voxel worlds with dynamic biomes, chunk loading, and frustum culling.
-              <span className="text-retro-gold font-bold"> Click to fly.</span>
+              <span className="text-retro-gold font-bold">{isMobile ? ' Tap to fly.' : ' Click to fly.'}</span>
             </p>
           </div>
 
@@ -874,11 +922,12 @@ export default function ProceduralTerrain() {
               <label className="font-pixel text-[8px] sm:text-[9px] text-retro-green/80 uppercase tracking-wider">World Seed</label>
               <div className="flex gap-2">
                 <input
-                  type="text"
+                  type="number"
+                  inputMode="numeric"
                   value={seedInput}
-                  onChange={(e) => setSeedInput(e.target.value)}
+                  onChange={(e) => setSeedInput(e.target.value.replace(/[^0-9]/g, ''))}
                   onKeyDown={(e) => e.key === 'Enter' && applySeed()}
-                  className="flex-1 bg-retro-surface/80 border border-retro-border/50 rounded px-2 sm:px-3 py-1.5 font-mono text-xs sm:text-sm text-retro-text focus:border-retro-green/60 focus:outline-none transition-colors"
+                  className="flex-1 bg-retro-surface/80 border border-retro-border/50 rounded px-2 sm:px-3 py-1.5 font-mono text-xs sm:text-sm text-retro-text focus:border-retro-green/60 focus:outline-none transition-colors [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   placeholder="Enter seed..."
                 />
                 <button
@@ -935,17 +984,25 @@ export default function ProceduralTerrain() {
               onClick={requestPointerLock}
               className="w-full py-2.5 sm:py-3 bg-retro-green/20 hover:bg-retro-green/30 border-2 border-retro-green/60 rounded-lg font-pixel text-[9px] sm:text-[10px] md:text-xs text-retro-green transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(74,222,128,0.2)]"
             >
-              ▶ CLICK TO EXPLORE
+              ▶ {isMobile ? 'TAP TO EXPLORE' : 'CLICK TO EXPLORE'}
             </button>
 
             {/* Controls hint */}
             <div className="text-center space-y-0.5">
-              <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">
-                WASD / Arrows = Move · Space = Up · Shift = Down
-              </p>
-              <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">
-                Mouse = Look · ESC = Release cursor
-              </p>
+              {isMobile ? (
+                <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">
+                  Use on-screen joystick to fly · Tap ✕ to exit
+                </p>
+              ) : (
+                <>
+                  <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">
+                    WASD / Arrows = Move · Space = Up · Shift = Down
+                  </p>
+                  <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">
+                    Mouse = Look · ESC = Release cursor
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -954,13 +1011,15 @@ export default function ProceduralTerrain() {
       {/* ── Locked Overlay (minimal HUD) ── */}
       {isLocked && (
         <>
-          {/* Crosshair */}
-          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
-            <div className="w-4 h-4 sm:w-5 sm:h-5 relative opacity-40">
-              <div className="absolute top-1/2 left-0 right-0 h-px bg-white" />
-              <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white" />
+          {/* Crosshair (desktop only) */}
+          {!isMobile && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+              <div className="w-4 h-4 sm:w-5 sm:h-5 relative opacity-40">
+                <div className="absolute top-1/2 left-0 right-0 h-px bg-white" />
+                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white" />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Mini stats */}
           <OverlayStats
@@ -970,16 +1029,28 @@ export default function ProceduralTerrain() {
             biome={currentBiome}
           />
 
-          {/* ESC hint */}
-          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 pointer-events-none">
-            <span className="font-pixel text-[7px] sm:text-[8px] text-retro-muted/40 bg-retro-bg/40 px-2 py-1 rounded border border-retro-border/20">
-              ESC to release
-            </span>
+          {/* ESC / Exit hint */}
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20">
+            {isMobile ? (
+              <button
+                onClick={exitImmersive}
+                className="p-2 bg-retro-bg/70 backdrop-blur-sm border border-retro-border/30 rounded font-pixel text-[9px] text-retro-muted/60 hover:text-retro-red transition-all cursor-pointer"
+              >
+                ✕
+              </button>
+            ) : (
+              <span className="font-pixel text-[7px] sm:text-[8px] text-retro-muted/40 bg-retro-bg/40 px-2 py-1 rounded border border-retro-border/20 pointer-events-none">
+                ESC to release
+              </span>
+            )}
           </div>
+
+          {/* Mobile Touch Controls */}
+          {isMobile && <MobileTouchControls onKey={handleTouchKey} />}
         </>
       )}
 
-      {/* ── Settings toggle when locked ── */}
+      {/* ── Settings toggle when not locked and not showing controls ── */}
       {!isLocked && !showControls && (
         <button
           onClick={() => setShowControls(true)}
@@ -995,7 +1066,7 @@ export default function ProceduralTerrain() {
           camera={{ fov: 65, near: 0.1, far: 300 }}
           dpr={[1, 1.5]}
           gl={{ antialias: true, toneMapping: THREE.NoToneMapping }}
-          style={{ background: '#1a2a3a' }}
+          style={{ background: 'transparent' }}
         >
           <SkyGradient />
           <FogEffect />
@@ -1005,6 +1076,50 @@ export default function ProceduralTerrain() {
           <ChunkManagerWithCounter seed={seed} renderDistance={renderDistance} onChunkCount={handleChunkCount} />
           <CameraTracker onUpdate={handleCameraUpdate} biomeNoise={noises.biome} tempNoise={noises.temp} />
         </Canvas>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+ *  Mobile Touch Controls — D-pad + Up/Down buttons
+ * ═══════════════════════════════════════════════════════════ */
+
+function MobileTouchControls({
+  onKey,
+}: {
+  onKey: (key: string, active: boolean) => void;
+}) {
+  const createTouchHandlers = useCallback(
+    (key: string) => ({
+      onTouchStart: (e: React.TouchEvent) => { e.preventDefault(); onKey(key, true); },
+      onTouchEnd: (e: React.TouchEvent) => { e.preventDefault(); onKey(key, false); },
+      onTouchCancel: () => onKey(key, false),
+    }),
+    [onKey],
+  );
+
+  const btnBase = 'w-11 h-11 flex items-center justify-center rounded-lg bg-retro-bg/50 border border-retro-border/30 text-retro-muted/60 font-pixel text-sm select-none active:bg-retro-green/20 active:text-retro-green active:border-retro-green/40 transition-colors touch-none';
+
+  return (
+    <div className="absolute bottom-4 z-20 w-full px-4 flex justify-between items-end pointer-events-none">
+      {/* D-pad (left side) */}
+      <div className="pointer-events-auto grid grid-cols-3 gap-1">
+        <div /> {/* empty */}
+        <button className={btnBase} {...createTouchHandlers('w')}>▲</button>
+        <div /> {/* empty */}
+        <button className={btnBase} {...createTouchHandlers('a')}>◄</button>
+        <div className="w-11 h-11" /> {/* center */}
+        <button className={btnBase} {...createTouchHandlers('d')}>►</button>
+        <div /> {/* empty */}
+        <button className={btnBase} {...createTouchHandlers('s')}>▼</button>
+        <div /> {/* empty */}
+      </div>
+
+      {/* Ascend / Descend (right side) */}
+      <div className="pointer-events-auto flex flex-col gap-2">
+        <button className={btnBase} {...createTouchHandlers(' ')}>↑</button>
+        <button className={btnBase} {...createTouchHandlers('shift')}>↓</button>
       </div>
     </div>
   );

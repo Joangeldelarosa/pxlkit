@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 
 const ProceduralTerrain = dynamic(() => import('../../components/ProceduralTerrain'), {
   ssr: false,
@@ -28,7 +28,25 @@ const ProceduralTerrain = dynamic(() => import('../../components/ProceduralTerra
   ),
 });
 
+/**
+ * Explore page — immersive full-screen mode.
+ * Hides the footer and background grid to maximize the 3D viewport.
+ */
 export default function ExplorePage() {
+  // Hide footer and background grid for immersive experience
+  useEffect(() => {
+    const footer = document.querySelector('footer');
+    const gridBg = document.querySelector('.bg-grid-pattern');
+
+    if (footer) footer.style.display = 'none';
+    if (gridBg) (gridBg as HTMLElement).style.display = 'none';
+
+    return () => {
+      if (footer) footer.style.display = '';
+      if (gridBg) (gridBg as HTMLElement).style.display = '';
+    };
+  }, []);
+
   return (
     <Suspense
       fallback={
