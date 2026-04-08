@@ -15,13 +15,13 @@ import {
 import { SocialPack, Heart } from '@pxlkit/social';
 import { WeatherPack, Sun } from '@pxlkit/weather';
 import { EffectsPack } from '@pxlkit/effects';
-import { ParallaxPack, GhostFriend } from '@pxlkit/parallax';
+import { ParallaxPack } from '@pxlkit/parallax';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState, useCallback, Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { HeroCollage, TOTAL_ICON_COUNT } from '../components/HeroCollage';
+import { TOTAL_ICON_COUNT } from '../components/HeroCollage';
 import { useToast } from '../components/ToastProvider';
 import type { ToastTone } from '../components/ToastProvider';
 import { CoolEmoji } from '../data/cool-emoji';
@@ -30,8 +30,6 @@ import {
   PixelButton,
   PixelCard,
   PixelCodeInline,
-  PixelDivider,
-  PixelSection,
   PixelTextarea,
   PixelParallaxLayer,
   PixelMouseParallax,
@@ -81,78 +79,112 @@ function HeroSection() {
   const router = useRouter();
 
   return (
-    <section className="relative overflow-hidden" style={{ minHeight: '85vh' }}>
-      {/* ── Interactive icon collage background with scroll parallax ── */}
-      <PixelParallaxLayer speed={0.15} className="absolute inset-0">
-        <HeroCollage />
-      </PixelParallaxLayer>
+    <section className="relative overflow-hidden" style={{ minHeight: '90vh' }}>
+      {/* ── Background glows ── */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-retro-purple/6 rounded-full blur-[140px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-retro-green/5 rounded-full blur-[120px]" />
+      </div>
 
-      {/* ── Radial glow with mouse parallax ── */}
-      <PixelMouseParallax strength={30} invert>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-retro-green/8 rounded-full blur-[150px] pointer-events-none" />
-      </PixelMouseParallax>
+      {/* ── Content ── */}
+      <div className="relative z-10 flex items-center justify-center px-4 py-12 sm:py-16" style={{ minHeight: '90vh' }}>
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 
-      {/* ── Content overlay ── */}
-      <div className="relative z-10 flex items-center justify-center px-4 py-12 pointer-events-none" style={{ minHeight: '85vh' }}>
-        <PixelParallaxLayer speed={-0.05}>
+          {/* ── Left: 3D Voxel World ── */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-full max-w-4xl pointer-events-auto"
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="relative order-2 lg:order-1"
           >
-          <PixelSection title="Pxlkit" subtitle="Open-source retro React UI kit + icon library">
-            <div className="space-y-6 text-center">
-              <div className="flex flex-wrap justify-center gap-2">
-                <PixelBadge tone="green">v0.1.0</PixelBadge>
-                <PixelBadge tone="cyan">Open Source</PixelBadge>
-                <PixelBadge tone="gold">{UI_COMPONENTS_COUNT} Components</PixelBadge>
-                <PixelBadge tone="purple">{TOTAL_ICON_COUNT}+ Icons</PixelBadge>
-                <PixelBadge tone="red">NEW: 3D Parallax</PixelBadge>
-                <PixelBadge tone="purple">🔮 SOON: Voxel Worlds</PixelBadge>
+            <div className="relative rounded-xl border border-retro-border/30 overflow-hidden bg-[#0d1117]/60 backdrop-blur-sm">
+              {/* Corner accents */}
+              <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-retro-green/50 rounded-tl-xl" />
+              <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-retro-green/50 rounded-tr-xl" />
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-retro-purple/50 rounded-bl-xl" />
+              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-retro-purple/50 rounded-br-xl" />
+
+              {/* Scanline overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none opacity-[0.02]"
+                style={{
+                  backgroundImage:
+                    'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)',
+                }}
+              />
+
+              <div className="w-full aspect-[4/3] min-h-[280px] sm:min-h-[380px]">
+                <Suspense
+                  fallback={
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="font-pixel text-xs text-retro-muted animate-pulse">Loading 3D…</div>
+                    </div>
+                  }
+                >
+                  <VoxelPreview initialTab="world" showTabs={false} />
+                </Suspense>
               </div>
 
-              {/* ── GhostFriend parallax hero icon ── */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-                className="flex justify-center py-2"
-              >
-                <div className="relative">
-                  <div className="absolute inset-0 rounded-2xl bg-retro-purple/10 blur-[60px] pointer-events-none" />
-                  <ParallaxPxlKitIcon
-                    icon={GhostFriend}
-                    size={140}
-                    strength={22}
-                    layerGap={28}
-                    interactive
-                    colorful
-                  />
-                  <p className="mt-2 text-center font-mono text-[9px] text-retro-muted/60">
-                    Move mouse to rotate · Click to interact
-                  </p>
-                </div>
-              </motion.div>
+              {/* Label */}
+              <div className="absolute bottom-3 left-0 right-0 flex justify-center pointer-events-none">
+                <span className="bg-retro-bg/80 backdrop-blur-sm border border-retro-border/40 rounded px-3 py-1 font-mono text-[10px] text-retro-muted/60">
+                  🎮 Drag to orbit · @pxlkit/voxel preview
+                </span>
+              </div>
+            </div>
+          </motion.div>
 
-              <h1 className="font-pixel text-2xl sm:text-4xl md:text-5xl text-retro-green leading-relaxed text-glow">
-                BUILD RETRO INTERFACES FAST
-              </h1>
+          {/* ── Right: Text Content ── */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7 }}
+            className="order-1 lg:order-2 text-center lg:text-left"
+          >
+            <div className="space-y-6">
+              {/* Status badges */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-2">
+                <PixelBadge tone="green">Open Source</PixelBadge>
+                <motion.div
+                  className="inline-flex items-center gap-1.5"
+                  animate={{ scale: [1, 1.03, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-retro-purple opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-retro-purple" />
+                  </span>
+                  <PixelBadge tone="purple">Voxel Engine Coming Soon</PixelBadge>
+                </motion.div>
+              </div>
 
-              <p className="text-base sm:text-lg text-retro-muted max-w-2xl mx-auto">
-                Components, pixel icons, toasts, animations, and{' '}
-                <span className="text-retro-gold font-bold">3D parallax icons</span> with one consistent API.
-                Now featuring interactive multi-layer pixel art with real CSS 3D perspective and mouse tracking.
+              {/* Title */}
+              <div>
+                <h1 className="font-pixel text-3xl sm:text-4xl md:text-5xl text-retro-green leading-tight text-glow">
+                  PXLKIT
+                </h1>
+                <p className="font-pixel text-sm sm:text-base text-retro-gold mt-2">
+                  From Pixels to Worlds.
+                </p>
+              </div>
+
+              {/* Description */}
+              <p className="text-base sm:text-lg text-retro-muted max-w-lg leading-relaxed">
+                The open-source retro React toolkit — {UI_COMPONENTS_COUNT} UI components,{' '}
+                {TOTAL_ICON_COUNT}+ pixel icons, 3D parallax, toast notifications, and a visual builder.{' '}
+                Now building a <span className="text-retro-purple font-bold">3D voxel engine</span> to bring your pixel art into full three dimensions.
               </p>
 
-              <p className="text-sm text-retro-muted/80 font-mono">
-                <PixelCodeInline>{UI_COMPONENTS_COUNT} components</PixelCodeInline>{' '}
-                <PixelCodeInline tone="green">{TOTAL_ICON_COUNT}+ icons</PixelCodeInline>{' '}
-                <PixelCodeInline tone="purple">7 packs</PixelCodeInline>{' '}
+              {/* Stats */}
+              <div className="flex flex-wrap justify-center lg:justify-start gap-3 text-sm font-mono">
+                <PixelCodeInline>{UI_COMPONENTS_COUNT} components</PixelCodeInline>
+                <PixelCodeInline tone="green">{TOTAL_ICON_COUNT}+ icons</PixelCodeInline>
+                <PixelCodeInline tone="purple">7 packs</PixelCodeInline>
                 <PixelCodeInline tone="gold">React + SVG + 3D</PixelCodeInline>
-              </p>
+              </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
                 <PixelButton tone="green" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />} onClick={() => router.push('/ui-kit')}>
                   Explore UI Kit
                 </PixelButton>
@@ -160,29 +192,18 @@ function HeroSection() {
                   Browse Icons
                 </PixelButton>
                 <PixelButton tone="purple" variant="ghost" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />} onClick={() => router.push('/docs')}>
-                  Read Docs
+                  Docs
                 </PixelButton>
               </div>
 
-              <div className="rounded-lg border border-retro-border bg-retro-bg/80 px-4 py-3 font-mono text-xs text-retro-muted overflow-x-auto">
+              {/* Install command */}
+              <div className="rounded-lg border border-retro-border bg-retro-bg/80 px-4 py-3 font-mono text-xs text-retro-muted overflow-x-auto max-w-md mx-auto lg:mx-0">
                 <span className="text-retro-green mr-2">$</span>
                 npm i @pxlkit/core @pxlkit/ui @pxlkit/parallax
               </div>
-
-              <PixelDivider label="Packs" tone="neutral" />
-              <div className="flex flex-wrap justify-center gap-2">
-                <PixelBadge tone="gold">gamification ({GamificationPack.icons.length})</PixelBadge>
-                <PixelBadge tone="cyan">feedback ({FeedbackPack.icons.length})</PixelBadge>
-                <PixelBadge tone="red">social ({SocialPack.icons.length})</PixelBadge>
-                <PixelBadge tone="purple">weather ({WeatherPack.icons.length})</PixelBadge>
-                <PixelBadge tone="neutral">ui ({UiPack.icons.length})</PixelBadge>
-                <PixelBadge tone="green">effects ({EffectsPack.icons.length})</PixelBadge>
-                <PixelBadge tone="gold">parallax ({ParallaxPack.length})</PixelBadge>
-              </div>
             </div>
-          </PixelSection>
-        </motion.div>
-        </PixelParallaxLayer>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -204,7 +225,6 @@ function VoxelComingSoon() {
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-retro-purple/5 rounded-full blur-[140px]" />
         <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-retro-green/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-retro-gold/3 rounded-full blur-[80px]" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto">
@@ -231,16 +251,12 @@ function VoxelComingSoon() {
           <h2 className="font-pixel text-xl sm:text-2xl text-retro-purple mb-2 text-glow">
             @pxlkit/voxel
           </h2>
-          <p className="font-pixel text-sm sm:text-base text-retro-gold mb-4">
-            From Pixels to Worlds.
-          </p>
           <p className="text-retro-muted max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
-            A new dimension is loading. Craft immersive{' '}
+            Craft immersive{' '}
             <span className="text-retro-green font-bold">voxel worlds</span>,
             sculpt <span className="text-retro-purple font-bold">3D characters</span>,
             generate <span className="text-retro-gold font-bold">dynamic terrains</span>{' '}
-            with water and biomes, and bring pixel art to life in full three dimensions.
-            The same retro aesthetic you love — now in 3D.
+            — the same retro aesthetic you love, now in full three dimensions.
           </p>
         </motion.div>
 
