@@ -48,6 +48,68 @@ function mulberry32(seed: number) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+ *  Color Variation System
+ *
+ *  Instead of choosing from a fixed list of 4-5 colours,
+ *  we take a BASE hex and apply seeded per-voxel variation
+ *  in hue, saturation, and lightness.  The result is that
+ *  touching voxels are clearly distinguishable yet feel like
+ *  the same material — a natural, painterly gradient effect.
+ *
+ *  hashCoord produces a deterministic 0-1 float from (x,y,z)
+ *  so the same voxel always gets the same colour (no flicker).
+ * ═══════════════════════════════════════════════════════════════ */
+
+const _vc = new THREE.Color();
+
+/** Fast deterministic hash for 3 ints → [0,1) */
+function hashCoord(x: number, y: number, z: number): number {
+  let h = (x * 374761393 + y * 668265263 + z * 1274126177) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1103515245);
+  h = h ^ (h >>> 16);
+  return ((h >>> 0) % 10000) / 10000;
+}
+
+/** Secondary hash for independent second axis of variation */
+function hashCoord2(x: number, y: number, z: number): number {
+  let h = (x * 1911520717 + y * 2048419325 + z * 327664571) | 0;
+  h = Math.imul(h ^ (h >>> 15), 2246822507);
+  h = h ^ (h >>> 13);
+  return ((h >>> 0) % 10000) / 10000;
+}
+
+/**
+ * Vary a hex colour using world-coordinate-seeded noise.
+ * Returns the hex string of the varied colour.
+ *
+ * @param hex      Base colour in "#rrggbb"
+ * @param wx,wy,wz World voxel coordinates (integers)
+ * @param hueRange Max hue shift in degrees  (default 6)
+ * @param satRange Max saturation shift 0-1  (default 0.08)
+ * @param litRange Max lightness shift 0-1   (default 0.08)
+ */
+function varyColor(
+  hex: string,
+  wx: number, wy: number, wz: number,
+  hueRange = 6, satRange = 0.08, litRange = 0.08,
+): string {
+  _vc.set(hex);
+  const hsl = { h: 0, s: 0, l: 0 };
+  _vc.getHSL(hsl);
+
+  const r1 = hashCoord(wx, wy, wz);     // 0..1
+  const r2 = hashCoord2(wx, wy, wz);     // 0..1
+  const r3 = hashCoord(wz, wx, wy);      // 0..1
+
+  hsl.h += (r1 - 0.5) * 2 * (hueRange / 360);
+  hsl.s = Math.max(0, Math.min(1, hsl.s + (r2 - 0.5) * 2 * satRange));
+  hsl.l = Math.max(0, Math.min(1, hsl.l + (r3 - 0.5) * 2 * litRange));
+
+  _vc.setHSL(hsl.h, hsl.s, hsl.l);
+  return '#' + _vc.getHexString();
+}
+
+/* ═══════════════════════════════════════════════════════════════
  *  Optimised 2-D Perlin Noise (seeded)
  * ═══════════════════════════════════════════════════════════════ */
 
@@ -102,65 +164,38 @@ interface BiomeConfig {
   heightScale: number;
   heightBase: number;
   waterLevel: number;
-  colors: { top: string[]; mid: string[]; bottom: string[]; accent: string[]; water: string };
+  /** Single base colours for each layer — varyColor adds per-voxel variation */
+  colors: { top: string; mid: string; bottom: string; accent: string; water: string };
 }
 
 const BIOMES: Record<BiomeType, BiomeConfig> = {
   plains: {
     name: 'Plains', heightScale: 5, heightBase: 7, waterLevel: 5,
-    colors: {
-      top: ['#66ee88', '#77ff99', '#55dd77', '#88ffaa', '#5cd97a'],
-      mid: ['#cc8844', '#dd9955', '#bb7733'], bottom: ['#99aabb', '#aabbcc', '#889999'],
-      accent: ['#ff9999', '#ffdd66', '#ccaaff'], water: '#88ddff',
-    },
+    colors: { top: '#66ee88', mid: '#cc8844', bottom: '#99aabb', accent: '#ccaaff', water: '#88ddff' },
   },
   desert: {
     name: 'Desert', heightScale: 4, heightBase: 6, waterLevel: 2,
-    colors: {
-      top: ['#ffeecc', '#fff5dd', '#ffe8bb', '#ffdda0'],
-      mid: ['#ddbb88', '#ccaa77', '#bb9966'], bottom: ['#aa8866', '#997755', '#886644'],
-      accent: ['#88cc55', '#559944'], water: '#66bbdd',
-    },
+    colors: { top: '#ffeecc', mid: '#ddbb88', bottom: '#aa8866', accent: '#88cc55', water: '#66bbdd' },
   },
   tundra: {
     name: 'Tundra', heightScale: 6, heightBase: 7, waterLevel: 4,
-    colors: {
-      top: ['#eef4ff', '#f4f8ff', '#ffffff', '#e8eeff'],
-      mid: ['#99aabb', '#aabbcc', '#8899aa'], bottom: ['#778899', '#667788', '#556677'],
-      accent: ['#aaddff', '#88bbdd'], water: '#77ccee',
-    },
+    colors: { top: '#eef4ff', mid: '#99aabb', bottom: '#778899', accent: '#aaddff', water: '#77ccee' },
   },
   forest: {
     name: 'Forest', heightScale: 7, heightBase: 8, waterLevel: 5,
-    colors: {
-      top: ['#339955', '#44aa66', '#22884d', '#55bb77'],
-      mid: ['#886644', '#775533', '#664422'], bottom: ['#556655', '#667766', '#445544'],
-      accent: ['#ee5544', '#ff6655'], water: '#55aacc',
-    },
+    colors: { top: '#339955', mid: '#886644', bottom: '#556655', accent: '#ee5544', water: '#55aacc' },
   },
   mountains: {
     name: 'Mountains', heightScale: 18, heightBase: 5, waterLevel: 3,
-    colors: {
-      top: ['#bbccdd', '#ccddee', '#aabbcc', '#99aabb'],
-      mid: ['#8899aa', '#99aabb', '#7788aa'], bottom: ['#667788', '#556677', '#778899'],
-      accent: ['#eef4ff', '#ffffff', '#e0e8f0'], water: '#6699bb',
-    },
+    colors: { top: '#bbccdd', mid: '#8899aa', bottom: '#667788', accent: '#eef4ff', water: '#6699bb' },
   },
   ocean: {
     name: 'Ocean', heightScale: 3, heightBase: 2, waterLevel: 8,
-    colors: {
-      top: ['#ffeecc', '#fff5dd', '#ffe8bb'],
-      mid: ['#ddcc99', '#ccbb88', '#bbaa77'], bottom: ['#99aabb', '#aabbcc', '#889999'],
-      accent: ['#ff9999', '#ffcc66'], water: '#4499cc',
-    },
+    colors: { top: '#ffeecc', mid: '#ddcc99', bottom: '#99aabb', accent: '#ff9999', water: '#4499cc' },
   },
   city: {
     name: 'City', heightScale: 1, heightBase: 7, waterLevel: 5,
-    colors: {
-      top: ['#888888', '#999999', '#777777', '#aaaaaa'],
-      mid: ['#666666', '#777777', '#555555'], bottom: ['#444444', '#555555', '#333333'],
-      accent: ['#ffdd44', '#ff9944', '#44ddff'], water: '#88ddff',
-    },
+    colors: { top: '#888888', mid: '#666666', bottom: '#444444', accent: '#ffdd44', water: '#88ddff' },
   },
 };
 
@@ -464,17 +499,18 @@ function generateChunkData(
           || y > hN || y > hS || y > hE || y > hW2;
         if (!exposed) continue;
 
-        let col: string;
+        let baseCol: string;
         if (isTop && biome === 'mountains' && y > 16) {
-          col = c.colors.accent[Math.abs(wx + wz) % c.colors.accent.length];
+          baseCol = c.colors.accent;
         } else if (isTop) {
-          col = c.colors.top[Math.abs(wx + wz) % c.colors.top.length];
+          baseCol = c.colors.top;
         } else if (y >= h - 3) {
-          col = c.colors.mid[Math.abs(wx + y) % c.colors.mid.length];
+          baseCol = c.colors.mid;
         } else {
-          col = c.colors.bottom[Math.abs(wx + y + wz) % c.colors.bottom.length];
+          baseCol = c.colors.bottom;
         }
-        push((bX + lx) * VOXEL_SIZE, y * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, col);
+        push((bX + lx) * VOXEL_SIZE, y * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+          varyColor(baseCol, wx, y, wz));
       }
       trackH(lx, lz, h);
 
@@ -490,7 +526,8 @@ function generateChunkData(
           const wExpW = wy > Math.max(hW2, hW2 >= wl ? 999 : 0);
           const wExposed = isWTop || wy === h + 1 || wExpN || wExpS || wExpE || wExpW;
           if (!wExposed) continue;
-          pushW((bX + lx) * VOXEL_SIZE, wy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, c.colors.water);
+          pushW((bX + lx) * VOXEL_SIZE, wy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+            varyColor(c.colors.water, wx, wy, wz, 4, 0.06, 0.06));
         }
         trackH(lx, lz, wl);
       }
@@ -504,7 +541,7 @@ function generateChunkData(
           const modX = ((wx % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
           const modZ = ((wz % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
           push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-            cell.isIntersection ? '#555555' : '#3a3a3a');
+            varyColor(cell.isIntersection ? '#555555' : '#3a3a3a', wx, h + 1, wz, 2, 0.03, 0.04));
           trackH(lx, lz, h + 1);
 
           /* Road markings */
@@ -541,7 +578,8 @@ function generateChunkData(
 
         } else if (cell.isSidewalk) {
           /* ── Sidewalk — slightly raised, lighter colour ── */
-          push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#aaaaaa');
+          push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+            varyColor('#aaaaaa', wx, h + 1, wz, 2, 0.03, 0.05));
           trackH(lx, lz, h + 1);
 
         } else if (cell.isBuilding) {
@@ -551,20 +589,22 @@ function generateChunkData(
 
           if (bType === 'park') {
             /* Park — grass with occasional tree */
-            push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#66cc77');
+            push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor('#66cc77', wx, h + 1, wz));
             trackH(lx, lz, h + 1);
             if (cell.lotLocalX === 3 && cell.lotLocalZ === 3 && cfg.treeDensity > 0.2) {
-              for (let ty = 2; ty <= 4; ty++) push((bX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#664422');
+              for (let ty = 2; ty <= 4; ty++) push((bX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, varyColor('#664422', wx, h + ty, wz, 4, 0.05, 0.06));
               for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
-                push((bX + lx + dx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, '#44aa66');
-                if (dx === 0 || dz === 0) push((bX + lx + dx) * VOXEL_SIZE, (h + 6) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, '#44aa66');
+                push((bX + lx + dx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, varyColor('#44aa66', wx + dx, h + 5, wz + dz));
+                if (dx === 0 || dz === 0) push((bX + lx + dx) * VOXEL_SIZE, (h + 6) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, varyColor('#44aa66', wx + dx, h + 6, wz + dz));
               }
               trackH(lx, lz, h + 6);
             }
           } else if (bType === 'parking') {
             /* Parking lot */
             const stripe = cell.lotLocalZ % 3 === 0 && cell.lotLocalX > 0 && cell.lotLocalX < 5;
-            push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, stripe ? '#eeeeee' : '#666666');
+            push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor(stripe ? '#eeeeee' : '#666666', wx, h + 1, wz, 2, 0.03, 0.04));
             trackH(lx, lz, h + 1);
           } else {
             /* Actual building (skyscraper / office / house) */
@@ -573,7 +613,7 @@ function generateChunkData(
             const isEdgeX = blX === 0 || blX === footprint - 1;
             const isEdgeZ = blZ === 0 || blZ === footprint - 1;
             const isEdge = isEdgeX || isEdgeZ;
-            const wallPalette = BUILDING_WALL_PALETTES[bType] || BUILDING_WALL_PALETTES.house;
+            const wallBase = BUILDING_WALL_PALETTES[bType]?.[0] || '#ddccaa';
             const roofCol = BUILDING_ROOF_COLORS[bType] || '#cc6633';
             const windowCol = '#aaddff';
             const doorCol = '#886644';
@@ -582,18 +622,16 @@ function generateChunkData(
               if (!isEdge && by < bh) continue; // interior: skip (hollow)
               let color: string;
               if (by === bh) {
-                color = roofCol;
+                color = varyColor(roofCol, wx, h + by, wz, 4, 0.04, 0.06);
               } else if (by === 1 && blZ === 0 && blX >= 2 && blX <= 3) {
-                // Door on ground floor facing south road
-                color = doorCol;
+                color = varyColor(doorCol, wx, h + by, wz, 3, 0.04, 0.05);
               } else if (isEdge && by > 1 && by < bh && by % 2 === 0) {
-                // Window rows on walls
                 const isWindowCol = isEdgeZ
                   ? (blX >= 1 && blX <= footprint - 2 && blX % 2 === 1)
                   : (blZ >= 1 && blZ <= footprint - 2 && blZ % 2 === 1);
-                color = isWindowCol ? windowCol : wallPalette[Math.abs(wx + by) % wallPalette.length];
+                color = isWindowCol ? varyColor(windowCol, wx, h + by, wz, 3, 0.05, 0.06) : varyColor(wallBase, wx, h + by, wz, 5, 0.06, 0.07);
               } else {
-                color = wallPalette[Math.abs(wx + by) % wallPalette.length];
+                color = varyColor(wallBase, wx, h + by, wz, 5, 0.06, 0.07);
               }
               push((bX + lx) * VOXEL_SIZE, (h + by) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, color);
             }
@@ -604,7 +642,8 @@ function generateChunkData(
               const dist = Math.abs(blX - midX);
               const roofExtra = Math.max(0, 2 - dist);
               for (let ry = 1; ry <= roofExtra; ry++) {
-                push((bX + lx) * VOXEL_SIZE, (h + bh + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, roofCol);
+                push((bX + lx) * VOXEL_SIZE, (h + bh + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor(roofCol, wx, h + bh + ry, wz, 4, 0.04, 0.06));
               }
               trackH(lx, lz, h + bh + roofExtra);
             } else {
@@ -626,15 +665,15 @@ function generateChunkData(
         const threshold = (biome === 'forest' ? 0.22 : 0.40) + (1 - cfg.treeDensity) * 0.25;
         if (tv > threshold) {
           const trunkH = biome === 'forest' ? 3 + (Math.abs(wx * 13 + wz * 7) % 3) : 2 + (Math.abs(wx * 7 + wz) % 2);
-          const trunkC = biome === 'forest' ? '#664422' : '#AA7744';
-          const leafPal = biome === 'forest' ? ['#339955', '#44aa66', '#22884d'] : ['#44dd66', '#55ee77', '#66ff88'];
-          const leafC = leafPal[Math.abs(wx * 3 + wz * 5) % leafPal.length];
-          for (let ty = 1; ty <= trunkH; ty++) push((bX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, trunkC);
+          const trunkBase = biome === 'forest' ? '#664422' : '#AA7744';
+          const leafBase = biome === 'forest' ? '#339955' : '#55ee77';
+          for (let ty = 1; ty <= trunkH; ty++) push((bX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, varyColor(trunkBase, wx, h + ty, wz, 4, 0.05, 0.06));
           const cr = 2, cy2 = h + trunkH + cr;
           for (let dx = -cr; dx <= cr; dx++) for (let dy = -cr; dy <= cr; dy++) for (let dz = -cr; dz <= cr; dz++) {
             const d2 = dx * dx + dy * dy + dz * dz;
             if (d2 > cr * cr + 0.5 || (cr > 1 && d2 < (cr - 1) * (cr - 1))) continue;
-            push((bX + lx + dx) * VOXEL_SIZE, (cy2 + dy) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, leafC);
+            push((bX + lx + dx) * VOXEL_SIZE, (cy2 + dy) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE,
+              varyColor(leafBase, wx + dx, cy2 + dy, wz + dz, 8, 0.08, 0.08));
           }
           trackH(lx, lz, cy2 + cr);
         }
@@ -644,10 +683,10 @@ function generateChunkData(
       if (biome === 'desert' && h > c.waterLevel && lx > 0 && lx < CHUNK_SIZE - 1 && lz > 0 && lz < CHUNK_SIZE - 1) {
         if (treeN(wx * 0.7 + 50, wz * 0.7 + 50) > 0.46) {
           const cH = 3 + (Math.abs(wx * 11 + wz * 3) % 3);
-          for (let cy = 1; cy <= cH; cy++) push((bX + lx) * VOXEL_SIZE, (h + cy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#55aa44');
+          for (let cy = 1; cy <= cH; cy++) push((bX + lx) * VOXEL_SIZE, (h + cy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, varyColor('#55aa44', wx, h + cy, wz));
           if (cH > 3) {
-            push((bX + lx + 1) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#66bb55');
-            push((bX + lx + 1) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#66bb55');
+            push((bX + lx + 1) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, varyColor('#66bb55', wx + 1, h + 3, wz));
+            push((bX + lx + 1) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, varyColor('#66bb55', wx + 1, h + 4, wz));
           }
           trackH(lx, lz, h + cH);
         }
@@ -662,7 +701,7 @@ function generateChunkData(
             const w = ps - layer;
             for (let px = -w; px <= w; px++) for (let pz = -w; pz <= w; pz++) {
               push((bX + lx + px) * VOXEL_SIZE, (h + layer + 1) * VOXEL_SIZE, (bZ + lz + pz) * VOXEL_SIZE,
-                layer === ps - 1 ? '#FFD700' : '#ddbb77');
+                varyColor(layer === ps - 1 ? '#FFD700' : '#ddbb77', wx + px, h + layer + 1, wz + pz, 5, 0.05, 0.06));
             }
           }
           trackH(lx, lz, h + ps);
@@ -681,13 +720,16 @@ function generateChunkData(
           for (let hx = 0; hx < 3; hx++) for (let hz = 0; hz < 3; hz++) for (let hy = 1; hy <= 3; hy++) {
             if (hx === 1 && hz === 1) continue; // hollow interior
             if (hx === 1 && hz === 0 && hy <= 2) continue; // door
-            const color = hy === 2 && ((hx === 0 && hz === 1) || (hx === 2 && hz === 1)) ? '#AADDFF' : wallC;
-            push((bX + lx + hx) * VOXEL_SIZE, (h + hy) * VOXEL_SIZE, (bZ + lz + hz) * VOXEL_SIZE, color);
+            const isWin = hy === 2 && ((hx === 0 && hz === 1) || (hx === 2 && hz === 1));
+            push((bX + lx + hx) * VOXEL_SIZE, (h + hy) * VOXEL_SIZE, (bZ + lz + hz) * VOXEL_SIZE,
+              varyColor(isWin ? '#AADDFF' : wallC, wx + hx, h + hy, wz + hz));
           }
           for (let rx = -1; rx <= 3; rx++) for (let rz = -1; rz <= 3; rz++)
-            push((bX + lx + rx) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE, roofC);
+            push((bX + lx + rx) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE,
+              varyColor(roofC, wx + rx, h + 4, wz + rz, 4, 0.04, 0.06));
           for (let rx = 0; rx <= 2; rx++) for (let rz = 0; rz <= 2; rz++)
-            push((bX + lx + rx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE, roofC);
+            push((bX + lx + rx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE,
+              varyColor(roofC, wx + rx, h + 5, wz + rz, 4, 0.04, 0.06));
           trackH(lx, lz, h + 5);
         }
       }
@@ -699,10 +741,10 @@ function generateChunkData(
         if (structN(wx * 0.4 + 300, wz * 0.4 + 300) > 0.44) {
           const rh = 1 + (Math.abs(wx * 7 + wz * 3) % 3);
           const rc = biome === 'tundra' ? '#8899aa' : '#667788';
-          for (let ry = 1; ry <= rh; ry++) push((bX + lx) * VOXEL_SIZE, (h + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, rc);
+          for (let ry = 1; ry <= rh; ry++) push((bX + lx) * VOXEL_SIZE, (h + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, varyColor(rc, wx, h + ry, wz));
           if (rh > 1) {
-            push((bX + lx + 1) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, rc);
-            push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz + 1) * VOXEL_SIZE, rc);
+            push((bX + lx + 1) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, varyColor(rc, wx + 1, h + 1, wz));
+            push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz + 1) * VOXEL_SIZE, varyColor(rc, wx, h + 1, wz + 1));
           }
           trackH(lx, lz, h + rh);
         }
@@ -1081,10 +1123,12 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
   const { camera } = useThree();
   const [visibleChunks, setVisibleChunks] = useState<Map<string, ChunkVoxelData>>(new Map());
   const lastCamChunk = useRef('');
+  const lastCamDir = useRef(new THREE.Vector3());
   const frustum = useRef(new THREE.Frustum());
   const projMat = useRef(new THREE.Matrix4());
   const prevSeed = useRef(seed);
   const pendingKeys = useRef<string[]>([]);
+  const _dir = useMemo(() => new THREE.Vector3(), []);
 
   const noises = useMemo(() => ({
     height: createNoise2D(seed), detail: createNoise2D(seed + 1),
@@ -1097,12 +1141,20 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
       prevSeed.current = seed;
       chunkCacheRef.current.clear();
       lastCamChunk.current = '';
+      lastCamDir.current.set(0, 0, 0);
       pendingKeys.current = [];
     }
 
     const [ccx, ccz] = worldToChunk(camera.position.x, camera.position.z);
     const curKey = `${ccx},${ccz}`;
     const rd = config.renderDistance;
+
+    // Detect camera rotation changes — round direction to avoid micro-jitter
+    camera.getWorldDirection(_dir);
+    const dx10 = Math.round(_dir.x * 10);
+    const dz10 = Math.round(_dir.z * 10);
+    const dirChanged = dx10 !== Math.round(lastCamDir.current.x * 10)
+                    || dz10 !== Math.round(lastCamDir.current.z * 10);
 
     // Throttled generation
     let generated = 0;
@@ -1115,8 +1167,10 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
       generated++;
     }
 
-    if (curKey === lastCamChunk.current && generated === 0) return;
+    // Recalculate visible chunks when position OR direction changes OR new chunks were generated
+    if (curKey === lastCamChunk.current && !dirChanged && generated === 0) return;
     lastCamChunk.current = curKey;
+    lastCamDir.current.copy(_dir);
 
     projMat.current.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.current.setFromProjectionMatrix(projMat.current);
@@ -1125,20 +1179,26 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
     const cws = CHUNK_SIZE * VOXEL_SIZE;
     const newPending: string[] = [];
 
-    // Sort nearest-first for progressive loading
-    const cands: { cx: number; cz: number; dist: number }[] = [];
-    for (let dx = -rd; dx <= rd; dx++) for (let dz = -rd; dz <= rd; dz++) {
-      if (dx * dx + dz * dz > rd * rd) continue;
-      cands.push({ cx: ccx + dx, cz: ccz + dz, dist: dx * dx + dz * dz });
+    // Sort by PRIORITY: chunks in camera direction first, then by distance
+    // This ensures the user never sees holes in their field of view
+    const camDirX = _dir.x, camDirZ = _dir.z;
+    const cands: { cx: number; cz: number; priority: number }[] = [];
+    for (let ddx = -rd; ddx <= rd; ddx++) for (let ddz = -rd; ddz <= rd; ddz++) {
+      const d2 = ddx * ddx + ddz * ddz;
+      if (d2 > rd * rd) continue;
+      // Priority: dot product with camera direction (higher = more in-view) + distance penalty
+      const dot = ddx * camDirX + ddz * camDirZ;
+      const priority = dot * 2 - d2 * 0.5; // favour chunks in view direction
+      cands.push({ cx: ccx + ddx, cz: ccz + ddz, priority });
     }
-    cands.sort((a, b) => a.dist - b.dist);
+    cands.sort((a, b) => b.priority - a.priority);
 
     for (const { cx: chkCx, cz: chkCz } of cands) {
       const key = chunkKey(chkCx, chkCz);
-      const minX = chkCx * cws, minZ = chkCz * cws;
+      const minX2 = chkCx * cws, minZ2 = chkCz * cws;
       const bbox = new THREE.Box3(
-        new THREE.Vector3(minX, 0, minZ),
-        new THREE.Vector3(minX + cws, MAX_HEIGHT * VOXEL_SIZE, minZ + cws),
+        new THREE.Vector3(minX2, 0, minZ2),
+        new THREE.Vector3(minX2 + cws, MAX_HEIGHT * VOXEL_SIZE, minZ2 + cws),
       );
       if (!frustum.current.intersectsBox(bbox)) continue;
       const data = chunkCacheRef.current.get(key);
@@ -1146,6 +1206,7 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
       else { newPending.push(key); }
     }
 
+    // Pending queue: new in-view chunks first, then existing pending
     pendingKeys.current = [...newPending, ...pendingKeys.current.filter(k => !newPending.includes(k))];
 
     // Prune distant cache
