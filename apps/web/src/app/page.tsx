@@ -19,7 +19,8 @@ import { ParallaxPack, GhostFriend } from '@pxlkit/parallax';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import { HeroCollage, TOTAL_ICON_COUNT } from '../components/HeroCollage';
 import { useToast } from '../components/ToastProvider';
 import type { ToastTone } from '../components/ToastProvider';
@@ -39,6 +40,15 @@ import {
 
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
 
+const VoxelPreview = dynamic(() => import('../components/VoxelPreview'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="font-pixel text-xs text-retro-muted animate-pulse">Loading 3D…</div>
+    </div>
+  ),
+});
+
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
@@ -53,6 +63,7 @@ export default function HomePage() {
   return (
     <div className="relative overflow-x-hidden w-full max-w-[100vw]">
       <HeroSection />
+      <VoxelComingSoon />
       <FeaturesSection />
       <ParallaxShowcase />
       <IconShowcase />
@@ -98,6 +109,7 @@ function HeroSection() {
                 <PixelBadge tone="gold">{UI_COMPONENTS_COUNT} Components</PixelBadge>
                 <PixelBadge tone="purple">{TOTAL_ICON_COUNT}+ Icons</PixelBadge>
                 <PixelBadge tone="red">NEW: 3D Parallax</PixelBadge>
+                <PixelBadge tone="purple">🔮 SOON: 3D Voxels</PixelBadge>
               </div>
 
               {/* ── GhostFriend parallax hero icon ── */}
@@ -171,6 +183,119 @@ function HeroSection() {
           </PixelSection>
         </motion.div>
         </PixelParallaxLayer>
+      </div>
+    </section>
+  );
+}
+
+/* ──────────────────── VOXEL COMING SOON ──────────────────── */
+function VoxelComingSoon() {
+  return (
+    <section className="relative py-16 px-4 border-t border-retro-border/20 overflow-hidden">
+      {/* Subtle background glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-retro-purple/5 rounded-full blur-[120px]" />
+        <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-retro-green/5 rounded-full blur-[80px]" />
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          {/* Pulsing Coming Soon badge */}
+          <motion.div
+            className="inline-flex items-center gap-2 mb-4"
+            animate={{ scale: [1, 1.03, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-retro-green opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-retro-green" />
+            </span>
+            <PixelBadge tone="green">COMING SOON</PixelBadge>
+          </motion.div>
+
+          <h2 className="font-pixel text-lg sm:text-xl text-retro-purple mb-3 text-glow">
+            @pxlkit/voxel
+          </h2>
+          <p className="text-retro-muted max-w-xl mx-auto text-sm leading-relaxed">
+            A new dimension for pixel art.{' '}
+            <span className="text-retro-gold font-bold">3D voxel icons</span> built with React Three Fiber —
+            transform any PxlKit icon into interactive, animated voxel models on floating islands.
+          </p>
+        </motion.div>
+
+        {/* 3D Preview */}
+        <motion.div
+          className="relative mx-auto max-w-3xl"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+        >
+          {/* Glowing border frame */}
+          <div className="relative rounded-xl border border-retro-border/40 overflow-hidden bg-[#0d1117]/80 backdrop-blur-sm">
+            {/* Corner accents */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-retro-green/60 rounded-tl-xl" />
+            <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-retro-green/60 rounded-tr-xl" />
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-retro-purple/60 rounded-bl-xl" />
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-retro-purple/60 rounded-br-xl" />
+
+            {/* Scanline overlay */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)',
+              }}
+            />
+
+            {/* Canvas container */}
+            <div className="w-full aspect-[16/10] min-h-[300px] sm:min-h-[400px]">
+              <VoxelPreview />
+            </div>
+
+            {/* Bottom label */}
+            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-3 pointer-events-none">
+              <span className="bg-retro-bg/80 backdrop-blur-sm border border-retro-border/40 rounded px-3 py-1 font-mono text-[10px] text-retro-muted/70">
+                🎮 Drag to orbit • Auto-rotating
+              </span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Feature pills */}
+        <motion.div
+          className="flex flex-wrap justify-center gap-2 mt-6"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <PixelBadge tone="purple">Voxel Engine</PixelBadge>
+          <PixelBadge tone="green">React Three Fiber</PixelBadge>
+          <PixelBadge tone="gold">Floating Islands</PixelBadge>
+          <PixelBadge tone="cyan">Animated Icons</PixelBadge>
+          <PixelBadge tone="red">Interactive 3D</PixelBadge>
+        </motion.div>
+
+        {/* Install hint */}
+        <motion.div
+          className="mt-5 text-center"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <div className="inline-block rounded-lg border border-retro-border/30 bg-retro-bg/60 px-4 py-2 font-mono text-xs text-retro-muted/70">
+            <span className="text-retro-green mr-2">$</span>
+            npm i @pxlkit/voxel{' '}
+            <span className="text-retro-muted/40 ml-2">← soon</span>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
