@@ -804,11 +804,11 @@ if (icon) {
             </P>
             <CodeBlock title="UI Kit Route">{`/ui-kit#getting-started`}</CodeBlock>
             <CodeBlock title="Install UI Kit">{`npm install @pxlkit/core @pxlkit/ui-kit tailwindcss`}</CodeBlock>
-            <CodeBlock title="CSS Setup (Tailwind v4)">{`/* Add this to your global stylesheet (e.g., globals.css or index.css) /
+            <CodeBlock title="CSS Setup (Tailwind v4)">{`/* Add this to your global stylesheet (e.g., globals.css or index.css) */
 @import "tailwindcss";
 @import "@pxlkit/ui-kit/styles.css";
 
-/* Tell Tailwind to scan the package for its utility classes /
+/* Tell Tailwind to scan the package for its utility classes */
 @source "../node_modules/@pxlkit/ui-kit";`}</CodeBlock>
             <CodeBlock title="Import Components">{`import { PixelButton, PixelCard, PixelInput, PixelSelect } from '@pxlkit/ui-kit';
 import { PxlKitIcon } from '@pxlkit/core';
