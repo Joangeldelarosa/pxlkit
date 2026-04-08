@@ -37,8 +37,8 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-retro-muted text-sm font-mono max-w-sm">
-              The open source retro React UI kit.
-              Components, pixel icons, animations &mdash; built for the modern web.
+              The open-source retro React UI kit that developers love.
+              Ship pixel-perfect interfaces with components, icons, and 3D effects — all from code.
             </p>
           </div>
 
