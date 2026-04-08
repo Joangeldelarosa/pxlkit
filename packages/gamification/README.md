@@ -12,14 +12,14 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/@pxlkit/gamification"><img src="https://img.shields.io/npm/v/@pxlkit/gamification?color=blue" alt="npm version" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Pxlkit%20v1.0-blue.svg" alt="Pxlkit License" /></a>
-  <img src="https://img.shields.io/badge/icons-48-FFD700?style=flat" alt="48 icons" />
+  <img src="https://img.shields.io/badge/icons-51-FFD700?style=flat" alt="51 icons" />
 </p>
 
 ---
 
 ## Overview
 
-`@pxlkit/gamification` is a themed icon pack for the [Pxlkit](https://pxlkit.xyz) ecosystem containing **48 icons** (39 static + 9 animated) designed for game mechanics, achievements, rewards, and RPG elements.
+`@pxlkit/gamification` is a themed icon pack for the [Pxlkit](https://pxlkit.xyz) ecosystem containing **51 icons** (41 static + 10 animated) designed for game mechanics, achievements, rewards, and RPG elements.
 
 ## Installation
 
@@ -44,7 +44,7 @@ import { Trophy, FireSword } from '@pxlkit/gamification';
 
 ## Icons
 
-### Static Icons (39)
+### Static Icons (41)
 
 | Icon | Name | Description |
 | --- | --- | --- |
@@ -90,7 +90,7 @@ import { Trophy, FireSword } from '@pxlkit/gamification';
 | 🎲 | `Dice` | Random / chance |
 | 📊 | `XpBar` | Experience progress |
 
-### Animated Icons (9)
+### Animated Icons (10)
 
 | Icon | Name | Description |
 | --- | --- | --- |
@@ -128,9 +128,9 @@ import { GamificationPack } from '@pxlkit/gamification';
 | [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Core rendering engine (required) |
 | [`@pxlkit/feedback`](https://www.npmjs.com/package/@pxlkit/feedback) | 33 icons — alerts, status, notifications |
 | [`@pxlkit/social`](https://www.npmjs.com/package/@pxlkit/social) | 43 icons — community, emojis, messaging |
-| [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | 34 icons — climate, moon, temperature |
-| [`@pxlkit/ui`](https://www.npmjs.com/package/@pxlkit/ui) | 40 icons — interface controls, navigation |
-| [`@pxlkit/effects`](https://www.npmjs.com/package/@pxlkit/effects) | 6 animated VFX icons |
+| [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | 36 icons — climate, moon, temperature |
+| [`@pxlkit/ui`](https://www.npmjs.com/package/@pxlkit/ui) | 41 icons — interface controls, navigation |
+| [`@pxlkit/effects`](https://www.npmjs.com/package/@pxlkit/effects) | 12 animated VFX icons |
 | [`@pxlkit/parallax`](https://www.npmjs.com/package/@pxlkit/parallax) | 10 multi-layer 3D parallax icons |
 
 ## Documentation

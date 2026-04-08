@@ -9,9 +9,9 @@ import { Analytics } from "@vercel/analytics/next";
 /* ─── SEO Constants ─── */
 const SITE_NAME = 'Pxlkit';
 const SITE_URL = 'https://pxlkit.xyz';
-const SITE_TAGLINE = 'Open-Source Retro React UI Kit & Icon Library';
+const SITE_TAGLINE = 'Retro React UI Kit — Pixel-Art Components, Icons & 3D';
 const SITE_DESCRIPTION =
-  'Pxlkit is a free, open-source retro React UI kit with 40 pixel-art components and 204+ hand-crafted icons. Build pixel-perfect interfaces with TypeScript, Tailwind CSS, and zero native browser UI. Community-driven and tree-shakeable.';
+  'Ship retro-styled React interfaces in minutes. Pxlkit is a free, open-source UI kit with 40+ pixel-art components, 204+ hand-crafted SVG icons, 3D parallax effects, toast notifications, and a visual icon builder. TypeScript, Tailwind CSS, tree-shakeable — zero native browser UI.';
 
 export const viewport: Viewport = {
   themeColor: [
@@ -53,6 +53,17 @@ export const metadata: Metadata = {
     'tree-shakeable icons',
     'typescript ui kit',
     'pxlkit',
+    'pixel art react',
+    'retro design system',
+    'react pixel components',
+    'voxel engine react',
+    '3d parallax icons',
+    'toast notifications react',
+    'react svg icons',
+    'pixel art css',
+    'nostalgic ui kit',
+    'indie game ui',
+    'retro web design',
   ],
   authors: [{ name: 'Joangel De La Rosa', url: 'https://github.com/joangeldelarosa' }],
   creator: 'Joangel De La Rosa',
@@ -95,7 +106,7 @@ export const metadata: Metadata = {
   },
 };
 
-/** JSON-LD Structured Data — SoftwareApplication + WebSite */
+/** JSON-LD Structured Data — SoftwareApplication + WebSite + FAQPage */
 const JSON_LD = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -130,25 +141,63 @@ const JSON_LD = {
           name: 'Community',
           price: '0',
           priceCurrency: 'USD',
-          description: 'Free with attribution',
+          description: 'Free with attribution — all components and icons',
         },
         {
           '@type': 'Offer',
           name: 'Indie License',
-          price: '29',
+          price: '9.50',
           priceCurrency: 'USD',
-          description: 'One project, no attribution required',
+          description: 'One commercial project, no attribution, lifetime updates',
         },
         {
           '@type': 'Offer',
           name: 'Team License',
-          price: '79',
+          price: '24.50',
           priceCurrency: 'USD',
-          description: 'Unlimited projects, no attribution required',
+          description: 'Unlimited projects, all future packs, priority support',
         },
       ],
       softwareVersion: '1.0.0',
       programmingLanguage: ['TypeScript', 'React'],
+      downloadUrl: 'https://www.npmjs.com/package/@pxlkit/core',
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Is Pxlkit free to use?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. Pxlkit is open source and free with attribution. Paid licenses remove the attribution requirement and unlock priority support.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What frameworks does Pxlkit support?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Pxlkit is built for React with TypeScript. It works with Next.js, Vite, CRA, and any React setup. Icons render as pure SVG so they work anywhere.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How many icons and components are included?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Pxlkit includes 40+ pixel-art UI components and 204+ hand-crafted SVG icons across 7 thematic packs, plus animated icons and 3D parallax effects.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is the bundle size small?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. Every icon and component is tree-shakeable. Import only what you use — your final bundle includes zero unused code.',
+          },
+        },
+      ],
     },
   ],
 };

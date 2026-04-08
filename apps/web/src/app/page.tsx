@@ -61,14 +61,16 @@ export default function HomePage() {
   return (
     <div className="relative overflow-x-hidden w-full max-w-[100vw]">
       <HeroSection />
-      <VoxelComingSoon />
+      <TrustBar />
       <FeaturesSection />
-      <ParallaxShowcase />
-      <IconShowcase />
-      <ToastSection />
       <HowItWorks />
+      <IconShowcase />
+      <ParallaxShowcase />
+      <ToastSection />
       <AISection />
+      <VoxelComingSoon />
       <PricingPreview />
+      <FAQSection />
       <CTASection />
     </div>
   );
@@ -144,62 +146,54 @@ function HeroSection() {
             <div className="space-y-4 sm:space-y-5 md:space-y-6">
               {/* Status badges */}
               <div className="flex flex-wrap justify-center lg:justify-start gap-2">
-                <PixelBadge tone="green">Open Source</PixelBadge>
-                <motion.div
-                  className="inline-flex items-center gap-1.5"
-                  animate={{ scale: [1, 1.03, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                >
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-retro-purple opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-retro-purple" />
-                  </span>
-                  <PixelBadge tone="purple">Voxel Engine Coming Soon</PixelBadge>
-                </motion.div>
+                <PixelBadge tone="green">Free &amp; Open Source</PixelBadge>
+                <PixelBadge tone="gold"><span aria-label="50 percent off launch price">🔥 50% Off Launch</span></PixelBadge>
               </div>
 
-              {/* Title */}
+              {/* Title — benefit-driven H1 */}
               <div>
                 <h1 className="font-pixel text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-retro-green leading-tight text-glow">
-                  PXLKIT
+                  BUILD RETRO UIS<br className="hidden sm:block" /> IN MINUTES
                 </h1>
                 <p className="font-pixel text-xs sm:text-sm md:text-base text-retro-gold mt-1.5 sm:mt-2">
-                  From Pixels to Worlds.
+                  The React UI Kit That Makes Pixel-Art Easy.
                 </p>
               </div>
 
-              {/* Description */}
+              {/* Description — focus on outcome, not features */}
               <p className="text-sm sm:text-base md:text-lg text-retro-muted max-w-lg mx-auto lg:mx-0 leading-relaxed">
-                The open-source retro React toolkit — {UI_COMPONENTS_COUNT} UI components,{' '}
-                {TOTAL_ICON_COUNT}+ pixel icons, 3D parallax, toast notifications, and a visual builder.{' '}
-                Now building a <span className="text-retro-purple font-bold">3D voxel engine</span> to bring your pixel art into full three dimensions.
+                Stop building retro components from scratch.{' '}
+                <span className="text-retro-text font-medium">Pxlkit gives you {UI_COMPONENTS_COUNT} production-ready components</span>,{' '}
+                {TOTAL_ICON_COUNT}+ hand-crafted pixel icons, 3D parallax effects, and a visual builder —{' '}
+                so you can ship pixel-perfect interfaces <span className="text-retro-green font-bold">today</span>.
               </p>
 
-              {/* Stats */}
+              {/* Stats — social proof numbers */}
               <div className="flex flex-wrap justify-center lg:justify-start gap-2 sm:gap-3 text-xs sm:text-sm font-mono">
                 <PixelCodeInline>{UI_COMPONENTS_COUNT} components</PixelCodeInline>
                 <PixelCodeInline tone="green">{TOTAL_ICON_COUNT}+ icons</PixelCodeInline>
-                <PixelCodeInline tone="purple">7 packs</PixelCodeInline>
-                <PixelCodeInline tone="gold">React + SVG + 3D</PixelCodeInline>
+                <PixelCodeInline tone="purple">7 themed packs</PixelCodeInline>
+                <PixelCodeInline tone="gold">TypeScript + Tailwind</PixelCodeInline>
               </div>
 
-              {/* CTA Buttons */}
+              {/* CTA Buttons — clear hierarchy */}
               <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-2 sm:gap-3">
-                <PixelButton tone="green" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />} onClick={() => router.push('/ui-kit')}>
-                  Explore UI Kit
+                <PixelButton tone="green" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />} onClick={() => router.push('/docs')}>
+                  Get Started Free
                 </PixelButton>
-                <PixelButton tone="cyan" variant="ghost" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />} onClick={() => router.push('/icons')}>
+                <PixelButton tone="cyan" variant="ghost" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />} onClick={() => router.push('/ui-kit')}>
+                  Live Demo
+                </PixelButton>
+                <PixelButton tone="purple" variant="ghost" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />} onClick={() => router.push('/icons')}>
                   Browse Icons
                 </PixelButton>
-                <PixelButton tone="purple" variant="ghost" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />} onClick={() => router.push('/docs')}>
-                  Docs
-                </PixelButton>
               </div>
 
-              {/* Install command */}
+              {/* Install command — instant gratification */}
               <div className="rounded-lg border border-retro-border bg-retro-bg/80 px-3 sm:px-4 py-2 sm:py-3 font-mono text-[10px] sm:text-xs text-retro-muted overflow-x-auto max-w-md mx-auto lg:mx-0">
                 <span className="text-retro-green mr-2">$</span>
                 npm i @pxlkit/core @pxlkit/ui @pxlkit/parallax
+                <span className="text-retro-muted/40 ml-2" aria-label="ready in seconds">— ready in seconds</span>
               </div>
             </div>
           </motion.div>
@@ -209,13 +203,44 @@ function HeroSection() {
   );
 }
 
+/* ──────────────────── TRUST BAR ──────────────────── */
+function TrustBar() {
+  return (
+    <section className="py-6 sm:py-8 px-4 sm:px-6 border-t border-retro-border/20 bg-retro-surface/10">
+      <div className="max-w-5xl mx-auto">
+        <motion.div
+          className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 md:gap-12"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          {[
+            { value: `${UI_COMPONENTS_COUNT}+`, label: 'UI Components' },
+            { value: `${TOTAL_ICON_COUNT}+`, label: 'Pixel Icons' },
+            { value: '7', label: 'Themed Packs' },
+            { value: '100%', label: 'TypeScript' },
+            { value: '0', label: 'Dependencies*' },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center min-w-[70px]">
+              <div className="font-pixel text-base sm:text-lg md:text-xl text-retro-green text-glow">{stat.value}</div>
+              <div className="font-mono text-[9px] sm:text-[10px] text-retro-muted/70 mt-0.5">{stat.label}</div>
+            </div>
+          ))}
+        </motion.div>
+        <p className="text-center font-mono text-[8px] text-retro-muted/40 mt-3">*Icons have zero runtime dependencies — pure SVG</p>
+      </div>
+    </section>
+  );
+}
+
 /* ──────────────────── VOXEL COMING SOON ──────────────────── */
 
 const VOXEL_CAPABILITIES: { icon: string; title: string; desc: string }[] = [
-  { icon: '🌍', title: 'Voxel Worlds', desc: 'Build floating islands, caves, biomes, and entire worlds from voxel blocks with procedural terrain.' },
-  { icon: '🤖', title: '3D Characters', desc: 'Design and animate voxel characters, NPCs, and creatures with per-voxel control.' },
-  { icon: '⛰️', title: 'Terrain Engine', desc: 'Heightmap-based terrain with grass, dirt, stone layers, water systems, and biome blending.' },
-  { icon: '🎮', title: 'Interactive Scenes', desc: 'Orbit controls, real-time lighting, physics-ready, and full React Three Fiber integration.' },
+  { icon: '🌍', title: 'Voxel Worlds', desc: 'Create floating islands, caves, and biomes from code — procedural terrain at your fingertips.' },
+  { icon: '🤖', title: '3D Characters', desc: 'Design and animate voxel characters with per-voxel control. Bring your pixel art to life.' },
+  { icon: '⛰️', title: 'Terrain Engine', desc: 'Heightmap terrain with grass, stone, water, and biome blending — all generated from React.' },
+  { icon: '🎮', title: 'Interactive Scenes', desc: 'Orbit controls, real-time lighting, and React Three Fiber integration — your code, your world.' },
 ];
 
 function VoxelComingSoon() {
@@ -249,14 +274,17 @@ function VoxelComingSoon() {
           </motion.div>
 
           <h2 className="font-pixel text-base sm:text-xl md:text-2xl text-retro-purple mb-2 text-glow">
-            @pxlkit/voxel
+            WHAT&apos;S NEXT: @pxlkit/voxel
           </h2>
           <p className="text-retro-muted max-w-2xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed px-2">
-            Craft immersive{' '}
-            <span className="text-retro-green font-bold">voxel worlds</span>,
-            sculpt <span className="text-retro-purple font-bold">3D characters</span>,
-            generate <span className="text-retro-gold font-bold">dynamic terrains</span>{' '}
-            — the same retro aesthetic you love, now in full three dimensions.
+            We&apos;re building a{' '}
+            <span className="text-retro-green font-bold">3D voxel engine</span>{' '}
+            for React. Craft{' '}
+            <span className="text-retro-purple font-bold">immersive worlds</span>,
+            sculpt characters, generate{' '}
+            <span className="text-retro-gold font-bold">dynamic terrains</span>{' '}
+            — the retro aesthetic you love, now in full three dimensions.{' '}
+            <span className="text-retro-cyan font-medium">Be the first to know when it drops.</span>
           </p>
         </motion.div>
 
@@ -365,45 +393,45 @@ function VoxelComingSoon() {
 const FEATURES: { icon: PxlKitData | AnyIcon; title: string; description: string; color: string; animated?: boolean }[] = [
   {
     icon: Package,
-    title: 'React UI Kit',
+    title: 'Ship Faster with Ready-Made Components',
     description:
-      `${UI_COMPONENTS_COUNT} production-ready components: buttons, inputs, cards, modals, toasts, tables, selects, and more. Fully typed.`,
+      `${UI_COMPONENTS_COUNT} pixel-art components — buttons, inputs, cards, modals, tables, selects, and more. Fully typed, fully styled, ready for production.`,
     color: 'text-retro-green',
   },
   {
     icon: Lightning,
-    title: 'Pixel Perfect Icons',
+    title: 'Icons That Load in Microseconds',
     description:
-      `${TOTAL_ICON_COUNT}+ hand-crafted 16×16 SVG icons across 6 thematic packs. Tree-shakeable — bundle only what you use.`,
+      `${TOTAL_ICON_COUNT}+ hand-crafted 16×16 SVG icons across 6 thematic packs. Tree-shakeable — your bundle only includes what you actually use.`,
     color: 'text-retro-gold',
   },
   {
     icon: FireSword,
-    title: 'Animated Icons',
+    title: 'Bring Icons to Life with Animation',
     description:
-      'Frame-based animations with loop, ping-pong, hover trigger, and speed control. Fire swords, sparkles, and more.',
+      'Frame-based animations with loop, ping-pong, hover trigger, and speed control. Fire swords, sparkles, pulses — all from code.',
     color: 'text-retro-red',
     animated: true,
   },
   {
     icon: Bell,
-    title: 'Toast Notifications',
+    title: 'Notifications That Match Your Style',
     description:
-      'Built-in retro notification system with animated icons, progress bars, 6 positions, and smooth stacking.',
+      'Built-in toast system with animated pixel icons, progress bars, 6 positions, and smooth stacking. No extra dependencies.',
     color: 'text-retro-purple',
   },
   {
     icon: Palette,
-    title: 'Visual Builder',
+    title: 'Design Icons Without Leaving the Browser',
     description:
-      'Paint-style pixel editor with retro palettes, tools, undo/redo, and live code preview. Design in the browser.',
+      'Paint-style pixel editor with retro palettes, drawing tools, undo/redo, and live code export. Create, preview, ship.',
     color: 'text-retro-pink',
   },
   {
     icon: Robot,
-    title: 'AI-Friendly Format',
+    title: 'Let AI Create Your Icons',
     description:
-      'Simple grids + color palettes. Perfect for LLM icon generation with ChatGPT, Claude, or any AI model.',
+      'Simple grid + palette format is tailor-made for LLMs. Copy a prompt, paste the result, preview instantly. Works with ChatGPT, Claude, and more.',
     color: 'text-retro-cyan',
   },
 ];
@@ -419,9 +447,9 @@ function FeaturesSection() {
           viewport={{ once: true }}
         >
           <PixelParallaxLayer speed={-0.03}>
-            <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-green mb-2 sm:mb-3">EVERYTHING YOU NEED</h2>
+            <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-green mb-2 sm:mb-3">EVERYTHING YOU NEED, NOTHING YOU DON&apos;T</h2>
             <p className="text-retro-muted max-w-lg mx-auto text-xs sm:text-sm px-2">
-              A complete React UI kit with pixel art icons, animated components, toast notifications, and a visual builder — all open source.
+              A complete retro toolkit so you can focus on building your product — not reinventing pixel-art UI from scratch.
             </p>
           </PixelParallaxLayer>
         </motion.div>
@@ -476,13 +504,12 @@ function ParallaxShowcase() {
             <PixelBadge tone="green">{ParallaxPack.length} Icons</PixelBadge>
           </div>
           <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-gold mb-2 sm:mb-3">
-            3D PARALLAX ICON PACK
+            ICONS THAT POP OFF THE SCREEN
           </h2>
           <p className="text-retro-muted max-w-2xl mx-auto text-xs sm:text-sm px-2">
-            Animated multi-layer pixel art with real CSS 3D perspective.
-            Each layer floats at a different Z-depth. Move your mouse anywhere
-            to rotate —<span className="text-retro-gold font-bold"> click any icon</span> to
-            trigger particle bursts, layer explosions, and color shifts.
+            Not flat. Not boring. Each icon has multiple layers floating at different Z-depths with real CSS 3D perspective.
+            Move your mouse to rotate —<span className="text-retro-gold font-bold"> click any icon</span> for
+            particle bursts, layer explosions, and color shifts. Your users will love this.
           </p>
         </motion.div>
 
@@ -593,9 +620,9 @@ function IconShowcase() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
         >
-          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-gold mb-2 sm:mb-3">ICON PACKS</h2>
+          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-gold mb-2 sm:mb-3">{TOTAL_ICON_COUNT}+ ICONS, 6 PACKS, ZERO FILLER</h2>
           <p className="text-retro-muted font-mono text-xs sm:text-sm max-w-lg mx-auto px-2">
-            {TOTAL_ICON_COUNT} hand-crafted icons across 6 themed packs — including animated effects.
+            Every icon is hand-crafted at 16×16 pixels. Organized into themed packs so you find what you need instantly — and import only what you ship.
           </p>
         </motion.div>
 
@@ -700,10 +727,10 @@ function ToastSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-purple mb-2 sm:mb-3">PIXEL TOASTS</h2>
+          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-purple mb-2 sm:mb-3">TOASTS THAT FEEL ALIVE</h2>
           <p className="text-retro-muted max-w-lg mx-auto text-xs sm:text-sm px-2">
-            Retro-styled notifications with pixel art icons, animated progress bars,
-            configurable positions, and smooth stacking. Click to try them live.
+            Retro-styled notifications your users will actually notice. Animated pixel icons, smooth progress bars,
+            6 screen positions, smart stacking. Click the buttons below — see them in action right now.
           </p>
         </motion.div>
 
@@ -803,11 +830,11 @@ import { Trophy } from '@pxlkit/gamification';
           viewport={{ once: true }}
         >
           <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-cyan mb-2 sm:mb-3">
-            HOW IT WORKS
+            FROM INSTALL TO PIXEL-PERFECT IN 3 STEPS
           </h2>
           <p className="text-retro-muted max-w-xl mx-auto text-xs sm:text-sm px-2">
-            Icons are defined as simple character grids. Each character maps to a
-            color. That&apos;s it.
+            Icons are simple character grids — each character maps to a color.
+            No complex APIs, no config files, no learning curve. If you can read a grid, you can use Pxlkit.
           </p>
         </motion.div>
 
@@ -1066,11 +1093,12 @@ Create an animated [DESCRIBE YOUR ICON HERE] icon.`;
           viewport={{ once: true }}
         >
           <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-purple mb-2 sm:mb-3">
-            AI GENERATION
+            CREATE ICONS WITH AI IN SECONDS
           </h2>
           <p className="text-retro-muted max-w-xl mx-auto text-xs sm:text-sm px-2">
-            The grid format is designed to be generated by AI. Copy the prompt
-            template, ask any LLM, and paste the result here.
+            Our grid format was designed for AI from day one. Copy the prompt,
+            ask ChatGPT, Claude, or any LLM — paste the result and see your icon instantly.
+            Then polish it in the visual builder.
           </p>
           {/* Mode toggle */}
           <div className="inline-flex gap-1 mt-4 p-1 bg-retro-bg rounded-lg border border-retro-border/30">
@@ -1181,26 +1209,26 @@ function PricingPreview() {
     {
       name: 'Community',
       price: 'Free',
-      suffix: 'forever',
+      suffix: 'forever — no credit card',
       color: 'green' as const,
-      features: ['204+ pixel art icons', '6 thematic packs', 'React UI kit', 'Attribution required'],
+      features: [`${TOTAL_ICON_COUNT}+ pixel art icons`, '6 thematic packs', `${UI_COMPONENTS_COUNT}+ React components`, 'Attribution required'],
     },
     {
       name: 'Indie',
       price: '$9.50',
       originalPrice: '$19',
-      suffix: 'one-time · 1 project',
+      suffix: 'one-time · 1 project · lifetime',
       color: 'gold' as const,
       popular: true,
-      features: ['No attribution', '1 commercial project', 'Lifetime license', 'All current packs'],
+      features: ['No attribution needed', '1 commercial project', 'Lifetime updates included', 'All current icon packs'],
     },
     {
       name: 'Team',
       price: '$24.50',
       originalPrice: '$49',
-      suffix: 'one-time · unlimited',
+      suffix: 'one-time · unlimited projects',
       color: 'cyan' as const,
-      features: ['Unlimited projects', 'All future packs', 'Priority support', 'Sponsor logo'],
+      features: ['Unlimited commercial projects', 'All future packs free', 'Priority support', 'Sponsor logo on GitHub'],
     },
   ];
 
@@ -1220,15 +1248,15 @@ function PricingPreview() {
           viewport={{ once: true }}
         >
           <div className="inline-flex items-center gap-2 mb-3 sm:mb-4">
-            <PixelBadge tone="red">50% OFF</PixelBadge>
-            <PixelBadge tone="gold">Launch Special</PixelBadge>
+            <PixelBadge tone="red"><span aria-label="50% off launch price">🔥 50% OFF — Launch Price</span></PixelBadge>
           </div>
           <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-green mb-2 sm:mb-3">
-            SIMPLE PRICING
+            PAY ONCE, USE FOREVER
           </h2>
           <p className="text-retro-muted max-w-lg mx-auto text-xs sm:text-sm px-2">
-            Free for everyone with attribution. Remove it with a one-time payment.
-            All licenses are <span className="text-retro-gold">50% off</span> during launch.
+            Free for everyone with attribution. Need commercial use?{' '}
+            <span className="text-retro-gold font-bold">Grab a lifetime license at 50% off</span> — this price won&apos;t last.
+            One payment, no subscriptions, no surprises.
           </p>
         </motion.div>
 
@@ -1290,6 +1318,89 @@ function PricingPreview() {
   );
 }
 
+/* ──────────────────── FAQ ──────────────────── */
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const faqs = [
+    {
+      q: 'Is Pxlkit really free?',
+      a: 'Yes! The Community plan is 100% free and includes all components, icons, and features. The only requirement is a small attribution link. Paid licenses simply remove that requirement for commercial projects.',
+    },
+    {
+      q: 'What frameworks does Pxlkit work with?',
+      a: 'Pxlkit is built for React with TypeScript. It works seamlessly with Next.js, Vite, Create React App, Remix, and any React setup. The SVG icons can also be used in any framework since they\'re pure markup.',
+    },
+    {
+      q: 'Will it slow down my app?',
+      a: 'No. Every icon and component is tree-shakeable — your final bundle only includes the code you actually import. Icons are pure SVG with zero runtime dependencies. The UI kit has minimal peer dependencies (React + Tailwind).',
+    },
+    {
+      q: 'Can I use Pxlkit in a commercial product?',
+      a: 'Absolutely. The free Community plan requires attribution. For commercial projects without attribution, grab an Indie ($9.50) or Team ($24.50) license — both are one-time payments with lifetime updates.',
+    },
+    {
+      q: 'How do I create custom icons?',
+      a: 'Three ways: use the visual builder on our website, let AI generate them with our prompt templates (works with ChatGPT, Claude, etc.), or hand-code the simple grid + palette JSON format directly.',
+    },
+    {
+      q: 'What\'s the 3D voxel engine?',
+      a: 'We\'re building @pxlkit/voxel — a React Three Fiber-based voxel engine for creating 3D worlds, characters, and terrains with the same retro aesthetic. It\'s coming soon and will be available as a separate package.',
+    },
+  ];
+
+  return (
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 bg-retro-surface/20">
+      <div className="max-w-3xl mx-auto">
+        <motion.div
+          className="text-center mb-8 sm:mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-cyan mb-2 sm:mb-3">
+            QUESTIONS? WE&apos;VE GOT ANSWERS
+          </h2>
+          <p className="text-retro-muted text-xs sm:text-sm px-2">
+            Everything you need to know before getting started.
+          </p>
+        </motion.div>
+
+        <div className="space-y-2">
+          {faqs.map((faq, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <button
+                onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                className="w-full text-left px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-retro-border/30 bg-retro-bg/60 hover:bg-retro-surface/50 transition-colors group"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="font-mono text-xs sm:text-sm text-retro-text group-hover:text-retro-green transition-colors">
+                    {faq.q}
+                  </h3>
+                  <span className={`font-pixel text-retro-muted text-xs shrink-0 transition-transform ${openIndex === i ? 'rotate-45' : ''}`}>
+                    +
+                  </span>
+                </div>
+                {openIndex === i && (
+                  <p className="mt-2 sm:mt-3 text-retro-muted text-xs sm:text-sm leading-relaxed pr-6">
+                    {faq.a}
+                  </p>
+                )}
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ──────────────────── CTA ──────────────────── */
 function CTASection() {
   const router = useRouter();
@@ -1319,16 +1430,23 @@ function CTASection() {
         >
           <PixelParallaxLayer speed={-0.03}>
             <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-green mb-3 sm:mb-4">
-              START BUILDING TODAY
+              YOUR NEXT PROJECT DESERVES BETTER UI
             </h2>
-            <p className="text-retro-muted mb-6 sm:mb-8 max-w-md mx-auto text-xs sm:text-sm px-2">
-              Pxlkit is free and open source. Use the UI kit and icons in your products,
-              contribute icons, or help grow the component library.
+            <p className="text-retro-muted mb-4 sm:mb-5 max-w-md mx-auto text-xs sm:text-sm px-2">
+              Join developers who are shipping retro-styled interfaces in minutes instead of days.
+              Free, open source, and ready when you are.
             </p>
+            <div className="rounded-lg border border-retro-border bg-retro-bg/80 px-3 sm:px-4 py-2 sm:py-3 font-mono text-[10px] sm:text-xs text-retro-muted overflow-x-auto max-w-sm mx-auto mb-6 sm:mb-8">
+              <span className="text-retro-green mr-2">$</span>
+              npm i @pxlkit/core @pxlkit/ui-kit
+            </div>
           </PixelParallaxLayer>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <PixelButton tone="green" onClick={() => router.push('/ui-kit')}>
-              Explore UI Kit
+            <PixelButton tone="green" onClick={() => router.push('/docs')}>
+              Get Started — It&apos;s Free
+            </PixelButton>
+            <PixelButton tone="gold" variant="ghost" onClick={() => router.push('/pricing')}>
+              View Pricing
             </PixelButton>
             <PixelButton tone="neutral" variant="ghost" onClick={() => window.open('https://github.com/joangeldelarosa/pxlkit', '_blank', 'noopener,noreferrer')}>
               Star on GitHub

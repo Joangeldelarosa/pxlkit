@@ -6,13 +6,13 @@
 
 <p align="center">
   <strong>Bring retro aesthetics to the modern web.</strong><br/>
-  Pxlkit is a comprehensive React UI toolkit and icon library featuring over 200 pixel art icons divided into 7 themed packs, including interactive 3D parallax icons. Includes 40+ styled components, animated SVGs, a visual builder, and a robust toast system.
+  Pxlkit is a comprehensive React UI toolkit and icon library featuring over 220 pixel art icons divided into 7 themed packs, including interactive 3D parallax icons. Includes 40+ styled components, animated SVGs, a visual builder, and a robust toast system.
 </p>
 
 <p align="center">
   <a href="https://pxlkit.xyz"><img src="https://img.shields.io/badge/docs-pxlkit.xyz-00FF88?style=flat&logo=vercel&logoColor=black" alt="Documentation" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Pxlkit%20v1.0-blue.svg" alt="Pxlkit License" /></a>
-  <img src="https://img.shields.io/badge/icons-204%2B-FFD700?style=flat" alt="204+ icons" />
+  <img src="https://img.shields.io/badge/icons-226%2B-FFD700?style=flat" alt="226+ icons" />
   <img src="https://img.shields.io/badge/react-%E2%89%A518-61DAFB?logo=react&logoColor=white" alt="React ≥18" />
   <img src="https://img.shields.io/badge/typescript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict" />
 </p>
@@ -21,18 +21,18 @@
 
 ## Overview
 
-**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **204+ pixel art icons** organized into themed packs, a retro React UI kit with **40+ components**, a core rendering engine, and a Next.js showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. You can browse and visually edit all icons at the [official website](https://pxlkit.xyz).
+**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into themed packs, a retro React UI kit with **40+ components**, a core rendering engine, and a Next.js showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. You can browse and visually edit all icons at the [official website](https://pxlkit.xyz).
 
 ```
 pxlkit/
 ├── packages/
 │   ├── core/           → Types, React components, SVG utilities
-│   ├── gamification/   → 48 icons — RPG, achievements, rewards
+│   ├── gamification/   → 51 icons — RPG, achievements, rewards
 │   ├── feedback/       → 33 icons — alerts, status, notifications
 │   ├── social/         → 43 icons — community, emojis, messaging
-│   ├── weather/        → 34 icons — climate, moon phases, temperature
-│   ├── ui/             → 40 icons — interface controls, navigation
-│   ├── effects/        →  6 icons — animated VFX, particles
+│   ├── weather/        → 36 icons — climate, moon phases, temperature
+│   ├── ui/             → 41 icons — interface controls, navigation
+│   ├── effects/        → 12 icons — animated VFX, particles
 │   └── parallax/       → 10 icons — multi-layer 3D parallax
 └── apps/
     └── web/            → Next.js 15 showcase & documentation site
@@ -42,12 +42,12 @@ pxlkit/
 
 | Pack             | Package                | Static | Animated |  Total | Description                                |
 | ---------------- | ---------------------- | -----: | -------: | -----: | ------------------------------------------ |
-| **Gamification** | `@pxlkit/gamification` |     39 |        9 | **48** | Trophies, swords, potions, RPG gear, coins |
+| **Gamification** | `@pxlkit/gamification` |     41 |       10 | **51** | Trophies, swords, potions, RPG gear, coins |
 | **Feedback**     | `@pxlkit/feedback`     |     30 |        3 | **33** | Checkmarks, alerts, shields, bugs, badges  |
 | **Social**       | `@pxlkit/social`       |     35 |        8 | **43** | Emojis, users, messages, hearts, reactions |
-| **Weather**      | `@pxlkit/weather`      |     29 |        5 | **34** | Sun, moon, storms, temperature, night sky  |
-| **UI**           | `@pxlkit/ui`           |     35 |        5 | **40** | Home, search, settings, navigation, layout |
-| **Effects**      | `@pxlkit/effects`      |      0 |        6 |  **6** | Explosions, radar ping, flame, shockwave   |
+| **Weather**      | `@pxlkit/weather`      |     30 |        6 | **36** | Sun, moon, storms, temperature, night sky  |
+| **UI**           | `@pxlkit/ui`           |     36 |        5 | **41** | Home, search, settings, navigation, layout |
+| **Effects**      | `@pxlkit/effects`      |      0 |       12 | **12** | Explosions, radar ping, flame, shockwave   |
 | **Parallax**     | `@pxlkit/parallax`     |      — |        — | **10** | Multi-layer 3D parallax icons (3–5 layers) |
 
 ## Quick Start
