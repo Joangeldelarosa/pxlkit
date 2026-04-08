@@ -19,15 +19,19 @@ type WorldMode = 'infinite' | 'finite';
 interface WorldConfig {
   worldMode: WorldMode;
   worldSize: number;           // finite mode: world width/depth in voxels (16-512)
-  renderDistance: number;
+  renderDistance: number;       // 2-20 chunks
   flySpeed: number;
-  treeDensity: number;       // 0-1
-  structureDensity: number;  // 0-1
-  cityFrequency: number;     // 0-1
-  pickupDensity: number;     // 0-1
-  fogDensity: number;        // 0-1
-  biomeVariation: number;    // 0-1  how much each biome instance varies
-  terrainRoughness: number;  // 0-1  extra detail noise amplitude
+  treeDensity: number;         // 0-1
+  structureDensity: number;    // 0-1
+  cityFrequency: number;       // 0-1
+  pickupDensity: number;       // 0-1
+  fogDensity: number;          // 0-1
+  biomeVariation: number;      // 0-1  how much each biome instance varies
+  terrainRoughness: number;    // 0-1  extra detail noise amplitude
+  particleIntensity: number;   // 0-1  controls ambient particles, birds, critters
+  backgroundDetail: number;    // 0-1  distant mountain silhouette layers + haze
+  chunkGenSpeed: number;       // 1-6  max chunks generated per frame
+  graphicsQuality: 'low' | 'medium' | 'high'; // DPR and antialias preset
 }
 
 const DEFAULT_CONFIG: WorldConfig = {
@@ -42,6 +46,10 @@ const DEFAULT_CONFIG: WorldConfig = {
   fogDensity: 0.5,
   biomeVariation: 0.5,
   terrainRoughness: 0.5,
+  particleIntensity: 0.7,
+  backgroundDetail: 0.8,
+  chunkGenSpeed: 2,
+  graphicsQuality: 'medium',
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -283,7 +291,8 @@ function getVariedBiome(
 const CHUNK_SIZE = 16;
 const VOXEL_SIZE = 0.5;
 const MAX_HEIGHT = 32;
-const MAX_CHUNKS_PER_FRAME = 2;
+/** Default; overridden by config.chunkGenSpeed at runtime */
+const DEFAULT_CHUNKS_PER_FRAME = 2;
 const PLAYER_HEIGHT = 1.5; // collision offset in voxel units
 /** Sentinel for water face culling — any value larger than MAX_HEIGHT */
 const NO_FACE = MAX_HEIGHT + 1;
@@ -1153,7 +1162,7 @@ function WorldLighting() {
   );
 }
 
-function SkyGradient() {
+function SkyGradient({ backgroundDetail }: { backgroundDetail: number }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
   useFrame(() => { if (meshRef.current) meshRef.current.position.copy(camera.position); });
@@ -1162,8 +1171,10 @@ function SkyGradient() {
    * 1) A sky gradient (top blue → horizon warm → bottom light blue)
    * 2) Procedural distant mountain silhouettes at the horizon
    *    using layered sine-wave ridgelines (parallax-like depth)
-   *    with atmospheric haze. Zero voxel cost — pure GPU math. */
+   *    with atmospheric haze. Zero voxel cost — pure GPU math.
+   * backgroundDetail uniform (0-1): 0 = no mountains, 1 = full detail */
   const mat = useMemo(() => new THREE.ShaderMaterial({
+    uniforms: { uDetail: { value: 0.8 } },
     vertexShader: `
       varying vec3 vWP;
       void main() {
@@ -1172,6 +1183,7 @@ function SkyGradient() {
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }`,
     fragmentShader: `
+      uniform float uDetail;
       varying vec3 vWP;
 
       /* Simple pseudo-random hash for ridgeline variation */
@@ -1197,46 +1209,57 @@ function SkyGradient() {
           ? mix(horizon, topSky, smoothstep(0.0, 0.5, h))
           : mix(horizon, botSky, smoothstep(0.0, -0.3, h));
 
-        /* Distant mountains — 3 layered ridgelines with parallax depth */
-        float angle = atan(dir.z, dir.x); /* horizontal angle around Y axis */
+        /* Distant mountains — controlled by uDetail */
+        if (uDetail > 0.01) {
+          float angle = atan(dir.z, dir.x);
 
-        /* Layer 1 — far mountains (large, soft, darkest/haziest) */
-        float ridge1 = 0.0;
-        ridge1 += sin(angle * 3.0) * 0.04;
-        ridge1 += sin(angle * 7.0 + 1.5) * 0.025;
-        ridge1 += snoise(angle * 5.0) * 0.03;
-        ridge1 += snoise(angle * 12.0 + 3.0) * 0.015;
-        ridge1 += 0.06;
+          /* Layer 1 — far mountains (large, soft, haziest) */
+          float ridge1 = 0.0;
+          ridge1 += sin(angle * 3.0) * 0.04;
+          ridge1 += sin(angle * 7.0 + 1.5) * 0.025;
+          ridge1 += snoise(angle * 5.0) * 0.03;
+          ridge1 += snoise(angle * 12.0 + 3.0) * 0.015;
+          ridge1 += 0.06;
+          ridge1 *= uDetail;
 
-        /* Layer 2 — mid mountains */
-        float ridge2 = 0.0;
-        ridge2 += sin(angle * 4.0 + 2.0) * 0.035;
-        ridge2 += sin(angle * 9.0 + 0.7) * 0.02;
-        ridge2 += snoise(angle * 8.0 + 10.0) * 0.025;
-        ridge2 += 0.04;
+          /* Layer 2 — mid mountains */
+          float ridge2 = 0.0;
+          ridge2 += sin(angle * 4.0 + 2.0) * 0.035;
+          ridge2 += sin(angle * 9.0 + 0.7) * 0.02;
+          ridge2 += snoise(angle * 8.0 + 10.0) * 0.025;
+          ridge2 += 0.04;
+          ridge2 *= uDetail;
 
-        /* Layer 3 — near hills (smaller, sharper, darkest) */
-        float ridge3 = 0.0;
-        ridge3 += sin(angle * 6.0 + 4.0) * 0.025;
-        ridge3 += sin(angle * 14.0 + 2.3) * 0.012;
-        ridge3 += snoise(angle * 15.0 + 20.0) * 0.018;
-        ridge3 += 0.02;
+          /* Layer 3 — near hills (smaller, sharper) */
+          float ridge3 = 0.0;
+          ridge3 += sin(angle * 6.0 + 4.0) * 0.025;
+          ridge3 += sin(angle * 14.0 + 2.3) * 0.012;
+          ridge3 += snoise(angle * 15.0 + 20.0) * 0.018;
+          ridge3 += 0.02;
+          ridge3 *= uDetail;
 
-        /* Mountain colours — each layer has atmospheric perspective */
-        vec3 mtnFar  = mix(horizon, vec3(0.45, 0.50, 0.58), 0.4);
-        vec3 mtnMid  = mix(horizon, vec3(0.35, 0.42, 0.50), 0.55);
-        vec3 mtnNear = mix(horizon, vec3(0.25, 0.33, 0.42), 0.7);
+          /* Mountain colours — atmospheric perspective */
+          vec3 mtnFar  = mix(horizon, vec3(0.45, 0.50, 0.58), 0.4 * uDetail);
+          vec3 mtnMid  = mix(horizon, vec3(0.35, 0.42, 0.50), 0.55 * uDetail);
+          vec3 mtnNear = mix(horizon, vec3(0.25, 0.33, 0.42), 0.7 * uDetail);
 
-        vec3 col = sky;
-        /* Paint mountains only near the horizon (h close to 0) */
-        if (h < ridge1 && h > -0.05) col = mix(col, mtnFar,  smoothstep(ridge1, ridge1 - 0.01, h));
-        if (h < ridge2 && h > -0.05) col = mix(col, mtnMid,  smoothstep(ridge2, ridge2 - 0.008, h));
-        if (h < ridge3 && h > -0.05) col = mix(col, mtnNear, smoothstep(ridge3, ridge3 - 0.006, h));
+          /* Paint mountains only near the horizon */
+          if (h < ridge1 && h > -0.05) sky = mix(sky, mtnFar,  smoothstep(ridge1, ridge1 - 0.01, h));
+          if (h < ridge2 && h > -0.05) sky = mix(sky, mtnMid,  smoothstep(ridge2, ridge2 - 0.008, h));
+          if (h < ridge3 && h > -0.05) sky = mix(sky, mtnNear, smoothstep(ridge3, ridge3 - 0.006, h));
+        }
 
-        gl_FragColor = vec4(col, 1.0);
+        gl_FragColor = vec4(sky, 1.0);
       }`,
     side: THREE.BackSide, depthWrite: false,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []);
+
+  // Update uniform when detail changes
+  useEffect(() => {
+    mat.uniforms.uDetail.value = backgroundDetail;
+  }, [mat, backgroundDetail]);
+
   return <mesh ref={meshRef} material={mat}><sphereGeometry args={[500, 32, 32]} /></mesh>;
 }
 
@@ -1270,11 +1293,12 @@ const BIOME_PARTICLE_CONFIG: Record<string, { color: string; count: number; size
   City:      { color: '#ffeecc', count: 12, size: 0.05, speed: 0.1, drift: [0.1, 0.15, 0.1], opacity: 0.25 },
 };
 
-function AmbientParticles({ biome }: { biome: string }) {
+function AmbientParticles({ biome, intensity }: { biome: string; intensity: number }) {
   const ref = useRef<THREE.Points>(null);
   const { camera } = useThree();
   const cfg = BIOME_PARTICLE_CONFIG[biome] || BIOME_PARTICLE_CONFIG.Plains;
   const RANGE = 12;
+  const activeCount = Math.max(1, Math.round(cfg.count * intensity));
 
   const geo = useMemo(() => {
     let seed2 = 42;
@@ -1296,7 +1320,7 @@ function AmbientParticles({ biome }: { biome: string }) {
     sizeAttenuation: true, depthWrite: false,
   }), [cfg.color, cfg.size, cfg.opacity]);
 
-  useEffect(() => { geo.setDrawRange(0, cfg.count); }, [geo, cfg.count]);
+  useEffect(() => { geo.setDrawRange(0, activeCount); }, [geo, activeCount]);
 
   useFrame(({ clock }) => {
     if (!ref.current) return;
@@ -1305,7 +1329,7 @@ function AmbientParticles({ biome }: { biome: string }) {
     const arr = attr.array as Float32Array;
 
     // Move particles + recycle when out of range
-    for (let i = 0; i < cfg.count; i++) {
+    for (let i = 0; i < activeCount; i++) {
       const i3 = i * 3;
       arr[i3]     += Math.sin(t * cfg.speed + i * 1.7) * cfg.drift[0] * 0.02;
       arr[i3 + 1] += cfg.drift[1] * 0.01 + Math.sin(t * 0.3 + i * 2.3) * 0.005;
@@ -1367,17 +1391,18 @@ const BIOME_BIRD_CONFIG: Record<string, { flocks: number; color: string; wingCol
 /** Max points we ever allocate for birds (3 points per bird × max birds) */
 const MAX_BIRD_POINTS = 120;
 
-function SkyBirds({ biome }: { biome: string }) {
+function SkyBirds({ biome, intensity }: { biome: string; intensity: number }) {
   const ref = useRef<THREE.Points>(null);
   const { camera } = useThree();
   const cfg = BIOME_BIRD_CONFIG[biome] || BIOME_BIRD_CONFIG.Plains;
+  const effectiveFlocks = Math.max(0, Math.round(cfg.flocks * intensity));
 
   // Build deterministic flocks
   const flocks = useMemo(() => {
     const sd = { v: 7919 };
     const rnd = () => { sd.v = (sd.v + 0x6D2B79F5) | 0; let t = Math.imul(sd.v ^ (sd.v >>> 15), 1 | sd.v); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
     const fl: BirdFlock[] = [];
-    for (let f = 0; f < cfg.flocks; f++) {
+    for (let f = 0; f < effectiveFlocks; f++) {
       const isLone = rnd() < 0.35;
       fl.push({
         cx: (rnd() - 0.5) * 30,
@@ -1390,7 +1415,7 @@ function SkyBirds({ biome }: { biome: string }) {
       });
     }
     return fl;
-  }, [cfg.flocks]);
+  }, [effectiveFlocks]);
 
   const totalPts = useMemo(() => {
     let n = 0;
@@ -1512,11 +1537,12 @@ const BIOME_CRITTER_CONFIG: Record<string, { count: number; color: string; size:
 
 const MAX_CRITTERS = 12;
 
-function GroundCritters({ biome }: { biome: string }) {
+function GroundCritters({ biome, intensity }: { biome: string; intensity: number }) {
   const ref = useRef<THREE.Points>(null);
   const { camera } = useThree();
   const cfg = BIOME_CRITTER_CONFIG[biome] || BIOME_CRITTER_CONFIG.Plains;
   const RANGE = 8;
+  const activeCount = Math.max(0, Math.round(cfg.count * intensity));
 
   const states = useRef<CritterState[]>([]);
 
@@ -1546,7 +1572,7 @@ function GroundCritters({ biome }: { biome: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [RANGE]);
 
-  useEffect(() => { geo.setDrawRange(0, Math.min(cfg.count, MAX_CRITTERS)); }, [geo, cfg.count]);
+  useEffect(() => { geo.setDrawRange(0, Math.min(activeCount, MAX_CRITTERS)); }, [geo, activeCount]);
 
   const mat = useMemo(() => new THREE.PointsMaterial({
     color: cfg.color, size: cfg.size, transparent: true, opacity: 0.7,
@@ -1559,7 +1585,7 @@ function GroundCritters({ biome }: { biome: string }) {
     const arr = attr.array as Float32Array;
     const dt = Math.min(delta, 0.05); // cap for tab-away
 
-    for (let i = 0; i < cfg.count && i < MAX_CRITTERS; i++) {
+    for (let i = 0; i < activeCount && i < MAX_CRITTERS; i++) {
       const st = states.current[i];
       if (!st) continue;
       const i3 = i * 3;
@@ -1756,8 +1782,9 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
       }
 
       // Generate throttled
+      const maxGen = config.chunkGenSpeed || DEFAULT_CHUNKS_PER_FRAME;
       let generated = 0;
-      while (pendingKeys.current.length > 0 && generated < MAX_CHUNKS_PER_FRAME) {
+      while (pendingKeys.current.length > 0 && generated < maxGen) {
         genChunk(pendingKeys.current.shift()!);
         generated++;
       }
@@ -1783,8 +1810,9 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
                     || dz10 !== Math.round(lastCamDir.current.z * DIR_PRECISION);
 
     // Throttled generation
+    const maxGen2 = config.chunkGenSpeed || DEFAULT_CHUNKS_PER_FRAME;
     let generated2 = 0;
-    while (pendingKeys.current.length > 0 && generated2 < MAX_CHUNKS_PER_FRAME) {
+    while (pendingKeys.current.length > 0 && generated2 < maxGen2) {
       genChunk(pendingKeys.current.shift()!);
       generated2++;
     }
@@ -1949,6 +1977,9 @@ export default function ProceduralTerrain() {
     setConfig(prev => ({ ...prev, [key]: val }));
   }, []);
 
+  const gfxDpr: [number, number] = config.graphicsQuality === 'low' ? [0.75, 1] : config.graphicsQuality === 'high' ? [1, 2] : [1, 1.5];
+  const gfxAA = config.graphicsQuality === 'high';
+
   return (
     <div className="relative w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] overflow-hidden bg-black select-none" style={{ touchAction: 'none', WebkitUserSelect: 'none' }}>
       {/* ── Controls Overlay ── */}
@@ -2000,7 +2031,7 @@ export default function ProceduralTerrain() {
               <ConfigSlider label="World Size" value={config.worldSize} onChange={v => updateConfig('worldSize', v)} min={32} max={512} step={16} color="text-retro-cyan/80" displayValue={`${config.worldSize}×${config.worldSize}`} />
             )}
             {config.worldMode === 'infinite' && (
-              <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => updateConfig('renderDistance', v)} min={2} max={10} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
+              <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => updateConfig('renderDistance', v)} min={2} max={20} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
             )}
             <ConfigSlider label="Fly Speed" value={config.flySpeed} onChange={v => updateConfig('flySpeed', v)} min={4} max={40} step={1} color="text-retro-gold/80" displayValue={String(config.flySpeed)} />
             <button onClick={() => setShowAdvanced(!showAdvanced)}
@@ -2009,13 +2040,41 @@ export default function ProceduralTerrain() {
             </button>
             {showAdvanced && (
               <div className="space-y-2.5 pt-1 border-t border-retro-border/20">
+                {/* ── Graphics & Performance ── */}
+                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1">Graphics &amp; Performance</p>
+                <div className="space-y-1">
+                  <label className="font-pixel text-[8px] sm:text-[9px] text-retro-cyan/80 uppercase tracking-wider select-none">Graphics Quality</label>
+                  <div className="flex gap-1.5">
+                    {(['low', 'medium', 'high'] as const).map(q => (
+                      <button key={q} onClick={() => setConfig(prev => ({ ...prev, graphicsQuality: q }))}
+                        className={`flex-1 py-1 rounded font-pixel text-[7px] sm:text-[8px] transition-all cursor-pointer select-none border ${config.graphicsQuality === q ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/50 hover:bg-retro-surface/60'}`}>
+                        {q.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="font-mono text-[7px] text-retro-muted/30 select-none">
+                    {config.graphicsQuality === 'low' ? 'Lower DPR, no AA — best for mobile' : config.graphicsQuality === 'high' ? 'Higher DPR + antialiasing — GPU intensive' : 'Balanced DPR, no AA — recommended'}
+                  </p>
+                </div>
+                <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => updateConfig('chunkGenSpeed', v)} min={1} max={6} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
+
+                {/* ── Terrain & Biomes ── */}
+                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Terrain &amp; Biomes</p>
                 <ConfigSlider label="Tree Density" value={config.treeDensity} onChange={v => updateConfig('treeDensity', v)} min={0} max={1} step={0.1} color="text-retro-green/80" displayValue={`${Math.round(config.treeDensity * 100)}%`} />
                 <ConfigSlider label="Structure Density" value={config.structureDensity} onChange={v => updateConfig('structureDensity', v)} min={0} max={1} step={0.1} color="text-retro-gold/80" displayValue={`${Math.round(config.structureDensity * 100)}%`} />
                 <ConfigSlider label="City Frequency" value={config.cityFrequency} onChange={v => updateConfig('cityFrequency', v)} min={0} max={1} step={0.1} color="text-retro-purple/80" displayValue={`${Math.round(config.cityFrequency * 100)}%`} />
-                <ConfigSlider label="Pickup Density" value={config.pickupDensity} onChange={v => updateConfig('pickupDensity', v)} min={0} max={1} step={0.1} color="text-retro-cyan/80" displayValue={`${Math.round(config.pickupDensity * 100)}%`} />
                 <ConfigSlider label="Biome Variation" value={config.biomeVariation} onChange={v => updateConfig('biomeVariation', v)} min={0} max={1} step={0.1} color="text-retro-green/80" displayValue={`${Math.round(config.biomeVariation * 100)}%`} />
                 <ConfigSlider label="Terrain Roughness" value={config.terrainRoughness} onChange={v => updateConfig('terrainRoughness', v)} min={0} max={1} step={0.1} color="text-retro-gold/80" displayValue={`${Math.round(config.terrainRoughness * 100)}%`} />
+
+                {/* ── Items & Pickups ── */}
+                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Items &amp; Effects</p>
+                <ConfigSlider label="Pickup Density" value={config.pickupDensity} onChange={v => updateConfig('pickupDensity', v)} min={0} max={1} step={0.1} color="text-retro-cyan/80" displayValue={`${Math.round(config.pickupDensity * 100)}%`} />
+                <ConfigSlider label="Particle Intensity" value={config.particleIntensity} onChange={v => updateConfig('particleIntensity', v)} min={0} max={1} step={0.1} color="text-retro-purple/80" displayValue={`${Math.round(config.particleIntensity * 100)}%`} />
+
+                {/* ── Atmosphere ── */}
+                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Atmosphere</p>
                 <ConfigSlider label="Fog Density" value={config.fogDensity} onChange={v => updateConfig('fogDensity', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.fogDensity * 100)}%`} />
+                <ConfigSlider label="Background Mountains" value={config.backgroundDetail} onChange={v => updateConfig('backgroundDetail', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.backgroundDetail * 100)}%`} />
               </div>
             )}
             <button onClick={requestPointerLock}
@@ -2067,20 +2126,20 @@ export default function ProceduralTerrain() {
       <div ref={canvasRef} className="w-full h-full" style={{ touchAction: 'none' }}>
         <Canvas
           camera={{ fov: 65, near: 0.1, far: 300 }}
-          dpr={[1, 1.5]}
-          gl={{ antialias: false, toneMapping: THREE.NoToneMapping, powerPreference: 'high-performance' }}
+          dpr={gfxDpr}
+          gl={{ antialias: gfxAA, toneMapping: THREE.NoToneMapping, powerPreference: 'high-performance' }}
           style={{ background: 'transparent', touchAction: 'none' }}
         >
-          <SkyGradient />
+          <SkyGradient backgroundDetail={config.backgroundDetail} />
           <FogEffect density={config.fogDensity} />
           <WorldLighting />
           <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} worldConfig={config} />
           <CameraLook isLocked={isLocked} isMobile={isMobile} />
           <ChunkManagerWithCounter seed={seed} config={config} onChunkCount={handleChunkCount} chunkCacheRef={chunkCacheRef} />
           <CameraTracker onUpdate={handleCameraUpdate} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} />
-          <AmbientParticles biome={currentBiome} />
-          <SkyBirds biome={currentBiome} />
-          <GroundCritters biome={currentBiome} />
+          <AmbientParticles biome={currentBiome} intensity={config.particleIntensity} />
+          <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
+          <GroundCritters biome={currentBiome} intensity={config.particleIntensity} />
         </Canvas>
       </div>
     </div>
