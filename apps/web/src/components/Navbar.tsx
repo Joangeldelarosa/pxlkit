@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useTheme } from './ThemeProvider';
 
-const NAV_ITEMS = [
+const NAV_ITEMS: { href: string; label: string; badge?: string }[] = [
   { href: '/', label: 'Home' },
   { href: '/icons', label: 'Icons' },
   { href: '/builder', label: 'Builder' },

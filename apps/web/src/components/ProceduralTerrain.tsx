@@ -378,7 +378,7 @@ function generateChunkData(
           }
 
           // Leaf crown (small sphere)
-          const crownR = biome === 'forest' ? 2 : 2;
+          const crownR = biome === 'forest' ? 3 : 2;
           const crownY = h + trunkH + crownR;
           for (let dx = -crownR; dx <= crownR; dx++) {
             for (let dy = -crownR; dy <= crownR; dy++) {
@@ -459,6 +459,7 @@ function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   const solidRef = useRef<THREE.InstancedMesh>(null);
   const waterRef = useRef<THREE.InstancedMesh>(null);
 
+  // Slightly smaller than VOXEL_SIZE to create visible gaps between cubes for a pixel-grid aesthetic
   const gap = VOXEL_SIZE * 0.92;
 
   useEffect(() => {
