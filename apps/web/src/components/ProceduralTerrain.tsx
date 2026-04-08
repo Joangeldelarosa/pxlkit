@@ -1252,6 +1252,7 @@ function SkyGradient({ backgroundDetail }: { backgroundDetail: number }) {
         gl_FragColor = vec4(sky, 1.0);
       }`,
     side: THREE.BackSide, depthWrite: false,
+  // Intentionally mount-only: uniform updated reactively via useEffect below
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []);
 
