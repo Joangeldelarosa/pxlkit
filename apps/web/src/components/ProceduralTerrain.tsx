@@ -559,10 +559,10 @@ function FlyCamera({
 
     // Ascend/Descend (Space, Shift)
     if (keys.has(' ')) {
-      camera.position.y += speed;
+      camera.position.addScaledVector(camera.up, speed);
     }
     if (keys.has('shift')) {
-      camera.position.y -= speed;
+      camera.position.addScaledVector(camera.up, -speed);
     }
 
     // Mouse look — handled by pointer lock in parent
@@ -679,12 +679,7 @@ function SkyGradient() {
  * ═══════════════════════════════════════════════════════════ */
 
 function FogEffect() {
-  const { scene } = useThree();
-  useEffect(() => {
-    scene.fog = new THREE.FogExp2('#b0c8e0', 0.012);
-    return () => { scene.fog = null; };
-  }, [scene]);
-  return null;
+  return <fogExp2 attach="fog" args={['#b0c8e0', 0.012]} />;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -772,11 +767,11 @@ export default function ProceduralTerrain() {
   const speedRef = useRef(flySpeed);
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  // Track noise functions for biome display
-  const [noises, setNoises] = useState<{
-    biome: ((x: number, y: number) => number) | null;
-    temp: ((x: number, y: number) => number) | null;
-  }>({ biome: null, temp: null });
+  // Compute noise functions for biome display (derived from seed)
+  const noises = useMemo(() => ({
+    biome: createNoise2D(seed + 2),
+    temp: createNoise2D(seed + 3),
+  }), [seed]);
 
   useEffect(() => {
     speedRef.current = flySpeed;
@@ -789,14 +784,6 @@ export default function ProceduralTerrain() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
-
-  // Recreate noise references when seed changes
-  useEffect(() => {
-    setNoises({
-      biome: createNoise2D(seed + 2),
-      temp: createNoise2D(seed + 3),
-    });
-  }, [seed]);
 
   // Keyboard handlers
   useEffect(() => {
@@ -1146,6 +1133,8 @@ function ChunkManagerWithCounter({
   const frustum = useRef(new THREE.Frustum());
   const projScreenMatrix = useRef(new THREE.Matrix4());
 
+  const prevSeedRef = useRef(seed);
+
   const noises = useMemo(() => ({
     height: createNoise2D(seed),
     detail: createNoise2D(seed + 1),
@@ -1154,13 +1143,14 @@ function ChunkManagerWithCounter({
     tree: createNoise2D(seed + 4),
   }), [seed]);
 
-  useEffect(() => {
-    chunkCache.current.clear();
-    setVisibleChunks(new Map());
-    lastCameraChunk.current = '';
-  }, [seed]);
-
   useFrame(() => {
+    // Reset cache when seed changes
+    if (prevSeedRef.current !== seed) {
+      prevSeedRef.current = seed;
+      chunkCache.current.clear();
+      lastCameraChunk.current = '';
+    }
+
     const [ccx, ccz] = worldToChunk(camera.position.x, camera.position.z);
     const currentKey = `${ccx},${ccz}`;
 
