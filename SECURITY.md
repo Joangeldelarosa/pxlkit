@@ -9,6 +9,13 @@ We provide security updates for the following versions of pxlkit packages:
 | `@pxlkit/core` | Latest major version |
 | `@pxlkit/ui-kit` | Latest major version |
 | `@pxlkit/ui` | Latest major version |
+| `@pxlkit/effects` | Latest major version |
+| `@pxlkit/feedback` | Latest major version |
+| `@pxlkit/gamification` | Latest major version |
+| `@pxlkit/parallax` | Latest major version |
+| `@pxlkit/social` | Latest major version |
+| `@pxlkit/voxel` | Latest major version |
+| `@pxlkit/weather` | Latest major version |
 
 ## Reporting a Vulnerability
 

@@ -52,6 +52,13 @@ body:
         - "@pxlkit/core"
         - "@pxlkit/ui-kit"
         - "@pxlkit/ui"
+        - "@pxlkit/effects"
+        - "@pxlkit/feedback"
+        - "@pxlkit/gamification"
+        - "@pxlkit/parallax"
+        - "@pxlkit/social"
+        - "@pxlkit/voxel"
+        - "@pxlkit/weather"
         - "New Package"
         - "Other / Multiple"
     validations:

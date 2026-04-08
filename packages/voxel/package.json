@@ -1,6 +1,6 @@
 {
   "name": "@pxlkit/voxel",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Voxel engine for pxlkit — 3D pixelated icons and elements using voxels",
   "author": {
     "name": "Joangel De La Rosa",
