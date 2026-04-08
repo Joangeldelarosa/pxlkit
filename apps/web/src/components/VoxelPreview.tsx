@@ -16,7 +16,7 @@ interface Voxel3D {
   color: string;
 }
 
-export type SceneTab = 'island' | 'terrain' | 'character';
+export type SceneTab = 'island' | 'terrain' | 'character' | 'world';
 
 /* ═══════════════════════════════════════════════════════════
  *  Color Palettes
@@ -57,6 +57,18 @@ const ROBOT_ANTENNA = '#ccddee';
 const FLOWER_COLORS = ['#ff9999', '#ffdd66', '#ccaaff', '#ff99cc', '#99ccff'];
 const ROCK_COLORS = ['#aabbcc', '#bbccdd', '#ccddee'];
 
+/* World scene extra palettes */
+const MOUNTAIN = ['#8899aa', '#99aabb', '#aabbcc', '#bbccdd'];
+const SNOW = ['#eef4ff', '#f4f8ff', '#ffffff'];
+const PATH_C = ['#ddcc99', '#ccbb88', '#bbaa77'];
+const BRIDGE_WOOD = ['#bb8844', '#aa7733', '#996622'];
+const RIVER_C = '#77ccee';
+const PINE_TRUNK = ['#886644', '#775533', '#664422'];
+const PINE_LEAF = ['#339955', '#44aa66', '#22884d'];
+const LAMP_POST = '#667788';
+const LAMP_GLOW = '#ffee88';
+const FENCE_C = '#aa8855';
+
 /* ═══════════════════════════════════════════════════════════
  *  GENERATOR: 3D Spherical Bomb
  * ═══════════════════════════════════════════════════════════ */
@@ -73,41 +85,52 @@ function generateBomb3D(R = 7): { voxels: Voxel3D[]; fuseTip: [number, number, n
     }
   }
 
-  // Sphere shell
+  // Build a set of occupied cells for neighbor-culling optimisation
+  const occupied = new Set<string>();
+  const shellCells: { x: number; y: number; z: number; dist: number }[] = [];
   for (let x = -R; x <= R; x++) {
     for (let y = -R; y <= R; y++) {
       for (let z = -R; z <= R; z++) {
         const dist = Math.sqrt(x * x + y * y + z * z);
-        if (dist > R + 0.3 || dist < R - 1.8) continue; // shell only
+        if (dist > R + 0.3 || dist < R - 1.8) continue;
         if (y >= R - 1 && x * x + z * z <= 3) continue; // fuse hole
-
-        const isSurface = dist > R - 1.1;
-        let color: string;
-
-        if (isSurface) {
-          // X marking on front-facing surface
-          const fz = frontZ.get(`${x},${y}`);
-          const isFront = fz !== undefined && z >= fz - 1 && z > 0;
-          if (isFront && Math.abs(x) <= 4 && Math.abs(y) <= 4) {
-            const onD1 = Math.abs(x - y) <= 1;
-            const onD2 = Math.abs(x + y) <= 1;
-            if (onD1 || onD2) {
-              const exact = Math.abs(x - y) === 0 || Math.abs(x + y) === 0;
-              voxels.push({ x, y, z, color: exact ? X_RED : X_RED_D });
-              continue;
-            }
-          }
-          // Simulated directional lighting via surface normal
-          const n = dist || 1;
-          const dot = (x / n) * -0.35 + (y / n) * 0.55 + (z / n) * 0.45;
-          const idx = Math.min(7, Math.max(0, Math.floor((dot + 0.7) / 1.4 * 8)));
-          color = BOMB_BODY[idx];
-        } else {
-          color = BOMB_BODY[0];
-        }
-        voxels.push({ x, y, z, color });
+        occupied.add(`${x},${y},${z}`);
+        shellCells.push({ x, y, z, dist });
       }
     }
+  }
+
+  // Only emit voxels that have at least one exposed face
+  for (const { x, y, z, dist } of shellCells) {
+    const hasExposed =
+      !occupied.has(`${x + 1},${y},${z}`) || !occupied.has(`${x - 1},${y},${z}`) ||
+      !occupied.has(`${x},${y + 1},${z}`) || !occupied.has(`${x},${y - 1},${z}`) ||
+      !occupied.has(`${x},${y},${z + 1}`) || !occupied.has(`${x},${y},${z - 1}`);
+    if (!hasExposed) continue;
+
+    const isSurface = dist > R - 1.1;
+    let color: string;
+
+    if (isSurface) {
+      const fz = frontZ.get(`${x},${y}`);
+      const isFront = fz !== undefined && z >= fz - 1 && z > 0;
+      if (isFront && Math.abs(x) <= 4 && Math.abs(y) <= 4) {
+        const onD1 = Math.abs(x - y) <= 1;
+        const onD2 = Math.abs(x + y) <= 1;
+        if (onD1 || onD2) {
+          const exact = Math.abs(x - y) === 0 || Math.abs(x + y) === 0;
+          voxels.push({ x, y, z, color: exact ? X_RED : X_RED_D });
+          continue;
+        }
+      }
+      const n = dist || 1;
+      const dot = (x / n) * -0.35 + (y / n) * 0.55 + (z / n) * 0.45;
+      const idx = Math.min(7, Math.max(0, Math.floor((dot + 0.7) / 1.4 * 8)));
+      color = BOMB_BODY[idx];
+    } else {
+      color = BOMB_BODY[0];
+    }
+    voxels.push({ x, y, z, color });
   }
 
   // Metallic nozzle ring at top
@@ -225,20 +248,27 @@ function generateRock(bx: number, bz: number): Voxel3D[] {
  *  GENERATOR: Terrain with Heightmap + Water
  * ═══════════════════════════════════════════════════════════ */
 
-function generateTerrain(size: number): { solid: Voxel3D[]; water: Voxel3D[] } {
+function generateTerrain(size: number): { solid: Voxel3D[]; water: Voxel3D[]; heightAt: (wx: number, wz: number) => number } {
   const solid: Voxel3D[] = [];
   const water: Voxel3D[] = [];
   const WATER_LVL = 3;
   const half = Math.floor(size / 2);
+  const heightMap = new Map<string, number>();
+
+  // Helper to compute height at any grid position
+  const computeHeight = (x: number, z: number) => {
+    const nx = x / size * 4, nz = z / size * 4;
+    return Math.max(0, Math.floor(
+      3.5 + Math.sin(nx * 1.8) * 2 + Math.cos(nz * 2.2) * 1.5
+      + Math.sin((nx + nz) * 1.1) * 1 + Math.cos(nx * 0.5 - nz * 1.5) * 1.5
+    ));
+  };
 
   for (let x = 0; x < size; x++) {
     for (let z = 0; z < size; z++) {
-      const nx = x / size * 4, nz = z / size * 4;
-      const h = Math.max(0, Math.floor(
-        3.5 + Math.sin(nx * 1.8) * 2 + Math.cos(nz * 2.2) * 1.5
-        + Math.sin((nx + nz) * 1.1) * 1 + Math.cos(nx * 0.5 - nz * 1.5) * 1.5
-      ));
+      const h = computeHeight(x, z);
       const ix = x - half, iz = z - half;
+      heightMap.set(`${ix},${iz}`, h);
 
       for (let y = 0; y <= h; y++) {
         let c: string;
@@ -255,7 +285,14 @@ function generateTerrain(size: number): { solid: Voxel3D[]; water: Voxel3D[] } {
       }
     }
   }
-  return { solid, water };
+
+  // Return heightmap lookup (accepts world-space coords)
+  const heightAt = (wx: number, wz: number) => {
+    const key = `${Math.round(wx)},${Math.round(wz)}`;
+    return heightMap.get(key) ?? 0;
+  };
+
+  return { solid, water, heightAt };
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -636,7 +673,10 @@ function TerrainScene() {
 
   const { solidVoxels, waterVoxels, extras } = useMemo(() => {
     const terrain = generateTerrain(28);
-    const house = generateHouse(3, -4, 6);
+    // Sample terrain height at house position and place it on the ground
+    const houseX = 3, houseZ = -4;
+    const groundH = terrain.heightAt(houseX, houseZ);
+    const house = generateHouse(houseX, houseZ, groundH + 1);
     const trees = [
       ...generateTree(-8, -6, 4, 2),
       ...generateTree(-5, 6, 5, 3),
@@ -696,6 +736,213 @@ function CharacterScene() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+ *  GENERATORS: World Scene elements
+ * ═══════════════════════════════════════════════════════════ */
+
+/** Generate a larger terrain with mountains, valley, and river channel */
+function generateWorldTerrain(size: number): { solid: Voxel3D[]; water: Voxel3D[]; heightAt: (wx: number, wz: number) => number } {
+  const solid: Voxel3D[] = [];
+  const water: Voxel3D[] = [];
+  const WATER_LVL = 2;
+  const half = Math.floor(size / 2);
+  const heightMap = new Map<string, number>();
+
+  const computeHeight = (x: number, z: number) => {
+    const nx = x / size, nz = z / size;
+    // Base rolling hills
+    let h = 2 + Math.sin(nx * 8) * 1.5 + Math.cos(nz * 10) * 1.2 + Math.sin((nx + nz) * 6) * 0.8;
+    // Mountain ridge on left side
+    const mDist = Math.abs(nx - 0.15);
+    if (mDist < 0.2) h += (0.2 - mDist) * 35;
+    // River channel through center (carve down)
+    const riverCenter = 0.5 + Math.sin(nz * 4) * 0.08;
+    const rDist = Math.abs(nx - riverCenter);
+    if (rDist < 0.08) h = Math.min(h, WATER_LVL - 1 + rDist * 15);
+    return Math.max(0, Math.floor(h));
+  };
+
+  for (let x = 0; x < size; x++) {
+    for (let z = 0; z < size; z++) {
+      const h = computeHeight(x, z);
+      const ix = x - half, iz = z - half;
+      heightMap.set(`${ix},${iz}`, h);
+
+      for (let y = 0; y <= h; y++) {
+        let c: string;
+        if (h > 8 && y >= h - 1) c = SNOW[(x + z) % 3]; // Snow caps
+        else if (h > 6 && y >= h - 1) c = MOUNTAIN[(x + z) % 4]; // Mountain rock
+        else if (y === h && h > WATER_LVL) c = GRASS[(x + z) % 3];
+        else if (y === h && h >= WATER_LVL - 1) c = SAND[(x + z) % 3];
+        else if (y >= h - 2) c = DIRT[(x + y) % 3];
+        else c = STONE[(x + y + z) % 3];
+        solid.push({ x: ix, y, z: iz, color: c });
+      }
+      if (h < WATER_LVL) {
+        for (let y = h + 1; y <= WATER_LVL; y++) {
+          water.push({ x: ix, y, z: iz, color: RIVER_C });
+        }
+      }
+    }
+  }
+
+  const heightAt = (wx: number, wz: number) => {
+    const key = `${Math.round(wx)},${Math.round(wz)}`;
+    return heightMap.get(key) ?? 0;
+  };
+
+  return { solid, water, heightAt };
+}
+
+/** Pine tree — taller and more conical than the regular tree */
+function generatePineTree(bx: number, bz: number, h = 7): Voxel3D[] {
+  const voxels: Voxel3D[] = [];
+  // Trunk
+  for (let y = 0; y < h; y++) {
+    voxels.push({ x: bx, y, z: bz, color: PINE_TRUNK[y % 3] });
+  }
+  // Conical crown (3 layers, getting narrower)
+  for (let layer = 0; layer < 3; layer++) {
+    const r = 3 - layer;
+    const baseY = h - 2 + layer * 2;
+    for (let dy = 0; dy < 2; dy++) {
+      for (let dx = -r; dx <= r; dx++) {
+        for (let dz = -r; dz <= r; dz++) {
+          if (Math.abs(dx) + Math.abs(dz) > r + 1) continue;
+          voxels.push({ x: bx + dx, y: baseY + dy, z: bz + dz, color: PINE_LEAF[(dx + dz + layer) % 3 < 0 ? 0 : (dx + dz + layer) % 3] });
+        }
+      }
+    }
+  }
+  return voxels;
+}
+
+/** Wooden bridge across a gap */
+function generateBridge(x1: number, x2: number, z: number, y: number): Voxel3D[] {
+  const voxels: Voxel3D[] = [];
+  for (let x = x1; x <= x2; x++) {
+    // Deck
+    for (let dz = -1; dz <= 1; dz++) {
+      voxels.push({ x, y, z: z + dz, color: BRIDGE_WOOD[(x + dz) % 3 < 0 ? 0 : (x + dz) % 3] });
+    }
+    // Rails on sides
+    if (x % 2 === 0) {
+      voxels.push({ x, y: y + 1, z: z - 1, color: FENCE_C });
+      voxels.push({ x, y: y + 1, z: z + 1, color: FENCE_C });
+    }
+  }
+  return voxels;
+}
+
+/** Small lamp post */
+function generateLamp(bx: number, bz: number, by: number): Voxel3D[] {
+  return [
+    { x: bx, y: by, z: bz, color: LAMP_POST },
+    { x: bx, y: by + 1, z: bz, color: LAMP_POST },
+    { x: bx, y: by + 2, z: bz, color: LAMP_POST },
+    { x: bx, y: by + 3, z: bz, color: LAMP_GLOW },
+  ];
+}
+
+/** Simple fence line */
+function generateFence(x1: number, x2: number, z: number, by: number): Voxel3D[] {
+  const voxels: Voxel3D[] = [];
+  for (let x = x1; x <= x2; x++) {
+    voxels.push({ x, y: by, z, color: FENCE_C });
+    if (x % 2 === 0) voxels.push({ x, y: by + 1, z, color: FENCE_C });
+  }
+  return voxels;
+}
+
+/** Dirt/stone path */
+function generatePath(positions: [number, number][], by: number): Voxel3D[] {
+  return positions.map(([x, z], i) => ({
+    x, y: by, z, color: PATH_C[i % PATH_C.length],
+  }));
+}
+
+/* ═══════════════════════════════════════════════════════════
+ *  SCENE 4: World — large coherent landscape
+ * ═══════════════════════════════════════════════════════════ */
+
+function WorldScene() {
+  const CS = 0.35; // Smaller cubes for bigger world
+
+  const { solidVoxels, waterVoxels, structureVoxels } = useMemo(() => {
+    const terrain = generateWorldTerrain(40);
+
+    // Village houses — grounded to terrain
+    const houses = [
+      ...generateHouse(5, 5, terrain.heightAt(5, 5) + 1),
+      ...generateHouse(5, -6, terrain.heightAt(5, -6) + 1),
+      ...generateHouse(10, 0, terrain.heightAt(10, 0) + 1),
+    ];
+
+    // Forest of pines on the mountain side
+    const pines = [
+      ...generatePineTree(-12, -8, 6),
+      ...generatePineTree(-14, -4, 7),
+      ...generatePineTree(-10, -2, 5),
+      ...generatePineTree(-13, 3, 6),
+      ...generatePineTree(-11, 7, 7),
+      ...generatePineTree(-15, 0, 5),
+      ...generatePineTree(-9, 10, 6),
+    ];
+
+    // Regular trees near village
+    const trees = [
+      ...generateTree(8, 8, 4, 2),
+      ...generateTree(12, -5, 5, 2),
+      ...generateTree(3, -10, 4, 2),
+    ];
+
+    // Bridge over the river
+    const bridgeY = terrain.heightAt(-1, 2);
+    const bridge = generateBridge(-3, 3, 2, Math.max(bridgeY, 3));
+
+    // Decorations
+    const lamps = [
+      ...generateLamp(4, 3, terrain.heightAt(4, 3) + 1),
+      ...generateLamp(7, -3, terrain.heightAt(7, -3) + 1),
+      ...generateLamp(11, 3, terrain.heightAt(11, 3) + 1),
+    ];
+
+    const fences = generateFence(6, 12, 3, terrain.heightAt(8, 3) + 1);
+
+    // Path connecting houses
+    const pathPositions: [number, number][] = [];
+    for (let px = 4; px <= 12; px++) {
+      pathPositions.push([px, 1]);
+      pathPositions.push([px, 0]);
+    }
+    const pathH = terrain.heightAt(8, 0);
+    const path = generatePath(pathPositions, pathH + 1);
+
+    const flowers = generateFlowers([[6, 7], [8, -7], [3, 4], [11, 5], [7, -9], [13, 2]]);
+    const rocks = [...generateRock(9, 7), ...generateRock(14, -3)];
+
+    return {
+      solidVoxels: terrain.solid,
+      waterVoxels: terrain.water,
+      structureVoxels: [...houses, ...pines, ...trees, ...bridge, ...lamps, ...fences, ...path, ...flowers, ...rocks],
+    };
+  }, []);
+
+  return (
+    <AutoRotate speed={0.08}>
+      <group position={[0, -3, 0]}>
+        <Voxel3DModel voxels={solidVoxels} cubeSize={CS} roughness={0.7} />
+        <Voxel3DModel voxels={structureVoxels} cubeSize={CS} roughness={0.55} />
+        {waterVoxels.length > 0 && (
+          <Voxel3DModel voxels={waterVoxels} cubeSize={CS} roughness={0.15} metalness={0.05} transparent opacity={0.6} />
+        )}
+      </group>
+      <Sparkles count={20} range={16} color="#FFD700" />
+      <Sparkles count={10} range={12} color="#88CCFF" />
+    </AutoRotate>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
  *  Main Export — Canvas + Tab Switcher
  * ═══════════════════════════════════════════════════════════ */
 
@@ -703,6 +950,7 @@ const TABS: { id: SceneTab; label: string; icon: string }[] = [
   { id: 'island', label: 'Island', icon: '🏝️' },
   { id: 'terrain', label: 'Terrain', icon: '🌍' },
   { id: 'character', label: 'Character', icon: '🤖' },
+  { id: 'world', label: 'World', icon: '🏔️' },
 ];
 
 export default function VoxelPreview({ onTabChange }: { onTabChange?: (tab: SceneTab) => void }) {
@@ -756,6 +1004,7 @@ export default function VoxelPreview({ onTabChange }: { onTabChange?: (tab: Scen
         {tab === 'island' && <IslandScene />}
         {tab === 'terrain' && <TerrainScene />}
         {tab === 'character' && <CharacterScene />}
+        {tab === 'world' && <WorldScene />}
       </Canvas>
     </div>
   );
