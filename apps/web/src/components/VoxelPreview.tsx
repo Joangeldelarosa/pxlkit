@@ -1063,7 +1063,7 @@ export default function VoxelPreview({ onTabChange, initialTab = 'island', showT
               `}
             >
               <span className="mr-0.5 sm:mr-1">{t.icon}</span>
-              <span className="hidden xs:inline sm:inline">{t.label}</span>
+              <span className="hidden sm:inline">{t.label}</span>
             </button>
           ))}
         </div>
