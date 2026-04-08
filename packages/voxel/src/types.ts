@@ -62,8 +62,10 @@ export function pxlToVoxels(
   const { grid, palette, size } = icon;
 
   for (let row = 0; row < size; row++) {
+    const rowStr = grid[row];
+    if (!rowStr) continue; // skip missing rows (defensive)
     for (let col = 0; col < size; col++) {
-      const char = grid[row]?.[col];
+      const char = rowStr[col];
       if (!char || char === '.') continue;
       const color = palette[char];
       if (!color) continue;
