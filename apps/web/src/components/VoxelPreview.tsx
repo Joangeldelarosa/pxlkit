@@ -1036,8 +1036,8 @@ const TABS: { id: SceneTab; label: string; icon: string }[] = [
   { id: 'world', label: 'World', icon: '🏔️' },
 ];
 
-export default function VoxelPreview({ onTabChange }: { onTabChange?: (tab: SceneTab) => void }) {
-  const [tab, setTab] = useState<SceneTab>('island');
+export default function VoxelPreview({ onTabChange, initialTab = 'island', showTabs = true }: { onTabChange?: (tab: SceneTab) => void; initialTab?: SceneTab; showTabs?: boolean }) {
+  const [tab, setTab] = useState<SceneTab>(initialTab);
 
   const handleTab = (t: SceneTab) => {
     setTab(t);
@@ -1047,25 +1047,27 @@ export default function VoxelPreview({ onTabChange }: { onTabChange?: (tab: Scen
   return (
     <div className="w-full h-full relative">
       {/* Tab buttons */}
-      <div className="absolute top-3 left-0 right-0 z-10 flex justify-center gap-2 pointer-events-auto">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => handleTab(t.id)}
-            className={`
-              font-pixel text-[9px] sm:text-[10px] px-2.5 py-1 rounded border transition-all duration-200 cursor-pointer
-              backdrop-blur-sm select-none
-              ${tab === t.id
-                ? 'bg-retro-green/20 border-retro-green/60 text-retro-green shadow-[0_0_8px_rgba(74,222,128,0.15)]'
-                : 'bg-retro-bg/60 border-retro-border/40 text-retro-muted/60 hover:text-retro-muted hover:border-retro-border/60'
-              }
-            `}
-          >
-            <span className="mr-1">{t.icon}</span>
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {showTabs && (
+        <div className="absolute top-3 left-0 right-0 z-10 flex justify-center gap-2 pointer-events-auto">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => handleTab(t.id)}
+              className={`
+                font-pixel text-[9px] sm:text-[10px] px-2.5 py-1 rounded border transition-all duration-200 cursor-pointer
+                backdrop-blur-sm select-none
+                ${tab === t.id
+                  ? 'bg-retro-green/20 border-retro-green/60 text-retro-green shadow-[0_0_8px_rgba(74,222,128,0.15)]'
+                  : 'bg-retro-bg/60 border-retro-border/40 text-retro-muted/60 hover:text-retro-muted hover:border-retro-border/60'
+                }
+              `}
+            >
+              <span className="mr-1">{t.icon}</span>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <Canvas
         camera={{ position: [0, 10, 24], fov: 42, near: 0.1, far: 100 }}
