@@ -10,14 +10,14 @@ import { Check, Package, SparkleSmall, Robot } from '@pxlkit/ui';
 import { Sun, Moon, Snowflake } from '@pxlkit/weather';
 import type { PxlKitData } from '@pxlkit/core';
 
-/* ═══════════════════════════════════════════════════════════
- *  World Configuration — user-adjustable
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  World Configuration — user-adjustable from the settings panel
+ * ═══════════════════════════════════════════════════════════════ */
 
 interface WorldConfig {
   renderDistance: number;
   flySpeed: number;
-  treeDensity: number;      // 0-1
+  treeDensity: number;       // 0-1
   structureDensity: number;  // 0-1
   cityFrequency: number;     // 0-1
   pickupDensity: number;     // 0-1
@@ -34,9 +34,9 @@ const DEFAULT_CONFIG: WorldConfig = {
   fogDensity: 0.5,
 };
 
-/* ═══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
  *  Seeded PRNG — mulberry32
- * ═══════════════════════════════════════════════════════════ */
+ * ═══════════════════════════════════════════════════════════════ */
 
 function mulberry32(seed: number) {
   return () => {
@@ -47,9 +47,9 @@ function mulberry32(seed: number) {
   };
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Seeded 2D Perlin Noise (optimized — inlined fade/lerp/dot)
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Optimised 2-D Perlin Noise (seeded)
+ * ═══════════════════════════════════════════════════════════════ */
 
 function createNoise2D(seed: number) {
   const rand = mulberry32(seed);
@@ -65,8 +65,7 @@ function createNoise2D(seed: number) {
   const GY = new Float32Array([1, 1, -1, -1, 0, 0, 1, -1]);
 
   return function noise2D(x: number, y: number): number {
-    const xi = Math.floor(x);
-    const yi = Math.floor(y);
+    const xi = Math.floor(x), yi = Math.floor(y);
     const X = xi & 255, Y = yi & 255;
     const xf = x - xi, yf = y - yi;
     const u = xf * xf * xf * (xf * (xf * 6 - 15) + 10);
@@ -79,7 +78,11 @@ function createNoise2D(seed: number) {
   };
 }
 
-function fbm(noise: (x: number, y: number) => number, x: number, y: number, octaves: number, lac = 2.0, gain = 0.5): number {
+function fbm(
+  noise: (x: number, y: number) => number,
+  x: number, y: number,
+  octaves: number, lac = 2.0, gain = 0.5,
+): number {
   let val = 0, amp = 1, freq = 1, max = 0;
   for (let i = 0; i < octaves; i++) {
     val += noise(x * freq, y * freq) * amp;
@@ -88,9 +91,9 @@ function fbm(noise: (x: number, y: number) => number, x: number, y: number, octa
   return val / max;
 }
 
-/* ═══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
  *  Biome System
- * ═══════════════════════════════════════════════════════════ */
+ * ═══════════════════════════════════════════════════════════════ */
 
 type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city';
 
@@ -105,74 +108,205 @@ interface BiomeConfig {
 const BIOMES: Record<BiomeType, BiomeConfig> = {
   plains: {
     name: 'Plains', heightScale: 5, heightBase: 7, waterLevel: 5,
-    colors: { top: ['#66ee88', '#77ff99', '#55dd77', '#88ffaa', '#5cd97a'], mid: ['#cc8844', '#dd9955', '#bb7733'], bottom: ['#99aabb', '#aabbcc', '#889999'], accent: ['#ff9999', '#ffdd66', '#ccaaff'], water: '#88ddff' },
+    colors: {
+      top: ['#66ee88', '#77ff99', '#55dd77', '#88ffaa', '#5cd97a'],
+      mid: ['#cc8844', '#dd9955', '#bb7733'], bottom: ['#99aabb', '#aabbcc', '#889999'],
+      accent: ['#ff9999', '#ffdd66', '#ccaaff'], water: '#88ddff',
+    },
   },
   desert: {
     name: 'Desert', heightScale: 4, heightBase: 6, waterLevel: 2,
-    colors: { top: ['#ffeecc', '#fff5dd', '#ffe8bb', '#ffdda0'], mid: ['#ddbb88', '#ccaa77', '#bb9966'], bottom: ['#aa8866', '#997755', '#886644'], accent: ['#88cc55', '#559944'], water: '#66bbdd' },
+    colors: {
+      top: ['#ffeecc', '#fff5dd', '#ffe8bb', '#ffdda0'],
+      mid: ['#ddbb88', '#ccaa77', '#bb9966'], bottom: ['#aa8866', '#997755', '#886644'],
+      accent: ['#88cc55', '#559944'], water: '#66bbdd',
+    },
   },
   tundra: {
     name: 'Tundra', heightScale: 6, heightBase: 7, waterLevel: 4,
-    colors: { top: ['#eef4ff', '#f4f8ff', '#ffffff', '#e8eeff'], mid: ['#99aabb', '#aabbcc', '#8899aa'], bottom: ['#778899', '#667788', '#556677'], accent: ['#aaddff', '#88bbdd'], water: '#77ccee' },
+    colors: {
+      top: ['#eef4ff', '#f4f8ff', '#ffffff', '#e8eeff'],
+      mid: ['#99aabb', '#aabbcc', '#8899aa'], bottom: ['#778899', '#667788', '#556677'],
+      accent: ['#aaddff', '#88bbdd'], water: '#77ccee',
+    },
   },
   forest: {
     name: 'Forest', heightScale: 7, heightBase: 8, waterLevel: 5,
-    colors: { top: ['#339955', '#44aa66', '#22884d', '#55bb77'], mid: ['#886644', '#775533', '#664422'], bottom: ['#556655', '#667766', '#445544'], accent: ['#ee5544', '#ff6655'], water: '#55aacc' },
+    colors: {
+      top: ['#339955', '#44aa66', '#22884d', '#55bb77'],
+      mid: ['#886644', '#775533', '#664422'], bottom: ['#556655', '#667766', '#445544'],
+      accent: ['#ee5544', '#ff6655'], water: '#55aacc',
+    },
   },
   mountains: {
     name: 'Mountains', heightScale: 18, heightBase: 5, waterLevel: 3,
-    colors: { top: ['#bbccdd', '#ccddee', '#aabbcc', '#99aabb'], mid: ['#8899aa', '#99aabb', '#7788aa'], bottom: ['#667788', '#556677', '#778899'], accent: ['#eef4ff', '#ffffff', '#e0e8f0'], water: '#6699bb' },
+    colors: {
+      top: ['#bbccdd', '#ccddee', '#aabbcc', '#99aabb'],
+      mid: ['#8899aa', '#99aabb', '#7788aa'], bottom: ['#667788', '#556677', '#778899'],
+      accent: ['#eef4ff', '#ffffff', '#e0e8f0'], water: '#6699bb',
+    },
   },
   ocean: {
     name: 'Ocean', heightScale: 3, heightBase: 2, waterLevel: 8,
-    colors: { top: ['#ffeecc', '#fff5dd', '#ffe8bb'], mid: ['#ddcc99', '#ccbb88', '#bbaa77'], bottom: ['#99aabb', '#aabbcc', '#889999'], accent: ['#ff9999', '#ffcc66'], water: '#4499cc' },
+    colors: {
+      top: ['#ffeecc', '#fff5dd', '#ffe8bb'],
+      mid: ['#ddcc99', '#ccbb88', '#bbaa77'], bottom: ['#99aabb', '#aabbcc', '#889999'],
+      accent: ['#ff9999', '#ffcc66'], water: '#4499cc',
+    },
   },
   city: {
-    name: 'City', heightScale: 2, heightBase: 7, waterLevel: 5,
-    colors: { top: ['#888888', '#999999', '#777777', '#aaaaaa'], mid: ['#666666', '#777777', '#555555'], bottom: ['#444444', '#555555', '#333333'], accent: ['#ffdd44', '#ff9944', '#44ddff'], water: '#88ddff' },
+    name: 'City', heightScale: 1, heightBase: 7, waterLevel: 5,
+    colors: {
+      top: ['#888888', '#999999', '#777777', '#aaaaaa'],
+      mid: ['#666666', '#777777', '#555555'], bottom: ['#444444', '#555555', '#333333'],
+      accent: ['#ffdd44', '#ff9944', '#44ddff'], water: '#88ddff',
+    },
   },
 };
 
-/* ═══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
  *  Constants
- * ═══════════════════════════════════════════════════════════ */
+ * ═══════════════════════════════════════════════════════════════ */
 
 const CHUNK_SIZE = 16;
 const VOXEL_SIZE = 0.5;
 const MAX_HEIGHT = 32;
 const MAX_CHUNKS_PER_FRAME = 2;
+const PLAYER_HEIGHT = 1.5; // collision offset in voxel units
 
 function chunkKey(cx: number, cz: number): string { return `${cx},${cz}`; }
 function worldToChunk(wx: number, wz: number): [number, number] {
   return [Math.floor(wx / (CHUNK_SIZE * VOXEL_SIZE)), Math.floor(wz / (CHUNK_SIZE * VOXEL_SIZE))];
 }
 
-/* ═══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
  *  Biome Determination
- * ═══════════════════════════════════════════════════════════ */
+ * ═══════════════════════════════════════════════════════════════ */
 
 function getBiome(
-  biomeNoise: (x: number, y: number) => number,
-  tempNoise: (x: number, y: number) => number,
+  biomeN: (x: number, y: number) => number,
+  tempN: (x: number, y: number) => number,
   wx: number, wz: number,
   cityFreq: number,
 ): BiomeType {
-  const temp = fbm(tempNoise, wx * 0.005, wz * 0.005, 2);
-  const moisture = fbm(biomeNoise, wx * 0.004 + 100, wz * 0.004 + 100, 2);
-  // City zones — clusters driven by low-frequency noise
-  const cityVal = biomeNoise(wx * 0.003 + 500, wz * 0.003 + 500);
+  const temp = fbm(tempN, wx * 0.005, wz * 0.005, 2);
+  const moisture = fbm(biomeN, wx * 0.004 + 100, wz * 0.004 + 100, 2);
+  // City zones — low-frequency clusters
+  const cityVal = biomeN(wx * 0.003 + 500, wz * 0.003 + 500);
   if (cityVal > 0.55 - cityFreq * 0.3 && temp > -0.15 && moisture < 0.25) return 'city';
   if (temp < -0.25) return 'tundra';
   if (temp > 0.3 && moisture < -0.1) return 'desert';
   if (moisture > 0.3) return 'ocean';
   if (temp > 0.0 && moisture > 0.05) return 'forest';
-  if (biomeNoise(wx * 0.008, wz * 0.008) > 0.2) return 'mountains';
+  if (biomeN(wx * 0.008, wz * 0.008) > 0.2) return 'mountains';
   return 'plains';
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Icon Pickup Data — convert PxlKit icons to flat voxel billboards
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  City Layout — GLOBAL grid so roads always connect
+ *
+ *  BLOCK_SIZE = 10   (total city block repeat)
+ *  ROAD_W     = 2    (road width)
+ *  LOT_INSET  = 1    (sidewalk / setback)
+ *
+ *  For any world coordinate (wx, wz):
+ *    modX = ((wx % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE
+ *    if modX < ROAD_W → on a Z-running road
+ *    similarly for Z
+ *    Remaining 8×8 area is the lot.
+ *    Sidewalk = first & last column/row of lot.
+ *    Building footprint = inner 6×6.
+ * ═══════════════════════════════════════════════════════════════ */
+
+const BLOCK_SIZE = 10;
+const ROAD_W = 2;
+const LOT_INSET = 1; // sidewalk width
+
+interface CityCell {
+  isRoad: boolean;
+  isIntersection: boolean;
+  isSidewalk: boolean;
+  isBuilding: boolean;
+  lotLocalX: number; // 0-based within building footprint, -1 if not building
+  lotLocalZ: number;
+  lotWorldX: number; // world-space lot ID for deterministic seeding
+  lotWorldZ: number;
+}
+
+function classifyCityCell(wx: number, wz: number): CityCell {
+  const modX = ((wx % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
+  const modZ = ((wz % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
+  const onRoadX = modX < ROAD_W;
+  const onRoadZ = modZ < ROAD_W;
+  const isRoad = onRoadX || onRoadZ;
+  const isIntersection = onRoadX && onRoadZ;
+
+  // Lot-local coordinates (within the 8×8 lot)
+  const lotRawX = modX - ROAD_W;
+  const lotRawZ = modZ - ROAD_W;
+  const lotSize = BLOCK_SIZE - ROAD_W; // 8
+
+  // Lot world ID
+  const lotWorldX = Math.floor(wx / BLOCK_SIZE);
+  const lotWorldZ = Math.floor(wz / BLOCK_SIZE);
+
+  if (isRoad) {
+    return { isRoad: true, isIntersection, isSidewalk: false, isBuilding: false,
+             lotLocalX: -1, lotLocalZ: -1, lotWorldX, lotWorldZ };
+  }
+
+  const isSidewalk = lotRawX < LOT_INSET || lotRawX >= lotSize - LOT_INSET
+                   || lotRawZ < LOT_INSET || lotRawZ >= lotSize - LOT_INSET;
+
+  return {
+    isRoad: false, isIntersection: false, isSidewalk,
+    isBuilding: !isSidewalk,
+    lotLocalX: lotRawX - LOT_INSET,
+    lotLocalZ: lotRawZ - LOT_INSET,
+    lotWorldX, lotWorldZ,
+  };
+}
+
+/* Building type determined per lot from noise */
+type BuildingType = 'skyscraper' | 'office' | 'house' | 'park' | 'parking';
+
+function getBuildingType(
+  structN: (x: number, y: number) => number,
+  lotWX: number, lotWZ: number, density: number,
+): BuildingType {
+  const v = structN(lotWX * 0.7 + 42, lotWZ * 0.7 + 42);
+  if (v > 0.35 + (1 - density) * 0.15) return 'skyscraper';
+  if (v > 0.1) return 'office';
+  if (v > -0.1) return 'house';
+  if (v > -0.3) return 'park';
+  return 'parking';
+}
+
+function getBuildingHeight(
+  structN: (x: number, y: number) => number,
+  lotWX: number, lotWZ: number, type: BuildingType,
+): number {
+  const v = Math.abs(structN(lotWX * 3.7 + 100, lotWZ * 3.7 + 100));
+  switch (type) {
+    case 'skyscraper': return 10 + Math.floor(v * 14); // 10-24
+    case 'office': return 5 + Math.floor(v * 6);       // 5-11
+    case 'house': return 3 + Math.floor(v * 2);        // 3-5
+    default: return 0;
+  }
+}
+
+const BUILDING_WALL_PALETTES: Record<string, string[]> = {
+  skyscraper: ['#8899aa', '#99aabb', '#7788aa', '#aabbcc', '#6688aa'],
+  office: ['#bbaa88', '#ccbb99', '#aa9977', '#c4a882'],
+  house: ['#ddccaa', '#ccbb99', '#eeddbb', '#d4c098'],
+};
+const BUILDING_ROOF_COLORS: Record<string, string> = {
+  skyscraper: '#556677', office: '#886644', house: '#cc6633',
+};
+
+/* ═══════════════════════════════════════════════════════════════
+ *  Icon Pickup Data — PxlKit icons → flat voxel sprites
+ * ═══════════════════════════════════════════════════════════════ */
 
 interface PickupVoxel { x: number; y: number; color: string }
 
@@ -180,13 +314,10 @@ function iconToPickupVoxels(icon: PxlKitData): PickupVoxel[] {
   const voxels: PickupVoxel[] = [];
   const { grid, palette, size } = icon;
   for (let row = 0; row < size; row++) {
-    const rowStr = grid[row];
-    if (!rowStr) continue;
+    const r = grid[row]; if (!r) continue;
     for (let col = 0; col < size; col++) {
-      const ch = rowStr[col];
-      if (!ch || ch === '.') continue;
-      const color = palette[ch];
-      if (!color) continue;
+      const ch = r[col]; if (!ch || ch === '.') continue;
+      const color = palette[ch]; if (!color) continue;
       voxels.push({ x: col, y: size - 1 - row, color });
     }
   }
@@ -198,9 +329,9 @@ const PICKUP_ICONS: { icon: PxlKitData; voxels: PickupVoxel[] }[] = [
   Heart, Check, Package, SparkleSmall, Robot, Sun, Moon, Snowflake,
 ].map(icon => ({ icon, voxels: iconToPickupVoxels(icon) }));
 
-/* ═══════════════════════════════════════════════════════════
- *  Chunk Data Generation — terrain + structures + pickups
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Chunk Data
+ * ═══════════════════════════════════════════════════════════════ */
 
 interface ChunkVoxelData {
   positions: Float32Array;
@@ -210,11 +341,22 @@ interface ChunkVoxelData {
   waterColors: Float32Array;
   waterCount: number;
   pickups: { wx: number; wy: number; wz: number; iconIdx: number }[];
-  // Heightmap for collision: max solid height at each (lx,lz) including structures
-  solidHeightMap: Int32Array; // CHUNK_SIZE * CHUNK_SIZE, indexed [lx * CHUNK_SIZE + lz]
+  /** Max solid height at each column for collision [lx * CHUNK_SIZE + lz] */
+  solidHeightMap: Int32Array;
   chunkX: number;
   chunkZ: number;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+ *  Chunk Generation — terrain, water, structures, cities, pickups
+ *
+ *  Design principles:
+ *  ‣ Terrain is SOLID — every exposed face is rendered, no gaps.
+ *  ‣ Water fills from terrain+1 to waterLevel, exposed faces only.
+ *  ‣ City terrain is forced flat so roads connect seamlessly.
+ *  ‣ Buildings respect road grid — never clip into roads.
+ *  ‣ Collision heightmap tracks tallest solid voxel per column.
+ * ═══════════════════════════════════════════════════════════════ */
 
 const _tc = new THREE.Color();
 
@@ -228,7 +370,7 @@ function generateChunkData(
   structN: (x: number, y: number) => number,
   cfg: WorldConfig,
 ): ChunkVoxelData {
-  const maxV = CHUNK_SIZE * CHUNK_SIZE * 14;
+  const maxV = CHUNK_SIZE * CHUNK_SIZE * 16;
   const posA = new Float32Array(maxV * 3);
   const colA = new Float32Array(maxV * 3);
   let sc = 0;
@@ -237,10 +379,11 @@ function generateChunkData(
   const wColA = new Float32Array(maxW * 3);
   let wc = 0;
   const pickups: ChunkVoxelData['pickups'] = [];
-  // Track max solid height at each column for collision
   const solidHeightMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
+
+  /* ── Pre-compute height map + biome for chunk + 1-cell border ── */
   const gW = CHUNK_SIZE + 2;
   const hMap = new Int32Array(gW * gW);
   const bMap = new Uint8Array(gW * gW);
@@ -252,21 +395,26 @@ function generateChunkData(
       const idx = (lx + 1) * gW + (lz + 1);
       const biome = getBiome(biomeN, tempN, wx, wz, cfg.cityFrequency);
       const c = BIOMES[biome];
-      let h = fbm(heightN, wx * 0.02, wz * 0.02, 4, 2.0, 0.5);
-      const det = detailN(wx * 0.08, wz * 0.08) * 0.25;
-      let extra = 0;
-      if (biome === 'mountains') {
-        extra = Math.abs(fbm(detailN, wx * 0.015 + 200, wz * 0.015 + 200, 2)) * 6;
-      }
+
+      let h: number;
       if (biome === 'city') {
-        h = 0; // flat terrain for cities
+        // City terrain is FLAT so roads are always level
+        h = c.heightBase;
+      } else {
+        const base = fbm(heightN, wx * 0.02, wz * 0.02, 4, 2.0, 0.5);
+        const det = detailN(wx * 0.08, wz * 0.08) * 0.25;
+        let extra = 0;
+        if (biome === 'mountains') {
+          extra = Math.abs(fbm(detailN, wx * 0.015 + 200, wz * 0.015 + 200, 2)) * 6;
+        }
+        h = Math.max(0, Math.min(MAX_HEIGHT, Math.floor(c.heightBase + (base + det) * c.heightScale + extra)));
       }
-      const height = Math.max(0, Math.min(MAX_HEIGHT, Math.floor(c.heightBase + (h + det) * c.heightScale + extra)));
-      hMap[idx] = height;
+      hMap[idx] = h;
       bMap[idx] = bTypes.indexOf(biome);
     }
   }
 
+  /* ── Helper: push solid voxel ── */
   function push(px: number, py: number, pz: number, hex: string) {
     if (sc >= maxV) return;
     const i3 = sc * 3;
@@ -274,13 +422,7 @@ function generateChunkData(
     _tc.set(hex); colA[i3] = _tc.r; colA[i3 + 1] = _tc.g; colA[i3 + 2] = _tc.b;
     sc++;
   }
-  // Track the tallest solid voxel placed at each column (for collision)
-  function trackHeight(lx: number, lz: number, yTop: number) {
-    if (lx >= 0 && lx < CHUNK_SIZE && lz >= 0 && lz < CHUNK_SIZE) {
-      const idx2 = lx * CHUNK_SIZE + lz;
-      if (yTop > solidHeightMap[idx2]) solidHeightMap[idx2] = yTop;
-    }
-  }
+  /* ── Helper: push water voxel ── */
   function pushW(px: number, py: number, pz: number, hex: string) {
     if (wc >= maxW) return;
     const i3 = wc * 3;
@@ -288,41 +430,45 @@ function generateChunkData(
     _tc.set(hex); wColA[i3] = _tc.r; wColA[i3 + 1] = _tc.g; wColA[i3 + 2] = _tc.b;
     wc++;
   }
+  /* ── Helper: track collision height ── */
+  function trackH(lx: number, lz: number, yTop: number) {
+    if (lx >= 0 && lx < CHUNK_SIZE && lz >= 0 && lz < CHUNK_SIZE) {
+      const i = lx * CHUNK_SIZE + lz;
+      if (yTop > solidHeightMap[i]) solidHeightMap[i] = yTop;
+    }
+  }
 
-  // Seeded random for this chunk
+  // Seeded RNG for this chunk (pickup placement)
   const chunkRand = mulberry32(cx * 73856093 + cz * 19349663);
 
+  /* ════════════════════════ MAIN LOOP ════════════════════════ */
   for (let lx = 0; lx < CHUNK_SIZE; lx++) {
     for (let lz = 0; lz < CHUNK_SIZE; lz++) {
       const idx = (lx + 1) * gW + (lz + 1);
       const h = hMap[idx];
-      const biome = bTypes[bMap[idx]];
+      const biome = bTypes[bMap[idx]] as BiomeType;
       const c = BIOMES[biome];
       const wx = bX + lx, wz = bZ + lz;
+
+      // Neighbor heights
       const hN = hMap[(lx + 1) * gW + lz];
       const hS = hMap[(lx + 1) * gW + (lz + 2)];
       const hE = hMap[(lx + 2) * gW + (lz + 1)];
-      const hW = hMap[lx * gW + (lz + 1)];
-
-      // ── Terrain voxels ──
-      // Render surface + any voxel exposed to air, water, or chunk edge.
-      // This ensures no hollow gaps are visible.
+      const hW2 = hMap[lx * gW + (lz + 1)];
       const wl = c.waterLevel;
-      const effectiveTop = Math.max(h, wl); // columns under water need walls visible through water
+
+      /* ── 1. TERRAIN — render every voxel with an exposed face ── */
       for (let y = 0; y <= h; y++) {
         const isTop = y === h;
-        // A voxel is exposed if it's the top, bottom, or any neighbor is shorter
-        // For underwater columns, also expose sides that face water
-        const exposedN = y > hN || (y > h && y <= wl);
-        const exposedS = y > hS || (y > h && y <= wl);
-        const exposedE = y > hE || (y > h && y <= wl);
-        const exposedW2 = y > hW || (y > h && y <= wl);
-        const hasExposed = isTop || y === 0 || exposedN || exposedS || exposedE || exposedW2;
-        if (!hasExposed) continue;
+        const exposed = isTop || y === 0
+          || y > hN || y > hS || y > hE || y > hW2;
+        if (!exposed) continue;
+
         let col: string;
-        if (isTop) {
-          col = (biome === 'mountains' && y > 16) ? c.colors.accent[Math.abs(wx + wz) % c.colors.accent.length]
-            : c.colors.top[Math.abs(wx + wz) % c.colors.top.length];
+        if (isTop && biome === 'mountains' && y > 16) {
+          col = c.colors.accent[Math.abs(wx + wz) % c.colors.accent.length];
+        } else if (isTop) {
+          col = c.colors.top[Math.abs(wx + wz) % c.colors.top.length];
         } else if (y >= h - 3) {
           col = c.colors.mid[Math.abs(wx + y) % c.colors.mid.length];
         } else {
@@ -330,202 +476,244 @@ function generateChunkData(
         }
         push((bX + lx) * VOXEL_SIZE, y * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, col);
       }
-      trackHeight(lx, lz, h);
+      trackH(lx, lz, h);
 
-      // ── Water — fill ALL voxels from terrain surface+1 to waterLevel ──
-      // This creates solid water with no gaps. Edges cascade naturally because
-      // neighboring columns with lower terrain will also have water voxels.
+      /* ── 2. WATER — solid fill from terrain+1 to waterLevel ── */
       if (h < wl) {
         for (let wy = h + 1; wy <= wl; wy++) {
-          // Only render water voxels that have an exposed face
           const isWTop = wy === wl;
-          const wExpN = wy > hN && hN < wl;  // neighbor is lower → side exposed
-          const wExpS = wy > hS && hS < wl;
-          const wExpE = wy > hE && hE < wl;
-          const wExpW = wy > hW && hW < wl;
+          // An underwater voxel is exposed if a horizontal neighbor's terrain
+          // is lower than this water voxel's Y, creating a visible face.
+          const wExpN = wy > Math.max(hN, hN >= wl ? 999 : 0);
+          const wExpS = wy > Math.max(hS, hS >= wl ? 999 : 0);
+          const wExpE = wy > Math.max(hE, hE >= wl ? 999 : 0);
+          const wExpW = wy > Math.max(hW2, hW2 >= wl ? 999 : 0);
           const wExposed = isWTop || wy === h + 1 || wExpN || wExpS || wExpE || wExpW;
           if (!wExposed) continue;
           pushW((bX + lx) * VOXEL_SIZE, wy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, c.colors.water);
         }
-        // Water counts as collision surface too
-        trackHeight(lx, lz, wl);
+        trackH(lx, lz, wl);
       }
 
-      // ── CITY BIOME — roads, buildings, lampposts ──
+      /* ══════════════════ 3. CITY BIOME ══════════════════ */
       if (biome === 'city') {
-        // Road grid: every 8 blocks in X or Z is a road (2 blocks wide)
-        const roadX = (((wx % 8) + 8) % 8) < 2;
-        const roadZ = (((wz % 8) + 8) % 8) < 2;
-        const isRoad = roadX || roadZ;
-        const isIntersection = roadX && roadZ;
+        const cell = classifyCityCell(wx, wz);
 
-        if (isRoad) {
-          // Road surface — dark asphalt
+        if (cell.isRoad) {
+          /* ── Road surface ── */
+          const modX = ((wx % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
+          const modZ = ((wz % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
           push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-            isIntersection ? '#555555' : '#444444');
-          trackHeight(lx, lz, h + 1);
-          // Road markings — center line (dashed yellow) for Z-roads
-          if (roadZ && !roadX && (((wz % 8) + 8) % 8) === 0 && (((wx % 4) + 4) % 4) < 2) {
-            push((bX + lx) * VOXEL_SIZE, (h + 1.1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
+            cell.isIntersection ? '#555555' : '#3a3a3a');
+          trackH(lx, lz, h + 1);
+
+          /* Road markings */
+          const onRoadX = modX < ROAD_W;
+          const onRoadZ = modZ < ROAD_W;
+          // Center dashed yellow line on Z-running roads
+          if (onRoadZ && !onRoadX && modZ === 0 && (((wx % 4) + 4) % 4) < 2) {
+            push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
           }
-          // Lampposts at intersections
-          if (isIntersection && (((wx % 8) + 8) % 8) === 0 && (((wz % 8) + 8) % 8) === 0) {
-            for (let ly = 2; ly <= 6; ly++) {
+          // Center dashed yellow line on X-running roads
+          if (onRoadX && !onRoadZ && modX === 0 && (((wz % 4) + 4) % 4) < 2) {
+            push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
+          }
+          // White edge lines
+          if ((onRoadX && !onRoadZ && (modX === 0 || modX === ROAD_W - 1)) ||
+              (onRoadZ && !onRoadX && (modZ === 0 || modZ === ROAD_W - 1))) {
+            push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#bbbbbb');
+          }
+          // Crosswalk at intersections
+          if (cell.isIntersection && ((modX + modZ) % 2 === 0)) {
+            push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#dddddd');
+          }
+
+          /* ── Lampposts — only at specific intersection corners ── */
+          if (modX === 0 && modZ === 0) {
+            for (let ly = 2; ly <= 5; ly++) {
               push((bX + lx) * VOXEL_SIZE, (h + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#666666');
             }
-            push((bX + lx) * VOXEL_SIZE, (h + 7) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffee88');
-            push((bX + lx + 1) * VOXEL_SIZE, (h + 6) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#666666');
-            push((bX + lx + 1) * VOXEL_SIZE, (h + 7) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffee88');
-            trackHeight(lx, lz, h + 7);
+            push((bX + lx) * VOXEL_SIZE, (h + 6) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffee88');
+            push((bX + lx + 1) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#555555');
+            push((bX + lx + 1) * VOXEL_SIZE, (h + 6) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffee88');
+            trackH(lx, lz, h + 6);
           }
-        } else {
-          // Building lot — use noise to determine building type
-          const lotX = Math.floor(((wx % 8) + 8) % 8) - 2; // 0-5 within lot
-          const lotZ = Math.floor(((wz % 8) + 8) % 8) - 2;
-          const blockCx = Math.floor(wx / 8), blockCz = Math.floor(wz / 8);
-          const buildVal = structN(blockCx * 0.5, blockCz * 0.5);
-          const buildType = Math.abs(buildVal) < 0.15 ? 0 // park/empty
-            : buildVal > 0.3 ? 2 // tall building
-            : buildVal > 0 ? 1 // medium building
-            : 3; // small house
 
-          if (lotX >= 0 && lotX < 5 && lotZ >= 0 && lotZ < 5) {
-            if (buildType === 0) {
-              // Park — maybe a tree
-              if (lotX === 2 && lotZ === 2 && cfg.treeDensity > 0.2) {
-                for (let ty = 1; ty <= 3; ty++) push((bX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#664422');
-                for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
-                  push((bX + lx + dx) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, '#44aa66');
-                  if (dx === 0 || dz === 0) push((bX + lx + dx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, '#44aa66');
-                }
+        } else if (cell.isSidewalk) {
+          /* ── Sidewalk — slightly raised, lighter colour ── */
+          push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#aaaaaa');
+          trackH(lx, lz, h + 1);
+
+        } else if (cell.isBuilding) {
+          /* ── Building ── */
+          const bType = getBuildingType(structN, cell.lotWorldX, cell.lotWorldZ, cfg.structureDensity);
+          const bh = getBuildingHeight(structN, cell.lotWorldX, cell.lotWorldZ, bType);
+
+          if (bType === 'park') {
+            /* Park — grass with occasional tree */
+            push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#66cc77');
+            trackH(lx, lz, h + 1);
+            if (cell.lotLocalX === 3 && cell.lotLocalZ === 3 && cfg.treeDensity > 0.2) {
+              for (let ty = 2; ty <= 4; ty++) push((bX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#664422');
+              for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+                push((bX + lx + dx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, '#44aa66');
+                if (dx === 0 || dz === 0) push((bX + lx + dx) * VOXEL_SIZE, (h + 6) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, '#44aa66');
               }
+              trackH(lx, lz, h + 6);
+            }
+          } else if (bType === 'parking') {
+            /* Parking lot */
+            const stripe = cell.lotLocalZ % 3 === 0 && cell.lotLocalX > 0 && cell.lotLocalX < 5;
+            push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, stripe ? '#eeeeee' : '#666666');
+            trackH(lx, lz, h + 1);
+          } else {
+            /* Actual building (skyscraper / office / house) */
+            const footprint = BLOCK_SIZE - ROAD_W - LOT_INSET * 2; // 6
+            const blX = cell.lotLocalX, blZ = cell.lotLocalZ;
+            const isEdgeX = blX === 0 || blX === footprint - 1;
+            const isEdgeZ = blZ === 0 || blZ === footprint - 1;
+            const isEdge = isEdgeX || isEdgeZ;
+            const wallPalette = BUILDING_WALL_PALETTES[bType] || BUILDING_WALL_PALETTES.house;
+            const roofCol = BUILDING_ROOF_COLORS[bType] || '#cc6633';
+            const windowCol = '#aaddff';
+            const doorCol = '#886644';
+
+            for (let by = 1; by <= bh; by++) {
+              if (!isEdge && by < bh) continue; // interior: skip (hollow)
+              let color: string;
+              if (by === bh) {
+                color = roofCol;
+              } else if (by === 1 && blZ === 0 && blX >= 2 && blX <= 3) {
+                // Door on ground floor facing south road
+                color = doorCol;
+              } else if (isEdge && by > 1 && by < bh && by % 2 === 0) {
+                // Window rows on walls
+                const isWindowCol = isEdgeZ
+                  ? (blX >= 1 && blX <= footprint - 2 && blX % 2 === 1)
+                  : (blZ >= 1 && blZ <= footprint - 2 && blZ % 2 === 1);
+                color = isWindowCol ? windowCol : wallPalette[Math.abs(wx + by) % wallPalette.length];
+              } else {
+                color = wallPalette[Math.abs(wx + by) % wallPalette.length];
+              }
+              push((bX + lx) * VOXEL_SIZE, (h + by) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, color);
+            }
+
+            // Peaked roof for houses
+            if (bType === 'house' && isEdge) {
+              const midX = Math.floor(footprint / 2);
+              const dist = Math.abs(blX - midX);
+              const roofExtra = Math.max(0, 2 - dist);
+              for (let ry = 1; ry <= roofExtra; ry++) {
+                push((bX + lx) * VOXEL_SIZE, (h + bh + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, roofCol);
+              }
+              trackH(lx, lz, h + bh + roofExtra);
             } else {
-              // Building
-              const bh = buildType === 2 ? 8 + Math.abs(Math.floor(structN(blockCx * 3.7, blockCz * 3.7) * 14))
-                : buildType === 1 ? 4 + Math.abs(Math.floor(structN(blockCx * 2.3, blockCz * 2.3) * 6))
-                : 3;
-              const isEdge = lotX === 0 || lotX === 4 || lotZ === 0 || lotZ === 4;
-              const wallColors = buildType === 2 ? ['#8899aa', '#99aabb', '#7788aa', '#aabbcc']
-                : buildType === 1 ? ['#bbaa88', '#ccbb99', '#aa9977']
-                : ['#ddccaa', '#ccbb99', '#eeddbb'];
-              const windowColor = '#aaddff';
-              const roofColor = buildType === 2 ? '#556677' : '#cc6633';
-
-              for (let by = 1; by <= bh; by++) {
-                if (!isEdge && by < bh) continue; // Only walls + roof
-                const isWindow = by > 1 && by < bh && (by % 2 === 0) && !isEdge;
-                let color: string;
-                if (by === bh) {
-                  color = roofColor;
-                } else if (isEdge && by > 1 && by < bh && (by % 2 === 0) && ((lotX === 0 || lotX === 4) ? (lotZ === 2) : (lotX === 2))) {
-                  color = windowColor;
-                } else {
-                  color = wallColors[Math.abs(wx + by) % wallColors.length];
-                }
-                push((bX + lx) * VOXEL_SIZE, (h + by) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, isWindow ? windowColor : color);
-              }
-              trackHeight(lx, lz, h + bh);
+              trackH(lx, lz, h + bh);
             }
           }
         }
-        continue; // Skip natural decorations for city
+        continue; // city biome handled — skip natural decorations
       }
 
-      // ── Trees (sparser based on config) ──
-      if ((biome === 'plains' || biome === 'forest') && h > c.waterLevel + 1 && lx > 1 && lx < CHUNK_SIZE - 2 && lz > 1 && lz < CHUNK_SIZE - 2) {
+      /* ══════════════════ 4. NATURAL STRUCTURES ══════════════════ */
+
+      /* ── Trees ── */
+      if ((biome === 'plains' || biome === 'forest')
+        && h > c.waterLevel + 1
+        && lx > 1 && lx < CHUNK_SIZE - 2 && lz > 1 && lz < CHUNK_SIZE - 2
+      ) {
         const tv = treeN(wx * 0.6, wz * 0.6);
-        const baseT = biome === 'forest' ? 0.22 : 0.40;
-        const threshold = baseT + (1 - cfg.treeDensity) * 0.25;
+        const threshold = (biome === 'forest' ? 0.22 : 0.40) + (1 - cfg.treeDensity) * 0.25;
         if (tv > threshold) {
           const trunkH = biome === 'forest' ? 3 + (Math.abs(wx * 13 + wz * 7) % 3) : 2 + (Math.abs(wx * 7 + wz) % 2);
-          const tc2 = biome === 'forest' ? '#664422' : '#AA7744';
-          const lcs = biome === 'forest' ? ['#339955', '#44aa66', '#22884d'] : ['#44dd66', '#55ee77', '#66ff88'];
-          const lc = lcs[Math.abs(wx * 3 + wz * 5) % lcs.length];
-          for (let ty = 1; ty <= trunkH; ty++) push((bX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, tc2);
+          const trunkC = biome === 'forest' ? '#664422' : '#AA7744';
+          const leafPal = biome === 'forest' ? ['#339955', '#44aa66', '#22884d'] : ['#44dd66', '#55ee77', '#66ff88'];
+          const leafC = leafPal[Math.abs(wx * 3 + wz * 5) % leafPal.length];
+          for (let ty = 1; ty <= trunkH; ty++) push((bX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, trunkC);
           const cr = 2, cy2 = h + trunkH + cr;
           for (let dx = -cr; dx <= cr; dx++) for (let dy = -cr; dy <= cr; dy++) for (let dz = -cr; dz <= cr; dz++) {
             const d2 = dx * dx + dy * dy + dz * dz;
             if (d2 > cr * cr + 0.5 || (cr > 1 && d2 < (cr - 1) * (cr - 1))) continue;
-            push((bX + lx + dx) * VOXEL_SIZE, (cy2 + dy) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, lc);
+            push((bX + lx + dx) * VOXEL_SIZE, (cy2 + dy) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE, leafC);
           }
-          trackHeight(lx, lz, cy2 + cr);
+          trackH(lx, lz, cy2 + cr);
         }
       }
 
-      // ── Cacti in desert ──
+      /* ── Cacti ── */
       if (biome === 'desert' && h > c.waterLevel && lx > 0 && lx < CHUNK_SIZE - 1 && lz > 0 && lz < CHUNK_SIZE - 1) {
         if (treeN(wx * 0.7 + 50, wz * 0.7 + 50) > 0.46) {
-          const ch2 = 3 + (Math.abs(wx * 11 + wz * 3) % 3);
-          for (let cy = 1; cy <= ch2; cy++) push((bX + lx) * VOXEL_SIZE, (h + cy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#55aa44');
-          trackHeight(lx, lz, h + ch2);
-          if (ch2 > 3) {
+          const cH = 3 + (Math.abs(wx * 11 + wz * 3) % 3);
+          for (let cy = 1; cy <= cH; cy++) push((bX + lx) * VOXEL_SIZE, (h + cy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#55aa44');
+          if (cH > 3) {
             push((bX + lx + 1) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#66bb55');
             push((bX + lx + 1) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#66bb55');
           }
+          trackH(lx, lz, h + cH);
         }
       }
 
-      // ── Pyramids in desert ──
+      /* ── Pyramids ── */
       if (biome === 'desert' && lx >= 1 && lx <= CHUNK_SIZE - 6 && lz >= 1 && lz <= CHUNK_SIZE - 6) {
-        const pyrVal = structN(wx * 0.06 + 100, wz * 0.06 + 100);
-        if (pyrVal > 0.52 - cfg.structureDensity * 0.1 && Math.abs(wx % 14) < 1 && Math.abs(wz % 14) < 1) {
-          const pyrSize = 4;
-          for (let layer = 0; layer < pyrSize; layer++) {
-            const w = pyrSize - layer;
+        const pv = structN(wx * 0.06 + 100, wz * 0.06 + 100);
+        if (pv > 0.52 - cfg.structureDensity * 0.1 && Math.abs(wx % 14) < 1 && Math.abs(wz % 14) < 1) {
+          const ps = 4;
+          for (let layer = 0; layer < ps; layer++) {
+            const w = ps - layer;
             for (let px = -w; px <= w; px++) for (let pz = -w; pz <= w; pz++) {
               push((bX + lx + px) * VOXEL_SIZE, (h + layer + 1) * VOXEL_SIZE, (bZ + lz + pz) * VOXEL_SIZE,
-                layer === pyrSize - 1 ? '#FFD700' : '#ddbb77');
+                layer === ps - 1 ? '#FFD700' : '#ddbb77');
             }
           }
-          trackHeight(lx, lz, h + pyrSize);
+          trackH(lx, lz, h + ps);
         }
       }
 
-      // ── Small houses in plains/forest ──
-      if ((biome === 'plains' || biome === 'forest') && h > c.waterLevel + 1 && lx >= 2 && lx <= CHUNK_SIZE - 5 && lz >= 2 && lz <= CHUNK_SIZE - 5) {
+      /* ── Houses in plains/forest ── */
+      if ((biome === 'plains' || biome === 'forest')
+        && h > c.waterLevel + 1
+        && lx >= 2 && lx <= CHUNK_SIZE - 5 && lz >= 2 && lz <= CHUNK_SIZE - 5
+      ) {
         const hv = structN(wx * 0.12, wz * 0.12);
         if (hv > 0.50 - cfg.structureDensity * 0.12 && Math.abs(wx % 11) < 1 && Math.abs(wz % 13) < 1) {
-          const wc2 = biome === 'forest' ? '#8B7355' : '#D4C5A9';
-          const rc = biome === 'forest' ? '#8B4513' : '#CC6633';
+          const wallC = biome === 'forest' ? '#8B7355' : '#D4C5A9';
+          const roofC = biome === 'forest' ? '#8B4513' : '#CC6633';
           for (let hx = 0; hx < 3; hx++) for (let hz = 0; hz < 3; hz++) for (let hy = 1; hy <= 3; hy++) {
-            if (hx === 1 && hz === 1) continue;
-            if (hx === 1 && hz === 0 && hy <= 2) continue;
-            const color = hy === 2 && ((hx === 0 && hz === 1) || (hx === 2 && hz === 1)) ? '#AADDFF' : wc2;
+            if (hx === 1 && hz === 1) continue; // hollow interior
+            if (hx === 1 && hz === 0 && hy <= 2) continue; // door
+            const color = hy === 2 && ((hx === 0 && hz === 1) || (hx === 2 && hz === 1)) ? '#AADDFF' : wallC;
             push((bX + lx + hx) * VOXEL_SIZE, (h + hy) * VOXEL_SIZE, (bZ + lz + hz) * VOXEL_SIZE, color);
           }
           for (let rx = -1; rx <= 3; rx++) for (let rz = -1; rz <= 3; rz++)
-            push((bX + lx + rx) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE, rc);
+            push((bX + lx + rx) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE, roofC);
           for (let rx = 0; rx <= 2; rx++) for (let rz = 0; rz <= 2; rz++)
-            push((bX + lx + rx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE, rc);
-          trackHeight(lx, lz, h + 5);
+            push((bX + lx + rx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE, roofC);
+          trackH(lx, lz, h + 5);
         }
       }
 
-      // ── Rock formations in tundra/mountains ──
-      if ((biome === 'tundra' || biome === 'mountains') && h > c.waterLevel && lx > 1 && lx < CHUNK_SIZE - 2 && lz > 1 && lz < CHUNK_SIZE - 2) {
+      /* ── Rock formations ── */
+      if ((biome === 'tundra' || biome === 'mountains')
+        && h > c.waterLevel && lx > 1 && lx < CHUNK_SIZE - 2 && lz > 1 && lz < CHUNK_SIZE - 2
+      ) {
         if (structN(wx * 0.4 + 300, wz * 0.4 + 300) > 0.44) {
           const rh = 1 + (Math.abs(wx * 7 + wz * 3) % 3);
           const rc = biome === 'tundra' ? '#8899aa' : '#667788';
           for (let ry = 1; ry <= rh; ry++) push((bX + lx) * VOXEL_SIZE, (h + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, rc);
-          trackHeight(lx, lz, h + rh);
           if (rh > 1) {
             push((bX + lx + 1) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, rc);
             push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz + 1) * VOXEL_SIZE, rc);
           }
+          trackH(lx, lz, h + rh);
         }
       }
 
-      // ── Floating icon pickups ──
+      /* ── Floating icon pickups (one per chunk centre) ── */
       if (cfg.pickupDensity > 0 && lx === 8 && lz === 8) {
         const pv = chunkRand();
         if (pv < cfg.pickupDensity * 0.15) {
           const iconIdx = Math.floor(chunkRand() * PICKUP_ICONS.length);
-          pickups.push({
-            wx: (bX + lx) * VOXEL_SIZE,
-            wy: (h + 6) * VOXEL_SIZE,
-            wz: (bZ + lz) * VOXEL_SIZE,
-            iconIdx,
-          });
+          pickups.push({ wx: (bX + lx) * VOXEL_SIZE, wy: (h + 6) * VOXEL_SIZE, wz: (bZ + lz) * VOXEL_SIZE, iconIdx });
         }
       }
     }
@@ -538,18 +726,19 @@ function generateChunkData(
   };
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Shared geometry & materials
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Shared geometry & materials (allocated ONCE)
+ * ═══════════════════════════════════════════════════════════════ */
 
-const VOXEL_GAP = VOXEL_SIZE * 0.92;
-const sharedGeo = new THREE.BoxGeometry(VOXEL_GAP, VOXEL_GAP, VOXEL_GAP);
+const sharedGeo = new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
 const sharedSolidMat = new THREE.MeshStandardMaterial({ roughness: 0.7 });
-const sharedWaterMat = new THREE.MeshStandardMaterial({ roughness: 0.2, metalness: 0.05, transparent: true, opacity: 0.6, depthWrite: false });
+const sharedWaterMat = new THREE.MeshStandardMaterial({
+  roughness: 0.2, metalness: 0.05, transparent: true, opacity: 0.6, depthWrite: false,
+});
 
-/* ═══════════════════════════════════════════════════════════
- *  Chunk Mesh — zero per-chunk alloc for geo/mat
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Chunk Mesh
+ * ═══════════════════════════════════════════════════════════════ */
 
 function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   const solidRef = useRef<THREE.InstancedMesh>(null);
@@ -593,12 +782,12 @@ function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Floating Icon Pickup — rendered as flat voxel sprite
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Floating Icon Pickup
+ * ═══════════════════════════════════════════════════════════════ */
 
-const pickupPixelSize = VOXEL_SIZE * 0.18;
-const pickupGeo = new THREE.BoxGeometry(pickupPixelSize, pickupPixelSize, pickupPixelSize * 0.3);
+const pickupPxSize = VOXEL_SIZE * 0.18;
+const pickupGeo = new THREE.BoxGeometry(pickupPxSize, pickupPxSize, pickupPxSize * 0.3);
 const pickupMat = new THREE.MeshStandardMaterial({ roughness: 0.3, metalness: 0.1 });
 
 function FloatingPickup({ position, iconIdx }: { position: [number, number, number]; iconIdx: number }) {
@@ -612,24 +801,19 @@ function FloatingPickup({ position, iconIdx }: { position: [number, number, numb
     const mesh = meshRef.current;
     if (!mesh || count === 0) return;
     const m = new THREE.Matrix4(), c = new THREE.Color();
-    const halfSize = icon.size / 2;
+    const hs = icon.size / 2;
     for (let i = 0; i < count; i++) {
       const v = voxels[i];
-      m.identity();
-      m.elements[12] = (v.x - halfSize) * pickupPixelSize;
-      m.elements[13] = (v.y - halfSize) * pickupPixelSize;
-      m.elements[14] = 0;
+      m.identity(); m.elements[12] = (v.x - hs) * pickupPxSize; m.elements[13] = (v.y - hs) * pickupPxSize; m.elements[14] = 0;
       mesh.setMatrixAt(i, m);
-      c.set(v.color);
-      mesh.setColorAt(i, c);
+      c.set(v.color); mesh.setColorAt(i, c);
     }
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   }, [count, voxels, icon.size]);
 
   useFrame(({ clock }) => {
-    const g = groupRef.current;
-    if (!g) return;
+    const g = groupRef.current; if (!g) return;
     const t = clock.getElapsedTime();
     g.rotation.y = t * 1.2;
     g.position.y = baseY.current + Math.sin(t * 2) * 0.3;
@@ -638,7 +822,6 @@ function FloatingPickup({ position, iconIdx }: { position: [number, number, numb
   return (
     <group ref={groupRef} position={position}>
       {count > 0 && <instancedMesh ref={meshRef} args={[pickupGeo, pickupMat, count]} />}
-      {/* Glow ring */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.4, 0]}>
         <ringGeometry args={[0.3, 0.5, 16]} />
         <meshBasicMaterial color="#ffdd44" transparent opacity={0.25} side={THREE.DoubleSide} />
@@ -647,31 +830,23 @@ function FloatingPickup({ position, iconIdx }: { position: [number, number, numb
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Collision helper — query solid height from chunk cache
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Collision Query — reads solidHeightMap from chunk cache
+ * ═══════════════════════════════════════════════════════════════ */
 
-// Height of player's collision capsule above terrain in voxel-space
-const PLAYER_HEIGHT = 1.5;
-
-function getSolidHeight(chunkCache: Map<string, ChunkVoxelData>, worldX: number, worldZ: number): number {
-  // Convert world position to voxel grid coordinates
-  const vx = worldX / VOXEL_SIZE;
-  const vz = worldZ / VOXEL_SIZE;
-  const cx = Math.floor(vx / CHUNK_SIZE);
-  const cz = Math.floor(vz / CHUNK_SIZE);
-  const key = chunkKey(cx, cz);
-  const data = chunkCache.get(key);
+function getSolidHeight(cache: Map<string, ChunkVoxelData>, worldX: number, worldZ: number): number {
+  const vx = worldX / VOXEL_SIZE, vz = worldZ / VOXEL_SIZE;
+  const cx2 = Math.floor(vx / CHUNK_SIZE), cz2 = Math.floor(vz / CHUNK_SIZE);
+  const data = cache.get(chunkKey(cx2, cz2));
   if (!data) return 0;
-  const lx = Math.floor(vx - cx * CHUNK_SIZE);
-  const lz = Math.floor(vz - cz * CHUNK_SIZE);
+  const lx = Math.floor(vx - cx2 * CHUNK_SIZE), lz = Math.floor(vz - cz2 * CHUNK_SIZE);
   if (lx < 0 || lx >= CHUNK_SIZE || lz < 0 || lz >= CHUNK_SIZE) return 0;
   return data.solidHeightMap[lx * CHUNK_SIZE + lz];
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Fly Camera — with collision detection
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Fly Camera — with per-frame collision against solid terrain
+ * ═══════════════════════════════════════════════════════════════ */
 
 function FlyCamera({ keysRef, speedRef, chunkCacheRef }: {
   keysRef: React.RefObject<Set<string>>;
@@ -681,59 +856,51 @@ function FlyCamera({ keysRef, speedRef, chunkCacheRef }: {
   const { camera } = useThree();
   const _d = useMemo(() => new THREE.Vector3(), []);
   const _r = useMemo(() => new THREE.Vector3(), []);
-  const _prevPos = useMemo(() => new THREE.Vector3(), []);
+  const _prev = useMemo(() => new THREE.Vector3(), []);
 
   useEffect(() => { camera.position.set(0, 12, 20); camera.lookAt(0, 6, 0); }, [camera]);
 
   useFrame((_, delta) => {
     const keys = keysRef.current;
     if (!keys || keys.size === 0) return;
+
+    _prev.copy(camera.position);
     const spd = (speedRef.current ?? 12) * delta;
-
-    // Save previous position for rollback
-    _prevPos.copy(camera.position);
-
     camera.getWorldDirection(_d);
     _r.crossVectors(_d, camera.up).normalize();
-    if (keys.has('w') || keys.has('arrowup')) camera.position.addScaledVector(_d, spd);
-    if (keys.has('s') || keys.has('arrowdown')) camera.position.addScaledVector(_d, -spd);
-    if (keys.has('a') || keys.has('arrowleft')) camera.position.addScaledVector(_r, -spd);
+
+    if (keys.has('w') || keys.has('arrowup'))    camera.position.addScaledVector(_d, spd);
+    if (keys.has('s') || keys.has('arrowdown'))  camera.position.addScaledVector(_d, -spd);
+    if (keys.has('a') || keys.has('arrowleft'))  camera.position.addScaledVector(_r, -spd);
     if (keys.has('d') || keys.has('arrowright')) camera.position.addScaledVector(_r, spd);
-    if (keys.has(' ')) camera.position.addScaledVector(camera.up, spd);
+    if (keys.has(' '))     camera.position.addScaledVector(camera.up, spd);
     if (keys.has('shift')) camera.position.addScaledVector(camera.up, -spd);
 
-    // Collision: don't let camera go below solid terrain + player height
+    /* Collision resolution */
     const cache = chunkCacheRef.current;
-    if (cache && cache.size > 0) {
-      const terrainH = getSolidHeight(cache, camera.position.x, camera.position.z);
-      const minY = (terrainH + PLAYER_HEIGHT) * VOXEL_SIZE;
-      if (camera.position.y < minY) {
-        camera.position.y = minY;
-      }
-      // Also check horizontal collision: if the new X/Z position is inside a tall column,
-      // push back to previous position on that axis
-      const newTerrainH = getSolidHeight(cache, camera.position.x, camera.position.z);
-      const newMinY = (newTerrainH + PLAYER_HEIGHT) * VOXEL_SIZE;
-      if (camera.position.y < newMinY) {
-        // Try sliding along X only
-        const hAtOldX = getSolidHeight(cache, _prevPos.x, camera.position.z);
-        const hAtOldZ = getSolidHeight(cache, camera.position.x, _prevPos.z);
-        if ((hAtOldX + PLAYER_HEIGHT) * VOXEL_SIZE <= camera.position.y) {
-          camera.position.x = _prevPos.x; // slide along Z
-        } else if ((hAtOldZ + PLAYER_HEIGHT) * VOXEL_SIZE <= camera.position.y) {
-          camera.position.z = _prevPos.z; // slide along X
-        } else {
-          camera.position.y = newMinY; // push up
-        }
+    if (!cache || cache.size === 0) return;
+
+    const th = getSolidHeight(cache, camera.position.x, camera.position.z);
+    const minY = (th + PLAYER_HEIGHT) * VOXEL_SIZE;
+    if (camera.position.y < minY) {
+      // Try sliding: revert X, check; revert Z, check
+      const hOldX = getSolidHeight(cache, _prev.x, camera.position.z);
+      const hOldZ = getSolidHeight(cache, camera.position.x, _prev.z);
+      if ((hOldX + PLAYER_HEIGHT) * VOXEL_SIZE <= camera.position.y) {
+        camera.position.set(_prev.x, camera.position.y, camera.position.z);
+      } else if ((hOldZ + PLAYER_HEIGHT) * VOXEL_SIZE <= camera.position.y) {
+        camera.position.set(camera.position.x, camera.position.y, _prev.z);
+      } else {
+        camera.position.set(camera.position.x, minY, camera.position.z);
       }
     }
   });
   return null;
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Mouse Look (desktop) + Touch Look (mobile)
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Camera Look — desktop mouse + mobile touch drag
+ * ═══════════════════════════════════════════════════════════════ */
 
 function CameraLook({ isLocked, isMobile }: { isLocked: boolean; isMobile: boolean }) {
   const { camera, gl } = useThree();
@@ -746,19 +913,16 @@ function CameraLook({ isLocked, isMobile }: { isLocked: boolean; isMobile: boole
     euler.current.setFromQuaternion(camera.quaternion);
     const canvas = gl.domElement;
 
-    const applyRotation = (dx: number, dy: number, sensitivity: number) => {
-      euler.current.y -= dx * sensitivity;
-      euler.current.x -= dy * sensitivity;
+    const rotate = (dx: number, dy: number, sens: number) => {
+      euler.current.y -= dx * sens;
+      euler.current.x -= dy * sens;
       euler.current.x = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, euler.current.x));
       camera.quaternion.setFromEuler(euler.current);
     };
 
-    // Desktop: mouse move
-    const onMouseMove = (e: MouseEvent) => { applyRotation(e.movementX, e.movementY, 0.002); };
+    const onMouse = (e: MouseEvent) => rotate(e.movementX, e.movementY, 0.002);
 
-    // Mobile: touch drag on canvas for camera rotation
     const onTouchStart = (e: TouchEvent) => {
-      // Only track touches that start on the canvas (not on UI buttons)
       if (touchIdRef.current !== null) return;
       const t = e.changedTouches[0];
       touchIdRef.current = t.identifier;
@@ -768,20 +932,15 @@ function CameraLook({ isLocked, isMobile }: { isLocked: boolean; isMobile: boole
       for (let i = 0; i < e.changedTouches.length; i++) {
         const t = e.changedTouches[i];
         if (t.identifier === touchIdRef.current) {
-          const dx = t.clientX - lastTouchRef.current.x;
-          const dy = t.clientY - lastTouchRef.current.y;
+          rotate(t.clientX - lastTouchRef.current.x, t.clientY - lastTouchRef.current.y, 0.004);
           lastTouchRef.current = { x: t.clientX, y: t.clientY };
-          applyRotation(dx, dy, 0.004);
           break;
         }
       }
     };
     const onTouchEnd = (e: TouchEvent) => {
       for (let i = 0; i < e.changedTouches.length; i++) {
-        if (e.changedTouches[i].identifier === touchIdRef.current) {
-          touchIdRef.current = null;
-          break;
-        }
+        if (e.changedTouches[i].identifier === touchIdRef.current) { touchIdRef.current = null; break; }
       }
     };
 
@@ -791,11 +950,10 @@ function CameraLook({ isLocked, isMobile }: { isLocked: boolean; isMobile: boole
       canvas.addEventListener('touchend', onTouchEnd, { passive: true });
       canvas.addEventListener('touchcancel', onTouchEnd, { passive: true });
     } else {
-      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('mousemove', onMouse);
     }
-
     return () => {
-      canvas.removeEventListener('mousemove', onMouseMove);
+      canvas.removeEventListener('mousemove', onMouse);
       canvas.removeEventListener('touchstart', onTouchStart);
       canvas.removeEventListener('touchmove', onTouchMove);
       canvas.removeEventListener('touchend', onTouchEnd);
@@ -806,9 +964,9 @@ function CameraLook({ isLocked, isMobile }: { isLocked: boolean; isMobile: boole
   return null;
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Lighting
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Lighting / Sky / Fog
+ * ═══════════════════════════════════════════════════════════════ */
 
 function WorldLighting() {
   return (
@@ -820,10 +978,6 @@ function WorldLighting() {
     </>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════
- *  Sky + Fog
- * ═══════════════════════════════════════════════════════════ */
 
 function SkyGradient() {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -838,15 +992,16 @@ function SkyGradient() {
 }
 
 function FogEffect({ density }: { density: number }) {
-  const d = 0.005 + density * 0.02;
-  return <fogExp2 attach="fog" args={['#b0c8e0', d]} />;
+  return <fogExp2 attach="fog" args={['#b0c8e0', 0.005 + density * 0.02]} />;
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Stats Overlay
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  HUD Components
+ * ═══════════════════════════════════════════════════════════════ */
 
-function OverlayStats({ seed, chunkCount, position, biome }: { seed: number; chunkCount: number; position: [number, number, number]; biome: string }) {
+function OverlayStats({ seed, chunkCount, position, biome }: {
+  seed: number; chunkCount: number; position: [number, number, number]; biome: string;
+}) {
   return (
     <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 font-mono text-[9px] sm:text-[10px] space-y-0.5 pointer-events-none select-none">
       <div className="text-retro-green/70">SEED: <span className="text-retro-green">{seed}</span></div>
@@ -856,10 +1011,6 @@ function OverlayStats({ seed, chunkCount, position, biome }: { seed: number; chu
     </div>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════
- *  Camera Tracker
- * ═══════════════════════════════════════════════════════════ */
 
 function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
   onUpdate: (pos: [number, number, number], biome: string) => void;
@@ -875,17 +1026,16 @@ function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
     const pos: [number, number, number] = [camera.position.x, camera.position.y, camera.position.z];
     let biome = 'Unknown';
     if (biomeNoise && tempNoise) {
-      const wx = camera.position.x / VOXEL_SIZE, wz = camera.position.z / VOXEL_SIZE;
-      biome = BIOMES[getBiome(biomeNoise, tempNoise, wx, wz, cityFreq)].name;
+      biome = BIOMES[getBiome(biomeNoise, tempNoise, camera.position.x / VOXEL_SIZE, camera.position.z / VOXEL_SIZE, cityFreq)].name;
     }
     onUpdate(pos, biome);
   });
   return null;
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Mobile Touch Controls — non-selectable, touch-action:none
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Mobile Touch Controls — fully non-selectable
+ * ═══════════════════════════════════════════════════════════════ */
 
 function MobileTouchControls({ onKey }: { onKey: (key: string, active: boolean) => void }) {
   const mkH = useCallback((key: string) => ({
@@ -895,37 +1045,40 @@ function MobileTouchControls({ onKey }: { onKey: (key: string, active: boolean) 
   }), [onKey]);
 
   const btn = 'w-12 h-12 flex items-center justify-center rounded-lg bg-retro-bg/50 border border-retro-border/30 text-retro-muted/60 font-pixel text-sm select-none active:bg-retro-green/20 active:text-retro-green active:border-retro-green/40 transition-colors';
+  const st = { touchAction: 'none' as const };
 
   return (
     <div className="absolute bottom-4 z-30 w-full px-4 flex justify-between items-end pointer-events-none select-none" style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' }}>
-      <div className="pointer-events-auto grid grid-cols-3 gap-1" style={{ touchAction: 'none' }}>
+      <div className="pointer-events-auto grid grid-cols-3 gap-1" style={st}>
         <div />
-        <button className={btn} style={{ touchAction: 'none' }} {...mkH('w')}>▲</button>
+        <button className={btn} style={st} {...mkH('w')}>▲</button>
         <div />
-        <button className={btn} style={{ touchAction: 'none' }} {...mkH('a')}>◄</button>
+        <button className={btn} style={st} {...mkH('a')}>◄</button>
         <div className="w-12 h-12" />
-        <button className={btn} style={{ touchAction: 'none' }} {...mkH('d')}>►</button>
+        <button className={btn} style={st} {...mkH('d')}>►</button>
         <div />
-        <button className={btn} style={{ touchAction: 'none' }} {...mkH('s')}>▼</button>
+        <button className={btn} style={st} {...mkH('s')}>▼</button>
         <div />
       </div>
-      <div className="pointer-events-auto flex flex-col gap-2" style={{ touchAction: 'none' }}>
-        <button className={btn} style={{ touchAction: 'none' }} {...mkH(' ')}>↑</button>
-        <button className={btn} style={{ touchAction: 'none' }} {...mkH('shift')}>↓</button>
+      <div className="pointer-events-auto flex flex-col gap-2" style={st}>
+        <button className={btn} style={st} {...mkH(' ')}>↑</button>
+        <button className={btn} style={st} {...mkH('shift')}>↓</button>
       </div>
     </div>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Chunk Manager — throttled generation, progressive loading
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Chunk Manager — throttled, progressive, exposes chunkCache ref
+ * ═══════════════════════════════════════════════════════════════ */
 
-function ChunkManagerWithCounter({ seed, config, onChunkCount }: {
-  seed: number; config: WorldConfig; onChunkCount: (count: number) => void;
+function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: {
+  seed: number;
+  config: WorldConfig;
+  onChunkCount: (count: number) => void;
+  chunkCacheRef: React.MutableRefObject<Map<string, ChunkVoxelData>>;
 }) {
   const { camera } = useThree();
-  const chunkCache = useRef<Map<string, ChunkVoxelData>>(new Map());
   const [visibleChunks, setVisibleChunks] = useState<Map<string, ChunkVoxelData>>(new Map());
   const lastCamChunk = useRef('');
   const frustum = useRef(new THREE.Frustum());
@@ -942,7 +1095,7 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount }: {
   useFrame(() => {
     if (prevSeed.current !== seed) {
       prevSeed.current = seed;
-      chunkCache.current.clear();
+      chunkCacheRef.current.clear();
       lastCamChunk.current = '';
       pendingKeys.current = [];
     }
@@ -951,14 +1104,14 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount }: {
     const curKey = `${ccx},${ccz}`;
     const rd = config.renderDistance;
 
-    // Generate pending chunks (throttled)
+    // Throttled generation
     let generated = 0;
     while (pendingKeys.current.length > 0 && generated < MAX_CHUNKS_PER_FRAME) {
       const pk = pendingKeys.current.shift()!;
-      if (chunkCache.current.has(pk)) continue;
+      if (chunkCacheRef.current.has(pk)) continue;
       const [pcx, pcz] = pk.split(',').map(Number);
       const data = generateChunkData(pcx, pcz, noises.height, noises.detail, noises.biome, noises.temp, noises.tree, noises.struct, config);
-      chunkCache.current.set(pk, data);
+      chunkCacheRef.current.set(pk, data);
       generated++;
     }
 
@@ -972,15 +1125,15 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount }: {
     const cws = CHUNK_SIZE * VOXEL_SIZE;
     const newPending: string[] = [];
 
-    // Sort chunks by distance (nearest first)
-    const candidates: { cx: number; cz: number; dist: number }[] = [];
+    // Sort nearest-first for progressive loading
+    const cands: { cx: number; cz: number; dist: number }[] = [];
     for (let dx = -rd; dx <= rd; dx++) for (let dz = -rd; dz <= rd; dz++) {
       if (dx * dx + dz * dz > rd * rd) continue;
-      candidates.push({ cx: ccx + dx, cz: ccz + dz, dist: dx * dx + dz * dz });
+      cands.push({ cx: ccx + dx, cz: ccz + dz, dist: dx * dx + dz * dz });
     }
-    candidates.sort((a, b) => a.dist - b.dist);
+    cands.sort((a, b) => a.dist - b.dist);
 
-    for (const { cx: chkCx, cz: chkCz } of candidates) {
+    for (const { cx: chkCx, cz: chkCz } of cands) {
       const key = chunkKey(chkCx, chkCz);
       const minX = chkCx * cws, minZ = chkCz * cws;
       const bbox = new THREE.Box3(
@@ -988,27 +1141,22 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount }: {
         new THREE.Vector3(minX + cws, MAX_HEIGHT * VOXEL_SIZE, minZ + cws),
       );
       if (!frustum.current.intersectsBox(bbox)) continue;
-
-      const data = chunkCache.current.get(key);
-      if (data) {
-        newVisible.set(key, data);
-      } else {
-        newPending.push(key);
-      }
+      const data = chunkCacheRef.current.get(key);
+      if (data) { newVisible.set(key, data); }
+      else { newPending.push(key); }
     }
 
-    // Add new pending to front of queue (nearest first)
     pendingKeys.current = [...newPending, ...pendingKeys.current.filter(k => !newPending.includes(k))];
 
     // Prune distant cache
     const maxC = (rd * 2 + 2) ** 2;
-    if (chunkCache.current.size > maxC * 2) {
+    if (chunkCacheRef.current.size > maxC * 2) {
       const del: string[] = [];
-      for (const [k] of chunkCache.current) {
+      for (const [k] of chunkCacheRef.current) {
         const [kx, kz] = k.split(',').map(Number);
         if ((kx - ccx) ** 2 + (kz - ccz) ** 2 > (rd * 2) ** 2) del.push(k);
       }
-      for (const k of del) chunkCache.current.delete(k);
+      for (const k of del) chunkCacheRef.current.delete(k);
     }
 
     setVisibleChunks(newVisible);
@@ -1017,31 +1165,26 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount }: {
 
   const entries = useMemo(() => Array.from(visibleChunks.entries()), [visibleChunks]);
   const allPickups = useMemo(() => {
-    const result: { wx: number; wy: number; wz: number; iconIdx: number; key: string }[] = [];
-    for (const [key, data] of visibleChunks) {
-      for (const p of data.pickups) {
-        result.push({ ...p, key: `${key}-${p.iconIdx}` });
-      }
-    }
-    return result;
+    const r: { wx: number; wy: number; wz: number; iconIdx: number; key: string }[] = [];
+    for (const [key, data] of visibleChunks) for (const p of data.pickups) r.push({ ...p, key: `${key}-${p.iconIdx}` });
+    return r;
   }, [visibleChunks]);
 
   return (
     <>
       {entries.map(([key, data]) => <ChunkMesh key={key} data={data} />)}
-      {allPickups.map(p => (
-        <FloatingPickup key={p.key} position={[p.wx, p.wy, p.wz]} iconIdx={p.iconIdx} />
-      ))}
+      {allPickups.map(p => <FloatingPickup key={p.key} position={[p.wx, p.wy, p.wz]} iconIdx={p.iconIdx} />)}
     </>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Config Slider component
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  Config Slider
+ * ═══════════════════════════════════════════════════════════════ */
 
 function ConfigSlider({ label, value, onChange, min, max, step, color, displayValue }: {
-  label: string; value: number; onChange: (v: number) => void; min: number; max: number; step: number; color: string; displayValue?: string;
+  label: string; value: number; onChange: (v: number) => void;
+  min: number; max: number; step: number; color: string; displayValue?: string;
 }) {
   return (
     <div className="space-y-1">
@@ -1049,17 +1192,18 @@ function ConfigSlider({ label, value, onChange, min, max, step, color, displayVa
         <label className={`font-pixel text-[8px] sm:text-[9px] ${color} uppercase tracking-wider select-none`}>{label}</label>
         <span className={`font-mono text-[9px] sm:text-[10px] ${color.replace('/80', '')} select-none`}>{displayValue ?? value}</span>
       </div>
-      <input type="range" min={min} max={max} step={step} value={value} onChange={e => onChange(Number(e.target.value))}
-        className={`w-full h-1 bg-retro-surface/80 rounded-full appearance-none cursor-pointer accent-current ${color.replace('text-', 'accent-').replace('/80', '')}`}
-        style={{ accentColor: color.includes('cyan') ? '#22d3ee' : color.includes('gold') ? '#fbbf24' : color.includes('green') ? '#4ade80' : color.includes('purple') ? '#c084fc' : color.includes('red') ? '#f87171' : '#94a3b8' }}
+      <input type="range" min={min} max={max} step={step} value={value}
+        onChange={e => onChange(Number(e.target.value))}
+        className={`w-full h-1 bg-retro-surface/80 rounded-full appearance-none cursor-pointer`}
+        style={{ accentColor: color.includes('cyan') ? '#22d3ee' : color.includes('gold') ? '#fbbf24' : color.includes('green') ? '#4ade80' : color.includes('purple') ? '#c084fc' : '#94a3b8' }}
       />
     </div>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════
- *  Main Component
- * ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+ *  MAIN COMPONENT
+ * ═══════════════════════════════════════════════════════════════ */
 
 export default function ProceduralTerrain() {
   const [seed, setSeed] = useState(42);
@@ -1076,6 +1220,8 @@ export default function ProceduralTerrain() {
   const keysRef = useRef<Set<string>>(new Set());
   const speedRef = useRef(config.flySpeed);
   const canvasRef = useRef<HTMLDivElement>(null);
+  // Shared chunk cache — used by ChunkManager for rendering AND by FlyCamera for collision
+  const chunkCacheRef = useRef<Map<string, ChunkVoxelData>>(new Map());
 
   const noises = useMemo(() => ({
     biome: createNoise2D(seed + 2), temp: createNoise2D(seed + 3),
@@ -1096,8 +1242,7 @@ export default function ProceduralTerrain() {
       keysRef.current.add(k);
     };
     const up = (e: KeyboardEvent) => keysRef.current.delete(e.key.toLowerCase());
-    window.addEventListener('keydown', down);
-    window.addEventListener('keyup', up);
+    window.addEventListener('keydown', down); window.addEventListener('keyup', up);
     return () => { window.removeEventListener('keydown', down); window.removeEventListener('keyup', up); };
   }, []);
 
@@ -1112,15 +1257,9 @@ export default function ProceduralTerrain() {
     return () => document.removeEventListener('pointerlockchange', h);
   }, []);
 
-  const handleCameraUpdate = useCallback((pos: [number, number, number], biome: string) => {
-    setCameraPos(pos); setCurrentBiome(biome);
-  }, []);
-  const generateNewSeed = useCallback(() => {
-    const s = Math.floor(Math.random() * 999999); setSeed(s); setSeedInput(String(s));
-  }, []);
-  const applySeed = useCallback(() => {
-    const p = parseInt(seedInput, 10); if (!isNaN(p)) setSeed(Math.abs(p));
-  }, [seedInput]);
+  const handleCameraUpdate = useCallback((pos: [number, number, number], biome: string) => { setCameraPos(pos); setCurrentBiome(biome); }, []);
+  const generateNewSeed = useCallback(() => { const s = Math.floor(Math.random() * 999999); setSeed(s); setSeedInput(String(s)); }, []);
+  const applySeed = useCallback(() => { const p = parseInt(seedInput, 10); if (!isNaN(p)) setSeed(Math.abs(p)); }, [seedInput]);
   const handleChunkCount = useCallback((c: number) => setChunkCount(c), []);
   const exitImmersive = useCallback(() => {
     if (isMobile) { setIsLocked(false); setShowControls(true); } else document.exitPointerLock();
@@ -1128,7 +1267,6 @@ export default function ProceduralTerrain() {
   const handleTouchKey = useCallback((key: string, active: boolean) => {
     if (active) keysRef.current.add(key); else keysRef.current.delete(key);
   }, []);
-
   const updateConfig = useCallback((key: keyof WorldConfig, val: number) => {
     setConfig(prev => ({ ...prev, [key]: val }));
   }, []);
@@ -1139,11 +1277,8 @@ export default function ProceduralTerrain() {
       {showControls && !isLocked && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none select-none">
           <div className="absolute top-3 left-3 sm:top-4 sm:left-4 pointer-events-auto">
-            <Link href="/" className="flex items-center gap-1.5 px-2.5 py-1.5 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-muted hover:text-retro-green hover:border-retro-green/40 transition-all select-none">
-              ← Back
-            </Link>
+            <Link href="/" className="flex items-center gap-1.5 px-2.5 py-1.5 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-muted hover:text-retro-green hover:border-retro-green/40 transition-all select-none">← Back</Link>
           </div>
-
           <div className="text-center pointer-events-auto mb-4 sm:mb-6 select-none">
             <h1 className="font-pixel text-lg sm:text-2xl md:text-3xl lg:text-4xl text-retro-green text-glow mb-2 sm:mb-3 drop-shadow-lg select-none">PROCEDURAL WORLDS</h1>
             <p className="font-pixel text-[8px] sm:text-[10px] md:text-xs text-retro-purple/80 mb-1 drop-shadow select-none">@pxlkit/voxel — Coming Soon</p>
@@ -1152,9 +1287,7 @@ export default function ProceduralTerrain() {
               <span className="text-retro-gold font-bold">{isMobile ? ' Tap to fly.' : ' Click to fly.'}</span>
             </p>
           </div>
-
           <div className="pointer-events-auto bg-retro-bg/80 backdrop-blur-md border border-retro-border/50 rounded-xl p-3 sm:p-4 md:p-5 max-w-sm w-[calc(100%-2rem)] space-y-3 shadow-xl overflow-y-auto max-h-[70vh] select-none">
-            {/* Seed */}
             <div className="space-y-1.5">
               <label className="font-pixel text-[8px] sm:text-[9px] text-retro-green/80 uppercase tracking-wider select-none">World Seed</label>
               <div className="flex gap-2">
@@ -1166,17 +1299,12 @@ export default function ProceduralTerrain() {
               </div>
             </div>
             <button onClick={generateNewSeed} className="w-full py-2 bg-retro-purple/20 hover:bg-retro-purple/30 border border-retro-purple/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-purple transition-all cursor-pointer select-none">🎲 RANDOM WORLD</button>
-
-            {/* Core controls */}
             <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => updateConfig('renderDistance', v)} min={2} max={10} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
             <ConfigSlider label="Fly Speed" value={config.flySpeed} onChange={v => updateConfig('flySpeed', v)} min={4} max={40} step={1} color="text-retro-gold/80" displayValue={String(config.flySpeed)} />
-
-            {/* Advanced toggle */}
             <button onClick={() => setShowAdvanced(!showAdvanced)}
               className="w-full py-1.5 bg-retro-surface/40 hover:bg-retro-surface/60 border border-retro-border/30 rounded font-pixel text-[7px] sm:text-[8px] text-retro-muted/70 transition-all cursor-pointer select-none">
               {showAdvanced ? '▾ HIDE ADVANCED' : '▸ SHOW ADVANCED'}
             </button>
-
             {showAdvanced && (
               <div className="space-y-2.5 pt-1 border-t border-retro-border/20">
                 <ConfigSlider label="Tree Density" value={config.treeDensity} onChange={v => updateConfig('treeDensity', v)} min={0} max={1} step={0.1} color="text-retro-green/80" displayValue={`${Math.round(config.treeDensity * 100)}%`} />
@@ -1186,13 +1314,10 @@ export default function ProceduralTerrain() {
                 <ConfigSlider label="Fog Density" value={config.fogDensity} onChange={v => updateConfig('fogDensity', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.fogDensity * 100)}%`} />
               </div>
             )}
-
-            {/* Start */}
             <button onClick={requestPointerLock}
               className="w-full py-2.5 sm:py-3 bg-retro-green/20 hover:bg-retro-green/30 border-2 border-retro-green/60 rounded-lg font-pixel text-[9px] sm:text-[10px] md:text-xs text-retro-green transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(74,222,128,0.2)] select-none">
               ▶ {isMobile ? 'TAP TO EXPLORE' : 'CLICK TO EXPLORE'}
             </button>
-
             <div className="text-center space-y-0.5 select-none">
               {isMobile ? (
                 <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">Drag canvas to look · D-pad to move · Tap ✕ to exit</p>
@@ -1245,9 +1370,9 @@ export default function ProceduralTerrain() {
           <SkyGradient />
           <FogEffect density={config.fogDensity} />
           <WorldLighting />
-          <FlyCamera keysRef={keysRef} speedRef={speedRef} />
+          <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} />
           <CameraLook isLocked={isLocked} isMobile={isMobile} />
-          <ChunkManagerWithCounter seed={seed} config={config} onChunkCount={handleChunkCount} />
+          <ChunkManagerWithCounter seed={seed} config={config} onChunkCount={handleChunkCount} chunkCacheRef={chunkCacheRef} />
           <CameraTracker onUpdate={handleCameraUpdate} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} />
         </Canvas>
       </div>
