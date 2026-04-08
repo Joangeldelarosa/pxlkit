@@ -226,7 +226,7 @@ function FuseSpark({ position }: { position: [number, number, number] }) {
     <group position={position}>
       <pointLight ref={lightRef} color="#FFD700" intensity={2} distance={12} decay={2} />
       <mesh ref={sparkRef}>
-        <sphereGeometry args={[0.4, 8, 8]} />
+        <sphereGeometry args={[0.4, 16, 16]} />
         <meshBasicMaterial color="#FFD700" transparent opacity={0.9} />
       </mesh>
     </group>
