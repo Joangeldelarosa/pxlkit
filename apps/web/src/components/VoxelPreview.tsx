@@ -23,8 +23,8 @@ export type SceneTab = 'island' | 'terrain' | 'character' | 'world';
  * ═══════════════════════════════════════════════════════════ */
 
 const BOMB_BODY = [
-  '#7070a0', '#8080b8', '#9090c8', '#a0a0d8',
-  '#b0b0e0', '#c0c0ea', '#d0d0f0', '#e0e0ff',
+  '#141424', '#1c1c34', '#242444', '#2c2c54',
+  '#343464', '#3c3c74', '#444484', '#4c4c94',
 ];
 const X_RED = '#ff5555';
 const X_RED_D = '#dd3333';
@@ -228,20 +228,90 @@ function generateIsland(w: number, d: number): Voxel3D[] {
  *  GENERATOR: Small Decorations (flowers, rocks)
  * ═══════════════════════════════════════════════════════════ */
 
-function generateFlowers(positions: [number, number][]): Voxel3D[] {
+function generateFlowers(positions: [number, number][], by = 1): Voxel3D[] {
   return positions.map(([x, z], i) => ({
-    x, y: 1, z, color: FLOWER_COLORS[i % FLOWER_COLORS.length],
+    x, y: by, z, color: FLOWER_COLORS[i % FLOWER_COLORS.length],
   }));
 }
 
-function generateRock(bx: number, bz: number): Voxel3D[] {
+function generateRock(bx: number, bz: number, by = 1): Voxel3D[] {
   return [
-    { x: bx, y: 1, z: bz, color: ROCK_COLORS[0] },
-    { x: bx + 1, y: 1, z: bz, color: ROCK_COLORS[1] },
-    { x: bx, y: 1, z: bz + 1, color: ROCK_COLORS[2] },
-    { x: bx + 1, y: 1, z: bz + 1, color: ROCK_COLORS[0] },
-    { x: bx, y: 2, z: bz, color: ROCK_COLORS[2] },
+    { x: bx, y: by, z: bz, color: ROCK_COLORS[0] },
+    { x: bx + 1, y: by, z: bz, color: ROCK_COLORS[1] },
+    { x: bx, y: by, z: bz + 1, color: ROCK_COLORS[2] },
+    { x: bx + 1, y: by, z: bz + 1, color: ROCK_COLORS[0] },
+    { x: bx, y: by + 1, z: bz, color: ROCK_COLORS[2] },
   ];
+}
+
+/* ═══════════════════════════════════════════════════════════
+ *  HELPER: Surface-aware placement
+ * ═══════════════════════════════════════════════════════════ */
+
+/** Get the maximum terrain height under a footprint area */
+function maxHeightUnder(heightAt: (x: number, z: number) => number, bx: number, bz: number, w = 1, d = 1): number {
+  let maxH = 0;
+  for (let dx = 0; dx < w; dx++) {
+    for (let dz = 0; dz < d; dz++) {
+      maxH = Math.max(maxH, heightAt(bx + dx, bz + dz));
+    }
+  }
+  return maxH;
+}
+
+/** Offset all voxels in a model by a Y delta */
+function offsetVoxelsY(voxels: Voxel3D[], dy: number): Voxel3D[] {
+  return voxels.map(v => ({ ...v, y: v.y + dy }));
+}
+
+/** Generate a windmill structure */
+function generateWindmill(bx: number, bz: number, by: number): Voxel3D[] {
+  const v: Voxel3D[] = [];
+  const MILL_STONE = ['#ccbbaa', '#ddccbb', '#eeddcc'];
+  const MILL_ROOF = ['#665544', '#776655'];
+  const BLADE = '#ddccbb';
+
+  // Cylindrical tower (radius ~2, height 8)
+  for (let y = 0; y < 8; y++) {
+    for (let dx = -2; dx <= 2; dx++) {
+      for (let dz = -2; dz <= 2; dz++) {
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist > 2.5) continue;
+        // Only shell (hollow inside)
+        if (dist < 1.5 && y > 0 && y < 7) continue;
+        // Door opening
+        if (dz === -2 && dx === 0 && y < 2) continue;
+        // Window
+        if (y === 4 && dz === -2 && dx === 0) {
+          v.push({ x: bx + dx, y: by + y, z: bz + dz, color: WINDOW_C });
+          continue;
+        }
+        v.push({ x: bx + dx, y: by + y, z: bz + dz, color: MILL_STONE[Math.abs(dx + y + dz) % 3] });
+      }
+    }
+  }
+
+  // Conical roof
+  for (let ly = 0; ly < 3; ly++) {
+    const r = 3 - ly;
+    for (let dx = -r; dx <= r; dx++) {
+      for (let dz = -r; dz <= r; dz++) {
+        if (Math.sqrt(dx * dx + dz * dz) > r + 0.3) continue;
+        v.push({ x: bx + dx, y: by + 8 + ly, z: bz + dz, color: MILL_ROOF[Math.abs(dx + dz + ly) % 2] });
+      }
+    }
+  }
+
+  // Blades (4 directions from center at height 6)
+  const bladeY = by + 6;
+  const bladeZ = bz - 3; // front face
+  for (const dir of [[0, 1], [0, -1], [1, 0], [-1, 0]] as [number, number][]) {
+    for (let i = 1; i <= 4; i++) {
+      v.push({ x: bx + dir[0] * i, y: bladeY + dir[1] * i, z: bladeZ, color: BLADE });
+    }
+  }
+
+  return v;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -665,7 +735,7 @@ function IslandScene() {
 }
 
 /* ═══════════════════════════════════════════════════════════
- *  SCENE 2: Terrain Landscape + Water + House + Trees
+ *  SCENE 2: Terrain Landscape + Water + Windmill + Trees
  * ═══════════════════════════════════════════════════════════ */
 
 function TerrainScene() {
@@ -673,21 +743,37 @@ function TerrainScene() {
 
   const { solidVoxels, waterVoxels, extras } = useMemo(() => {
     const terrain = generateTerrain(28);
-    // Sample terrain height at house position and place it on the ground
-    const houseX = 3, houseZ = -4;
-    const groundH = terrain.heightAt(houseX, houseZ);
-    const house = generateHouse(houseX, houseZ, groundH + 1);
-    const trees = [
-      ...generateTree(-8, -6, 4, 2),
-      ...generateTree(-5, 6, 5, 3),
-      ...generateTree(8, 4, 5, 2),
-      ...generateTree(5, -8, 4, 2),
-    ];
-    const flowers = generateFlowers([[-3, 3], [6, -2], [-7, -1], [1, 8], [9, 0], [-2, -6]]);
+
+    // Windmill on a high point — find max height under its footprint
+    const millX = 3, millZ = -3;
+    const millH = maxHeightUnder(terrain.heightAt, millX - 2, millZ - 2, 5, 5);
+    const windmill = generateWindmill(millX, millZ, millH + 1);
+
+    // Trees — placed ON the terrain surface
+    const treeDefs: [number, number, number, number][] = [[-8, -6, 4, 2], [-5, 6, 5, 3], [8, 4, 5, 2], [5, -8, 4, 2]];
+    const trees = treeDefs.flatMap(([tx, tz, th, tc]) => {
+      const surfH = maxHeightUnder(terrain.heightAt, tx, tz, 2, 2);
+      return offsetVoxelsY(generateTree(tx, tz, th, tc), surfH + 1);
+    });
+
+    // Flowers — each placed at its terrain height
+    const flowerDefs: [number, number][] = [[-3, 3], [6, -2], [-7, -1], [1, 8], [9, 0], [-2, -6]];
+    const flowers = flowerDefs.flatMap(([fx, fz]) => {
+      const fH = terrain.heightAt(fx, fz);
+      return generateFlowers([[fx, fz]], fH + 1);
+    });
+
+    // Rocks — placed on surface
+    const rockDefs: [number, number][] = [[4, -7], [-9, 4]];
+    const rocks = rockDefs.flatMap(([rx, rz]) => {
+      const rH = maxHeightUnder(terrain.heightAt, rx, rz, 2, 2);
+      return generateRock(rx, rz, rH + 1);
+    });
+
     return {
       solidVoxels: terrain.solid,
       waterVoxels: terrain.water,
-      extras: [...house, ...trees, ...flowers],
+      extras: [...windmill, ...trees, ...flowers, ...rocks],
     };
   }, []);
 
@@ -869,61 +955,72 @@ function WorldScene() {
 
   const { solidVoxels, waterVoxels, structureVoxels } = useMemo(() => {
     const terrain = generateWorldTerrain(40);
+    const hAt = terrain.heightAt;
 
-    // Village houses — grounded to terrain
-    const houses = [
-      ...generateHouse(5, 5, terrain.heightAt(5, 5) + 1),
-      ...generateHouse(5, -6, terrain.heightAt(5, -6) + 1),
-      ...generateHouse(10, 0, terrain.heightAt(10, 0) + 1),
+    // Village houses — grounded to max height under full footprint (5×4)
+    const houseDefs: [number, number][] = [[5, 5], [5, -6], [10, 0]];
+    const houses = houseDefs.flatMap(([hx, hz]) => {
+      const baseH = maxHeightUnder(hAt, hx, hz, 5, 4);
+      return generateHouse(hx, hz, baseH + 1);
+    });
+
+    // Forest of pines on the mountain side — placed on surface
+    const pineDefs: [number, number, number][] = [
+      [-12, -8, 6], [-14, -4, 7], [-10, -2, 5],
+      [-13, 3, 6], [-11, 7, 7], [-15, 0, 5], [-9, 10, 6],
     ];
+    const pines = pineDefs.flatMap(([px, pz, ph]) => {
+      const surfH = hAt(px, pz);
+      return offsetVoxelsY(generatePineTree(px, pz, ph), surfH + 1);
+    });
 
-    // Forest of pines on the mountain side
-    const pines = [
-      ...generatePineTree(-12, -8, 6),
-      ...generatePineTree(-14, -4, 7),
-      ...generatePineTree(-10, -2, 5),
-      ...generatePineTree(-13, 3, 6),
-      ...generatePineTree(-11, 7, 7),
-      ...generatePineTree(-15, 0, 5),
-      ...generatePineTree(-9, 10, 6),
-    ];
+    // Regular trees near village — placed on surface
+    const treeDefs: [number, number, number, number][] = [[8, 8, 4, 2], [12, -5, 5, 2], [3, -10, 4, 2]];
+    const trees = treeDefs.flatMap(([tx, tz, th, tc]) => {
+      const surfH = maxHeightUnder(hAt, tx, tz, 2, 2);
+      return offsetVoxelsY(generateTree(tx, tz, th, tc), surfH + 1);
+    });
 
-    // Regular trees near village
-    const trees = [
-      ...generateTree(8, 8, 4, 2),
-      ...generateTree(12, -5, 5, 2),
-      ...generateTree(3, -10, 4, 2),
-    ];
+    // Bridge over the river — find water level +1
+    const bridgeY = Math.max(hAt(-1, 2), hAt(1, 2), 3);
+    const bridge = generateBridge(-3, 3, 2, bridgeY);
 
-    // Bridge over the river
-    const bridgeY = terrain.heightAt(-1, 2);
-    const bridge = generateBridge(-3, 3, 2, Math.max(bridgeY, 3));
+    // Lamps — each grounded individually
+    const lampDefs: [number, number][] = [[4, 3], [7, -3], [11, 3]];
+    const lamps = lampDefs.flatMap(([lx, lz]) => generateLamp(lx, lz, hAt(lx, lz) + 1));
 
-    // Decorations
-    const lamps = [
-      ...generateLamp(4, 3, terrain.heightAt(4, 3) + 1),
-      ...generateLamp(7, -3, terrain.heightAt(7, -3) + 1),
-      ...generateLamp(11, 3, terrain.heightAt(11, 3) + 1),
-    ];
-
-    const fences = generateFence(6, 12, 3, terrain.heightAt(8, 3) + 1);
-
-    // Path connecting houses
-    const pathPositions: [number, number][] = [];
-    for (let px = 4; px <= 12; px++) {
-      pathPositions.push([px, 1]);
-      pathPositions.push([px, 0]);
+    // Fence — each post at its own terrain height
+    const fenceVoxels: Voxel3D[] = [];
+    for (let fx = 6; fx <= 12; fx++) {
+      const fy = hAt(fx, 3) + 1;
+      fenceVoxels.push({ x: fx, y: fy, z: 3, color: FENCE_C });
+      if (fx % 2 === 0) fenceVoxels.push({ x: fx, y: fy + 1, z: 3, color: FENCE_C });
     }
-    const pathH = terrain.heightAt(8, 0);
-    const path = generatePath(pathPositions, pathH + 1);
 
-    const flowers = generateFlowers([[6, 7], [8, -7], [3, 4], [11, 5], [7, -9], [13, 2]]);
-    const rocks = [...generateRock(9, 7), ...generateRock(14, -3)];
+    // Path connecting houses — each tile at its own height
+    const pathVoxels: Voxel3D[] = [];
+    for (let px = 4; px <= 12; px++) {
+      for (const pz of [0, 1]) {
+        const py = hAt(px, pz) + 1;
+        pathVoxels.push({ x: px, y: py, z: pz, color: PATH_C[px % PATH_C.length] });
+      }
+    }
+
+    // Flowers — each at its own terrain height
+    const flowerDefs: [number, number][] = [[6, 7], [8, -7], [3, 4], [11, 5], [7, -9], [13, 2]];
+    const flowers = flowerDefs.flatMap(([fx, fz]) => generateFlowers([[fx, fz]], hAt(fx, fz) + 1));
+
+    // Rocks — grounded
+    const rockDefs: [number, number][] = [[9, 7], [14, -3]];
+    const rocks = rockDefs.flatMap(([rx, rz]) => {
+      const rH = maxHeightUnder(hAt, rx, rz, 2, 2);
+      return generateRock(rx, rz, rH + 1);
+    });
 
     return {
       solidVoxels: terrain.solid,
       waterVoxels: terrain.water,
-      structureVoxels: [...houses, ...pines, ...trees, ...bridge, ...lamps, ...fences, ...path, ...flowers, ...rocks],
+      structureVoxels: [...houses, ...pines, ...trees, ...bridge, ...lamps, ...fenceVoxels, ...pathVoxels, ...flowers, ...rocks],
     };
   }, []);
 
