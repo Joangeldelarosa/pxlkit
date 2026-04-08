@@ -5,7 +5,8 @@ import { kv } from '@vercel/kv';
 
 const resend = new Resend(process.env.RESEND_API_KEY || 're_test123');
 const CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-const APP_SECRET = process.env.PAYPAL_SECRET;
+// Support both variable names to avoid breaking checkout due to env naming drift.
+const APP_SECRET = process.env.PAYPAL_SECRET || process.env.PAYPAL_CLIENT_SECRET;
 
 // To support sandbox vs live, use the correct endpoint
 const base = process.env.NODE_ENV === 'production' && !CLIENT_ID?.startsWith('sb-')
@@ -76,7 +77,10 @@ export async function POST(request: Request) {
     } else {
       // PRODUCCION / SANDBOX REAL
       if (!CLIENT_ID || !APP_SECRET || CLIENT_ID === 'test') {
-         return NextResponse.json({ error: 'PayPal credentials missing. Use DEV_ORDER_ID to simulate locally.' }, { status: 500 });
+        const errorMessage = process.env.NODE_ENV === 'development'
+          ? 'PayPal credentials missing. Use DEV_ORDER_ID to simulate locally.'
+          : 'PayPal credentials missing on server. Configure NEXT_PUBLIC_PAYPAL_CLIENT_ID and PAYPAL_SECRET in Vercel.';
+        return NextResponse.json({ error: errorMessage }, { status: 500 });
       }
 
       const captureData = await captureOrder(orderID);
