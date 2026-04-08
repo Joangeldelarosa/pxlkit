@@ -128,7 +128,7 @@ function HeroSection() {
               {/* Label */}
               <div className="absolute bottom-3 left-0 right-0 flex justify-center pointer-events-none">
                 <span className="bg-retro-bg/80 backdrop-blur-sm border border-retro-border/40 rounded px-3 py-1 font-mono text-[10px] text-retro-muted/60">
-                  🎮 Drag to orbit · @pxlkit/voxel preview
+                  🎮 Drag to orbit · @pxlkit/voxel
                 </span>
               </div>
             </div>
@@ -184,7 +184,7 @@ function HeroSection() {
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
+              <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-3">
                 <PixelButton tone="green" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />} onClick={() => router.push('/ui-kit')}>
                   Explore UI Kit
                 </PixelButton>
