@@ -19,59 +19,53 @@ function mulberry32(seed: number) {
 }
 
 /* ═══════════════════════════════════════════════════════════
- *  Simplex-like 2D Noise (seeded)
+ *  Seeded 2D Perlin Noise (optimized)
  * ═══════════════════════════════════════════════════════════ */
 
 function createNoise2D(seed: number) {
   const rand = mulberry32(seed);
-  // Generate a permutation table
   const perm = new Uint8Array(512);
   const p = new Uint8Array(256);
   for (let i = 0; i < 256; i++) p[i] = i;
-  // Fisher-Yates shuffle with seeded PRNG
   for (let i = 255; i > 0; i--) {
     const j = Math.floor(rand() * (i + 1));
     [p[i], p[j]] = [p[j], p[i]];
   }
   for (let i = 0; i < 512; i++) perm[i] = p[i & 255];
 
-  // Gradient vectors for 2D
-  const GRAD = [
-    [1, 1], [-1, 1], [1, -1], [-1, -1],
-    [1, 0], [-1, 0], [0, 1], [0, -1],
-  ];
-
-  function dot2(gIdx: number, x: number, y: number) {
-    const g = GRAD[gIdx % 8];
-    return g[0] * x + g[1] * y;
-  }
-
-  function fade(t: number) { return t * t * t * (t * (t * 6 - 15) + 10); }
-  function lerp(a: number, b: number, t: number) { return a + t * (b - a); }
+  // Pre-computed gradient x/y components for fast lookup
+  const GRAD_X = new Float32Array([1, -1, 1, -1, 1, -1, 0, 0]);
+  const GRAD_Y = new Float32Array([1, 1, -1, -1, 0, 0, 1, -1]);
 
   return function noise2D(x: number, y: number): number {
-    const X = Math.floor(x) & 255;
-    const Y = Math.floor(y) & 255;
-    const xf = x - Math.floor(x);
-    const yf = y - Math.floor(y);
-    const u = fade(xf);
-    const v = fade(yf);
+    const xi = Math.floor(x);
+    const yi = Math.floor(y);
+    const X = xi & 255;
+    const Y = yi & 255;
+    const xf = x - xi;
+    const yf = y - yi;
+    // Inline fade
+    const u = xf * xf * xf * (xf * (xf * 6 - 15) + 10);
+    const v = yf * yf * yf * (yf * (yf * 6 - 15) + 10);
 
-    const aa = perm[perm[X] + Y];
-    const ab = perm[perm[X] + Y + 1];
-    const ba = perm[perm[X + 1] + Y];
-    const bb = perm[perm[X + 1] + Y + 1];
+    const aa = perm[perm[X] + Y] & 7;
+    const ab = perm[perm[X] + Y + 1] & 7;
+    const ba = perm[perm[X + 1] + Y] & 7;
+    const bb = perm[perm[X + 1] + Y + 1] & 7;
 
-    return lerp(
-      lerp(dot2(aa, xf, yf), dot2(ba, xf - 1, yf), u),
-      lerp(dot2(ab, xf, yf - 1), dot2(bb, xf - 1, yf - 1), u),
-      v,
-    );
+    const d00 = GRAD_X[aa] * xf + GRAD_Y[aa] * yf;
+    const d10 = GRAD_X[ba] * (xf - 1) + GRAD_Y[ba] * yf;
+    const d01 = GRAD_X[ab] * xf + GRAD_Y[ab] * (yf - 1);
+    const d11 = GRAD_X[bb] * (xf - 1) + GRAD_Y[bb] * (yf - 1);
+
+    const x0 = d00 + u * (d10 - d00);
+    const x1 = d01 + u * (d11 - d01);
+    return x0 + v * (x1 - x0);
   };
 }
 
 /* ═══════════════════════════════════════════════════════════
- *  Fractal Brownian Motion
+ *  Fractal Brownian Motion (inlined for perf)
  * ═══════════════════════════════════════════════════════════ */
 
 function fbm(noise: (x: number, y: number) => number, x: number, y: number, octaves: number, lacunarity = 2.0, gain = 0.5): number {
@@ -89,7 +83,7 @@ function fbm(noise: (x: number, y: number) => number, x: number, y: number, octa
 }
 
 /* ═══════════════════════════════════════════════════════════
- *  Biome Definitions
+ *  Biome Definitions — More variety and realistic heights
  * ═══════════════════════════════════════════════════════════ */
 
 type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean';
@@ -111,12 +105,12 @@ interface BiomeConfig {
 const BIOMES: Record<BiomeType, BiomeConfig> = {
   plains: {
     name: 'Plains',
-    heightScale: 4,
-    heightBase: 8,
+    heightScale: 5,
+    heightBase: 7,
     waterLevel: 5,
     colors: {
-      top: ['#66ee88', '#77ff99', '#55dd77', '#88ffaa'],
-      mid: ['#cc8844', '#dd9955', '#bb7733'],
+      top: ['#66ee88', '#77ff99', '#55dd77', '#88ffaa', '#5cd97a'],
+      mid: ['#cc8844', '#dd9955', '#bb7733', '#c49040'],
       bottom: ['#99aabb', '#aabbcc', '#889999'],
       accent: ['#ff9999', '#ffdd66', '#ccaaff', '#ff99cc'],
       water: '#88ddff',
@@ -124,11 +118,11 @@ const BIOMES: Record<BiomeType, BiomeConfig> = {
   },
   desert: {
     name: 'Desert',
-    heightScale: 3,
+    heightScale: 4,
     heightBase: 6,
     waterLevel: 2,
     colors: {
-      top: ['#ffeecc', '#fff5dd', '#ffe8bb', '#ffdda0'],
+      top: ['#ffeecc', '#fff5dd', '#ffe8bb', '#ffdda0', '#f5deb0'],
       mid: ['#ddbb88', '#ccaa77', '#bb9966'],
       bottom: ['#aa8866', '#997755', '#886644'],
       accent: ['#88cc55', '#559944'],
@@ -137,11 +131,11 @@ const BIOMES: Record<BiomeType, BiomeConfig> = {
   },
   tundra: {
     name: 'Tundra',
-    heightScale: 5,
+    heightScale: 6,
     heightBase: 7,
     waterLevel: 4,
     colors: {
-      top: ['#eef4ff', '#f4f8ff', '#ffffff', '#e8eeff'],
+      top: ['#eef4ff', '#f4f8ff', '#ffffff', '#e8eeff', '#dde8f4'],
       mid: ['#99aabb', '#aabbcc', '#8899aa'],
       bottom: ['#778899', '#667788', '#556677'],
       accent: ['#aaddff', '#88bbdd'],
@@ -150,11 +144,11 @@ const BIOMES: Record<BiomeType, BiomeConfig> = {
   },
   forest: {
     name: 'Forest',
-    heightScale: 6,
+    heightScale: 7,
     heightBase: 8,
     waterLevel: 5,
     colors: {
-      top: ['#339955', '#44aa66', '#22884d', '#55bb77'],
+      top: ['#339955', '#44aa66', '#22884d', '#55bb77', '#2d994f'],
       mid: ['#886644', '#775533', '#664422'],
       bottom: ['#556655', '#667766', '#445544'],
       accent: ['#ee5544', '#ff6655', '#dd4433'],
@@ -163,14 +157,14 @@ const BIOMES: Record<BiomeType, BiomeConfig> = {
   },
   mountains: {
     name: 'Mountains',
-    heightScale: 14,
-    heightBase: 4,
+    heightScale: 18,
+    heightBase: 5,
     waterLevel: 3,
     colors: {
-      top: ['#bbccdd', '#ccddee', '#aabbcc', '#99aabb'],
-      mid: ['#8899aa', '#99aabb', '#7788aa'],
+      top: ['#bbccdd', '#ccddee', '#aabbcc', '#99aabb', '#8899aa'],
+      mid: ['#8899aa', '#99aabb', '#7788aa', '#6a7d90'],
       bottom: ['#667788', '#556677', '#778899'],
-      accent: ['#eef4ff', '#ffffff'],
+      accent: ['#eef4ff', '#ffffff', '#e0e8f0'],
       water: '#6699bb',
     },
   },
@@ -190,13 +184,15 @@ const BIOMES: Record<BiomeType, BiomeConfig> = {
 };
 
 /* ═══════════════════════════════════════════════════════════
- *  Chunk Constants
+ *  Chunk Constants — Optimized defaults
  * ═══════════════════════════════════════════════════════════ */
 
 const CHUNK_SIZE = 16;
 const VOXEL_SIZE = 0.5;
-const RENDER_DISTANCE = 6; // chunks
+const RENDER_DISTANCE = 5;
 const MAX_HEIGHT = 32;
+// Max chunks to generate per frame to avoid frame drops
+const MAX_CHUNKS_PER_FRAME = 2;
 
 /* ═══════════════════════════════════════════════════════════
  *  Chunk Key Helpers
@@ -214,7 +210,7 @@ function worldToChunk(wx: number, wz: number): [number, number] {
 }
 
 /* ═══════════════════════════════════════════════════════════
- *  Determine biome from noise
+ *  Determine biome from noise (reduced octaves for perf)
  * ═══════════════════════════════════════════════════════════ */
 
 function getBiome(
@@ -223,29 +219,32 @@ function getBiome(
   wx: number,
   wz: number,
 ): BiomeType {
-  const temp = fbm(tempNoise, wx * 0.005, wz * 0.005, 3);
-  const moisture = fbm(biomeNoise, wx * 0.004 + 100, wz * 0.004 + 100, 3);
+  const temp = fbm(tempNoise, wx * 0.005, wz * 0.005, 2);
+  const moisture = fbm(biomeNoise, wx * 0.004 + 100, wz * 0.004 + 100, 2);
 
   if (temp < -0.25) return 'tundra';
   if (temp > 0.3 && moisture < -0.1) return 'desert';
   if (moisture > 0.3) return 'ocean';
   if (temp > 0.0 && moisture > 0.05) return 'forest';
-  if (fbm(biomeNoise, wx * 0.008, wz * 0.008, 2) > 0.25) return 'mountains';
+  if (biomeNoise(wx * 0.008, wz * 0.008) > 0.2) return 'mountains';
   return 'plains';
 }
 
 /* ═══════════════════════════════════════════════════════════
- *  Generate Chunk Data
+ *  Generate Chunk Data — Optimized: surface-only + structures
  * ═══════════════════════════════════════════════════════════ */
 
 interface ChunkVoxelData {
-  matrices: Float32Array;
+  positions: Float32Array;
   colors: Float32Array;
   count: number;
-  waterMatrices: Float32Array;
+  waterPositions: Float32Array;
   waterColors: Float32Array;
   waterCount: number;
 }
+
+// Pre-allocate reusable Color to avoid GC pressure
+const _tmpColor = new THREE.Color();
 
 function generateChunkData(
   cx: number,
@@ -255,69 +254,109 @@ function generateChunkData(
   biomeNoise: (x: number, y: number) => number,
   tempNoise: (x: number, y: number) => number,
   treeNoise: (x: number, y: number) => number,
+  structNoise: (x: number, y: number) => number,
 ): ChunkVoxelData {
-  const solidPositions: number[] = [];
-  const solidColors: number[] = [];
-  const waterPositions: number[] = [];
-  const waterColorArr: number[] = [];
+  // Use pre-sized typed arrays instead of dynamic JS arrays
+  // Estimate: ~CHUNK_SIZE^2 surface voxels + decorations ≈ 600 max per chunk
+  const maxVoxels = CHUNK_SIZE * CHUNK_SIZE * 8;
+  const posArr = new Float32Array(maxVoxels * 3);
+  const colArr = new Float32Array(maxVoxels * 3);
+  let solidCount = 0;
+
+  const maxWater = CHUNK_SIZE * CHUNK_SIZE * 4;
+  const wPosArr = new Float32Array(maxWater * 3);
+  const wColArr = new Float32Array(maxWater * 3);
+  let waterCount = 0;
 
   const baseX = cx * CHUNK_SIZE;
   const baseZ = cz * CHUNK_SIZE;
 
-  // Pre-compute height map for the chunk + 1 border for neighbor checks
-  const heights: number[][] = [];
-  const biomes: BiomeType[][] = [];
+  // Pre-compute height map + biome for chunk + 1-cell border
+  const gridW = CHUNK_SIZE + 2;
+  const heightMap = new Int32Array(gridW * gridW);
+  const biomeMap = new Uint8Array(gridW * gridW);
+  const biomeTypes: BiomeType[] = ['plains', 'desert', 'tundra', 'forest', 'mountains', 'ocean'];
+
   for (let lx = -1; lx <= CHUNK_SIZE; lx++) {
-    const row: number[] = [];
-    const bRow: BiomeType[] = [];
     for (let lz = -1; lz <= CHUNK_SIZE; lz++) {
       const wx = baseX + lx;
       const wz = baseZ + lz;
+      const idx = (lx + 1) * gridW + (lz + 1);
 
       const biome = getBiome(biomeNoise, tempNoise, wx, wz);
       const cfg = BIOMES[biome];
 
-      const h = fbm(heightNoise, wx * 0.02, wz * 0.02, 5, 2.0, 0.5);
-      const detail = fbm(detailNoise, wx * 0.08, wz * 0.08, 3, 2.0, 0.4) * 0.3;
-      const height = Math.max(0, Math.floor(cfg.heightBase + (h + detail) * cfg.heightScale));
+      // Reduced octaves: 4 for height (was 5), 2 for detail (was 3) — big perf win
+      const h = fbm(heightNoise, wx * 0.02, wz * 0.02, 4, 2.0, 0.5);
+      const detail = detailNoise(wx * 0.08, wz * 0.08) * 0.25;
 
-      row.push(Math.min(height, MAX_HEIGHT));
-      bRow.push(biome);
+      // Mountain ridgeline variation for more dramatic peaks
+      let extraHeight = 0;
+      if (biome === 'mountains') {
+        const ridge = Math.abs(fbm(detailNoise, wx * 0.015 + 200, wz * 0.015 + 200, 2));
+        extraHeight = ridge * 6;
+      }
+
+      const height = Math.max(0, Math.min(MAX_HEIGHT,
+        Math.floor(cfg.heightBase + (h + detail) * cfg.heightScale + extraHeight)));
+
+      heightMap[idx] = height;
+      biomeMap[idx] = biomeTypes.indexOf(biome);
     }
-    heights.push(row);
-    biomes.push(bRow);
   }
 
-  const tmpColor = new THREE.Color();
+  function pushVoxel(wx: number, wy: number, wz: number, hex: string) {
+    if (solidCount >= maxVoxels) return;
+    const i3 = solidCount * 3;
+    posArr[i3] = wx;
+    posArr[i3 + 1] = wy;
+    posArr[i3 + 2] = wz;
+    _tmpColor.set(hex);
+    colArr[i3] = _tmpColor.r;
+    colArr[i3 + 1] = _tmpColor.g;
+    colArr[i3 + 2] = _tmpColor.b;
+    solidCount++;
+  }
+
+  function pushWater(wx: number, wy: number, wz: number, hex: string) {
+    if (waterCount >= maxWater) return;
+    const i3 = waterCount * 3;
+    wPosArr[i3] = wx;
+    wPosArr[i3 + 1] = wy;
+    wPosArr[i3 + 2] = wz;
+    _tmpColor.set(hex);
+    wColArr[i3] = _tmpColor.r;
+    wColArr[i3 + 1] = _tmpColor.g;
+    wColArr[i3 + 2] = _tmpColor.b;
+    waterCount++;
+  }
 
   for (let lx = 0; lx < CHUNK_SIZE; lx++) {
     for (let lz = 0; lz < CHUNK_SIZE; lz++) {
-      const h = heights[lx + 1][lz + 1];
-      const biome = biomes[lx + 1][lz + 1];
+      const idx = (lx + 1) * gridW + (lz + 1);
+      const h = heightMap[idx];
+      const biome = biomeTypes[biomeMap[idx]];
       const cfg = BIOMES[biome];
 
       const wx = baseX + lx;
       const wz = baseZ + lz;
 
-      // Get neighbor heights for occlusion culling
-      const hN = heights[lx + 1][lz];
-      const hS = heights[lx + 1][lz + 2];
-      const hE = heights[lx + 2][lz + 1];
-      const hW = heights[lx][lz + 1];
+      // Neighbor heights for occlusion
+      const hN = heightMap[(lx + 1) * gridW + lz];
+      const hS = heightMap[(lx + 1) * gridW + (lz + 2)];
+      const hE = heightMap[(lx + 2) * gridW + (lz + 1)];
+      const hW = heightMap[lx * gridW + (lz + 1)];
 
+      // PERF: Only render top surface + exposed sides (skip buried voxels)
       for (let y = 0; y <= h; y++) {
-        // Only render voxels that have at least one exposed face
         const isTop = y === h;
         const hasExposed = isTop || y === 0 ||
           y > hN || y > hS || y > hE || y > hW;
-
         if (!hasExposed) continue;
 
-        // Determine color based on height layers
         let colorHex: string;
         if (isTop) {
-          // Snow caps on mountains
-          if (biome === 'mountains' && y > 18) {
+          if (biome === 'mountains' && y > 16) {
             colorHex = cfg.colors.accent[Math.abs(wx + wz) % cfg.colors.accent.length];
           } else {
             colorHex = cfg.colors.top[Math.abs(wx + wz) % cfg.colors.top.length];
@@ -328,140 +367,202 @@ function generateChunkData(
           colorHex = cfg.colors.bottom[Math.abs(wx + y + wz) % cfg.colors.bottom.length];
         }
 
-        const worldX = (baseX + lx) * VOXEL_SIZE;
-        const worldY = y * VOXEL_SIZE;
-        const worldZ = (baseZ + lz) * VOXEL_SIZE;
-
-        solidPositions.push(worldX, worldY, worldZ);
-        tmpColor.set(colorHex);
-        solidColors.push(tmpColor.r, tmpColor.g, tmpColor.b);
+        pushVoxel(
+          (baseX + lx) * VOXEL_SIZE,
+          y * VOXEL_SIZE,
+          (baseZ + lz) * VOXEL_SIZE,
+          colorHex,
+        );
       }
 
-      // Water fill
+      // Water: only top surface
       if (h < cfg.waterLevel) {
-        for (let y = h + 1; y <= cfg.waterLevel; y++) {
-          // Only top water surface and edges
-          const isWaterTop = y === cfg.waterLevel;
-          if (!isWaterTop && y > h + 1) continue;
-
-          const worldX = (baseX + lx) * VOXEL_SIZE;
-          const worldY = y * VOXEL_SIZE;
-          const worldZ = (baseZ + lz) * VOXEL_SIZE;
-
-          waterPositions.push(worldX, worldY, worldZ);
-          tmpColor.set(cfg.colors.water);
-          waterColorArr.push(tmpColor.r, tmpColor.g, tmpColor.b);
-        }
+        pushWater(
+          (baseX + lx) * VOXEL_SIZE,
+          cfg.waterLevel * VOXEL_SIZE,
+          (baseZ + lz) * VOXEL_SIZE,
+          cfg.colors.water,
+        );
       }
 
-      // Trees (sparse, only on top layer of certain biomes)
+      // ── Trees (sparser, more random) ──
       if (
         (biome === 'plains' || biome === 'forest') &&
-        h > cfg.waterLevel + 1
+        h > cfg.waterLevel + 1 &&
+        lx > 1 && lx < CHUNK_SIZE - 2 && lz > 1 && lz < CHUNK_SIZE - 2
       ) {
-        const treeVal = treeNoise(wx * 0.5, wz * 0.5);
-        const threshold = biome === 'forest' ? 0.2 : 0.38;
-        if (treeVal > threshold && lx > 1 && lx < CHUNK_SIZE - 2 && lz > 1 && lz < CHUNK_SIZE - 2) {
-          // Simple tree: trunk + crown
-          const trunkH = biome === 'forest' ? 4 : 3;
+        const treeVal = treeNoise(wx * 0.6, wz * 0.6);
+        // Much sparser: forest 0.32, plains 0.44
+        const threshold = biome === 'forest' ? 0.32 : 0.44;
+        if (treeVal > threshold) {
+          const trunkH = biome === 'forest' ? 3 + (Math.abs(wx * 13 + wz * 7) % 3) : 2 + (Math.abs(wx * 7 + wz) % 2);
           const trunkColor = biome === 'forest' ? '#664422' : '#AA7744';
-          const leafColor = biome === 'forest'
-            ? ['#339955', '#44aa66', '#22884d'][Math.abs(wx) % 3]
-            : ['#44dd66', '#55ee77', '#66ff88'][Math.abs(wx) % 3];
+          const leafColors = biome === 'forest'
+            ? ['#339955', '#44aa66', '#22884d']
+            : ['#44dd66', '#55ee77', '#66ff88'];
+          const leafColor = leafColors[Math.abs(wx * 3 + wz * 5) % leafColors.length];
 
           for (let ty = 1; ty <= trunkH; ty++) {
-            const worldX = (baseX + lx) * VOXEL_SIZE;
-            const worldY = (h + ty) * VOXEL_SIZE;
-            const worldZ = (baseZ + lz) * VOXEL_SIZE;
-            solidPositions.push(worldX, worldY, worldZ);
-            tmpColor.set(trunkColor);
-            solidColors.push(tmpColor.r, tmpColor.g, tmpColor.b);
+            pushVoxel((baseX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (baseZ + lz) * VOXEL_SIZE, trunkColor);
           }
 
-          // Leaf crown (small sphere)
-          const crownR = biome === 'forest' ? 3 : 2;
+          // Leaf canopy — smaller, less dense (only shell of sphere)
+          const crownR = biome === 'forest' ? 2 : 2;
           const crownY = h + trunkH + crownR;
           for (let dx = -crownR; dx <= crownR; dx++) {
             for (let dy = -crownR; dy <= crownR; dy++) {
               for (let dz = -crownR; dz <= crownR; dz++) {
-                if (dx * dx + dy * dy + dz * dz > crownR * crownR + 0.5) continue;
-                const worldX = (baseX + lx + dx) * VOXEL_SIZE;
-                const worldY = (crownY + dy) * VOXEL_SIZE;
-                const worldZ = (baseZ + lz + dz) * VOXEL_SIZE;
-                solidPositions.push(worldX, worldY, worldZ);
-                tmpColor.set(leafColor);
-                solidColors.push(tmpColor.r, tmpColor.g, tmpColor.b);
+                const dist2 = dx * dx + dy * dy + dz * dz;
+                // Only render outer shell (dist > inner^2 && dist <= outer^2)
+                if (dist2 > crownR * crownR + 0.5) continue;
+                if (crownR > 1 && dist2 < (crownR - 1) * (crownR - 1)) continue;
+                pushVoxel(
+                  (baseX + lx + dx) * VOXEL_SIZE,
+                  (crownY + dy) * VOXEL_SIZE,
+                  (baseZ + lz + dz) * VOXEL_SIZE,
+                  leafColor,
+                );
               }
             }
           }
         }
       }
 
-      // Cacti in desert
-      if (biome === 'desert' && h > cfg.waterLevel) {
+      // ── Cacti in desert (sparser) ──
+      if (biome === 'desert' && h > cfg.waterLevel && lx > 0 && lx < CHUNK_SIZE - 1 && lz > 0 && lz < CHUNK_SIZE - 1) {
         const cactusVal = treeNoise(wx * 0.7 + 50, wz * 0.7 + 50);
-        if (cactusVal > 0.42 && lx > 0 && lx < CHUNK_SIZE - 1 && lz > 0 && lz < CHUNK_SIZE - 1) {
-          const cactusH = 3 + Math.floor(Math.abs(treeNoise(wx, wz)) * 3);
+        if (cactusVal > 0.46) {
+          const cactusH = 3 + (Math.abs(wx * 11 + wz * 3) % 3);
           for (let cy = 1; cy <= cactusH; cy++) {
-            solidPositions.push((baseX + lx) * VOXEL_SIZE, (h + cy) * VOXEL_SIZE, (baseZ + lz) * VOXEL_SIZE);
-            tmpColor.set('#55aa44');
-            solidColors.push(tmpColor.r, tmpColor.g, tmpColor.b);
+            pushVoxel((baseX + lx) * VOXEL_SIZE, (h + cy) * VOXEL_SIZE, (baseZ + lz) * VOXEL_SIZE, '#55aa44');
           }
-          // Arms
           if (cactusH > 3) {
-            solidPositions.push((baseX + lx + 1) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (baseZ + lz) * VOXEL_SIZE);
-            tmpColor.set('#66bb55');
-            solidColors.push(tmpColor.r, tmpColor.g, tmpColor.b);
-            solidPositions.push((baseX + lx + 1) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (baseZ + lz) * VOXEL_SIZE);
-            tmpColor.set('#66bb55');
-            solidColors.push(tmpColor.r, tmpColor.g, tmpColor.b);
+            pushVoxel((baseX + lx + 1) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (baseZ + lz) * VOXEL_SIZE, '#66bb55');
+            pushVoxel((baseX + lx + 1) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (baseZ + lz) * VOXEL_SIZE, '#66bb55');
+          }
+        }
+      }
+
+      // ── Small houses/cabins in plains/forest ──
+      if (
+        (biome === 'plains' || biome === 'forest') &&
+        h > cfg.waterLevel + 1 &&
+        lx >= 2 && lx <= CHUNK_SIZE - 5 && lz >= 2 && lz <= CHUNK_SIZE - 5
+      ) {
+        const houseVal = structNoise(wx * 0.12, wz * 0.12);
+        // Very rare: ~1 house per few chunks
+        if (houseVal > 0.48 && Math.abs(wx % 11) < 1 && Math.abs(wz % 13) < 1) {
+          const wallColor = biome === 'forest' ? '#8B7355' : '#D4C5A9';
+          const roofColor = biome === 'forest' ? '#8B4513' : '#CC6633';
+          const doorColor = '#664422';
+          const windowColor = '#AADDFF';
+
+          // 3x3x3 walls
+          for (let hx = 0; hx < 3; hx++) {
+            for (let hz = 0; hz < 3; hz++) {
+              for (let hy = 1; hy <= 3; hy++) {
+                // Skip interior
+                if (hx === 1 && hz === 1) continue;
+                // Door opening
+                if (hx === 1 && hz === 0 && hy <= 2) continue;
+                // Window
+                let color = wallColor;
+                if (hy === 2 && ((hx === 0 && hz === 1) || (hx === 2 && hz === 1))) {
+                  color = windowColor;
+                }
+                pushVoxel(
+                  (baseX + lx + hx) * VOXEL_SIZE,
+                  (h + hy) * VOXEL_SIZE,
+                  (baseZ + lz + hz) * VOXEL_SIZE,
+                  color,
+                );
+              }
+            }
+          }
+          // Door frame
+          pushVoxel((baseX + lx + 1) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (baseZ + lz) * VOXEL_SIZE, doorColor);
+
+          // Peaked roof (4x4 footprint)
+          for (let rx = -1; rx <= 3; rx++) {
+            for (let rz = -1; rz <= 3; rz++) {
+              pushVoxel(
+                (baseX + lx + rx) * VOXEL_SIZE,
+                (h + 4) * VOXEL_SIZE,
+                (baseZ + lz + rz) * VOXEL_SIZE,
+                roofColor,
+              );
+            }
+          }
+          // Roof peak
+          for (let rx = 0; rx <= 2; rx++) {
+            for (let rz = 0; rz <= 2; rz++) {
+              pushVoxel(
+                (baseX + lx + rx) * VOXEL_SIZE,
+                (h + 5) * VOXEL_SIZE,
+                (baseZ + lz + rz) * VOXEL_SIZE,
+                roofColor,
+              );
+            }
+          }
+        }
+      }
+
+      // ── Rock formations in tundra/mountains ──
+      if (
+        (biome === 'tundra' || biome === 'mountains') &&
+        h > cfg.waterLevel &&
+        lx > 1 && lx < CHUNK_SIZE - 2 && lz > 1 && lz < CHUNK_SIZE - 2
+      ) {
+        const rockVal = structNoise(wx * 0.4 + 300, wz * 0.4 + 300);
+        if (rockVal > 0.44) {
+          const rockH = 1 + (Math.abs(wx * 7 + wz * 3) % 3);
+          const rockColor = biome === 'tundra' ? '#8899aa' : '#667788';
+          for (let ry = 1; ry <= rockH; ry++) {
+            pushVoxel((baseX + lx) * VOXEL_SIZE, (h + ry) * VOXEL_SIZE, (baseZ + lz) * VOXEL_SIZE, rockColor);
+          }
+          // Wider base
+          if (rockH > 1) {
+            pushVoxel((baseX + lx + 1) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (baseZ + lz) * VOXEL_SIZE, rockColor);
+            pushVoxel((baseX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (baseZ + lz + 1) * VOXEL_SIZE, rockColor);
           }
         }
       }
     }
   }
 
-  // Convert to typed arrays
-  const count = solidPositions.length / 3;
-  const matrices = new Float32Array(count * 16);
-  const colors = new Float32Array(count * 3);
-  const tmpMat = new THREE.Matrix4();
-
-  for (let i = 0; i < count; i++) {
-    tmpMat.identity();
-    tmpMat.setPosition(solidPositions[i * 3], solidPositions[i * 3 + 1], solidPositions[i * 3 + 2]);
-    tmpMat.toArray(matrices, i * 16);
-    colors[i * 3] = solidColors[i * 3];
-    colors[i * 3 + 1] = solidColors[i * 3 + 1];
-    colors[i * 3 + 2] = solidColors[i * 3 + 2];
-  }
-
-  const waterCount = waterPositions.length / 3;
-  const waterMatrices = new Float32Array(waterCount * 16);
-  const waterColors = new Float32Array(waterCount * 3);
-
-  for (let i = 0; i < waterCount; i++) {
-    tmpMat.identity();
-    tmpMat.setPosition(waterPositions[i * 3], waterPositions[i * 3 + 1], waterPositions[i * 3 + 2]);
-    tmpMat.toArray(waterMatrices, i * 16);
-    waterColors[i * 3] = waterColorArr[i * 3];
-    waterColors[i * 3 + 1] = waterColorArr[i * 3 + 1];
-    waterColors[i * 3 + 2] = waterColorArr[i * 3 + 2];
-  }
-
-  return { matrices, colors, count, waterMatrices, waterColors, waterCount };
+  return {
+    positions: posArr.subarray(0, solidCount * 3),
+    colors: colArr.subarray(0, solidCount * 3),
+    count: solidCount,
+    waterPositions: wPosArr.subarray(0, waterCount * 3),
+    waterColors: wColArr.subarray(0, waterCount * 3),
+    waterCount,
+  };
 }
 
 /* ═══════════════════════════════════════════════════════════
- *  Chunk Mesh Component
+ *  Shared geometry & materials (created once, reused by all chunks)
+ * ═══════════════════════════════════════════════════════════ */
+
+const VOXEL_GAP = VOXEL_SIZE * 0.92;
+const sharedSolidGeo = new THREE.BoxGeometry(VOXEL_GAP, VOXEL_GAP, VOXEL_GAP);
+const sharedSolidMat = new THREE.MeshStandardMaterial({ roughness: 0.7 });
+const sharedWaterGeo = sharedSolidGeo; // Same shape
+const sharedWaterMat = new THREE.MeshStandardMaterial({
+  roughness: 0.2,
+  metalness: 0.05,
+  transparent: true,
+  opacity: 0.6,
+  depthWrite: false,
+});
+
+/* ═══════════════════════════════════════════════════════════
+ *  Chunk Mesh Component — Zero per-chunk geometry/material alloc
  * ═══════════════════════════════════════════════════════════ */
 
 function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   const solidRef = useRef<THREE.InstancedMesh>(null);
   const waterRef = useRef<THREE.InstancedMesh>(null);
-
-  // Slightly smaller than VOXEL_SIZE to create visible gaps between cubes for a pixel-grid aesthetic
-  const gap = VOXEL_SIZE * 0.92;
 
   useEffect(() => {
     const mesh = solidRef.current;
@@ -469,9 +570,13 @@ function ChunkMesh({ data }: { data: ChunkVoxelData }) {
     const mat4 = new THREE.Matrix4();
     const col = new THREE.Color();
     for (let i = 0; i < data.count; i++) {
-      mat4.fromArray(data.matrices, i * 16);
+      const i3 = i * 3;
+      mat4.identity();
+      mat4.elements[12] = data.positions[i3];
+      mat4.elements[13] = data.positions[i3 + 1];
+      mat4.elements[14] = data.positions[i3 + 2];
       mesh.setMatrixAt(i, mat4);
-      col.setRGB(data.colors[i * 3], data.colors[i * 3 + 1], data.colors[i * 3 + 2]);
+      col.setRGB(data.colors[i3], data.colors[i3 + 1], data.colors[i3 + 2]);
       mesh.setColorAt(i, col);
     }
     mesh.instanceMatrix.needsUpdate = true;
@@ -484,9 +589,13 @@ function ChunkMesh({ data }: { data: ChunkVoxelData }) {
     const mat4 = new THREE.Matrix4();
     const col = new THREE.Color();
     for (let i = 0; i < data.waterCount; i++) {
-      mat4.fromArray(data.waterMatrices, i * 16);
+      const i3 = i * 3;
+      mat4.identity();
+      mat4.elements[12] = data.waterPositions[i3];
+      mat4.elements[13] = data.waterPositions[i3 + 1];
+      mat4.elements[14] = data.waterPositions[i3 + 2];
       mesh.setMatrixAt(i, mat4);
-      col.setRGB(data.waterColors[i * 3], data.waterColors[i * 3 + 1], data.waterColors[i * 3 + 2]);
+      col.setRGB(data.waterColors[i3], data.waterColors[i3 + 1], data.waterColors[i3 + 2]);
       mesh.setColorAt(i, col);
     }
     mesh.instanceMatrix.needsUpdate = true;
@@ -496,16 +605,10 @@ function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   return (
     <group>
       {data.count > 0 && (
-        <instancedMesh ref={solidRef} args={[undefined, undefined, data.count]} frustumCulled={false}>
-          <boxGeometry args={[gap, gap, gap]} />
-          <meshStandardMaterial roughness={0.7} />
-        </instancedMesh>
+        <instancedMesh ref={solidRef} args={[sharedSolidGeo, sharedSolidMat, data.count]} frustumCulled={false} />
       )}
       {data.waterCount > 0 && (
-        <instancedMesh ref={waterRef} args={[undefined, undefined, data.waterCount]} frustumCulled={false}>
-          <boxGeometry args={[gap, gap, gap]} />
-          <meshStandardMaterial roughness={0.2} metalness={0.05} transparent opacity={0.6} depthWrite={false} />
-        </instancedMesh>
+        <instancedMesh ref={waterRef} args={[sharedWaterGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />
       )}
     </group>
   );
@@ -524,48 +627,30 @@ function FlyCamera({
 }) {
   const { camera } = useThree();
 
-  // Initialize camera position
   useEffect(() => {
     camera.position.set(0, 12, 20);
     camera.lookAt(0, 6, 0);
   }, [camera]);
 
+  // Reusable vectors — avoid alloc per frame
+  const _dir = useMemo(() => new THREE.Vector3(), []);
+  const _right = useMemo(() => new THREE.Vector3(), []);
+
   useFrame((_, delta) => {
     const keys = keysRef.current;
-    if (!keys) return;
+    if (!keys || keys.size === 0) return;
 
     const speed = (speedRef.current ?? 12) * delta;
-    const direction = new THREE.Vector3();
-    const right = new THREE.Vector3();
 
-    camera.getWorldDirection(direction);
-    right.crossVectors(direction, camera.up).normalize();
+    camera.getWorldDirection(_dir);
+    _right.crossVectors(_dir, camera.up).normalize();
 
-    // Forward/Backward (W/ArrowUp, S/ArrowDown)
-    if (keys.has('w') || keys.has('arrowup')) {
-      camera.position.addScaledVector(direction, speed);
-    }
-    if (keys.has('s') || keys.has('arrowdown')) {
-      camera.position.addScaledVector(direction, -speed);
-    }
-
-    // Strafe (A/ArrowLeft, D/ArrowRight)
-    if (keys.has('a') || keys.has('arrowleft')) {
-      camera.position.addScaledVector(right, -speed);
-    }
-    if (keys.has('d') || keys.has('arrowright')) {
-      camera.position.addScaledVector(right, speed);
-    }
-
-    // Ascend/Descend (Space, Shift)
-    if (keys.has(' ')) {
-      camera.position.addScaledVector(camera.up, speed);
-    }
-    if (keys.has('shift')) {
-      camera.position.addScaledVector(camera.up, -speed);
-    }
-
-    // Mouse look — handled by pointer lock in parent
+    if (keys.has('w') || keys.has('arrowup')) camera.position.addScaledVector(_dir, speed);
+    if (keys.has('s') || keys.has('arrowdown')) camera.position.addScaledVector(_dir, -speed);
+    if (keys.has('a') || keys.has('arrowleft')) camera.position.addScaledVector(_right, -speed);
+    if (keys.has('d') || keys.has('arrowright')) camera.position.addScaledVector(_right, speed);
+    if (keys.has(' ')) camera.position.addScaledVector(camera.up, speed);
+    if (keys.has('shift')) camera.position.addScaledVector(camera.up, -speed);
   });
 
   return null;
@@ -609,20 +694,14 @@ function WorldLighting() {
     <>
       <ambientLight intensity={0.8} color="#ffffff" />
       <hemisphereLight color="#aaccff" groundColor="#886644" intensity={0.5} />
-      <directionalLight
-        position={[50, 80, 50]}
-        intensity={1.4}
-        color="#ffffff"
-        castShadow={false}
-      />
+      <directionalLight position={[50, 80, 50]} intensity={1.4} color="#ffffff" castShadow={false} />
       <directionalLight position={[-30, 40, -30]} intensity={0.6} color="#ffffff" />
-      <directionalLight position={[0, -20, 20]} intensity={0.3} color="#ffffff" />
     </>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════
- *  Sky Gradient Background
+ *  Sky Gradient Background — Reduced poly count
  * ═══════════════════════════════════════════════════════════ */
 
 function SkyGradient() {
@@ -669,7 +748,7 @@ function SkyGradient() {
 
   return (
     <mesh ref={meshRef} material={shaderMaterial}>
-      <sphereGeometry args={[500, 32, 32]} />
+      <sphereGeometry args={[500, 16, 16]} />
     </mesh>
   );
 }
@@ -679,7 +758,7 @@ function SkyGradient() {
  * ═══════════════════════════════════════════════════════════ */
 
 function FogEffect() {
-  return <fogExp2 attach="fog" args={['#b0c8e0', 0.012]} />;
+  return <fogExp2 attach="fog" args={['#b0c8e0', 0.015]} />;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -729,7 +808,7 @@ function CameraTracker({
   const lastUpdate = useRef(0);
 
   useFrame(({ clock }) => {
-    if (clock.getElapsedTime() - lastUpdate.current < 0.2) return;
+    if (clock.getElapsedTime() - lastUpdate.current < 0.3) return;
     lastUpdate.current = clock.getElapsedTime();
 
     const pos: [number, number, number] = [camera.position.x, camera.position.y, camera.position.z];
