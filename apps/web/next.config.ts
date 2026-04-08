@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     '@pxlkit/weather',
     '@pxlkit/effects',
     '@pxlkit/ui',
+    '@pxlkit/voxel',
   ],
   eslint: {
     // Warning: This allows production builds to successfully complete even if

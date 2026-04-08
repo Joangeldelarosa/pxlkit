@@ -1,0 +1,48 @@
+{
+  "name": "@pxlkit/voxel",
+  "version": "0.1.0",
+  "description": "Voxel engine for pxlkit — 3D pixelated icons and elements using voxels",
+  "author": {
+    "name": "Joangel De La Rosa",
+    "url": "https://github.com/joangeldelarosa"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": "https://github.com/Joangeldelarosa/pxlkit",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pxlkit/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0"
+  },
+  "keywords": [
+    "pixel-art",
+    "voxel",
+    "3d",
+    "icons",
+    "retro",
+    "minecraft",
+    "pxlkit",
+    "react-three-fiber"
+  ]
+}

@@ -10,7 +10,8 @@
       "@pxlkit/social": ["../../packages/social/src"],
       "@pxlkit/weather": ["../../packages/weather/src"],
       "@pxlkit/effects": ["../../packages/effects/src"],
-      "@pxlkit/ui": ["../../packages/ui/src"]
+      "@pxlkit/ui": ["../../packages/ui/src"],
+      "@pxlkit/voxel": ["../../packages/voxel/src"]
     },
     "module": "ESNext",
     "moduleResolution": "bundler",
