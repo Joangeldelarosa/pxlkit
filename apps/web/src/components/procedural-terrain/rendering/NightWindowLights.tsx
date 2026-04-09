@@ -16,7 +16,9 @@ import { TimeContext } from './DayNightCycle';
 
 const WIN_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 0.95, VOXEL_SIZE * 0.95, VOXEL_SIZE * 0.95);
 
-/** Fast hash for window on/off (deterministic per position) */
+const WINDOW_LIT_PROBABILITY = 0.65;   // ~65% of windows lit at night
+const FLICKER_HASH_THRESHOLD = 0.5;    // only windows with hash > this can flicker off
+const FLICKER_OFF_THRESHOLD = -0.3;    // sin value below which flickering windows go dark
 function winHash(x: number, y: number, z: number): number {
   let h = (Math.round(x * 100) * 374761393 + Math.round(y * 100) * 668265263 + Math.round(z * 100) * 1274126177) | 0;
   h = Math.imul(h ^ (h >>> 13), 1103515245);
@@ -106,13 +108,13 @@ export function NightWindowLights({
 
         // Deterministic: ~65% of windows are lit at night
         const h = winHash(wx, wy, wz);
-        if (h > 0.65) continue;
+        if (h > WINDOW_LIT_PROBABILITY) continue;
 
         // Some windows flicker on/off with a slow pattern
         const flickerPhase = h * 100;
         const flickerSpeed = 0.1 + h * 0.2;
         const flicker = Math.sin(t * flickerSpeed + flickerPhase);
-        if (h > 0.5 && flicker < -0.3) continue; // occasional off
+        if (h > FLICKER_HASH_THRESHOLD && flicker < FLICKER_OFF_THRESHOLD) continue;
 
         m.identity();
         m.elements[12] = wx;
