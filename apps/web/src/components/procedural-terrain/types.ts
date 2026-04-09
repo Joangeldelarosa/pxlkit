@@ -73,6 +73,9 @@ export interface ChunkVoxelData {
   waterColors: Float32Array;
   waterCount: number;
   pickups: { wx: number; wy: number; wz: number; iconIdx: number }[];
+  /** Window positions for night-time lighting: [wx, wy, wz] world coords */
+  windowLights: Float32Array;
+  windowLightCount: number;
   solidHeightMap: Int32Array;
   chunkX: number;
   chunkZ: number;
