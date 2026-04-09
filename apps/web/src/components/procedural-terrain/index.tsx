@@ -67,7 +67,8 @@ import { SkyBirds } from './effects/SkyBirds';
 import { GroundCritters } from './effects/GroundCritters';
 import { FlyCamera } from './camera/FlyCamera';
 import { CameraLook } from './camera/CameraLook';
-import { OverlayStats, ConfigSlider, MobileTouchControls } from './ui/Controls';
+import { OverlayStats, MobileTouchControls } from './ui/Controls';
+import { SettingsPanel } from './ui/SettingsPanel';
 
 /* ═══════════════════════════════════════════════════════════════
  *  Initialize Pickup Icons
@@ -310,7 +311,6 @@ export default function ProceduralTerrain() {
   const [config, setConfig] = useState<WorldConfig>(DEFAULT_CONFIG);
   const [isLocked, setIsLocked] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const [cameraPos, setCameraPos] = useState<[number, number, number]>([0, 12, 20]);
   const [currentBiome, setCurrentBiome] = useState('Plains');
   const [chunkCount, setChunkCount] = useState(0);
@@ -377,7 +377,7 @@ export default function ProceduralTerrain() {
   const handleTouchKey = useCallback((key: string, active: boolean) => {
     if (active) keysRef.current.add(key); else keysRef.current.delete(key);
   }, []);
-  const updateConfig = useCallback((key: keyof WorldConfig, val: number) => {
+  const updateConfig = useCallback((key: keyof WorldConfig, val: number | string) => {
     setConfig(prev => ({ ...prev, [key]: val }));
   }, []);
 
@@ -397,119 +397,22 @@ export default function ProceduralTerrain() {
             <p className="font-pixel text-[8px] sm:text-[10px] md:text-xs text-retro-purple/80 mb-1 drop-shadow select-none">@pxlkit/voxel — Coming Soon</p>
             <p className="text-retro-muted/70 text-[10px] sm:text-xs md:text-sm max-w-md mx-auto px-4 leading-relaxed select-none">
               {config.worldMode === 'infinite'
-                ? 'Infinite procedural voxel worlds with cities, biomes, and ambient particles.'
+                ? 'Infinite procedural voxel worlds with cities, villages, swamps, and dynamic day/night.'
                 : `Floating ${config.worldSize}×${config.worldSize} island with tapered edges and full biome variety.`}
               <span className="text-retro-gold font-bold">{isMobile ? ' Tap to fly.' : ' Click to fly.'}</span>
             </p>
           </div>
-          <div className="pointer-events-auto bg-retro-bg/80 backdrop-blur-md border border-retro-border/50 rounded-xl p-3 sm:p-4 md:p-5 max-w-sm w-[calc(100%-2rem)] space-y-3 shadow-xl overflow-y-auto max-h-[70vh] select-none">
-            <div className="space-y-1.5">
-              <label className="font-pixel text-[8px] sm:text-[9px] text-retro-green/80 uppercase tracking-wider select-none">World Seed</label>
-              <div className="flex gap-2">
-                <input type="text" inputMode="numeric" pattern="[0-9]*" value={seedInput}
-                  onChange={e => setSeedInput(e.target.value.replace(/[^0-9]/g, ''))}
-                  onKeyDown={e => e.key === 'Enter' && applySeed()}
-                  className="flex-1 bg-retro-surface/80 border border-retro-border/50 rounded px-2 sm:px-3 py-1.5 font-mono text-xs sm:text-sm text-retro-text focus:border-retro-green/60 focus:outline-none transition-colors select-text" placeholder="Enter seed..." />
-                <button onClick={applySeed} className="px-2 sm:px-3 py-1.5 bg-retro-green/20 hover:bg-retro-green/30 border border-retro-green/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-green transition-all cursor-pointer select-none">GO</button>
-              </div>
-            </div>
-            <button onClick={generateNewSeed} className="w-full py-2 bg-retro-purple/20 hover:bg-retro-purple/30 border border-retro-purple/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-purple transition-all cursor-pointer select-none">🎲 RANDOM WORLD</button>
-            {/* World Mode Toggle */}
-            <div className="space-y-1">
-              <label className="font-pixel text-[8px] sm:text-[9px] text-retro-purple/80 uppercase tracking-wider select-none">World Mode</label>
-              <div className="flex gap-2">
-                <button onClick={() => setConfig(prev => ({ ...prev, worldMode: 'infinite' as WorldMode }))}
-                  className={`flex-1 py-1.5 rounded font-pixel text-[8px] sm:text-[9px] transition-all cursor-pointer select-none border ${config.worldMode === 'infinite' ? 'bg-retro-purple/30 border-retro-purple/60 text-retro-purple' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/60 hover:bg-retro-surface/60'}`}>
-                  ∞ INFINITE
-                </button>
-                <button onClick={() => setConfig(prev => ({ ...prev, worldMode: 'finite' as WorldMode }))}
-                  className={`flex-1 py-1.5 rounded font-pixel text-[8px] sm:text-[9px] transition-all cursor-pointer select-none border ${config.worldMode === 'finite' ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/60 hover:bg-retro-surface/60'}`}>
-                  ◻ FINITE
-                </button>
-              </div>
-              <p className="font-mono text-[7px] text-retro-muted/40 select-none">
-                {config.worldMode === 'infinite' ? 'Endless terrain, chunks loaded on demand' : `Island of ${config.worldSize}×${config.worldSize} voxels`}
-              </p>
-            </div>
-            {config.worldMode === 'finite' && (
-              <ConfigSlider label="World Size" value={config.worldSize} onChange={v => updateConfig('worldSize', v)} min={32} max={512} step={16} color="text-retro-cyan/80" displayValue={`${config.worldSize}×${config.worldSize}`} />
-            )}
-            {config.worldMode === 'infinite' && (
-              <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => updateConfig('renderDistance', v)} min={2} max={50} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
-            )}
-            <ConfigSlider label="Fly Speed" value={config.flySpeed} onChange={v => updateConfig('flySpeed', v)} min={4} max={80} step={1} color="text-retro-gold/80" displayValue={String(config.flySpeed)} />
-            <button onClick={() => setShowAdvanced(!showAdvanced)}
-              className="w-full py-1.5 bg-retro-surface/40 hover:bg-retro-surface/60 border border-retro-border/30 rounded font-pixel text-[7px] sm:text-[8px] text-retro-muted/70 transition-all cursor-pointer select-none">
-              {showAdvanced ? '▾ HIDE ADVANCED' : '▸ SHOW ADVANCED'}
-            </button>
-            {showAdvanced && (
-              <div className="space-y-2.5 pt-1 border-t border-retro-border/20">
-                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1">Graphics &amp; Performance</p>
-                <div className="space-y-1">
-                  <label className="font-pixel text-[8px] sm:text-[9px] text-retro-cyan/80 uppercase tracking-wider select-none">Graphics Quality</label>
-                  <div className="flex gap-1.5">
-                    {(['low', 'medium', 'high'] as const).map(q => (
-                      <button key={q} onClick={() => setConfig(prev => ({ ...prev, graphicsQuality: q }))}
-                        className={`flex-1 py-1 rounded font-pixel text-[7px] sm:text-[8px] transition-all cursor-pointer select-none border ${config.graphicsQuality === q ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/50 hover:bg-retro-surface/60'}`}>
-                        {q.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="font-mono text-[7px] text-retro-muted/30 select-none">
-                    {config.graphicsQuality === 'low' ? 'Lower DPR, no AA — best for mobile' : config.graphicsQuality === 'high' ? 'Higher DPR + antialiasing — GPU intensive' : 'Balanced DPR, no AA — recommended'}
-                  </p>
-                </div>
-                <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => updateConfig('chunkGenSpeed', v)} min={1} max={10} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
-                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Visual Detail</p>
-                <ConfigSlider label="Voxel Detail LOD" value={config.voxelDetail} onChange={v => updateConfig('voxelDetail', v)} min={0} max={16} step={1} color="text-retro-gold/80" displayValue={config.voxelDetail === 0 ? 'Off' : `${config.voxelDetail}× subdivisions`} />
-                <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                  {config.voxelDetail === 0 ? 'No surface detail — best performance' : config.voxelDetail <= 2 ? 'Mini-voxels on nearby surfaces for texture' : config.voxelDetail <= 8 ? 'High detail — more GPU intensive' : 'Ultra detail — very GPU intensive'}
-                </p>
-                {config.voxelDetail > 0 && (
-                  <>
-                    <ConfigSlider label="Detail Distance" value={config.detailDistance} onChange={v => updateConfig('detailDistance', v)} min={1} max={20} step={0.5} color="text-retro-gold/80" displayValue={`${config.detailDistance} units`} />
-                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                      Radius around camera where mini-voxels appear
-                    </p>
-                    <ConfigSlider label="Sharpness" value={config.detailSharpness} onChange={v => updateConfig('detailSharpness', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.detailSharpness === 0 ? 'Smooth' : config.detailSharpness < 0.3 ? 'Subtle' : config.detailSharpness < 0.7 ? 'Textured' : 'Rough'} />
-                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                      {config.detailSharpness === 0 ? 'Uniform flat mini-voxels — clean look' : config.detailSharpness < 0.3 ? 'Slight size & height variation' : config.detailSharpness < 0.7 ? 'Noticeable texture with bumps & color shifts' : 'Rough organic surfaces — gaps, bumps & contrast'}
-                    </p>
-                    <ConfigSlider label="Detail Max Instances" value={config.detailMaxInstances} onChange={v => updateConfig('detailMaxInstances', v)} min={1000} max={200000} step={1000} color="text-retro-cyan/80" displayValue={config.detailMaxInstances >= 1000 ? `${(config.detailMaxInstances / 1000).toFixed(0)}K` : String(config.detailMaxInstances)} />
-                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                      GPU budget for mini-voxels — higher = more detail but slower
-                    </p>
-                  </>
-                )}
-                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Terrain &amp; Biomes</p>
-                <ConfigSlider label="Tree Density" value={config.treeDensity} onChange={v => updateConfig('treeDensity', v)} min={0} max={1} step={0.1} color="text-retro-green/80" displayValue={`${Math.round(config.treeDensity * 100)}%`} />
-                <ConfigSlider label="Structure Density" value={config.structureDensity} onChange={v => updateConfig('structureDensity', v)} min={0} max={1} step={0.1} color="text-retro-gold/80" displayValue={`${Math.round(config.structureDensity * 100)}%`} />
-                <ConfigSlider label="City Frequency" value={config.cityFrequency} onChange={v => updateConfig('cityFrequency', v)} min={0} max={1} step={0.1} color="text-retro-purple/80" displayValue={`${Math.round(config.cityFrequency * 100)}%`} />
-                <ConfigSlider label="Biome Variation" value={config.biomeVariation} onChange={v => updateConfig('biomeVariation', v)} min={0} max={1} step={0.1} color="text-retro-green/80" displayValue={`${Math.round(config.biomeVariation * 100)}%`} />
-                <ConfigSlider label="Terrain Roughness" value={config.terrainRoughness} onChange={v => updateConfig('terrainRoughness', v)} min={0} max={1} step={0.1} color="text-retro-gold/80" displayValue={`${Math.round(config.terrainRoughness * 100)}%`} />
-                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Items &amp; Effects</p>
-                <ConfigSlider label="Pickup Density" value={config.pickupDensity} onChange={v => updateConfig('pickupDensity', v)} min={0} max={1} step={0.1} color="text-retro-cyan/80" displayValue={`${Math.round(config.pickupDensity * 100)}%`} />
-                <ConfigSlider label="Particle Intensity" value={config.particleIntensity} onChange={v => updateConfig('particleIntensity', v)} min={0} max={1} step={0.1} color="text-retro-purple/80" displayValue={`${Math.round(config.particleIntensity * 100)}%`} />
-                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Atmosphere</p>
-                <ConfigSlider label="Fog Density" value={config.fogDensity} onChange={v => updateConfig('fogDensity', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.fogDensity * 100)}%`} />
-                <ConfigSlider label="Background Mountains" value={config.backgroundDetail} onChange={v => updateConfig('backgroundDetail', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.backgroundDetail * 100)}%`} />
-              </div>
-            )}
-            <button onClick={requestPointerLock}
-              className="w-full py-2.5 sm:py-3 bg-retro-green/20 hover:bg-retro-green/30 border-2 border-retro-green/60 rounded-lg font-pixel text-[9px] sm:text-[10px] md:text-xs text-retro-green transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(74,222,128,0.2)] select-none">
-              ▶ {isMobile ? 'TAP TO EXPLORE' : 'CLICK TO EXPLORE'}
-            </button>
-            <div className="text-center space-y-0.5 select-none">
-              {isMobile ? (
-                <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">Drag canvas to look · D-pad to move · Tap ✕ to exit</p>
-              ) : (
-                <>
-                  <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">WASD / Arrows = Move · Space = Up · Shift = Down</p>
-                  <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">Mouse = Look · ESC = Release cursor</p>
-                </>
-              )}
-            </div>
-          </div>
+          <SettingsPanel
+            config={config}
+            onUpdateConfig={updateConfig}
+            onSetConfig={setConfig}
+            seed={seedInput}
+            onSeedChange={setSeedInput}
+            onApplySeed={applySeed}
+            onRandomSeed={generateNewSeed}
+            onStartExplore={requestPointerLock}
+            isMobile={isMobile}
+          />
         </div>
       )}
 
