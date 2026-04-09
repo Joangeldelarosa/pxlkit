@@ -35,6 +35,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${SITE_URL}/explore`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
       url: `${SITE_URL}/builder`,
       lastModified: now,
       changeFrequency: 'weekly',
@@ -51,12 +57,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/explore`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
     },
   ];
 }

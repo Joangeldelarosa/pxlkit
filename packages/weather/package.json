@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/weather",
   "version": "1.2.2",
-  "description": "Weather and nature icon pack for pxlkit — sun, rain, clouds, and more",
+  "description": "Weather and nature pixel art icon pack — 36 icons for sun, rain, clouds, moon phases, temperature, storms, snow, and climate UI",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
@@ -41,6 +41,23 @@
     "weather",
     "nature",
     "environment",
-    "ui"
+    "ui",
+    "sun-icon",
+    "moon-icon",
+    "rain-icon",
+    "cloud-icon",
+    "storm-icon",
+    "snow-icon",
+    "temperature-icon",
+    "climate-icons",
+    "moon-phases",
+    "svg-icons",
+    "react-icons",
+    "pxlkit",
+    "open-source-icons",
+    "free-weather-icons",
+    "8-bit-icons",
+    "retro-icons",
+    "animated-weather"
   ]
 }
