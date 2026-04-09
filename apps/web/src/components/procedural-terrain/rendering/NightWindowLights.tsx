@@ -58,20 +58,14 @@ export function NightWindowLights({
 
   /* Inner glow: brighter, slightly transparent, additive */
   const innerMat = useMemo(() => new THREE.MeshBasicMaterial({
-    transparent: true,
-    opacity: 0,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    toneMapped: false,
+    transparent: true, opacity: 0, depthWrite: false,
+    blending: THREE.AdditiveBlending, toneMapped: false,
   }), []);
 
   /* Outer halo: very transparent, large, soft bloom */
   const outerMat = useMemo(() => new THREE.MeshBasicMaterial({
-    transparent: true,
-    opacity: 0,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    toneMapped: false,
+    transparent: true, opacity: 0, depthWrite: false,
+    blending: THREE.AdditiveBlending, toneMapped: false,
   }), []);
 
   useFrame(({ clock }) => {
@@ -93,7 +87,9 @@ export function NightWindowLights({
     }
 
     if (nightFactor <= 0.01) {
+      // eslint-disable-next-line react-hooks/immutability
       innerMat.opacity = 0;
+      // eslint-disable-next-line react-hooks/immutability
       outerMat.opacity = 0;
       inner.count = 0;
       outer.count = 0;

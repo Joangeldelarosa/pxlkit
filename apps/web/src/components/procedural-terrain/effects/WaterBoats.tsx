@@ -197,8 +197,6 @@ export function WaterBoats({
   const sprayRef = useRef<THREE.InstancedMesh>(null);
   const boatsRef = useRef<BoatState[]>([]);
   const lastSpawnCheck = useRef(0);
-  const boatVoxelDataRef = useRef<{ offsets: Float32Array; colors: Float32Array; counts: number[] } | null>(null);
-
   /* ── Pre-compute boat voxel data ── */
   const maxBoatVoxels = useMemo(() => {
     let max = 0;
@@ -217,7 +215,7 @@ export function WaterBoats({
   }), []);
 
   // Pre-compute boat voxel offsets in local space
-  useMemo(() => {
+  const boatVoxelData = useMemo(() => {
     const offsets = new Float32Array(BOAT_MODELS.length * maxBoatVoxels * 3);
     const colors = new Float32Array(BOAT_MODELS.length * maxBoatVoxels * 3);
     const counts: number[] = [];
@@ -237,7 +235,7 @@ export function WaterBoats({
         colors[idx + 2] = tc.b;
       }
     }
-    boatVoxelDataRef.current = { offsets, colors, counts };
+    return { offsets, colors, counts };
   }, [maxBoatVoxels]);
 
   /* ── Spray particle state ── */
@@ -250,14 +248,14 @@ export function WaterBoats({
   useFrame(({ clock }, delta) => {
     const cache = chunkCacheRef.current;
     if (!cache || !boatMeshRef.current || !sprayRef.current) return;
-    if (!boatVoxelDataRef.current) return;
+    if (!boatVoxelData) return;
 
     const dt = Math.min(delta, 0.05); // clamp for stability
     const t = clock.getElapsedTime();
     const boats = boatsRef.current;
     const camX = camera.position.x;
     const camZ = camera.position.z;
-    const { offsets, colors, counts } = boatVoxelDataRef.current;
+    const { offsets, colors, counts } = boatVoxelData;
 
     /* ═══ 1. SPAWN new boats periodically ═══ */
     const maxBoats = Math.round(MAX_BOATS * boatDensity);

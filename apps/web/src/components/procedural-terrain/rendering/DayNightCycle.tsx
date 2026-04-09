@@ -20,18 +20,6 @@ export interface TimeState {
   fogColor: THREE.Color;
 }
 
-const defaultTime: TimeState = {
-  hour: 12,
-  sunIntensity: 1.4,
-  moonIntensity: 0,
-  isNight: false,
-  sunColor: new THREE.Color('#ffffff'),
-  ambientColor: new THREE.Color('#ffffff'),
-  skyTopColor: new THREE.Color(0.20, 0.35, 0.65),
-  skyHorizonColor: new THREE.Color(0.75, 0.68, 0.58),
-  fogColor: new THREE.Color('#b0c8e0'),
-};
-
 export const TimeContext = createContext<React.MutableRefObject<TimeState> | null>(null);
 
 export function useTimeState() {
@@ -331,6 +319,7 @@ export function DayNightSky({ backgroundDetail, starDensity }: { backgroundDetai
       const state = timeRef.current;
       mat.uniforms.uSkyTop.value.copy(state.skyTopColor);
       mat.uniforms.uHorizon.value.copy(state.skyHorizonColor);
+      // eslint-disable-next-line react-hooks/immutability
       mat.uniforms.uSunIntensity.value = state.sunIntensity;
       mat.uniforms.uMoonIntensity.value = state.moonIntensity;
       

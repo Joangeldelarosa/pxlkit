@@ -23,6 +23,9 @@ interface SettingsPanelProps {
   onRandomSeed: () => void;
   onStartExplore: () => void;
   isMobile: boolean;
+  onSaveWorld?: () => void;
+  onShareScene?: () => void;
+  shareStatus?: 'idle' | 'copied';
 }
 
 /* ── Section Header (collapsible) ── */
@@ -44,6 +47,7 @@ function SectionHeader({ title, icon, open, onToggle, color }: {
 
 export function SettingsPanel({
   config, onUpdateConfig, onSetConfig, seed, onSeedChange, onApplySeed, onRandomSeed, onStartExplore, isMobile,
+  onSaveWorld, onShareScene, shareStatus,
 }: SettingsPanelProps) {
   const [minimized, setMinimized] = useState(false);
   const [position, setPosition] = useState({ x: -1, y: -1 }); // -1 = centered
@@ -290,6 +294,22 @@ export function SettingsPanel({
             className="w-full py-2 sm:py-2.5 bg-retro-green/20 hover:bg-retro-green/30 border-2 border-retro-green/60 rounded-lg font-pixel text-[9px] sm:text-[10px] text-retro-green transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(74,222,128,0.2)] select-none mt-1">
             ▶ {isMobile ? 'TAP TO EXPLORE' : 'CLICK TO EXPLORE'}
           </button>
+
+          {/* ── Save & Share Buttons ── */}
+          <div className="flex gap-2 mt-1">
+            {onSaveWorld && (
+              <button onClick={onSaveWorld}
+                className="flex-1 py-1.5 bg-retro-cyan/15 hover:bg-retro-cyan/25 border border-retro-cyan/40 rounded font-pixel text-[8px] sm:text-[9px] text-retro-cyan transition-all cursor-pointer select-none">
+                💾 Save World
+              </button>
+            )}
+            {onShareScene && (
+              <button onClick={onShareScene}
+                className="flex-1 py-1.5 bg-retro-purple/15 hover:bg-retro-purple/25 border border-retro-purple/40 rounded font-pixel text-[8px] sm:text-[9px] text-retro-purple transition-all cursor-pointer select-none">
+                {shareStatus === 'copied' ? '✓ Link Copied!' : '🔗 Share Scene'}
+              </button>
+            )}
+          </div>
 
           {/* ── Controls Help ── */}
           <div className="text-center space-y-0.5 select-none pt-1">
