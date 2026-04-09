@@ -72,11 +72,15 @@ import { OverlayStats, ConfigSlider, MobileTouchControls } from './ui/Controls';
 
 function iconToPickupVoxels(icon: PxlKitData): { x: number; y: number; color: string }[] {
   const voxels: { x: number; y: number; color: string }[] = [];
-  icon.layers.forEach(layer => {
-    layer.pixels.forEach(pixel => {
-      voxels.push({ x: pixel.x, y: icon.height - 1 - pixel.y, color: pixel.color });
-    });
-  });
+  const { grid, palette, size } = icon;
+  for (let row = 0; row < size; row++) {
+    const r = grid[row]; if (!r) continue;
+    for (let col = 0; col < size; col++) {
+      const ch = r[col]; if (!ch || ch === '.') continue;
+      const color = palette[ch]; if (!color) continue;
+      voxels.push({ x: col, y: size - 1 - row, color });
+    }
+  }
   return voxels;
 }
 
