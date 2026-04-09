@@ -20,6 +20,13 @@ export function getBiome(
   const cv = biomeN(wx * 0.012 + 500, wz * 0.012 + 500);
   if (cv > 0.28 - cityFreq * 0.25 && Math.abs(bv) < 0.55 && Math.abs(tv) < 0.55) return 'city';
 
+  // Village zones — rural settlements, appear in moderate terrain
+  const vv = biomeN(wx * 0.015 + 700, wz * 0.015 + 700);
+  if (vv > 0.35 && Math.abs(bv) < 0.3 && tv > -0.2 && tv < 0.3) return 'village';
+
+  // Swamp — low-lying wet areas
+  if (bv < -0.15 && bv > -0.30 && tv < 0.1 && tv > -0.3) return 'swamp';
+
   if (bv > 0.35) return tv > 0 ? 'mountains' : 'tundra';
   if (bv < -0.30) return tv > 0.1 ? 'desert' : 'ocean';
   if (bv > 0.05) return 'forest';
