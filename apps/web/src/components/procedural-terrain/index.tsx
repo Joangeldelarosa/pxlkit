@@ -457,15 +457,10 @@ export default function ProceduralTerrain() {
                     <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
                       Radius around camera where mini-voxels appear
                     </p>
-                    <ConfigSlider label="Detail Height Relief" value={config.detailHeightVariation} onChange={v => updateConfig('detailHeightVariation', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.detailHeightVariation === 0 ? 'Flat' : `${Math.round(config.detailHeightVariation * 100)}%`} />
+                    <ConfigSlider label="Sharpness" value={config.detailSharpness} onChange={v => updateConfig('detailSharpness', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.detailSharpness === 0 ? 'Smooth' : config.detailSharpness < 0.3 ? 'Subtle' : config.detailSharpness < 0.7 ? 'Textured' : 'Rough'} />
                     <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                      {config.detailHeightVariation === 0 ? 'No height variation — perfectly flat mini-voxels' : config.detailHeightVariation < 0.3 ? 'Subtle surface texture' : config.detailHeightVariation < 0.7 ? 'Moderate terrain relief' : 'Extreme rocky/rough surfaces'}
+                      {config.detailSharpness === 0 ? 'Uniform flat mini-voxels — clean look' : config.detailSharpness < 0.3 ? 'Slight size & height variation' : config.detailSharpness < 0.7 ? 'Noticeable texture with bumps & color shifts' : 'Rough organic surfaces — gaps, bumps & contrast'}
                     </p>
-                    <ConfigSlider label="Detail Density" value={1 - config.detailGap} onChange={v => updateConfig('detailGap', 1 - v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={`${Math.round((1 - config.detailGap) * 100)}%`} />
-                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                      How densely packed the mini-voxels are
-                    </p>
-                    <ConfigSlider label="Detail Color Variation" value={config.detailColorVariation} onChange={v => updateConfig('detailColorVariation', v)} min={0} max={0.5} step={0.01} color="text-retro-gold/80" displayValue={`${Math.round(config.detailColorVariation * 100)}%`} />
                     <ConfigSlider label="Detail Max Instances" value={config.detailMaxInstances} onChange={v => updateConfig('detailMaxInstances', v)} min={1000} max={200000} step={1000} color="text-retro-cyan/80" displayValue={config.detailMaxInstances >= 1000 ? `${(config.detailMaxInstances / 1000).toFixed(0)}K` : String(config.detailMaxInstances)} />
                     <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
                       GPU budget for mini-voxels — higher = more detail but slower
@@ -554,10 +549,8 @@ export default function ProceduralTerrain() {
               chunkCacheRef={chunkCacheRef}
               detail={config.voxelDetail}
               detailDistance={config.detailDistance}
-              detailHeightVariation={config.detailHeightVariation}
+              detailSharpness={config.detailSharpness}
               detailMaxInstances={config.detailMaxInstances}
-              detailGap={config.detailGap}
-              detailColorVariation={config.detailColorVariation}
             />
           )}
         </Canvas>

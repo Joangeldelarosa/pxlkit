@@ -22,10 +22,8 @@ export interface WorldConfig {
   graphicsQuality: 'low' | 'medium' | 'high';
   voxelDetail: number;         // 0-16 subdivisions for nearby surface detail
   detailDistance: number;       // 1-20 radius in voxel-units for surface detail rendering
-  detailHeightVariation: number; // 0-1 height variation of mini-voxels (0 = flat, 1 = max relief)
+  detailSharpness: number;     // 0-1 unified texture intensity (drives height, gaps, color, scale)
   detailMaxInstances: number;  // 1000-200000 max mini-voxel instances (GPU budget)
-  detailGap: number;           // 0-1 probability of gaps between mini-voxels (0 = dense, 1 = sparse)
-  detailColorVariation: number; // 0-1 color variation between mini-voxels
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
@@ -46,10 +44,8 @@ export const DEFAULT_CONFIG: WorldConfig = {
   graphicsQuality: 'medium',
   voxelDetail: 2,
   detailDistance: 3,
-  detailHeightVariation: 0.4,
+  detailSharpness: 0.5,
   detailMaxInstances: 12000,
-  detailGap: 0.25,
-  detailColorVariation: 0.12,
 };
 
 export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city';
