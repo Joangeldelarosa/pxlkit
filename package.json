@@ -6,10 +6,27 @@
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
-  "description": "Open source retro pixel art icon library",
+  "description": "Open-source retro React UI toolkit — 226+ pixel art SVG icons, 40+ UI components, 3D parallax effects, animated icons, visual builder, toast notifications, and a voxel 3D game engine with procedural world generation powered by Three.js & React Three Fiber",
   "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "homepage": "https://pxlkit.xyz",
   "license": "SEE LICENSE IN LICENSE",
+  "keywords": [
+    "pxlkit",
+    "pixel-art",
+    "react",
+    "ui-kit",
+    "icons",
+    "svg",
+    "retro",
+    "voxel-engine",
+    "game-engine",
+    "procedural-generation",
+    "three-js",
+    "react-three-fiber",
+    "typescript",
+    "tailwind-css",
+    "open-source"
+  ],
   "workspaces": [
     "packages/*",
     "apps/*"

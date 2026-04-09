@@ -9,9 +9,9 @@ import { Analytics } from "@vercel/analytics/next";
 /* ─── SEO Constants ─── */
 const SITE_NAME = 'Pxlkit';
 const SITE_URL = 'https://pxlkit.xyz';
-const SITE_TAGLINE = 'Retro React UI Kit — Pixel-Art Components, Icons & 3D';
+const SITE_TAGLINE = 'Retro React UI Kit — Pixel-Art Components, Icons, 3D Voxel Engine & Procedural Worlds';
 const SITE_DESCRIPTION =
-  'Ship retro-styled React interfaces in minutes. Pxlkit is a free, open-source UI kit with 40+ pixel-art components, 204+ hand-crafted SVG icons, 3D parallax effects, toast notifications, and a visual icon builder. TypeScript, Tailwind CSS, tree-shakeable — zero native browser UI.';
+  'Ship retro-styled React interfaces and build 3D voxel games in minutes. Pxlkit is a free, open-source toolkit with 40+ pixel-art UI components, 226+ hand-crafted SVG icons, a voxel game engine powered by Three.js & React Three Fiber, procedural world generation, 3D parallax effects, toast notifications, and a visual icon builder. TypeScript, Tailwind CSS, tree-shakeable — zero native browser UI.';
 
 export const viewport: Viewport = {
   themeColor: [
@@ -32,9 +32,18 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   keywords: [
+    /* ── Brand & General ── */
+    'pxlkit',
+    'pixel art react',
     'retro react ui kit',
     'pixel art ui kit',
-    'react component library',
+    'retro design system',
+    'nostalgic ui kit',
+    'retro web design',
+    'indie game ui',
+    'open source react ui',
+    'typescript ui kit',
+    /* ── Icons ── */
     'pixel art icons',
     'retro icons',
     '16x16 icons',
@@ -44,26 +53,59 @@ export const metadata: Metadata = {
     'icon library',
     'icon builder',
     'pixel art generator',
-    'open source react ui',
+    'react svg icons',
+    'gamification icons',
+    'tree-shakeable icons',
+    'free pixel icons',
+    'pixel icon pack',
+    'hand-crafted svg icons',
+    'animated pixel icons',
+    'pixel art sprite',
+    /* ── UI Components ── */
+    'react component library',
     'tailwind ui components',
     'pixel buttons',
     'pixel forms',
     'retro UI components',
-    'gamification icons',
-    'tree-shakeable icons',
-    'typescript ui kit',
-    'pxlkit',
-    'pixel art react',
-    'retro design system',
     'react pixel components',
-    'voxel engine react',
-    '3d parallax icons',
-    'toast notifications react',
-    'react svg icons',
     'pixel art css',
-    'nostalgic ui kit',
-    'indie game ui',
-    'retro web design',
+    'pixel modal component',
+    'pixel table react',
+    'retro toast notifications',
+    'toast notifications react',
+    /* ── 3D / Parallax ── */
+    '3d parallax icons',
+    '3d pixel art',
+    'parallax react component',
+    'multi-layer 3d icons',
+    /* ── Voxel Engine & Gaming ── */
+    'voxel engine react',
+    'voxel game engine',
+    'react three fiber game engine',
+    'three.js voxel engine',
+    'procedural world generation',
+    'procedural terrain react',
+    'open source game engine',
+    'react game engine',
+    'voxel world builder',
+    'procedural generation library',
+    'infinite terrain generation',
+    'biome generation',
+    'chunk-based rendering',
+    'react three fiber procedural',
+    'threejs procedural terrain',
+    'voxel physics engine',
+    'npc game engine react',
+    'open source voxel engine',
+    'minecraft-like engine react',
+    'procedural world react',
+    '3d game library react',
+    'webgl game engine',
+    'browser game engine',
+    'indie game engine',
+    'react 3d world',
+    'procedural biomes',
+    'voxel sandbox',
   ],
   authors: [{ name: 'Joangel De La Rosa', url: 'https://github.com/joangeldelarosa' }],
   creator: 'Joangel De La Rosa',
@@ -106,34 +148,55 @@ export const metadata: Metadata = {
   },
 };
 
-/** JSON-LD Structured Data — SoftwareApplication + WebSite + FAQPage */
+/** JSON-LD Structured Data — Organization + WebSite + SoftwareApplication + SoftwareSourceCode + ItemList + FAQPage */
 const JSON_LD = {
   '@context': 'https://schema.org',
   '@graph': [
+    /* ── Organization ── */
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/icon-512.png`,
+      sameAs: [
+        'https://github.com/Joangeldelarosa/pxlkit',
+        'https://www.npmjs.com/org/pxlkit',
+        'https://twitter.com/joangeldelarosa',
+      ],
+      founder: {
+        '@type': 'Person',
+        name: 'Joangel De La Rosa',
+        url: 'https://github.com/joangeldelarosa',
+      },
+    },
+    /* ── WebSite ── */
     {
       '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
       name: SITE_NAME,
       url: SITE_URL,
       description: SITE_DESCRIPTION,
       inLanguage: 'en-US',
+      publisher: { '@id': `${SITE_URL}/#organization` },
       potentialAction: {
         '@type': 'SearchAction',
         target: `${SITE_URL}/icons?q={search_term_string}`,
         'query-input': 'required name=search_term_string',
       },
     },
+    /* ── SoftwareApplication — UI Kit ── */
     {
       '@type': 'SoftwareApplication',
-      name: SITE_NAME,
+      '@id': `${SITE_URL}/#ui-kit`,
+      name: `${SITE_NAME} UI Kit`,
       applicationCategory: 'DeveloperApplication',
+      applicationSubCategory: 'React Component Library',
       operatingSystem: 'Web',
-      description: SITE_DESCRIPTION,
+      description:
+        'Open-source retro React UI kit with 40+ pixel-art components, 226+ hand-crafted SVG icons across 10 npm packages, 3D parallax effects, animated icons, a visual builder, and toast notifications. TypeScript-first, Tailwind CSS-powered, fully tree-shakeable.',
       url: SITE_URL,
-      author: {
-        '@type': 'Person',
-        name: 'Joangel De La Rosa',
-        url: 'https://github.com/joangeldelarosa',
-      },
+      author: { '@id': `${SITE_URL}/#organization` },
       license: 'https://pxlkit.xyz/pricing',
       offers: [
         {
@@ -158,10 +221,71 @@ const JSON_LD = {
           description: 'Unlimited projects, all future packs, priority support',
         },
       ],
-      softwareVersion: '1.0.0',
-      programmingLanguage: ['TypeScript', 'React'],
+      softwareVersion: '1.2.2',
+      programmingLanguage: ['TypeScript', 'React', 'JavaScript'],
       downloadUrl: 'https://www.npmjs.com/package/@pxlkit/core',
+      featureList: [
+        '226+ pixel-art SVG icons',
+        '40+ retro UI components',
+        '10 themed npm packages',
+        '3D parallax icons',
+        'Animated icon effects',
+        'Visual icon builder',
+        'Toast notification system',
+        'Tree-shakeable imports',
+        'TypeScript strict mode',
+        'Tailwind CSS integration',
+      ],
     },
+    /* ── SoftwareSourceCode — Voxel Engine ── */
+    {
+      '@type': 'SoftwareSourceCode',
+      '@id': `${SITE_URL}/#voxel-engine`,
+      name: '@pxlkit/voxels',
+      description:
+        'Open-source 3D voxel game engine built with Three.js and React Three Fiber. Features procedural world generation with 9+ biomes, chunk-based terrain streaming, day/night cycles, NPC systems, physics integration, and a full entity framework for building browser-based voxel games.',
+      url: `${SITE_URL}/explore`,
+      codeRepository: 'https://github.com/Joangeldelarosa/pxlkit',
+      programmingLanguage: ['TypeScript', 'React', 'GLSL'],
+      runtimePlatform: 'Web Browser',
+      targetProduct: {
+        '@type': 'SoftwareApplication',
+        name: '@pxlkit/voxels — React Voxel Game Engine',
+        applicationCategory: 'GameApplication',
+        applicationSubCategory: 'Voxel Game Engine',
+        operatingSystem: 'Web',
+        description:
+          'Build 3D voxel games in the browser with React. Procedural world generation, physics, NPCs, biomes, day/night cycles — open-source game engine powered by Three.js and React Three Fiber.',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD',
+          description: 'Free and open source',
+        },
+      },
+      author: { '@id': `${SITE_URL}/#organization` },
+      license: 'https://pxlkit.xyz/pricing',
+    },
+    /* ── ItemList — npm Packages ── */
+    {
+      '@type': 'ItemList',
+      name: 'Pxlkit npm Packages',
+      description: 'All open-source npm packages in the Pxlkit ecosystem',
+      numberOfItems: 10,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: '@pxlkit/core', url: 'https://www.npmjs.com/package/@pxlkit/core', description: 'Core rendering engine, React components, and SVG utilities' },
+        { '@type': 'ListItem', position: 2, name: '@pxlkit/ui-kit', url: 'https://www.npmjs.com/package/@pxlkit/ui-kit', description: '40+ retro pixel-art React UI components' },
+        { '@type': 'ListItem', position: 3, name: '@pxlkit/gamification', url: 'https://www.npmjs.com/package/@pxlkit/gamification', description: '51 RPG, achievement, and reward pixel icons' },
+        { '@type': 'ListItem', position: 4, name: '@pxlkit/feedback', url: 'https://www.npmjs.com/package/@pxlkit/feedback', description: '33 alert, status, and notification pixel icons' },
+        { '@type': 'ListItem', position: 5, name: '@pxlkit/social', url: 'https://www.npmjs.com/package/@pxlkit/social', description: '43 community, emoji, and messaging pixel icons' },
+        { '@type': 'ListItem', position: 6, name: '@pxlkit/weather', url: 'https://www.npmjs.com/package/@pxlkit/weather', description: '36 climate, moon, and nature pixel icons' },
+        { '@type': 'ListItem', position: 7, name: '@pxlkit/ui', url: 'https://www.npmjs.com/package/@pxlkit/ui', description: '41 interface control and navigation pixel icons' },
+        { '@type': 'ListItem', position: 8, name: '@pxlkit/effects', url: 'https://www.npmjs.com/package/@pxlkit/effects', description: '12 animated VFX and particle pixel icons' },
+        { '@type': 'ListItem', position: 9, name: '@pxlkit/parallax', url: 'https://www.npmjs.com/package/@pxlkit/parallax', description: '10 multi-layer 3D parallax pixel icons' },
+        { '@type': 'ListItem', position: 10, name: '@pxlkit/voxel', url: 'https://www.npmjs.com/package/@pxlkit/voxel', description: '3D voxel game engine with procedural world generation' },
+      ],
+    },
+    /* ── FAQPage ── */
     {
       '@type': 'FAQPage',
       mainEntity: [
@@ -178,7 +302,7 @@ const JSON_LD = {
           name: 'What frameworks does Pxlkit support?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Pxlkit is built for React with TypeScript. It works with Next.js, Vite, CRA, and any React setup. Icons render as pure SVG so they work anywhere.',
+            text: 'Pxlkit is built for React with TypeScript. It works with Next.js, Vite, CRA, and any React setup. Icons render as pure SVG so they work anywhere. The voxel engine uses React Three Fiber and Three.js.',
           },
         },
         {
@@ -186,7 +310,7 @@ const JSON_LD = {
           name: 'How many icons and components are included?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Pxlkit includes 40+ pixel-art UI components and 204+ hand-crafted SVG icons across 7 thematic packs, plus animated icons and 3D parallax effects.',
+            text: 'Pxlkit includes 40+ pixel-art UI components and 226+ hand-crafted SVG icons across 10 themed npm packages, plus animated icons, 3D parallax effects, and a voxel game engine.',
           },
         },
         {
@@ -195,6 +319,38 @@ const JSON_LD = {
           acceptedAnswer: {
             '@type': 'Answer',
             text: 'Yes. Every icon and component is tree-shakeable. Import only what you use — your final bundle includes zero unused code.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is @pxlkit/voxels?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: '@pxlkit/voxels is an open-source 3D voxel game engine built on Three.js and React Three Fiber. It features procedural world generation with 9+ biomes, chunk-based terrain, day/night cycles, physics, NPC systems, and a full entity framework for building browser-based voxel games with React.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I build games with Pxlkit?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. The @pxlkit/voxels engine lets you create 3D voxel games in the browser using React. It provides procedural terrain generation, biome systems (plains, desert, tundra, forest, mountains, ocean, city, swamp, village), physics integration, NPC creation, and real-time chunk streaming — everything you need for a Minecraft-like game in React.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does the procedural world generation work?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Pxlkit uses seeded Perlin noise and fractal Brownian motion (FBM) to generate infinite, deterministic worlds. Terrain is divided into 16×16 chunks that load dynamically around the camera with frustum culling. Each biome has unique elevation, vegetation, structures, and color palettes.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What biomes are available in the voxel engine?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The engine currently supports 9+ biomes: plains, desert, tundra, forest, mountains, ocean, city (with 20+ building types), swamp, and village. Each biome features unique terrain, vegetation, structures, and ambient effects like weather particles and wildlife.',
           },
         },
       ],
