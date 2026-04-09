@@ -193,8 +193,8 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
         const centre = chunksPerSide / 2;
         allKeys.sort((a, b) => {
           const [ax, az] = a.split(',').map(Number);
-          const [bx2, bz2] = b.split(',').map(Number);
-          return ((ax - centre) ** 2 + (az - centre) ** 2) - ((bx2 - centre) ** 2 + (bz2 - centre) ** 2);
+          const [bChunkX, bChunkZ] = b.split(',').map(Number);
+          return ((ax - centre) ** 2 + (az - centre) ** 2) - ((bChunkX - centre) ** 2 + (bChunkZ - centre) ** 2);
         });
         pendingKeys.current = allKeys;
         finiteGenDone.current = true;
