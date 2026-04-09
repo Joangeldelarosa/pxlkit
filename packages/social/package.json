@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/social",
   "version": "1.2.2",
-  "description": "Social and media icon pack for pxlkit — hearts, shares, users, and more",
+  "description": "Social and media pixel art icon pack — 43 icons for community, emojis, messaging, hearts, shares, users, reactions, and social media UI",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
@@ -41,6 +41,20 @@
     "social",
     "media",
     "community",
-    "ui"
+    "ui",
+    "emoji-icons",
+    "heart-icon",
+    "user-icon",
+    "message-icon",
+    "reaction-icons",
+    "social-media-icons",
+    "pixel-art-emoji",
+    "svg-icons",
+    "react-icons",
+    "pxlkit",
+    "open-source-icons",
+    "free-social-icons",
+    "8-bit-icons",
+    "retro-icons"
   ]
 }

@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/voxel",
   "version": "0.1.2",
-  "description": "Voxel engine for pxlkit — 3D pixelated icons and elements using voxels",
+  "description": "Open-source 3D voxel game engine for React — procedural world generation, biome systems, chunk-based terrain streaming, day/night cycles, physics, NPC frameworks, and entity management built on Three.js and React Three Fiber",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
@@ -38,11 +38,38 @@
   "keywords": [
     "pixel-art",
     "voxel",
+    "voxel-engine",
     "3d",
-    "icons",
+    "game-engine",
+    "react-three-fiber",
+    "three-js",
+    "threejs",
+    "procedural-generation",
+    "procedural-terrain",
+    "procedural-world",
+    "infinite-terrain",
+    "biome-generation",
+    "chunk-based-rendering",
+    "day-night-cycle",
+    "npc-system",
+    "physics-engine",
+    "entity-framework",
+    "react-game-engine",
+    "open-source-game-engine",
+    "webgl",
+    "browser-game",
+    "indie-game-engine",
+    "minecraft-like",
+    "voxel-sandbox",
+    "voxel-world",
+    "react-3d",
+    "r3f",
     "retro",
-    "minecraft",
     "pxlkit",
-    "react-three-fiber"
+    "perlin-noise",
+    "terrain-generation",
+    "world-builder",
+    "game-development",
+    "web-game-engine"
   ]
 }
