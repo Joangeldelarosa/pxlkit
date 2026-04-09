@@ -175,13 +175,6 @@ function sampleWaterInfo(
   return { depth: 0, waterY: 0 };
 }
 
-function isDeepWater(
-  cache: Map<string, ChunkVoxelData>,
-  worldX: number, worldZ: number,
-): boolean {
-  return sampleWaterInfo(cache, worldX, worldZ).depth >= MIN_WATER_DEPTH;
-}
-
 /* ── Deterministic seeded random for spawn ── */
 function pseudoRand(a: number, b: number): number {
   let h = (Math.round(a * 100) * 374761393 + Math.round(b * 100) * 668265263) | 0;
@@ -518,7 +511,6 @@ export function WaterBoats({
     }
 
     sprayMesh.count = sprayCount;
-    sprayMat.opacity = 0.6;
     if (sprayMesh.instanceMatrix) sprayMesh.instanceMatrix.needsUpdate = true;
     if (sprayMesh.instanceColor) sprayMesh.instanceColor.needsUpdate = true;
   });
