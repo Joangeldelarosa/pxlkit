@@ -57,7 +57,9 @@ import { createNoise2D } from './utils/noise';
 import { getBiome } from './utils/biomes';
 import { generateChunkData, setPickupIcons } from './generation/chunk';
 import { ChunkMesh, FloatingPickup } from './rendering/ChunkMesh';
-import { WorldLighting, SkyGradient, FogEffect } from './rendering/WorldLighting';
+import { FogEffect } from './rendering/WorldLighting';
+import { DayNightLighting, DayNightSky, TimeContext } from './rendering/DayNightCycle';
+import type { TimeState } from './rendering/DayNightCycle';
 import { SurfaceDetailLayer } from './rendering/SurfaceDetailLayer';
 import { AmbientParticles } from './effects/AmbientParticles';
 import { SkyBirds } from './effects/SkyBirds';
@@ -318,6 +320,17 @@ export default function ProceduralTerrain() {
   const speedRef = useRef(config.flySpeed);
   const canvasRef = useRef<HTMLDivElement>(null);
   const chunkCacheRef = useRef<Map<string, ChunkVoxelData>>(new Map());
+  const timeStateRef = useRef<TimeState>({
+    hour: config.timeMode === 'fixed' ? config.fixedHour : 12,
+    sunIntensity: 1.4,
+    moonIntensity: 0,
+    isNight: false,
+    sunColor: new THREE.Color('#ffffff'),
+    ambientColor: new THREE.Color('#ffffff'),
+    skyTopColor: new THREE.Color(0.20, 0.35, 0.65),
+    skyHorizonColor: new THREE.Color(0.75, 0.68, 0.58),
+    fogColor: new THREE.Color('#b0c8e0'),
+  });
 
   const noises = useMemo(() => ({
     biome: createNoise2D(seed + 2), temp: createNoise2D(seed + 3),
@@ -510,7 +523,7 @@ export default function ProceduralTerrain() {
               </div>
             </div>
           )}
-          <OverlayStats seed={seed} chunkCount={chunkCount} position={cameraPos} biome={currentBiome} worldMode={config.worldMode} worldSize={config.worldSize} />
+          <OverlayStats seed={seed} chunkCount={chunkCount} position={cameraPos} biome={currentBiome} worldMode={config.worldMode} worldSize={config.worldSize} hour={timeStateRef.current.hour} />
           <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 select-none" style={{ touchAction: 'none' }}>
             {isMobile ? (
               <button onClick={exitImmersive} className="p-2 bg-retro-bg/70 backdrop-blur-sm border border-retro-border/30 rounded font-pixel text-[9px] text-retro-muted/60 hover:text-retro-red transition-all cursor-pointer select-none" style={{ touchAction: 'none' }}>✕</button>
@@ -534,9 +547,10 @@ export default function ProceduralTerrain() {
           gl={{ antialias: gfxAA, toneMapping: THREE.NoToneMapping, powerPreference: 'high-performance' }}
           style={{ background: 'transparent', touchAction: 'none' }}
         >
-          <SkyGradient backgroundDetail={config.backgroundDetail} />
+          <TimeContext.Provider value={timeStateRef}>
+          <DayNightSky backgroundDetail={config.backgroundDetail} />
           <FogEffect density={config.fogDensity} />
-          <WorldLighting />
+          <DayNightLighting timeMode={config.timeMode} fixedHour={config.fixedHour} dayDurationSeconds={config.dayDurationSeconds} />
           <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} worldConfig={config} />
           <CameraLook isLocked={isLocked} isMobile={isMobile} />
           <ChunkManagerWithCounter seed={seed} config={config} onChunkCount={handleChunkCount} chunkCacheRef={chunkCacheRef} />
@@ -553,6 +567,7 @@ export default function ProceduralTerrain() {
               detailMaxInstances={config.detailMaxInstances}
             />
           )}
+          </TimeContext.Provider>
         </Canvas>
       </div>
     </div>
