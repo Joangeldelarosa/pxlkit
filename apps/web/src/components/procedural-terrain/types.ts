@@ -24,6 +24,9 @@ export interface WorldConfig {
   detailDistance: number;       // 1-20 radius in voxel-units for surface detail rendering
   detailSharpness: number;     // 0-1 unified texture intensity (drives height, gaps, color, scale)
   detailMaxInstances: number;  // 1000-200000 max mini-voxel instances (GPU budget)
+  timeMode: 'fixed' | 'cycle';   // fixed = locked time, cycle = dynamic day/night
+  fixedHour: number;              // 0-24 hour of day when timeMode is 'fixed'
+  dayDurationSeconds: number;     // how many real seconds = 24 in-game hours (e.g. 60 = 1 minute per full day)
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
@@ -46,6 +49,9 @@ export const DEFAULT_CONFIG: WorldConfig = {
   detailDistance: 3,
   detailSharpness: 0.5,
   detailMaxInstances: 12000,
+  timeMode: 'cycle',
+  fixedHour: 12,
+  dayDurationSeconds: 120,
 };
 
 export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city' | 'swamp' | 'village';

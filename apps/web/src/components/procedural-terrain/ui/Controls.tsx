@@ -6,9 +6,9 @@
 import { useCallback } from 'react';
 import type { WorldMode } from '../types';
 
-export function OverlayStats({ seed, chunkCount, position, biome, worldMode, worldSize }: {
+export function OverlayStats({ seed, chunkCount, position, biome, worldMode, worldSize, hour }: {
   seed: number; chunkCount: number; position: [number, number, number]; biome: string;
-  worldMode: WorldMode; worldSize: number;
+  worldMode: WorldMode; worldSize: number; hour?: number;
 }) {
   return (
     <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 font-mono text-[9px] sm:text-[10px] space-y-0.5 pointer-events-none select-none">
@@ -16,6 +16,7 @@ export function OverlayStats({ seed, chunkCount, position, biome, worldMode, wor
       <div className="text-retro-cyan/70">BIOME: <span className="text-retro-cyan">{biome}</span></div>
       <div className="text-retro-gold/70">POS: <span className="text-retro-gold">{position[0].toFixed(0)}, {position[1].toFixed(0)}, {position[2].toFixed(0)}</span></div>
       <div className="text-retro-purple/70">CHUNKS: <span className="text-retro-purple">{chunkCount}</span></div>
+      {hour !== undefined && <div className="text-retro-gold/70">TIME: <span className="text-retro-gold">{Math.floor(hour)}:{String(Math.floor((hour % 1) * 60)).padStart(2, '0')}</span></div>}
       <div className="text-retro-muted/50">{worldMode === 'infinite' ? '∞ INFINITE' : `◻ ${worldSize}×${worldSize}`}</div>
     </div>
   );
