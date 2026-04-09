@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import type { BiomeType, BiomeConfig, ChunkVoxelData, WorldConfig } from '../types';
 import {
   CHUNK_SIZE, VOXEL_SIZE, MAX_HEIGHT, NO_FACE,
-  BIOMES, BIOME_TYPES, BLOCK_SIZE, ROAD_W, AVENUE_W,
+  BIOMES, BIOME_TYPES, BLOCK_SIZE, ROAD_W, LOT_INSET, AVENUE_W,
 } from '../constants';
 import { mulberry32, fbm } from '../utils/noise';
 import { varyColor } from '../utils/color';
@@ -25,11 +25,15 @@ interface PickupVoxel { x: number; y: number; color: string }
 
 function iconToPickupVoxels(icon: PxlKitData): PickupVoxel[] {
   const voxels: PickupVoxel[] = [];
-  icon.layers.forEach(layer => {
-    layer.pixels.forEach(pixel => {
-      voxels.push({ x: pixel.x, y: icon.height - 1 - pixel.y, color: pixel.color });
-    });
-  });
+  const { grid, palette, size } = icon;
+  for (let row = 0; row < size; row++) {
+    const r = grid[row]; if (!r) continue;
+    for (let col = 0; col < size; col++) {
+      const ch = r[col]; if (!ch || ch === '.') continue;
+      const color = palette[ch]; if (!color) continue;
+      voxels.push({ x: col, y: size - 1 - row, color });
+    }
+  }
   return voxels;
 }
 
