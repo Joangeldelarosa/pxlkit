@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/gamification",
   "version": "1.2.2",
-  "description": "Gamification icon pack for pxlkit — trophies, stars, swords, and more",
+  "description": "Gamification icon pack — 51 pixel art icons for RPG games, achievements, rewards, trophies, swords, potions, coins, stars, and gaming UI",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
@@ -41,6 +41,22 @@
     "gamification",
     "retro",
     "trophy",
-    "gaming"
+    "gaming",
+    "rpg-icons",
+    "achievement-icons",
+    "reward-icons",
+    "game-ui-icons",
+    "sword-icon",
+    "potion-icon",
+    "coin-icon",
+    "star-icon",
+    "pixel-art-game",
+    "indie-game-icons",
+    "8-bit-icons",
+    "svg-icons",
+    "react-icons",
+    "pxlkit",
+    "open-source-icons",
+    "free-game-icons"
   ]
 }

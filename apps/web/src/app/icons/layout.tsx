@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Browse Pixel Art Icons',
+  title: 'Browse 226+ Pixel Art Icons — Free Open-Source SVG React Icons',
   description:
-    'Browse 204+ open-source pixel art icons across 6 packs: UI, Gamification, Social, Feedback, Effects, Weather, and more. Filter, preview, and copy React or SVG code instantly.',
+    'Browse and search 226+ open-source pixel art SVG icons across 7 themed packs: UI, Gamification, Social, Feedback, Effects, Weather, and Parallax 3D. Filter by category, preview animations, and copy React or SVG code instantly. Free for personal and commercial use.',
   keywords: [
     'pixel art icons',
     'retro icons',
@@ -17,17 +17,43 @@ export const metadata: Metadata = {
     'open source icons',
     'free icons',
     'icon browser',
+    'pixel art svg',
+    'react icon library',
+    'free svg icons',
+    'animated pixel icons',
+    'pixel art sprites',
+    '16x16 pixel icons',
+    'retro game icons',
+    'rpg icons',
+    'achievement icons',
+    'trophy icons',
+    'emoji pixel art',
+    'notification icons',
+    'feedback icons',
+    'ui icons pack',
+    'weather pixel icons',
+    'effects icons animated',
+    'parallax 3d icons',
+    'pixel icon pack free',
+    'indie game icons',
+    'game ui icons',
+    'hand-crafted icons',
+    'typescript icons',
+    'tree-shakeable icons',
+    'icon search engine',
+    'copy paste icons react',
+    'pxlkit icons',
   ],
   openGraph: {
-    title: 'Browse Pixel Art Icons — Pxlkit',
+    title: 'Browse 226+ Pixel Art Icons — Pxlkit',
     description:
-      '204+ hand-crafted pixel art icons across 6 packs. Filter by category, copy React or SVG code, and use them in your projects for free.',
+      '226+ hand-crafted pixel art SVG icons across 7 themed packs. Filter by category, preview animations, copy React or SVG code, and use them free in your projects.',
     url: 'https://pxlkit.xyz/icons',
   },
   twitter: {
-    title: 'Browse Pixel Art Icons — Pxlkit',
+    title: 'Browse 226+ Pixel Art Icons — Pxlkit',
     description:
-      '204+ open-source pixel art icons — UI, Gamification, Social, Feedback, Effects, Weather and more.',
+      '226+ open-source pixel art icons — UI, Gamification, Social, Feedback, Effects, Weather, Parallax 3D. Free for React & SVG.',
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/icons',

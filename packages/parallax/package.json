@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/parallax",
   "version": "1.2.2",
-  "description": "Multi-layer 3D parallax pixel icons — interactive depth-based mouse-tracking icons",
+  "description": "Multi-layer 3D parallax pixel art icons — 10 interactive depth-based mouse-tracking icons with configurable perspective and layer separation",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
@@ -46,6 +46,19 @@
     "3d",
     "interactive",
     "retro",
-    "multi-layer"
+    "multi-layer",
+    "3d-icons",
+    "parallax-effect",
+    "mouse-tracking",
+    "depth-effect",
+    "perspective-icons",
+    "interactive-icons",
+    "react-parallax",
+    "svg-parallax",
+    "pxlkit",
+    "open-source-icons",
+    "3d-pixel-art",
+    "layered-icons",
+    "css-3d-transform"
   ]
 }
