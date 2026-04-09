@@ -113,7 +113,7 @@ export type BuildingType =
   | 'skyscraper' | 'skyscraper_twin' | 'skyscraper_stepped'
   | 'office' | 'office_tall'
   | 'tower' | 'tower_telecom'
-  | 'house' | 'mansion'
+  | 'house' | 'mansion' | 'castle'
   | 'shop' | 'mall'
   | 'warehouse' | 'factory'
   | 'park' | 'plaza' | 'fountain_plaza'
