@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { Suspense, useEffect } from 'react';
 
-const ProceduralTerrain = dynamic(() => import('../../components/ProceduralTerrain'), {
+const ProceduralTerrain = dynamic(() => import('../../components/procedural-terrain'), {
   ssr: false,
   loading: () => (
     <div className="w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] flex items-center justify-center bg-retro-bg">
