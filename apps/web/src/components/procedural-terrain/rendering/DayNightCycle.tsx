@@ -178,7 +178,7 @@ export function DayNightLighting({ timeMode, fixedHour, dayDurationSeconds }: {
 }
 
 /* ── Dynamic Sky Gradient ── */
-export function DayNightSky({ backgroundDetail }: { backgroundDetail: number }) {
+export function DayNightSky({ backgroundDetail, starDensity }: { backgroundDetail: number; starDensity: number }) {
   const meshRef = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
   const timeRef = useContext(TimeContext);
@@ -191,6 +191,7 @@ export function DayNightSky({ backgroundDetail }: { backgroundDetail: number }) 
       uSunIntensity: { value: 1.0 },
       uSunDir: { value: new THREE.Vector3(0.5, 0.7, 0.3).normalize() },
       uMoonIntensity: { value: 0.0 },
+      uStarDensity: { value: starDensity },
     },
     vertexShader: `
       varying vec3 vWP;
@@ -206,9 +207,11 @@ export function DayNightSky({ backgroundDetail }: { backgroundDetail: number }) 
       uniform float uSunIntensity;
       uniform vec3 uSunDir;
       uniform float uMoonIntensity;
+      uniform float uStarDensity;
       varying vec3 vWP;
       
       float hash(float n) { return fract(sin(n) * 43758.5453); }
+      float hash2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float snoise(float x) {
         float i = floor(x);
         float f = fract(x);
@@ -235,15 +238,44 @@ export function DayNightSky({ backgroundDetail }: { backgroundDetail: number }) 
           sky += sunCol * sunGlow + vec3(1.0, 0.7, 0.4) * sunHalo;
         }
         
-        // Stars at night
-        if (uSunIntensity < 0.2 && h > 0.0) {
-          float starDensity = (1.0 - uSunIntensity * 5.0);
-          float starAngle1 = atan(dir.z, dir.x) * 50.0;
-          float starAngle2 = dir.y * 80.0;
-          float star = hash(floor(starAngle1) * 100.0 + floor(starAngle2));
-          if (star > 0.985) {
-            float twinkle = 0.6 + 0.4 * sin(star * 6283.0 + uSunIntensity * 10.0);
-            sky += vec3(1.0) * starDensity * twinkle * smoothstep(0.0, 0.1, h);
+        // Stars at night — realistic small dots with varying brightness
+        if (uSunIntensity < 0.2 && h > 0.0 && uStarDensity > 0.0) {
+          float nightFade = (1.0 - uSunIntensity * 5.0);
+          float heightFade = smoothstep(0.0, 0.15, h);
+          
+          // Fine grid for small star points
+          float gridScale = 200.0;
+          vec2 starUV = vec2(atan(dir.z, dir.x), asin(clamp(dir.y, -1.0, 1.0)));
+          vec2 cell = floor(starUV * gridScale);
+          vec2 frac2 = fract(starUV * gridScale);
+          
+          // Star presence and properties from cell hash
+          float starSeed = hash2(cell);
+          // Threshold: higher starDensity = more stars
+          float threshold = 1.0 - uStarDensity * 0.06;
+          
+          if (starSeed > threshold) {
+            // Star position within cell (centered with jitter)
+            vec2 starPos = vec2(hash2(cell + 0.5), hash2(cell + 1.5)) * 0.6 + 0.2;
+            float dist = length(frac2 - starPos);
+            
+            // Small, round star with soft falloff
+            float starSize = 0.06 + hash2(cell + 2.5) * 0.1;
+            float starBright = smoothstep(starSize, starSize * 0.2, dist);
+            
+            // Twinkle animation
+            float twinkle = 0.6 + 0.4 * sin(starSeed * 6283.0 + uSunIntensity * 10.0);
+            
+            // Color variation: most white, some warm, some cool
+            vec3 starColor = vec3(1.0);
+            float colorSeed = hash2(cell + 3.5);
+            if (colorSeed > 0.85) starColor = vec3(1.0, 0.85, 0.7); // warm
+            else if (colorSeed > 0.7) starColor = vec3(0.8, 0.9, 1.0); // cool blue
+            
+            // Brightness variation (magnitude)
+            float magnitude = 0.4 + hash2(cell + 4.5) * 0.6;
+            
+            sky += starColor * starBright * nightFade * twinkle * heightFade * magnitude;
           }
         }
         
@@ -289,7 +321,7 @@ export function DayNightSky({ backgroundDetail }: { backgroundDetail: number }) 
         gl_FragColor = vec4(sky, 1.0);
       }`,
     side: THREE.BackSide, depthWrite: false,
-  }), [backgroundDetail]);
+  }), [backgroundDetail, starDensity]);
 
   useFrame(() => {
     if (!meshRef.current) return;

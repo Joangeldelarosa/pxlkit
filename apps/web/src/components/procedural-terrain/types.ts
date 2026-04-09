@@ -27,6 +27,9 @@ export interface WorldConfig {
   timeMode: 'fixed' | 'cycle';   // fixed = locked time, cycle = dynamic day/night
   fixedHour: number;              // 0-24 hour of day when timeMode is 'fixed'
   dayDurationSeconds: number;     // how many real seconds = 24 in-game hours (e.g. 60 = 1 minute per full day)
+  boatDensity: number;            // 0-1 controls how many boats spawn on water
+  windowLitProbability: number;   // 0-1 fraction of windows lit at night
+  starDensity: number;            // 0-1 controls how many stars appear at night
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
@@ -52,6 +55,9 @@ export const DEFAULT_CONFIG: WorldConfig = {
   timeMode: 'cycle',
   fixedHour: 12,
   dayDurationSeconds: 120,
+  boatDensity: 0.5,
+  windowLitProbability: 0.7,
+  starDensity: 0.5,
 };
 
 export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city' | 'swamp' | 'village';
@@ -77,6 +83,8 @@ export interface ChunkVoxelData {
   windowLights: Float32Array;
   windowLightCount: number;
   solidHeightMap: Int32Array;
+  /** Per-cell water level (from the biome config) for accurate water detection */
+  waterLevelMap: Int32Array;
   chunkX: number;
   chunkZ: number;
 }
