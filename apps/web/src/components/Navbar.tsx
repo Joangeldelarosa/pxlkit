@@ -5,11 +5,12 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useTheme } from './ThemeProvider';
 
-const NAV_ITEMS = [
+const NAV_ITEMS: { href: string; label: string; badge?: string }[] = [
   { href: '/', label: 'Home' },
   { href: '/icons', label: 'Icons' },
   { href: '/builder', label: 'Builder' },
   { href: '/ui-kit', label: 'UI Kit' },
+  { href: '/explore', label: 'Worlds', badge: '🚧' },
   { href: '/docs', label: 'Docs' },
   { href: '/pricing', label: 'Pricing' },
 ];
@@ -122,13 +123,16 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-4 py-2 text-sm font-mono transition-all rounded ${
+                className={`px-4 py-2 text-sm font-mono transition-all rounded relative ${
                   isActive
                     ? 'text-retro-green bg-retro-green/10'
                     : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
                 }`}
               >
                 {item.label}
+                {item.badge && (
+                  <span className="ml-1 text-[10px]" title="Coming Soon">{item.badge}</span>
+                )}
               </Link>
             );
           })}
@@ -227,6 +231,9 @@ export function Navbar() {
                   }`}
                 >
                   {item.label}
+                  {item.badge && (
+                    <span className="ml-1 text-[10px]" title="Coming Soon">{item.badge}</span>
+                  )}
                 </Link>
               );
             })}
