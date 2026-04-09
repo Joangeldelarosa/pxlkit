@@ -21,11 +21,13 @@ function getSolidHeight(cache: Map<string, ChunkVoxelData>, worldX: number, worl
   return data.solidHeightMap[lx * CHUNK_SIZE + lz];
 }
 
-export function FlyCamera({ keysRef, speedRef, chunkCacheRef, worldConfig }: {
+export function FlyCamera({ keysRef, speedRef, chunkCacheRef, worldConfig, initialPos, initialRot }: {
   keysRef: React.RefObject<Set<string>>;
   speedRef: React.RefObject<number>;
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
   worldConfig: WorldConfig;
+  initialPos?: [number, number, number];
+  initialRot?: [number, number, number];
 }) {
   const { camera } = useThree();
   const _d = useMemo(() => new THREE.Vector3(), []);
@@ -33,7 +35,13 @@ export function FlyCamera({ keysRef, speedRef, chunkCacheRef, worldConfig }: {
   const _prev = useMemo(() => new THREE.Vector3(), []);
 
   useEffect(() => {
-    if (worldConfig.worldMode === 'finite') {
+    if (initialPos) {
+      camera.position.set(initialPos[0], initialPos[1], initialPos[2]);
+      if (initialRot) {
+        const euler = new THREE.Euler(initialRot[0], initialRot[1], initialRot[2], 'YXZ');
+        camera.quaternion.setFromEuler(euler);
+      }
+    } else if (worldConfig.worldMode === 'finite') {
       const centre = worldConfig.worldSize * VOXEL_SIZE * 0.5;
       camera.position.set(centre, 12, centre + 10);
       camera.lookAt(centre, 6, centre);
@@ -41,6 +49,7 @@ export function FlyCamera({ keysRef, speedRef, chunkCacheRef, worldConfig }: {
       camera.position.set(0, 12, 20);
       camera.lookAt(0, 6, 0);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [camera, worldConfig.worldMode, worldConfig.worldSize]);
 
   useFrame((_, delta) => {

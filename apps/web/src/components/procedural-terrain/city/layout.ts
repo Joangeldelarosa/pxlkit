@@ -69,8 +69,10 @@ export function getMultiLotSize(
       if (h > 0.8) return [2, 2];
       return [1, 1];
     case 'residential':
-      // Residential: mostly single lots, 15% chance of 2×1 (mansion)
-      if (h > 0.85 && h2 > 0.5) return [2, 1];
+      // Residential: 15% mansion (2×1), 8% castle (3×2)
+      if (h > 0.92 && h2 > 0.3) return [3, 2]; // castle
+      if (h > 0.82 && h2 > 0.5) return [2, 2]; // large mansion
+      if (h > 0.72) return [2, 1]; // mansion
       return [1, 1];
     case 'industrial':
       // Industrial: 30% chance of 2×2 (warehouse complex), 10% chance of 3×2 (factory)
@@ -235,11 +237,11 @@ export function getBuildingType(
     if (zone === 'commercial') return 'mall';
     if (zone === 'civic') return v > 0 ? 'hospital' : 'school';
     if (zone === 'industrial') return v > 0 ? 'factory' : 'warehouse';
-    if (zone === 'residential') return 'mansion';
+    if (zone === 'residential') return v > 0.2 ? 'castle' : 'mansion';
     return 'office_tall';
   }
   if (area >= 2) {
-    if (zone === 'residential') return 'mansion';
+    if (zone === 'residential') return v > 0.4 ? 'castle' : 'mansion';
     if (zone === 'commercial') return v > 0.3 ? 'mall' : 'shop';
     if (zone === 'industrial') return 'warehouse';
     return 'office_tall';
@@ -304,7 +306,8 @@ export function getBuildingHeight(
     case 'shop':               return 3 + Math.floor(v * 2);     // 3-5
     case 'mall':               return 4 + Math.floor(v * 3);     // 4-7
     case 'house':              return 3 + Math.floor(v * 2);     // 3-5
-    case 'mansion':            return 4 + Math.floor(v * 2);     // 4-6
+    case 'mansion':            return 5 + Math.floor(v * 4);     // 5-9 (taller)
+    case 'castle':             return 8 + Math.floor(v * 8);     // 8-16
     case 'hospital':           return 6 + Math.floor(v * 6);     // 6-12
     case 'school':             return 4 + Math.floor(v * 3);     // 4-7
     case 'church':             return 5 + Math.floor(v * 4);     // 5-9

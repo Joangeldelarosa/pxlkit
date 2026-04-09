@@ -24,12 +24,18 @@ export interface WorldConfig {
   detailDistance: number;       // 1-20 radius in voxel-units for surface detail rendering
   detailSharpness: number;     // 0-1 unified texture intensity (drives height, gaps, color, scale)
   detailMaxInstances: number;  // 1000-200000 max mini-voxel instances (GPU budget)
+  timeMode: 'fixed' | 'cycle';   // fixed = locked time, cycle = dynamic day/night
+  fixedHour: number;              // 0-24 hour of day when timeMode is 'fixed'
+  dayDurationSeconds: number;     // how many real seconds = 24 in-game hours (e.g. 60 = 1 minute per full day)
+  boatDensity: number;            // 0-1 controls how many boats spawn on water
+  windowLitProbability: number;   // 0-1 fraction of windows lit at night
+  starDensity: number;            // 0-1 controls how many stars appear at night
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
   worldMode: 'infinite',
   worldSize: 128,
-  renderDistance: 5,
+  renderDistance: 15,
   flySpeed: 12,
   treeDensity: 0.5,
   structureDensity: 0.5,
@@ -46,9 +52,15 @@ export const DEFAULT_CONFIG: WorldConfig = {
   detailDistance: 3,
   detailSharpness: 0.5,
   detailMaxInstances: 12000,
+  timeMode: 'cycle',
+  fixedHour: 12,
+  dayDurationSeconds: 120,
+  boatDensity: 0.5,
+  windowLitProbability: 0.7,
+  starDensity: 0.5,
 };
 
-export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city';
+export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city' | 'swamp' | 'village';
 
 export interface BiomeConfig {
   name: string;
@@ -67,7 +79,12 @@ export interface ChunkVoxelData {
   waterColors: Float32Array;
   waterCount: number;
   pickups: { wx: number; wy: number; wz: number; iconIdx: number }[];
+  /** Window positions for night-time lighting: [wx, wy, wz] world coords */
+  windowLights: Float32Array;
+  windowLightCount: number;
   solidHeightMap: Int32Array;
+  /** Per-cell water level (from the biome config) for accurate water detection */
+  waterLevelMap: Int32Array;
   chunkX: number;
   chunkZ: number;
 }
@@ -104,7 +121,7 @@ export type BuildingType =
   | 'skyscraper' | 'skyscraper_twin' | 'skyscraper_stepped'
   | 'office' | 'office_tall'
   | 'tower' | 'tower_telecom'
-  | 'house' | 'mansion'
+  | 'house' | 'mansion' | 'castle'
   | 'shop' | 'mall'
   | 'warehouse' | 'factory'
   | 'park' | 'plaza' | 'fountain_plaza'

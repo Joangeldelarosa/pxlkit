@@ -33,7 +33,7 @@
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useMemo, useEffect, useState, useCallback } from 'react';
+import { useRef, useMemo, useEffect, useState, useCallback, useContext } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import Link from 'next/link';
@@ -46,7 +46,7 @@ import { Sun, Moon, Snowflake } from '@pxlkit/weather';
 import type { PxlKitData } from '@pxlkit/core';
 
 /* ── Internal modules ── */
-import type { WorldConfig, WorldMode, ChunkVoxelData } from './types';
+import type { WorldConfig, ChunkVoxelData } from './types';
 import { DEFAULT_CONFIG } from './types';
 import {
   CHUNK_SIZE, VOXEL_SIZE, MAX_HEIGHT,
@@ -57,14 +57,19 @@ import { createNoise2D } from './utils/noise';
 import { getBiome } from './utils/biomes';
 import { generateChunkData, setPickupIcons } from './generation/chunk';
 import { ChunkMesh, FloatingPickup } from './rendering/ChunkMesh';
-import { WorldLighting, SkyGradient, FogEffect } from './rendering/WorldLighting';
+import { FogEffect } from './rendering/WorldLighting';
+import { DayNightLighting, DayNightSky, TimeContext } from './rendering/DayNightCycle';
+import type { TimeState } from './rendering/DayNightCycle';
+import { NightWindowLights } from './rendering/NightWindowLights';
 import { SurfaceDetailLayer } from './rendering/SurfaceDetailLayer';
 import { AmbientParticles } from './effects/AmbientParticles';
 import { SkyBirds } from './effects/SkyBirds';
 import { GroundCritters } from './effects/GroundCritters';
+import { WaterBoats } from './effects/WaterBoats';
 import { FlyCamera } from './camera/FlyCamera';
 import { CameraLook } from './camera/CameraLook';
-import { OverlayStats, ConfigSlider, MobileTouchControls } from './ui/Controls';
+import { OverlayStats, MobileTouchControls } from './ui/Controls';
+import { SettingsPanel } from './ui/SettingsPanel';
 
 /* ═══════════════════════════════════════════════════════════════
  *  Initialize Pickup Icons
@@ -100,18 +105,96 @@ function worldToChunk(wx: number, wz: number): [number, number] {
   return [Math.floor(wx / (CHUNK_SIZE * VOXEL_SIZE) ), Math.floor(wz / (CHUNK_SIZE * VOXEL_SIZE))];
 }
 
+/* ── LocalStorage keys ── */
+const LS_CONFIG_KEY = 'pxlkit-explore-config';
+const LS_SAVE_KEY = 'pxlkit-explore-save';
+
+/** Load WorldConfig from localStorage (returns null if not found or invalid) */
+function loadConfigFromStorage(): WorldConfig | null {
+  try {
+    const raw = localStorage.getItem(LS_CONFIG_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Validate that it has expected shape by checking a few required keys
+    if (typeof parsed === 'object' && 'renderDistance' in parsed && 'flySpeed' in parsed) {
+      // Merge with defaults to ensure new fields are present
+      return { ...DEFAULT_CONFIG, ...parsed };
+    }
+  } catch { /* ignore corrupt data */ }
+  return null;
+}
+
+/** Save WorldConfig to localStorage */
+function saveConfigToStorage(config: WorldConfig) {
+  try { localStorage.setItem(LS_CONFIG_KEY, JSON.stringify(config)); } catch { /* quota */ }
+}
+
+/** Saved world state */
+interface WorldSave {
+  seed: number;
+  pos: [number, number, number];
+  rot: [number, number, number];  // Euler angles (YXZ)
+}
+
+/** Save world state to localStorage */
+function saveWorldToStorage(save: WorldSave) {
+  try { localStorage.setItem(LS_SAVE_KEY, JSON.stringify(save)); } catch { /* quota */ }
+}
+
+/** Load world save from localStorage */
+function loadWorldFromStorage(): WorldSave | null {
+  try {
+    const raw = localStorage.getItem(LS_SAVE_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    if (p && typeof p.seed === 'number' && Array.isArray(p.pos)) return p as WorldSave;
+  } catch { /* ignore */ }
+  return null;
+}
+
+/** Encode a scene link into URL query params: ?seed=42&px=1&py=12&pz=20&rx=0&ry=0&rz=0 */
+function encodeSceneToURL(seed: number, pos: [number, number, number], rot: [number, number, number]): string {
+  const params = new URLSearchParams();
+  params.set('seed', String(seed));
+  params.set('px', pos[0].toFixed(1));
+  params.set('py', pos[1].toFixed(1));
+  params.set('pz', pos[2].toFixed(1));
+  params.set('rx', rot[0].toFixed(4));
+  params.set('ry', rot[1].toFixed(4));
+  params.set('rz', rot[2].toFixed(4));
+  return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+}
+
+/** Decode scene from URL search params */
+function decodeSceneFromURL(): { seed: number; pos: [number, number, number]; rot: [number, number, number] } | null {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const seedStr = params.get('seed');
+    const px = params.get('px'), py = params.get('py'), pz = params.get('pz');
+    const rx = params.get('rx'), ry = params.get('ry'), rz = params.get('rz');
+    if (!seedStr || !px || !py || !pz) return null;
+    return {
+      seed: parseInt(seedStr, 10),
+      pos: [parseFloat(px), parseFloat(py), parseFloat(pz)],
+      rot: rx && ry && rz ? [parseFloat(rx), parseFloat(ry), parseFloat(rz)] : [0, 0, 0],
+    };
+  } catch { return null; }
+}
+
 /* ═══════════════════════════════════════════════════════════════
  *  Camera Tracker (converts camera pos → biome name for HUD)
  * ═══════════════════════════════════════════════════════════════ */
 
 function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
-  onUpdate: (pos: [number, number, number], biome: string) => void;
+  onUpdate: (pos: [number, number, number], biome: string, hour: number, rot: [number, number, number]) => void;
   biomeNoise: ((x: number, y: number) => number) | null;
   tempNoise: ((x: number, y: number) => number) | null;
   cityFreq: number;
 }) {
   const { camera } = useThree();
+  const timeRef = useContext(TimeContext);
   const last = useRef(0);
+  const _euler = useMemo(() => new THREE.Euler(0, 0, 0, 'YXZ'), []);
   useFrame(({ clock }) => {
     if (clock.getElapsedTime() - last.current < 0.3) return;
     last.current = clock.getElapsedTime();
@@ -120,7 +203,10 @@ function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
     if (biomeNoise && tempNoise) {
       biome = BIOMES[getBiome(biomeNoise, tempNoise, camera.position.x / VOXEL_SIZE, camera.position.z / VOXEL_SIZE, cityFreq)].name;
     }
-    onUpdate(pos, biome);
+    const hour = timeRef ? timeRef.current.hour : 12;
+    _euler.setFromQuaternion(camera.quaternion);
+    const rot: [number, number, number] = [_euler.x, _euler.y, _euler.z];
+    onUpdate(pos, biome, hour, rot);
   });
   return null;
 }
@@ -303,21 +389,60 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
  * ═══════════════════════════════════════════════════════════════ */
 
 export default function ProceduralTerrain() {
-  const [seed, setSeed] = useState(42);
-  const [config, setConfig] = useState<WorldConfig>(DEFAULT_CONFIG);
+  /* ── Restore from URL query params first, then localStorage, then defaults ── */
+  const urlScene = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    return decodeSceneFromURL();
+  }, []);
+  const savedWorld = useMemo(() => {
+    if (urlScene) return null; // URL takes precedence
+    if (typeof window === 'undefined') return null;
+    return loadWorldFromStorage();
+  }, [urlScene]);
+  const savedConfig = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    return loadConfigFromStorage();
+  }, []);
+
+  const initSeed = urlScene?.seed ?? savedWorld?.seed ?? 42;
+  const initPos = urlScene?.pos ?? savedWorld?.pos ?? undefined;
+  const initRot = urlScene?.rot ?? savedWorld?.rot ?? undefined;
+
+  const [seed, setSeed] = useState(initSeed);
+  const [config, setConfig] = useState<WorldConfig>(savedConfig ?? DEFAULT_CONFIG);
   const [isLocked, setIsLocked] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [cameraPos, setCameraPos] = useState<[number, number, number]>([0, 12, 20]);
+  const [cameraPos, setCameraPos] = useState<[number, number, number]>(initPos ?? [0, 12, 20]);
   const [currentBiome, setCurrentBiome] = useState('Plains');
   const [chunkCount, setChunkCount] = useState(0);
-  const [seedInput, setSeedInput] = useState('42');
+  const [seedInput, setSeedInput] = useState(String(initSeed));
   const [isMobile, setIsMobile] = useState(false);
+  const [displayHour, setDisplayHour] = useState(config.timeMode === 'fixed' ? config.fixedHour : 12);
+
+  /* ── Camera rotation ref (updated from CameraTracker, used for save/share) ── */
+  const cameraRotRef = useRef<[number, number, number]>(initRot ?? [0, 0, 0]);
+  /* ── Initial position/rotation for FlyCamera (only used on mount) ── */
+  const [initialPos] = useState(initPos);
+  const [initialRot] = useState(initRot);
+
+  /* ── Persist config to localStorage on every change ── */
+  useEffect(() => { saveConfigToStorage(config); }, [config]);
 
   const keysRef = useRef<Set<string>>(new Set());
   const speedRef = useRef(config.flySpeed);
   const canvasRef = useRef<HTMLDivElement>(null);
   const chunkCacheRef = useRef<Map<string, ChunkVoxelData>>(new Map());
+  const timeStateRef = useRef<TimeState>({
+    hour: config.timeMode === 'fixed' ? config.fixedHour : 12,
+    sunIntensity: 1.4,
+    moonIntensity: 0,
+    isNight: false,
+    sunColor: new THREE.Color('#ffffff'),
+    ambientColor: new THREE.Color('#ffffff'),
+    skyTopColor: new THREE.Color(0.20, 0.35, 0.65),
+    skyHorizonColor: new THREE.Color(0.75, 0.68, 0.58),
+    fogColor: new THREE.Color('#b0c8e0'),
+  });
 
   const noises = useMemo(() => ({
     biome: createNoise2D(seed + 2), temp: createNoise2D(seed + 3),
@@ -353,7 +478,9 @@ export default function ProceduralTerrain() {
     return () => document.removeEventListener('pointerlockchange', h);
   }, []);
 
-  const handleCameraUpdate = useCallback((pos: [number, number, number], biome: string) => { setCameraPos(pos); setCurrentBiome(biome); }, []);
+  const handleCameraUpdate = useCallback((pos: [number, number, number], biome: string, hour: number, rot: [number, number, number]) => {
+    setCameraPos(pos); setCurrentBiome(biome); setDisplayHour(hour); cameraRotRef.current = rot;
+  }, []);
   const generateNewSeed = useCallback(() => { const s = Math.floor(Math.random() * 999999); setSeed(s); setSeedInput(String(s)); }, []);
   const applySeed = useCallback(() => { const p = parseInt(seedInput, 10); if (!isNaN(p)) setSeed(Math.abs(p)); }, [seedInput]);
   const handleChunkCount = useCallback((c: number) => setChunkCount(c), []);
@@ -363,9 +490,27 @@ export default function ProceduralTerrain() {
   const handleTouchKey = useCallback((key: string, active: boolean) => {
     if (active) keysRef.current.add(key); else keysRef.current.delete(key);
   }, []);
-  const updateConfig = useCallback((key: keyof WorldConfig, val: number) => {
+  const updateConfig = useCallback((key: keyof WorldConfig, val: number | string) => {
     setConfig(prev => ({ ...prev, [key]: val }));
   }, []);
+
+  /* ── Save world (seed + camera) to localStorage ── */
+  const handleSaveWorld = useCallback(() => {
+    saveWorldToStorage({ seed, pos: cameraPos, rot: cameraRotRef.current });
+  }, [seed, cameraPos]);
+
+  /* ── Share scene — copy URL with seed + camera encoded as query params ── */
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied'>('idle');
+  const handleShareScene = useCallback(() => {
+    const url = encodeSceneToURL(seed, cameraPos, cameraRotRef.current);
+    navigator.clipboard.writeText(url).then(() => {
+      setShareStatus('copied');
+      setTimeout(() => setShareStatus('idle'), 2000);
+    }).catch(() => {
+      // Fallback: prompt user
+      window.prompt('Copy this link:', url);
+    });
+  }, [seed, cameraPos]);
 
   const gfxDpr: [number, number] = config.graphicsQuality === 'low' ? [0.75, 1] : config.graphicsQuality === 'high' ? [1, 2] : [1, 1.5];
   const gfxAA = config.graphicsQuality === 'high';
@@ -383,119 +528,25 @@ export default function ProceduralTerrain() {
             <p className="font-pixel text-[8px] sm:text-[10px] md:text-xs text-retro-purple/80 mb-1 drop-shadow select-none">@pxlkit/voxel — Coming Soon</p>
             <p className="text-retro-muted/70 text-[10px] sm:text-xs md:text-sm max-w-md mx-auto px-4 leading-relaxed select-none">
               {config.worldMode === 'infinite'
-                ? 'Infinite procedural voxel worlds with cities, biomes, and ambient particles.'
+                ? 'Infinite procedural voxel worlds with cities, villages, swamps, and dynamic day/night.'
                 : `Floating ${config.worldSize}×${config.worldSize} island with tapered edges and full biome variety.`}
               <span className="text-retro-gold font-bold">{isMobile ? ' Tap to fly.' : ' Click to fly.'}</span>
             </p>
           </div>
-          <div className="pointer-events-auto bg-retro-bg/80 backdrop-blur-md border border-retro-border/50 rounded-xl p-3 sm:p-4 md:p-5 max-w-sm w-[calc(100%-2rem)] space-y-3 shadow-xl overflow-y-auto max-h-[70vh] select-none">
-            <div className="space-y-1.5">
-              <label className="font-pixel text-[8px] sm:text-[9px] text-retro-green/80 uppercase tracking-wider select-none">World Seed</label>
-              <div className="flex gap-2">
-                <input type="text" inputMode="numeric" pattern="[0-9]*" value={seedInput}
-                  onChange={e => setSeedInput(e.target.value.replace(/[^0-9]/g, ''))}
-                  onKeyDown={e => e.key === 'Enter' && applySeed()}
-                  className="flex-1 bg-retro-surface/80 border border-retro-border/50 rounded px-2 sm:px-3 py-1.5 font-mono text-xs sm:text-sm text-retro-text focus:border-retro-green/60 focus:outline-none transition-colors select-text" placeholder="Enter seed..." />
-                <button onClick={applySeed} className="px-2 sm:px-3 py-1.5 bg-retro-green/20 hover:bg-retro-green/30 border border-retro-green/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-green transition-all cursor-pointer select-none">GO</button>
-              </div>
-            </div>
-            <button onClick={generateNewSeed} className="w-full py-2 bg-retro-purple/20 hover:bg-retro-purple/30 border border-retro-purple/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-purple transition-all cursor-pointer select-none">🎲 RANDOM WORLD</button>
-            {/* World Mode Toggle */}
-            <div className="space-y-1">
-              <label className="font-pixel text-[8px] sm:text-[9px] text-retro-purple/80 uppercase tracking-wider select-none">World Mode</label>
-              <div className="flex gap-2">
-                <button onClick={() => setConfig(prev => ({ ...prev, worldMode: 'infinite' as WorldMode }))}
-                  className={`flex-1 py-1.5 rounded font-pixel text-[8px] sm:text-[9px] transition-all cursor-pointer select-none border ${config.worldMode === 'infinite' ? 'bg-retro-purple/30 border-retro-purple/60 text-retro-purple' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/60 hover:bg-retro-surface/60'}`}>
-                  ∞ INFINITE
-                </button>
-                <button onClick={() => setConfig(prev => ({ ...prev, worldMode: 'finite' as WorldMode }))}
-                  className={`flex-1 py-1.5 rounded font-pixel text-[8px] sm:text-[9px] transition-all cursor-pointer select-none border ${config.worldMode === 'finite' ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/60 hover:bg-retro-surface/60'}`}>
-                  ◻ FINITE
-                </button>
-              </div>
-              <p className="font-mono text-[7px] text-retro-muted/40 select-none">
-                {config.worldMode === 'infinite' ? 'Endless terrain, chunks loaded on demand' : `Island of ${config.worldSize}×${config.worldSize} voxels`}
-              </p>
-            </div>
-            {config.worldMode === 'finite' && (
-              <ConfigSlider label="World Size" value={config.worldSize} onChange={v => updateConfig('worldSize', v)} min={32} max={512} step={16} color="text-retro-cyan/80" displayValue={`${config.worldSize}×${config.worldSize}`} />
-            )}
-            {config.worldMode === 'infinite' && (
-              <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => updateConfig('renderDistance', v)} min={2} max={50} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
-            )}
-            <ConfigSlider label="Fly Speed" value={config.flySpeed} onChange={v => updateConfig('flySpeed', v)} min={4} max={80} step={1} color="text-retro-gold/80" displayValue={String(config.flySpeed)} />
-            <button onClick={() => setShowAdvanced(!showAdvanced)}
-              className="w-full py-1.5 bg-retro-surface/40 hover:bg-retro-surface/60 border border-retro-border/30 rounded font-pixel text-[7px] sm:text-[8px] text-retro-muted/70 transition-all cursor-pointer select-none">
-              {showAdvanced ? '▾ HIDE ADVANCED' : '▸ SHOW ADVANCED'}
-            </button>
-            {showAdvanced && (
-              <div className="space-y-2.5 pt-1 border-t border-retro-border/20">
-                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1">Graphics &amp; Performance</p>
-                <div className="space-y-1">
-                  <label className="font-pixel text-[8px] sm:text-[9px] text-retro-cyan/80 uppercase tracking-wider select-none">Graphics Quality</label>
-                  <div className="flex gap-1.5">
-                    {(['low', 'medium', 'high'] as const).map(q => (
-                      <button key={q} onClick={() => setConfig(prev => ({ ...prev, graphicsQuality: q }))}
-                        className={`flex-1 py-1 rounded font-pixel text-[7px] sm:text-[8px] transition-all cursor-pointer select-none border ${config.graphicsQuality === q ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/50 hover:bg-retro-surface/60'}`}>
-                        {q.toUpperCase()}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="font-mono text-[7px] text-retro-muted/30 select-none">
-                    {config.graphicsQuality === 'low' ? 'Lower DPR, no AA — best for mobile' : config.graphicsQuality === 'high' ? 'Higher DPR + antialiasing — GPU intensive' : 'Balanced DPR, no AA — recommended'}
-                  </p>
-                </div>
-                <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => updateConfig('chunkGenSpeed', v)} min={1} max={10} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
-                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Visual Detail</p>
-                <ConfigSlider label="Voxel Detail LOD" value={config.voxelDetail} onChange={v => updateConfig('voxelDetail', v)} min={0} max={16} step={1} color="text-retro-gold/80" displayValue={config.voxelDetail === 0 ? 'Off' : `${config.voxelDetail}× subdivisions`} />
-                <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                  {config.voxelDetail === 0 ? 'No surface detail — best performance' : config.voxelDetail <= 2 ? 'Mini-voxels on nearby surfaces for texture' : config.voxelDetail <= 8 ? 'High detail — more GPU intensive' : 'Ultra detail — very GPU intensive'}
-                </p>
-                {config.voxelDetail > 0 && (
-                  <>
-                    <ConfigSlider label="Detail Distance" value={config.detailDistance} onChange={v => updateConfig('detailDistance', v)} min={1} max={20} step={0.5} color="text-retro-gold/80" displayValue={`${config.detailDistance} units`} />
-                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                      Radius around camera where mini-voxels appear
-                    </p>
-                    <ConfigSlider label="Sharpness" value={config.detailSharpness} onChange={v => updateConfig('detailSharpness', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.detailSharpness === 0 ? 'Smooth' : config.detailSharpness < 0.3 ? 'Subtle' : config.detailSharpness < 0.7 ? 'Textured' : 'Rough'} />
-                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                      {config.detailSharpness === 0 ? 'Uniform flat mini-voxels — clean look' : config.detailSharpness < 0.3 ? 'Slight size & height variation' : config.detailSharpness < 0.7 ? 'Noticeable texture with bumps & color shifts' : 'Rough organic surfaces — gaps, bumps & contrast'}
-                    </p>
-                    <ConfigSlider label="Detail Max Instances" value={config.detailMaxInstances} onChange={v => updateConfig('detailMaxInstances', v)} min={1000} max={200000} step={1000} color="text-retro-cyan/80" displayValue={config.detailMaxInstances >= 1000 ? `${(config.detailMaxInstances / 1000).toFixed(0)}K` : String(config.detailMaxInstances)} />
-                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                      GPU budget for mini-voxels — higher = more detail but slower
-                    </p>
-                  </>
-                )}
-                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Terrain &amp; Biomes</p>
-                <ConfigSlider label="Tree Density" value={config.treeDensity} onChange={v => updateConfig('treeDensity', v)} min={0} max={1} step={0.1} color="text-retro-green/80" displayValue={`${Math.round(config.treeDensity * 100)}%`} />
-                <ConfigSlider label="Structure Density" value={config.structureDensity} onChange={v => updateConfig('structureDensity', v)} min={0} max={1} step={0.1} color="text-retro-gold/80" displayValue={`${Math.round(config.structureDensity * 100)}%`} />
-                <ConfigSlider label="City Frequency" value={config.cityFrequency} onChange={v => updateConfig('cityFrequency', v)} min={0} max={1} step={0.1} color="text-retro-purple/80" displayValue={`${Math.round(config.cityFrequency * 100)}%`} />
-                <ConfigSlider label="Biome Variation" value={config.biomeVariation} onChange={v => updateConfig('biomeVariation', v)} min={0} max={1} step={0.1} color="text-retro-green/80" displayValue={`${Math.round(config.biomeVariation * 100)}%`} />
-                <ConfigSlider label="Terrain Roughness" value={config.terrainRoughness} onChange={v => updateConfig('terrainRoughness', v)} min={0} max={1} step={0.1} color="text-retro-gold/80" displayValue={`${Math.round(config.terrainRoughness * 100)}%`} />
-                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Items &amp; Effects</p>
-                <ConfigSlider label="Pickup Density" value={config.pickupDensity} onChange={v => updateConfig('pickupDensity', v)} min={0} max={1} step={0.1} color="text-retro-cyan/80" displayValue={`${Math.round(config.pickupDensity * 100)}%`} />
-                <ConfigSlider label="Particle Intensity" value={config.particleIntensity} onChange={v => updateConfig('particleIntensity', v)} min={0} max={1} step={0.1} color="text-retro-purple/80" displayValue={`${Math.round(config.particleIntensity * 100)}%`} />
-                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Atmosphere</p>
-                <ConfigSlider label="Fog Density" value={config.fogDensity} onChange={v => updateConfig('fogDensity', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.fogDensity * 100)}%`} />
-                <ConfigSlider label="Background Mountains" value={config.backgroundDetail} onChange={v => updateConfig('backgroundDetail', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.backgroundDetail * 100)}%`} />
-              </div>
-            )}
-            <button onClick={requestPointerLock}
-              className="w-full py-2.5 sm:py-3 bg-retro-green/20 hover:bg-retro-green/30 border-2 border-retro-green/60 rounded-lg font-pixel text-[9px] sm:text-[10px] md:text-xs text-retro-green transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(74,222,128,0.2)] select-none">
-              ▶ {isMobile ? 'TAP TO EXPLORE' : 'CLICK TO EXPLORE'}
-            </button>
-            <div className="text-center space-y-0.5 select-none">
-              {isMobile ? (
-                <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">Drag canvas to look · D-pad to move · Tap ✕ to exit</p>
-              ) : (
-                <>
-                  <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">WASD / Arrows = Move · Space = Up · Shift = Down</p>
-                  <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/50">Mouse = Look · ESC = Release cursor</p>
-                </>
-              )}
-            </div>
-          </div>
+          <SettingsPanel
+            config={config}
+            onUpdateConfig={updateConfig}
+            onSetConfig={setConfig}
+            seed={seedInput}
+            onSeedChange={setSeedInput}
+            onApplySeed={applySeed}
+            onRandomSeed={generateNewSeed}
+            onStartExplore={requestPointerLock}
+            isMobile={isMobile}
+            onSaveWorld={handleSaveWorld}
+            onShareScene={handleShareScene}
+            shareStatus={shareStatus}
+          />
         </div>
       )}
 
@@ -510,7 +561,7 @@ export default function ProceduralTerrain() {
               </div>
             </div>
           )}
-          <OverlayStats seed={seed} chunkCount={chunkCount} position={cameraPos} biome={currentBiome} worldMode={config.worldMode} worldSize={config.worldSize} />
+          <OverlayStats seed={seed} chunkCount={chunkCount} position={cameraPos} biome={currentBiome} worldMode={config.worldMode} worldSize={config.worldSize} hour={displayHour} />
           <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 select-none" style={{ touchAction: 'none' }}>
             {isMobile ? (
               <button onClick={exitImmersive} className="p-2 bg-retro-bg/70 backdrop-blur-sm border border-retro-border/30 rounded font-pixel text-[9px] text-retro-muted/60 hover:text-retro-red transition-all cursor-pointer select-none" style={{ touchAction: 'none' }}>✕</button>
@@ -534,16 +585,19 @@ export default function ProceduralTerrain() {
           gl={{ antialias: gfxAA, toneMapping: THREE.NoToneMapping, powerPreference: 'high-performance' }}
           style={{ background: 'transparent', touchAction: 'none' }}
         >
-          <SkyGradient backgroundDetail={config.backgroundDetail} />
+          <TimeContext.Provider value={timeStateRef}>
+          <DayNightSky backgroundDetail={config.backgroundDetail} starDensity={config.starDensity} />
           <FogEffect density={config.fogDensity} />
-          <WorldLighting />
-          <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} worldConfig={config} />
+          <DayNightLighting timeMode={config.timeMode} fixedHour={config.fixedHour} dayDurationSeconds={config.dayDurationSeconds} />
+          <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} worldConfig={config} initialPos={initialPos} initialRot={initialRot} />
           <CameraLook isLocked={isLocked} isMobile={isMobile} />
           <ChunkManagerWithCounter seed={seed} config={config} onChunkCount={handleChunkCount} chunkCacheRef={chunkCacheRef} />
           <CameraTracker onUpdate={handleCameraUpdate} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} />
           <AmbientParticles biome={currentBiome} intensity={config.particleIntensity} />
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
           <GroundCritters biome={currentBiome} intensity={config.particleIntensity} />
+          <NightWindowLights chunkCacheRef={chunkCacheRef} windowLitProbability={config.windowLitProbability} />
+          <WaterBoats chunkCacheRef={chunkCacheRef} boatDensity={config.boatDensity} />
           {config.voxelDetail > 0 && (
             <SurfaceDetailLayer
               chunkCacheRef={chunkCacheRef}
@@ -553,6 +607,7 @@ export default function ProceduralTerrain() {
               detailMaxInstances={config.detailMaxInstances}
             />
           )}
+          </TimeContext.Provider>
         </Canvas>
       </div>
     </div>

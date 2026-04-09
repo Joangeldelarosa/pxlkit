@@ -58,9 +58,17 @@ export const BIOMES: Record<BiomeType, BiomeConfig> = {
     name: 'City', heightScale: 1, heightBase: 7, waterLevel: 5,
     colors: { top: '#888888', mid: '#666666', bottom: '#444444', accent: '#ffdd44', water: '#88ddff' },
   },
+  swamp: {
+    name: 'Swamp', heightScale: 3, heightBase: 6, waterLevel: 6,
+    colors: { top: '#5a7a4a', mid: '#4a5a3a', bottom: '#3a4a2a', accent: '#7a9a5a', water: '#4a7744' },
+  },
+  village: {
+    name: 'Village', heightScale: 4, heightBase: 7, waterLevel: 4,
+    colors: { top: '#88cc66', mid: '#aa8855', bottom: '#887755', accent: '#ddaa44', water: '#77bbdd' },
+  },
 };
 
-export const BIOME_TYPES: BiomeType[] = ['plains', 'desert', 'tundra', 'forest', 'mountains', 'ocean', 'city'];
+export const BIOME_TYPES: BiomeType[] = ['plains', 'desert', 'tundra', 'forest', 'mountains', 'ocean', 'city', 'swamp', 'village'];
 
 /** Region scale — how large a single biome "patch" is in voxels */
 export const REGION_SCALE = 0.003;
@@ -81,6 +89,7 @@ export const BUILDING_WALL_PALETTES: Record<string, string[]> = {
   mall:               ['#ccbbaa', '#ddccbb', '#bbaa99', '#eeddcc'],
   house:              ['#ddccaa', '#ccbb99', '#eeddbb', '#d4c098'],
   mansion:            ['#eeddcc', '#ddccbb', '#ffeecc', '#d4c8a8'],
+  castle:             ['#8899aa', '#778899', '#99aabb', '#667788'],
   hospital:           ['#ddeeff', '#ccddef', '#bbccdd'],
   school:             ['#ddcc99', '#ccbb88', '#eedd99'],
   church:             ['#ccbbaa', '#bbaa99', '#ddccbb'],
@@ -95,7 +104,7 @@ export const BUILDING_ROOF_COLORS: Record<string, string> = {
   office: '#886644', office_tall: '#775544',
   warehouse: '#665544', factory: '#555555',
   shop: '#cc8844', mall: '#bb7744',
-  house: '#cc6633', mansion: '#aa5533',
+  house: '#cc6633', mansion: '#aa5533', castle: '#556677',
   hospital: '#dddddd', school: '#cc9944',
   church: '#886644', stadium: '#777777',
   parking_garage: '#666666',
