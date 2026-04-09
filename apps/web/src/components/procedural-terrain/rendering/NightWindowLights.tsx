@@ -1,9 +1,13 @@
 /* ═══════════════════════════════════════════════════════════════
  *  Night Window Lights — glowing windows on buildings at night
  *
- *  Uses registered window positions from chunk generation to render
- *  warm-colored emissive cubes that fade in at dusk and out at dawn.
- *  Each window has a deterministic on/off state and flicker pattern.
+ *  Two-layer rendering for maximum visibility:
+ *  1. Inner glow: slightly larger than voxel so it protrudes past the
+ *     opaque building wall (fixes z-fighting with same-position voxels).
+ *  2. Outer halo: larger, softer glow around each window for bloom effect.
+ *
+ *  Each window has a deterministic on/off state, flicker pattern, and
+ *  warm color chosen from the palette.
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
@@ -14,23 +18,30 @@ import type { ChunkVoxelData } from '../types';
 import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { TimeContext } from './DayNightCycle';
 
-const WIN_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 0.95, VOXEL_SIZE * 0.95, VOXEL_SIZE * 0.95);
+/* ── Geometry: inner glow protrudes 20% past wall; outer halo is 2.2× ── */
+const WIN_INNER_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 1.2, VOXEL_SIZE * 1.2, VOXEL_SIZE * 1.2);
+const WIN_OUTER_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 2.2, VOXEL_SIZE * 2.2, VOXEL_SIZE * 2.2);
 
-const WINDOW_LIT_PROBABILITY = 0.65;   // ~65% of windows lit at night
-const FLICKER_HASH_THRESHOLD = 0.5;    // only windows with hash > this can flicker off
-const FLICKER_OFF_THRESHOLD = -0.3;    // sin value below which flickering windows go dark
+/* ── Tuning constants ── */
+const WINDOW_LIT_PROBABILITY = 0.70;   // ~70% of windows lit at night
+const FLICKER_HASH_THRESHOLD = 0.55;   // windows above this can flicker
+const FLICKER_OFF_THRESHOLD = -0.35;   // sin threshold for flicker-off
+const VIEW_DIST_CHUNKS = 8;            // how many chunks to scan
+const MAX_INSTANCES = 6000;
+
 function winHash(x: number, y: number, z: number): number {
   let h = (Math.round(x * 100) * 374761393 + Math.round(y * 100) * 668265263 + Math.round(z * 100) * 1274126177) | 0;
   h = Math.imul(h ^ (h >>> 13), 1103515245);
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
-/** Warm window light colors */
+/** Warm window light colors — saturated for additive blending visibility */
 const WARM_COLORS = [
   new THREE.Color('#ffdd88'),  // warm yellow
   new THREE.Color('#ffeebb'),  // bright warm
   new THREE.Color('#ffcc66'),  // golden
   new THREE.Color('#eebb55'),  // amber
+  new THREE.Color('#ffaa44'),  // deep amber
   new THREE.Color('#88bbff'),  // cool blue (TV screen)
 ];
 
@@ -39,53 +50,65 @@ export function NightWindowLights({
 }: {
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
 }) {
-  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const innerRef = useRef<THREE.InstancedMesh>(null);
+  const outerRef = useRef<THREE.InstancedMesh>(null);
   const timeRef = useContext(TimeContext);
   const { camera } = useThree();
-  const maxInstances = 4000;
-  const prevCount = useRef(0);
 
-  const mat = useMemo(() => new THREE.MeshBasicMaterial({
+  /* Inner glow: brighter, slightly transparent, additive */
+  const innerMat = useMemo(() => new THREE.MeshBasicMaterial({
     transparent: true,
     opacity: 0,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
+    toneMapped: false,
+  }), []);
+
+  /* Outer halo: very transparent, large, soft bloom */
+  const outerMat = useMemo(() => new THREE.MeshBasicMaterial({
+    transparent: true,
+    opacity: 0,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    toneMapped: false,
   }), []);
 
   useFrame(({ clock }) => {
-    const mesh = meshRef.current;
-    if (!mesh || !timeRef) return;
+    const inner = innerRef.current;
+    const outer = outerRef.current;
+    if (!inner || !outer || !timeRef) return;
 
     const state = timeRef.current;
     const hour = state.hour;
 
-    // Calculate night intensity: 0 during day, 1 at deep night
+    // Night intensity: 0 during day, 1 at deep night
     let nightFactor = 0;
-    if (hour >= 18 && hour < 19.5) {
-      nightFactor = (hour - 18) / 1.5; // fade in during dusk
+    if (hour >= 17.5 && hour < 19.5) {
+      nightFactor = (hour - 17.5) / 2; // start earlier, fade in during dusk
     } else if (hour >= 19.5 || hour < 5) {
-      nightFactor = 1; // full night
+      nightFactor = 1;
     } else if (hour >= 5 && hour < 6.5) {
-      nightFactor = 1 - (hour - 5) / 1.5; // fade out at dawn
+      nightFactor = 1 - (hour - 5) / 1.5;
     }
 
     if (nightFactor <= 0.01) {
-      mat.opacity = 0;
-      mesh.count = 0;
-      if (mesh.instanceMatrix) mesh.instanceMatrix.needsUpdate = true;
-      prevCount.current = 0;
+      innerMat.opacity = 0;
+      outerMat.opacity = 0;
+      inner.count = 0;
+      outer.count = 0;
+      if (inner.instanceMatrix) inner.instanceMatrix.needsUpdate = true;
+      if (outer.instanceMatrix) outer.instanceMatrix.needsUpdate = true;
       return;
     }
 
-    mat.opacity = nightFactor * 0.85;
+    innerMat.opacity = nightFactor * 0.95;
+    outerMat.opacity = nightFactor * 0.25;
 
-    // Gather windows from nearby chunks
     const cache = chunkCacheRef.current;
     if (!cache) return;
 
     const camCX = Math.floor(camera.position.x / (CHUNK_SIZE * VOXEL_SIZE));
     const camCZ = Math.floor(camera.position.z / (CHUNK_SIZE * VOXEL_SIZE));
-    const viewDist = 6; // chunks to check
 
     const m = new THREE.Matrix4();
     const c = new THREE.Color();
@@ -93,55 +116,62 @@ export function NightWindowLights({
     const t = clock.getElapsedTime();
 
     for (const [, data] of cache) {
-      if (count >= maxInstances) break;
+      if (count >= MAX_INSTANCES) break;
 
-      // Skip distant chunks
       const dx = data.chunkX - camCX;
       const dz = data.chunkZ - camCZ;
-      if (dx * dx + dz * dz > viewDist * viewDist) continue;
+      if (dx * dx + dz * dz > VIEW_DIST_CHUNKS * VIEW_DIST_CHUNKS) continue;
 
-      for (let i = 0; i < data.windowLightCount && count < maxInstances; i++) {
+      for (let i = 0; i < data.windowLightCount && count < MAX_INSTANCES; i++) {
         const i3 = i * 3;
         const wx = data.windowLights[i3];
         const wy = data.windowLights[i3 + 1];
         const wz = data.windowLights[i3 + 2];
 
-        // Deterministic: ~65% of windows are lit at night
         const h = winHash(wx, wy, wz);
         if (h > WINDOW_LIT_PROBABILITY) continue;
 
-        // Some windows flicker on/off with a slow pattern
+        // Flicker
         const flickerPhase = h * 100;
-        const flickerSpeed = 0.1 + h * 0.2;
+        const flickerSpeed = 0.08 + h * 0.15;
         const flicker = Math.sin(t * flickerSpeed + flickerPhase);
         if (h > FLICKER_HASH_THRESHOLD && flicker < FLICKER_OFF_THRESHOLD) continue;
 
+        // Set transform for both inner and outer meshes
         m.identity();
         m.elements[12] = wx;
         m.elements[13] = wy;
         m.elements[14] = wz;
-        mesh.setMatrixAt(count, m);
+        inner.setMatrixAt(count, m);
+        outer.setMatrixAt(count, m);
 
-        // Choose warm color based on position hash
+        // Warm color
         const colorIdx = Math.floor(h * WARM_COLORS.length) % WARM_COLORS.length;
         c.copy(WARM_COLORS[colorIdx]);
-
-        // Slight brightness variation
-        const brightness = 0.7 + h * 0.3 + flicker * 0.05;
+        const brightness = 0.8 + h * 0.4 + flicker * 0.08;
         c.multiplyScalar(brightness);
-        mesh.setColorAt(count, c);
+        inner.setColorAt(count, c);
+
+        // Outer halo is dimmer / slightly different hue
+        c.multiplyScalar(0.5);
+        outer.setColorAt(count, c);
 
         count++;
       }
     }
 
-    mesh.count = count;
-    if (mesh.instanceMatrix) mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    prevCount.current = count;
+    inner.count = count;
+    outer.count = count;
+    if (inner.instanceMatrix) inner.instanceMatrix.needsUpdate = true;
+    if (inner.instanceColor) inner.instanceColor.needsUpdate = true;
+    if (outer.instanceMatrix) outer.instanceMatrix.needsUpdate = true;
+    if (outer.instanceColor) outer.instanceColor.needsUpdate = true;
   });
 
   return (
-    <instancedMesh ref={meshRef} args={[WIN_GEO, mat, maxInstances]} frustumCulled={false} />
+    <>
+      <instancedMesh ref={outerRef} args={[WIN_OUTER_GEO, outerMat, MAX_INSTANCES]} frustumCulled={false} renderOrder={998} />
+      <instancedMesh ref={innerRef} args={[WIN_INNER_GEO, innerMat, MAX_INSTANCES]} frustumCulled={false} renderOrder={999} />
+    </>
   );
 }

@@ -65,6 +65,7 @@ import { SurfaceDetailLayer } from './rendering/SurfaceDetailLayer';
 import { AmbientParticles } from './effects/AmbientParticles';
 import { SkyBirds } from './effects/SkyBirds';
 import { GroundCritters } from './effects/GroundCritters';
+import { WaterBoats } from './effects/WaterBoats';
 import { FlyCamera } from './camera/FlyCamera';
 import { CameraLook } from './camera/CameraLook';
 import { OverlayStats, MobileTouchControls } from './ui/Controls';
@@ -463,6 +464,7 @@ export default function ProceduralTerrain() {
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
           <GroundCritters biome={currentBiome} intensity={config.particleIntensity} />
           <NightWindowLights chunkCacheRef={chunkCacheRef} />
+          <WaterBoats chunkCacheRef={chunkCacheRef} />
           {config.voxelDetail > 0 && (
             <SurfaceDetailLayer
               chunkCacheRef={chunkCacheRef}
