@@ -60,6 +60,7 @@ import { ChunkMesh, FloatingPickup } from './rendering/ChunkMesh';
 import { FogEffect } from './rendering/WorldLighting';
 import { DayNightLighting, DayNightSky, TimeContext } from './rendering/DayNightCycle';
 import type { TimeState } from './rendering/DayNightCycle';
+import { NightWindowLights } from './rendering/NightWindowLights';
 import { SurfaceDetailLayer } from './rendering/SurfaceDetailLayer';
 import { AmbientParticles } from './effects/AmbientParticles';
 import { SkyBirds } from './effects/SkyBirds';
@@ -558,6 +559,7 @@ export default function ProceduralTerrain() {
           <AmbientParticles biome={currentBiome} intensity={config.particleIntensity} />
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
           <GroundCritters biome={currentBiome} intensity={config.particleIntensity} />
+          <NightWindowLights chunkCacheRef={chunkCacheRef} />
           {config.voxelDetail > 0 && (
             <SurfaceDetailLayer
               chunkCacheRef={chunkCacheRef}

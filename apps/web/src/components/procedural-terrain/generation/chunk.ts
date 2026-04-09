@@ -56,6 +56,9 @@ export function generateChunkData(
   const wColA = new Float32Array(maxW * 3);
   let wc = 0;
   const pickups: ChunkVoxelData['pickups'] = [];
+  const maxWin = CHUNK_SIZE * CHUNK_SIZE * 4;
+  const winPosA = new Float32Array(maxWin * 3);
+  let winC = 0;
   const solidHeightMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
@@ -141,6 +144,12 @@ export function generateChunkData(
       const i = lx2 * CHUNK_SIZE + lz2;
       if (yTop > solidHeightMap[i]) solidHeightMap[i] = yTop;
     }
+  }
+  function pushWin(px: number, py: number, pz: number) {
+    if (winC >= maxWin) return;
+    const i3 = winC * 3;
+    winPosA[i3] = px; winPosA[i3 + 1] = py; winPosA[i3 + 2] = pz;
+    winC++;
   }
 
   const chunkRand = mulberry32(cx * 73856093 + cz * 19349663);
@@ -294,7 +303,7 @@ export function generateChunkData(
           const totalD = cell.buildingD > 1 ? cell.buildingD * footprint : footprint;
 
           generateBuildingColumn({
-            push, trackH,
+            push, trackH, pushWin,
             bX, bZ, lx, lz, h, wx, wz,
             blX: cell.lotLocalX, blZ: cell.lotLocalZ,
             footW: totalW, footD: totalD,
@@ -373,6 +382,7 @@ export function generateChunkData(
             const isWin = hy === 2 && ((hx === 0 && hz === 1) || (hx === 2 && hz === 1));
             push((bX + lx + hx) * VOXEL_SIZE, (h + hy) * VOXEL_SIZE, (bZ + lz + hz) * VOXEL_SIZE,
               varyColor(isWin ? '#AADDFF' : wallC, wx + hx, h + hy, wz + hz));
+            if (isWin) pushWin((bX + lx + hx) * VOXEL_SIZE, (h + hy) * VOXEL_SIZE, (bZ + lz + hz) * VOXEL_SIZE);
           }
           for (let rx = -1; rx <= 3; rx++) for (let rz = -1; rz <= 3; rz++)
             push((bX + lx + rx) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE,
@@ -428,6 +438,7 @@ export function generateChunkData(
               const isDoor = hy <= 2 && hx === 1 && hz === 0;
               push((bX + lx + hx) * VOXEL_SIZE, (h + hy) * VOXEL_SIZE, (bZ + lz + hz) * VOXEL_SIZE,
                 varyColor(isDoor ? '#664422' : isWindow ? '#AADDFF' : wallC, wx + hx, h + hy, wz + hz));
+              if (isWindow) pushWin((bX + lx + hx) * VOXEL_SIZE, (h + hy) * VOXEL_SIZE, (bZ + lz + hz) * VOXEL_SIZE);
             }
             // Peaked roof
             for (let rx = -1; rx <= 4; rx++) for (let rz = -1; rz <= 4; rz++) {
@@ -568,6 +579,7 @@ export function generateChunkData(
   return {
     positions: posA.subarray(0, sc * 3), colors: colA.subarray(0, sc * 3), count: sc,
     waterPositions: wPosA.subarray(0, wc * 3), waterColors: wColA.subarray(0, wc * 3), waterCount: wc,
-    pickups, solidHeightMap, chunkX: cx, chunkZ: cz,
+    pickups, windowLights: winPosA.subarray(0, winC * 3), windowLightCount: winC,
+    solidHeightMap, chunkX: cx, chunkZ: cz,
   };
 }

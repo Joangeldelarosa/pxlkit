@@ -13,10 +13,12 @@ import { getWallPalette, getRoofColor } from './layout';
 
 type PushFn = (px: number, py: number, pz: number, hex: string) => void;
 type TrackFn = (lx: number, lz: number, h: number) => void;
+type PushWinFn = (px: number, py: number, pz: number) => void;
 
 interface BuildCtx {
   push: PushFn;
   trackH: TrackFn;
+  pushWin: PushWinFn;  // register window position for night lighting
   bX: number;       // chunk base X in voxels
   bZ: number;       // chunk base Z in voxels
   lx: number;       // local X within chunk
@@ -69,7 +71,7 @@ function isEdge(x: number, z: number, w: number, d: number): boolean {
 // Covers: skyscraper, office, office_tall, tower, house, shop
 
 function genStandardBuilding(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bType, bh } = ctx;
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bType, bh } = ctx;
   const walls = getWallPalette(bType);
   const wallBase = walls[0];
   const roofCol = getRoofColor(bType);
@@ -92,9 +94,12 @@ function genStandardBuilding(ctx: BuildCtx) {
       const isWindowCol = isEdgeZ
         ? (blX >= 1 && blX <= footW - 2 && blX % 2 === 1)
         : (blZ >= 1 && blZ <= footD - 2 && blZ % 2 === 1);
-      color = isWindowCol
-        ? varyColor(windowCol, wx, h + by, wz, 3, 0.05, 0.06)
-        : varyColor(wallBase, wx, h + by, wz, 5, 0.06, 0.07);
+      if (isWindowCol) {
+        color = varyColor(windowCol, wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor(wallBase, wx, h + by, wz, 5, 0.06, 0.07);
+      }
     } else {
       color = varyColor(wallBase, wx, h + by, wz, 5, 0.06, 0.07);
     }
@@ -135,7 +140,7 @@ function genStandardBuilding(ctx: BuildCtx) {
 
 /* ═══════════════ SKYSCRAPER TWIN ═══════════════ */
 function genSkyscraperTwin(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
   const walls = getWallPalette('skyscraper_twin');
   const roofCol = getRoofColor('skyscraper_twin');
   const onEdge = isEdge(blX, blZ, footW, footD);
@@ -152,6 +157,7 @@ function genSkyscraperTwin(ctx: BuildCtx) {
       color = varyColor(roofCol, wx, h + by, wz, 4, 0.04, 0.06);
     } else if (onEdge && by > 1 && by % 3 === 0) {
       color = varyColor('#88ccff', wx, h + by, wz, 3, 0.05, 0.06); // blue glass
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
     } else {
       color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
     }
@@ -435,7 +441,7 @@ function genHospital(ctx: BuildCtx) {
 
 /* ═══════════════ SCHOOL ═══════════════ */
 function genSchool(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
   const onEdge = isEdge(blX, blZ, footW, footD);
   const walls = getWallPalette('school');
 
@@ -447,7 +453,12 @@ function genSchool(ctx: BuildCtx) {
     } else if (onEdge && by % 2 === 0) {
       // Windows (large)
       const isWin = blX >= 1 && blX <= footW - 2 && blX % 2 === 0;
-      color = isWin ? varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06) : varyColor(walls[0], wx, h + by, wz, 4, 0.04, 0.06);
+      if (isWin) {
+        color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor(walls[0], wx, h + by, wz, 4, 0.04, 0.06);
+      }
     } else {
       color = varyColor(walls[0], wx, h + by, wz, 4, 0.04, 0.06);
     }
@@ -531,7 +542,7 @@ function genStadium(ctx: BuildCtx) {
 
 /* ═══════════════ MALL ═══════════════ */
 function genMall(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
   const onEdge = isEdge(blX, blZ, footW, footD);
 
   for (let by = 1; by <= bh; by++) {
@@ -542,10 +553,15 @@ function genMall(ctx: BuildCtx) {
     } else if (by <= 2 && blZ === 0 && blX >= 2 && blX < footW - 2) {
       // Glass entrance
       color = varyColor('#88ccee', wx, h + by, wz, 2, 0.04, 0.05);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
     } else if (onEdge && by % 2 === 0) {
       // Alternating glass/wall
-      color = blX % 2 === 0 ? varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06)
-                            : varyColor('#ccbbaa', wx, h + by, wz, 4, 0.04, 0.06);
+      if (blX % 2 === 0) {
+        color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor('#ccbbaa', wx, h + by, wz, 4, 0.04, 0.06);
+      }
     } else {
       color = varyColor('#ccbbaa', wx, h + by, wz, 4, 0.04, 0.06);
     }
@@ -596,7 +612,7 @@ function genAirportTerminal(ctx: BuildCtx) {
 
 /* ═══════════════ MANSION ═══════════════ */
 function genMansion(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
   const onEdge = isEdge(blX, blZ, footW, footD);
 
   // Garden area (outer ring)
@@ -622,6 +638,7 @@ function genMansion(ctx: BuildCtx) {
       color = varyColor('#886644', wx, h + by, wz, 3, 0.04, 0.05); // door
     } else if (innerEdge && by % 2 === 0) {
       color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06); // windows
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
     } else {
       color = varyColor('#eeddcc', wx, h + by, wz, 5, 0.06, 0.07);
     }
