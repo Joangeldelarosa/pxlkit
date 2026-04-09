@@ -7,7 +7,7 @@ export type WorldMode = 'infinite' | 'finite';
 export interface WorldConfig {
   worldMode: WorldMode;
   worldSize: number;           // finite mode: world width/depth in voxels (16-512)
-  renderDistance: number;       // 2-20 chunks
+  renderDistance: number;       // 2-50 chunks
   flySpeed: number;
   treeDensity: number;         // 0-1
   structureDensity: number;    // 0-1
@@ -18,9 +18,14 @@ export interface WorldConfig {
   terrainRoughness: number;    // 0-1  extra detail noise amplitude
   particleIntensity: number;   // 0-1  controls ambient particles, birds, critters
   backgroundDetail: number;    // 0-1  distant mountain silhouette layers + haze
-  chunkGenSpeed: number;       // 1-6  max chunks generated per frame
+  chunkGenSpeed: number;       // 1-10 max chunks generated per frame
   graphicsQuality: 'low' | 'medium' | 'high';
-  voxelDetail: number;         // 0-4  subdivisions for nearby surface detail
+  voxelDetail: number;         // 0-16 subdivisions for nearby surface detail
+  detailDistance: number;       // 1-20 radius in voxel-units for surface detail rendering
+  detailHeightVariation: number; // 0-1 height variation of mini-voxels (0 = flat, 1 = max relief)
+  detailMaxInstances: number;  // 1000-200000 max mini-voxel instances (GPU budget)
+  detailGap: number;           // 0-1 probability of gaps between mini-voxels (0 = dense, 1 = sparse)
+  detailColorVariation: number; // 0-1 color variation between mini-voxels
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
@@ -40,6 +45,11 @@ export const DEFAULT_CONFIG: WorldConfig = {
   chunkGenSpeed: 2,
   graphicsQuality: 'medium',
   voxelDetail: 2,
+  detailDistance: 3,
+  detailHeightVariation: 0.4,
+  detailMaxInstances: 12000,
+  detailGap: 0.25,
+  detailColorVariation: 0.12,
 };
 
 export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city';

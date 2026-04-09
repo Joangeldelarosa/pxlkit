@@ -421,9 +421,9 @@ export default function ProceduralTerrain() {
               <ConfigSlider label="World Size" value={config.worldSize} onChange={v => updateConfig('worldSize', v)} min={32} max={512} step={16} color="text-retro-cyan/80" displayValue={`${config.worldSize}×${config.worldSize}`} />
             )}
             {config.worldMode === 'infinite' && (
-              <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => updateConfig('renderDistance', v)} min={2} max={20} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
+              <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => updateConfig('renderDistance', v)} min={2} max={50} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
             )}
-            <ConfigSlider label="Fly Speed" value={config.flySpeed} onChange={v => updateConfig('flySpeed', v)} min={4} max={40} step={1} color="text-retro-gold/80" displayValue={String(config.flySpeed)} />
+            <ConfigSlider label="Fly Speed" value={config.flySpeed} onChange={v => updateConfig('flySpeed', v)} min={4} max={80} step={1} color="text-retro-gold/80" displayValue={String(config.flySpeed)} />
             <button onClick={() => setShowAdvanced(!showAdvanced)}
               className="w-full py-1.5 bg-retro-surface/40 hover:bg-retro-surface/60 border border-retro-border/30 rounded font-pixel text-[7px] sm:text-[8px] text-retro-muted/70 transition-all cursor-pointer select-none">
               {showAdvanced ? '▾ HIDE ADVANCED' : '▸ SHOW ADVANCED'}
@@ -445,12 +445,33 @@ export default function ProceduralTerrain() {
                     {config.graphicsQuality === 'low' ? 'Lower DPR, no AA — best for mobile' : config.graphicsQuality === 'high' ? 'Higher DPR + antialiasing — GPU intensive' : 'Balanced DPR, no AA — recommended'}
                   </p>
                 </div>
-                <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => updateConfig('chunkGenSpeed', v)} min={1} max={6} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
+                <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => updateConfig('chunkGenSpeed', v)} min={1} max={10} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
                 <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Visual Detail</p>
-                <ConfigSlider label="Voxel Detail LOD" value={config.voxelDetail} onChange={v => updateConfig('voxelDetail', v)} min={0} max={4} step={1} color="text-retro-gold/80" displayValue={config.voxelDetail === 0 ? 'Off' : `${config.voxelDetail}× subdivisions`} />
+                <ConfigSlider label="Voxel Detail LOD" value={config.voxelDetail} onChange={v => updateConfig('voxelDetail', v)} min={0} max={16} step={1} color="text-retro-gold/80" displayValue={config.voxelDetail === 0 ? 'Off' : `${config.voxelDetail}× subdivisions`} />
                 <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
-                  {config.voxelDetail === 0 ? 'No surface detail — best performance' : config.voxelDetail <= 2 ? 'Mini-voxels on nearby surfaces for texture' : 'High detail — more GPU intensive'}
+                  {config.voxelDetail === 0 ? 'No surface detail — best performance' : config.voxelDetail <= 2 ? 'Mini-voxels on nearby surfaces for texture' : config.voxelDetail <= 8 ? 'High detail — more GPU intensive' : 'Ultra detail — very GPU intensive'}
                 </p>
+                {config.voxelDetail > 0 && (
+                  <>
+                    <ConfigSlider label="Detail Distance" value={config.detailDistance} onChange={v => updateConfig('detailDistance', v)} min={1} max={20} step={0.5} color="text-retro-gold/80" displayValue={`${config.detailDistance} units`} />
+                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
+                      Radius around camera where mini-voxels appear
+                    </p>
+                    <ConfigSlider label="Detail Height Relief" value={config.detailHeightVariation} onChange={v => updateConfig('detailHeightVariation', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.detailHeightVariation === 0 ? 'Flat' : `${Math.round(config.detailHeightVariation * 100)}%`} />
+                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
+                      {config.detailHeightVariation === 0 ? 'No height variation — perfectly flat mini-voxels' : config.detailHeightVariation < 0.3 ? 'Subtle surface texture' : config.detailHeightVariation < 0.7 ? 'Moderate terrain relief' : 'Extreme rocky/rough surfaces'}
+                    </p>
+                    <ConfigSlider label="Detail Density" value={1 - config.detailGap} onChange={v => updateConfig('detailGap', 1 - v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={`${Math.round((1 - config.detailGap) * 100)}%`} />
+                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
+                      How densely packed the mini-voxels are
+                    </p>
+                    <ConfigSlider label="Detail Color Variation" value={config.detailColorVariation} onChange={v => updateConfig('detailColorVariation', v)} min={0} max={0.5} step={0.01} color="text-retro-gold/80" displayValue={`${Math.round(config.detailColorVariation * 100)}%`} />
+                    <ConfigSlider label="Detail Max Instances" value={config.detailMaxInstances} onChange={v => updateConfig('detailMaxInstances', v)} min={1000} max={200000} step={1000} color="text-retro-cyan/80" displayValue={config.detailMaxInstances >= 1000 ? `${(config.detailMaxInstances / 1000).toFixed(0)}K` : String(config.detailMaxInstances)} />
+                    <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
+                      GPU budget for mini-voxels — higher = more detail but slower
+                    </p>
+                  </>
+                )}
                 <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Terrain &amp; Biomes</p>
                 <ConfigSlider label="Tree Density" value={config.treeDensity} onChange={v => updateConfig('treeDensity', v)} min={0} max={1} step={0.1} color="text-retro-green/80" displayValue={`${Math.round(config.treeDensity * 100)}%`} />
                 <ConfigSlider label="Structure Density" value={config.structureDensity} onChange={v => updateConfig('structureDensity', v)} min={0} max={1} step={0.1} color="text-retro-gold/80" displayValue={`${Math.round(config.structureDensity * 100)}%`} />
@@ -529,7 +550,15 @@ export default function ProceduralTerrain() {
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
           <GroundCritters biome={currentBiome} intensity={config.particleIntensity} />
           {config.voxelDetail > 0 && (
-            <SurfaceDetailLayer chunkCacheRef={chunkCacheRef} detail={config.voxelDetail} />
+            <SurfaceDetailLayer
+              chunkCacheRef={chunkCacheRef}
+              detail={config.voxelDetail}
+              detailDistance={config.detailDistance}
+              detailHeightVariation={config.detailHeightVariation}
+              detailMaxInstances={config.detailMaxInstances}
+              detailGap={config.detailGap}
+              detailColorVariation={config.detailColorVariation}
+            />
           )}
         </Canvas>
       </div>
