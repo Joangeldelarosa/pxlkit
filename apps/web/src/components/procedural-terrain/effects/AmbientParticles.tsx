@@ -15,6 +15,8 @@ const BIOME_PARTICLE_CONFIG: Record<string, { color: string; count: number; size
   Plains:    { color: '#ffffee', count: 20, size: 0.07, speed: 0.2, drift: [0.15, 0.3, 0.15], opacity: 0.45, heightRange: [0.3, 4] },
   Mountains: { color: '#bbccdd', count: 35, size: 0.09, speed: 0.15, drift: [0.4, 0.1, 0.4], opacity: 0.3, heightRange: [1, 8] },
   City:      { color: '#ffeecc', count: 15, size: 0.05, speed: 0.1, drift: [0.1, 0.15, 0.1], opacity: 0.25, heightRange: [0.5, 4] },
+  Swamp:    { color: '#88aa44', count: 40, size: 0.08, speed: 0.2, drift: [0.1, 0.2, 0.1], opacity: 0.5, heightRange: [0.3, 4] },
+  Village:  { color: '#ffee88', count: 15, size: 0.06, speed: 0.15, drift: [0.1, 0.2, 0.1], opacity: 0.4, heightRange: [0.5, 3] },
 };
 
 export function AmbientParticles({ biome, intensity }: { biome: string; intensity: number }) {

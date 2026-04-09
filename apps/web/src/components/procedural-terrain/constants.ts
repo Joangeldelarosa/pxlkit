@@ -58,9 +58,17 @@ export const BIOMES: Record<BiomeType, BiomeConfig> = {
     name: 'City', heightScale: 1, heightBase: 7, waterLevel: 5,
     colors: { top: '#888888', mid: '#666666', bottom: '#444444', accent: '#ffdd44', water: '#88ddff' },
   },
+  swamp: {
+    name: 'Swamp', heightScale: 3, heightBase: 6, waterLevel: 6,
+    colors: { top: '#5a7a4a', mid: '#4a5a3a', bottom: '#3a4a2a', accent: '#7a9a5a', water: '#4a7744' },
+  },
+  village: {
+    name: 'Village', heightScale: 4, heightBase: 7, waterLevel: 4,
+    colors: { top: '#88cc66', mid: '#aa8855', bottom: '#887755', accent: '#ddaa44', water: '#77bbdd' },
+  },
 };
 
-export const BIOME_TYPES: BiomeType[] = ['plains', 'desert', 'tundra', 'forest', 'mountains', 'ocean', 'city'];
+export const BIOME_TYPES: BiomeType[] = ['plains', 'desert', 'tundra', 'forest', 'mountains', 'ocean', 'city', 'swamp', 'village'];
 
 /** Region scale — how large a single biome "patch" is in voxels */
 export const REGION_SCALE = 0.003;
