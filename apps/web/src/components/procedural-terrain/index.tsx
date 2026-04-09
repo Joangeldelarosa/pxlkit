@@ -453,7 +453,7 @@ export default function ProceduralTerrain() {
           style={{ background: 'transparent', touchAction: 'none' }}
         >
           <TimeContext.Provider value={timeStateRef}>
-          <DayNightSky backgroundDetail={config.backgroundDetail} />
+          <DayNightSky backgroundDetail={config.backgroundDetail} starDensity={config.starDensity} />
           <FogEffect density={config.fogDensity} />
           <DayNightLighting timeMode={config.timeMode} fixedHour={config.fixedHour} dayDurationSeconds={config.dayDurationSeconds} />
           <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} worldConfig={config} />
@@ -463,8 +463,8 @@ export default function ProceduralTerrain() {
           <AmbientParticles biome={currentBiome} intensity={config.particleIntensity} />
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
           <GroundCritters biome={currentBiome} intensity={config.particleIntensity} />
-          <NightWindowLights chunkCacheRef={chunkCacheRef} />
-          <WaterBoats chunkCacheRef={chunkCacheRef} />
+          <NightWindowLights chunkCacheRef={chunkCacheRef} windowLitProbability={config.windowLitProbability} />
+          <WaterBoats chunkCacheRef={chunkCacheRef} boatDensity={config.boatDensity} />
           {config.voxelDetail > 0 && (
             <SurfaceDetailLayer
               chunkCacheRef={chunkCacheRef}

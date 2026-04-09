@@ -80,6 +80,7 @@ export function generateChunkData(
   const winPosA = new Float32Array(maxWin * 3);
   let winC = 0;
   const solidHeightMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
+  const waterLevelMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
 
@@ -189,6 +190,7 @@ export function generateChunkData(
       const hE = hMap[(lx + 2) * gW + (lz + 1)];
       const hWest = hMap[lx * gW + (lz + 1)];
       const wl = c.waterLevel;
+      waterLevelMap[lx * CHUNK_SIZE + lz] = wl;
 
       /* ── 1. TERRAIN ── */
       for (let y = 0; y <= h; y++) {
@@ -582,6 +584,6 @@ export function generateChunkData(
     positions: posA.subarray(0, sc * 3), colors: colA.subarray(0, sc * 3), count: sc,
     waterPositions: wPosA.subarray(0, wc * 3), waterColors: wColA.subarray(0, wc * 3), waterCount: wc,
     pickups, windowLights: winPosA.subarray(0, winC * 3), windowLightCount: winC,
-    solidHeightMap, chunkX: cx, chunkZ: cz,
+    solidHeightMap, waterLevelMap, chunkX: cx, chunkZ: cz,
   };
 }

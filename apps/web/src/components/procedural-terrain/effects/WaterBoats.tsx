@@ -151,35 +151,35 @@ interface BoatState {
 }
 
 /* ── Water depth sampling from chunk data ── */
-function sampleWaterDepth(
+function sampleWaterInfo(
   cache: Map<string, ChunkVoxelData>,
   worldX: number, worldZ: number,
-): number {
+): { depth: number; waterY: number } {
   const cx = Math.floor(worldX / (CHUNK_SIZE * VOXEL_SIZE));
   const cz = Math.floor(worldZ / (CHUNK_SIZE * VOXEL_SIZE));
   const key = `${cx},${cz}`;
   const data = cache.get(key);
-  if (!data) return 0;
+  if (!data) return { depth: 0, waterY: 0 };
 
   const lx = Math.floor(worldX / VOXEL_SIZE) - cx * CHUNK_SIZE;
   const lz = Math.floor(worldZ / VOXEL_SIZE) - cz * CHUNK_SIZE;
-  if (lx < 0 || lx >= CHUNK_SIZE || lz < 0 || lz >= CHUNK_SIZE) return 0;
+  if (lx < 0 || lx >= CHUNK_SIZE || lz < 0 || lz >= CHUNK_SIZE) return { depth: 0, waterY: 0 };
 
-  const solidH = data.solidHeightMap[lx * CHUNK_SIZE + lz];
-  // Water depth estimate: check if there's water above the solid ground
-  // Water level is typically around 5-8 depending on biome
-  const waterLevels = [5, 6, 7, 8]; // typical water levels
-  for (const wl of waterLevels) {
-    if (solidH < wl) return wl - solidH;
+  const idx = lx * CHUNK_SIZE + lz;
+  const solidH = data.solidHeightMap[idx];
+  const wl = data.waterLevelMap[idx];
+  // Water exists when solid ground is below the water level
+  if (solidH < wl) {
+    return { depth: wl - solidH, waterY: wl * VOXEL_SIZE };
   }
-  return 0;
+  return { depth: 0, waterY: 0 };
 }
 
 function isDeepWater(
   cache: Map<string, ChunkVoxelData>,
   worldX: number, worldZ: number,
 ): boolean {
-  return sampleWaterDepth(cache, worldX, worldZ) >= MIN_WATER_DEPTH;
+  return sampleWaterInfo(cache, worldX, worldZ).depth >= MIN_WATER_DEPTH;
 }
 
 /* ── Deterministic seeded random for spawn ── */
@@ -193,8 +193,10 @@ function pseudoRand(a: number, b: number): number {
 
 export function WaterBoats({
   chunkCacheRef,
+  boatDensity,
 }: {
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
+  boatDensity: number;
 }) {
   const { camera } = useThree();
   const timeRef = useContext(TimeContext);
@@ -265,23 +267,25 @@ export function WaterBoats({
     const { offsets, colors, counts } = boatVoxelDataRef.current;
 
     /* ═══ 1. SPAWN new boats periodically ═══ */
-    if (t - lastSpawnCheck.current > SPAWN_CHECK_INTERVAL && boats.length < MAX_BOATS) {
+    const maxBoats = Math.round(MAX_BOATS * boatDensity);
+    if (boatDensity > 0 && t - lastSpawnCheck.current > SPAWN_CHECK_INTERVAL && boats.length < maxBoats) {
       lastSpawnCheck.current = t;
 
       // Try random positions around camera to find deep water
-      for (let attempt = 0; attempt < 8; attempt++) {
+      for (let attempt = 0; attempt < 12; attempt++) {
         const angle = pseudoRand(t * 100 + attempt, camX * 0.1) * Math.PI * 2;
         const dist = BOAT_SPAWN_RADIUS * 0.5 + pseudoRand(t * 50 + attempt, camZ * 0.1) * BOAT_SPAWN_RADIUS * 0.5;
         const sx = camX + Math.cos(angle) * dist * VOXEL_SIZE;
         const sz = camZ + Math.sin(angle) * dist * VOXEL_SIZE;
 
-        if (isDeepWater(cache, sx, sz)) {
+        const spawnInfo = sampleWaterInfo(cache, sx, sz);
+        if (spawnInfo.depth >= MIN_WATER_DEPTH) {
           // Also check surrounding area for navigability
-          const clearAhead = isDeepWater(cache, sx + Math.cos(angle) * 3 * VOXEL_SIZE, sz + Math.sin(angle) * 3 * VOXEL_SIZE);
-          if (clearAhead) {
+          const aheadInfo = sampleWaterInfo(cache, sx + Math.cos(angle) * 3 * VOXEL_SIZE, sz + Math.sin(angle) * 3 * VOXEL_SIZE);
+          if (aheadInfo.depth >= MIN_WATER_DEPTH) {
             boats.push({
-              x: sx, z: sz, y: 0,
-              heading: angle + Math.PI, // face away from spawn direction
+              x: sx, z: sz, y: spawnInfo.waterY,
+              heading: angle + Math.PI,
               targetHeading: angle + Math.PI,
               speed: 0.5,
               targetSpeed: MAX_SPEED * (0.4 + pseudoRand(sx, sz) * 0.6),
@@ -302,22 +306,28 @@ export function WaterBoats({
       const b = boats[bi];
       b.age += dt;
 
-      // Despawn if too far
+      // Despawn if too far or density dropped
       const distToCam = Math.sqrt((b.x - camX) ** 2 + (b.z - camZ) ** 2);
-      if (distToCam > BOAT_DESPAWN_RADIUS * VOXEL_SIZE || b.age > 120) {
+      if (distToCam > BOAT_DESPAWN_RADIUS * VOXEL_SIZE || b.age > 120 || boatDensity <= 0) {
         boats.splice(bi, 1);
         continue;
       }
 
-      // Check water depth ahead
+      // Check water depth ahead using real water level data
       const lookDist = SHORE_DETECT_DIST * VOXEL_SIZE;
       const aheadX = b.x + Math.cos(b.heading) * lookDist;
       const aheadZ = b.z + Math.sin(b.heading) * lookDist;
-      const depthAhead = sampleWaterDepth(cache, aheadX, aheadZ);
-      const depthHere = sampleWaterDepth(cache, b.x, b.z);
+      const infoAhead = sampleWaterInfo(cache, aheadX, aheadZ);
+      const infoHere = sampleWaterInfo(cache, b.x, b.z);
+
+      // If boat drifted onto land, despawn it
+      if (infoHere.depth <= 0) {
+        boats.splice(bi, 1);
+        continue;
+      }
 
       // Shore avoidance: steer away from shallow water
-      if (depthAhead < MIN_WATER_DEPTH || depthHere < MIN_WATER_DEPTH - 1) {
+      if (infoAhead.depth < MIN_WATER_DEPTH || infoHere.depth < MIN_WATER_DEPTH - 1) {
         // Brake
         b.targetSpeed = Math.max(0.3, b.speed * 0.5);
 
@@ -327,10 +337,10 @@ export function WaterBoats({
           const leftZ = b.z + Math.sin(b.heading - 0.7) * lookDist;
           const rightX = b.x + Math.cos(b.heading + 0.7) * lookDist;
           const rightZ = b.z + Math.sin(b.heading + 0.7) * lookDist;
-          const depthLeft = sampleWaterDepth(cache, leftX, leftZ);
-          const depthRight = sampleWaterDepth(cache, rightX, rightZ);
+          const infoLeft = sampleWaterInfo(cache, leftX, leftZ);
+          const infoRight = sampleWaterInfo(cache, rightX, rightZ);
 
-          b.turnDir = depthLeft > depthRight ? -1 : 1;
+          b.turnDir = infoLeft.depth > infoRight.depth ? -1 : 1;
           b.targetHeading = b.heading + b.turnDir * (0.5 + pseudoRand(b.age * 10, bi) * 1.0);
           b.lastTurnTime = b.age;
         }
@@ -345,7 +355,7 @@ export function WaterBoats({
           // Check if new heading leads to water
           const checkX = b.x + Math.cos(newHeading) * lookDist * 2;
           const checkZ = b.z + Math.sin(newHeading) * lookDist * 2;
-          if (sampleWaterDepth(cache, checkX, checkZ) >= MIN_WATER_DEPTH) {
+          if (sampleWaterInfo(cache, checkX, checkZ).depth >= MIN_WATER_DEPTH) {
             b.targetHeading = newHeading;
           }
           b.lastTurnTime = b.age;
@@ -370,10 +380,9 @@ export function WaterBoats({
       b.x += Math.cos(b.heading) * b.speed * VOXEL_SIZE * dt;
       b.z += Math.sin(b.heading) * b.speed * VOXEL_SIZE * dt;
 
-      // Water level Y (estimate from depth)
-      const waterY = (depthHere + (depthHere > 0 ? 0 : 1)) * VOXEL_SIZE;
+      // Water level Y — use real water surface from chunk data
       const bob = Math.sin(t * BOB_SPEED + b.bobPhase) * BOB_AMPLITUDE;
-      b.y = Math.max(waterY, 2.5 * VOXEL_SIZE) + bob;
+      b.y = infoHere.waterY + bob;
 
       /* ═══ 3. SPRAY PARTICLES ═══ */
       const speedRatio = b.speed / MAX_SPEED;

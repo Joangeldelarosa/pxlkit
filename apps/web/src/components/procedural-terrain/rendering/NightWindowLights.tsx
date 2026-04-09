@@ -23,7 +23,6 @@ const WIN_INNER_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 1.2, VOXEL_SIZE * 1.2, 
 const WIN_OUTER_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 2.2, VOXEL_SIZE * 2.2, VOXEL_SIZE * 2.2);
 
 /* ── Tuning constants ── */
-const WINDOW_LIT_PROBABILITY = 0.70;   // ~70% of windows lit at night
 const FLICKER_HASH_THRESHOLD = 0.55;   // windows above this can flicker
 const FLICKER_OFF_THRESHOLD = -0.35;   // sin threshold for flicker-off
 const VIEW_DIST_CHUNKS = 8;            // how many chunks to scan
@@ -47,8 +46,10 @@ const WARM_COLORS = [
 
 export function NightWindowLights({
   chunkCacheRef,
+  windowLitProbability,
 }: {
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
+  windowLitProbability: number;
 }) {
   const innerRef = useRef<THREE.InstancedMesh>(null);
   const outerRef = useRef<THREE.InstancedMesh>(null);
@@ -129,7 +130,7 @@ export function NightWindowLights({
         const wz = data.windowLights[i3 + 2];
 
         const h = winHash(wx, wy, wz);
-        if (h > WINDOW_LIT_PROBABILITY) continue;
+        if (h > windowLitProbability) continue;
 
         // Flicker
         const flickerPhase = h * 100;
