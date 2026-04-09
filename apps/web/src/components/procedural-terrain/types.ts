@@ -35,7 +35,7 @@ export interface WorldConfig {
 export const DEFAULT_CONFIG: WorldConfig = {
   worldMode: 'infinite',
   worldSize: 128,
-  renderDistance: 5,
+  renderDistance: 15,
   flySpeed: 12,
   treeDensity: 0.5,
   structureDensity: 0.5,

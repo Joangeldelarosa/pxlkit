@@ -33,7 +33,7 @@
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useMemo, useEffect, useState, useCallback } from 'react';
+import { useRef, useMemo, useEffect, useState, useCallback, useContext } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import Link from 'next/link';
@@ -105,12 +105,88 @@ function worldToChunk(wx: number, wz: number): [number, number] {
   return [Math.floor(wx / (CHUNK_SIZE * VOXEL_SIZE) ), Math.floor(wz / (CHUNK_SIZE * VOXEL_SIZE))];
 }
 
+/* ── LocalStorage keys ── */
+const LS_CONFIG_KEY = 'pxlkit-explore-config';
+const LS_SAVE_KEY = 'pxlkit-explore-save';
+
+/** Load WorldConfig from localStorage (returns null if not found or invalid) */
+function loadConfigFromStorage(): WorldConfig | null {
+  try {
+    const raw = localStorage.getItem(LS_CONFIG_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Validate that it has expected shape by checking a few required keys
+    if (typeof parsed === 'object' && 'renderDistance' in parsed && 'flySpeed' in parsed) {
+      // Merge with defaults to ensure new fields are present
+      return { ...DEFAULT_CONFIG, ...parsed };
+    }
+  } catch { /* ignore corrupt data */ }
+  return null;
+}
+
+/** Save WorldConfig to localStorage */
+function saveConfigToStorage(config: WorldConfig) {
+  try { localStorage.setItem(LS_CONFIG_KEY, JSON.stringify(config)); } catch { /* quota */ }
+}
+
+/** Saved world state */
+interface WorldSave {
+  seed: number;
+  pos: [number, number, number];
+  rot: [number, number, number];  // Euler angles (YXZ)
+}
+
+/** Save world state to localStorage */
+function saveWorldToStorage(save: WorldSave) {
+  try { localStorage.setItem(LS_SAVE_KEY, JSON.stringify(save)); } catch { /* quota */ }
+}
+
+/** Load world save from localStorage */
+function loadWorldFromStorage(): WorldSave | null {
+  try {
+    const raw = localStorage.getItem(LS_SAVE_KEY);
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    if (p && typeof p.seed === 'number' && Array.isArray(p.pos)) return p as WorldSave;
+  } catch { /* ignore */ }
+  return null;
+}
+
+/** Encode a scene link into URL query params: ?seed=42&px=1&py=12&pz=20&rx=0&ry=0&rz=0 */
+function encodeSceneToURL(seed: number, pos: [number, number, number], rot: [number, number, number]): string {
+  const params = new URLSearchParams();
+  params.set('seed', String(seed));
+  params.set('px', pos[0].toFixed(1));
+  params.set('py', pos[1].toFixed(1));
+  params.set('pz', pos[2].toFixed(1));
+  params.set('rx', rot[0].toFixed(4));
+  params.set('ry', rot[1].toFixed(4));
+  params.set('rz', rot[2].toFixed(4));
+  return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+}
+
+/** Decode scene from URL search params */
+function decodeSceneFromURL(): { seed: number; pos: [number, number, number]; rot: [number, number, number] } | null {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const seedStr = params.get('seed');
+    const px = params.get('px'), py = params.get('py'), pz = params.get('pz');
+    const rx = params.get('rx'), ry = params.get('ry'), rz = params.get('rz');
+    if (!seedStr || !px || !py || !pz) return null;
+    return {
+      seed: parseInt(seedStr, 10),
+      pos: [parseFloat(px), parseFloat(py), parseFloat(pz)],
+      rot: rx && ry && rz ? [parseFloat(rx), parseFloat(ry), parseFloat(rz)] : [0, 0, 0],
+    };
+  } catch { return null; }
+}
+
 /* ═══════════════════════════════════════════════════════════════
  *  Camera Tracker (converts camera pos → biome name for HUD)
  * ═══════════════════════════════════════════════════════════════ */
 
 function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
-  onUpdate: (pos: [number, number, number], biome: string, hour: number) => void;
+  onUpdate: (pos: [number, number, number], biome: string, hour: number, rot: [number, number, number]) => void;
   biomeNoise: ((x: number, y: number) => number) | null;
   tempNoise: ((x: number, y: number) => number) | null;
   cityFreq: number;
@@ -118,6 +194,7 @@ function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
   const { camera } = useThree();
   const timeRef = useContext(TimeContext);
   const last = useRef(0);
+  const _euler = useMemo(() => new THREE.Euler(0, 0, 0, 'YXZ'), []);
   useFrame(({ clock }) => {
     if (clock.getElapsedTime() - last.current < 0.3) return;
     last.current = clock.getElapsedTime();
@@ -127,7 +204,9 @@ function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
       biome = BIOMES[getBiome(biomeNoise, tempNoise, camera.position.x / VOXEL_SIZE, camera.position.z / VOXEL_SIZE, cityFreq)].name;
     }
     const hour = timeRef ? timeRef.current.hour : 12;
-    onUpdate(pos, biome, hour);
+    _euler.setFromQuaternion(camera.quaternion);
+    const rot: [number, number, number] = [_euler.x, _euler.y, _euler.z];
+    onUpdate(pos, biome, hour, rot);
   });
   return null;
 }
@@ -310,16 +389,44 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
  * ═══════════════════════════════════════════════════════════════ */
 
 export default function ProceduralTerrain() {
-  const [seed, setSeed] = useState(42);
-  const [config, setConfig] = useState<WorldConfig>(DEFAULT_CONFIG);
+  /* ── Restore from URL query params first, then localStorage, then defaults ── */
+  const urlScene = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    return decodeSceneFromURL();
+  }, []);
+  const savedWorld = useMemo(() => {
+    if (urlScene) return null; // URL takes precedence
+    if (typeof window === 'undefined') return null;
+    return loadWorldFromStorage();
+  }, [urlScene]);
+  const savedConfig = useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    return loadConfigFromStorage();
+  }, []);
+
+  const initSeed = urlScene?.seed ?? savedWorld?.seed ?? 42;
+  const initPos = urlScene?.pos ?? savedWorld?.pos ?? undefined;
+  const initRot = urlScene?.rot ?? savedWorld?.rot ?? undefined;
+
+  const [seed, setSeed] = useState(initSeed);
+  const [config, setConfig] = useState<WorldConfig>(savedConfig ?? DEFAULT_CONFIG);
   const [isLocked, setIsLocked] = useState(false);
   const [showControls, setShowControls] = useState(true);
-  const [cameraPos, setCameraPos] = useState<[number, number, number]>([0, 12, 20]);
+  const [cameraPos, setCameraPos] = useState<[number, number, number]>(initPos ?? [0, 12, 20]);
   const [currentBiome, setCurrentBiome] = useState('Plains');
   const [chunkCount, setChunkCount] = useState(0);
-  const [seedInput, setSeedInput] = useState('42');
+  const [seedInput, setSeedInput] = useState(String(initSeed));
   const [isMobile, setIsMobile] = useState(false);
   const [displayHour, setDisplayHour] = useState(config.timeMode === 'fixed' ? config.fixedHour : 12);
+
+  /* ── Camera rotation ref (updated from CameraTracker, used for save/share) ── */
+  const cameraRotRef = useRef<[number, number, number]>(initRot ?? [0, 0, 0]);
+  /* ── Initial position/rotation for FlyCamera (only used on mount) ── */
+  const [initialPos] = useState(initPos);
+  const [initialRot] = useState(initRot);
+
+  /* ── Persist config to localStorage on every change ── */
+  useEffect(() => { saveConfigToStorage(config); }, [config]);
 
   const keysRef = useRef<Set<string>>(new Set());
   const speedRef = useRef(config.flySpeed);
@@ -371,7 +478,9 @@ export default function ProceduralTerrain() {
     return () => document.removeEventListener('pointerlockchange', h);
   }, []);
 
-  const handleCameraUpdate = useCallback((pos: [number, number, number], biome: string, hour: number) => { setCameraPos(pos); setCurrentBiome(biome); setDisplayHour(hour); }, []);
+  const handleCameraUpdate = useCallback((pos: [number, number, number], biome: string, hour: number, rot: [number, number, number]) => {
+    setCameraPos(pos); setCurrentBiome(biome); setDisplayHour(hour); cameraRotRef.current = rot;
+  }, []);
   const generateNewSeed = useCallback(() => { const s = Math.floor(Math.random() * 999999); setSeed(s); setSeedInput(String(s)); }, []);
   const applySeed = useCallback(() => { const p = parseInt(seedInput, 10); if (!isNaN(p)) setSeed(Math.abs(p)); }, [seedInput]);
   const handleChunkCount = useCallback((c: number) => setChunkCount(c), []);
@@ -384,6 +493,24 @@ export default function ProceduralTerrain() {
   const updateConfig = useCallback((key: keyof WorldConfig, val: number | string) => {
     setConfig(prev => ({ ...prev, [key]: val }));
   }, []);
+
+  /* ── Save world (seed + camera) to localStorage ── */
+  const handleSaveWorld = useCallback(() => {
+    saveWorldToStorage({ seed, pos: cameraPos, rot: cameraRotRef.current });
+  }, [seed, cameraPos]);
+
+  /* ── Share scene — copy URL with seed + camera encoded as query params ── */
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied'>('idle');
+  const handleShareScene = useCallback(() => {
+    const url = encodeSceneToURL(seed, cameraPos, cameraRotRef.current);
+    navigator.clipboard.writeText(url).then(() => {
+      setShareStatus('copied');
+      setTimeout(() => setShareStatus('idle'), 2000);
+    }).catch(() => {
+      // Fallback: prompt user
+      window.prompt('Copy this link:', url);
+    });
+  }, [seed, cameraPos]);
 
   const gfxDpr: [number, number] = config.graphicsQuality === 'low' ? [0.75, 1] : config.graphicsQuality === 'high' ? [1, 2] : [1, 1.5];
   const gfxAA = config.graphicsQuality === 'high';
@@ -416,6 +543,9 @@ export default function ProceduralTerrain() {
             onRandomSeed={generateNewSeed}
             onStartExplore={requestPointerLock}
             isMobile={isMobile}
+            onSaveWorld={handleSaveWorld}
+            onShareScene={handleShareScene}
+            shareStatus={shareStatus}
           />
         </div>
       )}
@@ -431,7 +561,7 @@ export default function ProceduralTerrain() {
               </div>
             </div>
           )}
-          <OverlayStats seed={seed} chunkCount={chunkCount} position={cameraPos} biome={currentBiome} worldMode={config.worldMode} worldSize={config.worldSize} hour={timeStateRef.current.hour} />
+          <OverlayStats seed={seed} chunkCount={chunkCount} position={cameraPos} biome={currentBiome} worldMode={config.worldMode} worldSize={config.worldSize} hour={displayHour} />
           <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 select-none" style={{ touchAction: 'none' }}>
             {isMobile ? (
               <button onClick={exitImmersive} className="p-2 bg-retro-bg/70 backdrop-blur-sm border border-retro-border/30 rounded font-pixel text-[9px] text-retro-muted/60 hover:text-retro-red transition-all cursor-pointer select-none" style={{ touchAction: 'none' }}>✕</button>
@@ -459,7 +589,7 @@ export default function ProceduralTerrain() {
           <DayNightSky backgroundDetail={config.backgroundDetail} starDensity={config.starDensity} />
           <FogEffect density={config.fogDensity} />
           <DayNightLighting timeMode={config.timeMode} fixedHour={config.fixedHour} dayDurationSeconds={config.dayDurationSeconds} />
-          <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} worldConfig={config} />
+          <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} worldConfig={config} initialPos={initialPos} initialRot={initialRot} />
           <CameraLook isLocked={isLocked} isMobile={isMobile} />
           <ChunkManagerWithCounter seed={seed} config={config} onChunkCount={handleChunkCount} chunkCacheRef={chunkCacheRef} />
           <CameraTracker onUpdate={handleCameraUpdate} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} />
