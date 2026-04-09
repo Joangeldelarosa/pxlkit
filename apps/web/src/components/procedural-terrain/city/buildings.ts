@@ -7,8 +7,8 @@
  * ═══════════════════════════════════════════════════════════════ */
 
 import type { BuildingType } from '../types';
-import { BLOCK_SIZE, ROAD_W, LOT_INSET, VOXEL_SIZE } from '../constants';
-import { varyColor, hashCoord } from '../utils/color';
+import { VOXEL_SIZE } from '../constants';
+import { varyColor } from '../utils/color';
 import { getWallPalette, getRoofColor } from './layout';
 
 type PushFn = (px: number, py: number, pz: number, hex: string) => void;
@@ -33,7 +33,6 @@ interface BuildCtx {
 }
 
 const VS = VOXEL_SIZE;
-const singleLotFoot = BLOCK_SIZE - ROAD_W - LOT_INSET * 2; // 6
 
 /** Generate voxels for a building at one column */
 export function generateBuildingColumn(ctx: BuildCtx): void {
@@ -77,7 +76,6 @@ function genStandardBuilding(ctx: BuildCtx) {
   const windowCol = '#aaddff';
   const doorCol = '#886644';
   const onEdge = isEdge(blX, blZ, footW, footD);
-  const isEdgeX = blX === 0 || blX === footW - 1;
   const isEdgeZ = blZ === 0 || blZ === footD - 1;
 
   for (let by = 1; by <= bh; by++) {
@@ -292,8 +290,7 @@ function genPark(ctx: BuildCtx) {
 
 /* ═══════════════ PLAZA ═══════════════ */
 function genPlaza(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD } = ctx;
-  // Tiled ground pattern
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ } = ctx;
   const isTile = (blX + blZ) % 2 === 0;
   push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
     varyColor(isTile ? '#ccbbaa' : '#bbaa99', wx, h + 1, wz, 2, 0.03, 0.04));
@@ -503,7 +500,6 @@ function genChurch(ctx: BuildCtx) {
 /* ═══════════════ STADIUM ═══════════════ */
 function genStadium(ctx: BuildCtx) {
   const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
   const isInner = blX >= 2 && blX < footW - 2 && blZ >= 2 && blZ < footD - 2;
 
   if (isInner) {

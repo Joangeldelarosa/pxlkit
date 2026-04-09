@@ -90,7 +90,8 @@ export function getMultiLotSize(
 export function findBuildingAnchor(
   structN: (x: number, y: number) => number,
   lotWX: number, lotWZ: number,
-  zone: ZoneType,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _zone: ZoneType,
 ): { anchorX: number; anchorZ: number; w: number; d: number; localX: number; localZ: number } {
   // Check lots in a 4×4 area to the left/below this one
   for (let dx = 0; dx >= -4; dx--) {

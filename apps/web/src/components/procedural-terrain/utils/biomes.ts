@@ -3,7 +3,7 @@
  * ═══════════════════════════════════════════════════════════════ */
 
 import type { BiomeType, BiomeConfig } from '../types';
-import { BIOMES, REGION_SCALE, MAX_HEIGHT } from '../constants';
+import { REGION_SCALE, MAX_HEIGHT } from '../constants';
 import { shiftColor } from './color';
 
 /** Classify the biome at world coordinates (wx, wz) */

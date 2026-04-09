@@ -3,10 +3,10 @@
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import type { ChunkVoxelData, PickupVoxel } from '../types';
+import type { ChunkVoxelData } from '../types';
 import { VOXEL_SIZE } from '../constants';
 import { getPickupIcons } from '../generation/chunk';
 

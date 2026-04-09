@@ -37,7 +37,7 @@ export function AmbientParticles({ biome, intensity }: { biome: string; intensit
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     return g;
-  }, [RANGE]);
+  }, [cfg.heightRange]);
 
   const mat = useMemo(() => new THREE.PointsMaterial({
     color: cfg.color, size: cfg.size, transparent: true, opacity: cfg.opacity,
