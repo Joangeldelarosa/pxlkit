@@ -46,7 +46,7 @@ import { Sun, Moon, Snowflake } from '@pxlkit/weather';
 import type { PxlKitData } from '@pxlkit/core';
 
 /* ── Internal modules ── */
-import type { WorldConfig, WorldMode, ChunkVoxelData } from './types';
+import type { WorldConfig, ChunkVoxelData } from './types';
 import { DEFAULT_CONFIG } from './types';
 import {
   CHUNK_SIZE, VOXEL_SIZE, MAX_HEIGHT,
@@ -110,12 +110,13 @@ function worldToChunk(wx: number, wz: number): [number, number] {
  * ═══════════════════════════════════════════════════════════════ */
 
 function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
-  onUpdate: (pos: [number, number, number], biome: string) => void;
+  onUpdate: (pos: [number, number, number], biome: string, hour: number) => void;
   biomeNoise: ((x: number, y: number) => number) | null;
   tempNoise: ((x: number, y: number) => number) | null;
   cityFreq: number;
 }) {
   const { camera } = useThree();
+  const timeRef = useContext(TimeContext);
   const last = useRef(0);
   useFrame(({ clock }) => {
     if (clock.getElapsedTime() - last.current < 0.3) return;
@@ -125,7 +126,8 @@ function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
     if (biomeNoise && tempNoise) {
       biome = BIOMES[getBiome(biomeNoise, tempNoise, camera.position.x / VOXEL_SIZE, camera.position.z / VOXEL_SIZE, cityFreq)].name;
     }
-    onUpdate(pos, biome);
+    const hour = timeRef ? timeRef.current.hour : 12;
+    onUpdate(pos, biome, hour);
   });
   return null;
 }
@@ -317,6 +319,7 @@ export default function ProceduralTerrain() {
   const [chunkCount, setChunkCount] = useState(0);
   const [seedInput, setSeedInput] = useState('42');
   const [isMobile, setIsMobile] = useState(false);
+  const [displayHour, setDisplayHour] = useState(config.timeMode === 'fixed' ? config.fixedHour : 12);
 
   const keysRef = useRef<Set<string>>(new Set());
   const speedRef = useRef(config.flySpeed);
@@ -368,7 +371,7 @@ export default function ProceduralTerrain() {
     return () => document.removeEventListener('pointerlockchange', h);
   }, []);
 
-  const handleCameraUpdate = useCallback((pos: [number, number, number], biome: string) => { setCameraPos(pos); setCurrentBiome(biome); }, []);
+  const handleCameraUpdate = useCallback((pos: [number, number, number], biome: string, hour: number) => { setCameraPos(pos); setCurrentBiome(biome); setDisplayHour(hour); }, []);
   const generateNewSeed = useCallback(() => { const s = Math.floor(Math.random() * 999999); setSeed(s); setSeedInput(String(s)); }, []);
   const applySeed = useCallback(() => { const p = parseInt(seedInput, 10); if (!isNaN(p)) setSeed(Math.abs(p)); }, [seedInput]);
   const handleChunkCount = useCallback((c: number) => setChunkCount(c), []);
