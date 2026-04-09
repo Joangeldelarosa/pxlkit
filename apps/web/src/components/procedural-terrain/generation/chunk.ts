@@ -36,6 +36,26 @@ export function getPickupIcons() { return PICKUP_ICONS; }
 
 const _tc = new THREE.Color();
 
+/* ── Village crop palettes (module-level to avoid per-iteration allocation) ── */
+const CROP_COLORS: string[] = [
+  '#ddaa22', // wheat/golden
+  '#ee4422', // tomatoes/red
+  '#8855cc', // lavender/purple
+  '#ff8833', // oranges
+  '#44bb44', // lettuce/green
+  '#ffdd55', // sunflowers/yellow
+  '#cc44aa', // berries/magenta
+];
+const CROP_STALK_COLORS: string[] = [
+  '#aa8833', // wheat stalk
+  '#55aa33', // tomato vine
+  '#66aa55', // lavender stem
+  '#668833', // orange tree bark
+  '#447733', // lettuce base
+  '#778833', // sunflower stalk
+  '#886655', // berry bush
+];
+
 export function generateChunkData(
   cx: number, cz: number,
   heightN: (x: number, y: number) => number,
@@ -398,28 +418,10 @@ export function generateChunkData(
       if (biome === 'village' && h > c.waterLevel) {
         // Determine village tile type using noise
         const villageTile = structN(wx * 0.08 + 800, wz * 0.08 + 800);
-        const cropType = Math.abs(Math.floor((structN(Math.floor(wx / 12) * 0.5 + 900, Math.floor(wz / 12) * 0.5 + 900) + 1) * 4)) % 7;
-        
-        // Crop field colors based on type
-        const CROP_COLORS: string[] = [
-          '#ddaa22', // wheat/golden
-          '#ee4422', // tomatoes/red
-          '#8855cc', // lavender/purple
-          '#ff8833', // oranges
-          '#44bb44', // lettuce/green
-          '#ffdd55', // sunflowers/yellow
-          '#cc44aa', // berries/magenta
-        ];
-        
-        const CROP_STALK_COLORS: string[] = [
-          '#aa8833', // wheat stalk
-          '#55aa33', // tomato vine
-          '#66aa55', // lavender stem
-          '#668833', // orange tree bark
-          '#447733', // lettuce base
-          '#778833', // sunflower stalk
-          '#886655', // berry bush
-        ];
+        const gridX = Math.floor(wx / 12);
+        const gridZ = Math.floor(wz / 12);
+        const cropNoise = structN(gridX * 0.5 + 900, gridZ * 0.5 + 900);
+        const cropType = Math.abs(Math.floor((cropNoise + 1) * 4)) % 7;
         
         if (villageTile > 0.25 && lx >= 2 && lx <= CHUNK_SIZE - 5 && lz >= 2 && lz <= CHUNK_SIZE - 5) {
           // Village house with garden

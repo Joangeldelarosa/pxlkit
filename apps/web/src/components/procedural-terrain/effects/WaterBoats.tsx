@@ -24,8 +24,8 @@ const MAX_SPRAY = 600;                    // max spray particles
 const SPAWN_CHECK_INTERVAL = 2;           // seconds between spawn checks
 const BOAT_SPAWN_RADIUS = 40;             // how far from camera to spawn
 const BOAT_DESPAWN_RADIUS = 60;           // remove when beyond this
-const MIN_WATER_DEPTH = 3;               // minimum water depth to navigate
-const SHORE_DETECT_DIST = 3;             // voxel units to detect shore ahead
+const MIN_WATER_DEPTH = 3;               // minimum water depth in voxels
+const SHORE_DETECT_DIST = 3;             // distance in voxels to detect shore ahead
 const MAX_SPEED = 2.5;                    // max boat speed (world units/sec)
 const ACCEL = 0.8;                        // acceleration rate
 const DECEL = 1.5;                        // deceleration rate (braking)
@@ -371,7 +371,7 @@ export function WaterBoats({
       b.z += Math.sin(b.heading) * b.speed * VOXEL_SIZE * dt;
 
       // Water level Y (estimate from depth)
-      const waterY = (depthHere + (sampleWaterDepth(cache, b.x, b.z) > 0 ? 0 : 1)) * VOXEL_SIZE;
+      const waterY = (depthHere + (depthHere > 0 ? 0 : 1)) * VOXEL_SIZE;
       const bob = Math.sin(t * BOB_SPEED + b.bobPhase) * BOB_AMPLITUDE;
       b.y = Math.max(waterY, 2.5 * VOXEL_SIZE) + bob;
 
