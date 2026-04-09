@@ -1239,7 +1239,7 @@ function SkyGradient({ backgroundDetail }: { backgroundDetail: number }) {
    *    with atmospheric haze. Zero voxel cost — pure GPU math.
    * backgroundDetail uniform (0-1): 0 = no mountains, 1 = full detail */
   const mat = useMemo(() => new THREE.ShaderMaterial({
-    uniforms: { uDetail: { value: 0.8 } },
+    uniforms: { uDetail: { value: backgroundDetail } },
     vertexShader: `
       varying vec3 vWP;
       void main() {
@@ -1318,13 +1318,7 @@ function SkyGradient({ backgroundDetail }: { backgroundDetail: number }) {
       }`,
     side: THREE.BackSide, depthWrite: false,
   // Intentionally mount-only: uniform updated reactively via useEffect below
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), []);
-
-  // Update uniform when detail changes
-  useEffect(() => {
-    mat.uniforms.uDetail.value = backgroundDetail;
-  }, [mat, backgroundDetail]);
+  }), [backgroundDetail]);
 
   return <mesh ref={meshRef} material={mat}><sphereGeometry args={[500, 32, 32]} /></mesh>;
 }
@@ -1379,7 +1373,7 @@ function AmbientParticles({ biome, intensity }: { biome: string; intensity: numb
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     return g;
-  }, [RANGE]);
+  }, [cfg.heightRange]);
 
   const mat = useMemo(() => new THREE.PointsMaterial({
     color: cfg.color, size: cfg.size, transparent: true, opacity: cfg.opacity,
@@ -1819,96 +1813,6 @@ function SurfaceDetailLayer({
   if (detail <= 0 || !subGeo) return null;
   return (
     <instancedMesh ref={meshRef} args={[subGeo, subMat, DETAIL_MAX_INSTANCES]} frustumCulled={false} />
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════
- *  Post-Processing: Sharpness Pass
- *
- *  Simple custom shader pass that applies unsharp masking
- *  for crisp voxel edges. Uses the R3F useFrame loop to
- *  set renderTarget parameters on the renderer.
- *  We achieve this by adding a screen-space quad with a
- *  sharpness shader as an effect.
- * ═══════════════════════════════════════════════════════════════ */
-
-function SharpnessEffect({ strength }: { strength: number }) {
-  const { gl, scene, camera, size } = useThree();
-  const targetRef = useRef<THREE.WebGLRenderTarget | null>(null);
-  const quadRef = useRef<THREE.Mesh>(null);
-  const sceneRef = useRef(new THREE.Scene());
-  const camRef = useRef(new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1));
-
-  const mat = useMemo(() => new THREE.ShaderMaterial({
-    uniforms: {
-      tDiffuse: { value: null },
-      resolution: { value: new THREE.Vector2(size.width, size.height) },
-      sharpness: { value: strength },
-    },
-    vertexShader: `
-      varying vec2 vUv;
-      void main() {
-        vUv = uv;
-        gl_Position = vec4(position, 1.0);
-      }`,
-    fragmentShader: `
-      uniform sampler2D tDiffuse;
-      uniform vec2 resolution;
-      uniform float sharpness;
-      varying vec2 vUv;
-
-      void main() {
-        vec2 px = 1.0 / resolution;
-        vec4 center = texture2D(tDiffuse, vUv);
-        vec4 top    = texture2D(tDiffuse, vUv + vec2(0.0, px.y));
-        vec4 bot    = texture2D(tDiffuse, vUv - vec2(0.0, px.y));
-        vec4 left   = texture2D(tDiffuse, vUv - vec2(px.x, 0.0));
-        vec4 right  = texture2D(tDiffuse, vUv + vec2(px.x, 0.0));
-        vec4 blur = (top + bot + left + right) * 0.25;
-        gl_FragColor = center + (center - blur) * sharpness;
-      }`,
-    depthWrite: false, depthTest: false,
-  }), [size.width, size.height, strength]);
-
-  useEffect(() => {
-    mat.uniforms.sharpness.value = strength;
-    mat.uniforms.resolution.value.set(size.width, size.height);
-  }, [mat, strength, size]);
-
-  useEffect(() => {
-    const rt = new THREE.WebGLRenderTarget(size.width, size.height, {
-      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
-    });
-    targetRef.current = rt;
-    return () => rt.dispose();
-  }, [size.width, size.height]);
-
-  useEffect(() => {
-    if (!quadRef.current) return;
-    sceneRef.current.add(quadRef.current);
-    return () => { sceneRef.current.remove(quadRef.current!); };
-  }, []);
-
-  useFrame(() => {
-    if (!targetRef.current || !quadRef.current || strength <= 0) return;
-    const rt = targetRef.current;
-
-    // Render scene to offscreen target
-    gl.setRenderTarget(rt);
-    gl.render(scene, camera);
-    gl.setRenderTarget(null);
-
-    // Apply sharpness pass
-    mat.uniforms.tDiffuse.value = rt.texture;
-    gl.render(sceneRef.current, camRef.current);
-  }, 100); // high priority — run after scene render
-
-  if (strength <= 0) return null;
-  return (
-    <mesh ref={quadRef} frustumCulled={false}>
-      <planeGeometry args={[2, 2]} />
-      <primitive object={mat} attach="material" />
-    </mesh>
   );
 }
 

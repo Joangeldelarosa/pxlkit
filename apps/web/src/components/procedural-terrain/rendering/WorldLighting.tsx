@@ -3,7 +3,7 @@
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -24,7 +24,7 @@ export function SkyGradient({ backgroundDetail }: { backgroundDetail: number }) 
   useFrame(() => { if (meshRef.current) meshRef.current.position.copy(camera.position); });
 
   const mat = useMemo(() => new THREE.ShaderMaterial({
-    uniforms: { uDetail: { value: 0.8 } },
+    uniforms: { uDetail: { value: backgroundDetail } },
     vertexShader: `
       varying vec3 vWP;
       void main() {
@@ -82,10 +82,7 @@ export function SkyGradient({ backgroundDetail }: { backgroundDetail: number }) 
         gl_FragColor = vec4(sky, 1.0);
       }`,
     side: THREE.BackSide, depthWrite: false,
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), []);
-
-  useEffect(() => { mat.uniforms.uDetail.value = backgroundDetail; }, [mat, backgroundDetail]);
+  }), [backgroundDetail]);
 
   return <mesh ref={meshRef} material={mat}><sphereGeometry args={[500, 32, 32]} /></mesh>;
 }

@@ -19,23 +19,9 @@ import { classifyCityCell, getBuildingType, getBuildingHeight } from '../city/la
 import { generateBuildingColumn } from '../city/buildings';
 import type { PxlKitData } from '@pxlkit/core';
 
-/* ── Icon pickup data (kept minimal — just the data extraction) ── */
+/* ── Icon pickup data ── */
 
 interface PickupVoxel { x: number; y: number; color: string }
-
-function iconToPickupVoxels(icon: PxlKitData): PickupVoxel[] {
-  const voxels: PickupVoxel[] = [];
-  const { grid, palette, size } = icon;
-  for (let row = 0; row < size; row++) {
-    const r = grid[row]; if (!r) continue;
-    for (let col = 0; col < size; col++) {
-      const ch = r[col]; if (!ch || ch === '.') continue;
-      const color = palette[ch]; if (!color) continue;
-      voxels.push({ x: col, y: size - 1 - row, color });
-    }
-  }
-  return voxels;
-}
 
 // These are loaded lazily — the icon imports are done in the main index
 let PICKUP_ICONS: { icon: PxlKitData; voxels: PickupVoxel[] }[] = [];
