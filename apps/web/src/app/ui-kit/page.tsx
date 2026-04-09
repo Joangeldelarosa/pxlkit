@@ -57,8 +57,6 @@ import {
   PxlKitLocaleProvider,
   toLocaleUpper,
   TURKISH_CHARACTERS,
-  PXLKIT_FONTS,
-  buildGoogleFontsUrl,
 } from '@pxlkit/ui-kit';
 import {
   Package, Search, Check, Grid, Edit, Robot, Copy, Gear, Menu, Home, ArrowRight, SparkleSmall,
