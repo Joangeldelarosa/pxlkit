@@ -32,6 +32,7 @@ interface WorldConfig {
   backgroundDetail: number;    // 0-1  distant mountain silhouette layers + haze
   chunkGenSpeed: number;       // 1-6  max chunks generated per frame
   graphicsQuality: 'low' | 'medium' | 'high'; // DPR and antialias preset
+  voxelDetail: number;         // 0-4  subdivisions: 0=off, 2=2x, 3=3x, 4=4x (mini-voxels for nearby surfaces)
 }
 
 const DEFAULT_CONFIG: WorldConfig = {
@@ -50,6 +51,7 @@ const DEFAULT_CONFIG: WorldConfig = {
   backgroundDetail: 0.8,
   chunkGenSpeed: 2,
   graphicsQuality: 'medium',
+  voxelDetail: 2,
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -396,16 +398,18 @@ function classifyCityCell(wx: number, wz: number): CityCell {
 }
 
 /* Building type determined per lot from noise */
-type BuildingType = 'skyscraper' | 'office' | 'house' | 'park' | 'parking';
+type BuildingType = 'skyscraper' | 'office' | 'house' | 'park' | 'parking' | 'warehouse' | 'tower' | 'shop';
 
 function getBuildingType(
   structN: (x: number, y: number) => number,
   lotWX: number, lotWZ: number, density: number,
 ): BuildingType {
   const v = structN(lotWX * 0.7 + 42, lotWZ * 0.7 + 42);
+  const v2 = structN(lotWX * 1.3 + 77, lotWZ * 1.3 + 77); // secondary noise for variety
   if (v > 0.35 + (1 - density) * 0.15) return 'skyscraper';
-  if (v > 0.1) return 'office';
-  if (v > -0.1) return 'house';
+  if (v > 0.2) return v2 > 0.0 ? 'tower' : 'office';
+  if (v > 0.05) return v2 > 0.1 ? 'shop' : 'house';
+  if (v > -0.1) return 'warehouse';
   if (v > -0.3) return 'park';
   return 'parking';
 }
@@ -417,7 +421,10 @@ function getBuildingHeight(
   const v = Math.abs(structN(lotWX * 3.7 + 100, lotWZ * 3.7 + 100));
   switch (type) {
     case 'skyscraper': return 10 + Math.floor(v * 14); // 10-24
+    case 'tower': return 8 + Math.floor(v * 10);       // 8-18
     case 'office': return 5 + Math.floor(v * 6);       // 5-11
+    case 'warehouse': return 3 + Math.floor(v * 2);    // 3-5
+    case 'shop': return 3 + Math.floor(v * 2);         // 3-5
     case 'house': return 3 + Math.floor(v * 2);        // 3-5
     default: return 0;
   }
@@ -425,11 +432,15 @@ function getBuildingHeight(
 
 const BUILDING_WALL_PALETTES: Record<string, string[]> = {
   skyscraper: ['#8899aa', '#99aabb', '#7788aa', '#aabbcc', '#6688aa'],
+  tower: ['#778899', '#8899aa', '#6677aa', '#99aacc'],
   office: ['#bbaa88', '#ccbb99', '#aa9977', '#c4a882'],
+  warehouse: ['#998877', '#887766', '#aa9988', '#776655'],
+  shop: ['#ddccbb', '#eeddcc', '#ccbbaa', '#ffeecc'],
   house: ['#ddccaa', '#ccbb99', '#eeddbb', '#d4c098'],
 };
 const BUILDING_ROOF_COLORS: Record<string, string> = {
-  skyscraper: '#556677', office: '#886644', house: '#cc6633',
+  skyscraper: '#556677', tower: '#445566', office: '#886644',
+  warehouse: '#665544', shop: '#cc8844', house: '#cc6633',
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -512,21 +523,33 @@ function generateChunkData(
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
 
-  /* ── Finite world edge taper — creates floating island effect ── */
+  /* ── Finite world edge taper — creates organic floating island effect ── */
   const isFinite = cfg.worldMode === 'finite';
   const halfW = isFinite ? cfg.worldSize / 2 : 0;
-  // Taper zone: outer 20% of radius
-  const taperStart = isFinite ? halfW * 0.8 : 0;
+  // Taper zone: outer 25% of radius
+  const taperStart = isFinite ? halfW * 0.75 : 0;
 
-  /** Returns 0-1 multiplier: 1 at centre, fades to 0 at edges */
+  /** Returns 0-1 multiplier: 1 at centre, fades to 0 at edges.
+   *  Uses noise-based irregular boundaries so the island isn't a perfect square. */
   function edgeFade(wx2: number, wz2: number): number {
     if (!isFinite) return 1;
     const dx2 = Math.abs(wx2 - halfW);
     const dz2 = Math.abs(wz2 - halfW);
-    const maxDist = Math.max(dx2, dz2);
-    if (maxDist >= halfW) return 0;            // outside world
-    if (maxDist <= taperStart) return 1;       // fully inside
-    return 1 - (maxDist - taperStart) / (halfW - taperStart); // smooth fade
+    // Circular distance instead of max(dx,dz) for rounder shape
+    const dist = Math.sqrt(dx2 * dx2 + dz2 * dz2) * 0.85; // 0.85 to slightly expand
+    if (dist >= halfW) return 0;
+    if (dist <= taperStart) return 1;
+    // Add noise-based irregularity to the edge
+    const angle = Math.atan2(wz2 - halfW, wx2 - halfW);
+    const edgeNoise = Math.sin(angle * 5.7 + wx2 * 0.13) * 0.3
+                    + Math.sin(angle * 11.3 + wz2 * 0.17) * 0.15
+                    + Math.sin(angle * 2.1 + (wx2 + wz2) * 0.07) * 0.2;
+    const adjustedDist = dist + edgeNoise * (halfW * 0.12); // noise shifts the boundary
+    if (adjustedDist >= halfW) return 0;
+    if (adjustedDist <= taperStart) return 1;
+    // Smooth cubic fade
+    const t = (adjustedDist - taperStart) / (halfW - taperStart);
+    return 1 - t * t * (3 - 2 * t); // smoothstep
   }
 
   /* ── Pre-compute height map + biome for chunk + 1-cell border ── */
@@ -729,8 +752,31 @@ function generateChunkData(
             push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
               varyColor(stripe ? '#eeeeee' : '#666666', wx, h + 1, wz, 2, 0.03, 0.04));
             trackH(lx, lz, h + 1);
+          } else if (bType === 'warehouse') {
+            /* Warehouse — flat corrugated roof, large door, no windows */
+            const footprint = BLOCK_SIZE - ROAD_W - LOT_INSET * 2;
+            const blX = cell.lotLocalX, blZ = cell.lotLocalZ;
+            const isEdge = blX === 0 || blX === footprint - 1 || blZ === 0 || blZ === footprint - 1;
+            const wallBase = BUILDING_WALL_PALETTES.warehouse[0];
+            const roofCol = BUILDING_ROOF_COLORS.warehouse;
+
+            for (let by = 1; by <= bh; by++) {
+              if (!isEdge && by < bh) continue;
+              let color: string;
+              if (by === bh) {
+                // Corrugated roof — alternating light/dark strips
+                color = varyColor(blX % 2 === 0 ? roofCol : '#776655', wx, h + by, wz, 3, 0.03, 0.05);
+              } else if (by <= 2 && blZ === 0 && blX >= 1 && blX <= 4) {
+                // Large roll-up door
+                color = varyColor('#555555', wx, h + by, wz, 2, 0.02, 0.04);
+              } else {
+                color = varyColor(wallBase, wx, h + by, wz, 4, 0.04, 0.06);
+              }
+              push((bX + lx) * VOXEL_SIZE, (h + by) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, color);
+            }
+            trackH(lx, lz, h + bh);
           } else {
-            /* Actual building (skyscraper / office / house) */
+            /* Actual building (skyscraper / tower / office / shop / house) */
             const footprint = BLOCK_SIZE - ROAD_W - LOT_INSET * 2; // 6
             const blX = cell.lotLocalX, blZ = cell.lotLocalZ;
             const isEdgeX = blX === 0 || blX === footprint - 1;
@@ -759,8 +805,8 @@ function generateChunkData(
               push((bX + lx) * VOXEL_SIZE, (h + by) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, color);
             }
 
-            // Peaked roof for houses
-            if (bType === 'house' && isEdge) {
+            // Peaked roof for houses & shops
+            if ((bType === 'house' || bType === 'shop') && isEdge) {
               const midX = Math.floor(footprint / 2);
               const dist = Math.abs(blX - midX);
               const roofExtra = Math.max(0, 2 - dist);
@@ -768,7 +814,25 @@ function generateChunkData(
                 push((bX + lx) * VOXEL_SIZE, (h + bh + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                   varyColor(roofCol, wx, h + bh + ry, wz, 4, 0.04, 0.06));
               }
+              // Shop awning on front face
+              if (bType === 'shop' && blZ === 0 && roofExtra === 0) {
+                push((bX + lx) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (bZ + lz - 1) * VOXEL_SIZE,
+                  varyColor('#ee6644', wx, h + 3, wz - 1, 5, 0.06, 0.06));
+              }
               trackH(lx, lz, h + bh + roofExtra);
+            } else if (bType === 'tower' && blX === 2 && blZ === 2) {
+              // Tower antenna — tall thin spire
+              for (let ay = 1; ay <= 4; ay++) {
+                push((bX + lx) * VOXEL_SIZE, (h + bh + ay) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#999999', wx, h + bh + ay, wz, 2, 0.02, 0.04));
+              }
+              // Blinking light at top
+              push((bX + lx) * VOXEL_SIZE, (h + bh + 5) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ff4444');
+              trackH(lx, lz, h + bh + 5);
+            } else if (bType === 'skyscraper' && blX === 3 && blZ === 3) {
+              // Helipad marking on top
+              push((bX + lx) * VOXEL_SIZE, (h + bh + 0.1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#dddd44');
+              trackH(lx, lz, h + bh);
             } else {
               trackH(lx, lz, h + bh);
             }
@@ -1051,12 +1115,13 @@ function FlyCamera({ keysRef, speedRef, chunkCacheRef, worldConfig }: {
     if (keys.has(' '))     camera.position.addScaledVector(camera.up, spd);
     if (keys.has('shift')) camera.position.addScaledVector(camera.up, -spd);
 
-    /* Boundary clamping for finite worlds */
+    /* Boundary clamping for finite worlds — generous margin so player can orbit the island */
     if (worldConfig.worldMode === 'finite') {
       const maxBound = worldConfig.worldSize * VOXEL_SIZE;
-      const px = Math.max(-2, Math.min(maxBound + 2, camera.position.x));
-      const pz = Math.max(-2, Math.min(maxBound + 2, camera.position.z));
-      const py = Math.max(0.5, Math.min(MAX_HEIGHT * VOXEL_SIZE * 2, camera.position.y));
+      const margin = Math.max(maxBound * 0.6, 20); // 60% of world size or 20 units — enough to see whole island
+      const px = Math.max(-margin, Math.min(maxBound + margin, camera.position.x));
+      const pz = Math.max(-margin, Math.min(maxBound + margin, camera.position.z));
+      const py = Math.max(0.5, Math.min(MAX_HEIGHT * VOXEL_SIZE * 4, camera.position.y));
       camera.position.set(px, py, pz);
     }
 
@@ -1284,31 +1349,31 @@ function FogEffect({ density }: { density: number }) {
  *  the camera and recycle when they drift out of range.
  * ═══════════════════════════════════════════════════════════════ */
 
-const BIOME_PARTICLE_CONFIG: Record<string, { color: string; count: number; size: number; speed: number; drift: [number, number, number]; opacity: number }> = {
-  Forest:    { color: '#ddee55', count: 40, size: 0.12, speed: 0.3, drift: [0.2, 0.4, 0.2], opacity: 0.7 },
-  Desert:    { color: '#eeddaa', count: 25, size: 0.08, speed: 0.8, drift: [1.2, 0.1, 0.4], opacity: 0.4 },
-  Tundra:    { color: '#ffffff', count: 50, size: 0.10, speed: 0.5, drift: [0.3, -0.6, 0.3], opacity: 0.6 },
-  Ocean:     { color: '#aaddee', count: 20, size: 0.06, speed: 0.4, drift: [0.1, 0.5, 0.1], opacity: 0.35 },
-  Plains:    { color: '#ffffee', count: 15, size: 0.07, speed: 0.2, drift: [0.15, 0.3, 0.15], opacity: 0.45 },
-  Mountains: { color: '#bbccdd', count: 30, size: 0.09, speed: 0.15, drift: [0.4, 0.1, 0.4], opacity: 0.3 },
-  City:      { color: '#ffeecc', count: 12, size: 0.05, speed: 0.1, drift: [0.1, 0.15, 0.1], opacity: 0.25 },
+const BIOME_PARTICLE_CONFIG: Record<string, { color: string; count: number; size: number; speed: number; drift: [number, number, number]; opacity: number; heightRange: [number, number] }> = {
+  Forest:    { color: '#ddee55', count: 50, size: 0.12, speed: 0.3, drift: [0.2, 0.4, 0.2], opacity: 0.7, heightRange: [0.5, 5] },
+  Desert:    { color: '#eeddaa', count: 30, size: 0.08, speed: 0.8, drift: [1.2, 0.1, 0.4], opacity: 0.4, heightRange: [0.3, 3] },
+  Tundra:    { color: '#ffffff', count: 60, size: 0.10, speed: 0.5, drift: [0.3, -0.6, 0.3], opacity: 0.6, heightRange: [0.5, 6] },
+  Ocean:     { color: '#aaddee', count: 25, size: 0.06, speed: 0.4, drift: [0.1, 0.5, 0.1], opacity: 0.35, heightRange: [0.2, 3] },
+  Plains:    { color: '#ffffee', count: 20, size: 0.07, speed: 0.2, drift: [0.15, 0.3, 0.15], opacity: 0.45, heightRange: [0.3, 4] },
+  Mountains: { color: '#bbccdd', count: 35, size: 0.09, speed: 0.15, drift: [0.4, 0.1, 0.4], opacity: 0.3, heightRange: [1, 8] },
+  City:      { color: '#ffeecc', count: 15, size: 0.05, speed: 0.1, drift: [0.1, 0.15, 0.1], opacity: 0.25, heightRange: [0.5, 4] },
 };
 
 function AmbientParticles({ biome, intensity }: { biome: string; intensity: number }) {
   const ref = useRef<THREE.Points>(null);
   const { camera } = useThree();
   const cfg = BIOME_PARTICLE_CONFIG[biome] || BIOME_PARTICLE_CONFIG.Plains;
-  const RANGE = 12;
+  const RANGE = 10; // tighter range so particles stay near the player
   const activeCount = Math.max(1, Math.round(cfg.count * intensity));
 
   const geo = useMemo(() => {
     let seed2 = 42;
     const rand = () => { seed2 = (seed2 + 0x6D2B79F5) | 0; let t = Math.imul(seed2 ^ (seed2 >>> 15), 1 | seed2); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-    const maxC = 50; // allocate max, use count via drawRange
+    const maxC = 60; // allocate max, use count via drawRange
     const pos = new Float32Array(maxC * 3);
     for (let i = 0; i < maxC; i++) {
       pos[i * 3]     = (rand() - 0.5) * RANGE * 2;
-      pos[i * 3 + 1] = rand() * 8 + 2;
+      pos[i * 3 + 1] = cfg.heightRange[0] + rand() * (cfg.heightRange[1] - cfg.heightRange[0]);
       pos[i * 3 + 2] = (rand() - 0.5) * RANGE * 2;
     }
     const g = new THREE.BufferGeometry();
@@ -1339,9 +1404,10 @@ function AmbientParticles({ biome, intensity }: { biome: string; intensity: numb
       // Recycle: if drifted too far from camera, reset near camera
       const dx2 = arr[i3] - (camera.position.x - ref.current.position.x);
       const dz2 = arr[i3 + 2] - (camera.position.z - ref.current.position.z);
-      if (dx2 * dx2 + dz2 * dz2 > RANGE * RANGE * 4 || arr[i3 + 1] > 14 || arr[i3 + 1] < 0) {
+      const maxH = cfg.heightRange[1] + 2;
+      if (dx2 * dx2 + dz2 * dz2 > RANGE * RANGE * 4 || arr[i3 + 1] > maxH || arr[i3 + 1] < 0) {
         arr[i3]     = (Math.random() - 0.5) * RANGE * 2;
-        arr[i3 + 1] = Math.random() * 8 + 2;
+        arr[i3 + 1] = cfg.heightRange[0] + Math.random() * (cfg.heightRange[1] - cfg.heightRange[0]);
         arr[i3 + 2] = (Math.random() - 0.5) * RANGE * 2;
       }
     }
@@ -1630,8 +1696,221 @@ function GroundCritters({ biome, intensity }: { biome: string; intensity: number
 }
 
 /* ═══════════════════════════════════════════════════════════════
- *  HUD Components
+ *  Voxel Detail LOD — Surface subdivision for nearby chunks
+ *
+ *  Creates mini-voxels on exposed surfaces of nearby terrain.
+ *  Each standard voxel is subdivided into NxNxN grid, but only
+ *  the surface-facing sub-voxels with slight randomised offsets
+ *  are rendered. This gives a natural rough texture that adds
+ *  tremendous visual detail up close, while distant voxels stay
+ *  as single blocks for performance.
+ *
+ *  The detail layer reads from the chunk cache's solidHeightMap
+ *  and generates instanced mini-voxels in a configurable radius.
+ *  Subdivision level is controlled by config.voxelDetail (0-4).
  * ═══════════════════════════════════════════════════════════════ */
+
+const DETAIL_MAX_INSTANCES = 12000; // max mini-voxels for the detail layer
+
+function SurfaceDetailLayer({
+  chunkCacheRef,
+  detail,
+}: {
+  chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
+  detail: number; // 0-4 subdivision level
+}) {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const { camera } = useThree();
+  const prevKey = useRef('');
+  const DETAIL_RADIUS = 2.5; // radius in world units for detail
+
+  const subSize = detail > 0 ? VOXEL_SIZE / detail : 0;
+  const subGeo = useMemo(() => {
+    if (detail <= 0) return null;
+    return new THREE.BoxGeometry(subSize * 0.92, subSize * 0.92, subSize * 0.92);
+  }, [subSize, detail]);
+
+  const subMat = useMemo(() => new THREE.MeshStandardMaterial({
+    roughness: 0.75, metalness: 0.0,
+  }), []);
+
+  useFrame(() => {
+    if (detail <= 0 || !meshRef.current || !chunkCacheRef.current) return;
+    const mesh = meshRef.current;
+    const cache = chunkCacheRef.current;
+    if (cache.size === 0) return;
+
+    // Only update when camera moves significantly
+    const cx = Math.round(camera.position.x * 2);
+    const cz = Math.round(camera.position.z * 2);
+    const newKey = `${cx},${cz}`;
+    if (newKey === prevKey.current) return;
+    prevKey.current = newKey;
+
+    const m = new THREE.Matrix4();
+    const c = new THREE.Color();
+    let count = 0;
+    const camX = camera.position.x, camZ = camera.position.z;
+    const detailRadSq = DETAIL_RADIUS * DETAIL_RADIUS;
+
+    // Iterate nearby chunks and find surface voxels within detail radius
+    for (const [, data] of cache) {
+      if (count >= DETAIL_MAX_INSTANCES) break;
+      const chkBaseX = data.chunkX * CHUNK_SIZE * VOXEL_SIZE;
+      const chkBaseZ = data.chunkZ * CHUNK_SIZE * VOXEL_SIZE;
+
+      // Quick check: is any part of this chunk within detail radius?
+      const closestX = Math.max(chkBaseX, Math.min(chkBaseX + CHUNK_SIZE * VOXEL_SIZE, camX));
+      const closestZ = Math.max(chkBaseZ, Math.min(chkBaseZ + CHUNK_SIZE * VOXEL_SIZE, camZ));
+      const cdx = camX - closestX, cdz = camZ - closestZ;
+      if (cdx * cdx + cdz * cdz > detailRadSq * 4) continue;
+
+      // Iterate surface voxels from chunk data
+      for (let i = 0; i < data.count && count < DETAIL_MAX_INSTANCES; i++) {
+        const i3 = i * 3;
+        const px = data.positions[i3], py = data.positions[i3 + 1], pz = data.positions[i3 + 2];
+
+        // Distance check — only add detail to nearby voxels
+        const dx = px - camX, dz = pz - camZ;
+        if (dx * dx + dz * dz > detailRadSq) continue;
+
+        // Create subdivided mini-voxels on the surface face of this voxel
+        const baseColor = new THREE.Color(data.colors[i3], data.colors[i3 + 1], data.colors[i3 + 2]);
+        const hsl = { h: 0, s: 0, l: 0 };
+        baseColor.getHSL(hsl);
+
+        for (let sx = 0; sx < detail && count < DETAIL_MAX_INSTANCES; sx++) {
+          for (let sz = 0; sz < detail && count < DETAIL_MAX_INSTANCES; sz++) {
+            // Only generate top-face sub-voxels + edges with random holes for organic look
+            const hash = (((px * 374761 + py * 668265 + pz * 1274126 + sx * 7919 + sz * 6271) | 0) >>> 0) % 100;
+            if (hash < 25) continue; // 25% chance of skip — creates natural roughness
+
+            // Slight height variation per sub-voxel for relief
+            const reliefHash = (((px * 9349 + py * 1993 + pz * 4159 + sx * 3571 + sz * 8237) | 0) >>> 0) % 1000;
+            const relief = (reliefHash / 1000 - 0.5) * subSize * 0.4;
+
+            const subX = px - VOXEL_SIZE * 0.5 + (sx + 0.5) * subSize;
+            const subY = py + VOXEL_SIZE * 0.5 + relief; // sit on top face with relief
+            const subZ = pz - VOXEL_SIZE * 0.5 + (sz + 0.5) * subSize;
+
+            m.identity();
+            m.elements[12] = subX; m.elements[13] = subY; m.elements[14] = subZ;
+            mesh.setMatrixAt(count, m);
+
+            // Vary colour per sub-voxel for texture richness
+            const colHash = (((sx * 1117 + sz * 2237 + reliefHash) | 0) >>> 0) % 1000;
+            const litShift = (colHash / 1000 - 0.5) * 0.12;
+            c.setHSL(hsl.h, hsl.s, Math.max(0, Math.min(1, hsl.l + litShift)));
+            mesh.setColorAt(count, c);
+            count++;
+          }
+        }
+      }
+    }
+
+    // Update the mesh
+    mesh.count = count;
+    if (count > 0) {
+      mesh.instanceMatrix.needsUpdate = true;
+      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    }
+  });
+
+  if (detail <= 0 || !subGeo) return null;
+  return (
+    <instancedMesh ref={meshRef} args={[subGeo, subMat, DETAIL_MAX_INSTANCES]} frustumCulled={false} />
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ *  Post-Processing: Sharpness Pass
+ *
+ *  Simple custom shader pass that applies unsharp masking
+ *  for crisp voxel edges. Uses the R3F useFrame loop to
+ *  set renderTarget parameters on the renderer.
+ *  We achieve this by adding a screen-space quad with a
+ *  sharpness shader as an effect.
+ * ═══════════════════════════════════════════════════════════════ */
+
+function SharpnessEffect({ strength }: { strength: number }) {
+  const { gl, scene, camera, size } = useThree();
+  const targetRef = useRef<THREE.WebGLRenderTarget | null>(null);
+  const quadRef = useRef<THREE.Mesh>(null);
+  const sceneRef = useRef(new THREE.Scene());
+  const camRef = useRef(new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1));
+
+  const mat = useMemo(() => new THREE.ShaderMaterial({
+    uniforms: {
+      tDiffuse: { value: null },
+      resolution: { value: new THREE.Vector2(size.width, size.height) },
+      sharpness: { value: strength },
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = vec4(position, 1.0);
+      }`,
+    fragmentShader: `
+      uniform sampler2D tDiffuse;
+      uniform vec2 resolution;
+      uniform float sharpness;
+      varying vec2 vUv;
+
+      void main() {
+        vec2 px = 1.0 / resolution;
+        vec4 center = texture2D(tDiffuse, vUv);
+        vec4 top    = texture2D(tDiffuse, vUv + vec2(0.0, px.y));
+        vec4 bot    = texture2D(tDiffuse, vUv - vec2(0.0, px.y));
+        vec4 left   = texture2D(tDiffuse, vUv - vec2(px.x, 0.0));
+        vec4 right  = texture2D(tDiffuse, vUv + vec2(px.x, 0.0));
+        vec4 blur = (top + bot + left + right) * 0.25;
+        gl_FragColor = center + (center - blur) * sharpness;
+      }`,
+    depthWrite: false, depthTest: false,
+  }), [size.width, size.height, strength]);
+
+  useEffect(() => {
+    mat.uniforms.sharpness.value = strength;
+    mat.uniforms.resolution.value.set(size.width, size.height);
+  }, [mat, strength, size]);
+
+  useEffect(() => {
+    const rt = new THREE.WebGLRenderTarget(size.width, size.height, {
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
+    });
+    targetRef.current = rt;
+    return () => rt.dispose();
+  }, [size.width, size.height]);
+
+  useEffect(() => {
+    if (!quadRef.current) return;
+    sceneRef.current.add(quadRef.current);
+    return () => { sceneRef.current.remove(quadRef.current!); };
+  }, []);
+
+  useFrame(() => {
+    if (!targetRef.current || !quadRef.current || strength <= 0) return;
+    const rt = targetRef.current;
+
+    // Render scene to offscreen target
+    gl.setRenderTarget(rt);
+    gl.render(scene, camera);
+    gl.setRenderTarget(null);
+
+    // Apply sharpness pass
+    mat.uniforms.tDiffuse.value = rt.texture;
+    gl.render(sceneRef.current, camRef.current);
+  }, 100); // high priority — run after scene render
+
+  if (strength <= 0) return null;
+  return (
+    <mesh ref={quadRef} frustumCulled={false}>
+      <planeGeometry args={[2, 2]} />
+      <primitive object={mat} attach="material" />
+    </mesh>
+  );
+}
 
 function OverlayStats({ seed, chunkCount, position, biome, worldMode, worldSize }: {
   seed: number; chunkCount: number; position: [number, number, number]; biome: string;
@@ -2059,6 +2338,13 @@ export default function ProceduralTerrain() {
                 </div>
                 <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => updateConfig('chunkGenSpeed', v)} min={1} max={6} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
 
+                {/* ── Visual Detail ── */}
+                <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Visual Detail</p>
+                <ConfigSlider label="Voxel Detail LOD" value={config.voxelDetail} onChange={v => updateConfig('voxelDetail', v)} min={0} max={4} step={1} color="text-retro-gold/80" displayValue={config.voxelDetail === 0 ? 'Off' : `${config.voxelDetail}× subdivisions`} />
+                <p className="font-mono text-[7px] text-retro-muted/30 select-none -mt-0.5">
+                  {config.voxelDetail === 0 ? 'No surface detail — best performance' : config.voxelDetail <= 2 ? 'Mini-voxels on nearby surfaces for texture' : 'High detail — more GPU intensive'}
+                </p>
+
                 {/* ── Terrain & Biomes ── */}
                 <p className="font-pixel text-[7px] text-retro-muted/40 uppercase tracking-widest select-none pt-1.5">Terrain &amp; Biomes</p>
                 <ConfigSlider label="Tree Density" value={config.treeDensity} onChange={v => updateConfig('treeDensity', v)} min={0} max={1} step={0.1} color="text-retro-green/80" displayValue={`${Math.round(config.treeDensity * 100)}%`} />
@@ -2126,7 +2412,7 @@ export default function ProceduralTerrain() {
       {/* ── Three.js Canvas ── */}
       <div ref={canvasRef} className="w-full h-full" style={{ touchAction: 'none' }}>
         <Canvas
-          camera={{ fov: 65, near: 0.1, far: 300 }}
+          camera={{ fov: 65, near: 0.1, far: 600 }}
           dpr={gfxDpr}
           gl={{ antialias: gfxAA, toneMapping: THREE.NoToneMapping, powerPreference: 'high-performance' }}
           style={{ background: 'transparent', touchAction: 'none' }}
@@ -2141,6 +2427,9 @@ export default function ProceduralTerrain() {
           <AmbientParticles biome={currentBiome} intensity={config.particleIntensity} />
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
           <GroundCritters biome={currentBiome} intensity={config.particleIntensity} />
+          {config.voxelDetail > 0 && (
+            <SurfaceDetailLayer chunkCacheRef={chunkCacheRef} detail={config.voxelDetail} />
+          )}
         </Canvas>
       </div>
     </div>
