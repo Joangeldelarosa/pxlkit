@@ -48,7 +48,7 @@ export const DEFAULT_CONFIG: WorldConfig = {
   detailMaxInstances: 12000,
 };
 
-export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city';
+export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city' | 'swamp' | 'village';
 
 export interface BiomeConfig {
   name: string;

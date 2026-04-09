@@ -13,7 +13,7 @@ import {
   BIOMES, BIOME_TYPES, BLOCK_SIZE, ROAD_W, LOT_INSET, AVENUE_W,
 } from '../constants';
 import { mulberry32, fbm } from '../utils/noise';
-import { varyColor } from '../utils/color';
+import { varyColor, hashCoord } from '../utils/color';
 import { getBiome, getVariedBiome } from '../utils/biomes';
 import { classifyCityCell, getBuildingType, getBuildingHeight } from '../city/layout';
 import { generateBuildingColumn } from '../city/buildings';
@@ -381,6 +381,160 @@ export function generateChunkData(
             push((bX + lx + rx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE,
               varyColor(roofC, wx + rx, h + 5, wz + rz, 4, 0.04, 0.06));
           trackH(lx, lz, h + 5);
+        }
+      }
+
+      /* ── Village structures: houses + crop fields ── */
+      if (biome === 'village' && h > c.waterLevel) {
+        // Determine village tile type using noise
+        const villageTile = structN(wx * 0.08 + 800, wz * 0.08 + 800);
+        const cropType = Math.abs(Math.floor((structN(Math.floor(wx / 12) * 0.5 + 900, Math.floor(wz / 12) * 0.5 + 900) + 1) * 4)) % 7;
+        
+        // Crop field colors based on type
+        const CROP_COLORS: string[] = [
+          '#ddaa22', // wheat/golden
+          '#ee4422', // tomatoes/red
+          '#8855cc', // lavender/purple
+          '#ff8833', // oranges
+          '#44bb44', // lettuce/green
+          '#ffdd55', // sunflowers/yellow
+          '#cc44aa', // berries/magenta
+        ];
+        
+        const CROP_STALK_COLORS: string[] = [
+          '#aa8833', // wheat stalk
+          '#55aa33', // tomato vine
+          '#66aa55', // lavender stem
+          '#668833', // orange tree bark
+          '#447733', // lettuce base
+          '#778833', // sunflower stalk
+          '#886655', // berry bush
+        ];
+        
+        if (villageTile > 0.25 && lx >= 2 && lx <= CHUNK_SIZE - 5 && lz >= 2 && lz <= CHUNK_SIZE - 5) {
+          // Village house with garden
+          if (Math.abs(wx % 16) < 1 && Math.abs(wz % 16) < 1) {
+            // Main house — varied styles
+            const houseStyle = Math.abs(wx * 3 + wz * 7) % 4;
+            const wallColors = ['#D4B896', '#C4A882', '#B8977A', '#CDBE9A'];
+            const roofColors = ['#8B4513', '#A0522D', '#6B3410', '#7B4513'];
+            const wallC = wallColors[houseStyle];
+            const roofC = roofColors[houseStyle];
+            
+            // 4x4 house with chimney
+            for (let hx = 0; hx < 4; hx++) for (let hz = 0; hz < 4; hz++) for (let hy = 1; hy <= 3; hy++) {
+              if (hx > 0 && hx < 3 && hz > 0 && hz < 3) continue; // hollow
+              const isWindow = hy === 2 && ((hx === 0 && hz === 2) || (hx === 3 && hz === 2) || (hx === 2 && hz === 0) || (hx === 2 && hz === 3));
+              const isDoor = hy <= 2 && hx === 1 && hz === 0;
+              push((bX + lx + hx) * VOXEL_SIZE, (h + hy) * VOXEL_SIZE, (bZ + lz + hz) * VOXEL_SIZE,
+                varyColor(isDoor ? '#664422' : isWindow ? '#AADDFF' : wallC, wx + hx, h + hy, wz + hz));
+            }
+            // Peaked roof
+            for (let rx = -1; rx <= 4; rx++) for (let rz = -1; rz <= 4; rz++) {
+              push((bX + lx + rx) * VOXEL_SIZE, (h + 4) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE,
+                varyColor(roofC, wx + rx, h + 4, wz + rz, 4, 0.04, 0.06));
+            }
+            for (let rx = 0; rx <= 3; rx++) for (let rz = 0; rz <= 3; rz++) {
+              push((bX + lx + rx) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz + rz) * VOXEL_SIZE,
+                varyColor(roofC, wx + rx, h + 5, wz + rz, 4, 0.04, 0.06));
+            }
+            // Chimney
+            for (let cy = 4; cy <= 7; cy++) {
+              push((bX + lx + 3) * VOXEL_SIZE, (h + cy) * VOXEL_SIZE, (bZ + lz + 3) * VOXEL_SIZE,
+                varyColor('#776655', wx + 3, h + cy, wz + 3));
+            }
+            trackH(lx, lz, h + 7);
+          }
+        } else {
+          // Crop field — rows of colorful crops
+          const cropColor = CROP_COLORS[cropType];
+          const stalkColor = CROP_STALK_COLORS[cropType];
+          const rowPhase = ((wx % 3) + 3) % 3;
+          
+          if (rowPhase === 0 || rowPhase === 1) {
+            // Tilled soil row
+            push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor('#6B4423', wx, h, wz, 3, 0.03, 0.05));
+            
+            // Crop on soil
+            const cropH = 1 + (Math.abs(wx * 5 + wz * 3) % 2);
+            if (rowPhase === 0 && ((wz % 2 + 2) % 2 === 0)) {
+              for (let cy = 1; cy <= cropH; cy++) {
+                push((bX + lx) * VOXEL_SIZE, (h + cy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor(cy === cropH ? cropColor : stalkColor, wx, h + cy, wz, 8, 0.08, 0.08));
+              }
+              trackH(lx, lz, h + cropH);
+            }
+          } else {
+            // Path between crop rows
+            push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor('#9B8B6B', wx, h, wz, 2, 0.02, 0.04));
+          }
+        }
+      }
+
+      /* ── Swamp features: dead trees, lily pads, mushrooms ── */
+      if (biome === 'swamp' && h >= c.waterLevel - 1) {
+        // Dead/twisted trees
+        if (lx > 1 && lx < CHUNK_SIZE - 2 && lz > 1 && lz < CHUNK_SIZE - 2) {
+          const stv = treeN(wx * 0.5 + 200, wz * 0.5 + 200);
+          if (stv > 0.38 - cfg.treeDensity * 0.15) {
+            const trunkH = 2 + (Math.abs(wx * 9 + wz * 5) % 4);
+            for (let ty = 1; ty <= trunkH; ty++) {
+              push((bX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#4a3a2a', wx, h + ty, wz, 4, 0.05, 0.06));
+            }
+            // Sparse hanging moss/leaves
+            const leafR = 1 + (Math.abs(wx * 3) % 2);
+            for (let dx = -leafR; dx <= leafR; dx++) for (let dz = -leafR; dz <= leafR; dz++) {
+              if (Math.abs(dx) + Math.abs(dz) > leafR + 1) continue;
+              if (dx === 0 && dz === 0) continue;
+              const leafH = hashCoord(wx + dx, 0, wz + dz);
+              if (leafH > 0.4) {
+                push((bX + lx + dx) * VOXEL_SIZE, (h + trunkH) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE,
+                  varyColor('#5a7a3a', wx + dx, h + trunkH, wz + dz, 6, 0.06, 0.08));
+                // Hanging vines
+                if (leafH > 0.7) {
+                  const vineLen = 1 + Math.floor(leafH * 3);
+                  for (let vy = 1; vy <= vineLen; vy++) {
+                    push((bX + lx + dx) * VOXEL_SIZE, (h + trunkH - vy) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE,
+                      varyColor('#4a6a2a', wx + dx, h + trunkH - vy, wz + dz, 5, 0.04, 0.06));
+                  }
+                }
+              }
+            }
+            trackH(lx, lz, h + trunkH);
+          }
+          
+          // Mushrooms
+          const mushV = structN(wx * 0.8 + 500, wz * 0.8 + 500);
+          if (mushV > 0.45 && h > c.waterLevel) {
+            const mushColor = (Math.abs(wx * 7 + wz) % 3) === 0 ? '#cc4444' : (Math.abs(wx * 7 + wz) % 3) === 1 ? '#ddaa44' : '#aa88cc';
+            push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor('#ddccaa', wx, h + 1, wz));
+            push((bX + lx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor(mushColor, wx, h + 2, wz, 6, 0.06, 0.08));
+            for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+              if (dx === 0 && dz === 0) continue;
+              push((bX + lx + dx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE,
+                varyColor(mushColor, wx + dx, h + 2, wz + dz, 6, 0.06, 0.08));
+            }
+            trackH(lx, lz, h + 2);
+          }
+        }
+        
+        // Lily pads on water surface
+        if (h < c.waterLevel && lx > 0 && lx < CHUNK_SIZE - 1 && lz > 0 && lz < CHUNK_SIZE - 1) {
+          const lilyV = treeN(wx * 0.9 + 400, wz * 0.9 + 400);
+          if (lilyV > 0.35) {
+            push((bX + lx) * VOXEL_SIZE, (c.waterLevel + 0.1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor('#44aa44', wx, c.waterLevel, wz, 5, 0.06, 0.08));
+            // Occasional flower on lily pad
+            if (lilyV > 0.55) {
+              push((bX + lx) * VOXEL_SIZE, (c.waterLevel + 0.5) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#ff88cc', wx, c.waterLevel + 1, wz, 8, 0.08, 0.06));
+            }
+          }
         }
       }
 
