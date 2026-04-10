@@ -1,13 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════
- *  Ground Critters — small voxel humanoid NPCs that walk on terrain
+ *  Ground Critters — Chunk-based NPC population system
  *
- *  Features:
- *  - Blocky voxel bodies (head, torso, arms, legs) using InstancedMesh
- *  - Walking animation with arm & leg swinging
- *  - Smooth rotation toward movement direction (rotate on own axis)
- *  - Terrain-aware Y positioning via solidHeightMap (no floating)
- *  - Smart spawn/despawn with opacity fade-in/fade-out
- *  - Biome-aware colors and density
+ *  NPCs are spawned/despawned per-chunk like terrain itself:
+ *  - Each loaded chunk gets deterministic NPC positions (seeded RNG)
+ *  - NPCs load/unload as chunks enter/leave the npcDistance radius
+ *  - Spawn happens behind the camera → never visible pop-in
+ *  - Smooth opacity fade-in/out for seamless transitions
+ *  - Walking animation, terrain tracking, biome-aware colors
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
@@ -18,28 +17,23 @@ import type { ChunkVoxelData } from '../types';
 import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { TimeContext } from '../rendering/DayNightCycle';
 
-/* ── NPC mini-voxel size (1/5 of normal voxel for small blocky characters) ── */
-/* Height: head top at (4+2)*NPC_VS + hair = ~0.66 world units */
-const NPC_VS = VOXEL_SIZE / 5;
-
 /* ── Constants ── */
-const MAX_NPCS = 16;
-const SPAWN_RANGE = 12;              // voxel-units radius around camera
-const DESPAWN_RANGE = 16;            // remove when beyond this
-const FADE_DURATION = 1.5;           // seconds to fade in/out
-const WALK_SPEED_MIN = 0.3;
-const WALK_SPEED_MAX = 0.9;
+const MAX_NPCS = 200;                // hard cap for instanced mesh
+const FADE_DURATION = 1.2;           // seconds to fade in/out
+const WALK_SPEED_MIN = 0.25;
+const WALK_SPEED_MAX = 0.75;
 const TURN_SPEED = 2.5;              // radians/sec for smooth rotation
-const PAUSE_MIN = 1.0;
-const PAUSE_MAX = 4.0;
+const PAUSE_MIN = 1.5;
+const PAUSE_MAX = 5.0;
 const MOVE_MIN = 2.0;
-const MOVE_MAX = 6.0;
-const ARM_SWING_SPEED = 8;           // arm/leg swing frequency multiplier
-const ARM_SWING_AMOUNT = 0.6;        // radians of arm/leg swing
+const MOVE_MAX = 7.0;
+const ARM_SWING_SPEED = 8;
+const ARM_SWING_AMOUNT = 0.6;
+const SPAWN_CHECK_INTERVAL = 0.3;    // seconds between chunk scans
 
 /* ── Biome NPC config ── */
 interface BiomeCritterCfg {
-  count: number;
+  maxPerChunk: number;     // max NPCs per chunk at density=1
   skinColor: string;
   shirtColor: string;
   pantsColor: string;
@@ -47,19 +41,18 @@ interface BiomeCritterCfg {
 }
 
 const BIOME_NPC_CONFIG: Record<string, BiomeCritterCfg> = {
-  Forest:    { count: 6, skinColor: '#ddb896', shirtColor: '#336633', pantsColor: '#553322', speedMult: 0.8 },
-  Plains:    { count: 5, skinColor: '#ddb896', shirtColor: '#5577cc', pantsColor: '#444466', speedMult: 1.0 },
-  Desert:    { count: 3, skinColor: '#c8a070', shirtColor: '#ccaa66', pantsColor: '#887744', speedMult: 0.7 },
-  Tundra:    { count: 2, skinColor: '#eeddcc', shirtColor: '#7799aa', pantsColor: '#556677', speedMult: 0.6 },
-  Ocean:     { count: 2, skinColor: '#c8a070', shirtColor: '#cc6644', pantsColor: '#553333', speedMult: 0.5 },
-  City:      { count: 8, skinColor: '#ddb896', shirtColor: '#666666', pantsColor: '#333344', speedMult: 1.2 },
-  Mountains: { count: 2, skinColor: '#ddb896', shirtColor: '#998877', pantsColor: '#556655', speedMult: 0.5 },
-  Swamp:     { count: 3, skinColor: '#bba888', shirtColor: '#557744', pantsColor: '#444433', speedMult: 0.6 },
-  Village:   { count: 5, skinColor: '#ddb896', shirtColor: '#cc8844', pantsColor: '#665533', speedMult: 0.9 },
+  Forest:    { maxPerChunk: 3, skinColor: '#ddb896', shirtColor: '#336633', pantsColor: '#553322', speedMult: 0.8 },
+  Plains:    { maxPerChunk: 3, skinColor: '#ddb896', shirtColor: '#5577cc', pantsColor: '#444466', speedMult: 1.0 },
+  Desert:    { maxPerChunk: 2, skinColor: '#c8a070', shirtColor: '#ccaa66', pantsColor: '#887744', speedMult: 0.7 },
+  Tundra:    { maxPerChunk: 1, skinColor: '#eeddcc', shirtColor: '#7799aa', pantsColor: '#556677', speedMult: 0.6 },
+  Ocean:     { maxPerChunk: 0, skinColor: '#c8a070', shirtColor: '#cc6644', pantsColor: '#553333', speedMult: 0.5 },
+  City:      { maxPerChunk: 5, skinColor: '#ddb896', shirtColor: '#666666', pantsColor: '#333344', speedMult: 1.2 },
+  Mountains: { maxPerChunk: 1, skinColor: '#ddb896', shirtColor: '#998877', pantsColor: '#556655', speedMult: 0.5 },
+  Swamp:     { maxPerChunk: 1, skinColor: '#bba888', shirtColor: '#557744', pantsColor: '#444433', speedMult: 0.6 },
+  Village:   { maxPerChunk: 3, skinColor: '#ddb896', shirtColor: '#cc8844', pantsColor: '#665533', speedMult: 0.9 },
 };
 
 /* ── NPC body part definitions ── */
-// colorType: 0=skin, 1=shirt, 2=pants, 3=hair
 type ColorType = 0 | 1 | 2 | 3;
 
 interface BodyPart {
@@ -70,26 +63,20 @@ interface BodyPart {
   pivotY?: number;
 }
 
-// Compact blocky humanoid — top of hair at oy(6)+sy(0.6)=6.6 NPC_VS ≈ 0.66 world units
 const BODY_PARTS: BodyPart[] = [
-  // Head (2×2×2) on top of torso
-  { ox: 0, oy: 4, oz: 0, sx: 2, sy: 2, sz: 2, colorType: 0 },
-  // Hair
-  { ox: 0, oy: 6, oz: 0, sx: 2, sy: 0.6, sz: 2, colorType: 3 },
-  // Torso (2×2×1)
-  { ox: 0, oy: 2, oz: 0, sx: 2, sy: 2, sz: 1, colorType: 1 },
-  // Left arm (0.8×2×0.8) — swings forward/back
+  { ox: 0, oy: 4, oz: 0, sx: 2, sy: 2, sz: 2, colorType: 0 },        // Head
+  { ox: 0, oy: 6, oz: 0, sx: 2, sy: 0.6, sz: 2, colorType: 3 },      // Hair
+  { ox: 0, oy: 2, oz: 0, sx: 2, sy: 2, sz: 1, colorType: 1 },        // Torso
   { ox: -1.4, oy: 2, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 1, animGroup: 'leftArm', pivotY: 2 },
-  // Right arm
   { ox: 1.4, oy: 2, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 1, animGroup: 'rightArm', pivotY: 2 },
-  // Left leg (0.8×2×0.8)
   { ox: -0.5, oy: 0, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 2, animGroup: 'leftLeg', pivotY: 2 },
-  // Right leg
   { ox: 0.5, oy: 0, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 2, animGroup: 'rightLeg', pivotY: 2 },
 ];
 
 const VOXELS_PER_NPC = BODY_PARTS.length;
 const TOTAL_INSTANCES = MAX_NPCS * VOXELS_PER_NPC;
+
+const HAIR_COLORS = ['#332211', '#443322', '#554433', '#221100', '#665544', '#887766', '#aa6633', '#cc9944'];
 
 /* ── NPC state ── */
 interface NpcState {
@@ -107,6 +94,13 @@ interface NpcState {
   alive: boolean;
   hairColor: string;
   colorShift: number;
+  chunkKey: string;              // which chunk this NPC belongs to
+}
+
+/* ── Deterministic seeded RNG (same positions each visit) ── */
+function mulberry32(seed: number): () => number {
+  let s = seed | 0;
+  return () => { s = Math.imul(s ^ (s >>> 15), s | 1); s ^= s + Math.imul(s ^ (s >>> 7), s | 61); return ((s ^ (s >>> 14)) >>> 0) / 4294967296; };
 }
 
 /* ── Terrain height sampling ── */
@@ -139,17 +133,19 @@ function getWaterLevel(cache: Map<string, ChunkVoxelData>, worldX: number, world
   return data.waterLevelMap[lx * CHUNK_SIZE + lz];
 }
 
-const HAIR_COLORS = ['#332211', '#443322', '#554433', '#221100', '#665544', '#887766', '#aa6633', '#cc9944'];
-
 /* ═══════════════ MAIN COMPONENT ═══════════════ */
 
 export function GroundCritters({
   biome,
-  intensity,
+  npcDensity,
+  npcDistance,
+  npcScale,
   chunkCacheRef,
 }: {
   biome: string;
-  intensity: number;
+  npcDensity: number;
+  npcDistance: number;
+  npcScale: number;
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
 }) {
   const { camera } = useThree();
@@ -157,9 +153,9 @@ export function GroundCritters({
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const npcsRef = useRef<NpcState[]>([]);
   const spawnTimerRef = useRef(0);
+  const activeChunksRef = useRef<Set<string>>(new Set());
 
   const cfg = BIOME_NPC_CONFIG[biome] || BIOME_NPC_CONFIG.Plains;
-  const activeMax = Math.max(0, Math.round(cfg.count * intensity));
 
   const colors = useMemo(() => ({
     skin: new THREE.Color(cfg.skinColor),
@@ -169,32 +165,34 @@ export function GroundCritters({
 
   const geo = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const mat = useMemo(() => new THREE.MeshLambertMaterial({ transparent: true, depthWrite: true }), []);
+
+  /* ── NPC voxel size based on npcScale ── */
+  const npcVs = VOXEL_SIZE / 5 * npcScale;
   const surfaceOffset = VOXEL_SIZE * 0.52;
 
-  /* ── Try to find a valid spawn position on solid ground ── */
-  function trySpawnPosition(camX: number, camZ: number, cache: Map<string, ChunkVoxelData>): { x: number; z: number; y: number } | null {
-    for (let attempt = 0; attempt < 8; attempt++) {
-      const angle = Math.random() * Math.PI * 2;
-      const dist = SPAWN_RANGE * 0.4 + Math.random() * SPAWN_RANGE * 0.5;
-      const sx = camX + Math.cos(angle) * dist;
-      const sz = camZ + Math.sin(angle) * dist;
+  /* ── Try to find a valid spawn position within a chunk ── */
+  function trySpawnInChunk(cx: number, cz: number, rng: () => number, cache: Map<string, ChunkVoxelData>): { x: number; z: number; y: number } | null {
+    for (let attempt = 0; attempt < 12; attempt++) {
+      const lx = 1 + Math.floor(rng() * (CHUNK_SIZE - 2));
+      const lz = 1 + Math.floor(rng() * (CHUNK_SIZE - 2));
+      const worldX = (cx * CHUNK_SIZE + lx) * VOXEL_SIZE;
+      const worldZ = (cz * CHUNK_SIZE + lz) * VOXEL_SIZE;
 
-      const sample = getGroundSample(cache, sx, sz);
-      const groundH = sample.height;
-      if (groundH < 0 || !sample.walkable) continue;
+      const sample = getGroundSample(cache, worldX, worldZ);
+      if (sample.height < 0 || !sample.walkable) continue;
 
-      const waterL = getWaterLevel(cache, sx, sz);
-      if (groundH < waterL) continue;
+      const waterL = getWaterLevel(cache, worldX, worldZ);
+      if (sample.height < waterL) continue;
 
       // Avoid steep terrain
-      const hL = getGroundSample(cache, sx - VOXEL_SIZE, sz).height;
-      const hR = getGroundSample(cache, sx + VOXEL_SIZE, sz).height;
-      const hF = getGroundSample(cache, sx, sz - VOXEL_SIZE).height;
-      const hB = getGroundSample(cache, sx, sz + VOXEL_SIZE).height;
+      const hL = getGroundSample(cache, worldX - VOXEL_SIZE, worldZ).height;
+      const hR = getGroundSample(cache, worldX + VOXEL_SIZE, worldZ).height;
+      const hF = getGroundSample(cache, worldX, worldZ - VOXEL_SIZE).height;
+      const hB = getGroundSample(cache, worldX, worldZ + VOXEL_SIZE).height;
       if (hL < 0 || hR < 0 || hF < 0 || hB < 0) continue;
-      if (Math.max(Math.abs(groundH - hL), Math.abs(groundH - hR), Math.abs(groundH - hF), Math.abs(groundH - hB)) > 2) continue;
+      if (Math.max(Math.abs(sample.height - hL), Math.abs(sample.height - hR), Math.abs(sample.height - hF), Math.abs(sample.height - hB)) > 2) continue;
 
-      return { x: sx, z: sz, y: groundH * VOXEL_SIZE + surfaceOffset };
+      return { x: worldX, z: worldZ, y: sample.height * VOXEL_SIZE + surfaceOffset };
     }
     return null;
   }
@@ -202,36 +200,112 @@ export function GroundCritters({
   useFrame((_, delta) => {
     const mesh = meshRef.current;
     const cache = chunkCacheRef.current;
-    if (!mesh || !cache) return;
+    if (!mesh || !cache || npcDensity <= 0) return;
 
     const dt = Math.min(delta, 0.05);
     const npcs = npcsRef.current;
     const camX = camera.position.x;
     const camZ = camera.position.z;
 
-    /* ═══ 1. SPAWN ═══ */
+    // Camera chunk position
+    const camCx = Math.floor(camX / (CHUNK_SIZE * VOXEL_SIZE));
+    const camCz = Math.floor(camZ / (CHUNK_SIZE * VOXEL_SIZE));
+
+    /* ═══ 1. CHUNK-BASED SPAWN/DESPAWN SCAN ═══ */
     spawnTimerRef.current += dt;
-    if (spawnTimerRef.current > 0.5) {
+    if (spawnTimerRef.current > SPAWN_CHECK_INTERVAL) {
       spawnTimerRef.current = 0;
+
+      const dist = npcDistance;
+      const distSq = (dist + 0.5) * (dist + 0.5);
+      const despawnDistSq = (dist + 2) * (dist + 2);
+
+      // Build set of chunks that should have NPCs
+      const wantedChunks = new Set<string>();
+      for (let dx = -dist; dx <= dist; dx++) {
+        for (let dz = -dist; dz <= dist; dz++) {
+          if (dx * dx + dz * dz > distSq) continue;
+          const ccx = camCx + dx;
+          const ccz = camCz + dz;
+          const key = `${ccx},${ccz}`;
+          if (cache.has(key)) {
+            wantedChunks.add(key);
+          }
+        }
+      }
+
+      // Despawn NPCs from chunks no longer in range
+      const active = activeChunksRef.current;
+      for (const key of active) {
+        if (!wantedChunks.has(key)) {
+          // Mark all NPCs from this chunk for fade-out
+          for (const n of npcs) {
+            if (n.alive && !n.fadeOut && n.chunkKey === key) {
+              n.fadeOut = true;
+              n.fadeTimer = 0;
+            }
+          }
+          active.delete(key);
+        }
+      }
+
+      // Spawn NPCs for new chunks in range
+      const npcsPerChunk = Math.max(0, Math.round(cfg.maxPerChunk * npcDensity));
       const aliveCount = npcs.filter(n => n.alive).length;
-      if (aliveCount < activeMax && aliveCount < MAX_NPCS) {
-        const pos = trySpawnPosition(camX, camZ, cache);
-        if (pos) {
-          const heading = Math.random() * Math.PI * 2;
-          const speed = (WALK_SPEED_MIN + Math.random() * (WALK_SPEED_MAX - WALK_SPEED_MIN)) * cfg.speedMult;
+      let remaining = MAX_NPCS - aliveCount;
+
+      for (const key of wantedChunks) {
+        if (active.has(key) || remaining <= 0) continue;
+
+        // Parse chunk coords
+        const [cxs, czs] = key.split(',');
+        const ccx = parseInt(cxs, 10);
+        const ccz = parseInt(czs, 10);
+
+        // Use deterministic RNG seeded by chunk coords
+        const seed = ccx * 73856093 + ccz * 19349663;
+        const rng = mulberry32(seed);
+
+        // How many NPCs for this chunk
+        const count = Math.min(npcsPerChunk, remaining);
+        let spawned = 0;
+
+        for (let i = 0; i < count; i++) {
+          const pos = trySpawnInChunk(ccx, ccz, rng, cache);
+          if (!pos) continue;
+
+          const heading = rng() * Math.PI * 2;
+          const speed = (WALK_SPEED_MIN + rng() * (WALK_SPEED_MAX - WALK_SPEED_MIN)) * cfg.speedMult;
           const npc: NpcState = {
             x: pos.x, z: pos.z, y: pos.y,
             heading, targetHeading: heading,
             speed: 0, targetSpeed: speed,
-            moveTimer: MOVE_MIN + Math.random() * (MOVE_MAX - MOVE_MIN),
+            moveTimer: MOVE_MIN + rng() * (MOVE_MAX - MOVE_MIN),
             moving: true, age: 0, fadeOut: false, fadeTimer: 0,
-            walkPhase: Math.random() * Math.PI * 2, alive: true,
-            hairColor: HAIR_COLORS[Math.floor(Math.random() * HAIR_COLORS.length)],
-            colorShift: (Math.random() - 0.5) * 0.1,
+            walkPhase: rng() * Math.PI * 2, alive: true,
+            hairColor: HAIR_COLORS[Math.floor(rng() * HAIR_COLORS.length)],
+            colorShift: (rng() - 0.5) * 0.1,
+            chunkKey: key,
           };
           const slot = npcs.findIndex(n => !n.alive);
           if (slot >= 0) npcs[slot] = npc;
           else if (npcs.length < MAX_NPCS) npcs.push(npc);
+          else break;
+          spawned++;
+          remaining--;
+        }
+
+        if (spawned > 0) active.add(key);
+      }
+
+      // Also check distance-based despawn for NPCs that wandered far
+      for (const n of npcs) {
+        if (!n.alive || n.fadeOut) continue;
+        const ndx = (n.x / (CHUNK_SIZE * VOXEL_SIZE)) - camCx;
+        const ndz = (n.z / (CHUNK_SIZE * VOXEL_SIZE)) - camCz;
+        if (ndx * ndx + ndz * ndz > despawnDistSq) {
+          n.fadeOut = true;
+          n.fadeTimer = 0;
         }
       }
     }
@@ -242,13 +316,6 @@ export function GroundCritters({
       if (!n.alive) continue;
       n.age += dt;
 
-      // Despawn check
-      const dx = n.x - camX;
-      const dz = n.z - camZ;
-      if (dx * dx + dz * dz > DESPAWN_RANGE * DESPAWN_RANGE && !n.fadeOut) {
-        n.fadeOut = true;
-        n.fadeTimer = 0;
-      }
       if (n.fadeOut) {
         n.fadeTimer += dt;
         if (n.fadeTimer >= FADE_DURATION) { n.alive = false; continue; }
@@ -265,10 +332,8 @@ export function GroundCritters({
           n.heading = n.targetHeading;
         }
 
-        // Accelerate
         if (n.speed < n.targetSpeed) n.speed = Math.min(n.speed + 2.0 * dt, n.targetSpeed);
 
-        // Move in facing direction: heading=0 → +Z, sin(h)→X, cos(h)→Z
         const newX = n.x + Math.sin(n.heading) * n.speed * dt;
         const newZ = n.z + Math.cos(n.heading) * n.speed * dt;
 
@@ -282,7 +347,6 @@ export function GroundCritters({
           n.z = newZ;
           n.y += (newY - n.y) * Math.min(1, dt * 10);
         } else {
-          // Blocked — turn around
           n.targetHeading = n.heading + Math.PI * (0.5 + Math.random());
           n.speed *= 0.3;
         }
@@ -299,13 +363,13 @@ export function GroundCritters({
         n.speed = Math.max(0, n.speed - 3.0 * dt);
         n.walkPhase += dt * ARM_SWING_SPEED * (n.speed / WALK_SPEED_MAX) * 0.3;
 
-        // Track terrain while standing
         const standSample = getGroundSample(cache, n.x, n.z);
         if (standSample.height >= 0 && standSample.walkable) {
           const standY = standSample.height * VOXEL_SIZE + surfaceOffset;
           n.y += (standY - n.y) * Math.min(1, dt * 10);
         } else {
           n.fadeOut = true;
+          n.fadeTimer = 0;
         }
 
         n.moveTimer -= dt;
@@ -336,7 +400,6 @@ export function GroundCritters({
       if (n.age < FADE_DURATION) opacity = n.age / FADE_DURATION;
       if (n.fadeOut) opacity = Math.max(0, 1 - n.fadeTimer / FADE_DURATION);
 
-      // Y-axis rotation: heading=0 → facing +Z, matches movement dir (sin(h), cos(h))
       const ch = Math.cos(n.heading);
       const sh = Math.sin(n.heading);
       const speedRatio = Math.min(1, n.speed / WALK_SPEED_MAX);
@@ -354,14 +417,12 @@ export function GroundCritters({
         else if (part.animGroup === 'leftLeg') animSwing = -swingAmt;
         else if (part.animGroup === 'rightLeg') animSwing = swingAmt;
 
-        // Part center in local NPC space
-        const lx = part.ox * NPC_VS;
-        let ly = (part.oy + part.sy * 0.5) * NPC_VS;
-        let lz = part.oz * NPC_VS;
+        const lx = part.ox * npcVs;
+        let ly = (part.oy + part.sy * 0.5) * npcVs;
+        let lz = part.oz * npcVs;
 
-        // Swing animation around pivot (top of limb, in forward/back axis)
         if (animSwing !== 0 && part.pivotY !== undefined) {
-          const pivotWorldY = (part.oy + part.pivotY) * NPC_VS;
+          const pivotWorldY = (part.oy + part.pivotY) * npcVs;
           const relY = ly - pivotWorldY;
           const cosS = Math.cos(animSwing);
           const sinS = Math.sin(animSwing);
@@ -369,14 +430,12 @@ export function GroundCritters({
           lz = lz * cosS + relY * sinS;
         }
 
-        // Manual heading rotation for part offset positioning (matches rotM below)
         const rx = lx * ch + lz * sh;
         const rz = -lx * sh + lz * ch;
 
-        // Build instance matrix: rotation + scale + position
-        const sx = part.sx * NPC_VS;
-        const sy = part.sy * NPC_VS;
-        const sz = part.sz * NPC_VS;
+        const sx = part.sx * npcVs;
+        const sy = part.sy * npcVs;
+        const sz = part.sz * npcVs;
 
         rotM.makeRotationY(n.heading);
         if (animSwing !== 0) {
@@ -392,7 +451,6 @@ export function GroundCritters({
 
         mesh.setMatrixAt(idx, m);
 
-        // Color selection with per-NPC variation
         const shift = n.colorShift;
         switch (part.colorType) {
           case 0: c.copy(colors.skin); break;
