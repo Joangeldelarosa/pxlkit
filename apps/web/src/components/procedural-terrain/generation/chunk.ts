@@ -85,6 +85,12 @@ export function generateChunkData(
   const npcWalkableMap = new Uint8Array(CHUNK_SIZE * CHUNK_SIZE);
   const solidHeightMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
   const waterLevelMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
+  /* Mini-voxel buffer for street furniture (lampposts, road lines, hydrants, etc.)
+     Each mini-voxel is VOXEL_SIZE*0.15 = 0.075 world units — much thinner than regular voxels */
+  const maxMini = CHUNK_SIZE * CHUNK_SIZE * 12;
+  const miniPosA = new Float32Array(maxMini * 3);
+  const miniColA = new Float32Array(maxMini * 3);
+  let miniC = 0;
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
 

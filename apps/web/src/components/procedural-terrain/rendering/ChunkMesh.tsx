@@ -31,6 +31,7 @@ const miniMat = new THREE.MeshStandardMaterial({ roughness: 0.5 });
 export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   const solidRef = useRef<THREE.InstancedMesh>(null);
   const waterRef = useRef<THREE.InstancedMesh>(null);
+  const miniRef = useRef<THREE.InstancedMesh>(null);
 
   useEffect(() => {
     const mesh = solidRef.current;
@@ -62,10 +63,29 @@ export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   }, [data]);
 
+  useEffect(() => {
+    const mesh = miniRef.current;
+    if (!mesh || data.miniVoxelCount === 0) return;
+    const m = new THREE.Matrix4(), c = new THREE.Color();
+    for (let i = 0; i < data.miniVoxelCount; i++) {
+      const i3 = i * 3;
+      m.identity();
+      m.elements[12] = data.miniVoxelPositions[i3];
+      m.elements[13] = data.miniVoxelPositions[i3 + 1];
+      m.elements[14] = data.miniVoxelPositions[i3 + 2];
+      mesh.setMatrixAt(i, m);
+      c.setRGB(data.miniVoxelColors[i3], data.miniVoxelColors[i3 + 1], data.miniVoxelColors[i3 + 2]);
+      mesh.setColorAt(i, c);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [data]);
+
   return (
     <group>
       {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, sharedSolidMat, data.count]} frustumCulled={false} />}
       {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />}
+      {data.miniVoxelCount > 0 && <instancedMesh ref={miniRef} args={[miniGeo, miniMat, data.miniVoxelCount]} frustumCulled={false} />}
     </group>
   );
 }
