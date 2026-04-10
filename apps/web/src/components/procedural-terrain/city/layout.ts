@@ -134,6 +134,38 @@ function getRoadWidthZ(wz: number): number {
   return isAvenueZ(blockZ) ? AVENUE_W : ROAD_W;
 }
 
+/* ── Road termination — procedural dead-ends and T-intersections ──
+ *  Non-avenue road segments can be "closed" (converted to building lot)
+ *  based on deterministic noise. Avenues always remain open so connectivity
+ *  is guaranteed: every block is reachable via the avenue grid.
+ *
+ *  A road segment runs along X between two Z-direction intersections
+ *  (or vice versa). We hash the block coordinate of that segment and
+ *  close ~20% of non-avenue segments. The closed segment becomes
+ *  extra building space (a cul-de-sac lot).
+ */
+
+/** Returns true if the X-direction road at this Z-block is closed (terminated). */
+function isRoadXClosed(blockX: number, blockZ: number): boolean {
+  // Avenues never close
+  if (isAvenueZ(blockZ)) return false;
+  // Roads adjacent to avenues stay open for access
+  const mod = ((blockZ % AVENUE_INTERVAL) + AVENUE_INTERVAL) % AVENUE_INTERVAL;
+  if (mod === 1 || mod === AVENUE_INTERVAL - 1) return false;
+  // Deterministic hash: ~20% of eligible segments are closed
+  const h = hashCoord(blockX * 31 + 173, 0, blockZ * 47 + 211);
+  return h > 0.80;
+}
+
+/** Returns true if the Z-direction road at this X-block is closed (terminated). */
+function isRoadZClosed(blockX: number, blockZ: number): boolean {
+  if (isAvenueX(blockX)) return false;
+  const mod = ((blockX % AVENUE_INTERVAL) + AVENUE_INTERVAL) % AVENUE_INTERVAL;
+  if (mod === 1 || mod === AVENUE_INTERVAL - 1) return false;
+  const h = hashCoord(blockX * 53 + 347, 0, blockZ * 29 + 197);
+  return h > 0.80;
+}
+
 /* ── Main classification function ── */
 
 export function classifyCityCell(
@@ -146,8 +178,15 @@ export function classifyCityCell(
 
   const modX = ((wx % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
   const modZ = ((wz % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
-  const onRoadX = modX < rw;
-  const onRoadZ = modZ < rdz;
+  let onRoadX = modX < rw;
+  let onRoadZ = modZ < rdz;
+
+  // Apply road termination: closed segments become building lot
+  const blockX = Math.floor(wx / BLOCK_SIZE);
+  const blockZ = Math.floor(wz / BLOCK_SIZE);
+  if (onRoadX && !onRoadZ && isRoadXClosed(blockX, blockZ)) onRoadX = false;
+  if (onRoadZ && !onRoadX && isRoadZClosed(blockX, blockZ)) onRoadZ = false;
+
   const isRoad = onRoadX || onRoadZ;
   const isIntersection = onRoadX && onRoadZ;
   const isAvenue = (onRoadX && rw >= AVENUE_W) || (onRoadZ && rdz >= AVENUE_W);

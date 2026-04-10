@@ -8,7 +8,7 @@
 
 import type { BuildingType } from '../types';
 import { VOXEL_SIZE } from '../constants';
-import { varyColor } from '../utils/color';
+import { varyColor, hashCoord } from '../utils/color';
 import { getWallPalette, getRoofColor } from './layout';
 
 type PushFn = (px: number, py: number, pz: number, hex: string) => void;
@@ -108,16 +108,38 @@ function isExposedWall(x: number, z: number, w: number, d: number, fe: ForceEdge
 
 /* ═══════════════ STANDARD BUILDINGS ═══════════════ */
 // Covers: skyscraper, office, office_tall, tower, house, shop
+// Now with 5 facade styles determined by building lot hash
 
 function genStandardBuilding(ctx: BuildCtx) {
   const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bType, bh, forceEdge } = ctx;
   const walls = getWallPalette(bType);
   const wallBase = walls[0];
   const roofCol = getRoofColor(bType);
-  const windowCol = '#aaddff';
   const doorCol = '#886644';
   const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
   const isEdgeZ = blZ === 0 || blZ === footD - 1;
+  const isEdgeX = blX === 0 || blX === footW - 1;
+
+  // Facade style determined by building anchor hash (same for all columns of one building)
+  const facadeHash = hashCoord(wx - blX, 0, wz - blZ);
+  const facadeStyle = Math.floor(facadeHash * 5); // 0-4
+
+  // Window color variants
+  const windowColors = ['#aaddff', '#99ccee', '#bbddee', '#88bbdd', '#aaccdd'];
+  const windowCol = windowColors[facadeStyle];
+
+  // Window spacing pattern (varies by facade style)
+  const winRowMod = facadeStyle <= 1 ? 2 : (facadeStyle === 2 ? 3 : 2); // every 2 or 3
+  const winColOdd = facadeStyle >= 3; // use even columns instead of odd for windows
+
+  // Accent/trim colors per style
+  const trimColors = ['#99887a', '#8a9a7a', '#7a8a9a', '#9a8a8a', '#8a8a7a'];
+  const trimCol = trimColors[facadeStyle];
+
+  // Whether to add horizontal band / cornice
+  const hasBand = facadeStyle === 1 || facadeStyle === 3;
+  // Whether to add pilasters (vertical trim strips at corners)
+  const hasPilasters = facadeStyle === 2 || facadeStyle === 4;
 
   for (let by = 1; by <= bh; by++) {
     if (!onEdge && by < bh) continue; // hollow interior
@@ -128,16 +150,26 @@ function genStandardBuilding(ctx: BuildCtx) {
     } else if (by === 1 && blZ === 0 && blX >= 1 && blX <= Math.min(2, footW - 2)) {
       // Door
       color = varyColor(doorCol, wx, h + by, wz, 3, 0.04, 0.05);
-    } else if (onEdge && by > 1 && by < bh && by % 2 === 0) {
+    } else if (hasBand && onEdge && (by === Math.floor(bh * 0.5) || by === bh - 1)) {
+      // Horizontal trim band (cornice/belt course)
+      color = varyColor(trimCol, wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (hasPilasters && onEdge && by > 1 && by < bh
+               && ((isEdgeZ && (blX === 0 || blX === footW - 1 || blX === Math.floor(footW / 2)))
+                || (isEdgeX && (blZ === 0 || blZ === footD - 1 || blZ === Math.floor(footD / 2))))) {
+      // Pilaster columns at corners and center
+      color = varyColor(trimCol, wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (onEdge && by > 1 && by < bh && by % winRowMod === 0) {
       // Window rows
       const isWindowCol = isEdgeZ
-        ? (blX >= 1 && blX <= footW - 2 && blX % 2 === 1)
-        : (blZ >= 1 && blZ <= footD - 2 && blZ % 2 === 1);
+        ? (blX >= 1 && blX <= footW - 2 && (winColOdd ? blX % 2 === 0 : blX % 2 === 1))
+        : (blZ >= 1 && blZ <= footD - 2 && (winColOdd ? blZ % 2 === 0 : blZ % 2 === 1));
       if (isWindowCol) {
         color = varyColor(windowCol, wx, h + by, wz, 3, 0.05, 0.06);
         pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
       } else {
-        color = varyColor(wallBase, wx, h + by, wz, 5, 0.06, 0.07);
+        // Use secondary wall color from palette if available
+        const wallAlt = walls.length > 1 ? walls[1] : wallBase;
+        color = varyColor(facadeStyle >= 3 ? wallAlt : wallBase, wx, h + by, wz, 5, 0.06, 0.07);
       }
     } else {
       color = varyColor(wallBase, wx, h + by, wz, 5, 0.06, 0.07);
@@ -155,9 +187,10 @@ function genStandardBuilding(ctx: BuildCtx) {
         varyColor(roofCol, wx, h + bh + ry, wz, 4, 0.04, 0.06));
     }
     if (bType === 'shop' && blZ === 0 && roofExtra === 0) {
-      // Awning
+      // Awning — color varies by facade
+      const awningColors = ['#ee6644', '#4488cc', '#44aa66', '#dd8833', '#886644'];
       push((bX + lx) * VS, (h + 3) * VS, (bZ + lz - 1) * VS,
-        varyColor('#ee6644', wx, h + 3, wz - 1, 5, 0.06, 0.06));
+        varyColor(awningColors[facadeStyle], wx, h + 3, wz - 1, 5, 0.06, 0.06));
     }
     trackH(lx, lz, h + bh + roofExtra);
   } else if (bType === 'tower' && blX === Math.floor(footW / 2) && blZ === Math.floor(footD / 2)) {

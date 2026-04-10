@@ -22,11 +22,17 @@ import { TimeContext } from './DayNightCycle';
 const WIN_INNER_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 1.2, VOXEL_SIZE * 1.2, VOXEL_SIZE * 1.2);
 const WIN_OUTER_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 2.2, VOXEL_SIZE * 2.2, VOXEL_SIZE * 2.2);
 
+/* ── Street lamp geometry: larger sphere-like glow for area illumination ── */
+const LAMP_INNER_GEO = new THREE.SphereGeometry(VOXEL_SIZE * 0.6, 6, 4);
+const LAMP_OUTER_GEO = new THREE.SphereGeometry(VOXEL_SIZE * 2.5, 8, 6);
+const LAMP_GROUND_GEO = new THREE.CylinderGeometry(VOXEL_SIZE * 3, VOXEL_SIZE * 4, VOXEL_SIZE * 0.3, 8);
+
 /* ── Tuning constants ── */
 const FLICKER_HASH_THRESHOLD = 0.55;   // windows above this can flicker
 const FLICKER_OFF_THRESHOLD = -0.35;   // sin threshold for flicker-off
 const VIEW_DIST_CHUNKS = 8;            // how many chunks to scan
 const MAX_INSTANCES = 6000;
+const MAX_LAMP_INSTANCES = 256;
 
 function winHash(x: number, y: number, z: number): number {
   let h = (Math.round(x * 100) * 374761393 + Math.round(y * 100) * 668265263 + Math.round(z * 100) * 1274126177) | 0;
@@ -53,6 +59,9 @@ export function NightWindowLights({
 }) {
   const innerRef = useRef<THREE.InstancedMesh>(null);
   const outerRef = useRef<THREE.InstancedMesh>(null);
+  const lampInnerRef = useRef<THREE.InstancedMesh>(null);
+  const lampOuterRef = useRef<THREE.InstancedMesh>(null);
+  const lampGroundRef = useRef<THREE.InstancedMesh>(null);
   const timeRef = useContext(TimeContext);
   const { camera } = useThree();
 
@@ -68,10 +77,32 @@ export function NightWindowLights({
     blending: THREE.AdditiveBlending, toneMapped: false,
   }), []);
 
+  /* Lamp inner: bright warm light at fixture */
+  const lampInnerMat = useMemo(() => new THREE.MeshBasicMaterial({
+    transparent: true, opacity: 0, depthWrite: false,
+    blending: THREE.AdditiveBlending, toneMapped: false,
+  }), []);
+
+  /* Lamp outer: large warm halo around fixture */
+  const lampOuterMat = useMemo(() => new THREE.MeshBasicMaterial({
+    transparent: true, opacity: 0, depthWrite: false,
+    blending: THREE.AdditiveBlending, toneMapped: false,
+  }), []);
+
+  /* Lamp ground: pool of light on the ground below lamp */
+  const lampGroundMat = useMemo(() => new THREE.MeshBasicMaterial({
+    transparent: true, opacity: 0, depthWrite: false,
+    blending: THREE.AdditiveBlending, toneMapped: false,
+    side: THREE.DoubleSide,
+  }), []);
+
   useFrame(({ clock }) => {
     const inner = innerRef.current;
     const outer = outerRef.current;
-    if (!inner || !outer || !timeRef) return;
+    const lampInner = lampInnerRef.current;
+    const lampOuter = lampOuterRef.current;
+    const lampGround = lampGroundRef.current;
+    if (!inner || !outer || !lampInner || !lampOuter || !lampGround || !timeRef) return;
 
     const state = timeRef.current;
     const hour = state.hour;
@@ -91,15 +122,27 @@ export function NightWindowLights({
       innerMat.opacity = 0;
       // eslint-disable-next-line react-hooks/immutability
       outerMat.opacity = 0;
+      lampInnerMat.opacity = 0;
+      lampOuterMat.opacity = 0;
+      lampGroundMat.opacity = 0;
       inner.count = 0;
       outer.count = 0;
+      lampInner.count = 0;
+      lampOuter.count = 0;
+      lampGround.count = 0;
       if (inner.instanceMatrix) inner.instanceMatrix.needsUpdate = true;
       if (outer.instanceMatrix) outer.instanceMatrix.needsUpdate = true;
+      if (lampInner.instanceMatrix) lampInner.instanceMatrix.needsUpdate = true;
+      if (lampOuter.instanceMatrix) lampOuter.instanceMatrix.needsUpdate = true;
+      if (lampGround.instanceMatrix) lampGround.instanceMatrix.needsUpdate = true;
       return;
     }
 
     innerMat.opacity = nightFactor * 0.95;
     outerMat.opacity = nightFactor * 0.25;
+    lampInnerMat.opacity = nightFactor * 1.0;
+    lampOuterMat.opacity = nightFactor * 0.35;
+    lampGroundMat.opacity = nightFactor * 0.18;
 
     const cache = chunkCacheRef.current;
     if (!cache) return;
@@ -110,65 +153,126 @@ export function NightWindowLights({
     const m = new THREE.Matrix4();
     const c = new THREE.Color();
     let count = 0;
+    let lampCount = 0;
     const t = clock.getElapsedTime();
 
-    for (const [, data] of cache) {
-      if (count >= MAX_INSTANCES) break;
+    /* ── Street lamp warm color (sodium vapor-like warm orange-white) ── */
+    const lampColor = new THREE.Color('#ffeedd');
+    const lampGroundColor = new THREE.Color('#ffdd99');
 
+    for (const [, data] of cache) {
       const dx = data.chunkX - camCX;
       const dz = data.chunkZ - camCZ;
       if (dx * dx + dz * dz > VIEW_DIST_CHUNKS * VIEW_DIST_CHUNKS) continue;
 
-      for (let i = 0; i < data.windowLightCount && count < MAX_INSTANCES; i++) {
-        const i3 = i * 3;
-        const wx = data.windowLights[i3];
-        const wy = data.windowLights[i3 + 1];
-        const wz = data.windowLights[i3 + 2];
+      /* ── Window lights ── */
+      if (count < MAX_INSTANCES) {
+        for (let i = 0; i < data.windowLightCount && count < MAX_INSTANCES; i++) {
+          const i3 = i * 3;
+          const wx = data.windowLights[i3];
+          const wy = data.windowLights[i3 + 1];
+          const wz = data.windowLights[i3 + 2];
 
-        const h = winHash(wx, wy, wz);
-        if (h > windowLitProbability) continue;
+          const h = winHash(wx, wy, wz);
+          if (h > windowLitProbability) continue;
 
-        // Flicker
-        const flickerPhase = h * 100;
-        const flickerSpeed = 0.08 + h * 0.15;
-        const flicker = Math.sin(t * flickerSpeed + flickerPhase);
-        if (h > FLICKER_HASH_THRESHOLD && flicker < FLICKER_OFF_THRESHOLD) continue;
+          // Flicker
+          const flickerPhase = h * 100;
+          const flickerSpeed = 0.08 + h * 0.15;
+          const flicker = Math.sin(t * flickerSpeed + flickerPhase);
+          if (h > FLICKER_HASH_THRESHOLD && flicker < FLICKER_OFF_THRESHOLD) continue;
 
-        // Set transform for both inner and outer meshes
-        m.identity();
-        m.elements[12] = wx;
-        m.elements[13] = wy;
-        m.elements[14] = wz;
-        inner.setMatrixAt(count, m);
-        outer.setMatrixAt(count, m);
+          // Set transform for both inner and outer meshes
+          m.identity();
+          m.elements[12] = wx;
+          m.elements[13] = wy;
+          m.elements[14] = wz;
+          inner.setMatrixAt(count, m);
+          outer.setMatrixAt(count, m);
 
-        // Warm color
-        const colorIdx = Math.floor(h * WARM_COLORS.length) % WARM_COLORS.length;
-        c.copy(WARM_COLORS[colorIdx]);
-        const brightness = 0.8 + h * 0.4 + flicker * 0.08;
-        c.multiplyScalar(brightness);
-        inner.setColorAt(count, c);
+          // Warm color
+          const colorIdx = Math.floor(h * WARM_COLORS.length) % WARM_COLORS.length;
+          c.copy(WARM_COLORS[colorIdx]);
+          const brightness = 0.8 + h * 0.4 + flicker * 0.08;
+          c.multiplyScalar(brightness);
+          inner.setColorAt(count, c);
 
-        // Outer halo is dimmer / slightly different hue
-        c.multiplyScalar(0.5);
-        outer.setColorAt(count, c);
+          // Outer halo is dimmer / slightly different hue
+          c.multiplyScalar(0.5);
+          outer.setColorAt(count, c);
 
-        count++;
+          count++;
+        }
+      }
+
+      /* ── Street lamp lights ── */
+      if (data.streetLights && lampCount < MAX_LAMP_INSTANCES) {
+        for (let i = 0; i < data.streetLightCount && lampCount < MAX_LAMP_INSTANCES; i++) {
+          const i3 = i * 3;
+          const lx = data.streetLights[i3];
+          const ly = data.streetLights[i3 + 1];
+          const lz = data.streetLights[i3 + 2];
+
+          // Subtle flicker for street lamps (very mild — mostly steady)
+          const lh = winHash(lx, ly, lz);
+          const lampFlicker = 0.95 + Math.sin(t * 0.3 + lh * 50) * 0.05;
+
+          // Lamp fixture glow (at fixture position)
+          m.identity();
+          m.elements[12] = lx;
+          m.elements[13] = ly;
+          m.elements[14] = lz;
+          lampInner.setMatrixAt(lampCount, m);
+          lampOuter.setMatrixAt(lampCount, m);
+
+          // Ground light pool (below lamp, on ground surface)
+          // Estimate ground Y: lamp is roughly shaftH*MVS above ground
+          // MVS = 0.075, shaftH = 40 → lamp is ~3.0 units above ground surface
+          const groundY = ly - VOXEL_SIZE * 5.5;
+          m.identity();
+          m.elements[12] = lx;
+          m.elements[13] = groundY;
+          m.elements[14] = lz;
+          lampGround.setMatrixAt(lampCount, m);
+
+          // Lamp colors
+          c.copy(lampColor).multiplyScalar(lampFlicker);
+          lampInner.setColorAt(lampCount, c);
+          c.copy(lampColor).multiplyScalar(lampFlicker * 0.6);
+          lampOuter.setColorAt(lampCount, c);
+          c.copy(lampGroundColor).multiplyScalar(lampFlicker * 0.4);
+          lampGround.setColorAt(lampCount, c);
+
+          lampCount++;
+        }
       }
     }
 
     inner.count = count;
     outer.count = count;
+    lampInner.count = lampCount;
+    lampOuter.count = lampCount;
+    lampGround.count = lampCount;
     if (inner.instanceMatrix) inner.instanceMatrix.needsUpdate = true;
     if (inner.instanceColor) inner.instanceColor.needsUpdate = true;
     if (outer.instanceMatrix) outer.instanceMatrix.needsUpdate = true;
     if (outer.instanceColor) outer.instanceColor.needsUpdate = true;
+    if (lampInner.instanceMatrix) lampInner.instanceMatrix.needsUpdate = true;
+    if (lampInner.instanceColor) lampInner.instanceColor.needsUpdate = true;
+    if (lampOuter.instanceMatrix) lampOuter.instanceMatrix.needsUpdate = true;
+    if (lampOuter.instanceColor) lampOuter.instanceColor.needsUpdate = true;
+    if (lampGround.instanceMatrix) lampGround.instanceMatrix.needsUpdate = true;
+    if (lampGround.instanceColor) lampGround.instanceColor.needsUpdate = true;
   });
 
   return (
     <>
       <instancedMesh ref={outerRef} args={[WIN_OUTER_GEO, outerMat, MAX_INSTANCES]} frustumCulled={false} renderOrder={998} />
       <instancedMesh ref={innerRef} args={[WIN_INNER_GEO, innerMat, MAX_INSTANCES]} frustumCulled={false} renderOrder={999} />
+      {/* Street lamp lights */}
+      <instancedMesh ref={lampGroundRef} args={[LAMP_GROUND_GEO, lampGroundMat, MAX_LAMP_INSTANCES]} frustumCulled={false} renderOrder={996} />
+      <instancedMesh ref={lampOuterRef} args={[LAMP_OUTER_GEO, lampOuterMat, MAX_LAMP_INSTANCES]} frustumCulled={false} renderOrder={997} />
+      <instancedMesh ref={lampInnerRef} args={[LAMP_INNER_GEO, lampInnerMat, MAX_LAMP_INSTANCES]} frustumCulled={false} renderOrder={1000} />
     </>
   );
 }

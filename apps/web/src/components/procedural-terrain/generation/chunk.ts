@@ -91,6 +91,10 @@ export function generateChunkData(
   const miniPosA = new Float32Array(maxMini * 3);
   const miniColA = new Float32Array(maxMini * 3);
   let miniC = 0;
+  /* Street light positions for night illumination (lamp top positions) */
+  const maxSL = 32; // max street lights per chunk (typically 4 corners × few intersections)
+  const slPosA = new Float32Array(maxSL * 3);
+  let slC = 0;
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
 
@@ -189,6 +193,13 @@ export function generateChunkData(
     miniPosA[i3] = px; miniPosA[i3 + 1] = py; miniPosA[i3 + 2] = pz;
     _tc.set(hex); miniColA[i3] = _tc.r; miniColA[i3 + 1] = _tc.g; miniColA[i3 + 2] = _tc.b;
     miniC++;
+  }
+  /** Register a street lamp light position for night illumination */
+  function pushSL(px: number, py: number, pz: number) {
+    if (slC >= maxSL) return;
+    const i3 = slC * 3;
+    slPosA[i3] = px; slPosA[i3 + 1] = py; slPosA[i3 + 2] = pz;
+    slC++;
   }
   /** Mini-voxel step size = VOXEL_SIZE * 0.15 */
   const MVS = VOXEL_SIZE * 0.15;
@@ -430,12 +441,16 @@ export function generateChunkData(
               // Light at end of X arm (2×2 glow)
               pushMini(px + 3 * armDx * MVS, poleBaseY + shaftH * MVS, pz, '#ffee88');
               pushMini(px + 4 * armDx * MVS, poleBaseY + shaftH * MVS, pz, '#ffdd66');
+              // Register X-arm light for night illumination
+              pushSL(px + 3.5 * armDx * MVS, poleBaseY + shaftH * MVS, pz);
               // Z-direction arm + light
               for (let a = 1; a <= 4; a++) {
                 pushMini(px, poleBaseY + (shaftH - 1) * MVS, pz + a * armDz * MVS, '#666666');
               }
               pushMini(px, poleBaseY + shaftH * MVS, pz + 3 * armDz * MVS, '#ffee88');
               pushMini(px, poleBaseY + shaftH * MVS, pz + 4 * armDz * MVS, '#ffdd66');
+              // Register Z-arm light for night illumination
+              pushSL(px, poleBaseY + shaftH * MVS, pz + 3.5 * armDz * MVS);
               // trackH still uses regular voxel grid height
               trackH(lx, lz, h + 1 + Math.ceil((shaftH * MVS) / VOXEL_SIZE));
             }
@@ -791,6 +806,7 @@ export function generateChunkData(
     positions: posA.subarray(0, sc * 3), colors: colA.subarray(0, sc * 3), count: sc,
     waterPositions: wPosA.subarray(0, wc * 3), waterColors: wColA.subarray(0, wc * 3), waterCount: wc,
     pickups, windowLights: winPosA.subarray(0, winC * 3), windowLightCount: winC,
+    streetLights: slPosA.subarray(0, slC * 3), streetLightCount: slC,
     groundHeightMap, npcWalkableMap, solidHeightMap, waterLevelMap,
     miniVoxelPositions: miniPosA.subarray(0, miniC * 3),
     miniVoxelColors: miniColA.subarray(0, miniC * 3),
