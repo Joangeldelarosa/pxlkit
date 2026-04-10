@@ -19,12 +19,13 @@ import { TimeContext } from '../rendering/DayNightCycle';
 
 /* ── Constants ── */
 const MINI_VS = VOXEL_SIZE / 3;          // mini-voxel size for boats
-const MAX_BOATS = 20;                     // max simultaneous boats
+const MAX_BOATS = 24;                     // max simultaneous boats
 const MAX_SPRAY = 600;                    // max spray particles
-const SPAWN_CHECK_INTERVAL = 1.5;         // seconds between spawn checks
-const BOAT_SPAWN_RADIUS = 30;             // how far from camera to spawn (in voxel units)
-const BOAT_DESPAWN_RADIUS = 50;           // remove when beyond this
-const MIN_WATER_DEPTH = 2;                // minimum water depth in voxels (lowered for more spawns)
+const SPAWN_CHECK_INTERVAL = 0.8;         // seconds between spawn checks (faster spawning)
+const BOAT_SPAWN_RADIUS_MIN = 10;         // min distance from camera (in voxel units)
+const BOAT_SPAWN_RADIUS_MAX = 45;         // max distance from camera (in voxel units)
+const BOAT_DESPAWN_RADIUS = 55;           // remove when beyond this
+const MIN_WATER_DEPTH = 1;               // minimum water depth in voxels (1 = any water)
 const SHORE_DETECT_DIST = 3;             // distance in voxels to detect shore ahead
 const MAX_SPEED = 2.5;                    // max boat speed (world units/sec)
 const ACCEL = 0.8;                        // acceleration rate
@@ -262,10 +263,10 @@ export function WaterBoats({
     if (boatDensity > 0 && t - lastSpawnCheck.current > SPAWN_CHECK_INTERVAL && boats.length < maxBoats) {
       lastSpawnCheck.current = t;
 
-      // Try random positions around camera to find deep water
-      for (let attempt = 0; attempt < 24; attempt++) {
+      // Try random positions around camera to find water — use broader search
+      for (let attempt = 0; attempt < 32; attempt++) {
         const angle = pseudoRand(t * 100 + attempt, camX * 0.1) * Math.PI * 2;
-        const dist = BOAT_SPAWN_RADIUS * 0.3 + pseudoRand(t * 50 + attempt, camZ * 0.1) * BOAT_SPAWN_RADIUS * 0.7;
+        const dist = BOAT_SPAWN_RADIUS_MIN + pseudoRand(t * 50 + attempt, camZ * 0.1) * (BOAT_SPAWN_RADIUS_MAX - BOAT_SPAWN_RADIUS_MIN);
         const sx = camX + Math.cos(angle) * dist * VOXEL_SIZE;
         const sz = camZ + Math.sin(angle) * dist * VOXEL_SIZE;
 

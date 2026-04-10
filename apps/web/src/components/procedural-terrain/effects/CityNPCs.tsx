@@ -311,6 +311,7 @@ function computeBoneOffset(npc: NPCState, bone: BoneName): BoneOffset {
   const sp = npc.speed / WALK_SPEED_NORMAL;
 
   // Walking gait — natural pendulum
+  // dz = forward/back stride (model +Z is front), dx = side sway
   const legAmp = moving ? 0.7 * sp : 0;
   const armAmp = moving ? 0.55 * sp : 0;
   const hipSway = moving ? Math.sin(wc) * NPC_VS * 0.2 * sp : 0;
@@ -321,22 +322,22 @@ function computeBoneOffset(npc: NPCState, bone: BoneName): BoneOffset {
 
   switch (bone) {
     case 'rfoot': return {
-      dx: Math.sin(wc) * legAmp * NPC_VS * 2.5,
+      dx: 0,
       dy: Math.max(0, Math.sin(wc)) * legAmp * NPC_VS * 1.0,
-      dz: 0,
+      dz: Math.sin(wc) * legAmp * NPC_VS * 2.5,
     };
     case 'lfoot': return {
-      dx: Math.sin(wc + Math.PI) * legAmp * NPC_VS * 2.5,
+      dx: 0,
       dy: Math.max(0, Math.sin(wc + Math.PI)) * legAmp * NPC_VS * 1.0,
-      dz: 0,
+      dz: Math.sin(wc + Math.PI) * legAmp * NPC_VS * 2.5,
     };
     case 'rleg': return {
-      dx: Math.sin(wc) * legAmp * NPC_VS * 1.8,
-      dy: 0, dz: 0,
+      dx: 0, dy: 0,
+      dz: Math.sin(wc) * legAmp * NPC_VS * 1.8,
     };
     case 'lleg': return {
-      dx: Math.sin(wc + Math.PI) * legAmp * NPC_VS * 1.8,
-      dy: 0, dz: 0,
+      dx: 0, dy: 0,
+      dz: Math.sin(wc + Math.PI) * legAmp * NPC_VS * 1.8,
     };
     case 'hip': return {
       dx: hipSway + weightShift,
@@ -348,14 +349,14 @@ function computeBoneOffset(npc: NPCState, bone: BoneName): BoneOffset {
       dz: 0,
     };
     case 'rarm': return {
-      dx: Math.sin(wc + Math.PI) * armAmp * NPC_VS * 2.2 + gestureArm,
+      dx: gestureArm,
       dy: chatting ? Math.abs(gestureArm) * 0.5 : 0,
-      dz: 0,
+      dz: Math.sin(wc + Math.PI) * armAmp * NPC_VS * 2.2,
     };
     case 'larm': return {
-      dx: Math.sin(wc) * armAmp * NPC_VS * 2.2 - gestureArm * 0.2,
+      dx: -gestureArm * 0.2,
       dy: npc.behavior === 'phoneLooking' ? NPC_VS * 3 : 0,
-      dz: npc.behavior === 'phoneLooking' ? NPC_VS * 2 : 0,
+      dz: Math.sin(wc) * armAmp * NPC_VS * 2.2 + (npc.behavior === 'phoneLooking' ? NPC_VS * 2 : 0),
     };
     case 'neck': return {
       dx: hipSway * 0.3 + weightShift * 0.3,
@@ -787,8 +788,10 @@ export function CityNPCs({
       fade = Math.max(0, Math.min(1, fade));
       if (fade < 0.01) continue; // skip invisible NPCs
 
-      // Heading rotation sin/cos
-      const headingAngle = -npc.heading + Math.PI / 2;
+      // Heading rotation: map model's +Z (front/face) to the movement direction
+      // Movement at heading θ goes in direction (cos θ, sin θ) in world XZ.
+      // Model's front face is +Z, so we need rotation -θ - π/2 around Y.
+      const headingAngle = -npc.heading - Math.PI / 2;
       const ch = Math.cos(headingAngle);
       const sh = Math.sin(headingAngle);
 
