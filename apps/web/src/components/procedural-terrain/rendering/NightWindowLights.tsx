@@ -25,7 +25,6 @@ const WIN_OUTER_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 2.2, VOXEL_SIZE * 2.2, 
 /* ── Tuning constants ── */
 const FLICKER_HASH_THRESHOLD = 0.55;   // windows above this can flicker
 const FLICKER_OFF_THRESHOLD = -0.35;   // sin threshold for flicker-off
-const VIEW_DIST_CHUNKS = 8;            // how many chunks to scan
 const MAX_INSTANCES = 6000;
 
 function winHash(x: number, y: number, z: number): number {
@@ -47,9 +46,11 @@ const WARM_COLORS = [
 export function NightWindowLights({
   chunkCacheRef,
   windowLitProbability,
+  lightRenderDistance,
 }: {
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
   windowLitProbability: number;
+  lightRenderDistance: number;
 }) {
   const innerRef = useRef<THREE.InstancedMesh>(null);
   const outerRef = useRef<THREE.InstancedMesh>(null);
@@ -117,7 +118,7 @@ export function NightWindowLights({
 
       const dx = data.chunkX - camCX;
       const dz = data.chunkZ - camCZ;
-      if (dx * dx + dz * dz > VIEW_DIST_CHUNKS * VIEW_DIST_CHUNKS) continue;
+      if (dx * dx + dz * dz > lightRenderDistance * lightRenderDistance) continue;
 
       for (let i = 0; i < data.windowLightCount && count < MAX_INSTANCES; i++) {
         const i3 = i * 3;

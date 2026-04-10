@@ -19,7 +19,7 @@
  *  ├── rendering/
  *  │   ├── ChunkMesh.tsx  — instanced mesh renderer + FloatingPickup
  *  │   ├── WorldLighting.tsx — lights, sky dome, fog
- *  │   └── SurfaceDetailLayer.tsx — voxel detail LOD
+ *  │   └── DayNightCycle.tsx — day/night cycle + sky shader
  *  ├── effects/
  *  │   ├── AmbientParticles.tsx
  *  │   ├── SkyBirds.tsx
@@ -61,7 +61,6 @@ import { FogEffect } from './rendering/WorldLighting';
 import { DayNightLighting, DayNightSky, TimeContext } from './rendering/DayNightCycle';
 import type { TimeState } from './rendering/DayNightCycle';
 import { NightWindowLights } from './rendering/NightWindowLights';
-import { SurfaceDetailLayer } from './rendering/SurfaceDetailLayer';
 import { AmbientParticles } from './effects/AmbientParticles';
 import { SkyBirds } from './effects/SkyBirds';
 import { GroundCritters } from './effects/GroundCritters';
@@ -596,17 +595,8 @@ export default function ProceduralTerrain() {
           <AmbientParticles biome={currentBiome} intensity={config.particleIntensity} />
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
           <GroundCritters biome={currentBiome} intensity={config.particleIntensity} />
-          <NightWindowLights chunkCacheRef={chunkCacheRef} windowLitProbability={config.windowLitProbability} />
+          <NightWindowLights chunkCacheRef={chunkCacheRef} windowLitProbability={config.windowLitProbability} lightRenderDistance={config.lightRenderDistance} />
           <WaterBoats chunkCacheRef={chunkCacheRef} boatDensity={config.boatDensity} />
-          {config.voxelDetail > 0 && (
-            <SurfaceDetailLayer
-              chunkCacheRef={chunkCacheRef}
-              detail={config.voxelDetail}
-              detailDistance={config.detailDistance}
-              detailSharpness={config.detailSharpness}
-              detailMaxInstances={config.detailMaxInstances}
-            />
-          )}
           </TimeContext.Provider>
         </Canvas>
       </div>

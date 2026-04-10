@@ -20,15 +20,12 @@ export interface WorldConfig {
   backgroundDetail: number;    // 0-1  distant mountain silhouette layers + haze
   chunkGenSpeed: number;       // 1-10 max chunks generated per frame
   graphicsQuality: 'low' | 'medium' | 'high';
-  voxelDetail: number;         // 0-16 subdivisions for nearby surface detail
-  detailDistance: number;       // 1-20 radius in voxel-units for surface detail rendering
-  detailSharpness: number;     // 0-1 unified texture intensity (drives height, gaps, color, scale)
-  detailMaxInstances: number;  // 1000-200000 max mini-voxel instances (GPU budget)
   timeMode: 'fixed' | 'cycle';   // fixed = locked time, cycle = dynamic day/night
   fixedHour: number;              // 0-24 hour of day when timeMode is 'fixed'
   dayDurationSeconds: number;     // how many real seconds = 24 in-game hours (e.g. 60 = 1 minute per full day)
   boatDensity: number;            // 0-1 controls how many boats spawn on water
   windowLitProbability: number;   // 0-1 fraction of windows lit at night
+  lightRenderDistance: number;    // 1-50 chunks — how far away window lights are rendered
   starDensity: number;            // 0-1 controls how many stars appear at night
 }
 
@@ -48,15 +45,12 @@ export const DEFAULT_CONFIG: WorldConfig = {
   backgroundDetail: 0.8,
   chunkGenSpeed: 2,
   graphicsQuality: 'medium',
-  voxelDetail: 2,
-  detailDistance: 3,
-  detailSharpness: 0.5,
-  detailMaxInstances: 12000,
   timeMode: 'cycle',
   fixedHour: 12,
   dayDurationSeconds: 120,
   boatDensity: 0.5,
   windowLitProbability: 0.7,
+  lightRenderDistance: 15,
   starDensity: 0.5,
 };
 
