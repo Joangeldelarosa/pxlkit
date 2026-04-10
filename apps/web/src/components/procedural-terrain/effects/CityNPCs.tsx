@@ -679,6 +679,15 @@ export function CityNPCs({
         continue;
       }
 
+      // WATER CHECK: immediately despawn any NPC standing on water
+      // (can happen when chunks load after NPC spawned, or NPC drifted due to collision)
+      if (isWaterAt(cache, npc.x, npc.z)) {
+        freeChatPartner(npc, npcs, ni);
+        npcs.splice(ni, 1);
+        fixPartnerIndices(npcs, ni);
+        continue;
+      }
+
       // Trim excess NPCs (remove furthest)
       if (npcs.length > maxNpcs + 5 && ni === npcs.length - 1) {
         freeChatPartner(npc, npcs, ni);

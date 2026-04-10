@@ -1,37 +1,79 @@
 /* ═══════════════════════════════════════════════════════════════
  *  Rendering — ChunkMesh & FloatingPickup
+ *
+ *  Water uses a SINGLE flat plane per chunk at the water surface level.
+ *  This eliminates all grid seams between water voxels.
+ *  Underwater side voxels are still rendered as instanced boxes.
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { ChunkVoxelData } from '../types';
-import { VOXEL_SIZE } from '../constants';
+import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { getPickupIcons } from '../generation/chunk';
 
 /* Shared geometry & materials */
 const sharedGeo = new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
 const sharedSolidMat = new THREE.MeshStandardMaterial({ roughness: 0.7 });
 
-/* Water voxels use a slightly oversized geometry (1.06×) so adjacent water
- * cubes overlap by a small margin — this eliminates the visible grid seams
- * between water voxels without affecting visual appearance. The 6% overlap
- * ensures no gap is visible at any camera angle or distance. */
-const WATER_OVERLAP = 1.06;
-const sharedWaterGeo = new THREE.BoxGeometry(
-  VOXEL_SIZE * WATER_OVERLAP,
-  VOXEL_SIZE,                   // keep vertical size exact to avoid stacking issues
-  VOXEL_SIZE * WATER_OVERLAP,
+/* Water surface plane: covers the entire chunk + slight overlap (2%) for seamless tiling.
+ * A single PlaneGeometry per chunk at the water level → NO grid lines ever. */
+const WATER_PLANE_OVERLAP = 1.02;   // 2% overlap to hide chunk boundaries
+const chunkWorldSize = CHUNK_SIZE * VOXEL_SIZE;
+const waterPlaneGeo = new THREE.PlaneGeometry(
+  chunkWorldSize * WATER_PLANE_OVERLAP,
+  chunkWorldSize * WATER_PLANE_OVERLAP,
 );
-const sharedWaterMat = new THREE.MeshStandardMaterial({
-  roughness: 0.12, metalness: 0.15, transparent: true, opacity: 0.55,
+waterPlaneGeo.rotateX(-Math.PI / 2); // make horizontal
+
+const sharedWaterPlaneMat = new THREE.MeshStandardMaterial({
+  roughness: 0.08, metalness: 0.2,
+  transparent: true, opacity: 0.55,
+  depthWrite: false,
+  side: THREE.DoubleSide,
+});
+
+/* Underwater side/bottom voxels still use instanced cubes */
+const sharedWaterVoxelGeo = new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
+const sharedWaterVoxelMat = new THREE.MeshStandardMaterial({
+  roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.4,
   depthWrite: false,
 });
 
 export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   const solidRef = useRef<THREE.InstancedMesh>(null);
-  const waterRef = useRef<THREE.InstancedMesh>(null);
+  const waterVoxelRef = useRef<THREE.InstancedMesh>(null);
+  const waterPlaneRef = useRef<THREE.Mesh>(null);
+
+  /* ── Separate water voxels into surface (skip) and underwater (keep) ── */
+  const underwaterData = useMemo(() => {
+    if (data.waterCount === 0 || !data.hasWater) return null;
+    const surfaceY = data.waterSurfaceLevel * VOXEL_SIZE;
+    const threshold = VOXEL_SIZE * 0.1; // tolerance
+    // Filter: keep only non-surface water voxels (underwater sides/depths)
+    const positions: number[] = [];
+    const colors: number[] = [];
+    for (let i = 0; i < data.waterCount; i++) {
+      const i3 = i * 3;
+      const vy = data.waterPositions[i3 + 1];
+      // Skip the top surface layer — that's rendered by the plane
+      if (Math.abs(vy - surfaceY) < threshold) continue;
+      positions.push(data.waterPositions[i3], data.waterPositions[i3 + 1], data.waterPositions[i3 + 2]);
+      colors.push(data.waterColors[i3], data.waterColors[i3 + 1], data.waterColors[i3 + 2]);
+    }
+    return { positions: new Float32Array(positions), colors: new Float32Array(colors), count: positions.length / 3 };
+  }, [data]);
+
+  /* ── Water plane material (cloned per chunk for unique biome color) ── */
+  const waterPlaneMat = useMemo(() => {
+    const mat = sharedWaterPlaneMat.clone();
+    if (data.hasWater && data.waterSurfaceColor) {
+      mat.color.set(data.waterSurfaceColor);
+    }
+    return mat;
+  }, [data.hasWater, data.waterSurfaceColor]);
 
   useEffect(() => {
     const mesh = solidRef.current;
@@ -48,25 +90,42 @@ export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   }, [data]);
 
+  /* ── Underwater voxel instances ── */
   useEffect(() => {
-    const mesh = waterRef.current;
-    if (!mesh || data.waterCount === 0) return;
+    const mesh = waterVoxelRef.current;
+    if (!mesh || !underwaterData || underwaterData.count === 0) return;
     const m = new THREE.Matrix4(), c = new THREE.Color();
-    for (let i = 0; i < data.waterCount; i++) {
+    for (let i = 0; i < underwaterData.count; i++) {
       const i3 = i * 3;
-      m.identity(); m.elements[12] = data.waterPositions[i3]; m.elements[13] = data.waterPositions[i3 + 1]; m.elements[14] = data.waterPositions[i3 + 2];
+      m.identity(); m.elements[12] = underwaterData.positions[i3]; m.elements[13] = underwaterData.positions[i3 + 1]; m.elements[14] = underwaterData.positions[i3 + 2];
       mesh.setMatrixAt(i, m);
-      c.setRGB(data.waterColors[i3], data.waterColors[i3 + 1], data.waterColors[i3 + 2]);
+      c.setRGB(underwaterData.colors[i3], underwaterData.colors[i3 + 1], underwaterData.colors[i3 + 2]);
       mesh.setColorAt(i, c);
     }
     mesh.instanceMatrix.needsUpdate = true;
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [underwaterData]);
+
+  /* ── Water surface plane: position at chunk center, water level Y ── */
+  useEffect(() => {
+    const plane = waterPlaneRef.current;
+    if (!plane || !data.hasWater || data.waterSurfaceLevel < 0) return;
+    const chunkCenterX = (data.chunkX * CHUNK_SIZE + CHUNK_SIZE / 2) * VOXEL_SIZE;
+    const chunkCenterZ = (data.chunkZ * CHUNK_SIZE + CHUNK_SIZE / 2) * VOXEL_SIZE;
+    // Place plane at top of water level + small offset to avoid z-fighting with terrain
+    const planeY = (data.waterSurfaceLevel + 0.5) * VOXEL_SIZE + 0.01;
+    plane.position.set(chunkCenterX, planeY, chunkCenterZ);
   }, [data]);
 
   return (
     <group>
       {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, sharedSolidMat, data.count]} frustumCulled={false} />}
-      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />}
+      {data.hasWater && data.waterSurfaceLevel >= 0 && (
+        <mesh ref={waterPlaneRef} geometry={waterPlaneGeo} material={waterPlaneMat} frustumCulled={false} />
+      )}
+      {underwaterData && underwaterData.count > 0 && (
+        <instancedMesh ref={waterVoxelRef} args={[sharedWaterVoxelGeo, sharedWaterVoxelMat, underwaterData.count]} frustumCulled={false} />
+      )}
     </group>
   );
 }

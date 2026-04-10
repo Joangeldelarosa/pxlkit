@@ -580,10 +580,42 @@ export function generateChunkData(
     }
   }
 
+  /* ── Compute dominant water surface level and average color ── */
+  let waterSurfaceLevel = -1;
+  let waterSurfaceColor = '#88ddff';
+  let hasWater = false;
+  {
+    // Find most common water level and sample the water color
+    const levelCounts = new Map<number, number>();
+    let maxCount = 0;
+    let maxLevel = -1;
+    for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
+      const wl2 = waterLevelMap[i];
+      const sh = solidHeightMap[i];
+      if (sh < wl2) {
+        hasWater = true;
+        const cnt = (levelCounts.get(wl2) ?? 0) + 1;
+        levelCounts.set(wl2, cnt);
+        if (cnt > maxCount) { maxCount = cnt; maxLevel = wl2; }
+      }
+    }
+    if (hasWater && maxLevel >= 0) {
+      waterSurfaceLevel = maxLevel;
+      // Sample the water color from the center of the chunk
+      const centerLx = Math.floor(CHUNK_SIZE / 2);
+      const centerLz = Math.floor(CHUNK_SIZE / 2);
+      const centerBiome = BIOME_TYPES[bMap[(centerLx + 1) * gW + (centerLz + 1)]] as BiomeType;
+      const centerCfg = variedConfigs[centerLx * CHUNK_SIZE + centerLz] || BIOMES[centerBiome];
+      waterSurfaceColor = centerCfg.colors.water;
+    }
+  }
+
   return {
     positions: posA.subarray(0, sc * 3), colors: colA.subarray(0, sc * 3), count: sc,
     waterPositions: wPosA.subarray(0, wc * 3), waterColors: wColA.subarray(0, wc * 3), waterCount: wc,
     pickups, windowLights: winPosA.subarray(0, winC * 3), windowLightCount: winC,
-    solidHeightMap, waterLevelMap, chunkX: cx, chunkZ: cz,
+    solidHeightMap, waterLevelMap,
+    waterSurfaceLevel, waterSurfaceColor, hasWater,
+    chunkX: cx, chunkZ: cz,
   };
 }

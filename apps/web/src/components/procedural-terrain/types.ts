@@ -83,6 +83,12 @@ export interface ChunkVoxelData {
   solidHeightMap: Int32Array;
   /** Per-cell water level (from the biome config) for accurate water detection */
   waterLevelMap: Int32Array;
+  /** Dominant water surface level in this chunk (voxel Y), or -1 if no water */
+  waterSurfaceLevel: number;
+  /** Average water color for the surface plane (hex string) */
+  waterSurfaceColor: string;
+  /** Whether this chunk has any water cells */
+  hasWater: boolean;
   chunkX: number;
   chunkZ: number;
 }

@@ -19,13 +19,16 @@ import { TimeContext } from '../rendering/DayNightCycle';
 
 /* ── Constants ── */
 const MINI_VS = VOXEL_SIZE / 3;          // mini-voxel size for boats
-const MAX_BOATS = 24;                     // max simultaneous boats
+const MAX_BOATS = 30;                     // max simultaneous boats
 const MAX_SPRAY = 600;                    // max spray particles
-const SPAWN_CHECK_INTERVAL = 0.8;         // seconds between spawn checks (faster spawning)
-const BOAT_SPAWN_RADIUS_MIN = 10;         // min distance from camera (in voxel units)
-const BOAT_SPAWN_RADIUS_MAX = 45;         // max distance from camera (in voxel units)
-const BOAT_DESPAWN_RADIUS = 55;           // remove when beyond this
-const MIN_WATER_DEPTH = 1;               // minimum water depth in voxels (1 = any water)
+const SPAWN_CHECK_INTERVAL = 0.5;         // seconds between spawn checks
+const SPAWN_BATCH = 3;                    // boats to try spawning per check
+/* Spawn radius in WORLD UNITS (not voxels!) — camera.position is in world units.
+ * A chunk is 16 * 0.5 = 8 world units, so 80 = 10 chunks away. */
+const BOAT_SPAWN_RADIUS_MIN = 15;         // min world-unit distance from camera
+const BOAT_SPAWN_RADIUS_MAX = 80;         // max world-unit distance — far enough to see boats moving in distance
+const BOAT_DESPAWN_RADIUS = 100;          // despawn at this world-unit distance
+const MIN_WATER_DEPTH = 1;               // minimum water depth in voxels
 const SHORE_DETECT_DIST = 3;             // distance in voxels to detect shore ahead
 const MAX_SPEED = 2.5;                    // max boat speed (world units/sec)
 const ACCEL = 0.8;                        // acceleration rate
@@ -263,17 +266,18 @@ export function WaterBoats({
     if (boatDensity > 0 && t - lastSpawnCheck.current > SPAWN_CHECK_INTERVAL && boats.length < maxBoats) {
       lastSpawnCheck.current = t;
 
+      let spawned = 0;
       // Try random positions around camera to find water — use broader search
-      for (let attempt = 0; attempt < 32; attempt++) {
-        const angle = pseudoRand(t * 100 + attempt, camX * 0.1) * Math.PI * 2;
-        const dist = BOAT_SPAWN_RADIUS_MIN + pseudoRand(t * 50 + attempt, camZ * 0.1) * (BOAT_SPAWN_RADIUS_MAX - BOAT_SPAWN_RADIUS_MIN);
-        const sx = camX + Math.cos(angle) * dist * VOXEL_SIZE;
-        const sz = camZ + Math.sin(angle) * dist * VOXEL_SIZE;
+      for (let attempt = 0; attempt < 48 && spawned < SPAWN_BATCH; attempt++) {
+        const angle = pseudoRand(t * 100 + attempt + spawned * 17, camX * 0.1 + spawned) * Math.PI * 2;
+        // dist is now in WORLD UNITS (camera.position units), NOT voxel units
+        const dist = BOAT_SPAWN_RADIUS_MIN + pseudoRand(t * 50 + attempt, camZ * 0.1 + spawned) * (BOAT_SPAWN_RADIUS_MAX - BOAT_SPAWN_RADIUS_MIN);
+        const sx = camX + Math.cos(angle) * dist;
+        const sz = camZ + Math.sin(angle) * dist;
 
         const spawnInfo = sampleWaterInfo(cache, sx, sz);
         if (spawnInfo.depth >= MIN_WATER_DEPTH) {
           // Check at least 1 neighbor direction also has water (avoid single-cell puddles)
-          // Tests 4 angular offsets centered behind the spawn angle (±0.75 rad spread)
           let navOk = false;
           for (let di = 0; di < 4; di++) {
             const checkAngle = angle + Math.PI + (di - 1.5) * 0.5;
@@ -293,7 +297,8 @@ export function WaterBoats({
               turnDir: 0,
               lastTurnTime: 0,
             });
-            break;
+            spawned++;
+            if (boats.length >= maxBoats) break;
           }
         }
       }
@@ -306,7 +311,8 @@ export function WaterBoats({
 
       // Despawn if too far or density dropped
       const distToCamSq = (b.x - camX) ** 2 + (b.z - camZ) ** 2;
-      const despawnThresholdSq = (BOAT_DESPAWN_RADIUS * VOXEL_SIZE) ** 2;
+      // BOAT_DESPAWN_RADIUS is already in world units
+      const despawnThresholdSq = BOAT_DESPAWN_RADIUS * BOAT_DESPAWN_RADIUS;
       if (distToCamSq > despawnThresholdSq || b.age > 120 || boatDensity <= 0) {
         boats.splice(bi, 1);
         continue;
