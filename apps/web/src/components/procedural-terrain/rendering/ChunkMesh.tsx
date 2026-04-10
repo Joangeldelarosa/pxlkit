@@ -23,6 +23,10 @@ const sharedWaterMat = new THREE.MeshStandardMaterial({
   roughness: 0.2, metalness: 0.05, transparent: true, opacity: 0.6,
   depthWrite: false, side: THREE.DoubleSide,
 });
+/* Mini-voxel geometry for street furniture (lampposts, hydrants, etc.) — 15% of full voxel */
+const MINI_VS = VOXEL_SIZE * 0.15;
+const miniGeo = new THREE.BoxGeometry(MINI_VS, MINI_VS, MINI_VS);
+const miniMat = new THREE.MeshStandardMaterial({ roughness: 0.5 });
 
 export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   const solidRef = useRef<THREE.InstancedMesh>(null);

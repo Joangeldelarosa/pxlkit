@@ -89,6 +89,12 @@ export interface ChunkVoxelData {
   solidHeightMap: Int32Array;
   /** Per-cell water level (from the biome config) for accurate water detection */
   waterLevelMap: Int32Array;
+  /** Mini-voxel positions for street furniture (lampposts, hydrants, benches, etc.) */
+  miniVoxelPositions: Float32Array;
+  /** Mini-voxel colors (r,g,b) */
+  miniVoxelColors: Float32Array;
+  /** Number of mini-voxels */
+  miniVoxelCount: number;
   chunkX: number;
   chunkZ: number;
 }
@@ -138,7 +144,10 @@ export type BuildingType =
   | 'stadium'
   | 'airport_terminal'
   | 'church'
-  | 'bridge_base';
+  | 'bridge_base'
+  | 'apartment' | 'hotel'
+  | 'gas_station' | 'restaurant'
+  | 'fire_station' | 'library';
 
 /** Pickup sprite data */
 export interface PickupVoxel { x: number; y: number; color: string }
