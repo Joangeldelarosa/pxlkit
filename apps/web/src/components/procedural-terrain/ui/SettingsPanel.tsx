@@ -113,9 +113,9 @@ export function SettingsPanel({
       className={`pointer-events-auto bg-retro-bg/90 backdrop-blur-md border border-retro-border/60 rounded-xl shadow-2xl select-none transition-shadow ${dragging ? 'shadow-[0_0_30px_rgba(74,222,128,0.15)]' : ''}`}
       style={{
         ...posStyle,
-        width: isMobile ? 'calc(100% - 1.5rem)' : '360px',
-        maxWidth: '420px',
-        maxHeight: minimized ? undefined : '75vh',
+        width: isMobile ? 'calc(100% - 1.5rem)' : '520px',
+        maxWidth: isMobile ? '420px' : '560px',
+        maxHeight: minimized ? undefined : '80vh',
         ...(position.x < 0 ? {} : { position: 'absolute' as const }),
         zIndex: 30,
       }}
@@ -142,7 +142,7 @@ export function SettingsPanel({
 
       {/* ── Panel Content ── */}
       {!minimized && (
-        <div className="p-3 space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(75vh - 3rem)' }}>
+        <div className="p-3 space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 3rem)' }}>
 
           {/* ══════ WORLD SECTION ══════ */}
           <SectionHeader title="World" icon="🌍" open={sections.world} onToggle={() => toggleSection('world')} color="text-retro-green/80" />
@@ -261,19 +261,42 @@ export function SettingsPanel({
               <ConfigSlider label="Boats on Water" value={config.boatDensity} onChange={v => onUpdateConfig('boatDensity', v)} min={0} max={1} step={0.05} color="text-retro-cyan/80" displayValue={config.boatDensity === 0 ? 'Off' : `${Math.round(config.boatDensity * 100)}%`} />
               <ConfigSlider label="NPC Density" value={config.npcDensity} onChange={v => onUpdateConfig('npcDensity', v)} min={0} max={1} step={0.05} color="text-retro-green/80" displayValue={config.npcDensity === 0 ? 'Off' : `${Math.round(config.npcDensity * 100)}%`} />
               <ConfigSlider label="NPCs Per Chunk" value={config.npcMaxPerChunk} onChange={v => onUpdateConfig('npcMaxPerChunk', v)} min={1} max={25} step={1} color="text-retro-green/80" displayValue={`${config.npcMaxPerChunk}`} />
-              <ConfigSlider label="NPC Distance" value={config.npcDistance} onChange={v => onUpdateConfig('npcDistance', v)} min={2} max={20} step={1} color="text-retro-green/80" displayValue={`${config.npcDistance} chunks`} />
+              <ConfigSlider label="NPC Distance" value={Math.min(config.npcDistance, config.renderDistance)} onChange={v => onUpdateConfig('npcDistance', v)} min={2} max={config.renderDistance} step={1} color="text-retro-green/80" displayValue={`${Math.min(config.npcDistance, config.renderDistance)} chunks`} />
               <ConfigSlider label="NPC Size" value={config.npcScale} onChange={v => onUpdateConfig('npcScale', v)} min={0.25} max={1.5} step={0.05} color="text-retro-green/80" displayValue={`${Math.round(config.npcScale * 100)}%`} />
             </div>
           )}
 
-          {/* ══════ ATMOSPHERE SECTION ══════ */}
-          <SectionHeader title="Atmosphere" icon="🌫" open={sections.atmosphere} onToggle={() => toggleSection('atmosphere')} color="text-retro-muted/80" />
+          {/* ══════ ATMOSPHERE & LIGHTING SECTION ══════ */}
+          <SectionHeader title="Atmosphere & Lighting" icon="🌫" open={sections.atmosphere} onToggle={() => toggleSection('atmosphere')} color="text-retro-muted/80" />
           {sections.atmosphere && (
             <div className="space-y-2 pl-1 pb-2">
               <ConfigSlider label="Fog Density" value={config.fogDensity} onChange={v => onUpdateConfig('fogDensity', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.fogDensity * 100)}%`} />
               <ConfigSlider label="Mountains" value={config.backgroundDetail} onChange={v => onUpdateConfig('backgroundDetail', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.backgroundDetail * 100)}%`} />
-              <ConfigSlider label="Window Lights" value={config.windowLitProbability} onChange={v => onUpdateConfig('windowLitProbability', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.windowLitProbability === 0 ? 'All dark' : config.windowLitProbability >= 0.95 ? 'All lit' : `${Math.round(config.windowLitProbability * 100)}%`} />
               <ConfigSlider label="Stars" value={config.starDensity} onChange={v => onUpdateConfig('starDensity', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.starDensity === 0 ? 'None' : config.starDensity >= 0.95 ? 'Maximum' : `${Math.round(config.starDensity * 100)}%`} />
+
+              {/* ── Night Lighting sub-group ── */}
+              <div className="border-t border-retro-border/20 pt-2 mt-1">
+                <p className="font-pixel text-[7px] text-retro-gold/50 uppercase tracking-widest mb-1.5 select-none">Night Lighting</p>
+                <div className="space-y-2">
+                  <ConfigSlider label="Window Lights %" value={config.windowLitProbability} onChange={v => onUpdateConfig('windowLitProbability', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.windowLitProbability === 0 ? 'All dark' : config.windowLitProbability >= 0.95 ? 'All lit' : `${Math.round(config.windowLitProbability * 100)}%`} />
+                  <ConfigSlider label="Light Distance" value={Math.min(config.lightDistance, config.renderDistance)} onChange={v => onUpdateConfig('lightDistance', v)} min={1} max={config.renderDistance} step={1} color="text-retro-gold/80" displayValue={`${Math.min(config.lightDistance, config.renderDistance)} chunks`} />
+                  <ConfigSlider label="Lamp Brightness" value={config.lampBrightness} onChange={v => onUpdateConfig('lampBrightness', v)} min={0} max={2} step={0.1} color="text-retro-gold/80" displayValue={config.lampBrightness === 0 ? 'Off' : `${Math.round(config.lampBrightness * 100)}%`} />
+                  <div className="space-y-1">
+                    <label className="font-pixel text-[7px] sm:text-[8px] text-retro-gold/70 uppercase tracking-wider select-none">Lamp Color</label>
+                    <div className="flex gap-1">
+                      {(['sodium', 'warm', 'neutral', 'cool'] as const).map(ct => (
+                        <button key={ct} onClick={() => onSetConfig(prev => ({ ...prev, lampColorTemp: ct }))}
+                          className={`flex-1 py-1 rounded font-pixel text-[7px] transition-all cursor-pointer select-none border ${config.lampColorTemp === ct ? 'bg-retro-gold/30 border-retro-gold/60 text-retro-gold' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/50 hover:bg-retro-surface/60'}`}>
+                          {ct === 'sodium' ? '🟠' : ct === 'warm' ? '🟡' : ct === 'neutral' ? '⚪' : '🔵'} {ct.charAt(0).toUpperCase() + ct.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="font-mono text-[7px] text-retro-muted/40 select-none">
+                      {config.lampColorTemp === 'sodium' ? 'Classic sodium vapor (orange)' : config.lampColorTemp === 'warm' ? 'Warm white (2700K)' : config.lampColorTemp === 'neutral' ? 'Neutral white (4000K)' : 'Cool white / LED (6000K)'}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

@@ -95,6 +95,13 @@ export function generateChunkData(
   const maxSL = 32; // max street lights per chunk (typically 4 corners × few intersections)
   const slPosA = new Float32Array(maxSL * 3);
   let slC = 0;
+  /* Road paint buffer — flat decal quads for lane markings, crosswalks.
+     Each paint instance is a thin PlaneGeometry positioned flush on road surface. */
+  const maxPaint = CHUNK_SIZE * CHUNK_SIZE * 6;
+  const paintPosA = new Float32Array(maxPaint * 3);
+  const paintColA = new Float32Array(maxPaint * 3);
+  const paintScaleA = new Float32Array(maxPaint * 2); // [scaleX, scaleZ] per instance
+  let paintC = 0;
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
 
@@ -201,6 +208,17 @@ export function generateChunkData(
     slPosA[i3] = px; slPosA[i3 + 1] = py; slPosA[i3 + 2] = pz;
     slC++;
   }
+  /** Push a flat road paint decal. scaleX/scaleZ control the width of the thin strip
+   *  in world units. Height is handled by the renderer (0.01 thick). */
+  function pushPaint(px: number, py: number, pz: number, hex: string, scaleX: number, scaleZ: number) {
+    if (paintC >= maxPaint) return;
+    const i3 = paintC * 3;
+    const i2 = paintC * 2;
+    paintPosA[i3] = px; paintPosA[i3 + 1] = py; paintPosA[i3 + 2] = pz;
+    _tc.set(hex); paintColA[i3] = _tc.r; paintColA[i3 + 1] = _tc.g; paintColA[i3 + 2] = _tc.b;
+    paintScaleA[i2] = scaleX; paintScaleA[i2 + 1] = scaleZ;
+    paintC++;
+  }
   /** Mini-voxel step size = VOXEL_SIZE * 0.15 */
   const MVS = VOXEL_SIZE * 0.15;
 
@@ -276,13 +294,16 @@ export function generateChunkData(
 
           const onRoadX = modX < cell.roadWidthX;
           const onRoadZ = modZ < cell.roadWidthZ;
-          // Y position for markings: sits on top of road voxel surface
-          const markY = (h + 1) * VOXEL_SIZE + VOXEL_SIZE * 0.5 + MVS * 0.5;
+          // Paint Y: flush on top of road surface with tiny 0.005 offset to avoid z-fighting
+          const paintY = (h + 1) * VOXEL_SIZE + VOXEL_SIZE * 0.5 + 0.005;
           // Center of this voxel cell
           const cellCx = (bX + lx) * VOXEL_SIZE;
           const cellCz = (bZ + lz) * VOXEL_SIZE;
+          // Paint strip width = ~2 mini-voxels = MVS*2, length = full voxel
+          const stripW = MVS * 1.5;    // narrow paint line width
+          const cellLen = VOXEL_SIZE;   // full voxel length for continuous line
 
-          /* ── Lane markings as mini-voxels (non-intersection) ── */
+          /* ── Lane markings as flat paint (non-intersection) ── */
           if (!cell.isIntersection) {
             if (rw >= AVENUE_W) {
               /* Avenue markings (9 wide):
@@ -292,46 +313,28 @@ export function generateChunkData(
               if (onRoadZ && !onRoadX) {
                 // Road runs along X axis, modZ = cross-section position
                 if (modZ === 0 || modZ === cell.roadWidthZ - 1) {
-                  // Solid white edge lines — thin strip along X direction
-                  for (let s = -2; s <= 2; s++) {
-                    pushMini(cellCx + s * MVS, markY, cellCz, '#cccccc');
-                  }
+                  // Solid white edge — one flat strip along X
+                  pushPaint(cellCx, paintY, cellCz, '#cccccc', cellLen, stripW);
                 } else if (modZ === mid - 1 || modZ === mid + 1) {
                   // Dashed white lane dividers along X
                   if (((wx % 6) + 6) % 6 < 3) {
-                    for (let s = -2; s <= 2; s++) {
-                      pushMini(cellCx + s * MVS, markY, cellCz, '#aaaaaa');
-                    }
+                    pushPaint(cellCx, paintY, cellCz, '#aaaaaa', cellLen * 0.5, stripW);
                   }
                 } else if (modZ === mid) {
-                  // Raised green median strip — slightly wider
-                  for (let sx = -2; sx <= 2; sx++) {
-                    for (let sz = -1; sz <= 1; sz++) {
-                      pushMini(cellCx + sx * MVS, markY + MVS, cellCz + sz * MVS,
-                        varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06));
-                    }
-                  }
+                  // Green median strip — wider paint stripe, slightly raised
+                  pushPaint(cellCx, paintY + 0.01, cellCz, varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06), cellLen, MVS * 3);
                 }
               }
               if (onRoadX && !onRoadZ) {
                 // Road runs along Z axis, modX = cross-section position
                 if (modX === 0 || modX === cell.roadWidthX - 1) {
-                  for (let s = -2; s <= 2; s++) {
-                    pushMini(cellCx, markY, cellCz + s * MVS, '#cccccc');
-                  }
+                  pushPaint(cellCx, paintY, cellCz, '#cccccc', stripW, cellLen);
                 } else if (modX === mid - 1 || modX === mid + 1) {
                   if (((wz % 6) + 6) % 6 < 3) {
-                    for (let s = -2; s <= 2; s++) {
-                      pushMini(cellCx, markY, cellCz + s * MVS, '#aaaaaa');
-                    }
+                    pushPaint(cellCx, paintY, cellCz, '#aaaaaa', stripW, cellLen * 0.5);
                   }
                 } else if (modX === mid) {
-                  for (let sx = -1; sx <= 1; sx++) {
-                    for (let sz = -2; sz <= 2; sz++) {
-                      pushMini(cellCx + sx * MVS, markY + MVS, cellCz + sz * MVS,
-                        varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06));
-                    }
-                  }
+                  pushPaint(cellCx, paintY + 0.01, cellCz, varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06), MVS * 3, cellLen);
                 }
               }
             } else {
@@ -342,65 +345,45 @@ export function generateChunkData(
               if (onRoadZ && !onRoadX) {
                 // Road runs along X, markings along X direction
                 if (modZ === 0 || modZ === cell.roadWidthZ - 1) {
-                  for (let s = -2; s <= 2; s++) {
-                    pushMini(cellCx + s * MVS, markY, cellCz, '#bbbbbb');
-                  }
+                  pushPaint(cellCx, paintY, cellCz, '#bbbbbb', cellLen, stripW);
                 } else if (modZ === cL && ((wx % 4) + 4) % 4 < 2) {
-                  // Left yellow center line
-                  for (let s = -2; s <= 2; s++) {
-                    pushMini(cellCx + s * MVS, markY, cellCz + MVS, '#ffdd44');
-                  }
+                  // Left yellow center line — offset by MVS in Z
+                  pushPaint(cellCx, paintY, cellCz + MVS, '#ffdd44', cellLen * 0.4, stripW);
                 } else if (modZ === cR && ((wx % 4) + 4) % 4 < 2) {
                   // Right yellow center line
-                  for (let s = -2; s <= 2; s++) {
-                    pushMini(cellCx + s * MVS, markY, cellCz - MVS, '#ffdd44');
-                  }
+                  pushPaint(cellCx, paintY, cellCz - MVS, '#ffdd44', cellLen * 0.4, stripW);
                 }
               }
               if (onRoadX && !onRoadZ) {
                 // Road runs along Z, markings along Z direction
                 if (modX === 0 || modX === cell.roadWidthX - 1) {
-                  for (let s = -2; s <= 2; s++) {
-                    pushMini(cellCx, markY, cellCz + s * MVS, '#bbbbbb');
-                  }
+                  pushPaint(cellCx, paintY, cellCz, '#bbbbbb', stripW, cellLen);
                 } else if (modX === cL && ((wz % 4) + 4) % 4 < 2) {
-                  for (let s = -2; s <= 2; s++) {
-                    pushMini(cellCx + MVS, markY, cellCz + s * MVS, '#ffdd44');
-                  }
+                  pushPaint(cellCx + MVS, paintY, cellCz, '#ffdd44', stripW, cellLen * 0.4);
                 } else if (modX === cR && ((wz % 4) + 4) % 4 < 2) {
-                  for (let s = -2; s <= 2; s++) {
-                    pushMini(cellCx - MVS, markY, cellCz + s * MVS, '#ffdd44');
-                  }
+                  pushPaint(cellCx - MVS, paintY, cellCz, '#ffdd44', stripW, cellLen * 0.4);
                 }
               }
             }
           }
 
-          /* ── Crosswalk zebra stripes at intersections (mini-voxels) ── */
+          /* ── Crosswalk zebra stripes at intersections (flat paint) ── */
           if (cell.isIntersection) {
             const rwX = cell.roadWidthX;
             const rwZ = cell.roadWidthZ;
             const nearEdgeX = modX <= 1 || modX >= rwX - 2;
             const nearEdgeZ = modZ <= 1 || modZ >= rwZ - 2;
             if ((nearEdgeX || nearEdgeZ) && (((modX + modZ) % 2) === 0)) {
-              // Draw crosswalk stripe perpendicular to road edge
+              const crossW = VOXEL_SIZE * 0.8; // crosswalk stripe width
               if (nearEdgeZ && !nearEdgeX) {
                 // Stripe runs along X (across Z-road at edge)
-                for (let s = -2; s <= 2; s++) {
-                  pushMini(cellCx + s * MVS, markY, cellCz, '#dddddd');
-                }
+                pushPaint(cellCx, paintY, cellCz, '#dddddd', crossW, stripW * 1.5);
               } else if (nearEdgeX && !nearEdgeZ) {
                 // Stripe runs along Z (across X-road at edge)
-                for (let s = -2; s <= 2; s++) {
-                  pushMini(cellCx, markY, cellCz + s * MVS, '#dddddd');
-                }
+                pushPaint(cellCx, paintY, cellCz, '#dddddd', stripW * 1.5, crossW);
               } else {
-                // Corner of intersection — small cross
-                pushMini(cellCx, markY, cellCz, '#dddddd');
-                pushMini(cellCx + MVS, markY, cellCz, '#dddddd');
-                pushMini(cellCx - MVS, markY, cellCz, '#dddddd');
-                pushMini(cellCx, markY, cellCz + MVS, '#dddddd');
-                pushMini(cellCx, markY, cellCz - MVS, '#dddddd');
+                // Corner of intersection — small cross paint
+                pushPaint(cellCx, paintY, cellCz, '#dddddd', stripW * 2, stripW * 2);
               }
             }
           }
@@ -811,6 +794,10 @@ export function generateChunkData(
     miniVoxelPositions: miniPosA.subarray(0, miniC * 3),
     miniVoxelColors: miniColA.subarray(0, miniC * 3),
     miniVoxelCount: miniC,
+    paintPositions: paintPosA.subarray(0, paintC * 3),
+    paintColors: paintColA.subarray(0, paintC * 3),
+    paintScales: paintScaleA.subarray(0, paintC * 2),
+    paintCount: paintC,
     chunkX: cx, chunkZ: cz,
   };
 }

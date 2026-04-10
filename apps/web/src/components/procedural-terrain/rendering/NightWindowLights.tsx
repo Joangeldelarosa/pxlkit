@@ -6,6 +6,10 @@
  *     opaque building wall (fixes z-fighting with same-position voxels).
  *  2. Outer halo: larger, softer glow around each window for bloom effect.
  *
+ *  Street lamp lights use smooth sprite-based rendering:
+ *  - Sprite at fixture: smooth radial gradient (no polygon edges)
+ *  - Ground pool: flat disc sprite projected below for realistic light cone
+ *
  *  Each window has a deterministic on/off state, flicker pattern, and
  *  warm color chosen from the palette.
  * ═══════════════════════════════════════════════════════════════ */
@@ -22,17 +26,54 @@ import { TimeContext } from './DayNightCycle';
 const WIN_INNER_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 1.2, VOXEL_SIZE * 1.2, VOXEL_SIZE * 1.2);
 const WIN_OUTER_GEO = new THREE.BoxGeometry(VOXEL_SIZE * 2.2, VOXEL_SIZE * 2.2, VOXEL_SIZE * 2.2);
 
-/* ── Street lamp geometry: larger sphere-like glow for area illumination ── */
-const LAMP_INNER_GEO = new THREE.SphereGeometry(VOXEL_SIZE * 0.6, 6, 4);
-const LAMP_OUTER_GEO = new THREE.SphereGeometry(VOXEL_SIZE * 2.5, 8, 6);
-const LAMP_GROUND_GEO = new THREE.CylinderGeometry(VOXEL_SIZE * 3, VOXEL_SIZE * 4, VOXEL_SIZE * 0.3, 8);
+/* ── Street lamp: smooth sprite-based glow (no polygon edges) ── */
+// Generate radial gradient texture for smooth light glow
+function createGlowTexture(size: number, falloffPower: number): THREE.Texture {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  const center = size / 2;
+  const gradient = ctx.createRadialGradient(center, center, 0, center, center, center);
+  gradient.addColorStop(0, 'rgba(255,255,255,1.0)');
+  gradient.addColorStop(0.15, 'rgba(255,255,255,0.8)');
+  gradient.addColorStop(0.4, `rgba(255,255,255,${(0.3 / falloffPower).toFixed(2)})`);
+  gradient.addColorStop(0.7, `rgba(255,255,255,${(0.08 / falloffPower).toFixed(2)})`);
+  gradient.addColorStop(1, 'rgba(255,255,255,0.0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+// Fixture glow sprite (bright, compact)
+const LAMP_GLOW_TEX = createGlowTexture(128, 1.0);
+const LAMP_FIXTURE_SIZE = VOXEL_SIZE * 3.0;
+const LAMP_FIXTURE_GEO = new THREE.PlaneGeometry(LAMP_FIXTURE_SIZE, LAMP_FIXTURE_SIZE);
+
+// Ground light pool (wide, soft disc)
+const LAMP_GROUND_TEX = createGlowTexture(128, 0.6);
+const LAMP_GROUND_SIZE = VOXEL_SIZE * 8.0;
+const LAMP_GROUND_GEO = (() => {
+  const g = new THREE.PlaneGeometry(LAMP_GROUND_SIZE, LAMP_GROUND_SIZE);
+  g.rotateX(-Math.PI / 2); // lay flat
+  return g;
+})();
 
 /* ── Tuning constants ── */
-const FLICKER_HASH_THRESHOLD = 0.55;   // windows above this can flicker
-const FLICKER_OFF_THRESHOLD = -0.35;   // sin threshold for flicker-off
-const VIEW_DIST_CHUNKS = 8;            // how many chunks to scan
+const FLICKER_HASH_THRESHOLD = 0.55;
+const FLICKER_OFF_THRESHOLD = -0.35;
 const MAX_INSTANCES = 6000;
 const MAX_LAMP_INSTANCES = 256;
+
+/* ── Lamp color temperature presets ── */
+const LAMP_COLOR_PRESETS: Record<string, { fixture: string; ground: string }> = {
+  warm:    { fixture: '#ffe8cc', ground: '#ffd9a0' },
+  neutral: { fixture: '#fff5e6', ground: '#ffe8cc' },
+  cool:    { fixture: '#e8f0ff', ground: '#d0e0ff' },
+  sodium:  { fixture: '#ffeedd', ground: '#ffdd99' },
+};
 
 function winHash(x: number, y: number, z: number): number {
   let h = (Math.round(x * 100) * 374761393 + Math.round(y * 100) * 668265263 + Math.round(z * 100) * 1274126177) | 0;
@@ -42,25 +83,30 @@ function winHash(x: number, y: number, z: number): number {
 
 /** Warm window light colors — saturated for additive blending visibility */
 const WARM_COLORS = [
-  new THREE.Color('#ffdd88'),  // warm yellow
-  new THREE.Color('#ffeebb'),  // bright warm
-  new THREE.Color('#ffcc66'),  // golden
-  new THREE.Color('#eebb55'),  // amber
-  new THREE.Color('#ffaa44'),  // deep amber
-  new THREE.Color('#88bbff'),  // cool blue (TV screen)
+  new THREE.Color('#ffdd88'),
+  new THREE.Color('#ffeebb'),
+  new THREE.Color('#ffcc66'),
+  new THREE.Color('#eebb55'),
+  new THREE.Color('#ffaa44'),
+  new THREE.Color('#88bbff'),
 ];
 
 export function NightWindowLights({
   chunkCacheRef,
   windowLitProbability,
+  lightDistance,
+  lampBrightness,
+  lampColorTemp,
 }: {
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
   windowLitProbability: number;
+  lightDistance: number;
+  lampBrightness: number;
+  lampColorTemp: string;
 }) {
   const innerRef = useRef<THREE.InstancedMesh>(null);
   const outerRef = useRef<THREE.InstancedMesh>(null);
-  const lampInnerRef = useRef<THREE.InstancedMesh>(null);
-  const lampOuterRef = useRef<THREE.InstancedMesh>(null);
+  const lampFixtureRef = useRef<THREE.InstancedMesh>(null);
   const lampGroundRef = useRef<THREE.InstancedMesh>(null);
   const timeRef = useContext(TimeContext);
   const { camera } = useThree();
@@ -77,32 +123,26 @@ export function NightWindowLights({
     blending: THREE.AdditiveBlending, toneMapped: false,
   }), []);
 
-  /* Lamp inner: bright warm light at fixture */
-  const lampInnerMat = useMemo(() => new THREE.MeshBasicMaterial({
+  /* Lamp fixture: smooth sprite glow — billboard-facing camera */
+  const lampFixtureMat = useMemo(() => new THREE.MeshBasicMaterial({
     transparent: true, opacity: 0, depthWrite: false,
     blending: THREE.AdditiveBlending, toneMapped: false,
+    map: LAMP_GLOW_TEX, side: THREE.DoubleSide,
   }), []);
 
-  /* Lamp outer: large warm halo around fixture */
-  const lampOuterMat = useMemo(() => new THREE.MeshBasicMaterial({
-    transparent: true, opacity: 0, depthWrite: false,
-    blending: THREE.AdditiveBlending, toneMapped: false,
-  }), []);
-
-  /* Lamp ground: pool of light on the ground below lamp */
+  /* Lamp ground pool: flat disc of light */
   const lampGroundMat = useMemo(() => new THREE.MeshBasicMaterial({
     transparent: true, opacity: 0, depthWrite: false,
     blending: THREE.AdditiveBlending, toneMapped: false,
-    side: THREE.DoubleSide,
+    map: LAMP_GROUND_TEX, side: THREE.DoubleSide,
   }), []);
 
   useFrame(({ clock }) => {
     const inner = innerRef.current;
     const outer = outerRef.current;
-    const lampInner = lampInnerRef.current;
-    const lampOuter = lampOuterRef.current;
+    const lampFixture = lampFixtureRef.current;
     const lampGround = lampGroundRef.current;
-    if (!inner || !outer || !lampInner || !lampOuter || !lampGround || !timeRef) return;
+    if (!inner || !outer || !lampFixture || !lampGround || !timeRef) return;
 
     const state = timeRef.current;
     const hour = state.hour;
@@ -110,7 +150,7 @@ export function NightWindowLights({
     // Night intensity: 0 during day, 1 at deep night
     let nightFactor = 0;
     if (hour >= 17.5 && hour < 19.5) {
-      nightFactor = (hour - 17.5) / 2; // start earlier, fade in during dusk
+      nightFactor = (hour - 17.5) / 2;
     } else if (hour >= 19.5 || hour < 5) {
       nightFactor = 1;
     } else if (hour >= 5 && hour < 6.5) {
@@ -122,27 +162,24 @@ export function NightWindowLights({
       innerMat.opacity = 0;
       // eslint-disable-next-line react-hooks/immutability
       outerMat.opacity = 0;
-      lampInnerMat.opacity = 0;
-      lampOuterMat.opacity = 0;
+      lampFixtureMat.opacity = 0;
       lampGroundMat.opacity = 0;
       inner.count = 0;
       outer.count = 0;
-      lampInner.count = 0;
-      lampOuter.count = 0;
+      lampFixture.count = 0;
       lampGround.count = 0;
       if (inner.instanceMatrix) inner.instanceMatrix.needsUpdate = true;
       if (outer.instanceMatrix) outer.instanceMatrix.needsUpdate = true;
-      if (lampInner.instanceMatrix) lampInner.instanceMatrix.needsUpdate = true;
-      if (lampOuter.instanceMatrix) lampOuter.instanceMatrix.needsUpdate = true;
+      if (lampFixture.instanceMatrix) lampFixture.instanceMatrix.needsUpdate = true;
       if (lampGround.instanceMatrix) lampGround.instanceMatrix.needsUpdate = true;
       return;
     }
 
+    const brightMul = lampBrightness;
     innerMat.opacity = nightFactor * 0.95;
     outerMat.opacity = nightFactor * 0.25;
-    lampInnerMat.opacity = nightFactor * 1.0;
-    lampOuterMat.opacity = nightFactor * 0.35;
-    lampGroundMat.opacity = nightFactor * 0.18;
+    lampFixtureMat.opacity = nightFactor * Math.min(1.0, 0.85 * brightMul);
+    lampGroundMat.opacity = nightFactor * Math.min(1.0, 0.35 * brightMul);
 
     const cache = chunkCacheRef.current;
     if (!cache) return;
@@ -150,20 +187,26 @@ export function NightWindowLights({
     const camCX = Math.floor(camera.position.x / (CHUNK_SIZE * VOXEL_SIZE));
     const camCZ = Math.floor(camera.position.z / (CHUNK_SIZE * VOXEL_SIZE));
 
+    const viewDistSq = lightDistance * lightDistance;
+
     const m = new THREE.Matrix4();
     const c = new THREE.Color();
     let count = 0;
     let lampCount = 0;
     const t = clock.getElapsedTime();
 
-    /* ── Street lamp warm color (sodium vapor-like warm orange-white) ── */
-    const lampColor = new THREE.Color('#ffeedd');
-    const lampGroundColor = new THREE.Color('#ffdd99');
+    /* ── Street lamp color from config ── */
+    const preset = LAMP_COLOR_PRESETS[lampColorTemp] || LAMP_COLOR_PRESETS.sodium;
+    const lampColor = new THREE.Color(preset.fixture);
+    const lampGroundColor = new THREE.Color(preset.ground);
+
+    // Billboard rotation: make fixture sprites face camera
+    const camQuat = camera.quaternion;
 
     for (const [, data] of cache) {
       const dx = data.chunkX - camCX;
       const dz = data.chunkZ - camCZ;
-      if (dx * dx + dz * dz > VIEW_DIST_CHUNKS * VIEW_DIST_CHUNKS) continue;
+      if (dx * dx + dz * dz > viewDistSq) continue;
 
       /* ── Window lights ── */
       if (count < MAX_INSTANCES) {
@@ -176,13 +219,11 @@ export function NightWindowLights({
           const h = winHash(wx, wy, wz);
           if (h > windowLitProbability) continue;
 
-          // Flicker
           const flickerPhase = h * 100;
           const flickerSpeed = 0.08 + h * 0.15;
           const flicker = Math.sin(t * flickerSpeed + flickerPhase);
           if (h > FLICKER_HASH_THRESHOLD && flicker < FLICKER_OFF_THRESHOLD) continue;
 
-          // Set transform for both inner and outer meshes
           m.identity();
           m.elements[12] = wx;
           m.elements[13] = wy;
@@ -190,14 +231,12 @@ export function NightWindowLights({
           inner.setMatrixAt(count, m);
           outer.setMatrixAt(count, m);
 
-          // Warm color
           const colorIdx = Math.floor(h * WARM_COLORS.length) % WARM_COLORS.length;
           c.copy(WARM_COLORS[colorIdx]);
           const brightness = 0.8 + h * 0.4 + flicker * 0.08;
           c.multiplyScalar(brightness);
           inner.setColorAt(count, c);
 
-          // Outer halo is dimmer / slightly different hue
           c.multiplyScalar(0.5);
           outer.setColorAt(count, c);
 
@@ -205,7 +244,7 @@ export function NightWindowLights({
         }
       }
 
-      /* ── Street lamp lights ── */
+      /* ── Street lamp lights (smooth sprite-based) ── */
       if (data.streetLights && lampCount < MAX_LAMP_INSTANCES) {
         for (let i = 0; i < data.streetLightCount && lampCount < MAX_LAMP_INSTANCES; i++) {
           const i3 = i * 3;
@@ -213,21 +252,18 @@ export function NightWindowLights({
           const ly = data.streetLights[i3 + 1];
           const lz = data.streetLights[i3 + 2];
 
-          // Subtle flicker for street lamps (very mild — mostly steady)
+          // Subtle flicker (very mild — mostly steady)
           const lh = winHash(lx, ly, lz);
           const lampFlicker = 0.95 + Math.sin(t * 0.3 + lh * 50) * 0.05;
 
-          // Lamp fixture glow (at fixture position)
-          m.identity();
+          // Fixture sprite: billboard facing camera
+          m.makeRotationFromQuaternion(camQuat);
           m.elements[12] = lx;
           m.elements[13] = ly;
           m.elements[14] = lz;
-          lampInner.setMatrixAt(lampCount, m);
-          lampOuter.setMatrixAt(lampCount, m);
+          lampFixture.setMatrixAt(lampCount, m);
 
-          // Ground light pool (below lamp, on ground surface)
-          // Estimate ground Y: lamp is roughly shaftH*MVS above ground
-          // MVS = 0.075, shaftH = 40 → lamp is ~3.0 units above ground surface
+          // Ground light pool: flat disc below lamp
           const groundY = ly - VOXEL_SIZE * 5.5;
           m.identity();
           m.elements[12] = lx;
@@ -235,12 +271,10 @@ export function NightWindowLights({
           m.elements[14] = lz;
           lampGround.setMatrixAt(lampCount, m);
 
-          // Lamp colors
-          c.copy(lampColor).multiplyScalar(lampFlicker);
-          lampInner.setColorAt(lampCount, c);
-          c.copy(lampColor).multiplyScalar(lampFlicker * 0.6);
-          lampOuter.setColorAt(lampCount, c);
-          c.copy(lampGroundColor).multiplyScalar(lampFlicker * 0.4);
+          // Colors with brightness multiplier
+          c.copy(lampColor).multiplyScalar(lampFlicker * brightMul);
+          lampFixture.setColorAt(lampCount, c);
+          c.copy(lampGroundColor).multiplyScalar(lampFlicker * 0.5 * brightMul);
           lampGround.setColorAt(lampCount, c);
 
           lampCount++;
@@ -250,17 +284,14 @@ export function NightWindowLights({
 
     inner.count = count;
     outer.count = count;
-    lampInner.count = lampCount;
-    lampOuter.count = lampCount;
+    lampFixture.count = lampCount;
     lampGround.count = lampCount;
     if (inner.instanceMatrix) inner.instanceMatrix.needsUpdate = true;
     if (inner.instanceColor) inner.instanceColor.needsUpdate = true;
     if (outer.instanceMatrix) outer.instanceMatrix.needsUpdate = true;
     if (outer.instanceColor) outer.instanceColor.needsUpdate = true;
-    if (lampInner.instanceMatrix) lampInner.instanceMatrix.needsUpdate = true;
-    if (lampInner.instanceColor) lampInner.instanceColor.needsUpdate = true;
-    if (lampOuter.instanceMatrix) lampOuter.instanceMatrix.needsUpdate = true;
-    if (lampOuter.instanceColor) lampOuter.instanceColor.needsUpdate = true;
+    if (lampFixture.instanceMatrix) lampFixture.instanceMatrix.needsUpdate = true;
+    if (lampFixture.instanceColor) lampFixture.instanceColor.needsUpdate = true;
     if (lampGround.instanceMatrix) lampGround.instanceMatrix.needsUpdate = true;
     if (lampGround.instanceColor) lampGround.instanceColor.needsUpdate = true;
   });
@@ -269,10 +300,9 @@ export function NightWindowLights({
     <>
       <instancedMesh ref={outerRef} args={[WIN_OUTER_GEO, outerMat, MAX_INSTANCES]} frustumCulled={false} renderOrder={998} />
       <instancedMesh ref={innerRef} args={[WIN_INNER_GEO, innerMat, MAX_INSTANCES]} frustumCulled={false} renderOrder={999} />
-      {/* Street lamp lights */}
+      {/* Street lamp lights — smooth sprite-based */}
       <instancedMesh ref={lampGroundRef} args={[LAMP_GROUND_GEO, lampGroundMat, MAX_LAMP_INSTANCES]} frustumCulled={false} renderOrder={996} />
-      <instancedMesh ref={lampOuterRef} args={[LAMP_OUTER_GEO, lampOuterMat, MAX_LAMP_INSTANCES]} frustumCulled={false} renderOrder={997} />
-      <instancedMesh ref={lampInnerRef} args={[LAMP_INNER_GEO, lampInnerMat, MAX_LAMP_INSTANCES]} frustumCulled={false} renderOrder={1000} />
+      <instancedMesh ref={lampFixtureRef} args={[LAMP_FIXTURE_GEO, lampFixtureMat, MAX_LAMP_INSTANCES]} frustumCulled={false} renderOrder={1000} />
     </>
   );
 }
