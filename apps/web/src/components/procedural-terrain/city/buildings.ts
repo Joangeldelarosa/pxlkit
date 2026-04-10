@@ -8,12 +8,22 @@
 
 import type { BuildingType } from '../types';
 import { VOXEL_SIZE } from '../constants';
-import { varyColor } from '../utils/color';
+import { varyColor, hashCoord } from '../utils/color';
 import { getWallPalette, getRoofColor } from './layout';
 
 type PushFn = (px: number, py: number, pz: number, hex: string) => void;
 type TrackFn = (lx: number, lz: number, h: number) => void;
 type PushWinFn = (px: number, py: number, pz: number) => void;
+
+/** Flags indicating which building faces are exposed due to biome boundaries.
+ *  When true, the face must render a wall even if the column isn't at the
+ *  footprint edge — this closes holes where the city biome ends mid-building. */
+interface ForceEdge {
+  xNeg: boolean;  // −X face exposed
+  xPos: boolean;  // +X face exposed
+  zNeg: boolean;  // −Z face exposed
+  zPos: boolean;  // +Z face exposed
+}
 
 interface BuildCtx {
   push: PushFn;
@@ -32,6 +42,8 @@ interface BuildCtx {
   footD: number;    // total building footprint depth
   bType: BuildingType;
   bh: number;       // building height
+  /** Biome-boundary forced wall flags */
+  forceEdge: ForceEdge;
 }
 
 const VS = VOXEL_SIZE;
@@ -56,6 +68,12 @@ export function generateBuildingColumn(ctx: BuildCtx): void {
     case 'airport_terminal': return genAirportTerminal(ctx);
     case 'mansion':        return genMansion(ctx);
     case 'castle':         return genCastle(ctx);
+    case 'apartment':      return genApartment(ctx);
+    case 'hotel':          return genHotel(ctx);
+    case 'gas_station':    return genGasStation(ctx);
+    case 'restaurant':     return genRestaurant(ctx);
+    case 'fire_station':   return genFireStation(ctx);
+    case 'library':        return genLibrary(ctx);
     case 'skyscraper_twin':    return genSkyscraperTwin(ctx);
     case 'skyscraper_stepped': return genSkyscraperStepped(ctx);
     case 'tower_telecom':  return genTelecomTower(ctx);
@@ -63,23 +81,65 @@ export function generateBuildingColumn(ctx: BuildCtx): void {
   }
 }
 
-/* ── Helper ── */
+/* ── Helpers ── */
 function isEdge(x: number, z: number, w: number, d: number): boolean {
   return x === 0 || x === w - 1 || z === 0 || z === d - 1;
 }
 
+/**
+ * Returns true if this column should render a wall.
+ * A column is a wall if it is on the natural footprint edge OR if a biome
+ * boundary forces the adjacent face to be exposed.
+ *
+ * Note: forced edges affect columns 1 step inside the boundary. This assumes
+ * that building generators render walls on the outermost ring of footprint
+ * columns (the `onEdge` pattern). All existing generators follow this convention.
+ */
+function isExposedWall(x: number, z: number, w: number, d: number, fe: ForceEdge): boolean {
+  if (x === 0 || x === w - 1 || z === 0 || z === d - 1) return true;
+  // Check forced edges: if this column is 1 step inside the boundary, the
+  // missing neighbor makes it an effective edge.
+  if (fe.xNeg && x === 1) return true;
+  if (fe.xPos && x === w - 2) return true;
+  if (fe.zNeg && z === 1) return true;
+  if (fe.zPos && z === d - 2) return true;
+  return false;
+}
+
 /* ═══════════════ STANDARD BUILDINGS ═══════════════ */
 // Covers: skyscraper, office, office_tall, tower, house, shop
+// Now with 5 facade styles determined by building lot hash
 
 function genStandardBuilding(ctx: BuildCtx) {
-  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bType, bh } = ctx;
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bType, bh, forceEdge } = ctx;
   const walls = getWallPalette(bType);
   const wallBase = walls[0];
   const roofCol = getRoofColor(bType);
-  const windowCol = '#aaddff';
   const doorCol = '#886644';
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
   const isEdgeZ = blZ === 0 || blZ === footD - 1;
+  const isEdgeX = blX === 0 || blX === footW - 1;
+
+  // Facade style determined by building anchor hash (same for all columns of one building)
+  const facadeHash = hashCoord(wx - blX, 0, wz - blZ);
+  const facadeStyle = Math.floor(facadeHash * 5); // 0-4
+
+  // Window color variants
+  const windowColors = ['#aaddff', '#99ccee', '#bbddee', '#88bbdd', '#aaccdd'];
+  const windowCol = windowColors[facadeStyle];
+
+  // Window spacing pattern (varies by facade style)
+  const winRowMod = facadeStyle === 2 ? 3 : 2;
+  const winColOdd = facadeStyle >= 3; // use even columns instead of odd for windows
+
+  // Accent/trim colors per style
+  const trimColors = ['#99887a', '#8a9a7a', '#7a8a9a', '#9a8a8a', '#8a8a7a'];
+  const trimCol = trimColors[facadeStyle];
+
+  // Whether to add horizontal band / cornice
+  const hasBand = facadeStyle === 1 || facadeStyle === 3;
+  // Whether to add pilasters (vertical trim strips at corners)
+  const hasPilasters = facadeStyle === 2 || facadeStyle === 4;
 
   for (let by = 1; by <= bh; by++) {
     if (!onEdge && by < bh) continue; // hollow interior
@@ -90,16 +150,26 @@ function genStandardBuilding(ctx: BuildCtx) {
     } else if (by === 1 && blZ === 0 && blX >= 1 && blX <= Math.min(2, footW - 2)) {
       // Door
       color = varyColor(doorCol, wx, h + by, wz, 3, 0.04, 0.05);
-    } else if (onEdge && by > 1 && by < bh && by % 2 === 0) {
+    } else if (hasBand && onEdge && (by === Math.floor(bh * 0.5) || by === bh - 1)) {
+      // Horizontal trim band (cornice/belt course)
+      color = varyColor(trimCol, wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (hasPilasters && onEdge && by > 1 && by < bh
+               && ((isEdgeZ && (blX === 0 || blX === footW - 1 || blX === Math.floor(footW / 2)))
+                || (isEdgeX && (blZ === 0 || blZ === footD - 1 || blZ === Math.floor(footD / 2))))) {
+      // Pilaster columns at corners and center
+      color = varyColor(trimCol, wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (onEdge && by > 1 && by < bh && by % winRowMod === 0) {
       // Window rows
       const isWindowCol = isEdgeZ
-        ? (blX >= 1 && blX <= footW - 2 && blX % 2 === 1)
-        : (blZ >= 1 && blZ <= footD - 2 && blZ % 2 === 1);
+        ? (blX >= 1 && blX <= footW - 2 && (winColOdd ? blX % 2 === 0 : blX % 2 === 1))
+        : (blZ >= 1 && blZ <= footD - 2 && (winColOdd ? blZ % 2 === 0 : blZ % 2 === 1));
       if (isWindowCol) {
         color = varyColor(windowCol, wx, h + by, wz, 3, 0.05, 0.06);
         pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
       } else {
-        color = varyColor(wallBase, wx, h + by, wz, 5, 0.06, 0.07);
+        // Use secondary wall color from palette if available
+        const wallAlt = walls.length > 1 ? walls[1] : wallBase;
+        color = varyColor(facadeStyle >= 3 ? wallAlt : wallBase, wx, h + by, wz, 5, 0.06, 0.07);
       }
     } else {
       color = varyColor(wallBase, wx, h + by, wz, 5, 0.06, 0.07);
@@ -117,9 +187,10 @@ function genStandardBuilding(ctx: BuildCtx) {
         varyColor(roofCol, wx, h + bh + ry, wz, 4, 0.04, 0.06));
     }
     if (bType === 'shop' && blZ === 0 && roofExtra === 0) {
-      // Awning
+      // Awning — color varies by facade
+      const awningColors = ['#ee6644', '#4488cc', '#44aa66', '#dd8833', '#886644'];
       push((bX + lx) * VS, (h + 3) * VS, (bZ + lz - 1) * VS,
-        varyColor('#ee6644', wx, h + 3, wz - 1, 5, 0.06, 0.06));
+        varyColor(awningColors[facadeStyle], wx, h + 3, wz - 1, 5, 0.06, 0.06));
     }
     trackH(lx, lz, h + bh + roofExtra);
   } else if (bType === 'tower' && blX === Math.floor(footW / 2) && blZ === Math.floor(footD / 2)) {
@@ -141,10 +212,10 @@ function genStandardBuilding(ctx: BuildCtx) {
 
 /* ═══════════════ SKYSCRAPER TWIN ═══════════════ */
 function genSkyscraperTwin(ctx: BuildCtx) {
-  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
   const walls = getWallPalette('skyscraper_twin');
   const roofCol = getRoofColor('skyscraper_twin');
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   // Twin tower: two towers with a gap in the middle
   const midX = Math.floor(footW / 2);
@@ -177,7 +248,7 @@ function genSkyscraperTwin(ctx: BuildCtx) {
 
 /* ═══════════════ SKYSCRAPER STEPPED ═══════════════ */
 function genSkyscraperStepped(ctx: BuildCtx) {
-  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
   const walls = getWallPalette('skyscraper_stepped');
   const roofCol = getRoofColor('skyscraper_stepped');
 
@@ -195,10 +266,24 @@ function genSkyscraperStepped(ctx: BuildCtx) {
     return x >= inset && x < footW - inset && z >= inset && z < footD - inset;
   }
 
+  /** Tier-level edge detection that respects both tier insets and biome boundaries.
+   *  At the outermost tier (inset=0), forceEdge applies directly.
+   *  At inner tiers, forceEdge shifts the detection inward by the same delta. */
+  function isTierEdge(x: number, z: number, inset: number): boolean {
+    // Natural tier edge
+    if (!inRange(x, z, inset + 1)) return true;
+    // Biome-forced edge (shifted by inset)
+    if (forceEdge.xNeg && x === inset + 1) return true;
+    if (forceEdge.xPos && x === footW - inset - 2) return true;
+    if (forceEdge.zNeg && z === inset + 1) return true;
+    if (forceEdge.zPos && z === footD - inset - 2) return true;
+    return false;
+  }
+
   let maxY = 0;
   // Tier 1 (full width)
   if (inRange(blX, blZ, inset1)) {
-    const onEdgeT = !inRange(blX, blZ, inset1 + 1);
+    const onEdgeT = isTierEdge(blX, blZ, inset1);
     for (let by = 1; by <= tier1; by++) {
       if (!onEdgeT && by < tier1) continue;
       let color: string;
@@ -217,7 +302,7 @@ function genSkyscraperStepped(ctx: BuildCtx) {
 
   // Tier 2 (medium)
   if (inRange(blX, blZ, inset2)) {
-    const onEdgeT = !inRange(blX, blZ, inset2 + 1);
+    const onEdgeT = isTierEdge(blX, blZ, inset2);
     for (let by = tier1 + 1; by <= tier2; by++) {
       if (!onEdgeT && by < tier2) continue;
       let color: string;
@@ -236,7 +321,7 @@ function genSkyscraperStepped(ctx: BuildCtx) {
 
   // Tier 3 (small top)
   if (inRange(blX, blZ, inset3)) {
-    const onEdgeT = !inRange(blX, blZ, inset3 + 1);
+    const onEdgeT = isTierEdge(blX, blZ, inset3);
     for (let by = tier2 + 1; by <= tier3; by++) {
       if (!onEdgeT && by < tier3) continue;
       let color: string;
@@ -258,10 +343,11 @@ function genSkyscraperStepped(ctx: BuildCtx) {
 
 /* ═══════════════ TELECOM TOWER ═══════════════ */
 function genTelecomTower(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
   const midX = Math.floor(footW / 2), midZ = Math.floor(footD / 2);
   const isTower = blX === midX && blZ === midZ;
   const isBase = Math.abs(blX - midX) <= 1 && Math.abs(blZ - midZ) <= 1;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   if (isTower) {
     // Main tower column
@@ -284,10 +370,17 @@ function genTelecomTower(ctx: BuildCtx) {
     }
     trackH(lx, lz, h + Math.floor(bh * 0.4));
   } else {
-    // Ground - concrete pad
+    // Ground - concrete pad (add small wall at biome boundary)
     push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
       varyColor('#999999', wx, h + 1, wz, 2, 0.03, 0.04));
-    trackH(lx, lz, h + 1);
+    if (onEdge) {
+      // Small perimeter wall at biome boundary to close any gaps
+      push((bX + lx) * VS, (h + 2) * VS, (bZ + lz) * VS,
+        varyColor('#888888', wx, h + 2, wz, 2, 0.03, 0.04));
+      trackH(lx, lz, h + 2);
+    } else {
+      trackH(lx, lz, h + 1);
+    }
   }
 }
 
@@ -359,8 +452,8 @@ function genParking(ctx: BuildCtx) {
 
 /* ═══════════════ PARKING GARAGE ═══════════════ */
 function genParkingGarage(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   for (let by = 1; by <= bh; by++) {
     if (!onEdge && by % 2 !== 0) continue; // open sides on every other floor
@@ -382,8 +475,8 @@ function genParkingGarage(ctx: BuildCtx) {
 
 /* ═══════════════ WAREHOUSE ═══════════════ */
 function genWarehouse(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
   const walls = getWallPalette('warehouse');
   const roofCol = getRoofColor('warehouse');
 
@@ -404,8 +497,8 @@ function genWarehouse(ctx: BuildCtx) {
 
 /* ═══════════════ FACTORY ═══════════════ */
 function genFactory(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   for (let by = 1; by <= bh; by++) {
     if (!onEdge && by < bh) continue;
@@ -432,8 +525,8 @@ function genFactory(ctx: BuildCtx) {
 
 /* ═══════════════ HOSPITAL ═══════════════ */
 function genHospital(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
   const walls = getWallPalette('hospital');
 
   for (let by = 1; by <= bh; by++) {
@@ -460,8 +553,8 @@ function genHospital(ctx: BuildCtx) {
 
 /* ═══════════════ SCHOOL ═══════════════ */
 function genSchool(ctx: BuildCtx) {
-  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
   const walls = getWallPalette('school');
 
   for (let by = 1; by <= bh; by++) {
@@ -498,8 +591,8 @@ function genSchool(ctx: BuildCtx) {
 
 /* ═══════════════ CHURCH ═══════════════ */
 function genChurch(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   for (let by = 1; by <= bh; by++) {
     if (!onEdge && by < bh) continue;
@@ -529,8 +622,9 @@ function genChurch(ctx: BuildCtx) {
 
 /* ═══════════════ STADIUM ═══════════════ */
 function genStadium(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
   const isInner = blX >= 2 && blX < footW - 2 && blZ >= 2 && blZ < footD - 2;
+  const onOuterEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   if (isInner) {
     // Field
@@ -541,6 +635,8 @@ function genStadium(ctx: BuildCtx) {
     const distFromEdge = Math.min(blX, footW - 1 - blX, blZ, footD - 1 - blZ);
     const seatH = Math.max(1, bh - distFromEdge);
     for (let by = 1; by <= seatH; by++) {
+      // Force fill wall voxels at biome boundary even for interior seating columns
+      if (!onOuterEdge && by < seatH && distFromEdge > 0) continue;
       const color = by === seatH
         ? varyColor((blX + blZ) % 2 === 0 ? '#bbbbbb' : '#999999', wx, h + by, wz, 2, 0.03, 0.04)
         : varyColor('#aaaaaa', wx, h + by, wz, 3, 0.03, 0.05);
@@ -561,8 +657,8 @@ function genStadium(ctx: BuildCtx) {
 
 /* ═══════════════ MALL ═══════════════ */
 function genMall(ctx: BuildCtx) {
-  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   for (let by = 1; by <= bh; by++) {
     if (!onEdge && by < bh) continue;
@@ -598,8 +694,8 @@ function genMall(ctx: BuildCtx) {
 
 /* ═══════════════ AIRPORT TERMINAL ═══════════════ */
 function genAirportTerminal(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   for (let by = 1; by <= bh; by++) {
     if (!onEdge && by < bh) continue;
@@ -631,8 +727,8 @@ function genAirportTerminal(ctx: BuildCtx) {
 
 /* ═══════════════ MANSION (improved — larger, more detailed) ═══════════════ */
 function genMansion(ctx: BuildCtx) {
-  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   // Style variations based on lot position
   const style = Math.abs(ctx.wx * 3 + ctx.wz * 7) % 4;
@@ -736,8 +832,8 @@ function genMansion(ctx: BuildCtx) {
 
 /* ═══════════════ CASTLE ═══════════════ */
 function genCastle(ctx: BuildCtx) {
-  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
-  const onEdge = isEdge(blX, blZ, footW, footD);
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
   const walls = getWallPalette('castle');
   const roofCol = getRoofColor('castle');
 
@@ -869,5 +965,315 @@ function genCastle(ctx: BuildCtx) {
     push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
       varyColor('#777766', wx, h + 1, wz, 2, 0.03, 0.04));
     trackH(lx, lz, h + 1);
+  }
+}
+
+/* ═══════════════ APARTMENT ═══════════════ */
+function genApartment(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('apartment');
+  const roofCol = getRoofColor('apartment');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor(roofCol, wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (by === 1 && blZ === 0 && blX >= 1 && blX <= 2) {
+      // Entrance door
+      color = varyColor('#664422', wx, h + by, wz, 3, 0.04, 0.05);
+    } else if (onEdge && by > 1 && by < bh) {
+      // Window grid — every 2 floors, alternating columns
+      const isWinFloor = by % 2 === 0;
+      const isWinCol = (blZ === 0 || blZ === footD - 1)
+        ? (blX >= 1 && blX <= footW - 2 && blX % 2 === 0)
+        : (blZ >= 1 && blZ <= footD - 2 && blZ % 2 === 0);
+      if (isWinFloor && isWinCol) {
+        color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+      }
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+
+  // Balcony ledges every 3 floors on front face
+  if (blZ === 0 && blX >= 1 && blX <= footW - 2 && bh > 4) {
+    for (let fl = 3; fl < bh; fl += 3) {
+      push((bX + lx) * VS, (h + fl) * VS, (bZ + lz - 1) * VS,
+        varyColor('#999999', wx, h + fl, wz - 1, 2, 0.03, 0.04));
+    }
+  }
+
+  // AC units on side walls (every 4 floors)
+  if ((blX === 0 || blX === footW - 1) && blZ >= 1 && blZ < footD - 1 && blZ % 3 === 0) {
+    for (let fl = 4; fl < bh; fl += 4) {
+      const acX = blX === 0 ? -1 : 1;
+      push((bX + lx + acX) * VS, (h + fl) * VS, (bZ + lz) * VS,
+        varyColor('#aaaaaa', wx + acX, h + fl, wz, 2, 0.02, 0.04));
+    }
+  }
+
+  trackH(lx, lz, h + bh);
+}
+
+/* ═══════════════ HOTEL ═══════════════ */
+function genHotel(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('hotel');
+  const roofCol = getRoofColor('hotel');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor(roofCol, wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (by <= 2 && blZ === 0 && blX >= 1 && blX <= Math.min(3, footW - 2)) {
+      // Grand entrance — glass doors
+      color = varyColor('#88ccee', wx, h + by, wz, 2, 0.04, 0.05);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else if (onEdge && by > 2 && by < bh && by % 2 === 0) {
+      // Uniform window grid
+      const isWinCol = (blZ === 0 || blZ === footD - 1)
+        ? (blX >= 1 && blX <= footW - 2)
+        : (blZ >= 1 && blZ <= footD - 2);
+      if (isWinCol) {
+        color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+      }
+    } else if (by === 1 && onEdge) {
+      // Ground floor — lobby trim
+      color = varyColor('#ddccaa', wx, h + by, wz, 3, 0.04, 0.06);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+
+  // Rooftop pool at center
+  if (bh > 6) {
+    const midX = Math.floor(footW / 2), midZ = Math.floor(footD / 2);
+    if (Math.abs(blX - midX) <= 1 && Math.abs(blZ - midZ) <= 1) {
+      push((bX + lx) * VS, (h + bh + 0.1) * VS, (bZ + lz) * VS, '#4488cc');
+    }
+  }
+
+  // Entrance canopy
+  if (blZ === 0 && blX >= 0 && blX <= Math.min(4, footW - 1)) {
+    push((bX + lx) * VS, (h + 3) * VS, (bZ + lz - 1) * VS,
+      varyColor('#bbaa88', wx, h + 3, wz - 1, 2, 0.03, 0.04));
+  }
+
+  trackH(lx, lz, h + bh);
+}
+
+/* ═══════════════ GAS STATION ═══════════════ */
+function genGasStation(ctx: BuildCtx) {
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+
+  // Small booth in corner
+  const isShop = blX >= footW - 3 && blZ >= footD - 3;
+  // Canopy area (fuel pumps)
+  const isCanopy = blX < footW - 3;
+
+  if (isShop) {
+    for (let by = 1; by <= bh; by++) {
+      const shopEdge = (blX === footW - 3 || blX === footW - 1 || blZ === footD - 3 || blZ === footD - 1);
+      if (!shopEdge && by < bh) continue;
+      let color: string;
+      if (by === bh) {
+        color = varyColor('#888888', wx, h + by, wz, 3, 0.03, 0.05);
+      } else if (by === 1 && blZ === footD - 3 && blX === footW - 2) {
+        color = varyColor('#88ccee', wx, h + by, wz, 2, 0.04, 0.05); // door
+      } else {
+        color = varyColor('#dddddd', wx, h + by, wz, 4, 0.04, 0.06);
+      }
+      push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+    }
+    trackH(lx, lz, h + bh);
+  } else if (isCanopy) {
+    // Concrete ground
+    push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
+      varyColor('#aaaaaa', wx, h + 1, wz, 2, 0.02, 0.04));
+
+    // Canopy roof on pillars
+    const isPillar = (blX === 0 || blX === footW - 4) && (blZ === 0 || blZ === footD - 1);
+    if (isPillar) {
+      for (let py = 2; py <= bh + 1; py++) {
+        push((bX + lx) * VS, (h + py) * VS, (bZ + lz) * VS,
+          varyColor('#888888', wx, h + py, wz, 2, 0.02, 0.04));
+      }
+    }
+    // Canopy slab at top
+    push((bX + lx) * VS, (h + bh + 2) * VS, (bZ + lz) * VS,
+      varyColor('#eeeeee', wx, h + bh + 2, wz, 2, 0.02, 0.03));
+
+    // Fuel pumps (3 per row, centered)
+    if (blZ === Math.floor(footD / 2) && blX >= 1 && blX <= footW - 5 && blX % 2 === 1) {
+      push((bX + lx) * VS, (h + 2) * VS, (bZ + lz) * VS, '#dd4444');
+      push((bX + lx) * VS, (h + 3) * VS, (bZ + lz) * VS, '#eeeeee');
+    }
+    trackH(lx, lz, h + bh + 2);
+  } else {
+    push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
+      varyColor(onEdge ? '#999999' : '#aaaaaa', wx, h + 1, wz, 2, 0.02, 0.04));
+    trackH(lx, lz, h + 1);
+  }
+}
+
+/* ═══════════════ RESTAURANT ═══════════════ */
+function genRestaurant(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('restaurant');
+  const roofCol = getRoofColor('restaurant');
+  // Style variation based on position
+  const style = Math.abs(wx * 3 + wz * 7) % 3;
+  const accentColor = ['#ee4444', '#44aa44', '#4488cc'][style];
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor(roofCol, wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (by <= 2 && blZ === 0 && blX >= 1 && blX <= Math.min(2, footW - 2)) {
+      // Glass front windows
+      color = varyColor('#88ccee', wx, h + by, wz, 2, 0.04, 0.05);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else if (by === bh - 1 && onEdge) {
+      // Color accent band near top
+      color = varyColor(accentColor, wx, h + by, wz, 4, 0.04, 0.06);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+
+  // Awning on front
+  if (blZ === 0) {
+    push((bX + lx) * VS, (h + bh) * VS, (bZ + lz - 1) * VS,
+      varyColor(accentColor, wx, h + bh, wz - 1, 3, 0.04, 0.06));
+  }
+
+  // Outdoor seating area
+  if (blZ === footD - 1 && blX >= 1 && blX <= footW - 2 && blX % 2 === 0) {
+    push((bX + lx) * VS, (h + 2) * VS, (bZ + lz + 1) * VS,
+      varyColor('#885533', wx, h + 2, wz + 1, 3, 0.04, 0.05)); // table
+  }
+
+  // Rooftop signage
+  if (blX === Math.floor(footW / 2) && blZ === 0) {
+    push((bX + lx) * VS, (h + bh + 1) * VS, (bZ + lz) * VS,
+      varyColor(accentColor, wx, h + bh + 1, wz, 2, 0.03, 0.05));
+    trackH(lx, lz, h + bh + 1);
+  } else {
+    trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════ FIRE STATION ═══════════════ */
+function genFireStation(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('fire_station');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#882222', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (by <= 3 && blZ === 0 && blX >= 1 && blX <= Math.min(footW - 2, 4)) {
+      // Large garage bay doors
+      color = varyColor('#555555', wx, h + by, wz, 2, 0.02, 0.04);
+    } else if (onEdge && by > 3 && by % 2 === 0) {
+      // Windows above bay doors
+      const isWin = (blZ === 0 || blZ === footD - 1)
+        ? (blX >= 1 && blX < footW - 1 && blX % 2 === 1)
+        : (blZ >= 1 && blZ < footD - 1 && blZ % 2 === 1);
+      if (isWin) {
+        color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+      }
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+
+  // Hose tower at back corner
+  if (blX === footW - 1 && blZ === footD - 1) {
+    for (let ty = 1; ty <= 3; ty++) {
+      push((bX + lx) * VS, (h + bh + ty) * VS, (bZ + lz) * VS,
+        varyColor('#777777', wx, h + bh + ty, wz, 2, 0.02, 0.04));
+    }
+    trackH(lx, lz, h + bh + 3);
+  } else {
+    trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════ LIBRARY ═══════════════ */
+function genLibrary(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('library');
+  const roofCol = getRoofColor('library');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor(roofCol, wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (by <= 2 && blZ === 0 && blX === Math.floor(footW / 2)) {
+      // Grand entrance with columns
+      color = varyColor('#dddddd', wx, h + by, wz, 2, 0.02, 0.04);
+    } else if (onEdge && by > 1 && by < bh) {
+      // Tall arched windows (every column on sides)
+      const isWinRow = by > 1 && by < bh - 1;
+      const isWinCol = (blZ === 0 || blZ === footD - 1)
+        ? (blX >= 1 && blX <= footW - 2 && blX % 2 === 1)
+        : (blZ >= 1 && blZ <= footD - 2 && blZ % 2 === 1);
+      if (isWinRow && isWinCol) {
+        color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+      }
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+
+  // Front columns (pillars)
+  if (blZ === 0 && (blX === 1 || blX === footW - 2)) {
+    for (let py = 1; py <= bh; py++) {
+      push((bX + lx) * VS, (h + py) * VS, (bZ + lz - 1) * VS,
+        varyColor('#cccccc', wx, h + py, wz - 1, 2, 0.02, 0.04));
+    }
+  }
+
+  // Peaked pediment on front
+  if (onEdge && blZ === 0) {
+    const midX = Math.floor(footW / 2);
+    const dist = Math.abs(blX - midX);
+    const peakH = Math.max(0, 2 - dist);
+    for (let ry = 1; ry <= peakH; ry++) {
+      push((bX + lx) * VS, (h + bh + ry) * VS, (bZ + lz) * VS,
+        varyColor('#ccbbaa', wx, h + bh + ry, wz, 3, 0.03, 0.05));
+    }
+    trackH(lx, lz, h + bh + peakH);
+  } else {
+    trackH(lx, lz, h + bh);
   }
 }

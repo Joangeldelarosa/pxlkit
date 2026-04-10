@@ -17,13 +17,13 @@ export const DIST_PENALTY = 0.5;
 /* ── City layout ── */
 
 /** Total city block repeat size (road + lot) */
-export const BLOCK_SIZE = 10;
-/** Standard road width in voxels */
-export const ROAD_W = 2;
-/** Avenue width in voxels (wider major roads) */
-export const AVENUE_W = 3;
-/** Sidewalk width on each side */
-export const LOT_INSET = 1;
+export const BLOCK_SIZE = 20;
+/** Standard road width in voxels (6-wide: edge + 2 lanes + double-yellow center + 2 lanes + edge) */
+export const ROAD_W = 6;
+/** Avenue width in voxels (9-wide: edge + 2 lanes + divider + median + divider + 2 lanes + edge) */
+export const AVENUE_W = 9;
+/** Sidewalk width on each side (curb + walkway) */
+export const LOT_INSET = 2;
 /** Interval for major avenues (every N blocks) */
 export const AVENUE_INTERVAL = 4;
 
@@ -96,6 +96,12 @@ export const BUILDING_WALL_PALETTES: Record<string, string[]> = {
   stadium:            ['#aaaaaa', '#999999', '#bbbbbb'],
   parking_garage:     ['#888888', '#777777', '#999999'],
   airport_terminal:   ['#bbccdd', '#aabbcc', '#99aabb', '#ccdded'],
+  apartment:          ['#ccbbaa', '#bbaa99', '#ddccbb', '#aa9988'],
+  hotel:              ['#ddccaa', '#ccbb99', '#eeddbb', '#bbaa88'],
+  gas_station:        ['#dddddd', '#cccccc', '#eeeeee'],
+  restaurant:         ['#eeddcc', '#ddccbb', '#ffeecc'],
+  fire_station:       ['#cc4444', '#bb3333', '#dd5555', '#aa2222'],
+  library:            ['#ccbbaa', '#bbaa99', '#ddccbb', '#aa9988'],
 };
 
 export const BUILDING_ROOF_COLORS: Record<string, string> = {
@@ -109,4 +115,10 @@ export const BUILDING_ROOF_COLORS: Record<string, string> = {
   church: '#886644', stadium: '#777777',
   parking_garage: '#666666',
   airport_terminal: '#667788',
+  apartment: '#886644',
+  hotel: '#aa8855',
+  gas_station: '#888888',
+  restaurant: '#cc6633',
+  fire_station: '#882222',
+  library: '#886644',
 };

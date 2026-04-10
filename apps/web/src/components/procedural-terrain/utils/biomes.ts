@@ -17,8 +17,9 @@ export function getBiome(
   const tv = tempN(wx * 0.006, wz * 0.006);
 
   // City zones — controlled by cityFrequency config
-  const cv = biomeN(wx * 0.012 + 500, wz * 0.012 + 500);
-  if (cv > 0.28 - cityFreq * 0.25 && Math.abs(bv) < 0.55 && Math.abs(tv) < 0.55) return 'city';
+  // Lower frequency (0.006) = larger biome patches; lower threshold = more city area
+  const cv = biomeN(wx * 0.006 + 500, wz * 0.006 + 500);
+  if (cv > 0.12 - cityFreq * 0.25 && Math.abs(bv) < 0.55 && Math.abs(tv) < 0.55) return 'city';
 
   // Village zones — rural settlements, appear in moderate terrain
   const vv = biomeN(wx * 0.015 + 700, wz * 0.015 + 700);
