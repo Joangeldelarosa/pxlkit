@@ -823,12 +823,12 @@ export function CityNPCs({
         c.setRGB(colors[oi], colors[oi + 1], colors[oi + 2]);
         // Fade opacity via darkening (since instanced mesh doesn't support per-instance opacity easily)
         c.multiplyScalar(fade);
-        // Night darkening
-        if (isNight) c.multiplyScalar(0.35);
-        else if (hour >= 18 || hour < 6) {
-          const dusk = hour >= 18 ? Math.max(0.35, 1 - (hour - 18) / 4) : Math.max(0.35, 0.4 + hour / 15);
-          c.multiplyScalar(dusk);
-        }
+        // Time-of-day lighting: smooth transition from full brightness → dusk → night
+        const lightMul = isNight ? 0.35
+          : (hour >= 18) ? Math.max(0.35, 1 - (hour - 18) / 4)   // sunset: 18h→22h fade
+          : (hour < 7) ? Math.max(0.35, 0.35 + (hour / 7) * 0.65) // dawn: 0h→7h brighten
+          : 1.0;
+        c.multiplyScalar(lightMul);
         mesh.setColorAt(voxelCount, c);
         voxelCount++;
       }

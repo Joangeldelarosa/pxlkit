@@ -272,6 +272,7 @@ export function WaterBoats({
         const spawnInfo = sampleWaterInfo(cache, sx, sz);
         if (spawnInfo.depth >= MIN_WATER_DEPTH) {
           // Check at least 1 neighbor direction also has water (avoid single-cell puddles)
+          // Tests 4 angular offsets centered behind the spawn angle (±0.75 rad spread)
           let navOk = false;
           for (let di = 0; di < 4; di++) {
             const checkAngle = angle + Math.PI + (di - 1.5) * 0.5;
