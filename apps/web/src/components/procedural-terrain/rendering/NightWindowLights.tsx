@@ -175,6 +175,28 @@ export function NightWindowLights({
       nightFactor = 1 - (hour - 5) / 1.5;
     }
 
+    /* ── Sleep cycle: realistic window turn-off pattern through the night ──
+     *  People go to bed progressively starting around 22:00.
+     *  By 2:00am only ~15% of windows remain lit (night owls, 24hr shops).
+     *  Early risers start turning lights on around 4:30.
+     *  This modulates the effective windowLitProbability. */
+    let sleepFactor = 1.0; // 1 = all awake, 0.15 = deep sleep (only insomniacs left)
+    if (hour >= 21 && hour < 24) {
+      // 21:00 → 24:00: gradual decline from 100% to 25%
+      sleepFactor = 1.0 - 0.75 * ((hour - 21) / 3);
+    } else if (hour >= 0 && hour < 2) {
+      // 0:00 → 2:00: continue declining from 25% to 15%
+      sleepFactor = 0.25 - 0.10 * (hour / 2);
+    } else if (hour >= 2 && hour < 4.5) {
+      // 2:00 → 4:30: deep sleep, minimal lights
+      sleepFactor = 0.15;
+    } else if (hour >= 4.5 && hour < 6) {
+      // 4:30 → 6:00: early risers, lights coming back on
+      sleepFactor = 0.15 + 0.85 * ((hour - 4.5) / 1.5);
+    }
+    // During daytime or early evening (6:00-21:00), sleepFactor stays at 1.0
+    const effectiveLitProb = windowLitProbability * sleepFactor;
+
     if (nightFactor <= 0.01) {
       // eslint-disable-next-line react-hooks/immutability
       innerMat.opacity = 0;
@@ -305,7 +327,7 @@ export function NightWindowLights({
           const wz = data.windowLights[i3 + 2];
 
           const h = winHash(wx, wy, wz);
-          if (h > windowLitProbability) continue;
+          if (h > effectiveLitProb) continue;
 
           // Per-light distance fade
           const fade = lightFade(wx, wy, wz);
