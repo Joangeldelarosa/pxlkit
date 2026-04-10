@@ -129,7 +129,7 @@ function genStandardBuilding(ctx: BuildCtx) {
   const windowCol = windowColors[facadeStyle];
 
   // Window spacing pattern (varies by facade style)
-  const winRowMod = facadeStyle <= 1 ? 2 : (facadeStyle === 2 ? 3 : 2); // every 2 or 3
+  const winRowMod = facadeStyle === 2 ? 3 : 2;
   const winColOdd = facadeStyle >= 3; // use even columns instead of odd for windows
 
   // Accent/trim colors per style

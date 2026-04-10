@@ -67,7 +67,7 @@ export function generateChunkData(
   regionN: (x: number, y: number) => number,
   cfg: WorldConfig,
 ): ChunkVoxelData {
-  // Buffer size accounts for wider roads (3× original), taller lampposts (12 voxels),
+   // Buffer size accounts for wider roads (3× original), taller lampposts (40 mini-voxels ≈ 6 regular voxels),
   // and larger building footprints from increased BLOCK_SIZE
   const maxV = CHUNK_SIZE * CHUNK_SIZE * 24;
   const posA = new Float32Array(maxV * 3);
