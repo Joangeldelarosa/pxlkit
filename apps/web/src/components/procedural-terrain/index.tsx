@@ -593,7 +593,7 @@ export default function ProceduralTerrain() {
           <CameraTracker onUpdate={handleCameraUpdate} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} />
           <AmbientParticles biome={currentBiome} intensity={config.particleIntensity} />
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
-          <GroundCritters biome={currentBiome} intensity={config.particleIntensity} chunkCacheRef={chunkCacheRef} />
+          <GroundCritters biome={currentBiome} npcDensity={config.npcDensity} npcDistance={config.npcDistance} npcScale={config.npcScale} chunkCacheRef={chunkCacheRef} />
           <NightWindowLights chunkCacheRef={chunkCacheRef} windowLitProbability={config.windowLitProbability} />
           <WaterBoats chunkCacheRef={chunkCacheRef} boatDensity={config.boatDensity} />
           </TimeContext.Provider>
