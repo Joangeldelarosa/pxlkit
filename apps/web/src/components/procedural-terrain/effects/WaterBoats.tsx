@@ -187,9 +187,11 @@ function pseudoRand(a: number, b: number): number {
 export function WaterBoats({
   chunkCacheRef,
   boatDensity,
+  boatDistance,
 }: {
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
   boatDensity: number;
+  boatDistance: number;
 }) {
   const { camera } = useThree();
   const timeRef = useContext(TimeContext);

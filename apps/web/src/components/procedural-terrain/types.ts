@@ -7,8 +7,8 @@ export type WorldMode = 'infinite' | 'finite';
 export interface WorldConfig {
   worldMode: WorldMode;
   worldSize: number;           // finite mode: world width/depth in voxels (16-512)
-  renderDistance: number;       // 2-50 chunks
-  flySpeed: number;
+  renderDistance: number;       // 2-100 chunks
+  flySpeed: number;            // 4-120
   treeDensity: number;         // 0-1
   structureDensity: number;    // 0-1
   cityFrequency: number;       // 0-1
@@ -18,52 +18,54 @@ export interface WorldConfig {
   terrainRoughness: number;    // 0-1  extra detail noise amplitude
   particleIntensity: number;   // 0-1  controls ambient particles, birds, critters
   backgroundDetail: number;    // 0-1  distant mountain silhouette layers + haze
-  chunkGenSpeed: number;       // 1-10 max chunks generated per frame
+  chunkGenSpeed: number;       // 1-20 max chunks generated per frame
   graphicsQuality: 'low' | 'medium' | 'high';
   timeMode: 'fixed' | 'cycle';   // fixed = locked time, cycle = dynamic day/night
   fixedHour: number;              // 0-24 hour of day when timeMode is 'fixed'
   dayDurationSeconds: number;     // how many real seconds = 24 in-game hours (e.g. 60 = 1 minute per full day)
   boatDensity: number;            // 0-1 controls how many boats spawn on water
+  boatDistance: number;           // 2-100 chunk radius for boat spawning (max = renderDistance)
   windowLitProbability: number;   // 0-1 fraction of windows lit at night
   starDensity: number;            // 0-1 controls how many stars appear at night
-  lightDistance: number;           // 1-50 chunk radius for window/lamp light rendering (max = renderDistance)
-  lampBrightness: number;         // 0-2 street lamp brightness multiplier
+  lightDistance: number;           // 1-100 chunk radius for window/lamp light rendering (max = renderDistance)
+  lampBrightness: number;         // 0-3 street lamp brightness multiplier
   lampColorTemp: 'warm' | 'neutral' | 'cool' | 'sodium';  // street lamp color temperature
   npcDensity: number;             // 0-1 how many NPCs per chunk (0 = off)
-  npcDistance: number;            // 2-50 chunk radius for NPC population (max = renderDistance)
-  npcScale: number;               // 0.25-1.5 NPC body scale multiplier
-  npcMaxPerChunk: number;         // 1-25 max NPCs spawned per chunk
+  npcDistance: number;            // 2-100 chunk radius for NPC population (max = renderDistance)
+  npcScale: number;               // 0.25-2.0 NPC body scale multiplier
+  npcMaxPerChunk: number;         // 1-50 max NPCs spawned per chunk
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
   worldMode: 'infinite',
   worldSize: 128,
-  renderDistance: 15,
-  flySpeed: 12,
-  treeDensity: 0.5,
-  structureDensity: 0.5,
-  cityFrequency: 0.4,
+  renderDistance: 20,
+  flySpeed: 14,
+  treeDensity: 0.6,
+  structureDensity: 0.6,
+  cityFrequency: 0.45,
   pickupDensity: 0.5,
-  fogDensity: 0.5,
-  biomeVariation: 0.5,
+  fogDensity: 0.4,
+  biomeVariation: 0.6,
   terrainRoughness: 0.5,
   particleIntensity: 0.7,
-  backgroundDetail: 0.8,
-  chunkGenSpeed: 2,
-  graphicsQuality: 'medium',
+  backgroundDetail: 0.85,
+  chunkGenSpeed: 4,
+  graphicsQuality: 'high',
   timeMode: 'cycle',
   fixedHour: 12,
   dayDurationSeconds: 120,
   boatDensity: 0.5,
-  windowLitProbability: 0.7,
-  starDensity: 0.5,
-  lightDistance: 12,
-  lampBrightness: 1.0,
+  boatDistance: 10,
+  windowLitProbability: 0.75,
+  starDensity: 0.6,
+  lightDistance: 18,
+  lampBrightness: 1.2,
   lampColorTemp: 'sodium',
   npcDensity: 0.6,
-  npcDistance: 6,
+  npcDistance: 8,
   npcScale: 0.5,
-  npcMaxPerChunk: 4,
+  npcMaxPerChunk: 6,
 };
 
 export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city' | 'swamp' | 'village';

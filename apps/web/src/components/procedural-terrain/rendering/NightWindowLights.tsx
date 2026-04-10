@@ -64,10 +64,10 @@ const LAMP_GROUND_GEO = (() => {
 /* ── Tuning constants ── */
 const FLICKER_HASH_THRESHOLD = 0.55;
 const FLICKER_OFF_THRESHOLD = -0.35;
-const MAX_INSTANCES = 6000;
-/** Max street lamp instanced-mesh slots. 1024 supports ~32 lamps/chunk × ~30 chunks
- *  in view. Instanced mesh is cheap (just matrix + color per slot). */
-const MAX_LAMP_INSTANCES = 1024;
+/** Base window light instance budget. Scales up dynamically with lightDistance. */
+const BASE_WINDOW_INSTANCES = 6000;
+/** Base street lamp instance budget. Scales up dynamically with lightDistance. */
+const BASE_LAMP_INSTANCES = 1024;
 
 /* ── Lamp color temperature presets ── */
 const LAMP_COLOR_PRESETS: Record<string, { fixture: string; ground: string }> = {
@@ -112,6 +112,19 @@ export function NightWindowLights({
   const lampGroundRef = useRef<THREE.InstancedMesh>(null);
   const timeRef = useContext(TimeContext);
   const { camera } = useThree();
+
+  /* ── Dynamic instance budget: scales with lightDistance ── */
+  const maxWindowInstances = useMemo(() => {
+    // Scale from base at lightDistance=12 up to 3× at lightDistance=100
+    const scale = Math.max(1, lightDistance / 12);
+    return Math.min(30000, Math.round(BASE_WINDOW_INSTANCES * scale));
+  }, [lightDistance]);
+
+  const maxLampInstances = useMemo(() => {
+    // Scale from base at lightDistance=12 up to 4× at lightDistance=100
+    const scale = Math.max(1, lightDistance / 12);
+    return Math.min(8192, Math.round(BASE_LAMP_INSTANCES * scale));
+  }, [lightDistance]);
 
   /* Inner glow: brighter, slightly transparent, additive */
   const innerMat = useMemo(() => new THREE.MeshBasicMaterial({
@@ -259,8 +272,8 @@ export function NightWindowLights({
       const clampedFade = Math.max(0.3, Math.min(1.0, fadeFactor));
 
       /* ── Window lights ── */
-      if (count < MAX_INSTANCES) {
-        for (let i = 0; i < data.windowLightCount && count < MAX_INSTANCES; i++) {
+      if (count < maxWindowInstances) {
+        for (let i = 0; i < data.windowLightCount && count < maxWindowInstances; i++) {
           const i3 = i * 3;
           const wx = data.windowLights[i3];
           const wy = data.windowLights[i3 + 1];
@@ -295,8 +308,8 @@ export function NightWindowLights({
       }
 
       /* ── Street lamp lights (smooth sprite-based) ── */
-      if (data.streetLights && lampCount < MAX_LAMP_INSTANCES) {
-        for (let i = 0; i < data.streetLightCount && lampCount < MAX_LAMP_INSTANCES; i++) {
+      if (data.streetLights && lampCount < maxLampInstances) {
+        for (let i = 0; i < data.streetLightCount && lampCount < maxLampInstances; i++) {
           const i3 = i * 3;
           const lx = data.streetLights[i3];
           const ly = data.streetLights[i3 + 1];
@@ -349,11 +362,11 @@ export function NightWindowLights({
 
   return (
     <>
-      <instancedMesh ref={outerRef} args={[WIN_OUTER_GEO, outerMat, MAX_INSTANCES]} frustumCulled={false} renderOrder={998} />
-      <instancedMesh ref={innerRef} args={[WIN_INNER_GEO, innerMat, MAX_INSTANCES]} frustumCulled={false} renderOrder={999} />
+      <instancedMesh ref={outerRef} args={[WIN_OUTER_GEO, outerMat, maxWindowInstances]} frustumCulled={false} renderOrder={998} />
+      <instancedMesh ref={innerRef} args={[WIN_INNER_GEO, innerMat, maxWindowInstances]} frustumCulled={false} renderOrder={999} />
       {/* Street lamp lights — smooth sprite-based */}
-      <instancedMesh ref={lampGroundRef} args={[LAMP_GROUND_GEO, lampGroundMat, MAX_LAMP_INSTANCES]} frustumCulled={false} renderOrder={996} />
-      <instancedMesh ref={lampFixtureRef} args={[LAMP_FIXTURE_GEO, lampFixtureMat, MAX_LAMP_INSTANCES]} frustumCulled={false} renderOrder={1000} />
+      <instancedMesh ref={lampGroundRef} args={[LAMP_GROUND_GEO, lampGroundMat, maxLampInstances]} frustumCulled={false} renderOrder={996} />
+      <instancedMesh ref={lampFixtureRef} args={[LAMP_FIXTURE_GEO, lampFixtureMat, maxLampInstances]} frustumCulled={false} renderOrder={1000} />
     </>
   );
 }
