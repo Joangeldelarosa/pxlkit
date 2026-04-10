@@ -167,6 +167,30 @@ function npcHash(a: number, b: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
+/** Free a chatting partner when an NPC is removed or ends chat */
+function freeChatPartner(npc: NPCState, npcs: NPCState[], npcIdx: number): void {
+  if (npc.chatPartner >= 0 && npc.chatPartner < npcs.length) {
+    const partner = npcs[npc.chatPartner];
+    if (partner && partner.chatPartner === npcIdx) {
+      partner.chatPartner = -1;
+      partner.behavior = 'pausing';
+      partner.behaviorTimer = 0.5;
+    }
+  }
+}
+
+/** Fix chat partner indices after splicing an NPC out of the array */
+function fixPartnerIndices(npcs: NPCState[], removedIdx: number): void {
+  for (const other of npcs) {
+    if (other.chatPartner > removedIdx) other.chatPartner--;
+    else if (other.chatPartner === removedIdx) {
+      other.chatPartner = -1;
+      other.behavior = 'pausing';
+      other.behaviorTimer = 0.5;
+    }
+  }
+}
+
 /* ═══════════════ MAIN COMPONENT ═══════════════ */
 
 export function CityNPCs({
@@ -243,6 +267,8 @@ export function CityNPCs({
 
     const maxNpcs = Math.round(MAX_NPCS * npcDensity);
     const despawnDist = npcRenderDistance * CHUNK_SIZE * VOXEL_SIZE;
+    const despawnDistSq = despawnDist * despawnDist;
+    const chatDistSq = CHAT_DISTANCE * CHAT_DISTANCE;
 
     /* ═══ 1. SPAWN new NPCs ═══ */
     if (t - lastSpawnCheck.current > SPAWN_CHECK_INTERVAL && npcs.length < maxNpcs) {
@@ -293,23 +319,13 @@ export function CityNPCs({
       npc.age += dt;
 
       // Despawn if too far or density dropped
-      const distToCam = Math.sqrt((npc.x - camX) ** 2 + (npc.z - camZ) ** 2);
-      if (distToCam > despawnDist || npc.age > 180 || npcDensity <= 0) {
+      const dx2 = (npc.x - camX) ** 2 + (npc.z - camZ) ** 2;
+      if (dx2 > despawnDistSq || npc.age > 180 || npcDensity <= 0) {
         // If chatting, free partner
-        if (npc.chatPartner >= 0 && npc.chatPartner < npcs.length) {
-          const partner = npcs[npc.chatPartner];
-          if (partner && partner.chatPartner === ni) {
-            partner.chatPartner = -1;
-            partner.behavior = 'pausing';
-            partner.behaviorTimer = 0.5;
-          }
-        }
+        freeChatPartner(npc, npcs, ni);
         npcs.splice(ni, 1);
         // Fix chat partner indices after splice
-        for (const other of npcs) {
-          if (other.chatPartner > ni) other.chatPartner--;
-          else if (other.chatPartner === ni) { other.chatPartner = -1; other.behavior = 'pausing'; other.behaviorTimer = 0.5; }
-        }
+        fixPartnerIndices(npcs, ni);
         continue;
       }
 
@@ -350,7 +366,7 @@ export function CityNPCs({
               if (other.chatPartner >= 0 || other.behavior === 'chatting') continue;
               const ddx = npc.x - other.x, ddz = npc.z - other.z;
               const distSq = ddx * ddx + ddz * ddz;
-              if (distSq < CHAT_DISTANCE * CHAT_DISTANCE && npcHash(npc.age + ni, oi) > 0.85) {
+              if (distSq < chatDistSq && npcHash(npc.age + ni, oi) > 0.85) {
                 // Start chatting!
                 const chatTime = CHAT_DURATION_MIN + npcHash(ni * 7, oi * 11) * (CHAT_DURATION_MAX - CHAT_DURATION_MIN);
                 npc.behavior = 'chatting';
@@ -402,14 +418,7 @@ export function CityNPCs({
             // End chat
             npc.behavior = 'pausing';
             npc.behaviorTimer = 0.5 + npcHash(npc.age, ni) * 1.0;
-            if (npc.chatPartner >= 0 && npc.chatPartner < npcs.length) {
-              const partner = npcs[npc.chatPartner];
-              if (partner && partner.chatPartner === ni) {
-                partner.chatPartner = -1;
-                partner.behavior = 'pausing';
-                partner.behaviorTimer = 0.5 + npcHash(partner.age, npc.chatPartner) * 1.0;
-              }
-            }
+            freeChatPartner(npc, npcs, ni);
             npc.chatPartner = -1;
           }
           break;
