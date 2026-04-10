@@ -63,7 +63,6 @@ export function SettingsPanel({
     terrain: false,
     effects: false,
     atmosphere: false,
-    detail: false,
   });
   const toggleSection = useCallback((key: keyof typeof sections) => {
     setSections(prev => ({ ...prev, [key]: !prev[key] }));
@@ -250,21 +249,6 @@ export function SettingsPanel({
                 </div>
               </div>
               <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => onUpdateConfig('chunkGenSpeed', v)} min={1} max={10} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
-            </div>
-          )}
-
-          {/* ══════ VISUAL DETAIL SECTION ══════ */}
-          <SectionHeader title="Visual Detail" icon="✨" open={sections.detail} onToggle={() => toggleSection('detail')} color="text-retro-gold/80" />
-          {sections.detail && (
-            <div className="space-y-2 pl-1 pb-2">
-              <ConfigSlider label="Voxel Detail LOD" value={config.voxelDetail} onChange={v => onUpdateConfig('voxelDetail', v)} min={0} max={16} step={1} color="text-retro-gold/80" displayValue={config.voxelDetail === 0 ? 'Off' : `${config.voxelDetail}×`} />
-              {config.voxelDetail > 0 && (
-                <>
-                  <ConfigSlider label="Detail Distance" value={config.detailDistance} onChange={v => onUpdateConfig('detailDistance', v)} min={1} max={20} step={0.5} color="text-retro-gold/80" displayValue={`${config.detailDistance}u`} />
-                  <ConfigSlider label="Sharpness" value={config.detailSharpness} onChange={v => onUpdateConfig('detailSharpness', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.detailSharpness === 0 ? 'Smooth' : config.detailSharpness < 0.3 ? 'Subtle' : config.detailSharpness < 0.7 ? 'Textured' : 'Rough'} />
-                  <ConfigSlider label="Max Instances" value={config.detailMaxInstances} onChange={v => onUpdateConfig('detailMaxInstances', v)} min={1000} max={200000} step={1000} color="text-retro-cyan/80" displayValue={config.detailMaxInstances >= 1000 ? `${(config.detailMaxInstances / 1000).toFixed(0)}K` : String(config.detailMaxInstances)} />
-                </>
-              )}
             </div>
           )}
 
