@@ -18,8 +18,7 @@
  *  │   └── chunk.ts       — generateChunkData
  *  ├── rendering/
  *  │   ├── ChunkMesh.tsx  — instanced mesh renderer + FloatingPickup
- *  │   ├── WorldLighting.tsx — lights, sky dome, fog
- *  │   └── SurfaceDetailLayer.tsx — voxel detail LOD
+ *  │   └── WorldLighting.tsx — lights, sky dome, fog
  *  ├── effects/
  *  │   ├── AmbientParticles.tsx
  *  │   ├── SkyBirds.tsx
@@ -61,7 +60,6 @@ import { FogEffect } from './rendering/WorldLighting';
 import { DayNightLighting, DayNightSky, TimeContext } from './rendering/DayNightCycle';
 import type { TimeState } from './rendering/DayNightCycle';
 import { NightWindowLights } from './rendering/NightWindowLights';
-import { SurfaceDetailLayer } from './rendering/SurfaceDetailLayer';
 import { AmbientParticles } from './effects/AmbientParticles';
 import { SkyBirds } from './effects/SkyBirds';
 import { GroundCritters } from './effects/GroundCritters';
@@ -595,18 +593,9 @@ export default function ProceduralTerrain() {
           <CameraTracker onUpdate={handleCameraUpdate} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} />
           <AmbientParticles biome={currentBiome} intensity={config.particleIntensity} />
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
-          <GroundCritters biome={currentBiome} intensity={config.particleIntensity} />
+          <GroundCritters biome={currentBiome} npcDensity={config.npcDensity} npcDistance={config.npcDistance} npcScale={config.npcScale} npcMaxPerChunk={config.npcMaxPerChunk} chunkCacheRef={chunkCacheRef} />
           <NightWindowLights chunkCacheRef={chunkCacheRef} windowLitProbability={config.windowLitProbability} />
           <WaterBoats chunkCacheRef={chunkCacheRef} boatDensity={config.boatDensity} />
-          {config.voxelDetail > 0 && (
-            <SurfaceDetailLayer
-              chunkCacheRef={chunkCacheRef}
-              detail={config.voxelDetail}
-              detailDistance={config.detailDistance}
-              detailSharpness={config.detailSharpness}
-              detailMaxInstances={config.detailMaxInstances}
-            />
-          )}
           </TimeContext.Provider>
         </Canvas>
       </div>

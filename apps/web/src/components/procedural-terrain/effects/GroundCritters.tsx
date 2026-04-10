@@ -1,114 +1,611 @@
 /* ═══════════════════════════════════════════════════════════════
- *  Ground Critters — small life near terrain surface
+ *  Ground Critters — Camera-direction-aware NPC population system
+ *
+ *  NPCs are spawned/despawned per-chunk with camera awareness:
+ *  - Each loaded chunk gets deterministic NPC positions (seeded RNG)
+ *  - NPCs behind the camera despawn at a tighter radius than those in front
+ *  - Chunks in the camera's forward direction get spawn priority
+ *  - Movement detection triggers immediate spawn/despawn scans
+ *  - Walking animation, terrain tracking, biome-aware colors
+ *  - npcMaxPerChunk controls per-chunk cap; npcDensity scales it 0-1
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useMemo, useContext } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import type { ChunkVoxelData } from '../types';
+import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
+import { TimeContext } from '../rendering/DayNightCycle';
 
-interface CritterState {
-  dir: number;
-  speed: number;
-  moveTime: number;
-  pauseTime: number;
-  moving: boolean;
+/* ── Constants ── */
+const MAX_NPCS = 800;                // hard cap for instanced mesh
+const FADE_DURATION = 0.8;           // seconds to fade in/out
+const WALK_SPEED_MIN = 0.25;
+const WALK_SPEED_MAX = 0.75;
+const TURN_SPEED = 2.5;              // radians/sec for smooth rotation
+const PAUSE_MIN = 1.5;
+const PAUSE_MAX = 5.0;
+const MOVE_MIN = 2.0;
+const MOVE_MAX = 7.0;
+const ARM_SWING_SPEED = 8;
+const ARM_SWING_AMOUNT = 0.6;
+const SPAWN_CHECK_INTERVAL = 0.2;    // seconds between chunk scans
+const MOVE_TRIGGER_DIST = 2.0;       // world units of camera move to trigger immediate scan
+const BEHIND_DIST_FACTOR = 0.5;      // behind-camera despawn at this fraction of npcDistance
+const SIDE_DIST_FACTOR = 0.75;       // side/peripheral despawn factor
+
+/* ── Biome NPC config ── */
+interface BiomeCritterCfg {
+  densityMul: number;    // 0-1 multiplier on npcMaxPerChunk for this biome
+  skinColor: string;
+  shirtColor: string;
+  pantsColor: string;
+  speedMult: number;
 }
 
-const BIOME_CRITTER_CONFIG: Record<string, { count: number; color: string; size: number; speedRange: [number, number]; groundY: number }> = {
-  Forest:    { count: 8, color: '#886633', size: 0.06, speedRange: [0.3, 0.8], groundY: 0.15 },
-  Plains:    { count: 6, color: '#669944', size: 0.05, speedRange: [0.5, 1.2], groundY: 0.12 },
-  Desert:    { count: 4, color: '#ccaa77', size: 0.05, speedRange: [0.8, 1.8], groundY: 0.10 },
-  Tundra:    { count: 3, color: '#ddeeff', size: 0.06, speedRange: [0.2, 0.5], groundY: 0.12 },
-  Ocean:     { count: 3, color: '#cc6644', size: 0.05, speedRange: [0.3, 0.6], groundY: 0.08 },
-  City:      { count: 5, color: '#888888', size: 0.04, speedRange: [0.6, 1.5], groundY: 0.10 },
-  Mountains: { count: 2, color: '#99aabb', size: 0.05, speedRange: [0.2, 0.4], groundY: 0.12 },
+const BIOME_NPC_CONFIG: Record<string, BiomeCritterCfg> = {
+  Forest:    { densityMul: 0.7,  skinColor: '#ddb896', shirtColor: '#336633', pantsColor: '#553322', speedMult: 0.8 },
+  Plains:    { densityMul: 0.8,  skinColor: '#ddb896', shirtColor: '#5577cc', pantsColor: '#444466', speedMult: 1.0 },
+  Desert:    { densityMul: 0.4,  skinColor: '#c8a070', shirtColor: '#ccaa66', pantsColor: '#887744', speedMult: 0.7 },
+  Tundra:    { densityMul: 0.3,  skinColor: '#eeddcc', shirtColor: '#7799aa', pantsColor: '#556677', speedMult: 0.6 },
+  Ocean:     { densityMul: 0.0,  skinColor: '#c8a070', shirtColor: '#cc6644', pantsColor: '#553333', speedMult: 0.5 },
+  City:      { densityMul: 1.0,  skinColor: '#ddb896', shirtColor: '#666666', pantsColor: '#333344', speedMult: 1.2 },
+  Mountains: { densityMul: 0.2,  skinColor: '#ddb896', shirtColor: '#998877', pantsColor: '#556655', speedMult: 0.5 },
+  Swamp:     { densityMul: 0.3,  skinColor: '#bba888', shirtColor: '#557744', pantsColor: '#444433', speedMult: 0.6 },
+  Village:   { densityMul: 0.9,  skinColor: '#ddb896', shirtColor: '#cc8844', pantsColor: '#665533', speedMult: 0.9 },
 };
 
-const MAX_CRITTERS = 12;
+/* ── NPC body part definitions ── */
+type ColorType = 0 | 1 | 2 | 3;
 
-export function GroundCritters({ biome, intensity }: { biome: string; intensity: number }) {
-  const ref = useRef<THREE.Points>(null);
+interface BodyPart {
+  ox: number; oy: number; oz: number;
+  sx: number; sy: number; sz: number;
+  colorType: ColorType;
+  animGroup?: 'leftArm' | 'rightArm' | 'leftLeg' | 'rightLeg';
+  pivotY?: number;
+}
+
+const BODY_PARTS: BodyPart[] = [
+  { ox: 0, oy: 4, oz: 0, sx: 2, sy: 2, sz: 2, colorType: 0 },        // Head
+  { ox: 0, oy: 6, oz: 0, sx: 2, sy: 0.6, sz: 2, colorType: 3 },      // Hair
+  { ox: 0, oy: 2, oz: 0, sx: 2, sy: 2, sz: 1, colorType: 1 },        // Torso
+  { ox: -1.4, oy: 2, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 1, animGroup: 'leftArm', pivotY: 2 },
+  { ox: 1.4, oy: 2, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 1, animGroup: 'rightArm', pivotY: 2 },
+  { ox: -0.5, oy: 0, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 2, animGroup: 'leftLeg', pivotY: 2 },
+  { ox: 0.5, oy: 0, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 2, animGroup: 'rightLeg', pivotY: 2 },
+];
+
+const VOXELS_PER_NPC = BODY_PARTS.length;
+const TOTAL_INSTANCES = MAX_NPCS * VOXELS_PER_NPC;
+
+const HAIR_COLORS = ['#332211', '#443322', '#554433', '#221100', '#665544', '#887766', '#aa6633', '#cc9944'];
+
+/* ── NPC state ── */
+interface NpcState {
+  x: number; z: number; y: number;
+  heading: number;
+  targetHeading: number;
+  speed: number;
+  targetSpeed: number;
+  moveTimer: number;
+  moving: boolean;
+  age: number;
+  fadeOut: boolean;
+  fadeTimer: number;
+  walkPhase: number;
+  alive: boolean;
+  hairColor: string;
+  colorShift: number;
+  chunkKey: string;              // which chunk this NPC belongs to
+}
+
+/* ── Deterministic seeded RNG (same positions each visit) ── */
+function mulberry32(seed: number): () => number {
+  let s = seed | 0;
+  return () => { s = Math.imul(s ^ (s >>> 15), s | 1); s ^= s + Math.imul(s ^ (s >>> 7), s | 61); return ((s ^ (s >>> 14)) >>> 0) / 4294967296; };
+}
+
+/* ── Terrain height sampling ── */
+function getGroundSample(cache: Map<string, ChunkVoxelData>, worldX: number, worldZ: number): { height: number; walkable: boolean } {
+  const vx = worldX / VOXEL_SIZE;
+  const vz = worldZ / VOXEL_SIZE;
+  const cx = Math.floor(vx / CHUNK_SIZE);
+  const cz = Math.floor(vz / CHUNK_SIZE);
+  const data = cache.get(`${cx},${cz}`);
+  if (!data) return { height: -1, walkable: false };
+  const lx = Math.floor(vx - cx * CHUNK_SIZE);
+  const lz = Math.floor(vz - cz * CHUNK_SIZE);
+  if (lx < 0 || lx >= CHUNK_SIZE || lz < 0 || lz >= CHUNK_SIZE) return { height: -1, walkable: false };
+  const i = lx * CHUNK_SIZE + lz;
+  const height = data.groundHeightMap ? data.groundHeightMap[i] : data.solidHeightMap[i];
+  const walkable = data.npcWalkableMap ? data.npcWalkableMap[i] === 1 : true;
+  return { height, walkable };
+}
+
+function getWaterLevel(cache: Map<string, ChunkVoxelData>, worldX: number, worldZ: number): number {
+  const vx = worldX / VOXEL_SIZE;
+  const vz = worldZ / VOXEL_SIZE;
+  const cx = Math.floor(vx / CHUNK_SIZE);
+  const cz = Math.floor(vz / CHUNK_SIZE);
+  const data = cache.get(`${cx},${cz}`);
+  if (!data) return 0;
+  const lx = Math.floor(vx - cx * CHUNK_SIZE);
+  const lz = Math.floor(vz - cz * CHUNK_SIZE);
+  if (lx < 0 || lx >= CHUNK_SIZE || lz < 0 || lz >= CHUNK_SIZE) return 0;
+  return data.waterLevelMap[lx * CHUNK_SIZE + lz];
+}
+
+/* ═══════════════ MAIN COMPONENT ═══════════════ */
+
+export function GroundCritters({
+  biome,
+  npcDensity,
+  npcDistance,
+  npcScale,
+  npcMaxPerChunk,
+  chunkCacheRef,
+}: {
+  biome: string;
+  npcDensity: number;
+  npcDistance: number;
+  npcScale: number;
+  npcMaxPerChunk: number;
+  chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
+}) {
   const { camera } = useThree();
-  const cfg = BIOME_CRITTER_CONFIG[biome] || BIOME_CRITTER_CONFIG.Plains;
-  const RANGE = 8;
-  const activeCount = Math.max(0, Math.round(cfg.count * intensity));
+  const timeRef = useContext(TimeContext);
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const npcsRef = useRef<NpcState[]>([]);
+  const spawnTimerRef = useRef(0);
+  const activeChunksRef = useRef<Set<string>>(new Set());
+  const lastCamPosRef = useRef({ x: 0, z: 0 });
+  const camDirRef = useRef({ x: 0, z: -1 });  // camera forward on XZ plane
 
-  const states = useRef<CritterState[]>([]);
+  const cfg = BIOME_NPC_CONFIG[biome] || BIOME_NPC_CONFIG.Plains;
 
-  const geo = useMemo(() => {
-    let s2 = 31337;
-    const rnd = () => { s2 = (s2 + 0x6D2B79F5) | 0; let t2 = Math.imul(s2 ^ (s2 >>> 15), 1 | s2); t2 = (t2 + Math.imul(t2 ^ (t2 >>> 7), 61 | t2)) ^ t2; return ((t2 ^ (t2 >>> 14)) >>> 0) / 4294967296; };
-    const pos = new Float32Array(MAX_CRITTERS * 3);
-    const st: CritterState[] = [];
-    for (let i = 0; i < MAX_CRITTERS; i++) {
-      pos[i * 3]     = (rnd() - 0.5) * RANGE * 2;
-      pos[i * 3 + 1] = cfg.groundY;
-      pos[i * 3 + 2] = (rnd() - 0.5) * RANGE * 2;
-      st.push({
-        dir: rnd() * Math.PI * 2,
-        speed: cfg.speedRange[0] + rnd() * (cfg.speedRange[1] - cfg.speedRange[0]),
-        moveTime: 0.5 + rnd() * 2,
-        pauseTime: 0,
-        moving: true,
-      });
+  const colors = useMemo(() => ({
+    skin: new THREE.Color(cfg.skinColor),
+    shirt: new THREE.Color(cfg.shirtColor),
+    pants: new THREE.Color(cfg.pantsColor),
+  }), [cfg.skinColor, cfg.shirtColor, cfg.pantsColor]);
+
+  const geo = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
+  const mat = useMemo(() => new THREE.MeshLambertMaterial({ transparent: true, depthWrite: true }), []);
+
+  /* ── Reusable objects for render loop (avoid per-frame allocations) ── */
+  const renderObjs = useMemo(() => ({
+    m: new THREE.Matrix4(),
+    rotM: new THREE.Matrix4(),
+    scaleM: new THREE.Matrix4(),
+    swingM: new THREE.Matrix4(),
+    c: new THREE.Color(),
+    zeroMatrix: new THREE.Matrix4().makeScale(0, 0, 0),
+    dir: new THREE.Vector3(),
+  }), []);
+
+  /* ── NPC voxel size based on npcScale ── */
+  const npcVs = VOXEL_SIZE / 5 * npcScale;
+  const surfaceOffset = VOXEL_SIZE * 0.52;
+
+  /* ── Try to find a valid spawn position within a chunk ── */
+  function trySpawnInChunk(cx: number, cz: number, rng: () => number, cache: Map<string, ChunkVoxelData>): { x: number; z: number; y: number } | null {
+    for (let attempt = 0; attempt < 12; attempt++) {
+      const lx = 1 + Math.floor(rng() * (CHUNK_SIZE - 2));
+      const lz = 1 + Math.floor(rng() * (CHUNK_SIZE - 2));
+      const worldX = (cx * CHUNK_SIZE + lx) * VOXEL_SIZE;
+      const worldZ = (cz * CHUNK_SIZE + lz) * VOXEL_SIZE;
+
+      const sample = getGroundSample(cache, worldX, worldZ);
+      if (sample.height < 0 || !sample.walkable) continue;
+
+      const waterL = getWaterLevel(cache, worldX, worldZ);
+      if (sample.height < waterL) continue;
+
+      // Avoid steep terrain
+      const hL = getGroundSample(cache, worldX - VOXEL_SIZE, worldZ).height;
+      const hR = getGroundSample(cache, worldX + VOXEL_SIZE, worldZ).height;
+      const hF = getGroundSample(cache, worldX, worldZ - VOXEL_SIZE).height;
+      const hB = getGroundSample(cache, worldX, worldZ + VOXEL_SIZE).height;
+      if (hL < 0 || hR < 0 || hF < 0 || hB < 0) continue;
+      if (Math.max(Math.abs(sample.height - hL), Math.abs(sample.height - hR), Math.abs(sample.height - hF), Math.abs(sample.height - hB)) > 2) continue;
+
+      return { x: worldX, z: worldZ, y: sample.height * VOXEL_SIZE + surfaceOffset };
     }
-    states.current = st;
-    const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-    g.setDrawRange(0, cfg.count);
-    return g;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [RANGE]);
-
-  useEffect(() => { geo.setDrawRange(0, Math.min(activeCount, MAX_CRITTERS)); }, [geo, activeCount]);
-
-  const mat = useMemo(() => new THREE.PointsMaterial({
-    color: cfg.color, size: cfg.size, transparent: true, opacity: 0.7,
-    sizeAttenuation: true, depthWrite: false,
-  }), [cfg.color, cfg.size]);
+    return null;
+  }
 
   useFrame((_, delta) => {
-    if (!ref.current) return;
-    const attr = ref.current.geometry.getAttribute('position') as THREE.BufferAttribute;
-    const arr = attr.array as Float32Array;
+    const mesh = meshRef.current;
+    const cache = chunkCacheRef.current;
+    if (!mesh || !cache || npcDensity <= 0) return;
+
     const dt = Math.min(delta, 0.05);
+    const npcs = npcsRef.current;
+    const camX = camera.position.x;
+    const camZ = camera.position.z;
+    const chunkWorldSize = CHUNK_SIZE * VOXEL_SIZE;
 
-    for (let i = 0; i < activeCount && i < MAX_CRITTERS; i++) {
-      const st = states.current[i];
-      if (!st) continue;
-      const i3 = i * 3;
+    // Camera chunk position
+    const camCx = Math.floor(camX / chunkWorldSize);
+    const camCz = Math.floor(camZ / chunkWorldSize);
 
-      if (st.moving) {
-        arr[i3]     += Math.cos(st.dir) * st.speed * dt;
-        arr[i3 + 2] += Math.sin(st.dir) * st.speed * dt;
-        arr[i3 + 1] = cfg.groundY;
+    // ── Get camera forward direction on XZ plane ──
+    camera.getWorldDirection(renderObjs.dir);
+    const fwdLen = Math.sqrt(renderObjs.dir.x * renderObjs.dir.x + renderObjs.dir.z * renderObjs.dir.z);
+    const fwdX = fwdLen > 0.001 ? renderObjs.dir.x / fwdLen : 0;
+    const fwdZ = fwdLen > 0.001 ? renderObjs.dir.z / fwdLen : -1;
+    camDirRef.current.x = fwdX;
+    camDirRef.current.z = fwdZ;
 
-        st.moveTime -= dt;
-        if (st.moveTime <= 0) {
-          st.moving = false;
-          st.pauseTime = 0.3 + Math.random() * 1.5;
-        }
-      } else {
-        st.pauseTime -= dt;
-        if (st.pauseTime <= 0) {
-          st.dir = Math.random() * Math.PI * 2;
-          st.speed = cfg.speedRange[0] + Math.random() * (cfg.speedRange[1] - cfg.speedRange[0]);
-          st.moveTime = 0.5 + Math.random() * 2.5;
-          st.moving = true;
+    // ── Detect significant camera movement for immediate scan ──
+    const moveDx = camX - lastCamPosRef.current.x;
+    const moveDz = camZ - lastCamPosRef.current.z;
+    const moveDist = Math.sqrt(moveDx * moveDx + moveDz * moveDz);
+    const cameraMovedSignificantly = moveDist > MOVE_TRIGGER_DIST;
+
+    /* ═══ 1. CAMERA-DIRECTION-AWARE SPAWN/DESPAWN SCAN ═══ */
+    spawnTimerRef.current += dt;
+    const shouldScan = spawnTimerRef.current > SPAWN_CHECK_INTERVAL || cameraMovedSignificantly;
+
+    if (shouldScan) {
+      spawnTimerRef.current = 0;
+      lastCamPosRef.current.x = camX;
+      lastCamPosRef.current.z = camZ;
+
+      const dist = npcDistance;
+      const distSq = (dist + 0.5) * (dist + 0.5);
+
+      // ── Directional despawn distances ──
+      // Behind camera: tighter radius → despawn sooner
+      // In front: full radius → keep visible NPCs alive
+      const behindDistSq = (dist * BEHIND_DIST_FACTOR) * (dist * BEHIND_DIST_FACTOR);
+      const sideDistSq = (dist * SIDE_DIST_FACTOR) * (dist * SIDE_DIST_FACTOR);
+      const killDistSq = (dist + 1.0) * (dist + 1.0);
+
+      /**
+       * Get effective despawn distance² for a chunk based on camera direction.
+       * dot > 0 = in front, dot < 0 = behind, |dot| small = to the side.
+       */
+      function getEffectiveDespawnDistSq(chunkCenterX: number, chunkCenterZ: number): number {
+        const toCx = chunkCenterX - camX;
+        const toCz = chunkCenterZ - camZ;
+        const toLen = Math.sqrt(toCx * toCx + toCz * toCz);
+        if (toLen < 0.001) return distSq; // camera is in this chunk
+        const dot = (toCx / toLen) * fwdX + (toCz / toLen) * fwdZ;
+        // dot: -1 = directly behind, +1 = directly in front
+        if (dot < -0.3) return behindDistSq;   // behind camera
+        if (dot < 0.2)  return sideDistSq;     // to the side
+        return distSq;                          // in front
+      }
+
+      // Build set of chunks that should have NPCs (full circle)
+      const wantedChunks = new Set<string>();
+      for (let dx = -dist; dx <= dist; dx++) {
+        for (let dz = -dist; dz <= dist; dz++) {
+          if (dx * dx + dz * dz > distSq) continue;
+          const ccx = camCx + dx;
+          const ccz = camCz + dz;
+          const key = `${ccx},${ccz}`;
+          if (cache.has(key)) {
+            wantedChunks.add(key);
+          }
         }
       }
 
-      const dx2 = arr[i3], dz2 = arr[i3 + 2];
-      if (dx2 * dx2 + dz2 * dz2 > RANGE * RANGE * 4) {
-        arr[i3]     = (Math.random() - 0.5) * RANGE;
-        arr[i3 + 2] = (Math.random() - 0.5) * RANGE;
-        st.dir = Math.random() * Math.PI * 2;
+      // ── Phase A: Direction-aware chunk despawn ──
+      const active = activeChunksRef.current;
+      for (const key of active) {
+        if (wantedChunks.has(key)) {
+          // Check if this chunk should be despawned based on camera direction
+          const [cxs, czs] = key.split(',');
+          const kcx = parseInt(cxs, 10);
+          const kcz = parseInt(czs, 10);
+          const ddx = kcx - camCx;
+          const ddz = kcz - camCz;
+          const cdSq = ddx * ddx + ddz * ddz;
+          const chunkCenterX = (kcx + 0.5) * chunkWorldSize;
+          const chunkCenterZ = (kcz + 0.5) * chunkWorldSize;
+          const effectiveDistSq = getEffectiveDespawnDistSq(chunkCenterX, chunkCenterZ);
+
+          if (cdSq > effectiveDistSq) {
+            // Behind/side camera, beyond effective range → fade out
+            for (let i = 0; i < npcs.length; i++) {
+              if (npcs[i].alive && !npcs[i].fadeOut && npcs[i].chunkKey === key) {
+                npcs[i].fadeOut = true;
+                npcs[i].fadeTimer = 0;
+              }
+            }
+            active.delete(key);
+            wantedChunks.delete(key); // don't re-spawn immediately
+          }
+          continue;
+        }
+
+        // Chunk no longer in wanted set at all
+        const [cxs, czs] = key.split(',');
+        const kcx = parseInt(cxs, 10);
+        const kcz = parseInt(czs, 10);
+        const ddx = kcx - camCx;
+        const ddz = kcz - camCz;
+        const cdSq = ddx * ddx + ddz * ddz;
+
+        if (cdSq > killDistSq) {
+          // Far away → instant kill
+          for (let i = 0; i < npcs.length; i++) {
+            if (npcs[i].alive && npcs[i].chunkKey === key) {
+              npcs[i].alive = false;
+            }
+          }
+        } else {
+          // Near border → fade out
+          for (let i = 0; i < npcs.length; i++) {
+            if (npcs[i].alive && !npcs[i].fadeOut && npcs[i].chunkKey === key) {
+              npcs[i].fadeOut = true;
+              npcs[i].fadeTimer = 0;
+            }
+          }
+        }
+        active.delete(key);
+      }
+
+      // ── Phase B: Individual NPC direction-aware despawn ──
+      for (let i = 0; i < npcs.length; i++) {
+        const n = npcs[i];
+        if (!n.alive) continue;
+        const ndx = (n.x / chunkWorldSize) - camCx;
+        const ndz = (n.z / chunkWorldSize) - camCz;
+        const nDistSq = ndx * ndx + ndz * ndz;
+
+        if (nDistSq > killDistSq) {
+          n.alive = false;
+        } else if (!n.fadeOut) {
+          const effectiveDistSq = getEffectiveDespawnDistSq(n.x, n.z);
+          if (nDistSq > effectiveDistSq) {
+            n.fadeOut = true;
+            n.fadeTimer = 0;
+          }
+        }
+      }
+
+      // ── Phase C: Spawn NPCs, prioritizing chunks ahead of camera ──
+      const perChunk = Math.max(0, Math.round(npcMaxPerChunk * cfg.densityMul * npcDensity));
+
+      // Count only non-fading NPCs for capacity
+      let liveCount = 0;
+      for (let i = 0; i < npcs.length; i++) {
+        if (npcs[i].alive && !npcs[i].fadeOut) liveCount++;
+      }
+      let remaining = MAX_NPCS - liveCount;
+
+      // Sort wanted chunks: prioritize those in front of the camera, then by distance
+      const chunksToSpawn: { key: string; cx: number; cz: number; priority: number }[] = [];
+      for (const key of wantedChunks) {
+        if (active.has(key)) continue;
+        const [cxs, czs] = key.split(',');
+        const ccx = parseInt(cxs, 10);
+        const ccz = parseInt(czs, 10);
+        const chunkCenterX = (ccx + 0.5) * chunkWorldSize;
+        const chunkCenterZ = (ccz + 0.5) * chunkWorldSize;
+        const toCx = chunkCenterX - camX;
+        const toCz = chunkCenterZ - camZ;
+        const toLen = Math.sqrt(toCx * toCx + toCz * toCz);
+        const dot = toLen > 0.001 ? (toCx / toLen) * fwdX + (toCz / toLen) * fwdZ : 0;
+        const ddx = ccx - camCx;
+        const ddz = ccz - camCz;
+        const distFromCam = Math.sqrt(ddx * ddx + ddz * ddz);
+        // Priority: higher = spawn first. In-front chunks close to camera win.
+        // dot ranges -1 to 1. Weigh it so front chunks get priority.
+        const priority = (dot + 1.0) * 2.0 - distFromCam * 0.5;
+        chunksToSpawn.push({ key, cx: ccx, cz: ccz, priority });
+      }
+      chunksToSpawn.sort((a, b) => b.priority - a.priority);
+
+      for (const entry of chunksToSpawn) {
+        if (remaining <= 0) break;
+
+        const { key, cx: ccx, cz: ccz } = entry;
+
+        // Deterministic RNG seeded by chunk coords
+        const seed = ccx * 73856093 + ccz * 19349663;
+        const rng = mulberry32(seed);
+
+        const count = Math.min(perChunk, remaining);
+        let spawned = 0;
+
+        for (let i = 0; i < count; i++) {
+          const pos = trySpawnInChunk(ccx, ccz, rng, cache);
+          if (!pos) continue;
+
+          const heading = rng() * Math.PI * 2;
+          const speed = (WALK_SPEED_MIN + rng() * (WALK_SPEED_MAX - WALK_SPEED_MIN)) * cfg.speedMult;
+          const npc: NpcState = {
+            x: pos.x, z: pos.z, y: pos.y,
+            heading, targetHeading: heading,
+            speed: 0, targetSpeed: speed,
+            moveTimer: MOVE_MIN + rng() * (MOVE_MAX - MOVE_MIN),
+            moving: true, age: 0, fadeOut: false, fadeTimer: 0,
+            walkPhase: rng() * Math.PI * 2, alive: true,
+            hairColor: HAIR_COLORS[Math.floor(rng() * HAIR_COLORS.length)],
+            colorShift: (rng() - 0.5) * 0.1,
+            chunkKey: key,
+          };
+          // Find a free slot (dead NPC or append)
+          let placed = false;
+          for (let s = 0; s < npcs.length; s++) {
+            if (!npcs[s].alive) { npcs[s] = npc; placed = true; break; }
+          }
+          if (!placed && npcs.length < MAX_NPCS) npcs.push(npc);
+          else if (!placed) break;
+          spawned++;
+          remaining--;
+        }
+
+        if (spawned > 0) active.add(key);
       }
     }
-    attr.needsUpdate = true;
-    ref.current.position.set(camera.position.x, 0, camera.position.z);
+
+    /* ═══ 2. UPDATE ═══ */
+    for (let i = 0; i < npcs.length; i++) {
+      const n = npcs[i];
+      if (!n.alive) continue;
+      n.age += dt;
+
+      if (n.fadeOut) {
+        n.fadeTimer += dt;
+        if (n.fadeTimer >= FADE_DURATION) { n.alive = false; continue; }
+      }
+
+      if (n.moving) {
+        // Smooth heading interpolation
+        let hd = n.targetHeading - n.heading;
+        while (hd > Math.PI) hd -= Math.PI * 2;
+        while (hd < -Math.PI) hd += Math.PI * 2;
+        if (Math.abs(hd) > 0.05) {
+          n.heading += Math.sign(hd) * Math.min(TURN_SPEED * dt, Math.abs(hd));
+        } else {
+          n.heading = n.targetHeading;
+        }
+
+        if (n.speed < n.targetSpeed) n.speed = Math.min(n.speed + 2.0 * dt, n.targetSpeed);
+
+        const newX = n.x + Math.sin(n.heading) * n.speed * dt;
+        const newZ = n.z + Math.cos(n.heading) * n.speed * dt;
+
+        const newSample = getGroundSample(cache, newX, newZ);
+        const newH = newSample.height;
+        const newW = getWaterLevel(cache, newX, newZ);
+        const newY = newH * VOXEL_SIZE + surfaceOffset;
+
+        if (newH >= 0 && newSample.walkable && newH >= newW && Math.abs(newY - n.y) <= VOXEL_SIZE * 1.5) {
+          n.x = newX;
+          n.z = newZ;
+          n.y += (newY - n.y) * Math.min(1, dt * 10);
+        } else {
+          n.targetHeading = n.heading + Math.PI * (0.5 + Math.random());
+          n.speed *= 0.3;
+        }
+
+        n.walkPhase += dt * ARM_SWING_SPEED * (n.speed / WALK_SPEED_MAX);
+        n.moveTimer -= dt;
+        if (n.moveTimer <= 0) {
+          n.moving = false;
+          n.moveTimer = PAUSE_MIN + Math.random() * (PAUSE_MAX - PAUSE_MIN);
+          n.targetSpeed = 0;
+          n.speed *= 0.5;
+        }
+      } else {
+        n.speed = Math.max(0, n.speed - 3.0 * dt);
+        n.walkPhase += dt * ARM_SWING_SPEED * (n.speed / WALK_SPEED_MAX) * 0.3;
+
+        const standSample = getGroundSample(cache, n.x, n.z);
+        if (standSample.height >= 0 && standSample.walkable) {
+          const standY = standSample.height * VOXEL_SIZE + surfaceOffset;
+          n.y += (standY - n.y) * Math.min(1, dt * 10);
+        } else {
+          n.fadeOut = true;
+          n.fadeTimer = 0;
+        }
+
+        n.moveTimer -= dt;
+        if (n.moveTimer <= 0) {
+          n.moving = true;
+          n.targetHeading = n.heading + (Math.random() - 0.5) * Math.PI * 1.5;
+          n.targetSpeed = (WALK_SPEED_MIN + Math.random() * (WALK_SPEED_MAX - WALK_SPEED_MIN)) * cfg.speedMult;
+          n.moveTimer = MOVE_MIN + Math.random() * (MOVE_MAX - MOVE_MIN);
+        }
+      }
+    }
+
+    /* ═══ 3. RENDER ═══ */
+    const { m, rotM, scaleM, swingM, c, zeroMatrix } = renderObjs;
+    let idx = 0;
+    const isNight = timeRef?.current.isNight ?? false;
+    const nightMul = isNight ? 0.4 : 1.0;
+
+    for (let i = 0; i < npcs.length; i++) {
+      const n = npcs[i];
+      if (!n.alive) continue;
+
+      let opacity = 1.0;
+      if (n.age < FADE_DURATION) opacity = n.age / FADE_DURATION;
+      if (n.fadeOut) opacity = Math.max(0, 1 - n.fadeTimer / FADE_DURATION);
+
+      const ch = Math.cos(n.heading);
+      const sh = Math.sin(n.heading);
+      const speedRatio = Math.min(1, n.speed / WALK_SPEED_MAX);
+      const swingAmt = n.moving
+        ? Math.sin(n.walkPhase) * ARM_SWING_AMOUNT * speedRatio
+        : Math.sin(n.walkPhase) * ARM_SWING_AMOUNT * 0.05;
+
+      for (let p = 0; p < BODY_PARTS.length; p++) {
+        if (idx >= TOTAL_INSTANCES) break;
+        const part = BODY_PARTS[p];
+
+        let animSwing = 0;
+        if (part.animGroup === 'leftArm') animSwing = swingAmt;
+        else if (part.animGroup === 'rightArm') animSwing = -swingAmt;
+        else if (part.animGroup === 'leftLeg') animSwing = -swingAmt;
+        else if (part.animGroup === 'rightLeg') animSwing = swingAmt;
+
+        const lx = part.ox * npcVs;
+        let ly = (part.oy + part.sy * 0.5) * npcVs;
+        let lz = part.oz * npcVs;
+
+        if (animSwing !== 0 && part.pivotY !== undefined) {
+          const pivotWorldY = (part.oy + part.pivotY) * npcVs;
+          const relY = ly - pivotWorldY;
+          const cosS = Math.cos(animSwing);
+          const sinS = Math.sin(animSwing);
+          ly = pivotWorldY + relY * cosS - lz * sinS;
+          lz = lz * cosS + relY * sinS;
+        }
+
+        const rx = lx * ch + lz * sh;
+        const rz = -lx * sh + lz * ch;
+
+        const sx = part.sx * npcVs;
+        const sy = part.sy * npcVs;
+        const sz = part.sz * npcVs;
+
+        rotM.makeRotationY(n.heading);
+        if (animSwing !== 0) {
+          swingM.makeRotationX(animSwing);
+          rotM.multiply(swingM);
+        }
+        scaleM.makeScale(sx, sy, sz);
+        m.copy(rotM);
+        m.multiply(scaleM);
+        // eslint-disable-next-line react-hooks/immutability
+        m.elements[12] = n.x + rx;
+        m.elements[13] = n.y + ly;
+        m.elements[14] = n.z + rz;
+
+        mesh.setMatrixAt(idx, m);
+
+        const shift = n.colorShift;
+        switch (part.colorType) {
+          case 0: c.copy(colors.skin); break;
+          case 1: c.copy(colors.shirt); c.offsetHSL(shift, 0, shift * 0.5); break;
+          case 2: c.copy(colors.pants); c.offsetHSL(shift * 0.5, 0, shift * 0.3); break;
+          case 3: c.set(n.hairColor); break;
+        }
+        c.multiplyScalar(nightMul * opacity);
+        mesh.setColorAt(idx, c);
+        idx++;
+      }
+    }
+
+    // Hide unused instances
+    for (let z = idx; z < TOTAL_INSTANCES; z++) mesh.setMatrixAt(z, zeroMatrix);
+
+    mesh.count = TOTAL_INSTANCES;
+    if (mesh.instanceMatrix) mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   });
 
-  return <points ref={ref} geometry={geo} material={mat} />;
+  return (
+    <instancedMesh ref={meshRef} args={[geo, mat, TOTAL_INSTANCES]} frustumCulled={false} />
+  );
 }
