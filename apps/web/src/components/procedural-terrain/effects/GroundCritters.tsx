@@ -75,13 +75,13 @@ interface BodyPart {
 const MALE_BODY_PARTS: BodyPart[] = [
   // Head
   { ox: 0, oy: 4.2, oz: 0, sx: 1.8, sy: 1.8, sz: 1.8, colorType: 0 },
-  // Hair (short, flat on top — base, overridden by style)
+  // Hair (short, flat on top) — offset +0.06 to prevent z-fight with head top
   { ox: 0, oy: 5.5, oz: 0, sx: 1.9, sy: 0.7, sz: 1.9, colorType: 3 },
-  // Hair sides / sideburns
-  { ox: 0, oy: 4.8, oz: 0.7, sx: 1.4, sy: 0.5, sz: 0.4, colorType: 3 },
-  // Eyes (two tiny dots)
-  { ox: -0.4, oy: 4.5, oz: -0.9, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
-  { ox: 0.4, oy: 4.5, oz: -0.9, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
+  // Hair sides / sideburns — offset +0.06 Z to prevent z-fight with head back
+  { ox: 0, oy: 4.8, oz: 0.76, sx: 1.4, sy: 0.5, sz: 0.4, colorType: 3 },
+  // Eyes (two tiny dots) — offset -0.06 Z to prevent z-fight with head front
+  { ox: -0.4, oy: 4.5, oz: -0.96, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
+  { ox: 0.4, oy: 4.5, oz: -0.96, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
   // Torso (broader)
   { ox: 0, oy: 2.2, oz: 0, sx: 2.2, sy: 2.0, sz: 1.2, colorType: 1 },
   // Left arm
@@ -106,15 +106,15 @@ const MALE_BODY_PARTS: BodyPart[] = [
 const FEMALE_BODY_PARTS: BodyPart[] = [
   // Head
   { ox: 0, oy: 4.0, oz: 0, sx: 1.7, sy: 1.7, sz: 1.7, colorType: 0 },
-  // Hair (longer, extends down back)
+  // Hair (longer, extends down back) — offset +0.06 Y to prevent z-fight with head top
   { ox: 0, oy: 5.2, oz: 0, sx: 1.85, sy: 0.8, sz: 1.85, colorType: 3 },
-  // Hair extension (ponytail / long hair draping down back)
-  { ox: 0, oy: 3.8, oz: 0.6, sx: 1.2, sy: 1.6, sz: 0.5, colorType: 3 },
-  // Hair side fringe (bangs hanging on sides of face)
-  { ox: 0, oy: 4.6, oz: -0.6, sx: 1.6, sy: 0.6, sz: 0.3, colorType: 3 },
-  // Eyes
-  { ox: -0.35, oy: 4.3, oz: -0.85, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
-  { ox: 0.35, oy: 4.3, oz: -0.85, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
+  // Hair extension (ponytail / long hair draping down back) — offset +0.06 Z
+  { ox: 0, oy: 3.8, oz: 0.66, sx: 1.2, sy: 1.6, sz: 0.5, colorType: 3 },
+  // Hair side fringe (bangs hanging on sides of face) — offset -0.06 Z
+  { ox: 0, oy: 4.6, oz: -0.66, sx: 1.6, sy: 0.6, sz: 0.3, colorType: 3 },
+  // Eyes — offset -0.06 Z to prevent z-fight with head front
+  { ox: -0.35, oy: 4.3, oz: -0.91, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
+  { ox: 0.35, oy: 4.3, oz: -0.91, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
   // Torso (narrower)
   { ox: 0, oy: 2.2, oz: 0, sx: 1.8, sy: 1.8, sz: 1.0, colorType: 1 },
   // Left arm
@@ -589,8 +589,10 @@ export function GroundCritters({
       if (n.age < FADE_DURATION) opacity = n.age / FADE_DURATION;
       if (n.fadeOut) opacity = Math.max(0, 1 - n.fadeTimer / FADE_DURATION);
 
-      const ch = Math.cos(n.heading);
-      const sh = Math.sin(n.heading);
+      // Facing angle: model faces -Z in local space, so add PI to align with movement (+Z at heading=0)
+      const facingAngle = n.heading + Math.PI;
+      const ch = Math.cos(facingAngle);
+      const sh = Math.sin(facingAngle);
       const speedRatio = Math.min(1, n.speed / WALK_SPEED_MAX);
       const swingAmt = n.moving
         ? Math.sin(n.walkPhase) * ARM_SWING_AMOUNT * speedRatio
@@ -628,7 +630,7 @@ export function GroundCritters({
         const sy = part.sy * npcVs;
         const sz = part.sz * npcVs;
 
-        rotM.makeRotationY(n.heading);
+        rotM.makeRotationY(facingAngle);
         if (animSwing !== 0) {
           swingM.makeRotationX(animSwing);
           rotM.multiply(swingM);

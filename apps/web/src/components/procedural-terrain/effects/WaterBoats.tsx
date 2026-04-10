@@ -260,6 +260,9 @@ export function WaterBoats({
     const { offsets, colors, counts } = boatVoxelData;
 
     /* ═══ 1. SPAWN new boats periodically ═══ */
+    // Spawn radius derived from boatDistance (in chunks → world units)
+    const spawnRadius = boatDistance * CHUNK_SIZE * VOXEL_SIZE * 0.7;
+    const despawnRadius = boatDistance * CHUNK_SIZE * VOXEL_SIZE;
     const maxBoats = Math.round(MAX_BOATS * boatDensity);
     if (boatDensity > 0 && t - lastSpawnCheck.current > SPAWN_CHECK_INTERVAL && boats.length < maxBoats) {
       lastSpawnCheck.current = t;
@@ -267,7 +270,7 @@ export function WaterBoats({
       // Try random positions around camera to find deep water
       for (let attempt = 0; attempt < 12; attempt++) {
         const angle = pseudoRand(t * 100 + attempt, camX * 0.1) * Math.PI * 2;
-        const dist = BOAT_SPAWN_RADIUS * 0.5 + pseudoRand(t * 50 + attempt, camZ * 0.1) * BOAT_SPAWN_RADIUS * 0.5;
+        const dist = spawnRadius * 0.4 + pseudoRand(t * 50 + attempt, camZ * 0.1) * spawnRadius * 0.6;
         const sx = camX + Math.cos(angle) * dist * VOXEL_SIZE;
         const sz = camZ + Math.sin(angle) * dist * VOXEL_SIZE;
 
@@ -301,7 +304,7 @@ export function WaterBoats({
 
       // Despawn if too far or density dropped
       const distToCam = Math.sqrt((b.x - camX) ** 2 + (b.z - camZ) ** 2);
-      if (distToCam > BOAT_DESPAWN_RADIUS * VOXEL_SIZE || b.age > 120 || boatDensity <= 0) {
+      if (distToCam > despawnRadius || b.age > 120 || boatDensity <= 0) {
         boats.splice(bi, 1);
         continue;
       }
