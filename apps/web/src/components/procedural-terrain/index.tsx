@@ -594,8 +594,8 @@ export default function ProceduralTerrain() {
           <AmbientParticles biome={currentBiome} intensity={config.particleIntensity} />
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
           <GroundCritters biome={currentBiome} npcDensity={config.npcDensity} npcDistance={config.npcDistance} npcScale={config.npcScale} npcMaxPerChunk={config.npcMaxPerChunk} chunkCacheRef={chunkCacheRef} />
-          <NightWindowLights chunkCacheRef={chunkCacheRef} windowLitProbability={config.windowLitProbability} lightDistance={Math.min(config.lightDistance, config.renderDistance)} lampBrightness={config.lampBrightness} lampColorTemp={config.lampColorTemp} />
-          <WaterBoats chunkCacheRef={chunkCacheRef} boatDensity={config.boatDensity} />
+          <NightWindowLights chunkCacheRef={chunkCacheRef} windowLitProbability={config.windowLitProbability} lightDistance={Math.min(config.lightDistance, config.renderDistance)} lightFadeStart={config.lightFadeStart} lampBrightness={config.lampBrightness} lampColorTemp={config.lampColorTemp} />
+          <WaterBoats chunkCacheRef={chunkCacheRef} boatDensity={config.boatDensity} boatDistance={Math.min(config.boatDistance, config.renderDistance)} />
           </TimeContext.Provider>
         </Canvas>
       </div>

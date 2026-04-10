@@ -97,12 +97,14 @@ export function NightWindowLights({
   chunkCacheRef,
   windowLitProbability,
   lightDistance,
+  lightFadeStart,
   lampBrightness,
   lampColorTemp,
 }: {
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
   windowLitProbability: number;
   lightDistance: number;
+  lightFadeStart: number;
   lampBrightness: number;
   lampColorTemp: string;
 }) {
@@ -115,13 +117,11 @@ export function NightWindowLights({
 
   /* ── Dynamic instance budget: scales with lightDistance ── */
   const maxWindowInstances = useMemo(() => {
-    // Scale from base at lightDistance=12 up to 3× at lightDistance=100
     const scale = Math.max(1, lightDistance / 12);
     return Math.min(30000, Math.round(BASE_WINDOW_INSTANCES * scale));
   }, [lightDistance]);
 
   const maxLampInstances = useMemo(() => {
-    // Scale from base at lightDistance=12 up to 4× at lightDistance=100
     const scale = Math.max(1, lightDistance / 12);
     return Math.min(8192, Math.round(BASE_LAMP_INSTANCES * scale));
   }, [lightDistance]);
@@ -205,10 +205,25 @@ export function NightWindowLights({
     const chunkWorldSize = CHUNK_SIZE * VOXEL_SIZE;
     const camCX = Math.floor(camera.position.x / chunkWorldSize);
     const camCZ = Math.floor(camera.position.z / chunkWorldSize);
+    const camWX = camera.position.x;
+    const camWY = camera.position.y;
+    const camWZ = camera.position.z;
 
     const viewDistSq = lightDistance * lightDistance;
 
-    /* ── Camera forward direction (XZ plane, normalized) for directional prioritization ── */
+    /* ── Per-light distance fade parameters (world-space) ──
+     *  maxWorldDist: maximum world distance for any light to be rendered
+     *  fadeWorldStart: world distance where fade begins (full brightness below this)
+     *  Lights beyond maxWorldDist are skipped entirely.
+     *  Lights between fadeWorldStart and maxWorldDist fade smoothly to 0.
+     *  lightFadeStart=0.5 means fade begins at 50% of max distance (default).
+     *  lightFadeStart=1.0 means no fade at all (hard cutoff).
+     *  lightFadeStart=0.0 means fade from the very beginning. */
+    const maxWorldDist = lightDistance * chunkWorldSize;
+    const fadeWorldStart = maxWorldDist * Math.max(0, Math.min(1, lightFadeStart));
+    const fadeRange = maxWorldDist - fadeWorldStart;
+
+    /* ── Camera forward direction (XZ plane) for directional prioritization ── */
     camera.getWorldDirection(_camDir);
     const fwdX = _camDir.x;
     const fwdZ = _camDir.z;
@@ -230,10 +245,11 @@ export function NightWindowLights({
     // Billboard rotation: make fixture sprites face camera
     const camQuat = camera.quaternion;
 
-    /* ── Build sorted chunk list: prioritize front-facing + close chunks ──
-     *  This ensures the limited lamp budget goes to visible lamps first.
-     *  Chunks behind the camera still get some budget but at lower priority. */
-    type ChunkEntry = { data: ChunkVoxelData; distSq: number; dot: number; priority: number };
+    /* ── Build sorted chunk list ──
+     *  Two-tier priority: (1) distance is PRIMARY — close chunks ALWAYS come first,
+     *  (2) direction is SECONDARY — within similar distances, front-facing get priority.
+     *  This guarantees nearby lights are never starved by distant front-facing chunks. */
+    type ChunkEntry = { data: ChunkVoxelData; distSq: number };
     const sortedChunks: ChunkEntry[] = [];
 
     for (const [, data] of cache) {
@@ -241,35 +257,44 @@ export function NightWindowLights({
       const dz = data.chunkZ - camCZ;
       const distSq = dx * dx + dz * dz;
       if (distSq > viewDistSq) continue;
-
-      // Dot product with camera forward: +1 = directly ahead, -1 = directly behind
-      const len = Math.sqrt(distSq);
-      const dot = len > 0.001 ? (dx * nfwdX + dz * nfwdZ) / len : 0;
-
-      // Priority: closer + in front = higher (lower number = processed first)
-      // Front-facing chunks get large bonus, behind-camera chunks get penalty
-      const dirBonus = dot * 3.0; // -3 to +3 based on direction
-      const priority = distSq - dirBonus * lightDistance;
-
-      sortedChunks.push({ data, distSq, dot, priority });
+      sortedChunks.push({ data, distSq });
     }
 
-    // Sort by priority (lowest = most important = processed first)
-    sortedChunks.sort((a, b) => a.priority - b.priority);
+    // Sort by distance first (close = first), then direction as tiebreaker
+    sortedChunks.sort((a, b) => {
+      // Primary: distance bands (group into rings of 2 chunk radius)
+      const aBand = Math.floor(Math.sqrt(a.distSq) * 0.5);
+      const bBand = Math.floor(Math.sqrt(b.distSq) * 0.5);
+      if (aBand !== bBand) return aBand - bBand;
+      // Secondary: within same distance band, front-facing chunks first
+      const aDx = a.data.chunkX - camCX, aDz = a.data.chunkZ - camCZ;
+      const bDx = b.data.chunkX - camCX, bDz = b.data.chunkZ - camCZ;
+      const aLen = Math.sqrt(a.distSq) || 1;
+      const bLen = Math.sqrt(b.distSq) || 1;
+      const aDot = (aDx * nfwdX + aDz * nfwdZ) / aLen;
+      const bDot = (bDx * nfwdX + bDz * nfwdZ) / bLen;
+      return bDot - aDot; // higher dot = more in front = first
+    });
+
+    /* ── Helper: per-light world-space distance fade ──
+     *  Returns brightness multiplier 0-1 based on 3D distance from camera to light.
+     *  Lights within fadeWorldStart get 1.0.
+     *  Lights between fadeWorldStart and maxWorldDist fade linearly to 0.
+     *  Lights beyond maxWorldDist are 0 (but shouldn't reach here due to chunk filter). */
+    function lightFade(lx: number, ly: number, lz: number): number {
+      const dx = lx - camWX;
+      const dy = ly - camWY;
+      const dz = lz - camWZ;
+      const worldDist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+      if (worldDist <= fadeWorldStart) return 1.0;
+      if (fadeRange < 0.001) return worldDist <= maxWorldDist ? 1.0 : 0.0;
+      const t2 = (worldDist - fadeWorldStart) / fadeRange;
+      return Math.max(0, 1.0 - t2);
+    }
 
     /* ── Process sorted chunks ── */
-    const maxLampDist = lightDistance * chunkWorldSize;
-    const fadeStart = maxLampDist * 0.7; // start fading at 70% of max distance
-
     for (const entry of sortedChunks) {
-      const { data, distSq } = entry;
-      const dist = Math.sqrt(distSq);
-
-      // Distance-based fade factor (1.0 close, fades to 0.3 at edge)
-      const worldDist = dist * chunkWorldSize;
-      const fadeFactor = worldDist < fadeStart ? 1.0
-        : 1.0 - 0.7 * ((worldDist - fadeStart) / (maxLampDist - fadeStart + 0.001));
-      const clampedFade = Math.max(0.3, Math.min(1.0, fadeFactor));
+      const { data } = entry;
 
       /* ── Window lights ── */
       if (count < maxWindowInstances) {
@@ -281,6 +306,10 @@ export function NightWindowLights({
 
           const h = winHash(wx, wy, wz);
           if (h > windowLitProbability) continue;
+
+          // Per-light distance fade
+          const fade = lightFade(wx, wy, wz);
+          if (fade <= 0.01) continue; // skip invisible lights entirely
 
           const flickerPhase = h * 100;
           const flickerSpeed = 0.08 + h * 0.15;
@@ -296,7 +325,7 @@ export function NightWindowLights({
 
           const colorIdx = Math.floor(h * WARM_COLORS.length) % WARM_COLORS.length;
           c.copy(WARM_COLORS[colorIdx]);
-          const brightness = (0.8 + h * 0.4 + flicker * 0.08) * clampedFade;
+          const brightness = (0.8 + h * 0.4 + flicker * 0.08) * fade;
           c.multiplyScalar(brightness);
           inner.setColorAt(count, c);
 
@@ -314,6 +343,10 @@ export function NightWindowLights({
           const lx = data.streetLights[i3];
           const ly = data.streetLights[i3 + 1];
           const lz = data.streetLights[i3 + 2];
+
+          // Per-light distance fade
+          const fade = lightFade(lx, ly, lz);
+          if (fade <= 0.01) continue; // skip invisible lamps entirely
 
           // Subtle flicker (very mild — mostly steady)
           const lh = winHash(lx, ly, lz);
@@ -334,8 +367,8 @@ export function NightWindowLights({
           m.elements[14] = lz;
           lampGround.setMatrixAt(lampCount, m);
 
-          // Colors with brightness multiplier and distance fade
-          const lampFade = lampFlicker * brightMul * clampedFade;
+          // Colors with brightness multiplier and per-light distance fade
+          const lampFade = lampFlicker * brightMul * fade;
           c.copy(lampColor).multiplyScalar(lampFade);
           lampFixture.setColorAt(lampCount, c);
           c.copy(lampGroundColor).multiplyScalar(lampFade * 0.5);
