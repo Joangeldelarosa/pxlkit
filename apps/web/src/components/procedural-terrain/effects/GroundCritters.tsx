@@ -110,17 +110,20 @@ interface NpcState {
 }
 
 /* ── Terrain height sampling ── */
-function getSolidHeight(cache: Map<string, ChunkVoxelData>, worldX: number, worldZ: number): number {
+function getGroundSample(cache: Map<string, ChunkVoxelData>, worldX: number, worldZ: number): { height: number; walkable: boolean } {
   const vx = worldX / VOXEL_SIZE;
   const vz = worldZ / VOXEL_SIZE;
   const cx = Math.floor(vx / CHUNK_SIZE);
   const cz = Math.floor(vz / CHUNK_SIZE);
   const data = cache.get(`${cx},${cz}`);
-  if (!data) return -1;
+  if (!data) return { height: -1, walkable: false };
   const lx = Math.floor(vx - cx * CHUNK_SIZE);
   const lz = Math.floor(vz - cz * CHUNK_SIZE);
-  if (lx < 0 || lx >= CHUNK_SIZE || lz < 0 || lz >= CHUNK_SIZE) return -1;
-  return data.solidHeightMap[lx * CHUNK_SIZE + lz];
+  if (lx < 0 || lx >= CHUNK_SIZE || lz < 0 || lz >= CHUNK_SIZE) return { height: -1, walkable: false };
+  const i = lx * CHUNK_SIZE + lz;
+  const height = data.groundHeightMap ? data.groundHeightMap[i] : data.solidHeightMap[i];
+  const walkable = data.npcWalkableMap ? data.npcWalkableMap[i] === 1 : true;
+  return { height, walkable };
 }
 
 function getWaterLevel(cache: Map<string, ChunkVoxelData>, worldX: number, worldZ: number): number {
@@ -158,17 +161,15 @@ export function GroundCritters({
   const cfg = BIOME_NPC_CONFIG[biome] || BIOME_NPC_CONFIG.Plains;
   const activeMax = Math.max(0, Math.round(cfg.count * intensity));
 
-  const colorsRef = useRef({
+  const colors = useMemo(() => ({
     skin: new THREE.Color(cfg.skinColor),
     shirt: new THREE.Color(cfg.shirtColor),
     pants: new THREE.Color(cfg.pantsColor),
-  });
-  colorsRef.current.skin.set(cfg.skinColor);
-  colorsRef.current.shirt.set(cfg.shirtColor);
-  colorsRef.current.pants.set(cfg.pantsColor);
+  }), [cfg.skinColor, cfg.shirtColor, cfg.pantsColor]);
 
   const geo = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const mat = useMemo(() => new THREE.MeshLambertMaterial({ transparent: true, depthWrite: true }), []);
+  const surfaceOffset = VOXEL_SIZE * 0.52;
 
   /* ── Try to find a valid spawn position on solid ground ── */
   function trySpawnPosition(camX: number, camZ: number, cache: Map<string, ChunkVoxelData>): { x: number; z: number; y: number } | null {
@@ -178,21 +179,22 @@ export function GroundCritters({
       const sx = camX + Math.cos(angle) * dist;
       const sz = camZ + Math.sin(angle) * dist;
 
-      const solidH = getSolidHeight(cache, sx, sz);
-      if (solidH < 0) continue;
+      const sample = getGroundSample(cache, sx, sz);
+      const groundH = sample.height;
+      if (groundH < 0 || !sample.walkable) continue;
 
       const waterL = getWaterLevel(cache, sx, sz);
-      if (solidH < waterL) continue;
+      if (groundH < waterL) continue;
 
       // Avoid steep terrain
-      const hL = getSolidHeight(cache, sx - VOXEL_SIZE, sz);
-      const hR = getSolidHeight(cache, sx + VOXEL_SIZE, sz);
-      const hF = getSolidHeight(cache, sx, sz - VOXEL_SIZE);
-      const hB = getSolidHeight(cache, sx, sz + VOXEL_SIZE);
+      const hL = getGroundSample(cache, sx - VOXEL_SIZE, sz).height;
+      const hR = getGroundSample(cache, sx + VOXEL_SIZE, sz).height;
+      const hF = getGroundSample(cache, sx, sz - VOXEL_SIZE).height;
+      const hB = getGroundSample(cache, sx, sz + VOXEL_SIZE).height;
       if (hL < 0 || hR < 0 || hF < 0 || hB < 0) continue;
-      if (Math.max(Math.abs(solidH - hL), Math.abs(solidH - hR), Math.abs(solidH - hF), Math.abs(solidH - hB)) > 2) continue;
+      if (Math.max(Math.abs(groundH - hL), Math.abs(groundH - hR), Math.abs(groundH - hF), Math.abs(groundH - hB)) > 2) continue;
 
-      return { x: sx, z: sz, y: solidH * VOXEL_SIZE };
+      return { x: sx, z: sz, y: groundH * VOXEL_SIZE + surfaceOffset };
     }
     return null;
   }
@@ -270,13 +272,15 @@ export function GroundCritters({
         const newX = n.x + Math.sin(n.heading) * n.speed * dt;
         const newZ = n.z + Math.cos(n.heading) * n.speed * dt;
 
-        const newH = getSolidHeight(cache, newX, newZ);
+        const newSample = getGroundSample(cache, newX, newZ);
+        const newH = newSample.height;
         const newW = getWaterLevel(cache, newX, newZ);
+        const newY = newH * VOXEL_SIZE + surfaceOffset;
 
-        if (newH >= 0 && newH >= newW && Math.abs(newH * VOXEL_SIZE - n.y) <= VOXEL_SIZE * 1.5) {
+        if (newH >= 0 && newSample.walkable && newH >= newW && Math.abs(newY - n.y) <= VOXEL_SIZE * 1.5) {
           n.x = newX;
           n.z = newZ;
-          n.y += (newH * VOXEL_SIZE - n.y) * Math.min(1, dt * 8);
+          n.y += (newY - n.y) * Math.min(1, dt * 10);
         } else {
           // Blocked — turn around
           n.targetHeading = n.heading + Math.PI * (0.5 + Math.random());
@@ -296,8 +300,13 @@ export function GroundCritters({
         n.walkPhase += dt * ARM_SWING_SPEED * (n.speed / WALK_SPEED_MAX) * 0.3;
 
         // Track terrain while standing
-        const standH = getSolidHeight(cache, n.x, n.z);
-        if (standH >= 0) n.y += (standH * VOXEL_SIZE - n.y) * Math.min(1, dt * 8);
+        const standSample = getGroundSample(cache, n.x, n.z);
+        if (standSample.height >= 0 && standSample.walkable) {
+          const standY = standSample.height * VOXEL_SIZE + surfaceOffset;
+          n.y += (standY - n.y) * Math.min(1, dt * 10);
+        } else {
+          n.fadeOut = true;
+        }
 
         n.moveTimer -= dt;
         if (n.moveTimer <= 0) {
@@ -346,7 +355,7 @@ export function GroundCritters({
         else if (part.animGroup === 'rightLeg') animSwing = swingAmt;
 
         // Part center in local NPC space
-        let lx = part.ox * NPC_VS;
+        const lx = part.ox * NPC_VS;
         let ly = (part.oy + part.sy * 0.5) * NPC_VS;
         let lz = part.oz * NPC_VS;
 
@@ -386,9 +395,9 @@ export function GroundCritters({
         // Color selection with per-NPC variation
         const shift = n.colorShift;
         switch (part.colorType) {
-          case 0: c.copy(colorsRef.current.skin); break;
-          case 1: c.copy(colorsRef.current.shirt); c.offsetHSL(shift, 0, shift * 0.5); break;
-          case 2: c.copy(colorsRef.current.pants); c.offsetHSL(shift * 0.5, 0, shift * 0.3); break;
+          case 0: c.copy(colors.skin); break;
+          case 1: c.copy(colors.shirt); c.offsetHSL(shift, 0, shift * 0.5); break;
+          case 2: c.copy(colors.pants); c.offsetHSL(shift * 0.5, 0, shift * 0.3); break;
           case 3: c.set(n.hairColor); break;
         }
         c.multiplyScalar(nightMul * opacity);
