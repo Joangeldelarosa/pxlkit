@@ -658,6 +658,8 @@ export function GroundCritters({
       for (let pad = partCount; pad < MAX_PARTS; pad++) {
         if (idx >= TOTAL_INSTANCES) break;
         mesh.setMatrixAt(idx, zeroMatrix);
+        c.setRGB(0, 0, 0);
+        mesh.setColorAt(idx, c);
         idx++;
       }
     }
