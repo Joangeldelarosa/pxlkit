@@ -111,6 +111,7 @@ export function generateChunkData(
   const gW = CHUNK_SIZE + 2;
   const hMap = new Int32Array(gW * gW);
   const bMap = new Uint8Array(gW * gW);
+  const wlMap = new Int32Array(gW * gW);   // water level for extended grid (inc. borders)
   const variedConfigs: BiomeConfig[] = new Array(CHUNK_SIZE * CHUNK_SIZE);
 
   for (let lx = -1; lx <= CHUNK_SIZE; lx++) {
@@ -124,6 +125,7 @@ export function generateChunkData(
       if (lx >= 0 && lx < CHUNK_SIZE && lz >= 0 && lz < CHUNK_SIZE) {
         variedConfigs[lx * CHUNK_SIZE + lz] = c;
       }
+      wlMap[idx] = c.waterLevel;
 
       let h: number;
       if (biome === 'city') {
@@ -227,6 +229,36 @@ export function generateChunkData(
             varyColor(c.colors.water, wx, wy, wz, 4, 0.06, 0.06));
         }
         trackH(lx, lz, wl);
+      }
+
+      /* ── 2b. WATERFALL — cascade water at edges where neighbor has higher water ── */
+      {
+        const myTop = Math.max(h, wl);
+        // Check each neighbor for higher water that should cascade into this cell
+        const nDirs: [number, number][] = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        let maxNeighborWater = -1;
+        for (const [dlx, dlz] of nDirs) {
+          const nIdx = (lx + dlx + 1) * gW + (lz + dlz + 1);
+          const nh = hMap[nIdx];
+          const nwl = wlMap[nIdx];
+          // Neighbor has water (terrain below its water level) AND its water is above our surface
+          if (nh >= 0 && nh < nwl && nwl > myTop) {
+            if (nwl > maxNeighborWater) maxNeighborWater = nwl;
+          }
+        }
+        if (maxNeighborWater > myTop) {
+          // Add cascading water voxels from myTop+1 up to the neighbor's water level
+          const waterCol = c.colors.water || '#88ddff';
+          for (let wy = myTop + 1; wy <= maxNeighborWater; wy++) {
+            pushW((bX + lx) * VOXEL_SIZE, wy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor(waterCol, wx, wy, wz, 6, 0.15, 0.20));
+          }
+          trackH(lx, lz, maxNeighborWater);
+          // Update water level map for this cell so NPC/boats can see it
+          if (maxNeighborWater > waterLevelMap[lx * CHUNK_SIZE + lz]) {
+            waterLevelMap[lx * CHUNK_SIZE + lz] = maxNeighborWater;
+          }
+        }
       }
 
       /* ══════════════════ 3. CITY BIOME ══════════════════ */
