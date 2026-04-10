@@ -67,7 +67,7 @@ export function generateChunkData(
   regionN: (x: number, y: number) => number,
   cfg: WorldConfig,
 ): ChunkVoxelData {
-  const maxV = CHUNK_SIZE * CHUNK_SIZE * 16;
+  const maxV = CHUNK_SIZE * CHUNK_SIZE * 24;
   const posA = new Float32Array(maxV * 3);
   const colA = new Float32Array(maxV * 3);
   let sc = 0;
@@ -228,8 +228,8 @@ export function generateChunkData(
       /* ══════════════════ 3. CITY BIOME ══════════════════ */
       if (biome === 'city') {
         const cell = classifyCityCell(wx, wz, structN);
-        npcWalkableMap[lIdx] = cell.isRoad ? 1 : 0;
-        if (cell.isRoad) groundHeightMap[lIdx] = h + 1; // road surface is one voxel above terrain
+        npcWalkableMap[lIdx] = (cell.isRoad || cell.isSidewalk) ? 1 : 0;
+        if (cell.isRoad || cell.isSidewalk) groundHeightMap[lIdx] = h + 1;
 
         if (cell.isRoad) {
           /* ── Road surface ── */
@@ -237,78 +237,141 @@ export function generateChunkData(
           const modZ = ((wz % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
           const rw = cell.roadWidth;
 
-          // Road surface color — avenues are slightly different
-          const roadBase = cell.isIntersection ? '#555555'
-                         : cell.isAvenue ? '#444444'
-                         : '#3a3a3a';
+          // Road surface color — avenues slightly lighter than standard
+          const roadBase = cell.isIntersection ? '#505050'
+                         : cell.isAvenue ? '#424242'
+                         : '#383838';
           push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-            varyColor(roadBase, wx, h + 1, wz, 2, 0.03, 0.04));
+            varyColor(roadBase, wx, h + 1, wz, 2, 0.02, 0.03));
           trackH(lx, lz, h + 1);
 
-          /* Road markings — intelligent: adapt to road width */
-          const onRoadX = modX < rw;
-          const onRoadZ = modZ < rw;
+          const onRoadX = modX < cell.roadWidthX;
+          const onRoadZ = modZ < cell.roadWidthZ;
 
-          if (rw >= AVENUE_W) {
-            // Avenue — has center line, edge lines, and lane markings
-            // Center dashed yellow line
-            if (onRoadZ && !onRoadX && modZ === Math.floor(rw / 2) && (((wx % 4) + 4) % 4) < 2) {
-              push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
-            }
-            if (onRoadX && !onRoadZ && modX === Math.floor(rw / 2) && (((wz % 4) + 4) % 4) < 2) {
-              push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
-            }
-            // White edge lines
-            if ((onRoadX && !onRoadZ && (modX === 0 || modX === rw - 1)) ||
-                (onRoadZ && !onRoadX && (modZ === 0 || modZ === rw - 1))) {
-              push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#cccccc');
-            }
-          } else {
-            // Standard road (ROAD_W = 2) — yellow center when width allows
-            if (onRoadZ && !onRoadX && modZ === 0 && (((wx % 4) + 4) % 4) < 2) {
-              push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
-            }
-            if (onRoadX && !onRoadZ && modX === 0 && (((wz % 4) + 4) % 4) < 2) {
-              push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
-            }
-            // White edge lines
-            if ((onRoadX && !onRoadZ && (modX === 0 || modX === rw - 1)) ||
-                (onRoadZ && !onRoadX && (modZ === 0 || modZ === rw - 1))) {
-              push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#bbbbbb');
+          /* ── Lane markings (non-intersection) ── */
+          if (!cell.isIntersection) {
+            if (rw >= AVENUE_W) {
+              /* Avenue markings (9 wide):
+                 0: white edge | 1-2: lanes | 3: dashed divider
+                 4: green median | 5: dashed divider | 6-7: lanes | 8: white edge */
+              const mid = Math.floor(rw / 2); // 4 for width 9
+              if (onRoadZ && !onRoadX) {
+                // Road runs along X, modZ = lane position
+                if (modZ === 0 || modZ === cell.roadWidthZ - 1) {
+                  // Solid white edge lines
+                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#cccccc');
+                } else if (modZ === mid - 1 || modZ === mid + 1) {
+                  // Dashed white lane dividers
+                  if (((wx % 6) + 6) % 6 < 3) {
+                    push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#aaaaaa');
+                  }
+                } else if (modZ === mid) {
+                  // Raised green median strip
+                  push((bX + lx) * VOXEL_SIZE, (h + 1.1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                    varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06));
+                }
+              }
+              if (onRoadX && !onRoadZ) {
+                // Road runs along Z, modX = lane position
+                if (modX === 0 || modX === cell.roadWidthX - 1) {
+                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#cccccc');
+                } else if (modX === mid - 1 || modX === mid + 1) {
+                  if (((wz % 6) + 6) % 6 < 3) {
+                    push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#aaaaaa');
+                  }
+                } else if (modX === mid) {
+                  push((bX + lx) * VOXEL_SIZE, (h + 1.1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                    varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06));
+                }
+              }
+            } else {
+              /* Standard road markings (6 wide):
+                 0: white edge | 1: lane | 2-3: dashed yellow center
+                 4: lane | 5: white edge */
+              const cL = Math.floor(rw / 2) - 1; // 2
+              const cR = Math.floor(rw / 2);     // 3
+              if (onRoadZ && !onRoadX) {
+                if (modZ === 0 || modZ === cell.roadWidthZ - 1) {
+                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#bbbbbb');
+                } else if ((modZ === cL || modZ === cR) && ((wx % 4) + 4) % 4 < 2) {
+                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
+                }
+              }
+              if (onRoadX && !onRoadZ) {
+                if (modX === 0 || modX === cell.roadWidthX - 1) {
+                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#bbbbbb');
+                } else if ((modX === cL || modX === cR) && ((wz % 4) + 4) % 4 < 2) {
+                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
+                }
+              }
             }
           }
 
-          // Crosswalk at intersections
-          if (cell.isIntersection && ((modX + modZ) % 2 === 0)) {
-            push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#dddddd');
-          }
-
-          /* Lampposts at intersection corners */
-          if (modX === 0 && modZ === 0) {
-            for (let ly = 2; ly <= 5; ly++) {
-              push((bX + lx) * VOXEL_SIZE, (h + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#666666');
+          /* ── Crosswalk zebra stripes at intersections ── */
+          if (cell.isIntersection) {
+            const rwX = cell.roadWidthX;
+            const rwZ = cell.roadWidthZ;
+            // Stripes near the edges where pedestrians cross
+            const nearEdgeX = modX <= 1 || modX >= rwX - 2;
+            const nearEdgeZ = modZ <= 1 || modZ >= rwZ - 2;
+            if ((nearEdgeX || nearEdgeZ) && (((modX + modZ) % 2) === 0)) {
+              push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#dddddd');
             }
-            push((bX + lx) * VOXEL_SIZE, (h + 6) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffee88');
-            push((bX + lx + 1) * VOXEL_SIZE, (h + 5) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#555555');
-            push((bX + lx + 1) * VOXEL_SIZE, (h + 6) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffee88');
-            trackH(lx, lz, h + 6);
           }
 
-          /* Avenue median / boulevard strip */
-          if (cell.isAvenue && !cell.isIntersection) {
-            const midX = Math.floor(rw / 2);
-            const midZ = Math.floor(rw / 2);
-            // Green median strip in the center of avenues
-            if ((onRoadX && !onRoadZ && modX === midX) ||
-                (onRoadZ && !onRoadX && modZ === midZ)) {
-              push((bX + lx) * VOXEL_SIZE, (h + 1.08) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06));
+          /* ── Lampposts — tall, detailed, at intersection corners ── */
+          if (cell.isIntersection) {
+            const rwX = cell.roadWidthX;
+            const rwZ = cell.roadWidthZ;
+            const atCorner = (modX === 0 || modX === rwX - 1) && (modZ === 0 || modZ === rwZ - 1);
+            if (atCorner) {
+              const poleBase = '#444444';
+              const poleShaft = '#555555';
+              const poleCap = '#666666';
+              const lightColor = '#ffee88';
+              const lightDim = '#ffdd66';
+              // Thicker base
+              push((bX + lx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleBase);
+              push((bX + lx) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleBase);
+              // Main shaft (8 voxels: h+4 to h+11)
+              for (let ly = 4; ly <= 11; ly++) {
+                push((bX + lx) * VOXEL_SIZE, (h + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleShaft);
+              }
+              // Top cap
+              push((bX + lx) * VOXEL_SIZE, (h + 12) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleCap);
+              // Lamp arms extend over the road from the corner
+              const armDx = (modX === 0) ? 1 : -1;
+              const armDz = (modZ === 0) ? 1 : -1;
+              // X-direction arm + lights
+              push((bX + lx + armDx) * VOXEL_SIZE, (h + 11) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleCap);
+              push((bX + lx + armDx * 2) * VOXEL_SIZE, (h + 11) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleCap);
+              push((bX + lx + armDx) * VOXEL_SIZE, (h + 12) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, lightColor);
+              push((bX + lx + armDx * 2) * VOXEL_SIZE, (h + 12) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, lightDim);
+              // Z-direction arm + lights
+              push((bX + lx) * VOXEL_SIZE, (h + 11) * VOXEL_SIZE, (bZ + lz + armDz) * VOXEL_SIZE, poleCap);
+              push((bX + lx) * VOXEL_SIZE, (h + 11) * VOXEL_SIZE, (bZ + lz + armDz * 2) * VOXEL_SIZE, poleCap);
+              push((bX + lx) * VOXEL_SIZE, (h + 12) * VOXEL_SIZE, (bZ + lz + armDz) * VOXEL_SIZE, lightColor);
+              push((bX + lx) * VOXEL_SIZE, (h + 12) * VOXEL_SIZE, (bZ + lz + armDz * 2) * VOXEL_SIZE, lightDim);
+              trackH(lx, lz, h + 12);
             }
           }
 
         } else if (cell.isSidewalk) {
+          /* ── Sidewalk with curb / walkway distinction ── */
+          const modX = ((wx % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
+          const modZ = ((wz % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
+          const lotRawX = modX - cell.roadWidthX;
+          const lotRawZ = modZ - cell.roadWidthZ;
+          const lotSzX = BLOCK_SIZE - cell.roadWidthX;
+          const lotSzZ = BLOCK_SIZE - cell.roadWidthZ;
+
+          // Curb = innermost sidewalk voxel adjacent to road (first or last in lot)
+          const isCurb = lotRawX === 0 || lotRawX === lotSzX - 1
+                      || lotRawZ === 0 || lotRawZ === lotSzZ - 1;
+
+          const swColor = isCurb ? '#999999' : '#b0b0b0';
           push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-            varyColor('#aaaaaa', wx, h + 1, wz, 2, 0.03, 0.05));
+            varyColor(swColor, wx, h + 1, wz, 2, 0.03, 0.05));
           trackH(lx, lz, h + 1);
 
         } else if (cell.isBuilding) {
@@ -318,9 +381,12 @@ export function generateChunkData(
             cfg.structureDensity, cell.zone, cell.buildingW, cell.buildingD,
           );
           const bh = getBuildingHeight(structN, cell.lotWorldX, cell.lotWorldZ, bType);
-          const footprint = BLOCK_SIZE - ROAD_W - LOT_INSET * 2;
-          const totalW = cell.buildingW > 1 ? cell.buildingW * footprint : footprint;
-          const totalD = cell.buildingD > 1 ? cell.buildingD * footprint : footprint;
+          const baseFootprint = BLOCK_SIZE - ROAD_W - LOT_INSET * 2;
+          // Per-dimension footprint for single-lot; multi-lot uses consistent baseFootprint
+          const footprintX = BLOCK_SIZE - cell.roadWidthX - LOT_INSET * 2;
+          const footprintZ = BLOCK_SIZE - cell.roadWidthZ - LOT_INSET * 2;
+          const totalW = cell.buildingW > 1 ? cell.buildingW * baseFootprint : footprintX;
+          const totalD = cell.buildingD > 1 ? cell.buildingD * baseFootprint : footprintZ;
 
           generateBuildingColumn({
             push, trackH, pushWin,

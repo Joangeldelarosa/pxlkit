@@ -262,7 +262,7 @@ export function SettingsPanel({
               <ConfigSlider label="NPC Density" value={config.npcDensity} onChange={v => onUpdateConfig('npcDensity', v)} min={0} max={1} step={0.05} color="text-retro-green/80" displayValue={config.npcDensity === 0 ? 'Off' : `${Math.round(config.npcDensity * 100)}%`} />
               <ConfigSlider label="NPCs Per Chunk" value={config.npcMaxPerChunk} onChange={v => onUpdateConfig('npcMaxPerChunk', v)} min={1} max={25} step={1} color="text-retro-green/80" displayValue={`${config.npcMaxPerChunk}`} />
               <ConfigSlider label="NPC Distance" value={config.npcDistance} onChange={v => onUpdateConfig('npcDistance', v)} min={2} max={20} step={1} color="text-retro-green/80" displayValue={`${config.npcDistance} chunks`} />
-              <ConfigSlider label="NPC Size" value={config.npcScale} onChange={v => onUpdateConfig('npcScale', v)} min={0.3} max={1.5} step={0.05} color="text-retro-green/80" displayValue={`${Math.round(config.npcScale * 100)}%`} />
+              <ConfigSlider label="NPC Size" value={config.npcScale} onChange={v => onUpdateConfig('npcScale', v)} min={0.25} max={1.5} step={0.05} color="text-retro-green/80" displayValue={`${Math.round(config.npcScale * 100)}%`} />
             </div>
           )}
 

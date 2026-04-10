@@ -17,13 +17,13 @@ export const DIST_PENALTY = 0.5;
 /* ── City layout ── */
 
 /** Total city block repeat size (road + lot) */
-export const BLOCK_SIZE = 10;
-/** Standard road width in voxels */
-export const ROAD_W = 2;
-/** Avenue width in voxels (wider major roads) */
-export const AVENUE_W = 3;
-/** Sidewalk width on each side */
-export const LOT_INSET = 1;
+export const BLOCK_SIZE = 20;
+/** Standard road width in voxels (6-wide: edge + 2 lanes + double-yellow center + 2 lanes + edge) */
+export const ROAD_W = 6;
+/** Avenue width in voxels (9-wide: edge + 2 lanes + divider + median + divider + 2 lanes + edge) */
+export const AVENUE_W = 9;
+/** Sidewalk width on each side (curb + walkway) */
+export const LOT_INSET = 2;
 /** Interval for major avenues (every N blocks) */
 export const AVENUE_INTERVAL = 4;
 

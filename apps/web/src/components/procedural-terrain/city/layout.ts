@@ -152,10 +152,11 @@ export function classifyCityCell(
   const isIntersection = onRoadX && onRoadZ;
   const isAvenue = (onRoadX && rw >= AVENUE_W) || (onRoadZ && rdz >= AVENUE_W);
 
-  // Lot-local coordinates
+  // Lot-local coordinates (per-dimension to handle avenue vs standard road)
   const lotRawX = modX - rw;
   const lotRawZ = modZ - rdz;
-  const lotSize = BLOCK_SIZE - Math.max(rw, ROAD_W); // adjusted for varying road width
+  const lotSizeX = BLOCK_SIZE - rw;
+  const lotSizeZ = BLOCK_SIZE - rdz;
 
   // Lot world ID
   const lotWorldX = Math.floor(wx / BLOCK_SIZE);
@@ -168,11 +169,13 @@ export function classifyCityCell(
       buildingW: 0, buildingD: 0,
       zone: 'downtown', // roads don't have zones
       roadWidth: effectiveRW,
+      roadWidthX: rw,
+      roadWidthZ: rdz,
     };
   }
 
-  const isSidewalk = lotRawX < LOT_INSET || lotRawX >= lotSize - LOT_INSET
-                   || lotRawZ < LOT_INSET || lotRawZ >= lotSize - LOT_INSET;
+  const isSidewalk = lotRawX < LOT_INSET || lotRawX >= lotSizeX - LOT_INSET
+                   || lotRawZ < LOT_INSET || lotRawZ >= lotSizeZ - LOT_INSET;
 
   // Default zone (will be overridden if structN is provided)
   let zone: ZoneType = 'residential';
@@ -204,6 +207,8 @@ export function classifyCityCell(
     buildingW, buildingD,
     zone,
     roadWidth: effectiveRW,
+    roadWidthX: rw,
+    roadWidthZ: rdz,
   };
 }
 
