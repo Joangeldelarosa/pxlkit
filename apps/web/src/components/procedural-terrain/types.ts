@@ -26,8 +26,11 @@ export interface WorldConfig {
   boatDensity: number;            // 0-1 controls how many boats spawn on water
   windowLitProbability: number;   // 0-1 fraction of windows lit at night
   starDensity: number;            // 0-1 controls how many stars appear at night
+  lightDistance: number;           // 1-50 chunk radius for window/lamp light rendering (max = renderDistance)
+  lampBrightness: number;         // 0-2 street lamp brightness multiplier
+  lampColorTemp: 'warm' | 'neutral' | 'cool' | 'sodium';  // street lamp color temperature
   npcDensity: number;             // 0-1 how many NPCs per chunk (0 = off)
-  npcDistance: number;            // 2-20 chunk radius for NPC population
+  npcDistance: number;            // 2-50 chunk radius for NPC population (max = renderDistance)
   npcScale: number;               // 0.25-1.5 NPC body scale multiplier
   npcMaxPerChunk: number;         // 1-25 max NPCs spawned per chunk
 }
@@ -54,6 +57,9 @@ export const DEFAULT_CONFIG: WorldConfig = {
   boatDensity: 0.5,
   windowLitProbability: 0.7,
   starDensity: 0.5,
+  lightDistance: 8,
+  lampBrightness: 1.0,
+  lampColorTemp: 'sodium',
   npcDensity: 0.6,
   npcDistance: 6,
   npcScale: 0.5,
@@ -98,6 +104,14 @@ export interface ChunkVoxelData {
   miniVoxelColors: Float32Array;
   /** Number of mini-voxels */
   miniVoxelCount: number;
+  /** Road paint positions — flat decals (x,y,z) for lane markings, crosswalks */
+  paintPositions: Float32Array;
+  /** Road paint colors (r,g,b) */
+  paintColors: Float32Array;
+  /** Road paint sizes: [scaleX, scaleZ] per instance — width in each axis */
+  paintScales: Float32Array;
+  /** Number of road paint instances */
+  paintCount: number;
   chunkX: number;
   chunkZ: number;
 }

@@ -28,10 +28,22 @@ const MINI_VS = VOXEL_SIZE * 0.15;
 const miniGeo = new THREE.BoxGeometry(MINI_VS, MINI_VS, MINI_VS);
 const miniMat = new THREE.MeshStandardMaterial({ roughness: 0.5 });
 
+/* Road paint geometry — paper-thin horizontal plane (1×1 base, scaled per instance) */
+const paintGeo = (() => {
+  const g = new THREE.PlaneGeometry(1, 1);
+  g.rotateX(-Math.PI / 2); // lay flat on XZ plane
+  return g;
+})();
+const paintMat = new THREE.MeshStandardMaterial({
+  roughness: 0.85, metalness: 0, depthWrite: true,
+  polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
+});
+
 export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   const solidRef = useRef<THREE.InstancedMesh>(null);
   const waterRef = useRef<THREE.InstancedMesh>(null);
   const miniRef = useRef<THREE.InstancedMesh>(null);
+  const paintRef = useRef<THREE.InstancedMesh>(null);
 
   useEffect(() => {
     const mesh = solidRef.current;
@@ -81,11 +93,35 @@ export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   }, [data]);
 
+  /* ── Road paint: flat decals scaled per-instance ── */
+  useEffect(() => {
+    const mesh = paintRef.current;
+    if (!mesh || data.paintCount === 0) return;
+    const m = new THREE.Matrix4(), c = new THREE.Color();
+    for (let i = 0; i < data.paintCount; i++) {
+      const i3 = i * 3;
+      const i2 = i * 2;
+      const sx = data.paintScales[i2];      // width in X
+      const sz = data.paintScales[i2 + 1];  // width in Z
+      // PlaneGeometry is 1×1 on XZ after rotation, scale to desired size
+      m.makeScale(sx, 1, sz);
+      m.elements[12] = data.paintPositions[i3];
+      m.elements[13] = data.paintPositions[i3 + 1];
+      m.elements[14] = data.paintPositions[i3 + 2];
+      mesh.setMatrixAt(i, m);
+      c.setRGB(data.paintColors[i3], data.paintColors[i3 + 1], data.paintColors[i3 + 2]);
+      mesh.setColorAt(i, c);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [data]);
+
   return (
     <group>
       {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, sharedSolidMat, data.count]} frustumCulled={false} />}
       {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />}
       {data.miniVoxelCount > 0 && <instancedMesh ref={miniRef} args={[miniGeo, miniMat, data.miniVoxelCount]} frustumCulled={false} />}
+      {data.paintCount > 0 && <instancedMesh ref={paintRef} args={[paintGeo, paintMat, data.paintCount]} frustumCulled={false} />}
     </group>
   );
 }

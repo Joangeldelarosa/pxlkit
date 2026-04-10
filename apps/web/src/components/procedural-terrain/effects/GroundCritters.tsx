@@ -75,8 +75,10 @@ interface BodyPart {
 const MALE_BODY_PARTS: BodyPart[] = [
   // Head
   { ox: 0, oy: 4.2, oz: 0, sx: 1.8, sy: 1.8, sz: 1.8, colorType: 0 },
-  // Hair (short, flat on top)
+  // Hair (short, flat on top — base, overridden by style)
   { ox: 0, oy: 5.5, oz: 0, sx: 1.9, sy: 0.7, sz: 1.9, colorType: 3 },
+  // Hair sides / sideburns
+  { ox: 0, oy: 4.8, oz: 0.7, sx: 1.4, sy: 0.5, sz: 0.4, colorType: 3 },
   // Eyes (two tiny dots)
   { ox: -0.4, oy: 4.5, oz: -0.9, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
   { ox: 0.4, oy: 4.5, oz: -0.9, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
