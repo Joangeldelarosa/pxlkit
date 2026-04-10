@@ -179,9 +179,9 @@ export function SettingsPanel({
                 <ConfigSlider label="World Size" value={config.worldSize} onChange={v => onUpdateConfig('worldSize', v)} min={32} max={512} step={16} color="text-retro-cyan/80" displayValue={`${config.worldSize}×${config.worldSize}`} />
               )}
               {config.worldMode === 'infinite' && (
-                <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => onUpdateConfig('renderDistance', v)} min={2} max={50} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
+                <ConfigSlider label="Render Distance" value={config.renderDistance} onChange={v => onUpdateConfig('renderDistance', v)} min={2} max={100} step={1} color="text-retro-cyan/80" displayValue={`${config.renderDistance} chunks`} />
               )}
-              <ConfigSlider label="Fly Speed" value={config.flySpeed} onChange={v => onUpdateConfig('flySpeed', v)} min={4} max={80} step={1} color="text-retro-gold/80" displayValue={String(config.flySpeed)} />
+              <ConfigSlider label="Fly Speed" value={config.flySpeed} onChange={v => onUpdateConfig('flySpeed', v)} min={4} max={120} step={1} color="text-retro-gold/80" displayValue={String(config.flySpeed)} />
             </div>
           )}
 
@@ -248,7 +248,7 @@ export function SettingsPanel({
                   ))}
                 </div>
               </div>
-              <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => onUpdateConfig('chunkGenSpeed', v)} min={1} max={10} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
+              <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => onUpdateConfig('chunkGenSpeed', v)} min={1} max={20} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
             </div>
           )}
 
@@ -259,10 +259,11 @@ export function SettingsPanel({
               <ConfigSlider label="Pickup Density" value={config.pickupDensity} onChange={v => onUpdateConfig('pickupDensity', v)} min={0} max={1} step={0.1} color="text-retro-cyan/80" displayValue={`${Math.round(config.pickupDensity * 100)}%`} />
               <ConfigSlider label="Particles" value={config.particleIntensity} onChange={v => onUpdateConfig('particleIntensity', v)} min={0} max={1} step={0.1} color="text-retro-purple/80" displayValue={`${Math.round(config.particleIntensity * 100)}%`} />
               <ConfigSlider label="Boats on Water" value={config.boatDensity} onChange={v => onUpdateConfig('boatDensity', v)} min={0} max={1} step={0.05} color="text-retro-cyan/80" displayValue={config.boatDensity === 0 ? 'Off' : `${Math.round(config.boatDensity * 100)}%`} />
+              <ConfigSlider label="Boat Distance" value={Math.min(config.boatDistance, config.renderDistance)} onChange={v => onUpdateConfig('boatDistance', v)} min={2} max={config.renderDistance} step={1} color="text-retro-cyan/80" displayValue={`${Math.min(config.boatDistance, config.renderDistance)} chunks`} />
               <ConfigSlider label="NPC Density" value={config.npcDensity} onChange={v => onUpdateConfig('npcDensity', v)} min={0} max={1} step={0.05} color="text-retro-green/80" displayValue={config.npcDensity === 0 ? 'Off' : `${Math.round(config.npcDensity * 100)}%`} />
-              <ConfigSlider label="NPCs Per Chunk" value={config.npcMaxPerChunk} onChange={v => onUpdateConfig('npcMaxPerChunk', v)} min={1} max={25} step={1} color="text-retro-green/80" displayValue={`${config.npcMaxPerChunk}`} />
+              <ConfigSlider label="NPCs Per Chunk" value={config.npcMaxPerChunk} onChange={v => onUpdateConfig('npcMaxPerChunk', v)} min={1} max={50} step={1} color="text-retro-green/80" displayValue={`${config.npcMaxPerChunk}`} />
               <ConfigSlider label="NPC Distance" value={Math.min(config.npcDistance, config.renderDistance)} onChange={v => onUpdateConfig('npcDistance', v)} min={2} max={config.renderDistance} step={1} color="text-retro-green/80" displayValue={`${Math.min(config.npcDistance, config.renderDistance)} chunks`} />
-              <ConfigSlider label="NPC Size" value={config.npcScale} onChange={v => onUpdateConfig('npcScale', v)} min={0.25} max={1.5} step={0.05} color="text-retro-green/80" displayValue={`${Math.round(config.npcScale * 100)}%`} />
+              <ConfigSlider label="NPC Size" value={config.npcScale} onChange={v => onUpdateConfig('npcScale', v)} min={0.25} max={2.0} step={0.05} color="text-retro-green/80" displayValue={`${Math.round(config.npcScale * 100)}%`} />
             </div>
           )}
 
@@ -280,7 +281,7 @@ export function SettingsPanel({
                 <div className="space-y-2">
                   <ConfigSlider label="Window Lights %" value={config.windowLitProbability} onChange={v => onUpdateConfig('windowLitProbability', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.windowLitProbability === 0 ? 'All dark' : config.windowLitProbability >= 0.95 ? 'All lit' : `${Math.round(config.windowLitProbability * 100)}%`} />
                   <ConfigSlider label="Light Distance" value={Math.min(config.lightDistance, config.renderDistance)} onChange={v => onUpdateConfig('lightDistance', v)} min={1} max={config.renderDistance} step={1} color="text-retro-gold/80" displayValue={`${Math.min(config.lightDistance, config.renderDistance)} chunks`} />
-                  <ConfigSlider label="Lamp Brightness" value={config.lampBrightness} onChange={v => onUpdateConfig('lampBrightness', v)} min={0} max={2} step={0.1} color="text-retro-gold/80" displayValue={config.lampBrightness === 0 ? 'Off' : `${Math.round(config.lampBrightness * 100)}%`} />
+                  <ConfigSlider label="Lamp Brightness" value={config.lampBrightness} onChange={v => onUpdateConfig('lampBrightness', v)} min={0} max={3} step={0.1} color="text-retro-gold/80" displayValue={config.lampBrightness === 0 ? 'Off' : `${Math.round(config.lampBrightness * 100)}%`} />
                   <div className="space-y-1">
                     <label className="font-pixel text-[7px] sm:text-[8px] text-retro-gold/70 uppercase tracking-wider select-none">Lamp Color</label>
                     <div className="flex gap-1">
