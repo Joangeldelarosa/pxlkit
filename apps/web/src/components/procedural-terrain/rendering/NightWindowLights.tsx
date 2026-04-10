@@ -72,7 +72,7 @@ const LAMP_COLOR_PRESETS: Record<string, { fixture: string; ground: string }> = 
   warm:    { fixture: '#ffe8cc', ground: '#ffd9a0' },
   neutral: { fixture: '#fff5e6', ground: '#ffe8cc' },
   cool:    { fixture: '#e8f0ff', ground: '#d0e0ff' },
-  sodium:  { fixture: '#ffeedd', ground: '#ffdd99' },
+  sodium:  { fixture: '#ffaa44', ground: '#ff9933' },
 };
 
 function winHash(x: number, y: number, z: number): number {

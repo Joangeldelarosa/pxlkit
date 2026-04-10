@@ -209,7 +209,7 @@ export function generateChunkData(
     slC++;
   }
   /** Push a flat road paint decal. scaleX/scaleZ control the width of the thin strip
-   *  in world units. Height is handled by the renderer (0.01 thick). */
+   *  in world units. Sits 0.005 above road surface for z-fighting prevention. */
   function pushPaint(px: number, py: number, pz: number, hex: string, scaleX: number, scaleZ: number) {
     if (paintC >= maxPaint) return;
     const i3 = paintC * 3;
