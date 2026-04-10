@@ -202,7 +202,9 @@ export function NightWindowLights({
       innerMat.opacity = 0;
       // eslint-disable-next-line react-hooks/immutability
       outerMat.opacity = 0;
+      // eslint-disable-next-line react-hooks/immutability
       lampFixtureMat.opacity = 0;
+      // eslint-disable-next-line react-hooks/immutability
       lampGroundMat.opacity = 0;
       inner.count = 0;
       outer.count = 0;
@@ -216,9 +218,13 @@ export function NightWindowLights({
     }
 
     const brightMul = lampBrightness;
+    // eslint-disable-next-line react-hooks/immutability
     innerMat.opacity = nightFactor * 0.95;
+    // eslint-disable-next-line react-hooks/immutability
     outerMat.opacity = nightFactor * 0.25;
+    // eslint-disable-next-line react-hooks/immutability
     lampFixtureMat.opacity = nightFactor * Math.min(1.0, 0.85 * brightMul);
+    // eslint-disable-next-line react-hooks/immutability
     lampGroundMat.opacity = nightFactor * Math.min(1.0, 0.35 * brightMul);
 
     const cache = chunkCacheRef.current;
