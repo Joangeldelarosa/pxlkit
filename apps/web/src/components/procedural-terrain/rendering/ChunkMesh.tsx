@@ -13,8 +13,15 @@ import { getPickupIcons } from '../generation/chunk';
 /* Shared geometry & materials */
 const sharedGeo = new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
 const sharedSolidMat = new THREE.MeshStandardMaterial({ roughness: 0.7 });
+/* Water uses a flat horizontal plane — no side faces means no z-fighting at chunk seams */
+const sharedWaterGeo = (() => {
+  const g = new THREE.PlaneGeometry(VOXEL_SIZE, VOXEL_SIZE);
+  g.rotateX(-Math.PI / 2);
+  return g;
+})();
 const sharedWaterMat = new THREE.MeshStandardMaterial({
-  roughness: 0.2, metalness: 0.05, transparent: true, opacity: 0.6, depthWrite: false,
+  roughness: 0.2, metalness: 0.05, transparent: true, opacity: 0.6,
+  depthWrite: false, side: THREE.DoubleSide,
 });
 
 export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
@@ -54,7 +61,7 @@ export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   return (
     <group>
       {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, sharedSolidMat, data.count]} frustumCulled={false} />}
-      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />}
+      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />}
     </group>
   );
 }
