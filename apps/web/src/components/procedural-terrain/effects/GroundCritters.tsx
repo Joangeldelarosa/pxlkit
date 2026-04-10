@@ -266,7 +266,7 @@ export function GroundCritters({
         // Accelerate
         if (n.speed < n.targetSpeed) n.speed = Math.min(n.speed + 2.0 * dt, n.targetSpeed);
 
-        // Move in facing direction (sin/cos maps heading to X/Z world axes)
+        // Move in facing direction: heading=0 → +Z, sin(h)→X, cos(h)→Z
         const newX = n.x + Math.sin(n.heading) * n.speed * dt;
         const newZ = n.z + Math.cos(n.heading) * n.speed * dt;
 
@@ -360,7 +360,7 @@ export function GroundCritters({
           lz = lz * cosS + relY * sinS;
         }
 
-        // Rotate by NPC heading (Y-axis)
+        // Manual heading rotation for part offset positioning (matches rotM below)
         const rx = lx * ch + lz * sh;
         const rz = -lx * sh + lz * ch;
 
