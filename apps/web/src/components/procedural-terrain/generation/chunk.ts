@@ -81,6 +81,11 @@ export function generateChunkData(
   let winC = 0;
   const solidHeightMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
   const waterLevelMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
+  /* ── Water surface tracking (populated during water voxel generation) ── */
+  let hasWater = false;
+  let waterSurfaceLevel = -1;
+  let waterSurfaceColor = '#88ddff';
+  const _waterLevelVotes = new Map<number, number>(); // level → count, to pick dominant
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
 
@@ -215,6 +220,9 @@ export function generateChunkData(
 
       /* ── 2. WATER ── */
       if (h < wl) {
+        hasWater = true;
+        const cnt = (_waterLevelVotes.get(wl) ?? 0) + 1;
+        _waterLevelVotes.set(wl, cnt);
         for (let wy = h + 1; wy <= wl; wy++) {
           const isWTop = wy === wl;
           const wExpN = wy > Math.max(hN, hN >= wl ? NO_FACE : 0);
@@ -580,34 +588,18 @@ export function generateChunkData(
     }
   }
 
-  /* ── Compute dominant water surface level and average color ── */
-  let waterSurfaceLevel = -1;
-  let waterSurfaceColor = '#88ddff';
-  let hasWater = false;
-  {
-    // Find most common water level and sample the water color
-    const levelCounts = new Map<number, number>();
+  /* ── Finalize dominant water surface level from votes collected during water gen ── */
+  if (hasWater) {
     let maxCount = 0;
-    let maxLevel = -1;
-    for (let i = 0; i < CHUNK_SIZE * CHUNK_SIZE; i++) {
-      const wl2 = waterLevelMap[i];
-      const sh = solidHeightMap[i];
-      if (sh < wl2) {
-        hasWater = true;
-        const cnt = (levelCounts.get(wl2) ?? 0) + 1;
-        levelCounts.set(wl2, cnt);
-        if (cnt > maxCount) { maxCount = cnt; maxLevel = wl2; }
-      }
+    for (const [lvl, cnt] of _waterLevelVotes) {
+      if (cnt > maxCount) { maxCount = cnt; waterSurfaceLevel = lvl; }
     }
-    if (hasWater && maxLevel >= 0) {
-      waterSurfaceLevel = maxLevel;
-      // Sample the water color from the center of the chunk
-      const centerLx = Math.floor(CHUNK_SIZE / 2);
-      const centerLz = Math.floor(CHUNK_SIZE / 2);
-      const centerBiome = BIOME_TYPES[bMap[(centerLx + 1) * gW + (centerLz + 1)]] as BiomeType;
-      const centerCfg = variedConfigs[centerLx * CHUNK_SIZE + centerLz] || BIOMES[centerBiome];
-      waterSurfaceColor = centerCfg.colors.water;
-    }
+    // Sample the water color from the center of the chunk
+    const centerLx = Math.floor(CHUNK_SIZE / 2);
+    const centerLz = Math.floor(CHUNK_SIZE / 2);
+    const centerBiome = BIOME_TYPES[bMap[(centerLx + 1) * gW + (centerLz + 1)]] as BiomeType;
+    const centerCfg = variedConfigs[centerLx * CHUNK_SIZE + centerLz] || BIOMES[centerBiome];
+    waterSurfaceColor = centerCfg.colors.water;
   }
 
   return {
