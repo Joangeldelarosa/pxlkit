@@ -9,7 +9,7 @@
 import * as THREE from 'three';
 import type { BiomeType, BiomeConfig, ChunkVoxelData, WorldConfig } from '../types';
 import {
-  CHUNK_SIZE, VOXEL_SIZE, MAX_HEIGHT, NO_FACE,
+  CHUNK_SIZE, VOXEL_SIZE, MAX_HEIGHT,
   BIOMES, BIOME_TYPES, BLOCK_SIZE, ROAD_W, LOT_INSET, AVENUE_W,
 } from '../constants';
 import { mulberry32, fbm } from '../utils/noise';
@@ -79,6 +79,8 @@ export function generateChunkData(
   const maxWin = CHUNK_SIZE * CHUNK_SIZE * 4;
   const winPosA = new Float32Array(maxWin * 3);
   let winC = 0;
+  const groundHeightMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
+  const npcWalkableMap = new Uint8Array(CHUNK_SIZE * CHUNK_SIZE);
   const solidHeightMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
   const waterLevelMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
 
@@ -190,7 +192,10 @@ export function generateChunkData(
       const hE = hMap[(lx + 2) * gW + (lz + 1)];
       const hWest = hMap[lx * gW + (lz + 1)];
       const wl = c.waterLevel;
-      waterLevelMap[lx * CHUNK_SIZE + lz] = wl;
+      const lIdx = lx * CHUNK_SIZE + lz;
+      waterLevelMap[lIdx] = wl;
+      groundHeightMap[lIdx] = h;
+      npcWalkableMap[lIdx] = biome === 'city' ? 0 : 1;
 
       /* ── 1. TERRAIN ── */
       for (let y = 0; y <= h; y++) {
@@ -213,25 +218,18 @@ export function generateChunkData(
       }
       trackH(lx, lz, h);
 
-      /* ── 2. WATER ── */
+      /* ── 2. WATER — flat surface plane for seamless cross-chunk rendering ── */
       if (h < wl) {
-        for (let wy = h + 1; wy <= wl; wy++) {
-          const isWTop = wy === wl;
-          const wExpN = wy > Math.max(hN, hN >= wl ? NO_FACE : 0);
-          const wExpS = wy > Math.max(hS, hS >= wl ? NO_FACE : 0);
-          const wExpE = wy > Math.max(hE, hE >= wl ? NO_FACE : 0);
-          const wExpW = wy > Math.max(hWest, hWest >= wl ? NO_FACE : 0);
-          const wExposed = isWTop || wy === h + 1 || wExpN || wExpS || wExpE || wExpW;
-          if (!wExposed) continue;
-          pushW((bX + lx) * VOXEL_SIZE, wy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-            varyColor(c.colors.water, wx, wy, wz, 4, 0.06, 0.06));
-        }
+        pushW((bX + lx) * VOXEL_SIZE, wl * VOXEL_SIZE + VOXEL_SIZE * 0.5, (bZ + lz) * VOXEL_SIZE,
+          varyColor(c.colors.water, wx, wl, wz, 4, 0.06, 0.06));
         trackH(lx, lz, wl);
       }
 
       /* ══════════════════ 3. CITY BIOME ══════════════════ */
       if (biome === 'city') {
         const cell = classifyCityCell(wx, wz, structN);
+        npcWalkableMap[lIdx] = cell.isRoad ? 1 : 0;
+        if (cell.isRoad) groundHeightMap[lIdx] = h + 1; // road surface is one voxel above terrain
 
         if (cell.isRoad) {
           /* ── Road surface ── */
@@ -584,6 +582,6 @@ export function generateChunkData(
     positions: posA.subarray(0, sc * 3), colors: colA.subarray(0, sc * 3), count: sc,
     waterPositions: wPosA.subarray(0, wc * 3), waterColors: wColA.subarray(0, wc * 3), waterCount: wc,
     pickups, windowLights: winPosA.subarray(0, winC * 3), windowLightCount: winC,
-    solidHeightMap, waterLevelMap, chunkX: cx, chunkZ: cz,
+    groundHeightMap, npcWalkableMap, solidHeightMap, waterLevelMap, chunkX: cx, chunkZ: cz,
   };
 }
