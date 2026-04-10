@@ -90,6 +90,10 @@ function isEdge(x: number, z: number, w: number, d: number): boolean {
  * Returns true if this column should render a wall.
  * A column is a wall if it is on the natural footprint edge OR if a biome
  * boundary forces the adjacent face to be exposed.
+ *
+ * Note: forced edges affect columns 1 step inside the boundary. This assumes
+ * that building generators render walls on the outermost ring of footprint
+ * columns (the `onEdge` pattern). All existing generators follow this convention.
  */
 function isExposedWall(x: number, z: number, w: number, d: number, fe: ForceEdge): boolean {
   if (x === 0 || x === w - 1 || z === 0 || z === d - 1) return true;

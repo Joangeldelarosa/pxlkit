@@ -515,18 +515,20 @@ export function generateChunkData(
           const totalW = cell.buildingW > 1 ? cell.buildingW * baseFootprint : footprintX;
           const totalD = cell.buildingD > 1 ? cell.buildingD * baseFootprint : footprintZ;
 
-          /* ── Biome boundary detection: force walls where neighbor isn't a city building ── */
-          // Check the 4 cardinal neighbors via the pre-computed biome map (gW×gW grid)
-          const bIdxN = (lx + 1) * gW + lz;          // −Z neighbor
-          const bIdxS = (lx + 1) * gW + (lz + 2);    // +Z neighbor
-          const bIdxW = lx * gW + (lz + 1);           // −X neighbor
-          const bIdxE = (lx + 2) * gW + (lz + 1);    // +X neighbor
+          /* ── Biome boundary detection: force walls where neighbor isn't a city building ──
+             Grid layout: bMap index = (lx+1)*gW + (lz+1), where lx grows along world X, lz grows along world Z.
+             We check the 4 cardinal neighbors in the pre-computed biome grid; if a neighbor IS city,
+             we additionally check whether it's a building cell (roads/sidewalks don't count as wall support).
+             Short-circuit: if the neighbor biome isn't city, we immediately know it's exposed (no IIFE needed). */
           const cityIdx = BIOME_TYPES.indexOf('city');
-          // Also check if neighbor is a building cell (not road/sidewalk)
-          const nXneg = bMap[bIdxW] !== cityIdx || (() => { const c2 = classifyCityCell(wx - 1, wz, structN); return !c2.isBuilding; })();
-          const nXpos = bMap[bIdxE] !== cityIdx || (() => { const c2 = classifyCityCell(wx + 1, wz, structN); return !c2.isBuilding; })();
-          const nZneg = bMap[bIdxN] !== cityIdx || (() => { const c2 = classifyCityCell(wx, wz - 1, structN); return !c2.isBuilding; })();
-          const nZpos = bMap[bIdxS] !== cityIdx || (() => { const c2 = classifyCityCell(wx, wz + 1, structN); return !c2.isBuilding; })();
+          const bIdxXneg = lx * gW + (lz + 1);           // −X neighbor
+          const bIdxXpos = (lx + 2) * gW + (lz + 1);     // +X neighbor
+          const bIdxZneg = (lx + 1) * gW + lz;           // −Z neighbor
+          const bIdxZpos = (lx + 1) * gW + (lz + 2);     // +Z neighbor
+          const nXneg = bMap[bIdxXneg] !== cityIdx || !classifyCityCell(wx - 1, wz, structN).isBuilding;
+          const nXpos = bMap[bIdxXpos] !== cityIdx || !classifyCityCell(wx + 1, wz, structN).isBuilding;
+          const nZneg = bMap[bIdxZneg] !== cityIdx || !classifyCityCell(wx, wz - 1, structN).isBuilding;
+          const nZpos = bMap[bIdxZpos] !== cityIdx || !classifyCityCell(wx, wz + 1, structN).isBuilding;
 
           generateBuildingColumn({
             push, trackH, pushWin,
