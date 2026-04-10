@@ -134,6 +134,38 @@ function getRoadWidthZ(wz: number): number {
   return isAvenueZ(blockZ) ? AVENUE_W : ROAD_W;
 }
 
+/* ── Road termination — procedural dead-ends and T-intersections ──
+ *  Non-avenue road segments can be "closed" (converted to building lot)
+ *  based on deterministic noise. Avenues always remain open so connectivity
+ *  is guaranteed: every block is reachable via the avenue grid.
+ *
+ *  A road segment runs along X between two Z-direction intersections
+ *  (or vice versa). We hash the block coordinate of that segment and
+ *  close ~20% of non-avenue segments. The closed segment becomes
+ *  extra building space (a cul-de-sac lot).
+ */
+
+/** Returns true if the X-direction road at this Z-block is closed (terminated). */
+function isRoadXClosed(blockX: number, blockZ: number): boolean {
+  // Avenues never close
+  if (isAvenueZ(blockZ)) return false;
+  // Roads adjacent to avenues stay open for access
+  const mod = ((blockZ % AVENUE_INTERVAL) + AVENUE_INTERVAL) % AVENUE_INTERVAL;
+  if (mod === 1 || mod === AVENUE_INTERVAL - 1) return false;
+  // Deterministic hash: ~20% of eligible segments are closed
+  const h = hashCoord(blockX * 31 + 173, 0, blockZ * 47 + 211);
+  return h > 0.80;
+}
+
+/** Returns true if the Z-direction road at this X-block is closed (terminated). */
+function isRoadZClosed(blockX: number, blockZ: number): boolean {
+  if (isAvenueX(blockX)) return false;
+  const mod = ((blockX % AVENUE_INTERVAL) + AVENUE_INTERVAL) % AVENUE_INTERVAL;
+  if (mod === 1 || mod === AVENUE_INTERVAL - 1) return false;
+  const h = hashCoord(blockX * 53 + 347, 0, blockZ * 29 + 197);
+  return h > 0.80;
+}
+
 /* ── Main classification function ── */
 
 export function classifyCityCell(
@@ -146,16 +178,24 @@ export function classifyCityCell(
 
   const modX = ((wx % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
   const modZ = ((wz % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
-  const onRoadX = modX < rw;
-  const onRoadZ = modZ < rdz;
+  let onRoadX = modX < rw;
+  let onRoadZ = modZ < rdz;
+
+  // Apply road termination: closed segments become building lot
+  const blockX = Math.floor(wx / BLOCK_SIZE);
+  const blockZ = Math.floor(wz / BLOCK_SIZE);
+  if (onRoadX && !onRoadZ && isRoadXClosed(blockX, blockZ)) onRoadX = false;
+  if (onRoadZ && !onRoadX && isRoadZClosed(blockX, blockZ)) onRoadZ = false;
+
   const isRoad = onRoadX || onRoadZ;
   const isIntersection = onRoadX && onRoadZ;
   const isAvenue = (onRoadX && rw >= AVENUE_W) || (onRoadZ && rdz >= AVENUE_W);
 
-  // Lot-local coordinates
+  // Lot-local coordinates (per-dimension to handle avenue vs standard road)
   const lotRawX = modX - rw;
   const lotRawZ = modZ - rdz;
-  const lotSize = BLOCK_SIZE - Math.max(rw, ROAD_W); // adjusted for varying road width
+  const lotSizeX = BLOCK_SIZE - rw;
+  const lotSizeZ = BLOCK_SIZE - rdz;
 
   // Lot world ID
   const lotWorldX = Math.floor(wx / BLOCK_SIZE);
@@ -168,11 +208,13 @@ export function classifyCityCell(
       buildingW: 0, buildingD: 0,
       zone: 'downtown', // roads don't have zones
       roadWidth: effectiveRW,
+      roadWidthX: rw,
+      roadWidthZ: rdz,
     };
   }
 
-  const isSidewalk = lotRawX < LOT_INSET || lotRawX >= lotSize - LOT_INSET
-                   || lotRawZ < LOT_INSET || lotRawZ >= lotSize - LOT_INSET;
+  const isSidewalk = lotRawX < LOT_INSET || lotRawX >= lotSizeX - LOT_INSET
+                   || lotRawZ < LOT_INSET || lotRawZ >= lotSizeZ - LOT_INSET;
 
   // Default zone (will be overridden if structN is provided)
   let zone: ZoneType = 'residential';
@@ -204,6 +246,8 @@ export function classifyCityCell(
     buildingW, buildingD,
     zone,
     roadWidth: effectiveRW,
+    roadWidthX: rw,
+    roadWidthZ: rdz,
   };
 }
 
@@ -252,19 +296,21 @@ export function getBuildingType(
     case 'downtown':
       if (v > 0.35 + (1 - density) * 0.15) return v2 > 0.3 ? 'skyscraper' : 'skyscraper_stepped';
       if (v > 0.2) return v2 > 0.0 ? 'tower' : 'office_tall';
-      if (v > 0.05) return 'office';
+      if (v > 0.05) return v2 > 0.5 ? 'hotel' : 'office';
       if (v > -0.1) return 'parking_garage';
       return v > -0.25 ? 'plaza' : 'fountain_plaza';
 
     case 'commercial':
-      if (v > 0.3) return 'office';
-      if (v > 0.1) return 'shop';
-      if (v > -0.05) return v2 > 0 ? 'shop' : 'parking';
+      if (v > 0.35) return 'hotel';
+      if (v > 0.2) return 'office';
+      if (v > 0.1) return v2 > 0.3 ? 'restaurant' : 'shop';
+      if (v > -0.05) return v2 > 0 ? 'gas_station' : 'parking';
       if (v > -0.2) return 'fountain_plaza';
       return 'park';
 
     case 'residential':
-      if (v > 0.3) return v2 > 0.4 ? 'mansion' : 'house';
+      if (v > 0.35) return v2 > 0.5 ? 'apartment' : 'mansion';
+      if (v > 0.15) return v2 > 0.4 ? 'apartment' : 'house';
       if (v > 0.05) return 'house';
       if (v > -0.15) return 'park';
       if (v > -0.3) return 'church';
@@ -273,11 +319,13 @@ export function getBuildingType(
     case 'industrial':
       if (v > 0.25) return 'warehouse';
       if (v > 0.0) return 'factory';
-      if (v > -0.2) return 'parking';
+      if (v > -0.15) return 'gas_station';
+      if (v > -0.3) return 'parking';
       return 'park';
 
     case 'civic':
       if (v > 0.3) return v2 > 0 ? 'hospital' : 'school';
+      if (v > 0.15) return v2 > 0.3 ? 'library' : 'fire_station';
       if (v > 0.05) return 'church';
       if (v > -0.15) return 'fountain_plaza';
       return 'plaza';
@@ -314,6 +362,12 @@ export function getBuildingHeight(
     case 'stadium':            return 4 + Math.floor(v * 3);     // 4-7
     case 'parking_garage':     return 4 + Math.floor(v * 3);     // 4-7
     case 'airport_terminal':   return 4 + Math.floor(v * 2);     // 4-6
+    case 'apartment':          return 6 + Math.floor(v * 10);    // 6-16
+    case 'hotel':              return 8 + Math.floor(v * 12);    // 8-20
+    case 'gas_station':        return 2 + Math.floor(v * 1);     // 2-3
+    case 'restaurant':         return 3 + Math.floor(v * 2);     // 3-5
+    case 'fire_station':       return 4 + Math.floor(v * 3);     // 4-7
+    case 'library':            return 4 + Math.floor(v * 4);     // 4-8
     case 'plaza':              return 0;
     case 'fountain_plaza':     return 0;
     case 'park':               return 0;
