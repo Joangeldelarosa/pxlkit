@@ -28,7 +28,7 @@ export interface WorldConfig {
   starDensity: number;            // 0-1 controls how many stars appear at night
   npcDensity: number;             // 0-1 how many NPCs per chunk (0 = off)
   npcDistance: number;            // 2-20 chunk radius for NPC population
-  npcScale: number;               // 0.3-1.5 NPC body scale multiplier
+  npcScale: number;               // 0.25-1.5 NPC body scale multiplier
   npcMaxPerChunk: number;         // 1-25 max NPCs spawned per chunk
 }
 
@@ -56,7 +56,7 @@ export const DEFAULT_CONFIG: WorldConfig = {
   starDensity: 0.5,
   npcDensity: 0.6,
   npcDistance: 6,
-  npcScale: 0.7,
+  npcScale: 0.5,
   npcMaxPerChunk: 4,
 };
 
@@ -118,6 +118,10 @@ export interface CityCell {
   zone: ZoneType;
   /** Road width at this cell (avenues are wider) */
   roadWidth: number;
+  /** Road width in X direction at this cell's block */
+  roadWidthX: number;
+  /** Road width in Z direction at this cell's block */
+  roadWidthZ: number;
 }
 
 /** All building types available in the city */
