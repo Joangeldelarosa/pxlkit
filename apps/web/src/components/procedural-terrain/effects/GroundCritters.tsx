@@ -102,7 +102,7 @@ const MALE_BODY_PARTS: BodyPart[] = [
   { ox: 0.55, oy: -0.5, oz: -0.1, sx: 0.8, sy: 0.5, sz: 1.0, colorType: 4, animGroup: 'rightLeg', pivotY: 2.7 },
 ];
 
-/* Female NPC body parts — 14 parts: narrower shoulders, hair longer, slightly smaller build */
+/* Female NPC body parts — 15 parts: narrower shoulders, hair longer, slightly smaller build */
 const FEMALE_BODY_PARTS: BodyPart[] = [
   // Head
   { ox: 0, oy: 4.0, oz: 0, sx: 1.7, sy: 1.7, sz: 1.7, colorType: 0 },
@@ -110,6 +110,8 @@ const FEMALE_BODY_PARTS: BodyPart[] = [
   { ox: 0, oy: 5.2, oz: 0, sx: 1.85, sy: 0.8, sz: 1.85, colorType: 3 },
   // Hair extension (ponytail / long hair draping down back)
   { ox: 0, oy: 3.8, oz: 0.6, sx: 1.2, sy: 1.6, sz: 0.5, colorType: 3 },
+  // Hair side fringe (bangs hanging on sides of face)
+  { ox: 0, oy: 4.6, oz: -0.6, sx: 1.6, sy: 0.6, sz: 0.3, colorType: 3 },
   // Eyes
   { ox: -0.35, oy: 4.3, oz: -0.85, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
   { ox: 0.35, oy: 4.3, oz: -0.85, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
