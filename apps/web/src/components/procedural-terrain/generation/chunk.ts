@@ -515,12 +515,26 @@ export function generateChunkData(
           const totalW = cell.buildingW > 1 ? cell.buildingW * baseFootprint : footprintX;
           const totalD = cell.buildingD > 1 ? cell.buildingD * baseFootprint : footprintZ;
 
+          /* ── Biome boundary detection: force walls where neighbor isn't a city building ── */
+          // Check the 4 cardinal neighbors via the pre-computed biome map (gW×gW grid)
+          const bIdxN = (lx + 1) * gW + lz;          // −Z neighbor
+          const bIdxS = (lx + 1) * gW + (lz + 2);    // +Z neighbor
+          const bIdxW = lx * gW + (lz + 1);           // −X neighbor
+          const bIdxE = (lx + 2) * gW + (lz + 1);    // +X neighbor
+          const cityIdx = BIOME_TYPES.indexOf('city');
+          // Also check if neighbor is a building cell (not road/sidewalk)
+          const nXneg = bMap[bIdxW] !== cityIdx || (() => { const c2 = classifyCityCell(wx - 1, wz, structN); return !c2.isBuilding; })();
+          const nXpos = bMap[bIdxE] !== cityIdx || (() => { const c2 = classifyCityCell(wx + 1, wz, structN); return !c2.isBuilding; })();
+          const nZneg = bMap[bIdxN] !== cityIdx || (() => { const c2 = classifyCityCell(wx, wz - 1, structN); return !c2.isBuilding; })();
+          const nZpos = bMap[bIdxS] !== cityIdx || (() => { const c2 = classifyCityCell(wx, wz + 1, structN); return !c2.isBuilding; })();
+
           generateBuildingColumn({
             push, trackH, pushWin,
             bX, bZ, lx, lz, h, wx, wz,
             blX: cell.lotLocalX, blZ: cell.lotLocalZ,
             footW: totalW, footD: totalD,
             bType, bh,
+            forceEdge: { xNeg: nXneg, xPos: nXpos, zNeg: nZneg, zPos: nZpos },
           });
         }
         continue; // city biome handled
