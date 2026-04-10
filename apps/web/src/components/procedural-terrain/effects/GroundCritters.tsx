@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════
- *  Ground Critters — Chunk-based NPC population system
+ *  Ground Critters — Camera-direction-aware NPC population system
  *
- *  NPCs are spawned/despawned per-chunk like terrain itself:
+ *  NPCs are spawned/despawned per-chunk with camera awareness:
  *  - Each loaded chunk gets deterministic NPC positions (seeded RNG)
- *  - NPCs load/unload as chunks enter/leave the npcDistance radius
- *  - Far-away NPCs (behind camera) are instantly recycled → frees slots
- *  - Border NPCs get smooth opacity fade-in/out
+ *  - NPCs behind the camera despawn at a tighter radius than those in front
+ *  - Chunks in the camera's forward direction get spawn priority
+ *  - Movement detection triggers immediate spawn/despawn scans
  *  - Walking animation, terrain tracking, biome-aware colors
  *  - npcMaxPerChunk controls per-chunk cap; npcDensity scales it 0-1
  * ═══════════════════════════════════════════════════════════════ */
@@ -19,8 +19,8 @@ import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { TimeContext } from '../rendering/DayNightCycle';
 
 /* ── Constants ── */
-const MAX_NPCS = 500;                // hard cap for instanced mesh
-const FADE_DURATION = 1.0;           // seconds to fade in/out
+const MAX_NPCS = 800;                // hard cap for instanced mesh
+const FADE_DURATION = 0.8;           // seconds to fade in/out
 const WALK_SPEED_MIN = 0.25;
 const WALK_SPEED_MAX = 0.75;
 const TURN_SPEED = 2.5;              // radians/sec for smooth rotation
@@ -30,7 +30,10 @@ const MOVE_MIN = 2.0;
 const MOVE_MAX = 7.0;
 const ARM_SWING_SPEED = 8;
 const ARM_SWING_AMOUNT = 0.6;
-const SPAWN_CHECK_INTERVAL = 0.25;   // seconds between chunk scans
+const SPAWN_CHECK_INTERVAL = 0.2;    // seconds between chunk scans
+const MOVE_TRIGGER_DIST = 2.0;       // world units of camera move to trigger immediate scan
+const BEHIND_DIST_FACTOR = 0.5;      // behind-camera despawn at this fraction of npcDistance
+const SIDE_DIST_FACTOR = 0.75;       // side/peripheral despawn factor
 
 /* ── Biome NPC config ── */
 interface BiomeCritterCfg {
@@ -157,6 +160,8 @@ export function GroundCritters({
   const npcsRef = useRef<NpcState[]>([]);
   const spawnTimerRef = useRef(0);
   const activeChunksRef = useRef<Set<string>>(new Set());
+  const lastCamPosRef = useRef({ x: 0, z: 0 });
+  const camDirRef = useRef({ x: 0, z: -1 });  // camera forward on XZ plane
 
   const cfg = BIOME_NPC_CONFIG[biome] || BIOME_NPC_CONFIG.Plains;
 
@@ -168,6 +173,17 @@ export function GroundCritters({
 
   const geo = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const mat = useMemo(() => new THREE.MeshLambertMaterial({ transparent: true, depthWrite: true }), []);
+
+  /* ── Reusable objects for render loop (avoid per-frame allocations) ── */
+  const renderObjs = useMemo(() => ({
+    m: new THREE.Matrix4(),
+    rotM: new THREE.Matrix4(),
+    scaleM: new THREE.Matrix4(),
+    swingM: new THREE.Matrix4(),
+    c: new THREE.Color(),
+    zeroMatrix: new THREE.Matrix4().makeScale(0, 0, 0),
+    dir: new THREE.Vector3(),
+  }), []);
 
   /* ── NPC voxel size based on npcScale ── */
   const npcVs = VOXEL_SIZE / 5 * npcScale;
@@ -215,17 +231,56 @@ export function GroundCritters({
     const camCx = Math.floor(camX / chunkWorldSize);
     const camCz = Math.floor(camZ / chunkWorldSize);
 
-    /* ═══ 1. CHUNK-BASED SPAWN/DESPAWN SCAN ═══ */
+    // ── Get camera forward direction on XZ plane ──
+    camera.getWorldDirection(renderObjs.dir);
+    const fwdLen = Math.sqrt(renderObjs.dir.x * renderObjs.dir.x + renderObjs.dir.z * renderObjs.dir.z);
+    const fwdX = fwdLen > 0.001 ? renderObjs.dir.x / fwdLen : 0;
+    const fwdZ = fwdLen > 0.001 ? renderObjs.dir.z / fwdLen : -1;
+    camDirRef.current.x = fwdX;
+    camDirRef.current.z = fwdZ;
+
+    // ── Detect significant camera movement for immediate scan ──
+    const moveDx = camX - lastCamPosRef.current.x;
+    const moveDz = camZ - lastCamPosRef.current.z;
+    const moveDist = Math.sqrt(moveDx * moveDx + moveDz * moveDz);
+    const cameraMovedSignificantly = moveDist > MOVE_TRIGGER_DIST;
+
+    /* ═══ 1. CAMERA-DIRECTION-AWARE SPAWN/DESPAWN SCAN ═══ */
     spawnTimerRef.current += dt;
-    if (spawnTimerRef.current > SPAWN_CHECK_INTERVAL) {
+    const shouldScan = spawnTimerRef.current > SPAWN_CHECK_INTERVAL || cameraMovedSignificantly;
+
+    if (shouldScan) {
       spawnTimerRef.current = 0;
+      lastCamPosRef.current.x = camX;
+      lastCamPosRef.current.z = camZ;
 
       const dist = npcDistance;
       const distSq = (dist + 0.5) * (dist + 0.5);
-      // Instant-kill distance: far enough that player can't see
-      const killDistSq = (dist + 1.5) * (dist + 1.5);
 
-      // Build set of chunks that should have NPCs
+      // ── Directional despawn distances ──
+      // Behind camera: tighter radius → despawn sooner
+      // In front: full radius → keep visible NPCs alive
+      const behindDistSq = (dist * BEHIND_DIST_FACTOR) * (dist * BEHIND_DIST_FACTOR);
+      const sideDistSq = (dist * SIDE_DIST_FACTOR) * (dist * SIDE_DIST_FACTOR);
+      const killDistSq = (dist + 1.0) * (dist + 1.0);
+
+      /**
+       * Get effective despawn distance² for a chunk based on camera direction.
+       * dot > 0 = in front, dot < 0 = behind, |dot| small = to the side.
+       */
+      function getEffectiveDespawnDistSq(chunkCenterX: number, chunkCenterZ: number): number {
+        const toCx = chunkCenterX - camX;
+        const toCz = chunkCenterZ - camZ;
+        const toLen = Math.sqrt(toCx * toCx + toCz * toCz);
+        if (toLen < 0.001) return distSq; // camera is in this chunk
+        const dot = (toCx / toLen) * fwdX + (toCz / toLen) * fwdZ;
+        // dot: -1 = directly behind, +1 = directly in front
+        if (dot < -0.3) return behindDistSq;   // behind camera
+        if (dot < 0.2)  return sideDistSq;     // to the side
+        return distSq;                          // in front
+      }
+
+      // Build set of chunks that should have NPCs (full circle)
       const wantedChunks = new Set<string>();
       for (let dx = -dist; dx <= dist; dx++) {
         for (let dz = -dist; dz <= dist; dz++) {
@@ -239,13 +294,36 @@ export function GroundCritters({
         }
       }
 
-      // ── Phase A: Instantly kill far-away NPCs to free slots ──
-      // NPCs whose chunk is well beyond range get killed immediately
-      // (player can't see them anyway, no need to fade)
+      // ── Phase A: Direction-aware chunk despawn ──
       const active = activeChunksRef.current;
       for (const key of active) {
-        if (wantedChunks.has(key)) continue;
-        // Parse chunk coords to check distance
+        if (wantedChunks.has(key)) {
+          // Check if this chunk should be despawned based on camera direction
+          const [cxs, czs] = key.split(',');
+          const kcx = parseInt(cxs, 10);
+          const kcz = parseInt(czs, 10);
+          const ddx = kcx - camCx;
+          const ddz = kcz - camCz;
+          const cdSq = ddx * ddx + ddz * ddz;
+          const chunkCenterX = (kcx + 0.5) * chunkWorldSize;
+          const chunkCenterZ = (kcz + 0.5) * chunkWorldSize;
+          const effectiveDistSq = getEffectiveDespawnDistSq(chunkCenterX, chunkCenterZ);
+
+          if (cdSq > effectiveDistSq) {
+            // Behind/side camera, beyond effective range → fade out
+            for (let i = 0; i < npcs.length; i++) {
+              if (npcs[i].alive && !npcs[i].fadeOut && npcs[i].chunkKey === key) {
+                npcs[i].fadeOut = true;
+                npcs[i].fadeTimer = 0;
+              }
+            }
+            active.delete(key);
+            wantedChunks.delete(key); // don't re-spawn immediately
+          }
+          continue;
+        }
+
+        // Chunk no longer in wanted set at all
         const [cxs, czs] = key.split(',');
         const kcx = parseInt(cxs, 10);
         const kcz = parseInt(czs, 10);
@@ -254,14 +332,14 @@ export function GroundCritters({
         const cdSq = ddx * ddx + ddz * ddz;
 
         if (cdSq > killDistSq) {
-          // Far away → instant kill (no fade needed, invisible to player)
+          // Far away → instant kill
           for (let i = 0; i < npcs.length; i++) {
             if (npcs[i].alive && npcs[i].chunkKey === key) {
               npcs[i].alive = false;
             }
           }
         } else {
-          // Near border → fade out smoothly
+          // Near border → fade out
           for (let i = 0; i < npcs.length; i++) {
             if (npcs[i].alive && !npcs[i].fadeOut && npcs[i].chunkKey === key) {
               npcs[i].fadeOut = true;
@@ -272,23 +350,26 @@ export function GroundCritters({
         active.delete(key);
       }
 
-      // ── Phase B: Also instantly kill any individual NPC that wandered far ──
+      // ── Phase B: Individual NPC direction-aware despawn ──
       for (let i = 0; i < npcs.length; i++) {
         const n = npcs[i];
         if (!n.alive) continue;
         const ndx = (n.x / chunkWorldSize) - camCx;
         const ndz = (n.z / chunkWorldSize) - camCz;
         const nDistSq = ndx * ndx + ndz * ndz;
+
         if (nDistSq > killDistSq) {
-          n.alive = false; // instant kill
-        } else if (!n.fadeOut && nDistSq > distSq) {
-          n.fadeOut = true;
-          n.fadeTimer = 0;
+          n.alive = false;
+        } else if (!n.fadeOut) {
+          const effectiveDistSq = getEffectiveDespawnDistSq(n.x, n.z);
+          if (nDistSq > effectiveDistSq) {
+            n.fadeOut = true;
+            n.fadeTimer = 0;
+          }
         }
       }
 
-      // ── Phase C: Spawn NPCs for new chunks ──
-      // Per-chunk count: npcMaxPerChunk × biome densityMul × npcDensity
+      // ── Phase C: Spawn NPCs, prioritizing chunks ahead of camera ──
       const perChunk = Math.max(0, Math.round(npcMaxPerChunk * cfg.densityMul * npcDensity));
 
       // Count only non-fading NPCs for capacity
@@ -298,12 +379,33 @@ export function GroundCritters({
       }
       let remaining = MAX_NPCS - liveCount;
 
+      // Sort wanted chunks: prioritize those in front of the camera, then by distance
+      const chunksToSpawn: { key: string; cx: number; cz: number; priority: number }[] = [];
       for (const key of wantedChunks) {
-        if (active.has(key) || remaining <= 0) continue;
-
+        if (active.has(key)) continue;
         const [cxs, czs] = key.split(',');
         const ccx = parseInt(cxs, 10);
         const ccz = parseInt(czs, 10);
+        const chunkCenterX = (ccx + 0.5) * chunkWorldSize;
+        const chunkCenterZ = (ccz + 0.5) * chunkWorldSize;
+        const toCx = chunkCenterX - camX;
+        const toCz = chunkCenterZ - camZ;
+        const toLen = Math.sqrt(toCx * toCx + toCz * toCz);
+        const dot = toLen > 0.001 ? (toCx / toLen) * fwdX + (toCz / toLen) * fwdZ : 0;
+        const ddx = ccx - camCx;
+        const ddz = ccz - camCz;
+        const distFromCam = Math.sqrt(ddx * ddx + ddz * ddz);
+        // Priority: higher = spawn first. In-front chunks close to camera win.
+        // dot ranges -1 to 1. Weigh it so front chunks get priority.
+        const priority = (dot + 1.0) * 2.0 - distFromCam * 0.5;
+        chunksToSpawn.push({ key, cx: ccx, cz: ccz, priority });
+      }
+      chunksToSpawn.sort((a, b) => b.priority - a.priority);
+
+      for (const entry of chunksToSpawn) {
+        if (remaining <= 0) break;
+
+        const { key, cx: ccx, cz: ccz } = entry;
 
         // Deterministic RNG seeded by chunk coords
         const seed = ccx * 73856093 + ccz * 19349663;
@@ -417,11 +519,7 @@ export function GroundCritters({
     }
 
     /* ═══ 3. RENDER ═══ */
-    const m = new THREE.Matrix4();
-    const rotM = new THREE.Matrix4();
-    const scaleM = new THREE.Matrix4();
-    const swingM = new THREE.Matrix4();
-    const c = new THREE.Color();
+    const { m, rotM, scaleM, swingM, c, zeroMatrix } = renderObjs;
     let idx = 0;
     const isNight = timeRef?.current.isNight ?? false;
     const nightMul = isNight ? 0.4 : 1.0;
@@ -479,6 +577,7 @@ export function GroundCritters({
         scaleM.makeScale(sx, sy, sz);
         m.copy(rotM);
         m.multiply(scaleM);
+        // eslint-disable-next-line react-hooks/immutability
         m.elements[12] = n.x + rx;
         m.elements[13] = n.y + ly;
         m.elements[14] = n.z + rz;
@@ -499,7 +598,6 @@ export function GroundCritters({
     }
 
     // Hide unused instances
-    const zeroMatrix = new THREE.Matrix4().makeScale(0, 0, 0);
     for (let z = idx; z < TOTAL_INSTANCES; z++) mesh.setMatrixAt(z, zeroMatrix);
 
     mesh.count = TOTAL_INSTANCES;

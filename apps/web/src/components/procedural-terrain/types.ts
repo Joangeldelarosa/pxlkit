@@ -29,7 +29,7 @@ export interface WorldConfig {
   npcDensity: number;             // 0-1 how many NPCs per chunk (0 = off)
   npcDistance: number;            // 2-20 chunk radius for NPC population
   npcScale: number;               // 0.3-1.5 NPC body scale multiplier
-  npcMaxPerChunk: number;         // 1-15 max NPCs spawned per chunk
+  npcMaxPerChunk: number;         // 1-25 max NPCs spawned per chunk
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
