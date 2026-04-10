@@ -182,6 +182,16 @@ export function generateChunkData(
     winPosA[i3] = px; winPosA[i3 + 1] = py; winPosA[i3 + 2] = pz;
     winC++;
   }
+  /** Push a mini-voxel (VOXEL_SIZE*0.15 cube) for street furniture / road markings */
+  function pushMini(px: number, py: number, pz: number, hex: string) {
+    if (miniC >= maxMini) return;
+    const i3 = miniC * 3;
+    miniPosA[i3] = px; miniPosA[i3 + 1] = py; miniPosA[i3 + 2] = pz;
+    _tc.set(hex); miniColA[i3] = _tc.r; miniColA[i3 + 1] = _tc.g; miniColA[i3 + 2] = _tc.b;
+    miniC++;
+  }
+  /** Mini-voxel step size = VOXEL_SIZE * 0.15 */
+  const MVS = VOXEL_SIZE * 0.15;
 
   const chunkRand = mulberry32(cx * 73856093 + cz * 19349663);
 
@@ -255,8 +265,13 @@ export function generateChunkData(
 
           const onRoadX = modX < cell.roadWidthX;
           const onRoadZ = modZ < cell.roadWidthZ;
+          // Y position for markings: sits on top of road voxel surface
+          const markY = (h + 1) * VOXEL_SIZE + VOXEL_SIZE * 0.5 + MVS * 0.5;
+          // Center of this voxel cell
+          const cellCx = (bX + lx) * VOXEL_SIZE;
+          const cellCz = (bZ + lz) * VOXEL_SIZE;
 
-          /* ── Lane markings (non-intersection) ── */
+          /* ── Lane markings as mini-voxels (non-intersection) ── */
           if (!cell.isIntersection) {
             if (rw >= AVENUE_W) {
               /* Avenue markings (9 wide):
@@ -264,103 +279,165 @@ export function generateChunkData(
                  4: green median | 5: dashed divider | 6-7: lanes | 8: white edge */
               const mid = Math.floor(rw / 2); // 4 for width 9
               if (onRoadZ && !onRoadX) {
-                // Road runs along X, modZ = lane position
+                // Road runs along X axis, modZ = cross-section position
                 if (modZ === 0 || modZ === cell.roadWidthZ - 1) {
-                  // Solid white edge lines
-                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#cccccc');
+                  // Solid white edge lines — thin strip along X direction
+                  for (let s = -2; s <= 2; s++) {
+                    pushMini(cellCx + s * MVS, markY, cellCz, '#cccccc');
+                  }
                 } else if (modZ === mid - 1 || modZ === mid + 1) {
-                  // Dashed white lane dividers
+                  // Dashed white lane dividers along X
                   if (((wx % 6) + 6) % 6 < 3) {
-                    push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#aaaaaa');
+                    for (let s = -2; s <= 2; s++) {
+                      pushMini(cellCx + s * MVS, markY, cellCz, '#aaaaaa');
+                    }
                   }
                 } else if (modZ === mid) {
-                  // Raised green median strip
-                  push((bX + lx) * VOXEL_SIZE, (h + 1.1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                    varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06));
+                  // Raised green median strip — slightly wider
+                  for (let sx = -2; sx <= 2; sx++) {
+                    for (let sz = -1; sz <= 1; sz++) {
+                      pushMini(cellCx + sx * MVS, markY + MVS, cellCz + sz * MVS,
+                        varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06));
+                    }
+                  }
                 }
               }
               if (onRoadX && !onRoadZ) {
-                // Road runs along Z, modX = lane position
+                // Road runs along Z axis, modX = cross-section position
                 if (modX === 0 || modX === cell.roadWidthX - 1) {
-                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#cccccc');
+                  for (let s = -2; s <= 2; s++) {
+                    pushMini(cellCx, markY, cellCz + s * MVS, '#cccccc');
+                  }
                 } else if (modX === mid - 1 || modX === mid + 1) {
                   if (((wz % 6) + 6) % 6 < 3) {
-                    push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#aaaaaa');
+                    for (let s = -2; s <= 2; s++) {
+                      pushMini(cellCx, markY, cellCz + s * MVS, '#aaaaaa');
+                    }
                   }
                 } else if (modX === mid) {
-                  push((bX + lx) * VOXEL_SIZE, (h + 1.1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                    varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06));
+                  for (let sx = -1; sx <= 1; sx++) {
+                    for (let sz = -2; sz <= 2; sz++) {
+                      pushMini(cellCx + sx * MVS, markY + MVS, cellCz + sz * MVS,
+                        varyColor('#448844', wx, h + 1, wz, 3, 0.04, 0.06));
+                    }
+                  }
                 }
               }
             } else {
               /* Standard road markings (6 wide):
-                 0: white edge | 1: lane | 2-3: dashed yellow center
-                 4: lane | 5: white edge */
+                 0: white edge | 1: lane | 2-3: dashed yellow center | 4: lane | 5: white edge */
               const cL = Math.floor(rw / 2) - 1; // 2
               const cR = Math.floor(rw / 2);     // 3
               if (onRoadZ && !onRoadX) {
+                // Road runs along X, markings along X direction
                 if (modZ === 0 || modZ === cell.roadWidthZ - 1) {
-                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#bbbbbb');
-                } else if ((modZ === cL || modZ === cR) && ((wx % 4) + 4) % 4 < 2) {
-                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
+                  for (let s = -2; s <= 2; s++) {
+                    pushMini(cellCx + s * MVS, markY, cellCz, '#bbbbbb');
+                  }
+                } else if (modZ === cL && ((wx % 4) + 4) % 4 < 2) {
+                  // Left yellow center line
+                  for (let s = -2; s <= 2; s++) {
+                    pushMini(cellCx + s * MVS, markY, cellCz + MVS, '#ffdd44');
+                  }
+                } else if (modZ === cR && ((wx % 4) + 4) % 4 < 2) {
+                  // Right yellow center line
+                  for (let s = -2; s <= 2; s++) {
+                    pushMini(cellCx + s * MVS, markY, cellCz - MVS, '#ffdd44');
+                  }
                 }
               }
               if (onRoadX && !onRoadZ) {
+                // Road runs along Z, markings along Z direction
                 if (modX === 0 || modX === cell.roadWidthX - 1) {
-                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#bbbbbb');
-                } else if ((modX === cL || modX === cR) && ((wz % 4) + 4) % 4 < 2) {
-                  push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#ffdd44');
+                  for (let s = -2; s <= 2; s++) {
+                    pushMini(cellCx, markY, cellCz + s * MVS, '#bbbbbb');
+                  }
+                } else if (modX === cL && ((wz % 4) + 4) % 4 < 2) {
+                  for (let s = -2; s <= 2; s++) {
+                    pushMini(cellCx + MVS, markY, cellCz + s * MVS, '#ffdd44');
+                  }
+                } else if (modX === cR && ((wz % 4) + 4) % 4 < 2) {
+                  for (let s = -2; s <= 2; s++) {
+                    pushMini(cellCx - MVS, markY, cellCz + s * MVS, '#ffdd44');
+                  }
                 }
               }
             }
           }
 
-          /* ── Crosswalk zebra stripes at intersections ── */
+          /* ── Crosswalk zebra stripes at intersections (mini-voxels) ── */
           if (cell.isIntersection) {
             const rwX = cell.roadWidthX;
             const rwZ = cell.roadWidthZ;
-            // Stripes near the edges where pedestrians cross
             const nearEdgeX = modX <= 1 || modX >= rwX - 2;
             const nearEdgeZ = modZ <= 1 || modZ >= rwZ - 2;
             if ((nearEdgeX || nearEdgeZ) && (((modX + modZ) % 2) === 0)) {
-              push((bX + lx) * VOXEL_SIZE, (h + 1.05) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, '#dddddd');
+              // Draw crosswalk stripe perpendicular to road edge
+              if (nearEdgeZ && !nearEdgeX) {
+                // Stripe runs along X (across Z-road at edge)
+                for (let s = -2; s <= 2; s++) {
+                  pushMini(cellCx + s * MVS, markY, cellCz, '#dddddd');
+                }
+              } else if (nearEdgeX && !nearEdgeZ) {
+                // Stripe runs along Z (across X-road at edge)
+                for (let s = -2; s <= 2; s++) {
+                  pushMini(cellCx, markY, cellCz + s * MVS, '#dddddd');
+                }
+              } else {
+                // Corner of intersection — small cross
+                pushMini(cellCx, markY, cellCz, '#dddddd');
+                pushMini(cellCx + MVS, markY, cellCz, '#dddddd');
+                pushMini(cellCx - MVS, markY, cellCz, '#dddddd');
+                pushMini(cellCx, markY, cellCz + MVS, '#dddddd');
+                pushMini(cellCx, markY, cellCz - MVS, '#dddddd');
+              }
             }
           }
 
-          /* ── Lampposts — tall, detailed, at intersection corners ── */
+          /* ── Lampposts as mini-voxels — thin poles at NPC scale ── */
           if (cell.isIntersection) {
             const rwX = cell.roadWidthX;
             const rwZ = cell.roadWidthZ;
             const atCorner = (modX === 0 || modX === rwX - 1) && (modZ === 0 || modZ === rwZ - 1);
             if (atCorner) {
-              const poleBase = '#444444';
-              const poleShaft = '#555555';
-              const poleCap = '#666666';
-              const lightColor = '#ffee88';
-              const lightDim = '#ffdd66';
-              // Thicker base
-              push((bX + lx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleBase);
-              push((bX + lx) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleBase);
-              // Main shaft (8 voxels: h+4 to h+11)
-              for (let ly = 4; ly <= 11; ly++) {
-                push((bX + lx) * VOXEL_SIZE, (h + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleShaft);
+              // Pole base sits on the road surface: (h+1)*VOXEL_SIZE + VOXEL_SIZE*0.5
+              const poleBaseY = (h + 1) * VOXEL_SIZE + VOXEL_SIZE * 0.5;
+              const px = cellCx;
+              const pz = cellCz;
+              // Thick base (2×2 mini-voxels, 3 tall)
+              for (let by = 0; by < 3; by++) {
+                for (let bx = -1; bx <= 0; bx++) {
+                  for (let bz = -1; bz <= 0; bz++) {
+                    pushMini(px + bx * MVS, poleBaseY + by * MVS, pz + bz * MVS, '#3a3a3a');
+                  }
+                }
+              }
+              // Main shaft: single column of mini-voxels, ~40 units tall
+              // Total real height: 40 * 0.075 = 3.0 world units (= 6 regular voxels)
+              const shaftH = 40;
+              for (let sy = 3; sy < shaftH; sy++) {
+                pushMini(px, poleBaseY + sy * MVS, pz, '#555555');
               }
               // Top cap
-              push((bX + lx) * VOXEL_SIZE, (h + 12) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleCap);
-              // Lamp arms extend over the road from the corner
+              pushMini(px, poleBaseY + shaftH * MVS, pz, '#666666');
+              // Lamp arm extends toward road center from corner
               const armDx = (modX === 0) ? 1 : -1;
               const armDz = (modZ === 0) ? 1 : -1;
-              // X-direction arm + lights
-              push((bX + lx + armDx) * VOXEL_SIZE, (h + 11) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleCap);
-              push((bX + lx + armDx * 2) * VOXEL_SIZE, (h + 11) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, poleCap);
-              push((bX + lx + armDx) * VOXEL_SIZE, (h + 12) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, lightColor);
-              push((bX + lx + armDx * 2) * VOXEL_SIZE, (h + 12) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, lightDim);
-              // Z-direction arm + lights
-              push((bX + lx) * VOXEL_SIZE, (h + 11) * VOXEL_SIZE, (bZ + lz + armDz) * VOXEL_SIZE, poleCap);
-              push((bX + lx) * VOXEL_SIZE, (h + 11) * VOXEL_SIZE, (bZ + lz + armDz * 2) * VOXEL_SIZE, poleCap);
-              push((bX + lx) * VOXEL_SIZE, (h + 12) * VOXEL_SIZE, (bZ + lz + armDz) * VOXEL_SIZE, lightColor);
-              push((bX + lx) * VOXEL_SIZE, (h + 12) * VOXEL_SIZE, (bZ + lz + armDz * 2) * VOXEL_SIZE, lightDim);
-              trackH(lx, lz, h + 12);
+              // X-direction arm (4 mini-voxels long) + light fixture
+              for (let a = 1; a <= 4; a++) {
+                pushMini(px + a * armDx * MVS, poleBaseY + (shaftH - 1) * MVS, pz, '#666666');
+              }
+              // Light at end of X arm (2×2 glow)
+              pushMini(px + 3 * armDx * MVS, poleBaseY + shaftH * MVS, pz, '#ffee88');
+              pushMini(px + 4 * armDx * MVS, poleBaseY + shaftH * MVS, pz, '#ffdd66');
+              // Z-direction arm + light
+              for (let a = 1; a <= 4; a++) {
+                pushMini(px, poleBaseY + (shaftH - 1) * MVS, pz + a * armDz * MVS, '#666666');
+              }
+              pushMini(px, poleBaseY + shaftH * MVS, pz + 3 * armDz * MVS, '#ffee88');
+              pushMini(px, poleBaseY + shaftH * MVS, pz + 4 * armDz * MVS, '#ffdd66');
+              // trackH still uses regular voxel grid height
+              trackH(lx, lz, h + 1 + Math.ceil((shaftH * MVS) / VOXEL_SIZE));
             }
           }
 
@@ -381,6 +458,47 @@ export function generateChunkData(
           push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
             varyColor(swColor, wx, h + 1, wz, 2, 0.03, 0.05));
           trackH(lx, lz, h + 1);
+
+          /* ── Sidewalk details as mini-voxels ── */
+          const swSurfY = (h + 1) * VOXEL_SIZE + VOXEL_SIZE * 0.5;
+          const cellPx = (bX + lx) * VOXEL_SIZE;
+          const cellPz = (bZ + lz) * VOXEL_SIZE;
+
+          // Fire hydrant: every ~8 blocks along road edge (lotRawX=0 row, sparse along Z)
+          if (lotRawX === 0 && lotRawZ >= 2 && lotRawZ < lotSzZ - 2
+              && ((wz % 8) + 8) % 8 === 0 && ((wx % 20) + 20) % 20 < 3) {
+            // Red hydrant body: 5 tall mini-voxels
+            for (let hy = 0; hy < 5; hy++) {
+              pushMini(cellPx, swSurfY + hy * MVS, cellPz, hy < 2 ? '#cc2222' : '#dd3333');
+            }
+            // Cap
+            pushMini(cellPx - MVS, swSurfY + 3 * MVS, cellPz, '#cc2222');
+            pushMini(cellPx + MVS, swSurfY + 3 * MVS, cellPz, '#cc2222');
+            pushMini(cellPx, swSurfY + 5 * MVS, cellPz, '#aa1111');
+          }
+
+          // Sidewalk tree: every ~6 blocks along road edge, offset from hydrants
+          if (lotRawX === 1 && lotRawZ >= 2 && lotRawZ < lotSzZ - 2
+              && ((wz % 6) + 6) % 6 === 0 && ((wx % 20) + 20) % 20 >= 8
+              && ((wx % 20) + 20) % 20 < 14) {
+            // Small tree trunk: 8 tall mini-voxels
+            for (let ty = 0; ty < 8; ty++) {
+              pushMini(cellPx, swSurfY + ty * MVS, cellPz, '#664422');
+            }
+            // Small leaf canopy: cross pattern at top
+            const leafY = swSurfY + 8 * MVS;
+            for (let dx = -2; dx <= 2; dx++) {
+              for (let dz = -2; dz <= 2; dz++) {
+                if (Math.abs(dx) + Math.abs(dz) > 3) continue;
+                pushMini(cellPx + dx * MVS, leafY, cellPz + dz * MVS,
+                  varyColor('#44aa55', wx + dx, h + 2, wz + dz, 5, 0.06, 0.08));
+                if (Math.abs(dx) <= 1 && Math.abs(dz) <= 1) {
+                  pushMini(cellPx + dx * MVS, leafY + MVS, cellPz + dz * MVS,
+                    varyColor('#55bb66', wx + dx, h + 3, wz + dz, 5, 0.06, 0.08));
+                }
+              }
+            }
+          }
 
         } else if (cell.isBuilding) {
           /* ── Building — use modular building system ── */
@@ -657,6 +775,10 @@ export function generateChunkData(
     positions: posA.subarray(0, sc * 3), colors: colA.subarray(0, sc * 3), count: sc,
     waterPositions: wPosA.subarray(0, wc * 3), waterColors: wColA.subarray(0, wc * 3), waterCount: wc,
     pickups, windowLights: winPosA.subarray(0, winC * 3), windowLightCount: winC,
-    groundHeightMap, npcWalkableMap, solidHeightMap, waterLevelMap, chunkX: cx, chunkZ: cz,
+    groundHeightMap, npcWalkableMap, solidHeightMap, waterLevelMap,
+    miniVoxelPositions: miniPosA.subarray(0, miniC * 3),
+    miniVoxelColors: miniColA.subarray(0, miniC * 3),
+    miniVoxelCount: miniC,
+    chunkX: cx, chunkZ: cz,
   };
 }

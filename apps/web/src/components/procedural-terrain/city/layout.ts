@@ -257,19 +257,21 @@ export function getBuildingType(
     case 'downtown':
       if (v > 0.35 + (1 - density) * 0.15) return v2 > 0.3 ? 'skyscraper' : 'skyscraper_stepped';
       if (v > 0.2) return v2 > 0.0 ? 'tower' : 'office_tall';
-      if (v > 0.05) return 'office';
+      if (v > 0.05) return v2 > 0.5 ? 'hotel' : 'office';
       if (v > -0.1) return 'parking_garage';
       return v > -0.25 ? 'plaza' : 'fountain_plaza';
 
     case 'commercial':
-      if (v > 0.3) return 'office';
-      if (v > 0.1) return 'shop';
-      if (v > -0.05) return v2 > 0 ? 'shop' : 'parking';
+      if (v > 0.35) return 'hotel';
+      if (v > 0.2) return 'office';
+      if (v > 0.1) return v2 > 0.3 ? 'restaurant' : 'shop';
+      if (v > -0.05) return v2 > 0 ? 'gas_station' : 'parking';
       if (v > -0.2) return 'fountain_plaza';
       return 'park';
 
     case 'residential':
-      if (v > 0.3) return v2 > 0.4 ? 'mansion' : 'house';
+      if (v > 0.35) return v2 > 0.5 ? 'apartment' : 'mansion';
+      if (v > 0.15) return v2 > 0.4 ? 'apartment' : 'house';
       if (v > 0.05) return 'house';
       if (v > -0.15) return 'park';
       if (v > -0.3) return 'church';
@@ -278,11 +280,13 @@ export function getBuildingType(
     case 'industrial':
       if (v > 0.25) return 'warehouse';
       if (v > 0.0) return 'factory';
-      if (v > -0.2) return 'parking';
+      if (v > -0.15) return 'gas_station';
+      if (v > -0.3) return 'parking';
       return 'park';
 
     case 'civic':
       if (v > 0.3) return v2 > 0 ? 'hospital' : 'school';
+      if (v > 0.15) return v2 > 0.3 ? 'library' : 'fire_station';
       if (v > 0.05) return 'church';
       if (v > -0.15) return 'fountain_plaza';
       return 'plaza';
@@ -319,6 +323,12 @@ export function getBuildingHeight(
     case 'stadium':            return 4 + Math.floor(v * 3);     // 4-7
     case 'parking_garage':     return 4 + Math.floor(v * 3);     // 4-7
     case 'airport_terminal':   return 4 + Math.floor(v * 2);     // 4-6
+    case 'apartment':          return 6 + Math.floor(v * 10);    // 6-16
+    case 'hotel':              return 8 + Math.floor(v * 12);    // 8-20
+    case 'gas_station':        return 2 + Math.floor(v * 1);     // 2-3
+    case 'restaurant':         return 3 + Math.floor(v * 2);     // 3-5
+    case 'fire_station':       return 4 + Math.floor(v * 3);     // 4-7
+    case 'library':            return 4 + Math.floor(v * 4);     // 4-8
     case 'plaza':              return 0;
     case 'fountain_plaza':     return 0;
     case 'park':               return 0;
