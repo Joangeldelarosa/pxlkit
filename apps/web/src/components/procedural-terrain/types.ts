@@ -28,6 +28,7 @@ export interface WorldConfig {
   windowLitProbability: number;   // 0-1 fraction of windows lit at night
   starDensity: number;            // 0-1 controls how many stars appear at night
   lightDistance: number;           // 1-100 chunk radius for window/lamp light rendering (max = renderDistance)
+  lightFadeStart: number;          // 0-1 fraction of lightDistance where brightness fade begins (0 = fade from start, 1 = no fade)
   lampBrightness: number;         // 0-3 street lamp brightness multiplier
   lampColorTemp: 'warm' | 'neutral' | 'cool' | 'sodium';  // street lamp color temperature
   npcDensity: number;             // 0-1 how many NPCs per chunk (0 = off)
@@ -60,6 +61,7 @@ export const DEFAULT_CONFIG: WorldConfig = {
   windowLitProbability: 0.75,
   starDensity: 0.6,
   lightDistance: 18,
+  lightFadeStart: 0.5,
   lampBrightness: 1.2,
   lampColorTemp: 'sodium',
   npcDensity: 0.6,
