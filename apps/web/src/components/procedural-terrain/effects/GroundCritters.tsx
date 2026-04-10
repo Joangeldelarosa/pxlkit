@@ -4,9 +4,10 @@
  *  NPCs are spawned/despawned per-chunk like terrain itself:
  *  - Each loaded chunk gets deterministic NPC positions (seeded RNG)
  *  - NPCs load/unload as chunks enter/leave the npcDistance radius
- *  - Spawn happens behind the camera → never visible pop-in
- *  - Smooth opacity fade-in/out for seamless transitions
+ *  - Far-away NPCs (behind camera) are instantly recycled → frees slots
+ *  - Border NPCs get smooth opacity fade-in/out
  *  - Walking animation, terrain tracking, biome-aware colors
+ *  - npcMaxPerChunk controls per-chunk cap; npcDensity scales it 0-1
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
@@ -18,8 +19,8 @@ import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { TimeContext } from '../rendering/DayNightCycle';
 
 /* ── Constants ── */
-const MAX_NPCS = 200;                // hard cap for instanced mesh
-const FADE_DURATION = 1.2;           // seconds to fade in/out
+const MAX_NPCS = 500;                // hard cap for instanced mesh
+const FADE_DURATION = 1.0;           // seconds to fade in/out
 const WALK_SPEED_MIN = 0.25;
 const WALK_SPEED_MAX = 0.75;
 const TURN_SPEED = 2.5;              // radians/sec for smooth rotation
@@ -29,11 +30,11 @@ const MOVE_MIN = 2.0;
 const MOVE_MAX = 7.0;
 const ARM_SWING_SPEED = 8;
 const ARM_SWING_AMOUNT = 0.6;
-const SPAWN_CHECK_INTERVAL = 0.3;    // seconds between chunk scans
+const SPAWN_CHECK_INTERVAL = 0.25;   // seconds between chunk scans
 
 /* ── Biome NPC config ── */
 interface BiomeCritterCfg {
-  maxPerChunk: number;     // max NPCs per chunk at density=1
+  densityMul: number;    // 0-1 multiplier on npcMaxPerChunk for this biome
   skinColor: string;
   shirtColor: string;
   pantsColor: string;
@@ -41,15 +42,15 @@ interface BiomeCritterCfg {
 }
 
 const BIOME_NPC_CONFIG: Record<string, BiomeCritterCfg> = {
-  Forest:    { maxPerChunk: 3, skinColor: '#ddb896', shirtColor: '#336633', pantsColor: '#553322', speedMult: 0.8 },
-  Plains:    { maxPerChunk: 3, skinColor: '#ddb896', shirtColor: '#5577cc', pantsColor: '#444466', speedMult: 1.0 },
-  Desert:    { maxPerChunk: 2, skinColor: '#c8a070', shirtColor: '#ccaa66', pantsColor: '#887744', speedMult: 0.7 },
-  Tundra:    { maxPerChunk: 1, skinColor: '#eeddcc', shirtColor: '#7799aa', pantsColor: '#556677', speedMult: 0.6 },
-  Ocean:     { maxPerChunk: 0, skinColor: '#c8a070', shirtColor: '#cc6644', pantsColor: '#553333', speedMult: 0.5 },
-  City:      { maxPerChunk: 5, skinColor: '#ddb896', shirtColor: '#666666', pantsColor: '#333344', speedMult: 1.2 },
-  Mountains: { maxPerChunk: 1, skinColor: '#ddb896', shirtColor: '#998877', pantsColor: '#556655', speedMult: 0.5 },
-  Swamp:     { maxPerChunk: 1, skinColor: '#bba888', shirtColor: '#557744', pantsColor: '#444433', speedMult: 0.6 },
-  Village:   { maxPerChunk: 3, skinColor: '#ddb896', shirtColor: '#cc8844', pantsColor: '#665533', speedMult: 0.9 },
+  Forest:    { densityMul: 0.7,  skinColor: '#ddb896', shirtColor: '#336633', pantsColor: '#553322', speedMult: 0.8 },
+  Plains:    { densityMul: 0.8,  skinColor: '#ddb896', shirtColor: '#5577cc', pantsColor: '#444466', speedMult: 1.0 },
+  Desert:    { densityMul: 0.4,  skinColor: '#c8a070', shirtColor: '#ccaa66', pantsColor: '#887744', speedMult: 0.7 },
+  Tundra:    { densityMul: 0.3,  skinColor: '#eeddcc', shirtColor: '#7799aa', pantsColor: '#556677', speedMult: 0.6 },
+  Ocean:     { densityMul: 0.0,  skinColor: '#c8a070', shirtColor: '#cc6644', pantsColor: '#553333', speedMult: 0.5 },
+  City:      { densityMul: 1.0,  skinColor: '#ddb896', shirtColor: '#666666', pantsColor: '#333344', speedMult: 1.2 },
+  Mountains: { densityMul: 0.2,  skinColor: '#ddb896', shirtColor: '#998877', pantsColor: '#556655', speedMult: 0.5 },
+  Swamp:     { densityMul: 0.3,  skinColor: '#bba888', shirtColor: '#557744', pantsColor: '#444433', speedMult: 0.6 },
+  Village:   { densityMul: 0.9,  skinColor: '#ddb896', shirtColor: '#cc8844', pantsColor: '#665533', speedMult: 0.9 },
 };
 
 /* ── NPC body part definitions ── */
@@ -140,12 +141,14 @@ export function GroundCritters({
   npcDensity,
   npcDistance,
   npcScale,
+  npcMaxPerChunk,
   chunkCacheRef,
 }: {
   biome: string;
   npcDensity: number;
   npcDistance: number;
   npcScale: number;
+  npcMaxPerChunk: number;
   chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
 }) {
   const { camera } = useThree();
@@ -206,10 +209,11 @@ export function GroundCritters({
     const npcs = npcsRef.current;
     const camX = camera.position.x;
     const camZ = camera.position.z;
+    const chunkWorldSize = CHUNK_SIZE * VOXEL_SIZE;
 
     // Camera chunk position
-    const camCx = Math.floor(camX / (CHUNK_SIZE * VOXEL_SIZE));
-    const camCz = Math.floor(camZ / (CHUNK_SIZE * VOXEL_SIZE));
+    const camCx = Math.floor(camX / chunkWorldSize);
+    const camCz = Math.floor(camZ / chunkWorldSize);
 
     /* ═══ 1. CHUNK-BASED SPAWN/DESPAWN SCAN ═══ */
     spawnTimerRef.current += dt;
@@ -218,7 +222,8 @@ export function GroundCritters({
 
       const dist = npcDistance;
       const distSq = (dist + 0.5) * (dist + 0.5);
-      const despawnDistSq = (dist + 2) * (dist + 2);
+      // Instant-kill distance: far enough that player can't see
+      const killDistSq = (dist + 1.5) * (dist + 1.5);
 
       // Build set of chunks that should have NPCs
       const wantedChunks = new Set<string>();
@@ -234,40 +239,77 @@ export function GroundCritters({
         }
       }
 
-      // Despawn NPCs from chunks no longer in range
+      // ── Phase A: Instantly kill far-away NPCs to free slots ──
+      // NPCs whose chunk is well beyond range get killed immediately
+      // (player can't see them anyway, no need to fade)
       const active = activeChunksRef.current;
       for (const key of active) {
-        if (!wantedChunks.has(key)) {
-          // Mark all NPCs from this chunk for fade-out
-          for (const n of npcs) {
-            if (n.alive && !n.fadeOut && n.chunkKey === key) {
-              n.fadeOut = true;
-              n.fadeTimer = 0;
+        if (wantedChunks.has(key)) continue;
+        // Parse chunk coords to check distance
+        const [cxs, czs] = key.split(',');
+        const kcx = parseInt(cxs, 10);
+        const kcz = parseInt(czs, 10);
+        const ddx = kcx - camCx;
+        const ddz = kcz - camCz;
+        const cdSq = ddx * ddx + ddz * ddz;
+
+        if (cdSq > killDistSq) {
+          // Far away → instant kill (no fade needed, invisible to player)
+          for (let i = 0; i < npcs.length; i++) {
+            if (npcs[i].alive && npcs[i].chunkKey === key) {
+              npcs[i].alive = false;
             }
           }
-          active.delete(key);
+        } else {
+          // Near border → fade out smoothly
+          for (let i = 0; i < npcs.length; i++) {
+            if (npcs[i].alive && !npcs[i].fadeOut && npcs[i].chunkKey === key) {
+              npcs[i].fadeOut = true;
+              npcs[i].fadeTimer = 0;
+            }
+          }
+        }
+        active.delete(key);
+      }
+
+      // ── Phase B: Also instantly kill any individual NPC that wandered far ──
+      for (let i = 0; i < npcs.length; i++) {
+        const n = npcs[i];
+        if (!n.alive) continue;
+        const ndx = (n.x / chunkWorldSize) - camCx;
+        const ndz = (n.z / chunkWorldSize) - camCz;
+        const nDistSq = ndx * ndx + ndz * ndz;
+        if (nDistSq > killDistSq) {
+          n.alive = false; // instant kill
+        } else if (!n.fadeOut && nDistSq > distSq) {
+          n.fadeOut = true;
+          n.fadeTimer = 0;
         }
       }
 
-      // Spawn NPCs for new chunks in range
-      const npcsPerChunk = Math.max(0, Math.round(cfg.maxPerChunk * npcDensity));
-      const aliveCount = npcs.filter(n => n.alive).length;
-      let remaining = MAX_NPCS - aliveCount;
+      // ── Phase C: Spawn NPCs for new chunks ──
+      // Per-chunk count: npcMaxPerChunk × biome densityMul × npcDensity
+      const perChunk = Math.max(0, Math.round(npcMaxPerChunk * cfg.densityMul * npcDensity));
+
+      // Count only non-fading NPCs for capacity
+      let liveCount = 0;
+      for (let i = 0; i < npcs.length; i++) {
+        if (npcs[i].alive && !npcs[i].fadeOut) liveCount++;
+      }
+      let remaining = MAX_NPCS - liveCount;
 
       for (const key of wantedChunks) {
         if (active.has(key) || remaining <= 0) continue;
 
-        // Parse chunk coords
         const [cxs, czs] = key.split(',');
         const ccx = parseInt(cxs, 10);
         const ccz = parseInt(czs, 10);
 
-        // Use deterministic RNG seeded by chunk coords
+        // Deterministic RNG seeded by chunk coords
         const seed = ccx * 73856093 + ccz * 19349663;
         const rng = mulberry32(seed);
 
-        // How many NPCs for this chunk
-        const count = Math.min(npcsPerChunk, remaining);
+        const count = Math.min(perChunk, remaining);
         let spawned = 0;
 
         for (let i = 0; i < count; i++) {
@@ -287,26 +329,18 @@ export function GroundCritters({
             colorShift: (rng() - 0.5) * 0.1,
             chunkKey: key,
           };
-          const slot = npcs.findIndex(n => !n.alive);
-          if (slot >= 0) npcs[slot] = npc;
-          else if (npcs.length < MAX_NPCS) npcs.push(npc);
-          else break;
+          // Find a free slot (dead NPC or append)
+          let placed = false;
+          for (let s = 0; s < npcs.length; s++) {
+            if (!npcs[s].alive) { npcs[s] = npc; placed = true; break; }
+          }
+          if (!placed && npcs.length < MAX_NPCS) npcs.push(npc);
+          else if (!placed) break;
           spawned++;
           remaining--;
         }
 
         if (spawned > 0) active.add(key);
-      }
-
-      // Also check distance-based despawn for NPCs that wandered far
-      for (const n of npcs) {
-        if (!n.alive || n.fadeOut) continue;
-        const ndx = (n.x / (CHUNK_SIZE * VOXEL_SIZE)) - camCx;
-        const ndz = (n.z / (CHUNK_SIZE * VOXEL_SIZE)) - camCz;
-        if (ndx * ndx + ndz * ndz > despawnDistSq) {
-          n.fadeOut = true;
-          n.fadeTimer = 0;
-        }
       }
     }
 
