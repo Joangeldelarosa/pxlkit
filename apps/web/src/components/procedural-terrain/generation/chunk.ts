@@ -67,6 +67,8 @@ export function generateChunkData(
   regionN: (x: number, y: number) => number,
   cfg: WorldConfig,
 ): ChunkVoxelData {
+  // Buffer size accounts for wider roads (3× original), taller lampposts (12 voxels),
+  // and larger building footprints from increased BLOCK_SIZE
   const maxV = CHUNK_SIZE * CHUNK_SIZE * 24;
   const posA = new Float32Array(maxV * 3);
   const colA = new Float32Array(maxV * 3);
@@ -382,7 +384,8 @@ export function generateChunkData(
           );
           const bh = getBuildingHeight(structN, cell.lotWorldX, cell.lotWorldZ, bType);
           const baseFootprint = BLOCK_SIZE - ROAD_W - LOT_INSET * 2;
-          // Per-dimension footprint for single-lot; multi-lot uses consistent baseFootprint
+          // Single-lot: use actual per-dimension footprint for correct wall placement
+          // Multi-lot: use ROAD_W-based baseFootprint for consistent cross-lot alignment
           const footprintX = BLOCK_SIZE - cell.roadWidthX - LOT_INSET * 2;
           const footprintZ = BLOCK_SIZE - cell.roadWidthZ - LOT_INSET * 2;
           const totalW = cell.buildingW > 1 ? cell.buildingW * baseFootprint : footprintX;
