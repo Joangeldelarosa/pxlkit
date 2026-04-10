@@ -215,7 +215,7 @@ function genSkyscraperTwin(ctx: BuildCtx) {
 
 /* ═══════════════ SKYSCRAPER STEPPED ═══════════════ */
 function genSkyscraperStepped(ctx: BuildCtx) {
-  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
   const walls = getWallPalette('skyscraper_stepped');
   const roofCol = getRoofColor('skyscraper_stepped');
 
@@ -233,10 +233,24 @@ function genSkyscraperStepped(ctx: BuildCtx) {
     return x >= inset && x < footW - inset && z >= inset && z < footD - inset;
   }
 
+  /** Tier-level edge detection that respects both tier insets and biome boundaries.
+   *  At the outermost tier (inset=0), forceEdge applies directly.
+   *  At inner tiers, forceEdge shifts the detection inward by the same delta. */
+  function isTierEdge(x: number, z: number, inset: number): boolean {
+    // Natural tier edge
+    if (!inRange(x, z, inset + 1)) return true;
+    // Biome-forced edge (shifted by inset)
+    if (forceEdge.xNeg && x === inset + 1) return true;
+    if (forceEdge.xPos && x === footW - inset - 2) return true;
+    if (forceEdge.zNeg && z === inset + 1) return true;
+    if (forceEdge.zPos && z === footD - inset - 2) return true;
+    return false;
+  }
+
   let maxY = 0;
   // Tier 1 (full width)
   if (inRange(blX, blZ, inset1)) {
-    const onEdgeT = !inRange(blX, blZ, inset1 + 1);
+    const onEdgeT = isTierEdge(blX, blZ, inset1);
     for (let by = 1; by <= tier1; by++) {
       if (!onEdgeT && by < tier1) continue;
       let color: string;
@@ -255,7 +269,7 @@ function genSkyscraperStepped(ctx: BuildCtx) {
 
   // Tier 2 (medium)
   if (inRange(blX, blZ, inset2)) {
-    const onEdgeT = !inRange(blX, blZ, inset2 + 1);
+    const onEdgeT = isTierEdge(blX, blZ, inset2);
     for (let by = tier1 + 1; by <= tier2; by++) {
       if (!onEdgeT && by < tier2) continue;
       let color: string;
@@ -274,7 +288,7 @@ function genSkyscraperStepped(ctx: BuildCtx) {
 
   // Tier 3 (small top)
   if (inRange(blX, blZ, inset3)) {
-    const onEdgeT = !inRange(blX, blZ, inset3 + 1);
+    const onEdgeT = isTierEdge(blX, blZ, inset3);
     for (let by = tier2 + 1; by <= tier3; by++) {
       if (!onEdgeT && by < tier3) continue;
       let color: string;
@@ -296,10 +310,11 @@ function genSkyscraperStepped(ctx: BuildCtx) {
 
 /* ═══════════════ TELECOM TOWER ═══════════════ */
 function genTelecomTower(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
   const midX = Math.floor(footW / 2), midZ = Math.floor(footD / 2);
   const isTower = blX === midX && blZ === midZ;
   const isBase = Math.abs(blX - midX) <= 1 && Math.abs(blZ - midZ) <= 1;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   if (isTower) {
     // Main tower column
@@ -322,10 +337,17 @@ function genTelecomTower(ctx: BuildCtx) {
     }
     trackH(lx, lz, h + Math.floor(bh * 0.4));
   } else {
-    // Ground - concrete pad
+    // Ground - concrete pad (add small wall at biome boundary)
     push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
       varyColor('#999999', wx, h + 1, wz, 2, 0.03, 0.04));
-    trackH(lx, lz, h + 1);
+    if (onEdge) {
+      // Small perimeter wall at biome boundary to close any gaps
+      push((bX + lx) * VS, (h + 2) * VS, (bZ + lz) * VS,
+        varyColor('#888888', wx, h + 2, wz, 2, 0.03, 0.04));
+      trackH(lx, lz, h + 2);
+    } else {
+      trackH(lx, lz, h + 1);
+    }
   }
 }
 
@@ -567,8 +589,9 @@ function genChurch(ctx: BuildCtx) {
 
 /* ═══════════════ STADIUM ═══════════════ */
 function genStadium(ctx: BuildCtx) {
-  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh } = ctx;
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
   const isInner = blX >= 2 && blX < footW - 2 && blZ >= 2 && blZ < footD - 2;
+  const onOuterEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
 
   if (isInner) {
     // Field
@@ -579,6 +602,8 @@ function genStadium(ctx: BuildCtx) {
     const distFromEdge = Math.min(blX, footW - 1 - blX, blZ, footD - 1 - blZ);
     const seatH = Math.max(1, bh - distFromEdge);
     for (let by = 1; by <= seatH; by++) {
+      // Force fill wall voxels at biome boundary even for interior seating columns
+      if (!onOuterEdge && by < seatH && distFromEdge > 0) continue;
       const color = by === seatH
         ? varyColor((blX + blZ) % 2 === 0 ? '#bbbbbb' : '#999999', wx, h + by, wz, 2, 0.03, 0.04)
         : varyColor('#aaaaaa', wx, h + by, wz, 3, 0.03, 0.05);

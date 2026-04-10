@@ -8,6 +8,8 @@
  *  - Movement detection triggers immediate spawn/despawn scans
  *  - Walking animation, terrain tracking, biome-aware colors
  *  - npcMaxPerChunk controls per-chunk cap; npcDensity scales it 0-1
+ *  - Gender differentiation with distinct body proportions and clothing
+ *  - Per-NPC unique shirt, pants, shoes, hair colors
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
@@ -38,26 +40,27 @@ const SIDE_DIST_FACTOR = 0.75;       // side/peripheral despawn factor
 /* ── Biome NPC config ── */
 interface BiomeCritterCfg {
   densityMul: number;    // 0-1 multiplier on npcMaxPerChunk for this biome
-  skinColor: string;
-  shirtColor: string;
-  pantsColor: string;
+  skinColors: string[];  // range of skin tones
+  shirtColors: string[]; // range of shirt colors
+  pantsColors: string[]; // range of pants colors
+  shoeColors: string[];  // range of shoe colors
   speedMult: number;
 }
 
 const BIOME_NPC_CONFIG: Record<string, BiomeCritterCfg> = {
-  Forest:    { densityMul: 0.7,  skinColor: '#ddb896', shirtColor: '#336633', pantsColor: '#553322', speedMult: 0.8 },
-  Plains:    { densityMul: 0.8,  skinColor: '#ddb896', shirtColor: '#5577cc', pantsColor: '#444466', speedMult: 1.0 },
-  Desert:    { densityMul: 0.4,  skinColor: '#c8a070', shirtColor: '#ccaa66', pantsColor: '#887744', speedMult: 0.7 },
-  Tundra:    { densityMul: 0.3,  skinColor: '#eeddcc', shirtColor: '#7799aa', pantsColor: '#556677', speedMult: 0.6 },
-  Ocean:     { densityMul: 0.0,  skinColor: '#c8a070', shirtColor: '#cc6644', pantsColor: '#553333', speedMult: 0.5 },
-  City:      { densityMul: 1.0,  skinColor: '#ddb896', shirtColor: '#666666', pantsColor: '#333344', speedMult: 1.2 },
-  Mountains: { densityMul: 0.2,  skinColor: '#ddb896', shirtColor: '#998877', pantsColor: '#556655', speedMult: 0.5 },
-  Swamp:     { densityMul: 0.3,  skinColor: '#bba888', shirtColor: '#557744', pantsColor: '#444433', speedMult: 0.6 },
-  Village:   { densityMul: 0.9,  skinColor: '#ddb896', shirtColor: '#cc8844', pantsColor: '#665533', speedMult: 0.9 },
+  Forest:    { densityMul: 0.7,  skinColors: ['#ddb896', '#c8a070', '#e8c8a0'], shirtColors: ['#336633', '#445544', '#558855', '#2d5a2d', '#6b8f3c'], pantsColors: ['#553322', '#664433', '#443311', '#5a4632'], shoeColors: ['#443322', '#332211', '#554433'], speedMult: 0.8 },
+  Plains:    { densityMul: 0.8,  skinColors: ['#ddb896', '#c8a070', '#f0d0a0', '#a07050'], shirtColors: ['#5577cc', '#cc5555', '#55aa77', '#ddaa44', '#8866aa', '#dd7744'], pantsColors: ['#444466', '#336655', '#554444', '#3a4a5a', '#5a5a3a'], shoeColors: ['#443322', '#222222', '#554433', '#663322'], speedMult: 1.0 },
+  Desert:    { densityMul: 0.4,  skinColors: ['#c8a070', '#b09060', '#d4b080'], shirtColors: ['#ccaa66', '#ddbb77', '#eecc88', '#c4a458'], pantsColors: ['#887744', '#776633', '#998855'], shoeColors: ['#776644', '#665533', '#887755'], speedMult: 0.7 },
+  Tundra:    { densityMul: 0.3,  skinColors: ['#eeddcc', '#deccbb', '#f0e0d0'], shirtColors: ['#7799aa', '#889988', '#667788', '#9a8a7a'], pantsColors: ['#556677', '#445566', '#667788'], shoeColors: ['#443322', '#332211', '#554433'], speedMult: 0.6 },
+  Ocean:     { densityMul: 0.0,  skinColors: ['#c8a070'], shirtColors: ['#cc6644'], pantsColors: ['#553333'], shoeColors: ['#332211'], speedMult: 0.5 },
+  City:      { densityMul: 1.0,  skinColors: ['#ddb896', '#c8a070', '#f0d0a0', '#a07050', '#8b6945', '#e8c8a0'], shirtColors: ['#666666', '#444444', '#3355aa', '#aa3333', '#228844', '#bb8833', '#884488', '#555577', '#994422', '#dddddd', '#222222'], pantsColors: ['#333344', '#222233', '#444455', '#282838', '#3a3a4a', '#555566', '#1a1a2a'], shoeColors: ['#222222', '#443322', '#111111', '#332211', '#554433', '#663333'], speedMult: 1.2 },
+  Mountains: { densityMul: 0.2,  skinColors: ['#ddb896', '#c8a070'], shirtColors: ['#998877', '#887766', '#776655'], pantsColors: ['#556655', '#445544', '#667766'], shoeColors: ['#554433', '#443322', '#665544'], speedMult: 0.5 },
+  Swamp:     { densityMul: 0.3,  skinColors: ['#bba888', '#a89878'], shirtColors: ['#557744', '#667755', '#446633'], pantsColors: ['#444433', '#333322', '#555544'], shoeColors: ['#443322', '#332211', '#554433'], speedMult: 0.6 },
+  Village:   { densityMul: 0.9,  skinColors: ['#ddb896', '#c8a070', '#e0c090'], shirtColors: ['#cc8844', '#bb7733', '#dd9955', '#aa6622', '#997744'], pantsColors: ['#665533', '#554422', '#776644', '#443311'], shoeColors: ['#554433', '#443322', '#332211'], speedMult: 0.9 },
 };
 
-/* ── NPC body part definitions ── */
-type ColorType = 0 | 1 | 2 | 3;
+/* ── NPC body part definitions — enhanced with gender support ── */
+type ColorType = 0 | 1 | 2 | 3 | 4 | 5; // 0=skin, 1=shirt, 2=pants, 3=hair, 4=shoes, 5=accessory
 
 interface BodyPart {
   ox: number; oy: number; oz: number;
@@ -65,22 +68,79 @@ interface BodyPart {
   colorType: ColorType;
   animGroup?: 'leftArm' | 'rightArm' | 'leftLeg' | 'rightLeg';
   pivotY?: number;
+  genderOnly?: 'M' | 'F';  // only render for this gender (omit = both)
 }
 
-const BODY_PARTS: BodyPart[] = [
-  { ox: 0, oy: 4, oz: 0, sx: 2, sy: 2, sz: 2, colorType: 0 },        // Head
-  { ox: 0, oy: 6, oz: 0, sx: 2, sy: 0.6, sz: 2, colorType: 3 },      // Hair
-  { ox: 0, oy: 2, oz: 0, sx: 2, sy: 2, sz: 1, colorType: 1 },        // Torso
-  { ox: -1.4, oy: 2, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 1, animGroup: 'leftArm', pivotY: 2 },
-  { ox: 1.4, oy: 2, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 1, animGroup: 'rightArm', pivotY: 2 },
-  { ox: -0.5, oy: 0, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 2, animGroup: 'leftLeg', pivotY: 2 },
-  { ox: 0.5, oy: 0, oz: 0, sx: 0.8, sy: 2, sz: 0.8, colorType: 2, animGroup: 'rightLeg', pivotY: 2 },
+/* Male NPC body parts — 13 parts: broader shoulders, thicker build */
+const MALE_BODY_PARTS: BodyPart[] = [
+  // Head
+  { ox: 0, oy: 4.2, oz: 0, sx: 1.8, sy: 1.8, sz: 1.8, colorType: 0 },
+  // Hair (short, flat on top)
+  { ox: 0, oy: 5.5, oz: 0, sx: 1.9, sy: 0.7, sz: 1.9, colorType: 3 },
+  // Eyes (two tiny dots)
+  { ox: -0.4, oy: 4.5, oz: -0.9, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
+  { ox: 0.4, oy: 4.5, oz: -0.9, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
+  // Torso (broader)
+  { ox: 0, oy: 2.2, oz: 0, sx: 2.2, sy: 2.0, sz: 1.2, colorType: 1 },
+  // Left arm
+  { ox: -1.6, oy: 2.2, oz: 0, sx: 0.7, sy: 2.0, sz: 0.7, colorType: 1, animGroup: 'leftArm', pivotY: 2.0 },
+  // Right arm
+  { ox: 1.6, oy: 2.2, oz: 0, sx: 0.7, sy: 2.0, sz: 0.7, colorType: 1, animGroup: 'rightArm', pivotY: 2.0 },
+  // Left hand (skin)
+  { ox: -1.6, oy: 0.4, oz: 0, sx: 0.5, sy: 0.5, sz: 0.5, colorType: 0, animGroup: 'leftArm', pivotY: 3.8 },
+  // Right hand (skin)
+  { ox: 1.6, oy: 0.4, oz: 0, sx: 0.5, sy: 0.5, sz: 0.5, colorType: 0, animGroup: 'rightArm', pivotY: 3.8 },
+  // Left leg (pants)
+  { ox: -0.55, oy: 0.4, oz: 0, sx: 0.8, sy: 1.8, sz: 0.8, colorType: 2, animGroup: 'leftLeg', pivotY: 1.8 },
+  // Right leg (pants)
+  { ox: 0.55, oy: 0.4, oz: 0, sx: 0.8, sy: 1.8, sz: 0.8, colorType: 2, animGroup: 'rightLeg', pivotY: 1.8 },
+  // Left shoe
+  { ox: -0.55, oy: -0.5, oz: -0.1, sx: 0.8, sy: 0.5, sz: 1.0, colorType: 4, animGroup: 'leftLeg', pivotY: 2.7 },
+  // Right shoe
+  { ox: 0.55, oy: -0.5, oz: -0.1, sx: 0.8, sy: 0.5, sz: 1.0, colorType: 4, animGroup: 'rightLeg', pivotY: 2.7 },
 ];
 
-const VOXELS_PER_NPC = BODY_PARTS.length;
-const TOTAL_INSTANCES = MAX_NPCS * VOXELS_PER_NPC;
+/* Female NPC body parts — 14 parts: narrower shoulders, hair longer, slightly smaller build */
+const FEMALE_BODY_PARTS: BodyPart[] = [
+  // Head
+  { ox: 0, oy: 4.0, oz: 0, sx: 1.7, sy: 1.7, sz: 1.7, colorType: 0 },
+  // Hair (longer, extends down back)
+  { ox: 0, oy: 5.2, oz: 0, sx: 1.85, sy: 0.8, sz: 1.85, colorType: 3 },
+  // Hair extension (ponytail / long hair draping down back)
+  { ox: 0, oy: 3.8, oz: 0.6, sx: 1.2, sy: 1.6, sz: 0.5, colorType: 3 },
+  // Eyes
+  { ox: -0.35, oy: 4.3, oz: -0.85, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
+  { ox: 0.35, oy: 4.3, oz: -0.85, sx: 0.3, sy: 0.2, sz: 0.1, colorType: 5 },
+  // Torso (narrower)
+  { ox: 0, oy: 2.2, oz: 0, sx: 1.8, sy: 1.8, sz: 1.0, colorType: 1 },
+  // Left arm
+  { ox: -1.3, oy: 2.2, oz: 0, sx: 0.6, sy: 1.8, sz: 0.6, colorType: 1, animGroup: 'leftArm', pivotY: 1.8 },
+  // Right arm
+  { ox: 1.3, oy: 2.2, oz: 0, sx: 0.6, sy: 1.8, sz: 0.6, colorType: 1, animGroup: 'rightArm', pivotY: 1.8 },
+  // Left hand
+  { ox: -1.3, oy: 0.5, oz: 0, sx: 0.4, sy: 0.4, sz: 0.4, colorType: 0, animGroup: 'leftArm', pivotY: 3.5 },
+  // Right hand
+  { ox: 1.3, oy: 0.5, oz: 0, sx: 0.4, sy: 0.4, sz: 0.4, colorType: 0, animGroup: 'rightArm', pivotY: 3.5 },
+  // Left leg
+  { ox: -0.45, oy: 0.4, oz: 0, sx: 0.7, sy: 1.7, sz: 0.7, colorType: 2, animGroup: 'leftLeg', pivotY: 1.7 },
+  // Right leg
+  { ox: 0.45, oy: 0.4, oz: 0, sx: 0.7, sy: 1.7, sz: 0.7, colorType: 2, animGroup: 'rightLeg', pivotY: 1.7 },
+  // Left shoe
+  { ox: -0.45, oy: -0.4, oz: -0.1, sx: 0.7, sy: 0.5, sz: 0.9, colorType: 4, animGroup: 'leftLeg', pivotY: 2.5 },
+  // Right shoe
+  { ox: 0.45, oy: -0.4, oz: -0.1, sx: 0.7, sy: 0.5, sz: 0.9, colorType: 4, animGroup: 'rightLeg', pivotY: 2.5 },
+];
 
-const HAIR_COLORS = ['#332211', '#443322', '#554433', '#221100', '#665544', '#887766', '#aa6633', '#cc9944'];
+const MAX_PARTS = Math.max(MALE_BODY_PARTS.length, FEMALE_BODY_PARTS.length);
+const TOTAL_INSTANCES = MAX_NPCS * MAX_PARTS;
+
+const HAIR_COLORS = [
+  '#221100', '#332211', '#443322', '#554433', '#110000', // dark brown/black
+  '#665544', '#887766', '#776655', // light brown
+  '#aa6633', '#cc9944', '#ddbb66', // blonde shades
+  '#993322', '#bb4433', // auburn/red
+  '#222222', '#333333', '#111111', // black shades
+];
 
 /* ── NPC state ── */
 interface NpcState {
@@ -96,15 +156,25 @@ interface NpcState {
   fadeTimer: number;
   walkPhase: number;
   alive: boolean;
-  hairColor: string;
-  colorShift: number;
   chunkKey: string;              // which chunk this NPC belongs to
+  // Per-NPC appearance
+  gender: 'M' | 'F';
+  skinColor: string;
+  hairColor: string;
+  shirtColor: string;
+  pantsColor: string;
+  shoeColor: string;
+  eyeColor: string;
 }
 
 /* ── Deterministic seeded RNG (same positions each visit) ── */
 function mulberry32(seed: number): () => number {
   let s = seed | 0;
   return () => { s = Math.imul(s ^ (s >>> 15), s | 1); s ^= s + Math.imul(s ^ (s >>> 7), s | 61); return ((s ^ (s >>> 14)) >>> 0) / 4294967296; };
+}
+
+function pickRandom<T>(arr: T[], rng: () => number): T {
+  return arr[Math.floor(rng() * arr.length)];
 }
 
 /* ── Terrain height sampling ── */
@@ -164,12 +234,6 @@ export function GroundCritters({
   const camDirRef = useRef({ x: 0, z: -1 });  // camera forward on XZ plane
 
   const cfg = BIOME_NPC_CONFIG[biome] || BIOME_NPC_CONFIG.Plains;
-
-  const colors = useMemo(() => ({
-    skin: new THREE.Color(cfg.skinColor),
-    shirt: new THREE.Color(cfg.shirtColor),
-    pants: new THREE.Color(cfg.pantsColor),
-  }), [cfg.skinColor, cfg.shirtColor, cfg.pantsColor]);
 
   const geo = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const mat = useMemo(() => new THREE.MeshLambertMaterial({ transparent: true, depthWrite: true }), []);
@@ -258,29 +322,22 @@ export function GroundCritters({
       const distSq = (dist + 0.5) * (dist + 0.5);
 
       // ── Directional despawn distances ──
-      // Behind camera: tighter radius → despawn sooner
-      // In front: full radius → keep visible NPCs alive
       const behindDistSq = (dist * BEHIND_DIST_FACTOR) * (dist * BEHIND_DIST_FACTOR);
       const sideDistSq = (dist * SIDE_DIST_FACTOR) * (dist * SIDE_DIST_FACTOR);
       const killDistSq = (dist + 1.0) * (dist + 1.0);
 
-      /**
-       * Get effective despawn distance² for a chunk based on camera direction.
-       * dot > 0 = in front, dot < 0 = behind, |dot| small = to the side.
-       */
       function getEffectiveDespawnDistSq(chunkCenterX: number, chunkCenterZ: number): number {
         const toCx = chunkCenterX - camX;
         const toCz = chunkCenterZ - camZ;
         const toLen = Math.sqrt(toCx * toCx + toCz * toCz);
-        if (toLen < 0.001) return distSq; // camera is in this chunk
+        if (toLen < 0.001) return distSq;
         const dot = (toCx / toLen) * fwdX + (toCz / toLen) * fwdZ;
-        // dot: -1 = directly behind, +1 = directly in front
-        if (dot < -0.3) return behindDistSq;   // behind camera
-        if (dot < 0.2)  return sideDistSq;     // to the side
-        return distSq;                          // in front
+        if (dot < -0.3) return behindDistSq;
+        if (dot < 0.2)  return sideDistSq;
+        return distSq;
       }
 
-      // Build set of chunks that should have NPCs (full circle)
+      // Build set of chunks that should have NPCs
       const wantedChunks = new Set<string>();
       for (let dx = -dist; dx <= dist; dx++) {
         for (let dz = -dist; dz <= dist; dz++) {
@@ -298,7 +355,6 @@ export function GroundCritters({
       const active = activeChunksRef.current;
       for (const key of active) {
         if (wantedChunks.has(key)) {
-          // Check if this chunk should be despawned based on camera direction
           const [cxs, czs] = key.split(',');
           const kcx = parseInt(cxs, 10);
           const kcz = parseInt(czs, 10);
@@ -310,7 +366,6 @@ export function GroundCritters({
           const effectiveDistSq = getEffectiveDespawnDistSq(chunkCenterX, chunkCenterZ);
 
           if (cdSq > effectiveDistSq) {
-            // Behind/side camera, beyond effective range → fade out
             for (let i = 0; i < npcs.length; i++) {
               if (npcs[i].alive && !npcs[i].fadeOut && npcs[i].chunkKey === key) {
                 npcs[i].fadeOut = true;
@@ -318,12 +373,11 @@ export function GroundCritters({
               }
             }
             active.delete(key);
-            wantedChunks.delete(key); // don't re-spawn immediately
+            wantedChunks.delete(key);
           }
           continue;
         }
 
-        // Chunk no longer in wanted set at all
         const [cxs, czs] = key.split(',');
         const kcx = parseInt(cxs, 10);
         const kcz = parseInt(czs, 10);
@@ -332,14 +386,12 @@ export function GroundCritters({
         const cdSq = ddx * ddx + ddz * ddz;
 
         if (cdSq > killDistSq) {
-          // Far away → instant kill
           for (let i = 0; i < npcs.length; i++) {
             if (npcs[i].alive && npcs[i].chunkKey === key) {
               npcs[i].alive = false;
             }
           }
         } else {
-          // Near border → fade out
           for (let i = 0; i < npcs.length; i++) {
             if (npcs[i].alive && !npcs[i].fadeOut && npcs[i].chunkKey === key) {
               npcs[i].fadeOut = true;
@@ -372,14 +424,12 @@ export function GroundCritters({
       // ── Phase C: Spawn NPCs, prioritizing chunks ahead of camera ──
       const perChunk = Math.max(0, Math.round(npcMaxPerChunk * cfg.densityMul * npcDensity));
 
-      // Count only non-fading NPCs for capacity
       let liveCount = 0;
       for (let i = 0; i < npcs.length; i++) {
         if (npcs[i].alive && !npcs[i].fadeOut) liveCount++;
       }
       let remaining = MAX_NPCS - liveCount;
 
-      // Sort wanted chunks: prioritize those in front of the camera, then by distance
       const chunksToSpawn: { key: string; cx: number; cz: number; priority: number }[] = [];
       for (const key of wantedChunks) {
         if (active.has(key)) continue;
@@ -395,8 +445,6 @@ export function GroundCritters({
         const ddx = ccx - camCx;
         const ddz = ccz - camCz;
         const distFromCam = Math.sqrt(ddx * ddx + ddz * ddz);
-        // Priority: higher = spawn first. In-front chunks close to camera win.
-        // dot ranges -1 to 1. Weigh it so front chunks get priority.
         const priority = (dot + 1.0) * 2.0 - distFromCam * 0.5;
         chunksToSpawn.push({ key, cx: ccx, cz: ccz, priority });
       }
@@ -407,7 +455,6 @@ export function GroundCritters({
 
         const { key, cx: ccx, cz: ccz } = entry;
 
-        // Deterministic RNG seeded by chunk coords
         const seed = ccx * 73856093 + ccz * 19349663;
         const rng = mulberry32(seed);
 
@@ -420,6 +467,8 @@ export function GroundCritters({
 
           const heading = rng() * Math.PI * 2;
           const speed = (WALK_SPEED_MIN + rng() * (WALK_SPEED_MAX - WALK_SPEED_MIN)) * cfg.speedMult;
+          const gender: 'M' | 'F' = rng() > 0.5 ? 'M' : 'F';
+
           const npc: NpcState = {
             x: pos.x, z: pos.z, y: pos.y,
             heading, targetHeading: heading,
@@ -427,11 +476,16 @@ export function GroundCritters({
             moveTimer: MOVE_MIN + rng() * (MOVE_MAX - MOVE_MIN),
             moving: true, age: 0, fadeOut: false, fadeTimer: 0,
             walkPhase: rng() * Math.PI * 2, alive: true,
-            hairColor: HAIR_COLORS[Math.floor(rng() * HAIR_COLORS.length)],
-            colorShift: (rng() - 0.5) * 0.1,
             chunkKey: key,
+            // Per-NPC unique appearance
+            gender,
+            skinColor: pickRandom(cfg.skinColors, rng),
+            hairColor: pickRandom(HAIR_COLORS, rng),
+            shirtColor: pickRandom(cfg.shirtColors, rng),
+            pantsColor: pickRandom(cfg.pantsColors, rng),
+            shoeColor: pickRandom(cfg.shoeColors, rng),
+            eyeColor: rng() > 0.7 ? '#334455' : '#221100', // blue or dark
           };
-          // Find a free slot (dead NPC or append)
           let placed = false;
           for (let s = 0; s < npcs.length; s++) {
             if (!npcs[s].alive) { npcs[s] = npc; placed = true; break; }
@@ -458,7 +512,6 @@ export function GroundCritters({
       }
 
       if (n.moving) {
-        // Smooth heading interpolation
         let hd = n.targetHeading - n.heading;
         while (hd > Math.PI) hd -= Math.PI * 2;
         while (hd < -Math.PI) hd += Math.PI * 2;
@@ -539,9 +592,11 @@ export function GroundCritters({
         ? Math.sin(n.walkPhase) * ARM_SWING_AMOUNT * speedRatio
         : Math.sin(n.walkPhase) * ARM_SWING_AMOUNT * 0.05;
 
-      for (let p = 0; p < BODY_PARTS.length; p++) {
+      const parts = n.gender === 'F' ? FEMALE_BODY_PARTS : MALE_BODY_PARTS;
+
+      for (let p = 0; p < parts.length; p++) {
         if (idx >= TOTAL_INSTANCES) break;
-        const part = BODY_PARTS[p];
+        const part = parts[p];
 
         let animSwing = 0;
         if (part.animGroup === 'leftArm') animSwing = swingAmt;
@@ -584,15 +639,25 @@ export function GroundCritters({
 
         mesh.setMatrixAt(idx, m);
 
-        const shift = n.colorShift;
+        // Per-NPC color assignment
         switch (part.colorType) {
-          case 0: c.copy(colors.skin); break;
-          case 1: c.copy(colors.shirt); c.offsetHSL(shift, 0, shift * 0.5); break;
-          case 2: c.copy(colors.pants); c.offsetHSL(shift * 0.5, 0, shift * 0.3); break;
-          case 3: c.set(n.hairColor); break;
+          case 0: c.set(n.skinColor); break;            // skin
+          case 1: c.set(n.shirtColor); break;           // shirt
+          case 2: c.set(n.pantsColor); break;           // pants
+          case 3: c.set(n.hairColor); break;             // hair
+          case 4: c.set(n.shoeColor); break;             // shoes
+          case 5: c.set(n.eyeColor); break;              // eyes/accessory
         }
         c.multiplyScalar(nightMul * opacity);
         mesh.setColorAt(idx, c);
+        idx++;
+      }
+
+      // Pad remaining instance slots for this NPC (if fewer parts than MAX_PARTS)
+      const partCount = parts.length;
+      for (let pad = partCount; pad < MAX_PARTS; pad++) {
+        if (idx >= TOTAL_INSTANCES) break;
+        mesh.setMatrixAt(idx, zeroMatrix);
         idx++;
       }
     }
