@@ -57,7 +57,7 @@ export const DEFAULT_CONFIG: WorldConfig = {
   boatDensity: 0.5,
   windowLitProbability: 0.7,
   starDensity: 0.5,
-  lightDistance: 8,
+  lightDistance: 12,
   lampBrightness: 1.0,
   lampColorTemp: 'sodium',
   npcDensity: 0.6,
