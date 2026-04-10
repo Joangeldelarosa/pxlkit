@@ -19,7 +19,8 @@
  *  ├── rendering/
  *  │   ├── ChunkMesh.tsx  — instanced mesh renderer + FloatingPickup
  *  │   ├── WorldLighting.tsx — lights, sky dome, fog
- *  │   └── DayNightCycle.tsx — day/night cycle + sky shader
+ *  │   ├── DayNightCycle.tsx — day/night cycle + sky shader
+ *  │   └── NightWindowLights.tsx — glowing windows at night
  *  ├── effects/
  *  │   ├── AmbientParticles.tsx
  *  │   ├── SkyBirds.tsx
