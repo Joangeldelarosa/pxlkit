@@ -259,6 +259,8 @@ export function SettingsPanel({
               <ConfigSlider label="Pickup Density" value={config.pickupDensity} onChange={v => onUpdateConfig('pickupDensity', v)} min={0} max={1} step={0.1} color="text-retro-cyan/80" displayValue={`${Math.round(config.pickupDensity * 100)}%`} />
               <ConfigSlider label="Particles" value={config.particleIntensity} onChange={v => onUpdateConfig('particleIntensity', v)} min={0} max={1} step={0.1} color="text-retro-purple/80" displayValue={`${Math.round(config.particleIntensity * 100)}%`} />
               <ConfigSlider label="Boats on Water" value={config.boatDensity} onChange={v => onUpdateConfig('boatDensity', v)} min={0} max={1} step={0.05} color="text-retro-cyan/80" displayValue={config.boatDensity === 0 ? 'Off' : `${Math.round(config.boatDensity * 100)}%`} />
+              <ConfigSlider label="NPCs" value={config.npcDensity} onChange={v => onUpdateConfig('npcDensity', v)} min={0} max={1} step={0.05} color="text-retro-cyan/80" displayValue={config.npcDensity === 0 ? 'Off' : `${Math.round(config.npcDensity * 100)}%`} />
+              <ConfigSlider label="NPC Distance" value={config.npcRenderDistance} onChange={v => onUpdateConfig('npcRenderDistance', v)} min={1} max={20} step={1} color="text-retro-cyan/80" displayValue={`${config.npcRenderDistance} chunks`} />
             </div>
           )}
 

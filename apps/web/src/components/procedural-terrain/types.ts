@@ -27,6 +27,8 @@ export interface WorldConfig {
   windowLitProbability: number;   // 0-1 fraction of windows lit at night
   lightRenderDistance: number;    // 1-50 chunks — how far away window lights are rendered
   starDensity: number;            // 0-1 controls how many stars appear at night
+  npcDensity: number;             // 0-1 controls how many NPCs spawn in cities
+  npcRenderDistance: number;      // 1-20 chunks — how far away NPCs are rendered
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
@@ -52,6 +54,8 @@ export const DEFAULT_CONFIG: WorldConfig = {
   windowLitProbability: 0.7,
   lightRenderDistance: 15,
   starDensity: 0.5,
+  npcDensity: 0.5,
+  npcRenderDistance: 6,
 };
 
 export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city' | 'swamp' | 'village';
