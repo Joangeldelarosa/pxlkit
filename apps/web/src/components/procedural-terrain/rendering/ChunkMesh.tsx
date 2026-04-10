@@ -13,8 +13,20 @@ import { getPickupIcons } from '../generation/chunk';
 /* Shared geometry & materials */
 const sharedGeo = new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
 const sharedSolidMat = new THREE.MeshStandardMaterial({ roughness: 0.7 });
+
+/* Water voxels use a slightly oversized geometry (1.02×) so adjacent water
+ * cubes overlap by a tiny margin — this eliminates the visible grid seams
+ * between water voxels without affecting visual appearance. */
+const WATER_OVERLAP = 1.02;
+const sharedWaterGeo = new THREE.BoxGeometry(
+  VOXEL_SIZE * WATER_OVERLAP,
+  VOXEL_SIZE,                   // keep vertical size exact to avoid stacking issues
+  VOXEL_SIZE * WATER_OVERLAP,
+);
 const sharedWaterMat = new THREE.MeshStandardMaterial({
-  roughness: 0.2, metalness: 0.05, transparent: true, opacity: 0.6, depthWrite: false,
+  roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.55,
+  depthWrite: false,
+  color: new THREE.Color('#88ccee'),   // slight tint so water blends better
 });
 
 export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
@@ -54,7 +66,7 @@ export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
   return (
     <group>
       {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, sharedSolidMat, data.count]} frustumCulled={false} />}
-      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />}
+      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />}
     </group>
   );
 }

@@ -599,7 +599,7 @@ export default function ProceduralTerrain() {
           <GroundCritters biome={currentBiome} intensity={config.particleIntensity} />
           <NightWindowLights chunkCacheRef={chunkCacheRef} windowLitProbability={config.windowLitProbability} lightRenderDistance={config.lightRenderDistance} />
           <WaterBoats chunkCacheRef={chunkCacheRef} boatDensity={config.boatDensity} />
-          <CityNPCs chunkCacheRef={chunkCacheRef} npcDensity={config.npcDensity} npcRenderDistance={config.npcRenderDistance} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} />
+          <CityNPCs chunkCacheRef={chunkCacheRef} npcDensity={config.npcDensity} npcRenderDistance={config.npcRenderDistance} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} seed={seed} />
           </TimeContext.Provider>
         </Canvas>
       </div>

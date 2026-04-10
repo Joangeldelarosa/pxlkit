@@ -19,12 +19,12 @@ import { TimeContext } from '../rendering/DayNightCycle';
 
 /* ── Constants ── */
 const MINI_VS = VOXEL_SIZE / 3;          // mini-voxel size for boats
-const MAX_BOATS = 12;                     // max simultaneous boats
+const MAX_BOATS = 20;                     // max simultaneous boats
 const MAX_SPRAY = 600;                    // max spray particles
-const SPAWN_CHECK_INTERVAL = 2;           // seconds between spawn checks
-const BOAT_SPAWN_RADIUS = 40;             // how far from camera to spawn
-const BOAT_DESPAWN_RADIUS = 60;           // remove when beyond this
-const MIN_WATER_DEPTH = 3;               // minimum water depth in voxels
+const SPAWN_CHECK_INTERVAL = 1.5;         // seconds between spawn checks
+const BOAT_SPAWN_RADIUS = 30;             // how far from camera to spawn (in voxel units)
+const BOAT_DESPAWN_RADIUS = 50;           // remove when beyond this
+const MIN_WATER_DEPTH = 2;                // minimum water depth in voxels (lowered for more spawns)
 const SHORE_DETECT_DIST = 3;             // distance in voxels to detect shore ahead
 const MAX_SPEED = 2.5;                    // max boat speed (world units/sec)
 const ACCEL = 0.8;                        // acceleration rate
@@ -263,17 +263,22 @@ export function WaterBoats({
       lastSpawnCheck.current = t;
 
       // Try random positions around camera to find deep water
-      for (let attempt = 0; attempt < 12; attempt++) {
+      for (let attempt = 0; attempt < 24; attempt++) {
         const angle = pseudoRand(t * 100 + attempt, camX * 0.1) * Math.PI * 2;
-        const dist = BOAT_SPAWN_RADIUS * 0.5 + pseudoRand(t * 50 + attempt, camZ * 0.1) * BOAT_SPAWN_RADIUS * 0.5;
+        const dist = BOAT_SPAWN_RADIUS * 0.3 + pseudoRand(t * 50 + attempt, camZ * 0.1) * BOAT_SPAWN_RADIUS * 0.7;
         const sx = camX + Math.cos(angle) * dist * VOXEL_SIZE;
         const sz = camZ + Math.sin(angle) * dist * VOXEL_SIZE;
 
         const spawnInfo = sampleWaterInfo(cache, sx, sz);
         if (spawnInfo.depth >= MIN_WATER_DEPTH) {
-          // Also check surrounding area for navigability
-          const aheadInfo = sampleWaterInfo(cache, sx + Math.cos(angle) * 3 * VOXEL_SIZE, sz + Math.sin(angle) * 3 * VOXEL_SIZE);
-          if (aheadInfo.depth >= MIN_WATER_DEPTH) {
+          // Check at least 1 neighbor direction also has water (avoid single-cell puddles)
+          let navOk = false;
+          for (let di = 0; di < 4; di++) {
+            const checkAngle = angle + Math.PI + (di - 1.5) * 0.5;
+            const cInfo = sampleWaterInfo(cache, sx + Math.cos(checkAngle) * 2 * VOXEL_SIZE, sz + Math.sin(checkAngle) * 2 * VOXEL_SIZE);
+            if (cInfo.depth >= MIN_WATER_DEPTH) { navOk = true; break; }
+          }
+          if (navOk) {
             boats.push({
               x: sx, z: sz, y: spawnInfo.waterY,
               heading: angle + Math.PI,
@@ -298,8 +303,9 @@ export function WaterBoats({
       b.age += dt;
 
       // Despawn if too far or density dropped
-      const distToCam = Math.sqrt((b.x - camX) ** 2 + (b.z - camZ) ** 2);
-      if (distToCam > BOAT_DESPAWN_RADIUS * VOXEL_SIZE || b.age > 120 || boatDensity <= 0) {
+      const distToCamSq = (b.x - camX) ** 2 + (b.z - camZ) ** 2;
+      const despawnThresholdSq = (BOAT_DESPAWN_RADIUS * VOXEL_SIZE) ** 2;
+      if (distToCamSq > despawnThresholdSq || b.age > 120 || boatDensity <= 0) {
         boats.splice(bi, 1);
         continue;
       }
