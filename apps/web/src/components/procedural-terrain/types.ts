@@ -74,6 +74,10 @@ export interface ChunkVoxelData {
   /** Window positions for night-time lighting: [wx, wy, wz] world coords */
   windowLights: Float32Array;
   windowLightCount: number;
+  /** Terrain-only top height per cell (ignores buildings/props/water) */
+  groundHeightMap: Int32Array;
+  /** 1 = NPC can walk/spawn here, 0 = blocked (e.g. buildings) */
+  npcWalkableMap: Uint8Array;
   solidHeightMap: Int32Array;
   /** Per-cell water level (from the biome config) for accurate water detection */
   waterLevelMap: Int32Array;

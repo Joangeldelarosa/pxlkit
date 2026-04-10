@@ -79,6 +79,8 @@ export function generateChunkData(
   const maxWin = CHUNK_SIZE * CHUNK_SIZE * 4;
   const winPosA = new Float32Array(maxWin * 3);
   let winC = 0;
+  const groundHeightMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
+  const npcWalkableMap = new Uint8Array(CHUNK_SIZE * CHUNK_SIZE);
   const solidHeightMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
   const waterLevelMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
 
@@ -192,7 +194,10 @@ export function generateChunkData(
       const hE = hMap[(lx + 2) * gW + (lz + 1)];
       const hWest = hMap[lx * gW + (lz + 1)];
       const wl = c.waterLevel;
-      waterLevelMap[lx * CHUNK_SIZE + lz] = wl;
+      const lIdx = lx * CHUNK_SIZE + lz;
+      waterLevelMap[lIdx] = wl;
+      groundHeightMap[lIdx] = h;
+      npcWalkableMap[lIdx] = biome === 'city' ? 0 : 1;
 
       /* ── 1. TERRAIN ── */
       for (let y = 0; y <= h; y++) {
@@ -231,32 +236,30 @@ export function generateChunkData(
         trackH(lx, lz, wl);
       }
 
-      /* ── 2b. WATERFALL — cascade water at edges where neighbor has higher water ── */
-      {
+      /* ── 2b. WATERFALL — cascade only into dry lower cells near real water edges ── */
+      if (h >= wl) {
         const myTop = Math.max(h, wl);
-        // Check each neighbor for higher water that should cascade into this cell
         const nDirs: [number, number][] = [[-1, 0], [1, 0], [0, -1], [0, 1]];
         let maxNeighborWater = -1;
         for (const [dlx, dlz] of nDirs) {
           const nIdx = (lx + dlx + 1) * gW + (lz + dlz + 1);
           const nh = hMap[nIdx];
           const nwl = wlMap[nIdx];
-          // Neighbor has water (terrain below its water level) AND its water is above our surface
-          if (nh >= 0 && nh < nwl && nwl > myTop) {
+          const neighborHasWater = nh >= 0 && nh < nwl;
+          const thisCellDry = h >= wl;
+          if (neighborHasWater && thisCellDry && nwl > myTop) {
             if (nwl > maxNeighborWater) maxNeighborWater = nwl;
           }
         }
         if (maxNeighborWater > myTop) {
-          // Add cascading water voxels from myTop+1 up to the neighbor's water level
           const waterCol = c.colors.water || '#88ddff';
           for (let wy = myTop + 1; wy <= maxNeighborWater; wy++) {
             pushW((bX + lx) * VOXEL_SIZE, wy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
               varyColor(waterCol, wx, wy, wz, 6, 0.15, 0.20));
           }
           trackH(lx, lz, maxNeighborWater);
-          // Update water level map for this cell so NPC/boats can see it
-          if (maxNeighborWater > waterLevelMap[lx * CHUNK_SIZE + lz]) {
-            waterLevelMap[lx * CHUNK_SIZE + lz] = maxNeighborWater;
+          if (maxNeighborWater > waterLevelMap[lIdx]) {
+            waterLevelMap[lIdx] = maxNeighborWater;
           }
         }
       }
@@ -264,6 +267,7 @@ export function generateChunkData(
       /* ══════════════════ 3. CITY BIOME ══════════════════ */
       if (biome === 'city') {
         const cell = classifyCityCell(wx, wz, structN);
+        npcWalkableMap[lIdx] = cell.isRoad ? 1 : 0;
 
         if (cell.isRoad) {
           /* ── Road surface ── */
@@ -616,6 +620,6 @@ export function generateChunkData(
     positions: posA.subarray(0, sc * 3), colors: colA.subarray(0, sc * 3), count: sc,
     waterPositions: wPosA.subarray(0, wc * 3), waterColors: wColA.subarray(0, wc * 3), waterCount: wc,
     pickups, windowLights: winPosA.subarray(0, winC * 3), windowLightCount: winC,
-    solidHeightMap, waterLevelMap, chunkX: cx, chunkZ: cz,
+    groundHeightMap, npcWalkableMap, solidHeightMap, waterLevelMap, chunkX: cx, chunkZ: cz,
   };
 }
