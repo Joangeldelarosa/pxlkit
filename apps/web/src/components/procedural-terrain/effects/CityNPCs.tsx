@@ -1,19 +1,24 @@
 /* ═══════════════════════════════════════════════════════════════
- *  City NPCs — Ultra-detailed voxel pedestrians with lifelike AI
+ *  City NPCs — Ultra-dense, hyper-natural voxel pedestrians
  *
- *  Scale system: NPCs use NPC_SCALE (0.1×) voxel size for maximum
- *  detail — each NPC is built from ~80-120 mini-voxels with bone-tagged
- *  limbs for natural per-limb animation.
+ *  Scale: NPC_SCALE 0.06× → extremely small but highly detailed.
+ *  Up to 200 NPCs with collision avoidance, lane discipline,
+ *  road-crossing logic, sidewalk preference, waiting at crosswalks,
+ *  standing idle groups, and smooth fade-in/out.
  *
  *  Features:
  *  - 12 unique archetypes with accessories (hats, bags, ties, etc.)
  *  - Bone-tagged voxels for per-limb pendulum animation
  *  - Natural walking: hip sway, arm swing, head bob, breathing idle
- *  - Water/terrain-aware: NEVER spawns on water or non-city terrain
- *  - Sidewalk-biased pathfinding with 8-direction scoring
+ *  - NPC-NPC collision avoidance (separation steering)
+ *  - Lane discipline: walk on the right side of sidewalks
+ *  - Road-crossing behavior: NPCs briefly cross roads, prefer sidewalks
+ *  - Building avoidance: NEVER enters building footprints
+ *  - Water/terrain-aware: NEVER spawns on water
  *  - Fade-in/fade-out opacity for smooth spawn/despawn (no popping)
- *  - World-change detection: clears all NPCs on seed/mode change
- *  - Rich behaviors: stroll, normal walk, hurry, phone, window-shop, chat
+ *  - World-change detection: clears all NPCs on seed change
+ *  - Rich behaviors: stroll, walk, hurry, phone, window-shop, chat,
+ *    waiting at crosswalk, standing idle
  *  - Night-time: fewer NPCs, dusk/dawn lighting
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
@@ -28,31 +33,34 @@ import { getBiome } from '../utils/biomes';
 import { TimeContext } from '../rendering/DayNightCycle';
 
 /* ── Scale & Constants ── */
-const NPC_SCALE = 0.1;                    // 1/10 world voxel — very fine detail
-const NPC_VS = VOXEL_SIZE * NPC_SCALE;    // 0.05 world units per NPC voxel
-const MAX_NPCS = 50;
-const SPAWN_CHECK_INTERVAL = 0.8;
-const NPC_SPAWN_RADIUS_MIN = 12;          // min voxel dist from camera
-const NPC_SPAWN_RADIUS_MAX = 30;          // max voxel dist from camera
-const FADE_IN_TIME = 1.5;                 // seconds to fade in
-const FADE_OUT_DIST_START = 0.80;         // start fading at 80% of despawn dist
-const WALK_SPEED_STROLL = 0.3;
-const WALK_SPEED_NORMAL = 0.65;
-const WALK_SPEED_HURRY = 1.1;
-const PAUSE_MIN = 1.5;
-const PAUSE_MAX = 5.0;
-const WALK_MIN = 4.0;
-const WALK_MAX = 14.0;
-const CHAT_DISTANCE_SQ = 1.2 * 1.2;
+const NPC_SCALE = 0.06;                   // 6% of world voxel — tiny but highly detailed
+const NPC_VS = VOXEL_SIZE * NPC_SCALE;    // ~0.03 world units per NPC voxel
+const MAX_NPCS = 200;                     // massive crowd density
+const SPAWN_CHECK_INTERVAL = 0.3;         // spawn check every 0.3s for rapid population
+const SPAWN_BATCH = 4;                    // spawn up to 4 NPCs per check
+const NPC_SPAWN_RADIUS_MIN = 6;           // min voxel dist from camera (nearby)
+const NPC_SPAWN_RADIUS_MAX = 50;          // max voxel dist (far for populated feel)
+const FADE_IN_TIME = 1.2;                 // seconds to fade in
+const FADE_OUT_DIST_START = 0.75;         // start fading at 75% of despawn dist
+const WALK_SPEED_STROLL = 0.25;
+const WALK_SPEED_NORMAL = 0.55;
+const WALK_SPEED_HURRY = 0.95;
+const PAUSE_MIN = 2.0;
+const PAUSE_MAX = 6.0;
+const WALK_MIN = 5.0;
+const WALK_MAX = 16.0;
+const CHAT_DISTANCE_SQ = 0.8 * 0.8;      // closer chat distance for small NPCs
 const CHAT_DURATION_MIN = 3.0;
 const CHAT_DURATION_MAX = 10.0;
-const TURN_SPEED = 4.5;                   // radians/sec
+const TURN_SPEED = 5.0;                   // radians/sec (snappy turning)
+const COLLISION_RADIUS = 0.25;            // NPC-NPC collision avoidance radius (world units)
+const COLLISION_RADIUS_SQ = COLLISION_RADIUS * COLLISION_RADIUS;
+const SEPARATION_FORCE = 3.0;             // how strongly NPCs push apart
+const CROSSWALK_WAIT_MIN = 1.5;
+const CROSSWALK_WAIT_MAX = 4.0;
 
 /* ═══════════════════════════════════════════════════════════════
  *  Bone-tagged Voxel Humanoid Builder
- *
- *  Each voxel has a bone tag so we can animate limbs independently:
- *    lfoot, rfoot, lleg, rleg, hip, torso, larm, rarm, neck, head, hair, acc
  * ═══════════════════════════════════════════════════════════════ */
 type BoneName = 'lfoot' | 'rfoot' | 'lleg' | 'rleg' | 'hip' | 'torso' | 'larm' | 'rarm' | 'neck' | 'head' | 'hair' | 'acc';
 
@@ -186,7 +194,8 @@ const ARCHETYPES: NPCArchetype[] = [
 ];
 
 /* ── Behavior types ── */
-type NPCBehavior = 'walking' | 'strolling' | 'hurrying' | 'pausing' | 'chatting' | 'turning' | 'phoneLooking' | 'windowShop';
+type NPCBehavior = 'walking' | 'strolling' | 'hurrying' | 'pausing' | 'chatting' | 'turning'
+  | 'phoneLooking' | 'windowShop' | 'waitingCrosswalk' | 'standingIdle';
 
 interface NPCState {
   x: number; z: number; y: number;
@@ -195,17 +204,21 @@ interface NPCState {
   speed: number;
   targetSpeed: number;
   archetypeIdx: number;
-  age: number;                     // total lifetime
+  age: number;
   behavior: NPCBehavior;
   behaviorTimer: number;
   chatPartner: number;
-  walkCycle: number;               // continuous walk phase (radians)
+  walkCycle: number;
   breathPhase: number;
   gesturePhase: number;
   headTilt: number;
   targetHeadTilt: number;
-  fadeIn: number;                  // 0..1 opacity ramp-up
+  fadeIn: number;
   prefersSidewalk: boolean;
+  /** Lane offset: positive = right side of sidewalk. Used for lane discipline. */
+  laneOffset: number;
+  /** Whether this NPC is currently crossing a road */
+  isCrossingRoad: boolean;
 }
 
 /* ── Helpers ── */
@@ -220,12 +233,11 @@ function sampleGroundHeight(cache: Map<string, ChunkVoxelData>, worldX: number, 
   return data.solidHeightMap[lx * CHUNK_SIZE + lz];
 }
 
-/** Check water level at this position — if water level > solid height, it's water */
 function isWaterAt(cache: Map<string, ChunkVoxelData>, worldX: number, worldZ: number): boolean {
   const cx = Math.floor(worldX / (CHUNK_SIZE * VOXEL_SIZE));
   const cz = Math.floor(worldZ / (CHUNK_SIZE * VOXEL_SIZE));
   const data = cache.get(`${cx},${cz}`);
-  if (!data) return true; // no data = unsafe, treat as water
+  if (!data) return true;
   const lx = Math.floor(worldX / VOXEL_SIZE) - cx * CHUNK_SIZE;
   const lz = Math.floor(worldZ / VOXEL_SIZE) - cz * CHUNK_SIZE;
   if (lx < 0 || lx >= CHUNK_SIZE || lz < 0 || lz >= CHUNK_SIZE) return true;
@@ -233,13 +245,29 @@ function isWaterAt(cache: Map<string, ChunkVoxelData>, worldX: number, worldZ: n
   return data.solidHeightMap[idx] < data.waterLevelMap[idx];
 }
 
+function getCityCell(wx: number, wz: number) {
+  return classifyCityCell(wx, wz);
+}
+
 function isWalkable(wx: number, wz: number): boolean {
-  const cell = classifyCityCell(wx, wz);
+  const cell = getCityCell(wx, wz);
   return cell.isSidewalk || cell.isRoad;
 }
 
 function isSidewalkAt(wx: number, wz: number): boolean {
-  return classifyCityCell(wx, wz).isSidewalk;
+  return getCityCell(wx, wz).isSidewalk;
+}
+
+function isRoadAt(wx: number, wz: number): boolean {
+  return getCityCell(wx, wz).isRoad;
+}
+
+function isBuildingAt(wx: number, wz: number): boolean {
+  return getCityCell(wx, wz).isBuilding;
+}
+
+function isIntersectionAt(wx: number, wz: number): boolean {
+  return getCityCell(wx, wz).isIntersection;
 }
 
 function npcHash(a: number, b: number): number {
@@ -266,52 +294,83 @@ function fixPartnerIndices(npcs: NPCState[], removedIdx: number): void {
   }
 }
 
-/** Find best walkable direction, biased toward sidewalks */
+/** Find best walkable direction, biased toward sidewalks and away from buildings/water.
+ *  Uses 12 directions for finer-grained pathfinding. */
 function findWalkableHeading(npc: NPCState, cache: Map<string, ChunkVoxelData>, t: number, idx: number): number {
   let bestAngle = npc.heading;
-  let bestScore = -1;
-  for (let i = 0; i < 8; i++) {
-    const angle = npc.heading + ((i - 4) / 8) * Math.PI * 2;
-    const testWX = npc.x + Math.cos(angle) * 3 * VOXEL_SIZE;
-    const testWZ = npc.z + Math.sin(angle) * 3 * VOXEL_SIZE;
+  let bestScore = -999;
+  const DIRS = 12;
+  for (let i = 0; i < DIRS; i++) {
+    const angle = npc.heading + ((i - DIRS / 2) / DIRS) * Math.PI * 2;
+    const testDist = 3 * VOXEL_SIZE;
+    const testWX = npc.x + Math.cos(angle) * testDist;
+    const testWZ = npc.z + Math.sin(angle) * testDist;
     const vx = Math.floor(testWX / VOXEL_SIZE);
     const vz = Math.floor(testWZ / VOXEL_SIZE);
+
+    // Hard reject: building or water or unwalkable
+    if (isBuildingAt(vx, vz)) continue;
     if (!isWalkable(vx, vz)) continue;
     if (isWaterAt(cache, testWX, testWZ)) continue;
+
     let score = 1;
-    if (isSidewalkAt(vx, vz)) score += 4;
-    // Prefer forward-ish directions
+    // Strong sidewalk preference
+    if (isSidewalkAt(vx, vz)) score += 6;
+    // Road is ok but less preferred
+    else if (isRoadAt(vx, vz)) score += 1;
+
+    // Prefer forward-ish directions (avoid 180° turns)
     let da = angle - npc.heading;
     while (da > Math.PI) da -= Math.PI * 2;
     while (da < -Math.PI) da += Math.PI * 2;
-    score += (1 - Math.abs(da) / Math.PI) * 2;
-    // Randomness
-    score += npcHash(t * 10 + i, idx + npc.age) * 0.5;
+    score += (1 - Math.abs(da) / Math.PI) * 3;
+
+    // Check farther ahead too (2× distance)
+    const farWX = npc.x + Math.cos(angle) * testDist * 2;
+    const farWZ = npc.z + Math.sin(angle) * testDist * 2;
+    const fvx = Math.floor(farWX / VOXEL_SIZE);
+    const fvz = Math.floor(farWZ / VOXEL_SIZE);
+    if (isSidewalkAt(fvx, fvz)) score += 2;
+    if (isBuildingAt(fvx, fvz)) score -= 3;
+    if (isWaterAt(cache, farWX, farWZ)) score -= 5;
+
+    // Randomness for variety
+    score += npcHash(t * 10 + i, idx + npc.age) * 1.0;
+
     if (score > bestScore) { bestScore = score; bestAngle = angle; }
   }
   return bestScore >= 0 ? bestAngle : npc.heading + Math.PI;
 }
 
+/** Determine the dominant road direction at a position (0=E/W, PI/2=N/S) */
+function getRoadAxis(wx: number, wz: number): number {
+  const cell = getCityCell(wx, wz);
+  if (!cell.isRoad) return 0;
+  // Check if this is an E/W road or N/S road by checking neighbors
+  const cellN = getCityCell(wx, wz + 1);
+  const cellE = getCityCell(wx + 1, wz);
+  // If road continues East/West → heading is 0 or PI (along X axis → sin(heading)≈0)
+  if (cellE.isRoad && !cellN.isRoad) return 0; // E/W road
+  if (!cellE.isRoad && cellN.isRoad) return Math.PI / 2; // N/S road
+  return 0; // intersection or ambiguous
+}
+
 /* ═══════════════════════════════════════════════════════════════
  *  Per-bone animation transforms
- *
- *  Computed each frame for each NPC, driving natural motion.
- *  Walking uses sinusoidal pendulum for arms/legs with opposing phase,
- *  hip sway, torso counter-rotation, head bob.
- *  Idle uses breathing and weight-shift.
  * ═══════════════════════════════════════════════════════════════ */
 
 interface BoneOffset { dx: number; dy: number; dz: number }
 
 function computeBoneOffset(npc: NPCState, bone: BoneName): BoneOffset {
   const moving = npc.behavior === 'walking' || npc.behavior === 'strolling' || npc.behavior === 'hurrying';
-  const idle = npc.behavior === 'pausing' || npc.behavior === 'phoneLooking' || npc.behavior === 'windowShop';
+  const idle = npc.behavior === 'pausing' || npc.behavior === 'phoneLooking'
+    || npc.behavior === 'windowShop' || npc.behavior === 'waitingCrosswalk'
+    || npc.behavior === 'standingIdle';
   const chatting = npc.behavior === 'chatting';
   const wc = npc.walkCycle;
   const sp = npc.speed / WALK_SPEED_NORMAL;
 
-  // Walking gait — natural pendulum
-  // dz = forward/back stride (model +Z is front), dx = side sway
+  // Walking gait — dz = forward/back stride (model +Z is front), dx = side sway
   const legAmp = moving ? 0.7 * sp : 0;
   const armAmp = moving ? 0.55 * sp : 0;
   const hipSway = moving ? Math.sin(wc) * NPC_VS * 0.2 * sp : 0;
@@ -365,8 +424,10 @@ function computeBoneOffset(npc: NPCState, bone: BoneName): BoneOffset {
     case 'head': {
       const headBob = moving ? Math.sin(wc * 2 + 0.5) * NPC_VS * 0.2 * sp : 0;
       const phoneTilt = npc.behavior === 'phoneLooking' ? -NPC_VS * 0.8 : 0;
+      // Waiting at crosswalk: look left/right
+      const crosswalkLook = npc.behavior === 'waitingCrosswalk' ? Math.sin(npc.age * 1.5) * NPC_VS * 0.5 : 0;
       return {
-        dx: hipSway * 0.2 + weightShift * 0.2 + npc.headTilt * NPC_VS * 0.3,
+        dx: hipSway * 0.2 + weightShift * 0.2 + npc.headTilt * NPC_VS * 0.3 + crosswalkLook,
         dy: vertBob + headBob + breathe + phoneTilt,
         dz: phoneTilt * 0.3,
       };
@@ -457,7 +518,7 @@ export function CityNPCs({
     return { offsets, colors, counts, boneNames };
   }, [maxVoxelsPerNPC]);
 
-  // Reusable matrix objects — allocated once outside useFrame
+  // Reusable matrix objects
   const _m = useMemo(() => new THREE.Matrix4(), []);
   const _rot = useMemo(() => new THREE.Matrix4(), []);
   const _c = useMemo(() => new THREE.Color(), []);
@@ -466,7 +527,7 @@ export function CityNPCs({
     const cache = chunkCacheRef.current;
     if (!cache || !meshRef.current) return;
 
-    // World change: clear NPCs when chunk cache was wiped
+    // World change: clear NPCs
     if (prevSeed.current !== seed) {
       npcsRef.current = [];
       prevSeed.current = seed;
@@ -488,19 +549,21 @@ export function CityNPCs({
 
     const hour = timeRef?.current.hour ?? 12;
     const isNight = timeRef?.current.isNight ?? false;
-    const nightMul = (hour >= 22 || hour < 6) ? 0.2 : (hour >= 20 || hour < 7) ? 0.55 : 1.0;
+    // Night: dramatically reduce NPC count
+    const nightMul = (hour >= 23 || hour < 5) ? 0.12 : (hour >= 21 || hour < 6) ? 0.35 : (hour >= 20 || hour < 7) ? 0.6 : 1.0;
     const maxNpcs = Math.round(MAX_NPCS * npcDensity * nightMul);
     const despawnDist = npcRenderDistance * CHUNK_SIZE * VOXEL_SIZE;
     const despawnDistSq = despawnDist * despawnDist;
     const fadeStartSq = (despawnDist * FADE_OUT_DIST_START) ** 2;
 
-    /* ═══ 1. SPAWN ═══ */
+    /* ═══ 1. SPAWN — batch spawn for rapid population ═══ */
     if (t - lastSpawnCheck.current > SPAWN_CHECK_INTERVAL && npcs.length < maxNpcs) {
       lastSpawnCheck.current = t;
 
-      for (let attempt = 0; attempt < 24; attempt++) {
-        const angle = npcHash(t * 100 + attempt, camX * 0.1) * Math.PI * 2;
-        const dist = NPC_SPAWN_RADIUS_MIN + npcHash(t * 50 + attempt, camZ * 0.1) * (NPC_SPAWN_RADIUS_MAX - NPC_SPAWN_RADIUS_MIN);
+      let spawned = 0;
+      for (let attempt = 0; attempt < 40 && spawned < SPAWN_BATCH; attempt++) {
+        const angle = npcHash(t * 100 + attempt + spawned * 7, camX * 0.1 + spawned) * Math.PI * 2;
+        const dist = NPC_SPAWN_RADIUS_MIN + npcHash(t * 50 + attempt, camZ * 0.1 + spawned) * (NPC_SPAWN_RADIUS_MAX - NPC_SPAWN_RADIUS_MIN);
         const sx = camX + Math.cos(angle) * dist * VOXEL_SIZE;
         const sz = camZ + Math.sin(angle) * dist * VOXEL_SIZE;
 
@@ -511,7 +574,8 @@ export function CityNPCs({
         const biome = getBiome(biomeNoise, tempNoise, voxX, voxZ, cityFreq);
         if (biome !== 'city' && biome !== 'village') continue;
 
-        // MUST be walkable (sidewalk or road)
+        // MUST be walkable (sidewalk or road) — NOT building
+        if (isBuildingAt(voxX, voxZ)) continue;
         if (!isWalkable(voxX, voxZ)) continue;
 
         // MUST NOT be on water
@@ -521,32 +585,67 @@ export function CityNPCs({
         const groundH = sampleGroundHeight(cache, sx, sz);
         if (groundH < 0) continue;
 
+        // Don't spawn too close to existing NPCs
+        let tooClose = false;
+        for (let ei = 0; ei < npcs.length && !tooClose; ei++) {
+          const dd = (npcs[ei].x - sx) ** 2 + (npcs[ei].z - sz) ** 2;
+          if (dd < COLLISION_RADIUS_SQ * 0.5) tooClose = true;
+        }
+        if (tooClose) continue;
+
         const archetypeIdx = Math.floor(npcHash(sx * 7, sz * 3) * ARCHETYPES.length);
         const speedRoll = npcHash(sx * 11, sz * 13);
         const baseSpeed = speedRoll < 0.2 ? WALK_SPEED_STROLL : speedRoll > 0.85 ? WALK_SPEED_HURRY : WALK_SPEED_NORMAL;
-        const baseBehavior: NPCBehavior = speedRoll < 0.2 ? 'strolling' : speedRoll > 0.85 ? 'hurrying' : 'walking';
 
-        // Initial heading: pick a valid walkable direction
-        let initHeading = npcHash(sx, sz) * Math.PI * 2;
-        // Validate initial heading
-        const testVX = Math.floor((sx + Math.cos(initHeading) * 2 * VOXEL_SIZE) / VOXEL_SIZE);
-        const testVZ = Math.floor((sz + Math.sin(initHeading) * 2 * VOXEL_SIZE) / VOXEL_SIZE);
-        if (!isWalkable(testVX, testVZ) || isWaterAt(cache, sx + Math.cos(initHeading) * 2 * VOXEL_SIZE, sz + Math.sin(initHeading) * 2 * VOXEL_SIZE)) {
-          // Try opposite
-          initHeading += Math.PI;
+        // Determine initial behavior: some NPCs start standing idle
+        const behaviorRoll = npcHash(sx * 19, sz * 23);
+        let baseBehavior: NPCBehavior;
+        let baseBehaviorTimer: number;
+        if (behaviorRoll < 0.1) {
+          // Start standing idle
+          baseBehavior = 'standingIdle';
+          baseBehaviorTimer = PAUSE_MIN + npcHash(sx * 29, sz * 31) * PAUSE_MAX;
+        } else if (behaviorRoll < 0.18) {
+          // Start pausing
+          baseBehavior = 'pausing';
+          baseBehaviorTimer = PAUSE_MIN + npcHash(sx * 41, sz * 43) * (PAUSE_MAX - PAUSE_MIN);
+        } else {
+          baseBehavior = speedRoll < 0.2 ? 'strolling' : speedRoll > 0.85 ? 'hurrying' : 'walking';
+          baseBehaviorTimer = WALK_MIN + npcHash(sx * 3, sz * 5) * (WALK_MAX - WALK_MIN);
         }
 
+        // Initial heading: align to road/sidewalk direction
+        let initHeading: number;
+        const onRoad = isRoadAt(voxX, voxZ);
+        if (onRoad) {
+          // Align to road axis
+          const axis = getRoadAxis(voxX, voxZ);
+          initHeading = axis + (npcHash(sx * 47, sz * 53) > 0.5 ? 0 : Math.PI);
+        } else {
+          initHeading = npcHash(sx, sz) * Math.PI * 2;
+        }
+
+        // Validate initial heading leads to walkable area
+        const testWX = sx + Math.cos(initHeading) * 2 * VOXEL_SIZE;
+        const testWZ = sz + Math.sin(initHeading) * 2 * VOXEL_SIZE;
+        const testVX = Math.floor(testWX / VOXEL_SIZE);
+        const testVZ = Math.floor(testWZ / VOXEL_SIZE);
+        if (isBuildingAt(testVX, testVZ) || isWaterAt(cache, testWX, testWZ)) {
+          initHeading += Math.PI; // try opposite
+        }
+
+        const isSidewalk = isSidewalkAt(voxX, voxZ);
         npcs.push({
           x: sx, z: sz,
           y: (groundH + 1) * VOXEL_SIZE,
           heading: initHeading,
           targetHeading: initHeading,
-          speed: baseSpeed,
-          targetSpeed: baseSpeed,
+          speed: baseBehavior === 'standingIdle' || baseBehavior === 'pausing' ? 0 : baseSpeed,
+          targetSpeed: baseBehavior === 'standingIdle' || baseBehavior === 'pausing' ? 0 : baseSpeed,
           archetypeIdx,
           age: 0,
           behavior: baseBehavior,
-          behaviorTimer: WALK_MIN + npcHash(sx * 3, sz * 5) * (WALK_MAX - WALK_MIN),
+          behaviorTimer: baseBehaviorTimer,
           chatPartner: -1,
           walkCycle: npcHash(sx * 17, sz * 19) * Math.PI * 2,
           breathPhase: npcHash(sx * 23, sz * 29) * Math.PI * 2,
@@ -554,9 +653,12 @@ export function CityNPCs({
           headTilt: 0,
           targetHeadTilt: 0,
           fadeIn: 0,
-          prefersSidewalk: npcHash(sx * 31, sz * 37) > 0.15,
+          prefersSidewalk: npcHash(sx * 31, sz * 37) > 0.1, // 90% prefer sidewalks
+          laneOffset: npcHash(sx * 59, sz * 61) * 0.15, // slight lane offset for variety
+          isCrossingRoad: false,
         });
-        break;
+        spawned++;
+        if (npcs.length >= maxNpcs) break;
       }
     }
 
@@ -577,7 +679,7 @@ export function CityNPCs({
         continue;
       }
 
-      // Trim excess NPCs
+      // Trim excess NPCs (remove furthest)
       if (npcs.length > maxNpcs + 5 && ni === npcs.length - 1) {
         freeChatPartner(npc, npcs, ni);
         npcs.splice(ni, 1);
@@ -593,7 +695,7 @@ export function CityNPCs({
       npc.breathPhase += dt * 1.5;
       if (npc.behavior === 'chatting') npc.gesturePhase += dt;
 
-      // Smooth speed
+      // Smooth speed interpolation
       const sDiff = npc.targetSpeed - npc.speed;
       if (Math.abs(sDiff) > 0.01) npc.speed += Math.sign(sDiff) * Math.min(Math.abs(sDiff), 2.5 * dt);
 
@@ -601,59 +703,119 @@ export function CityNPCs({
       const tDiff = npc.targetHeadTilt - npc.headTilt;
       if (Math.abs(tDiff) > 0.01) npc.headTilt += Math.sign(tDiff) * Math.min(Math.abs(tDiff), 2.0 * dt);
 
+      /* ── NPC-NPC COLLISION AVOIDANCE ── */
+      if (isMoving) {
+        let sepX = 0, sepZ = 0;
+        // Only check nearby NPCs (spatial hash could optimize but for 200 NPCs this is fine)
+        for (let oi = Math.max(0, ni - 30); oi < Math.min(npcs.length, ni + 30); oi++) {
+          if (oi === ni) continue;
+          const other = npcs[oi];
+          const ddx = npc.x - other.x;
+          const ddz = npc.z - other.z;
+          const dd = ddx * ddx + ddz * ddz;
+          if (dd < COLLISION_RADIUS_SQ && dd > 0.0001) {
+            const dist = Math.sqrt(dd);
+            const force = (COLLISION_RADIUS - dist) / COLLISION_RADIUS;
+            sepX += (ddx / dist) * force * SEPARATION_FORCE;
+            sepZ += (ddz / dist) * force * SEPARATION_FORCE;
+          }
+        }
+        // Apply separation as a small position offset
+        if (sepX !== 0 || sepZ !== 0) {
+          const newX = npc.x + sepX * dt;
+          const newZ = npc.z + sepZ * dt;
+          const svx = Math.floor(newX / VOXEL_SIZE);
+          const svz = Math.floor(newZ / VOXEL_SIZE);
+          // Only apply if we don't push into building/water
+          if (!isBuildingAt(svx, svz) && !isWaterAt(cache, newX, newZ) && isWalkable(svx, svz)) {
+            npc.x = newX;
+            npc.z = newZ;
+          }
+        }
+      }
+
       switch (npc.behavior) {
         case 'walking':
         case 'strolling':
         case 'hurrying': {
-          // Look ahead — check BOTH walkability AND water
           const lookDist = 2 * VOXEL_SIZE;
           const aheadX = npc.x + Math.cos(npc.heading) * lookDist;
           const aheadZ = npc.z + Math.sin(npc.heading) * lookDist;
           const aheadVX = Math.floor(aheadX / VOXEL_SIZE);
           const aheadVZ = Math.floor(aheadZ / VOXEL_SIZE);
 
-          if (!isWalkable(aheadVX, aheadVZ) || isWaterAt(cache, aheadX, aheadZ)) {
+          // Hard boundary: building or water or unwalkable
+          if (isBuildingAt(aheadVX, aheadVZ) || !isWalkable(aheadVX, aheadVZ) || isWaterAt(cache, aheadX, aheadZ)) {
             npc.behavior = 'turning';
             npc.targetHeading = findWalkableHeading(npc, cache, t, ni);
-            npc.behaviorTimer = 0.6;
-            npc.targetSpeed = npc.speed * 0.3;
+            npc.behaviorTimer = 0.5;
+            npc.targetSpeed = npc.speed * 0.2;
             break;
           }
 
-          // Sidewalk steering
-          if (npc.prefersSidewalk) {
-            const currVX = Math.floor(npc.x / VOXEL_SIZE);
-            const currVZ = Math.floor(npc.z / VOXEL_SIZE);
-            if (!isSidewalkAt(currVX, currVZ)) {
-              // Try to steer toward sidewalk
-              const lx = Math.floor((npc.x + Math.cos(npc.heading - 0.4) * lookDist) / VOXEL_SIZE);
-              const lz = Math.floor((npc.z + Math.sin(npc.heading - 0.4) * lookDist) / VOXEL_SIZE);
-              const rx = Math.floor((npc.x + Math.cos(npc.heading + 0.4) * lookDist) / VOXEL_SIZE);
-              const rz = Math.floor((npc.z + Math.sin(npc.heading + 0.4) * lookDist) / VOXEL_SIZE);
-              if (isSidewalkAt(lx, lz)) npc.targetHeading = npc.heading - 0.25;
-              else if (isSidewalkAt(rx, rz)) npc.targetHeading = npc.heading + 0.25;
+          // Track if on road vs sidewalk
+          const currVX = Math.floor(npc.x / VOXEL_SIZE);
+          const currVZ = Math.floor(npc.z / VOXEL_SIZE);
+          const onSidewalk = isSidewalkAt(currVX, currVZ);
+          const onRoad = isRoadAt(currVX, currVZ);
+          npc.isCrossingRoad = onRoad && !npc.isCrossingRoad ? true : npc.isCrossingRoad;
+
+          // Sidewalk steering — actively steer back to sidewalk if on road
+          if (npc.prefersSidewalk && onRoad && !isIntersectionAt(currVX, currVZ)) {
+            // Look for sidewalk in nearby directions
+            for (let di = -2; di <= 2; di++) {
+              const testAngle = npc.heading + di * 0.4;
+              const slx = Math.floor((npc.x + Math.cos(testAngle) * lookDist) / VOXEL_SIZE);
+              const slz = Math.floor((npc.z + Math.sin(testAngle) * lookDist) / VOXEL_SIZE);
+              if (isSidewalkAt(slx, slz)) {
+                npc.targetHeading = testAngle;
+                break;
+              }
             }
           }
 
-          // Move FORWARD in heading direction
-          npc.x += Math.cos(npc.heading) * npc.speed * VOXEL_SIZE * dt;
-          npc.z += Math.sin(npc.heading) * npc.speed * VOXEL_SIZE * dt;
+          // Lane discipline: nudge to right side of walkway
+          if (onSidewalk) {
+            // Right-side bias: perpendicular to heading, rightward
+            const rightX = Math.cos(npc.heading + Math.PI / 2) * npc.laneOffset * VOXEL_SIZE * dt;
+            const rightZ = Math.sin(npc.heading + Math.PI / 2) * npc.laneOffset * VOXEL_SIZE * dt;
+            const laneNX = npc.x + rightX;
+            const laneNZ = npc.z + rightZ;
+            const laneVX = Math.floor(laneNX / VOXEL_SIZE);
+            const laneVZ = Math.floor(laneNZ / VOXEL_SIZE);
+            if (isSidewalkAt(laneVX, laneVZ) && !isWaterAt(cache, laneNX, laneNZ)) {
+              npc.x = laneNX;
+              npc.z = laneNZ;
+            }
+          }
 
-          // SAFETY: After moving, verify we're still on valid ground
-          const postVX = Math.floor(npc.x / VOXEL_SIZE);
-          const postVZ = Math.floor(npc.z / VOXEL_SIZE);
-          if (isWaterAt(cache, npc.x, npc.z) || !isWalkable(postVX, postVZ)) {
-            // Undo movement and turn
-            npc.x -= Math.cos(npc.heading) * npc.speed * VOXEL_SIZE * dt;
-            npc.z -= Math.sin(npc.heading) * npc.speed * VOXEL_SIZE * dt;
+          // Move forward
+          const moveX = Math.cos(npc.heading) * npc.speed * VOXEL_SIZE * dt;
+          const moveZ = Math.sin(npc.heading) * npc.speed * VOXEL_SIZE * dt;
+          const newX = npc.x + moveX;
+          const newZ = npc.z + moveZ;
+
+          // SAFETY: verify destination
+          const postVX = Math.floor(newX / VOXEL_SIZE);
+          const postVZ = Math.floor(newZ / VOXEL_SIZE);
+          if (isBuildingAt(postVX, postVZ) || isWaterAt(cache, newX, newZ) || !isWalkable(postVX, postVZ)) {
+            // Undo: don't move, turn instead
             npc.behavior = 'turning';
-            npc.targetHeading = npc.heading + Math.PI;
-            npc.behaviorTimer = 0.6;
+            npc.targetHeading = findWalkableHeading(npc, cache, t, ni);
+            npc.behaviorTimer = 0.5;
             npc.targetSpeed = 0;
             break;
           }
 
-          // Smooth Y
+          npc.x = newX;
+          npc.z = newZ;
+
+          // If we just stepped onto sidewalk from road, mark road crossing complete
+          if (npc.isCrossingRoad && isSidewalkAt(postVX, postVZ)) {
+            npc.isCrossingRoad = false;
+          }
+
+          // Smooth Y tracking
           const newGH = sampleGroundHeight(cache, npc.x, npc.z);
           if (newGH >= 0) {
             const targetY = (newGH + 1) * VOXEL_SIZE;
@@ -667,7 +829,7 @@ export function CityNPCs({
               const other = npcs[oi];
               if (other.chatPartner >= 0 || other.behavior === 'chatting' || other.behavior === 'hurrying') continue;
               const dd = (npc.x - other.x) ** 2 + (npc.z - other.z) ** 2;
-              if (dd < CHAT_DISTANCE_SQ && npcHash(npc.age + ni, oi) > 0.88) {
+              if (dd < CHAT_DISTANCE_SQ && npcHash(npc.age + ni, oi) > 0.92) {
                 const ct = CHAT_DURATION_MIN + npcHash(ni * 7, oi * 11) * (CHAT_DURATION_MAX - CHAT_DURATION_MIN);
                 npc.behavior = 'chatting'; npc.behaviorTimer = ct; npc.chatPartner = oi;
                 npc.targetSpeed = 0; npc.gesturePhase = 0;
@@ -680,18 +842,45 @@ export function CityNPCs({
             }
           }
 
-          // Timer expired: transition
+          // Timer expired: behavior transition
           if (npc.behaviorTimer <= 0) {
             const roll = npcHash(npc.age * 3, ni * 5);
-            if (roll < 0.12) {
-              npc.behavior = 'phoneLooking'; npc.behaviorTimer = 2 + npcHash(npc.age, ni) * 4;
+            const onSW = isSidewalkAt(Math.floor(npc.x / VOXEL_SIZE), Math.floor(npc.z / VOXEL_SIZE));
+
+            if (roll < 0.08) {
+              npc.behavior = 'phoneLooking';
+              npc.behaviorTimer = 2 + npcHash(npc.age, ni) * 4;
               npc.targetSpeed = 0; npc.targetHeadTilt = -0.5;
-            } else if (roll < 0.22 && isSidewalkAt(Math.floor(npc.x / VOXEL_SIZE), Math.floor(npc.z / VOXEL_SIZE))) {
-              npc.behavior = 'windowShop'; npc.behaviorTimer = 3 + npcHash(npc.age * 2, ni) * 5;
+            } else if (roll < 0.15 && onSW) {
+              // Wait at crosswalk (only on sidewalk near a road)
+              const nearRoadVX = Math.floor(npc.x / VOXEL_SIZE);
+              const nearRoadVZ = Math.floor(npc.z / VOXEL_SIZE);
+              let nearRoad = false;
+              for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+                if (isRoadAt(nearRoadVX + dx, nearRoadVZ + dz)) { nearRoad = true; break; }
+                if (nearRoad) break;
+              }
+              if (nearRoad) {
+                npc.behavior = 'waitingCrosswalk';
+                npc.behaviorTimer = CROSSWALK_WAIT_MIN + npcHash(npc.age * 13, ni) * (CROSSWALK_WAIT_MAX - CROSSWALK_WAIT_MIN);
+                npc.targetSpeed = 0;
+              } else {
+                npc.behavior = 'standingIdle';
+                npc.behaviorTimer = PAUSE_MIN + npcHash(npc.age * 17, ni) * PAUSE_MAX;
+                npc.targetSpeed = 0;
+              }
+            } else if (roll < 0.22 && onSW) {
+              npc.behavior = 'windowShop';
+              npc.behaviorTimer = 3 + npcHash(npc.age * 2, ni) * 5;
               npc.targetSpeed = 0;
               npc.targetHeading = npc.heading + (npcHash(ni, npc.age) > 0.5 ? Math.PI / 2 : -Math.PI / 2);
-            } else if (roll < 0.38) {
-              npc.behavior = 'pausing'; npc.behaviorTimer = PAUSE_MIN + npcHash(npc.age, ni) * (PAUSE_MAX - PAUSE_MIN);
+            } else if (roll < 0.30) {
+              npc.behavior = 'standingIdle';
+              npc.behaviorTimer = PAUSE_MIN + npcHash(npc.age * 37, ni) * PAUSE_MAX;
+              npc.targetSpeed = 0;
+            } else if (roll < 0.42) {
+              npc.behavior = 'pausing';
+              npc.behaviorTimer = PAUSE_MIN + npcHash(npc.age, ni) * (PAUSE_MAX - PAUSE_MIN);
               npc.targetSpeed = 0;
             } else {
               const sr = npcHash(npc.age * 7, ni * 3);
@@ -714,6 +903,45 @@ export function CityNPCs({
             npc.behaviorTimer = WALK_MIN + npcHash(npc.age * 2, ni * 3) * (WALK_MAX - WALK_MIN);
             npc.targetHeading = findWalkableHeading(npc, cache, t, ni);
             npc.targetHeadTilt = 0;
+          }
+          break;
+        }
+
+        case 'standingIdle': {
+          // Standing completely still — weight shift and breathing only
+          npc.targetSpeed = 0;
+          if (Math.floor(npc.age * 1.5) !== Math.floor((npc.age - dt) * 1.5)) {
+            npc.targetHeadTilt = (npcHash(npc.age * 8, ni) - 0.5) * 0.3;
+          }
+          if (npc.behaviorTimer <= 0) {
+            npc.behavior = 'walking'; npc.targetSpeed = WALK_SPEED_NORMAL;
+            npc.behaviorTimer = WALK_MIN + npcHash(npc.age * 6, ni * 7) * (WALK_MAX - WALK_MIN);
+            npc.targetHeading = findWalkableHeading(npc, cache, t, ni);
+            npc.targetHeadTilt = 0;
+          }
+          break;
+        }
+
+        case 'waitingCrosswalk': {
+          npc.targetSpeed = 0;
+          // Head looks left and right (animation handled in computeBoneOffset)
+          if (npc.behaviorTimer <= 0) {
+            // Cross the road! Turn toward road and walk
+            npc.behavior = 'walking';
+            npc.targetSpeed = WALK_SPEED_NORMAL;
+            // Find road direction
+            const currVX = Math.floor(npc.x / VOXEL_SIZE);
+            const currVZ = Math.floor(npc.z / VOXEL_SIZE);
+            let roadAngle = npc.heading;
+            for (let di = 0; di < 8; di++) {
+              const testAngle = (di / 8) * Math.PI * 2;
+              const tvx = Math.floor((npc.x + Math.cos(testAngle) * 2 * VOXEL_SIZE) / VOXEL_SIZE);
+              const tvz = Math.floor((npc.z + Math.sin(testAngle) * 2 * VOXEL_SIZE) / VOXEL_SIZE);
+              if (isRoadAt(tvx, tvz)) { roadAngle = testAngle; break; }
+            }
+            npc.targetHeading = roadAngle;
+            npc.behaviorTimer = 3 + npcHash(npc.age * 19, ni) * 5;
+            npc.isCrossingRoad = true;
           }
           break;
         }
@@ -751,7 +979,7 @@ export function CityNPCs({
         }
 
         case 'turning': {
-          npc.targetSpeed = npc.speed * 0.2;
+          npc.targetSpeed = npc.speed * 0.15;
           if (npc.behaviorTimer <= 0) {
             npc.heading = npc.targetHeading;
             npc.behavior = 'walking'; npc.targetSpeed = WALK_SPEED_NORMAL;
@@ -761,7 +989,7 @@ export function CityNPCs({
         }
       }
 
-      // Smooth heading
+      // Smooth heading interpolation
       let hd = npc.targetHeading - npc.heading;
       while (hd > Math.PI) hd -= Math.PI * 2;
       while (hd < -Math.PI) hd += Math.PI * 2;
@@ -786,11 +1014,9 @@ export function CityNPCs({
       let fade = npc.fadeIn;
       if (dx2 > fadeStartSq) fade *= 1 - (dx2 - fadeStartSq) / (despawnDistSq - fadeStartSq);
       fade = Math.max(0, Math.min(1, fade));
-      if (fade < 0.01) continue; // skip invisible NPCs
+      if (fade < 0.01) continue;
 
-      // Heading rotation: map model's +Z (front/face) to the movement direction
-      // Movement at heading θ goes in direction (cos θ, sin θ) in world XZ.
-      // Model's front face is +Z, so we need rotation -θ - π/2 around Y.
+      // Heading rotation: model's +Z (front/face) maps to movement direction
       const headingAngle = -npc.heading - Math.PI / 2;
       const ch = Math.cos(headingAngle);
       const sh = Math.sin(headingAngle);
@@ -799,11 +1025,10 @@ export function CityNPCs({
         const oi = baseOff + vi * 3;
         const bone = archBones[vi];
 
-        // Rest position + bone offset
         const boneOff = computeBoneOffset(npc, bone);
-        let lx = offsets[oi] + boneOff.dx;
+        const lx = offsets[oi] + boneOff.dx;
         const ly = offsets[oi + 1] + boneOff.dy;
-        let lz = offsets[oi + 2] + boneOff.dz;
+        const lz = offsets[oi + 2] + boneOff.dz;
 
         // Rotate local position by heading
         const rx = lx * ch - lz * sh;
@@ -813,8 +1038,8 @@ export function CityNPCs({
         rot.makeRotationY(headingAngle);
         m.multiply(rot);
 
-        // Scale by fade (shrink in/out for smooth appearance)
-        const s = 0.5 + fade * 0.5; // scale 0.5..1
+        // Scale by fade (shrink in/out)
+        const s = 0.5 + fade * 0.5;
         m.elements[0] *= s; m.elements[5] *= s; m.elements[10] *= s;
 
         m.elements[12] = npc.x + rx;
@@ -824,12 +1049,11 @@ export function CityNPCs({
         mesh.setMatrixAt(voxelCount, m);
 
         c.setRGB(colors[oi], colors[oi + 1], colors[oi + 2]);
-        // Fade opacity via darkening (since instanced mesh doesn't support per-instance opacity easily)
         c.multiplyScalar(fade);
-        // Time-of-day lighting: smooth transition from full brightness → dusk → night
+        // Time-of-day lighting
         const lightMul = isNight ? 0.35
-          : (hour >= 18) ? Math.max(0.35, 1 - (hour - 18) / 4)   // sunset: 18h→22h fade
-          : (hour < 7) ? Math.max(0.35, 0.35 + (hour / 7) * 0.65) // dawn: 0h→7h brighten
+          : (hour >= 18) ? Math.max(0.35, 1 - (hour - 18) / 4)
+          : (hour < 7) ? Math.max(0.35, 0.35 + (hour / 7) * 0.65)
           : 1.0;
         c.multiplyScalar(lightMul);
         mesh.setColorAt(voxelCount, c);
