@@ -65,6 +65,8 @@ const LAMP_GROUND_GEO = (() => {
 const FLICKER_HASH_THRESHOLD = 0.55;
 const FLICKER_OFF_THRESHOLD = -0.35;
 const MAX_INSTANCES = 6000;
+/** Max street lamp instanced-mesh slots. 1024 supports ~32 lamps/chunk × ~30 chunks
+ *  in view. Instanced mesh is cheap (just matrix + color per slot). */
 const MAX_LAMP_INSTANCES = 1024;
 
 /* ── Lamp color temperature presets ── */
