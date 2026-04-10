@@ -19,6 +19,7 @@ import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { TimeContext } from '../rendering/DayNightCycle';
 
 /* ── NPC mini-voxel size (1/5 of normal voxel for small blocky characters) ── */
+/* Height: head top at (4+2)*NPC_VS + hair = ~0.66 world units */
 const NPC_VS = VOXEL_SIZE / 5;
 
 /* ── Constants ── */
@@ -69,7 +70,7 @@ interface BodyPart {
   pivotY?: number;
 }
 
-// Compact blocky humanoid — ~6.6 NPC_VS units tall
+// Compact blocky humanoid — top of hair at oy(6)+sy(0.6)=6.6 NPC_VS ≈ 0.66 world units
 const BODY_PARTS: BodyPart[] = [
   // Head (2×2×2) on top of torso
   { ox: 0, oy: 4, oz: 0, sx: 2, sy: 2, sz: 2, colorType: 0 },
@@ -265,7 +266,7 @@ export function GroundCritters({
         // Accelerate
         if (n.speed < n.targetSpeed) n.speed = Math.min(n.speed + 2.0 * dt, n.targetSpeed);
 
-        // Move in facing direction
+        // Move in facing direction (sin/cos maps heading to X/Z world axes)
         const newX = n.x + Math.sin(n.heading) * n.speed * dt;
         const newZ = n.z + Math.cos(n.heading) * n.speed * dt;
 
@@ -309,7 +310,6 @@ export function GroundCritters({
     }
 
     /* ═══ 3. RENDER ═══ */
-    // eslint-disable-next-line react-hooks/immutability
     const m = new THREE.Matrix4();
     const rotM = new THREE.Matrix4();
     const scaleM = new THREE.Matrix4();
@@ -327,6 +327,7 @@ export function GroundCritters({
       if (n.age < FADE_DURATION) opacity = n.age / FADE_DURATION;
       if (n.fadeOut) opacity = Math.max(0, 1 - n.fadeTimer / FADE_DURATION);
 
+      // Y-axis rotation: heading=0 → facing +Z, matches movement dir (sin(h), cos(h))
       const ch = Math.cos(n.heading);
       const sh = Math.sin(n.heading);
       const speedRatio = Math.min(1, n.speed / WALK_SPEED_MAX);
