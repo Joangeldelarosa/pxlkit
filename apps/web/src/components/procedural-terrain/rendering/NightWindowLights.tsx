@@ -65,7 +65,7 @@ const LAMP_GROUND_GEO = (() => {
 const FLICKER_HASH_THRESHOLD = 0.55;
 const FLICKER_OFF_THRESHOLD = -0.35;
 const MAX_INSTANCES = 6000;
-const MAX_LAMP_INSTANCES = 256;
+const MAX_LAMP_INSTANCES = 1024;
 
 /* ── Lamp color temperature presets ── */
 const LAMP_COLOR_PRESETS: Record<string, { fixture: string; ground: string }> = {
@@ -137,6 +137,9 @@ export function NightWindowLights({
     map: LAMP_GROUND_TEX, side: THREE.DoubleSide,
   }), []);
 
+  /* ── Reusable objects for per-frame work (avoids GC churn) ── */
+  const _camDir = useMemo(() => new THREE.Vector3(), []);
+
   useFrame(({ clock }) => {
     const inner = innerRef.current;
     const outer = outerRef.current;
@@ -184,10 +187,19 @@ export function NightWindowLights({
     const cache = chunkCacheRef.current;
     if (!cache) return;
 
-    const camCX = Math.floor(camera.position.x / (CHUNK_SIZE * VOXEL_SIZE));
-    const camCZ = Math.floor(camera.position.z / (CHUNK_SIZE * VOXEL_SIZE));
+    const chunkWorldSize = CHUNK_SIZE * VOXEL_SIZE;
+    const camCX = Math.floor(camera.position.x / chunkWorldSize);
+    const camCZ = Math.floor(camera.position.z / chunkWorldSize);
 
     const viewDistSq = lightDistance * lightDistance;
+
+    /* ── Camera forward direction (XZ plane, normalized) for directional prioritization ── */
+    camera.getWorldDirection(_camDir);
+    const fwdX = _camDir.x;
+    const fwdZ = _camDir.z;
+    const fwdLen = Math.sqrt(fwdX * fwdX + fwdZ * fwdZ);
+    const nfwdX = fwdLen > 0.001 ? fwdX / fwdLen : 0;
+    const nfwdZ = fwdLen > 0.001 ? fwdZ / fwdLen : -1;
 
     const m = new THREE.Matrix4();
     const c = new THREE.Color();
@@ -203,10 +215,46 @@ export function NightWindowLights({
     // Billboard rotation: make fixture sprites face camera
     const camQuat = camera.quaternion;
 
+    /* ── Build sorted chunk list: prioritize front-facing + close chunks ──
+     *  This ensures the limited lamp budget goes to visible lamps first.
+     *  Chunks behind the camera still get some budget but at lower priority. */
+    type ChunkEntry = { data: ChunkVoxelData; distSq: number; dot: number; priority: number };
+    const sortedChunks: ChunkEntry[] = [];
+
     for (const [, data] of cache) {
       const dx = data.chunkX - camCX;
       const dz = data.chunkZ - camCZ;
-      if (dx * dx + dz * dz > viewDistSq) continue;
+      const distSq = dx * dx + dz * dz;
+      if (distSq > viewDistSq) continue;
+
+      // Dot product with camera forward: +1 = directly ahead, -1 = directly behind
+      const len = Math.sqrt(distSq);
+      const dot = len > 0.001 ? (dx * nfwdX + dz * nfwdZ) / len : 0;
+
+      // Priority: closer + in front = higher (lower number = processed first)
+      // Front-facing chunks get large bonus, behind-camera chunks get penalty
+      const dirBonus = dot * 3.0; // -3 to +3 based on direction
+      const priority = distSq - dirBonus * lightDistance;
+
+      sortedChunks.push({ data, distSq, dot, priority });
+    }
+
+    // Sort by priority (lowest = most important = processed first)
+    sortedChunks.sort((a, b) => a.priority - b.priority);
+
+    /* ── Process sorted chunks ── */
+    const maxLampDist = lightDistance * chunkWorldSize;
+    const fadeStart = maxLampDist * 0.7; // start fading at 70% of max distance
+
+    for (const entry of sortedChunks) {
+      const { data, distSq } = entry;
+      const dist = Math.sqrt(distSq);
+
+      // Distance-based fade factor (1.0 close, fades to 0.3 at edge)
+      const worldDist = dist * chunkWorldSize;
+      const fadeFactor = worldDist < fadeStart ? 1.0
+        : 1.0 - 0.7 * ((worldDist - fadeStart) / (maxLampDist - fadeStart + 0.001));
+      const clampedFade = Math.max(0.3, Math.min(1.0, fadeFactor));
 
       /* ── Window lights ── */
       if (count < MAX_INSTANCES) {
@@ -233,7 +281,7 @@ export function NightWindowLights({
 
           const colorIdx = Math.floor(h * WARM_COLORS.length) % WARM_COLORS.length;
           c.copy(WARM_COLORS[colorIdx]);
-          const brightness = 0.8 + h * 0.4 + flicker * 0.08;
+          const brightness = (0.8 + h * 0.4 + flicker * 0.08) * clampedFade;
           c.multiplyScalar(brightness);
           inner.setColorAt(count, c);
 
@@ -271,10 +319,11 @@ export function NightWindowLights({
           m.elements[14] = lz;
           lampGround.setMatrixAt(lampCount, m);
 
-          // Colors with brightness multiplier
-          c.copy(lampColor).multiplyScalar(lampFlicker * brightMul);
+          // Colors with brightness multiplier and distance fade
+          const lampFade = lampFlicker * brightMul * clampedFade;
+          c.copy(lampColor).multiplyScalar(lampFade);
           lampFixture.setColorAt(lampCount, c);
-          c.copy(lampGroundColor).multiplyScalar(lampFlicker * 0.5 * brightMul);
+          c.copy(lampGroundColor).multiplyScalar(lampFade * 0.5);
           lampGround.setColorAt(lampCount, c);
 
           lampCount++;
