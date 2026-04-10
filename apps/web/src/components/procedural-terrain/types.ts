@@ -29,6 +29,7 @@ export interface WorldConfig {
   npcDensity: number;             // 0-1 how many NPCs per chunk (0 = off)
   npcDistance: number;            // 2-20 chunk radius for NPC population
   npcScale: number;               // 0.3-1.5 NPC body scale multiplier
+  npcMaxPerChunk: number;         // 1-15 max NPCs spawned per chunk
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
@@ -56,6 +57,7 @@ export const DEFAULT_CONFIG: WorldConfig = {
   npcDensity: 0.6,
   npcDistance: 6,
   npcScale: 0.7,
+  npcMaxPerChunk: 4,
 };
 
 export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city' | 'swamp' | 'village';
