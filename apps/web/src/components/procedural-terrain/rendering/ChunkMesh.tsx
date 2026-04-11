@@ -19,20 +19,25 @@
  *  • revealRef starts at 1.0 (fully visible) — not 0.
  *  • Shader default uChunkReveal = 1.0 — if onBeforeRender
  *    misses the first frame, chunks appear visible not dark.
- *  • useLayoutEffect (not useEffect) sets onBeforeRender
- *    synchronously during commit — before the first render.
+ *  • useLayoutEffect (not useEffect) sets BOTH onBeforeRender
+ *    AND instance data synchronously during commit — before the
+ *    first render.  This eliminates the 1-2 frame timing gap
+ *    where instances render at default positions (world origin)
+ *    with heavy fog.
  *  • Safety floor: chunks within 15% of render distance
  *    always get reveal = 1.0 regardless of fade settings.
  *
  *  Performance notes:
  *  • No per-chunk material allocation — 4 materials total.
+ *  • Each material has a unique customProgramCacheKey to prevent
+ *    GL program sharing that could cause uniform contamination.
  *  • Chunk world-pos cached in a ref (computed once).
  *  • Atmosphere color synced once per frame from TimeContext.
  *  • Single sqrt per chunk per frame for normDist.
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useEffect, useLayoutEffect, useContext } from 'react';
+import { useRef, useLayoutEffect, useContext } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { ChunkVoxelData } from '../types';
@@ -83,7 +88,16 @@ const paintGeo = (() => {
 /* Default atmosphere color — matches DayNightCycle noon keyframe */
 const NOON_FOG_R = 0.69, NOON_FOG_G = 0.78, NOON_FOG_B = 0.88;
 
+let _matIdx = 0;
 function injectRevealShader(mat: THREE.MeshStandardMaterial): void {
+  /* Unique ID per material — prevents GL program sharing between
+   * solid/water/mini/paint materials.  Shared programs can cause
+   * uniform cache contamination when Three.js skips re-upload for
+   * consecutive draw calls with different materials using the same
+   * compiled program.  A unique key forces separate programs and
+   * eliminates the stale-uniform issue entirely. */
+  const uid = `chunk-atmo-reveal-${_matIdx++}`;
+
   mat.onBeforeCompile = (shader) => {
     /* Default 1.0 = fully visible.  Prevents dark flash on the
      * first frame if onBeforeRender hasn't been set yet. */
@@ -125,9 +139,7 @@ function injectRevealShader(mat: THREE.MeshStandardMaterial): void {
       #endif`,
     );
   };
-  /* Explicit program cache key ensures Three.js correctly caches
-   * the modified shader variant separately from unmodified materials. */
-  mat.customProgramCacheKey = () => 'chunk-atmo-reveal';
+  mat.customProgramCacheKey = () => uid;
 }
 
 const sharedSolidMat = (() => {
@@ -185,23 +197,97 @@ export function ChunkMesh({
   const chunkCx = useRef((data.chunkX + 0.5) * CWS);
   const chunkCz = useRef((data.chunkZ + 0.5) * CWS);
 
-  /* ── onBeforeRender: write per-chunk uniforms before each draw ──
-   * useLayoutEffect ensures the callback is attached synchronously
-   * during React's commit phase — BEFORE the first Three.js render.
-   * This eliminates the timing gap where useEffect is deferred and
-   * chunks render with the shader default for one or more frames.
+  /* ── onBeforeRender + instance data: ALL in useLayoutEffect ──
    *
-   * The callback reads _shaderRef lazily — if the shader hasn't
-   * compiled yet on the first frame, it simply returns (the material
-   * defaults to uChunkReveal=1.0 → fully visible, no dark flash).
+   * CRITICAL: Both the onBeforeRender callback AND the instance data
+   * setup MUST run synchronously before the first Three.js render.
    *
-   * Critical: shared materials cause Three.js to skip custom uniform
-   * re-upload for consecutive draw calls (same material.id → refreshMaterial=false).
-   * We bypass this by directly calling program.getUniforms().setValue()
-   * via renderer.properties, which writes to the GL uniform AND updates
-   * the internal cache — keeping everything in sync.
+   * Previously, onBeforeRender was in useLayoutEffect (synchronous)
+   * but instance data was in useEffect (DEFERRED).  This caused a
+   * 1-2 frame window where:
+   *   1. Meshes exist with default identity matrices (all at origin)
+   *   2. onBeforeRender sets uChunkReveal = 1.0 (correct)
+   *   3. Three.js renders instances at ORIGIN instead of real positions
+   *   4. vFogDepth = distance(camera, origin) → potentially HUGE
+   *   5. fogFactor → HIGH → combinedVis → LOW → chunk appears fogged
+   *
+   * Since the camera constantly moves and new chunks stream in,
+   * there were always SOME chunks in this "origin fog flash" state,
+   * creating persistent dark/fogged patches near the camera.
+   *
+   * By doing everything in useLayoutEffect, instance positions are
+   * correct BEFORE the first render — no more origin-fog flash.
    */
   useLayoutEffect(() => {
+    /* ── Set up instance data (positions + colors) ── */
+    const tmpM = new THREE.Matrix4(), tmpC = new THREE.Color();
+
+    /* Solid voxels */
+    const solidMesh = solidRef.current;
+    if (solidMesh && data.count > 0) {
+      for (let i = 0; i < data.count; i++) {
+        const i3 = i * 3;
+        tmpM.identity(); tmpM.elements[12] = data.positions[i3]; tmpM.elements[13] = data.positions[i3 + 1]; tmpM.elements[14] = data.positions[i3 + 2];
+        solidMesh.setMatrixAt(i, tmpM);
+        tmpC.setRGB(data.colors[i3], data.colors[i3 + 1], data.colors[i3 + 2]);
+        solidMesh.setColorAt(i, tmpC);
+      }
+      solidMesh.instanceMatrix.needsUpdate = true;
+      if (solidMesh.instanceColor) solidMesh.instanceColor.needsUpdate = true;
+    }
+
+    /* Water */
+    const waterMesh = waterRef.current;
+    if (waterMesh && data.waterCount > 0) {
+      for (let i = 0; i < data.waterCount; i++) {
+        const i3 = i * 3;
+        tmpM.identity(); tmpM.elements[12] = data.waterPositions[i3]; tmpM.elements[13] = data.waterPositions[i3 + 1]; tmpM.elements[14] = data.waterPositions[i3 + 2];
+        waterMesh.setMatrixAt(i, tmpM);
+        tmpC.setRGB(data.waterColors[i3], data.waterColors[i3 + 1], data.waterColors[i3 + 2]);
+        waterMesh.setColorAt(i, tmpC);
+      }
+      waterMesh.instanceMatrix.needsUpdate = true;
+      if (waterMesh.instanceColor) waterMesh.instanceColor.needsUpdate = true;
+    }
+
+    /* Mini-voxels (street furniture) */
+    const miniMesh = miniRef.current;
+    if (miniMesh && data.miniVoxelCount > 0) {
+      for (let i = 0; i < data.miniVoxelCount; i++) {
+        const i3 = i * 3;
+        tmpM.identity();
+        tmpM.elements[12] = data.miniVoxelPositions[i3];
+        tmpM.elements[13] = data.miniVoxelPositions[i3 + 1];
+        tmpM.elements[14] = data.miniVoxelPositions[i3 + 2];
+        miniMesh.setMatrixAt(i, tmpM);
+        tmpC.setRGB(data.miniVoxelColors[i3], data.miniVoxelColors[i3 + 1], data.miniVoxelColors[i3 + 2]);
+        miniMesh.setColorAt(i, tmpC);
+      }
+      miniMesh.instanceMatrix.needsUpdate = true;
+      if (miniMesh.instanceColor) miniMesh.instanceColor.needsUpdate = true;
+    }
+
+    /* Road paint decals */
+    const paintMesh = paintRef.current;
+    if (paintMesh && data.paintCount > 0) {
+      for (let i = 0; i < data.paintCount; i++) {
+        const i3 = i * 3;
+        const i2 = i * 2;
+        const sx = data.paintScales[i2];
+        const sz = data.paintScales[i2 + 1];
+        tmpM.makeScale(sx, 1, sz);
+        tmpM.elements[12] = data.paintPositions[i3];
+        tmpM.elements[13] = data.paintPositions[i3 + 1];
+        tmpM.elements[14] = data.paintPositions[i3 + 2];
+        paintMesh.setMatrixAt(i, tmpM);
+        tmpC.setRGB(data.paintColors[i3], data.paintColors[i3 + 1], data.paintColors[i3 + 2]);
+        paintMesh.setColorAt(i, tmpC);
+      }
+      paintMesh.instanceMatrix.needsUpdate = true;
+      if (paintMesh.instanceColor) paintMesh.instanceColor.needsUpdate = true;
+    }
+
+    /* ── Attach onBeforeRender callbacks ── */
     const rv = revealRef;
     const ac = atmoColorRef;
     const callback = (
@@ -235,7 +321,7 @@ export function ChunkMesh({
         p.setValue(gl, 'uAtmoColor', ac.current);
       }
     };
-    const meshes = [solidRef.current, waterRef.current, miniRef.current, paintRef.current];
+    const meshes = [solidMesh, waterMesh, miniMesh, paintMesh];
     for (const mesh of meshes) {
       if (mesh) mesh.onBeforeRender = callback;
     }
@@ -244,76 +330,6 @@ export function ChunkMesh({
         if (mesh) mesh.onBeforeRender = () => {};
       }
     };
-  }, [data]);
-
-  /* ── Instance data setup (unchanged logic) ── */
-  useEffect(() => {
-    const mesh = solidRef.current;
-    if (!mesh || data.count === 0) return;
-    const m = new THREE.Matrix4(), c = new THREE.Color();
-    for (let i = 0; i < data.count; i++) {
-      const i3 = i * 3;
-      m.identity(); m.elements[12] = data.positions[i3]; m.elements[13] = data.positions[i3 + 1]; m.elements[14] = data.positions[i3 + 2];
-      mesh.setMatrixAt(i, m);
-      c.setRGB(data.colors[i3], data.colors[i3 + 1], data.colors[i3 + 2]);
-      mesh.setColorAt(i, c);
-    }
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }, [data]);
-
-  useEffect(() => {
-    const mesh = waterRef.current;
-    if (!mesh || data.waterCount === 0) return;
-    const m = new THREE.Matrix4(), c = new THREE.Color();
-    for (let i = 0; i < data.waterCount; i++) {
-      const i3 = i * 3;
-      m.identity(); m.elements[12] = data.waterPositions[i3]; m.elements[13] = data.waterPositions[i3 + 1]; m.elements[14] = data.waterPositions[i3 + 2];
-      mesh.setMatrixAt(i, m);
-      c.setRGB(data.waterColors[i3], data.waterColors[i3 + 1], data.waterColors[i3 + 2]);
-      mesh.setColorAt(i, c);
-    }
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }, [data]);
-
-  useEffect(() => {
-    const mesh = miniRef.current;
-    if (!mesh || data.miniVoxelCount === 0) return;
-    const m = new THREE.Matrix4(), c = new THREE.Color();
-    for (let i = 0; i < data.miniVoxelCount; i++) {
-      const i3 = i * 3;
-      m.identity();
-      m.elements[12] = data.miniVoxelPositions[i3];
-      m.elements[13] = data.miniVoxelPositions[i3 + 1];
-      m.elements[14] = data.miniVoxelPositions[i3 + 2];
-      mesh.setMatrixAt(i, m);
-      c.setRGB(data.miniVoxelColors[i3], data.miniVoxelColors[i3 + 1], data.miniVoxelColors[i3 + 2]);
-      mesh.setColorAt(i, c);
-    }
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }, [data]);
-
-  useEffect(() => {
-    const mesh = paintRef.current;
-    if (!mesh || data.paintCount === 0) return;
-    const m = new THREE.Matrix4(), c = new THREE.Color();
-    for (let i = 0; i < data.paintCount; i++) {
-      const i3 = i * 3;
-      const i2 = i * 2;
-      const sx = data.paintScales[i2];
-      const sz = data.paintScales[i2 + 1];
-      m.makeScale(sx, 1, sz);
-      m.elements[12] = data.paintPositions[i3];
-      m.elements[13] = data.paintPositions[i3 + 1];
-      m.elements[14] = data.paintPositions[i3 + 2];
-      mesh.setMatrixAt(i, m);
-      c.setRGB(data.paintColors[i3], data.paintColors[i3 + 1], data.paintColors[i3 + 2]);
-      mesh.setColorAt(i, c);
-    }
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   }, [data]);
 
   /* ── Per-frame: continuous distance-proportional atmospheric fade ──
@@ -342,6 +358,13 @@ export function ChunkMesh({
     const dz = camera.position.z - chunkCz.current;
     const dist2 = dx * dx + dz * dz;
     const maxDist2 = renderDistance * renderDistance * CWS2;
+
+    /* Guard: if renderDistance is 0 or NaN, default to fully visible */
+    if (!(maxDist2 > 0)) {
+      revealRef.current = 1;
+      return;
+    }
+
     const normDist = Math.min(1, Math.sqrt(dist2 / maxDist2));
 
     /* ── Distance-based target reveal (smoothstep falloff) ── */
@@ -377,7 +400,10 @@ export function ChunkMesh({
     const speed = 4.0 + (1 - normDist) * 11.0;
     const cur = revealRef.current;
     const diff = target - cur;
-    revealRef.current = Math.abs(diff) < 0.003 ? target : cur + diff * Math.min(1, dt * speed);
+    const next = Math.abs(diff) < 0.003 ? target : cur + diff * Math.min(1, dt * speed);
+
+    /* NaN guard: if any arithmetic produced NaN, snap to 1.0 (visible) */
+    revealRef.current = Number.isFinite(next) ? next : 1;
 
     /* Sync atmosphere color from day/night cycle (once per frame) */
     if (timeRef) {
@@ -411,7 +437,7 @@ export function FloatingPickup({ position, iconIdx }: { position: [number, numbe
   const count = voxels.length;
   const baseY = useRef(position[1]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mesh = meshRef.current;
     if (!mesh || count === 0) return;
     const m = new THREE.Matrix4(), c = new THREE.Color();
