@@ -510,8 +510,13 @@ export default function ProceduralTerrain() {
     });
   }, [seed, cameraPos]);
 
-  const gfxDpr: [number, number] = config.graphicsQuality === 'low' ? [0.75, 1] : config.graphicsQuality === 'high' ? [1, 2] : [1, 1.5];
-  const gfxAA = config.graphicsQuality === 'high';
+  const gfxDpr: [number, number] =
+    config.graphicsQuality === 'potato' ? [0.5, 0.75] :
+    config.graphicsQuality === 'low'    ? [0.75, 1] :
+    config.graphicsQuality === 'ultra'  ? [1, 2] :
+    config.graphicsQuality === 'high'   ? [1, 2] :
+    /* medium / custom */                 [1, 1.5];
+  const gfxAA = config.graphicsQuality === 'high' || config.graphicsQuality === 'ultra';
 
   return (
     <div className="relative w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] overflow-hidden bg-black select-none" style={{ touchAction: 'none', WebkitUserSelect: 'none' }}>

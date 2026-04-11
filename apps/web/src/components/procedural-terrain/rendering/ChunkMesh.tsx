@@ -133,6 +133,7 @@ export function ChunkMesh({
   const paintRef = useRef<THREE.InstancedMesh>(null);
 
   const revealRef      = useRef(0);
+  const firstFrameRef  = useRef(true);
   const atmoColorRef   = useRef(new THREE.Color(NOON_FOG_R, NOON_FOG_G, NOON_FOG_B));
   const timeRef        = useContext(TimeContext);
 
@@ -278,7 +279,6 @@ export function ChunkMesh({
    * chunks emerge from fog over ~0.5 s — exactly how atmospheric
    * scattering should behave.
    */
-  // eslint-disable-next-line react-hooks/immutability
   useFrame(({ camera }, frameDelta) => {
     const dt = Math.min(0.1, frameDelta); // cap for tab-switch safety
 
@@ -305,17 +305,24 @@ export function ChunkMesh({
       target = 1 - fade * str;
     }
 
-    /* ── Exponential approach — speed proportional to proximity ──
-     * Close chunks (normDist≈0): speed≈12 → ~95% in 0.25 s
-     * Far chunks   (normDist≈1): speed≈3  → ~95% in 1.0 s
-     * The Math.min(1, ...) cap prevents overshooting at very
-     * high frame rates or after long pauses.
-     */
-    const speed = 3.0 + (1 - normDist) * 9.0;
-    const cur = revealRef.current;
-    const diff = target - cur;
-    // eslint-disable-next-line react-hooks/immutability
-    revealRef.current = Math.abs(diff) < 0.003 ? target : cur + diff * Math.min(1, dt * speed);
+    /* ── First-frame snap: eliminate the ~250 ms dark fade-in ──
+     * Without this, revealRef starts at 0 and smoothly approaches
+     * the target over ~15 frames at 60 fps.  Close chunks would
+     * appear fog-colored (dark) for a quarter-second on mount.
+     * Snapping to target on the first frame makes close chunks
+     * fully visible immediately and far chunks correctly faded.  */
+    if (firstFrameRef.current) {
+      firstFrameRef.current = false;
+      revealRef.current = target;
+    } else {
+      /* ── Exponential approach — speed proportional to proximity ──
+       * Close chunks (normDist≈0): speed≈12 → ~95% in 0.25 s
+       * Far chunks   (normDist≈1): speed≈3  → ~95% in 1.0 s */
+      const speed = 3.0 + (1 - normDist) * 9.0;
+      const cur = revealRef.current;
+      const diff = target - cur;
+      revealRef.current = Math.abs(diff) < 0.003 ? target : cur + diff * Math.min(1, dt * speed);
+    }
 
     /* Sync atmosphere color from day/night cycle (once per frame) */
     if (timeRef) {
