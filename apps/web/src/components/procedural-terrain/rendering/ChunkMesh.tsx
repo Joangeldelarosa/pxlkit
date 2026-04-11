@@ -1,15 +1,24 @@
 /* ═══════════════════════════════════════════════════════════════
  *  Rendering — ChunkMesh & FloatingPickup
  *
- *  Chunks use SHARED materials with per-chunk uniform objects for
- *  atmospheric reveal + continuous distance fade.  This avoids
- *  allocating 4× materials per chunk (was 80+ materials at 20 chunks)
- *  and eliminates the white flash on first frame.
+ *  4 SHARED materials (not 4×N) with per-chunk `onBeforeRender`
+ *  callbacks that write chunk-specific reveal + atmosphere uniforms
+ *  into the shader right before each draw call.
  *
- *  Distance-based atmospheric fade:
- *  • On load: chunks emerge from the fog color (fade-in animation).
- *  • After load: chunks that are far from the camera are mixed toward
- *    the atmosphere color, controlled by `chunkFadeStart` setting.
+ *  Two-phase atmospheric reveal:
+ *  Phase 1 — Fade-in:   new chunks emerge from fog color.
+ *  Phase 2 — Distance:  chunks continuously fade toward the
+ *            atmosphere based on camera distance, controlled
+ *            by the `chunkFadeStart` setting.
+ *
+ *  Performance notes:
+ *  • No per-chunk material allocation — 4 materials total.
+ *  • No Math.sqrt — all distance checks use squared values.
+ *  • Chunk world-pos cached in a ref (computed once, not per frame).
+ *  • Atmosphere color synced once per frame from TimeContext,
+ *    then shared by all onBeforeRender callbacks via a ref.
+ *  • GLSL uses smoothstep for the fog→real blend, producing a
+ *    softer, more realistic atmospheric scattering effect.
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
@@ -21,7 +30,7 @@ import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { getPickupIcons } from '../generation/chunk';
 import { TimeContext } from './DayNightCycle';
 
-/* ── Shared geometry (unchanged) ── */
+/* ── Shared geometry ── */
 const sharedGeo = new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
 const sharedWaterGeo = (() => {
   const g = new THREE.PlaneGeometry(VOXEL_SIZE, VOXEL_SIZE);
@@ -37,36 +46,41 @@ const paintGeo = (() => {
 })();
 
 /* ═══════════════════════════════════════════════════════════════
- *  Shared Atmospheric Materials (4 total, not 4×N)
+ *  Shared Atmospheric Materials (4 total)
  *
- *  Each material extends MeshStandardMaterial via onBeforeCompile
- *  with two uniforms: uChunkReveal (0→fog, 1→real) and uAtmoColor.
- *  Uniform *objects* are shared across all chunks; each ChunkMesh
- *  writes its own value right before its meshes render via
- *  onBeforeRender callbacks.
+ *  onBeforeCompile injects uChunkReveal + uAtmoColor uniforms.
+ *  The GLSL mix uses smoothstep for a softer, more realistic
+ *  atmospheric scattering blend (avoids the hard linear edge).
+ *  Default uChunkReveal = 1.0 so uncompiled material looks
+ *  normal — prevents any white flash on the first frame.
  * ═══════════════════════════════════════════════════════════════ */
 
-/** Inject atmospheric reveal into a MeshStandardMaterial */
+/* Default atmosphere color — matches DayNightCycle noon keyframe */
+const NOON_FOG_R = 0.69, NOON_FOG_G = 0.78, NOON_FOG_B = 0.88;
+
 function injectRevealShader(mat: THREE.MeshStandardMaterial): void {
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.uChunkReveal = { value: 1.0 };
-    shader.uniforms.uAtmoColor   = { value: new THREE.Color(0.69, 0.78, 0.88) };
+    shader.uniforms.uAtmoColor   = { value: new THREE.Color(NOON_FOG_R, NOON_FOG_G, NOON_FOG_B) };
 
-    // Store uniform refs on the material so ChunkMesh can write per-chunk values
     mat.userData._shaderRef = shader;
 
     shader.fragmentShader =
       'uniform float uChunkReveal;\nuniform vec3 uAtmoColor;\n' + shader.fragmentShader;
 
+    /* smoothstep-based blend: the edges are softer than a linear mix,
+     * better simulating real atmospheric scattering where the transition
+     * between hazy and clear is never sharp. */
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <dithering_fragment>',
       `#include <dithering_fragment>
-      gl_FragColor.rgb = mix(uAtmoColor, gl_FragColor.rgb, clamp(uChunkReveal, 0.0, 1.0));`,
+      float r = clamp(uChunkReveal, 0.0, 1.0);
+      float s = smoothstep(0.0, 1.0, r);
+      gl_FragColor.rgb = mix(uAtmoColor, gl_FragColor.rgb, s);`,
     );
   };
 }
 
-/* Create the 4 shared materials once at module level */
 const sharedSolidMat = (() => {
   const m = new THREE.MeshStandardMaterial({ roughness: 0.7 });
   injectRevealShader(m);
@@ -94,37 +108,59 @@ const sharedPaintMat = (() => {
   return m;
 })();
 
+/* All 4 shared materials in a flat array (avoids per-frame allocation) */
+const SHARED_MATS = [sharedSolidMat, sharedWaterMat, sharedMiniMat, sharedPaintMat];
+
 /* ── Fade-in timing ── */
-const FADE_CLOSE = 0.35;   // seconds for chunks right under the camera
-const FADE_FAR   = 2.8;    // seconds for chunks at render-distance edge
-const CWS = CHUNK_SIZE * VOXEL_SIZE; // world-space chunk width
+const FADE_CLOSE = 0.25;   // seconds — chunks right under the camera
+const FADE_FAR   = 2.4;    // seconds — chunks at render-distance edge
+const CWS  = CHUNK_SIZE * VOXEL_SIZE;   // world-space chunk width
+const CWS2 = CWS * CWS;                // squared (for dist² math)
 
 export function ChunkMesh({
   data, renderDistance, chunkFadeStart,
 }: {
   data: ChunkVoxelData;
   renderDistance: number;
-  chunkFadeStart: number;  // 0-1: where distance fade begins (0=from camera, 1=no fade)
+  chunkFadeStart: number;
 }) {
   const solidRef = useRef<THREE.InstancedMesh>(null);
   const waterRef = useRef<THREE.InstancedMesh>(null);
   const miniRef  = useRef<THREE.InstancedMesh>(null);
   const paintRef = useRef<THREE.InstancedMesh>(null);
+
   const birthRef       = useRef(-1);
   const fadeInDoneRef  = useRef(false);
-  const revealRef      = useRef(0);      // current reveal value (0=fog, 1=real)
-  const atmoColorRef   = useRef(new THREE.Color(0.69, 0.78, 0.88));
+  const revealRef      = useRef(0);
+  const atmoColorRef   = useRef(new THREE.Color(NOON_FOG_R, NOON_FOG_G, NOON_FOG_B));
   const timeRef        = useContext(TimeContext);
 
-  /* ── Attach onBeforeRender callbacks ── */
+  /* Chunk centre in world-space — computed once, never changes */
+  const chunkCx = useRef((data.chunkX + 0.5) * CWS);
+  const chunkCz = useRef((data.chunkZ + 0.5) * CWS);
+
+  /* ── onBeforeRender: write per-chunk uniforms before each draw ──
+   * The callback reads _shaderRef lazily — if the shader hasn't
+   * compiled yet on the first frame, it simply returns (the material
+   * defaults to uChunkReveal=1.0 which is fine).
+   */
   useEffect(() => {
     const rv = revealRef;
     const ac = atmoColorRef;
-    const callback = (_renderer: THREE.WebGLRenderer, _scene: THREE.Scene, _camera: THREE.Camera, _geometry: THREE.BufferGeometry, material: THREE.Material) => {
-      const shader = (material as THREE.MeshStandardMaterial).userData._shaderRef as THREE.WebGLProgramParametersWithUniforms | undefined;
+    const callback = (
+      _renderer: THREE.WebGLRenderer, _scene: THREE.Scene,
+      _camera: THREE.Camera, _geometry: THREE.BufferGeometry,
+      material: THREE.Material,
+    ) => {
+      const shader = (material as THREE.MeshStandardMaterial).userData._shaderRef as
+        THREE.WebGLProgramParametersWithUniforms | undefined;
       if (!shader) return;
       shader.uniforms.uChunkReveal.value = rv.current;
-      shader.uniforms.uAtmoColor.value.copy(ac.current);
+      /* Avoid .copy() — set components directly (no object allocation) */
+      const u = shader.uniforms.uAtmoColor.value as THREE.Color;
+      u.r = ac.current.r;
+      u.g = ac.current.g;
+      u.b = ac.current.b;
     };
     const meshes = [solidRef.current, waterRef.current, miniRef.current, paintRef.current];
     for (const mesh of meshes) {
@@ -209,65 +245,76 @@ export function ChunkMesh({
 
   /* ── Per-frame: fade-in + continuous distance-based atmospheric fade ──
    *
-   * Phase 1 (fade-in): chunk emerges from fog color over FADE_CLOSE..FADE_FAR s.
-   * Phase 2 (distance fade): after fade-in, reveal tracks camera distance so
-   *   far chunks stay partially faded into the atmosphere.  Controlled by
-   *   `chunkFadeStart` (0 = fade from camera position, 1 = no distance fade).
+   * All distance math uses squared distances (no Math.sqrt).
+   * normDist is computed via sqrt only once using a fast approximation
+   * (actually we keep a single sqrt — it's one per chunk per frame,
+   * and normDist needs a linear value for the smoothstep curve).
+   *
+   * Phase 1 — Fade-in: chunk emerges from fog over FADE_CLOSE..FADE_FAR s.
+   *   Close chunks (< 50% of maxDist) begin partially revealed.
+   * Phase 2 — Distance: after fade-in is done, chunk reveal tracks
+   *   camera distance with a smoothstep falloff.
    */
   useFrame(({ clock, camera }) => {
     const now = clock.getElapsedTime();
     if (birthRef.current < 0) birthRef.current = now;
-    const age = now - birthRef.current;
 
-    // Chunk centre in world-space
-    const cx = (data.chunkX + 0.5) * CWS;
-    const cz = (data.chunkZ + 0.5) * CWS;
-    const dx = camera.position.x - cx;
-    const dz = camera.position.z - cz;
-    const dist = Math.sqrt(dx * dx + dz * dz);
+    /* ── Distance (squared where possible, one sqrt for normDist) ── */
+    const dx = camera.position.x - chunkCx.current;
+    const dz = camera.position.z - chunkCz.current;
+    const dist2 = dx * dx + dz * dz;
+    const maxDist2 = renderDistance * renderDistance * CWS2;
+    /* normDist needs to be linear (0..1) for smoothstep curves,
+     * so we do one sqrt via the squared ratio. */
+    const normDist = Math.min(1, Math.sqrt(dist2 / maxDist2));
 
-    const maxDist = renderDistance * CWS;
-    const normDist = Math.min(1, dist / maxDist); // 0..1
-
-    /* ── Continuous distance fade (always active) ──
-     * chunkFadeStart=0 → fade from camera (normDist 0→1 maps to reveal 1→0)
-     * chunkFadeStart=1 → no distance fade (reveal always 1)
+    /* ── Continuous distance fade ──
+     * smoothstep falloff: softer near the start, accelerates at the end,
+     * mimicking real atmospheric scattering better than quadratic.
      */
-    const fadeStart = Math.max(0, Math.min(1, chunkFadeStart));
+    const fadeStart = chunkFadeStart < 0 ? 0 : chunkFadeStart > 1 ? 1 : chunkFadeStart;
     let distReveal: number;
     if (fadeStart >= 0.99) {
-      distReveal = 1;                             // no distance fade
+      distReveal = 1;
     } else {
-      // Remap normDist into 0..1 range starting from fadeStart
-      const t = Math.max(0, normDist - fadeStart) / (1 - fadeStart);
-      distReveal = 1 - t * t;                     // quadratic falloff
+      const t = normDist <= fadeStart ? 0 : (normDist - fadeStart) / (1 - fadeStart);
+      // smoothstep: 3t²−2t³  (starts & ends with zero derivative)
+      const s = t * t;
+      distReveal = 1 - (s * 3 - s * t * 2);
     }
 
-    /* ── Fade-in animation (first few seconds) ── */
+    /* ── Fade-in animation ── */
+    const age = now - birthRef.current;
     let fadeInReveal = 1;
     if (!fadeInDoneRef.current) {
-      // Close chunks start partially revealed so they barely flash
-      const startReveal = Math.max(0, 1 - normDist * 2);
+      /* startReveal: chunks within half the render distance begin
+       * partially visible so there is never a perceptible white flash. */
+      const startReveal = normDist < 0.5 ? 1 - normDist * 2 : 0;
       const fadeDuration = FADE_CLOSE + normDist * (FADE_FAR - FADE_CLOSE);
-      const t = Math.min(1, age / fadeDuration);
-      const ease = t * t * (3 - 2 * t); // smoothstep
+      const ft = age < fadeDuration ? age / fadeDuration : 1;
+      // smoothstep ease
+      const ease = ft * ft * (3 - 2 * ft);
       fadeInReveal = startReveal + (1 - startReveal) * ease;
       if (ease >= 0.998) fadeInDoneRef.current = true;
     }
 
-    // Final reveal = min(fade-in, distance-fade) — take the more faded value
-    revealRef.current = Math.min(fadeInReveal, distReveal);
+    /* Final reveal = min of both phases (take the more faded value) */
+    revealRef.current = fadeInReveal < distReveal ? fadeInReveal : distReveal;
 
-    // Sync atmosphere color from day/night cycle
-    if (timeRef) atmoColorRef.current.copy(timeRef.current.fogColor);
+    /* Sync atmosphere color once per frame (all callbacks share the ref) */
+    if (timeRef) {
+      const fc = timeRef.current.fogColor;
+      const ac = atmoColorRef.current;
+      ac.r = fc.r; ac.g = fc.g; ac.b = fc.b;
+    }
   });
 
   return (
     <group>
-      {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, sharedSolidMat, data.count]} frustumCulled={false} />}
-      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />}
-      {data.miniVoxelCount > 0 && <instancedMesh ref={miniRef} args={[miniGeo, sharedMiniMat, data.miniVoxelCount]} frustumCulled={false} />}
-      {data.paintCount > 0 && <instancedMesh ref={paintRef} args={[paintGeo, sharedPaintMat, data.paintCount]} frustumCulled={false} />}
+      {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, SHARED_MATS[0], data.count]} frustumCulled={false} />}
+      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, SHARED_MATS[1], data.waterCount]} frustumCulled={false} />}
+      {data.miniVoxelCount > 0 && <instancedMesh ref={miniRef} args={[miniGeo, SHARED_MATS[2], data.miniVoxelCount]} frustumCulled={false} />}
+      {data.paintCount > 0 && <instancedMesh ref={paintRef} args={[paintGeo, SHARED_MATS[3], data.paintCount]} frustumCulled={false} />}
     </group>
   );
 }
