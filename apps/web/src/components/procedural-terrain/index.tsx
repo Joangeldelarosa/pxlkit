@@ -376,7 +376,7 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
 
   return (
     <>
-      {entries.map(([key, data]) => <ChunkMesh key={key} data={data} />)}
+      {entries.map(([key, data]) => <ChunkMesh key={key} data={data} renderDistance={config.renderDistance} />)}
       {allPickups.map(p => <FloatingPickup key={p.key} position={[p.wx, p.wy, p.wz]} iconIdx={p.iconIdx} />)}
     </>
   );
@@ -585,7 +585,7 @@ export default function ProceduralTerrain() {
         >
           <TimeContext.Provider value={timeStateRef}>
           <DayNightSky backgroundDetail={config.backgroundDetail} starDensity={config.starDensity} />
-          <FogEffect density={config.fogDensity} />
+          <FogEffect density={config.fogDensity} renderDistance={config.renderDistance} />
           <DayNightLighting timeMode={config.timeMode} fixedHour={config.fixedHour} dayDurationSeconds={config.dayDurationSeconds} />
           <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} worldConfig={config} initialPos={initialPos} initialRot={initialRot} />
           <CameraLook isLocked={isLocked} isMobile={isMobile} />
