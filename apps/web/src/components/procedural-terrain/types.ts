@@ -35,6 +35,7 @@ export interface WorldConfig {
   npcDistance: number;            // 2-100 chunk radius for NPC population (max = renderDistance)
   npcScale: number;               // 0.25-2.0 NPC body scale multiplier
   npcMaxPerChunk: number;         // 1-50 max NPCs spawned per chunk
+  chunkFadeStart: number;         // 0-1 where distance fade begins (0 = from camera, 1 = no fade). Chunks beyond this start fading into atmosphere.
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
@@ -68,6 +69,7 @@ export const DEFAULT_CONFIG: WorldConfig = {
   npcDistance: 8,
   npcScale: 0.5,
   npcMaxPerChunk: 6,
+  chunkFadeStart: 0.5,
 };
 
 export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city' | 'swamp' | 'village';
