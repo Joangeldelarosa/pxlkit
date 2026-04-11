@@ -376,7 +376,7 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
 
   return (
     <>
-      {entries.map(([key, data]) => <ChunkMesh key={key} data={data} renderDistance={config.renderDistance} chunkFadeStart={config.chunkFadeStart} />)}
+      {entries.map(([key, data]) => <ChunkMesh key={key} data={data} renderDistance={config.renderDistance} chunkFadeStart={config.chunkFadeStart} chunkFadeStrength={config.chunkFadeStrength} />)}
       {allPickups.map(p => <FloatingPickup key={p.key} position={[p.wx, p.wy, p.wz]} iconIdx={p.iconIdx} />)}
     </>
   );

@@ -120,11 +120,12 @@ const CWS  = CHUNK_SIZE * VOXEL_SIZE;   // world-space chunk width
 const CWS2 = CWS * CWS;                // squared (for dist² math)
 
 export function ChunkMesh({
-  data, renderDistance, chunkFadeStart,
+  data, renderDistance, chunkFadeStart, chunkFadeStrength,
 }: {
   data: ChunkVoxelData;
   renderDistance: number;
   chunkFadeStart: number;
+  chunkFadeStrength: number;
 }) {
   const solidRef = useRef<THREE.InstancedMesh>(null);
   const waterRef = useRef<THREE.InstancedMesh>(null);
@@ -143,24 +144,46 @@ export function ChunkMesh({
    * The callback reads _shaderRef lazily — if the shader hasn't
    * compiled yet on the first frame, it simply returns (the material
    * defaults to uChunkReveal=0.0 → fog-colored, no flash).
+   *
+   * Critical: shared materials cause Three.js to skip custom uniform
+   * re-upload for consecutive draw calls (same material.id → refreshMaterial=false).
+   * We bypass this by directly calling program.getUniforms().setValue()
+   * via renderer.properties, which writes to the GL uniform AND updates
+   * the internal cache — keeping everything in sync.
    */
   useEffect(() => {
     const rv = revealRef;
     const ac = atmoColorRef;
     const callback = (
-      _renderer: THREE.WebGLRenderer, _scene: THREE.Scene,
+      renderer: THREE.WebGLRenderer, _scene: THREE.Scene,
       _camera: THREE.Camera, _geometry: THREE.BufferGeometry,
       material: THREE.Material,
     ) => {
       const shader = (material as THREE.MeshStandardMaterial).userData._shaderRef as
         THREE.WebGLProgramParametersWithUniforms | undefined;
       if (!shader) return;
+
+      /* Set JS-side values (used by setProgram's first-use upload) */
       shader.uniforms.uChunkReveal.value = rv.current;
-      /* Avoid .copy() — set components directly (no object allocation) */
       const u = shader.uniforms.uAtmoColor.value as THREE.Color;
       u.r = ac.current.r;
       u.g = ac.current.g;
       u.b = ac.current.b;
+
+      /* Direct GPU upload: bypass Three.js's material-level caching
+       * that skips re-upload for consecutive same-material draw calls.
+       * renderer.properties.get(material) → materialProperties with
+       * currentProgram → getUniforms().setValue() writes GL uniform
+       * AND updates cache, keeping Three.js's state consistent. */
+      const matProps = renderer.properties.get(material) as
+        { currentProgram?: { getUniforms(): { setValue(gl: WebGLRenderingContext | WebGL2RenderingContext, name: string, value: unknown): void } } } | undefined;
+      const prog = matProps?.currentProgram;
+      if (prog) {
+        const gl = renderer.getContext();
+        const p = prog.getUniforms();
+        p.setValue(gl, 'uChunkReveal', rv.current);
+        p.setValue(gl, 'uAtmoColor', ac.current);
+      }
     };
     const meshes = [solidRef.current, waterRef.current, miniRef.current, paintRef.current];
     for (const mesh of meshes) {
@@ -268,13 +291,18 @@ export function ChunkMesh({
 
     /* ── Distance-based target reveal (smoothstep falloff) ── */
     const fs = chunkFadeStart < 0 ? 0 : chunkFadeStart > 1 ? 1 : chunkFadeStart;
+    const str = chunkFadeStrength < 0 ? 0 : chunkFadeStrength > 1 ? 1 : chunkFadeStrength;
     let target: number;
-    if (fs >= 0.99) {
+    if (fs >= 0.99 || str <= 0.01) {
+      /* No fade: either fade starts beyond edge or strength is zero */
       target = 1;
     } else {
       const t = normDist <= fs ? 0 : (normDist - fs) / (1 - fs);
       // smoothstep: 3t² − 2t³  (zero derivative at endpoints)
-      target = 1 - t * t * (3 - 2 * t);
+      const fade = t * t * (3 - 2 * t);
+      /* Strength controls how much fade is applied:
+       * 0 = no fade (target stays 1), 1 = full fade (target can reach 0) */
+      target = 1 - fade * str;
     }
 
     /* ── Exponential approach — speed proportional to proximity ──
