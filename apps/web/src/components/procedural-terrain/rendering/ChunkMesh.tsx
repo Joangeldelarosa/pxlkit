@@ -5,20 +5,20 @@
  *  callbacks that write chunk-specific reveal + atmosphere uniforms
  *  into the shader right before each draw call.
  *
- *  Two-phase atmospheric reveal:
- *  Phase 1 — Fade-in:   new chunks emerge from fog color.
- *  Phase 2 — Distance:  chunks continuously fade toward the
- *            atmosphere based on camera distance, controlled
- *            by the `chunkFadeStart` setting.
+ *  Continuous distance-proportional atmospheric reveal:
+ *  Chunks always track a distance-based target opacity via
+ *  smoothstep falloff.  An exponential-smoothing approach
+ *  (close = fast, far = slow) ensures new chunks emerge
+ *  from fog without any pop or flash — no birth-time
+ *  animation state that could break on remount.
  *
  *  Performance notes:
  *  • No per-chunk material allocation — 4 materials total.
- *  • No Math.sqrt — all distance checks use squared values.
- *  • Chunk world-pos cached in a ref (computed once, not per frame).
- *  • Atmosphere color synced once per frame from TimeContext,
- *    then shared by all onBeforeRender callbacks via a ref.
- *  • GLSL uses smoothstep for the fog→real blend, producing a
- *    softer, more realistic atmospheric scattering effect.
+ *  • Chunk world-pos cached in a ref (computed once).
+ *  • Atmosphere color synced once per frame from TimeContext.
+ *  • Single sqrt per chunk per frame for normDist.
+ *  • Shader default uChunkReveal = 0.0 so first frame before
+ *    onBeforeRender is set renders fog-colored (no flash).
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
@@ -49,10 +49,11 @@ const paintGeo = (() => {
  *  Shared Atmospheric Materials (4 total)
  *
  *  onBeforeCompile injects uChunkReveal + uAtmoColor uniforms.
- *  The GLSL mix uses smoothstep for a softer, more realistic
- *  atmospheric scattering blend (avoids the hard linear edge).
- *  Default uChunkReveal = 1.0 so uncompiled material looks
- *  normal — prevents any white flash on the first frame.
+ *  Default uChunkReveal = 0.0 so the first frame (before
+ *  onBeforeRender is attached via useEffect) renders fog-colored
+ *  instead of flashing bright white.
+ *  GLSL uses a direct linear mix — the JS code already applies
+ *  the smoothstep curve, so no double-smoothstep in the shader.
  * ═══════════════════════════════════════════════════════════════ */
 
 /* Default atmosphere color — matches DayNightCycle noon keyframe */
@@ -60,7 +61,11 @@ const NOON_FOG_R = 0.69, NOON_FOG_G = 0.78, NOON_FOG_B = 0.88;
 
 function injectRevealShader(mat: THREE.MeshStandardMaterial): void {
   mat.onBeforeCompile = (shader) => {
-    shader.uniforms.uChunkReveal = { value: 1.0 };
+    /* Default 0.0 = fully fog-colored.  Prevents bright flash on the
+     * first frame before onBeforeRender can write the real value.
+     * onBeforeCompile runs during compilation, BEFORE onBeforeRender
+     * has had a chance to write, so the default is what the GPU sees. */
+    shader.uniforms.uChunkReveal = { value: 0.0 };
     shader.uniforms.uAtmoColor   = { value: new THREE.Color(NOON_FOG_R, NOON_FOG_G, NOON_FOG_B) };
 
     mat.userData._shaderRef = shader;
@@ -68,15 +73,14 @@ function injectRevealShader(mat: THREE.MeshStandardMaterial): void {
     shader.fragmentShader =
       'uniform float uChunkReveal;\nuniform vec3 uAtmoColor;\n' + shader.fragmentShader;
 
-    /* smoothstep-based blend: the edges are softer than a linear mix,
-     * better simulating real atmospheric scattering where the transition
-     * between hazy and clear is never sharp. */
+    /* Direct linear blend — the JS useFrame already applies a
+     * smoothstep distance curve, so an additional GLSL smoothstep
+     * would over-curve the transition and narrow the effective
+     * fade zone.  Linear mix lets JS fully control the shape. */
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <dithering_fragment>',
       `#include <dithering_fragment>
-      float r = clamp(uChunkReveal, 0.0, 1.0);
-      float s = smoothstep(0.0, 1.0, r);
-      gl_FragColor.rgb = mix(uAtmoColor, gl_FragColor.rgb, s);`,
+      gl_FragColor.rgb = mix(uAtmoColor, gl_FragColor.rgb, clamp(uChunkReveal, 0.0, 1.0));`,
     );
   };
 }
@@ -111,9 +115,7 @@ const sharedPaintMat = (() => {
 /* All 4 shared materials in a flat array (avoids per-frame allocation) */
 const SHARED_MATS = [sharedSolidMat, sharedWaterMat, sharedMiniMat, sharedPaintMat];
 
-/* ── Fade-in timing ── */
-const FADE_CLOSE = 0.25;   // seconds — chunks right under the camera
-const FADE_FAR   = 2.4;    // seconds — chunks at render-distance edge
+/* ── Constants ── */
 const CWS  = CHUNK_SIZE * VOXEL_SIZE;   // world-space chunk width
 const CWS2 = CWS * CWS;                // squared (for dist² math)
 
@@ -129,8 +131,6 @@ export function ChunkMesh({
   const miniRef  = useRef<THREE.InstancedMesh>(null);
   const paintRef = useRef<THREE.InstancedMesh>(null);
 
-  const birthRef       = useRef(-1);
-  const fadeInDoneRef  = useRef(false);
   const revealRef      = useRef(0);
   const atmoColorRef   = useRef(new THREE.Color(NOON_FOG_R, NOON_FOG_G, NOON_FOG_B));
   const timeRef        = useContext(TimeContext);
@@ -142,7 +142,7 @@ export function ChunkMesh({
   /* ── onBeforeRender: write per-chunk uniforms before each draw ──
    * The callback reads _shaderRef lazily — if the shader hasn't
    * compiled yet on the first frame, it simply returns (the material
-   * defaults to uChunkReveal=1.0 which is fine).
+   * defaults to uChunkReveal=0.0 → fog-colored, no flash).
    */
   useEffect(() => {
     const rv = revealRef;
@@ -243,64 +243,53 @@ export function ChunkMesh({
     if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   }, [data]);
 
-  /* ── Per-frame: fade-in + continuous distance-based atmospheric fade ──
+  /* ── Per-frame: continuous distance-proportional atmospheric fade ──
    *
-   * All distance math uses squared distances (no Math.sqrt).
-   * normDist is computed via sqrt only once using a fast approximation
-   * (actually we keep a single sqrt — it's one per chunk per frame,
-   * and normDist needs a linear value for the smoothstep curve).
+   * No birth-time animation — just a distance-based target reveal
+   * with exponential smoothing.  Close chunks approach the target
+   * quickly (speed ≈ 12), far chunks gradually (speed ≈ 3).
    *
-   * Phase 1 — Fade-in: chunk emerges from fog over FADE_CLOSE..FADE_FAR s.
-   *   Close chunks (< 50% of maxDist) begin partially revealed.
-   * Phase 2 — Distance: after fade-in is done, chunk reveal tracks
-   *   camera distance with a smoothstep falloff.
+   * This eliminates flash-on-remount: when a chunk unmounts (frustum
+   * cull) and remounts, it starts at reveal=0 and smoothly approaches
+   * the correct value.  Close chunks get there in ~3 frames; far
+   * chunks emerge from fog over ~0.5 s — exactly how atmospheric
+   * scattering should behave.
    */
-  useFrame(({ clock, camera }) => {
-    const now = clock.getElapsedTime();
-    if (birthRef.current < 0) birthRef.current = now;
+  // eslint-disable-next-line react-hooks/immutability
+  useFrame(({ camera }, frameDelta) => {
+    const dt = Math.min(0.1, frameDelta); // cap for tab-switch safety
 
-    /* ── Distance (squared where possible, one sqrt for normDist) ── */
+    /* ── Distance ── */
     const dx = camera.position.x - chunkCx.current;
     const dz = camera.position.z - chunkCz.current;
     const dist2 = dx * dx + dz * dz;
     const maxDist2 = renderDistance * renderDistance * CWS2;
-    /* normDist needs to be linear (0..1) for smoothstep curves,
-     * so we do one sqrt via the squared ratio. */
     const normDist = Math.min(1, Math.sqrt(dist2 / maxDist2));
 
-    /* ── Continuous distance fade ──
-     * smoothstep falloff: softer near the start, accelerates at the end,
-     * mimicking real atmospheric scattering better than quadratic.
-     */
-    const fadeStart = chunkFadeStart < 0 ? 0 : chunkFadeStart > 1 ? 1 : chunkFadeStart;
-    let distReveal: number;
-    if (fadeStart >= 0.99) {
-      distReveal = 1;
+    /* ── Distance-based target reveal (smoothstep falloff) ── */
+    const fs = chunkFadeStart < 0 ? 0 : chunkFadeStart > 1 ? 1 : chunkFadeStart;
+    let target: number;
+    if (fs >= 0.99) {
+      target = 1;
     } else {
-      const t = normDist <= fadeStart ? 0 : (normDist - fadeStart) / (1 - fadeStart);
-      // smoothstep: 3t² − 2t³  (zero derivative at both endpoints)
-      distReveal = 1 - t * t * (3 - 2 * t);
+      const t = normDist <= fs ? 0 : (normDist - fs) / (1 - fs);
+      // smoothstep: 3t² − 2t³  (zero derivative at endpoints)
+      target = 1 - t * t * (3 - 2 * t);
     }
 
-    /* ── Fade-in animation ── */
-    const age = now - birthRef.current;
-    let fadeInReveal = 1;
-    if (!fadeInDoneRef.current) {
-      /* startReveal: chunks within half the render distance begin
-       * partially visible so there is never a perceptible white flash. */
-      const startReveal = normDist < 0.5 ? 1 - normDist * 2 : 0;
-      const fadeDuration = FADE_CLOSE + normDist * (FADE_FAR - FADE_CLOSE);
-      const ft = age < fadeDuration ? age / fadeDuration : 1;
-      // smoothstep ease
-      const ease = ft * ft * (3 - 2 * ft);
-      fadeInReveal = startReveal + (1 - startReveal) * ease;
-      if (ease >= 0.998) fadeInDoneRef.current = true;
-    }
+    /* ── Exponential approach — speed proportional to proximity ──
+     * Close chunks (normDist≈0): speed≈12 → ~95% in 0.25 s
+     * Far chunks   (normDist≈1): speed≈3  → ~95% in 1.0 s
+     * The Math.min(1, ...) cap prevents overshooting at very
+     * high frame rates or after long pauses.
+     */
+    const speed = 3.0 + (1 - normDist) * 9.0;
+    const cur = revealRef.current;
+    const diff = target - cur;
+    // eslint-disable-next-line react-hooks/immutability
+    revealRef.current = Math.abs(diff) < 0.003 ? target : cur + diff * Math.min(1, dt * speed);
 
-    /* Final reveal = min of both phases (take the more faded value) */
-    revealRef.current = fadeInReveal < distReveal ? fadeInReveal : distReveal;
-
-    /* Sync atmosphere color once per frame (all callbacks share the ref) */
+    /* Sync atmosphere color from day/night cycle (once per frame) */
     if (timeRef) {
       const fc = timeRef.current.fogColor;
       const ac = atmoColorRef.current;
