@@ -11,6 +11,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { WorldConfig, WorldMode } from '../types';
+import { GRAPHICS_PRESETS } from '../types';
 import { ConfigSlider } from './Controls';
 
 interface SettingsPanelProps {
@@ -238,17 +239,28 @@ export function SettingsPanel({
           {sections.graphics && (
             <div className="space-y-2 pl-1 pb-2">
               <div className="space-y-1">
-                <label className="font-pixel text-[7px] sm:text-[8px] text-retro-cyan/70 uppercase tracking-wider select-none">Quality</label>
-                <div className="flex gap-1">
-                  {(['low', 'medium', 'high'] as const).map(q => (
-                    <button key={q} onClick={() => onSetConfig(prev => ({ ...prev, graphicsQuality: q }))}
-                      className={`flex-1 py-1 rounded font-pixel text-[7px] transition-all cursor-pointer select-none border ${config.graphicsQuality === q ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/50 hover:bg-retro-surface/60'}`}>
-                      {q.toUpperCase()}
+                <label className="font-pixel text-[7px] sm:text-[8px] text-retro-cyan/70 uppercase tracking-wider select-none">Quality Preset</label>
+                <div className="flex gap-1 flex-wrap">
+                  {(['potato', 'low', 'medium', 'high', 'ultra'] as const).map(q => (
+                    <button key={q} onClick={() => onSetConfig(prev => ({ ...prev, ...GRAPHICS_PRESETS[q] }))}
+                      className={`flex-1 min-w-[3.5rem] py-1 rounded font-pixel text-[7px] transition-all cursor-pointer select-none border ${config.graphicsQuality === q ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/50 hover:bg-retro-surface/60'}`}>
+                      {q === 'potato' ? '🥔' : q === 'low' ? '📉' : q === 'medium' ? '⚖️' : q === 'high' ? '📈' : '🚀'} {q.toUpperCase()}
                     </button>
                   ))}
                 </div>
+                {config.graphicsQuality === 'custom' && (
+                  <p className="font-mono text-[7px] text-retro-gold/50 select-none">Custom — values modified from preset</p>
+                )}
+                <p className="font-mono text-[7px] text-retro-muted/40 select-none">
+                  {config.graphicsQuality === 'potato' ? 'Minimal — best for weak devices'
+                    : config.graphicsQuality === 'low' ? 'Low — reduced effects, smooth on mobile'
+                    : config.graphicsQuality === 'medium' ? 'Balanced — recommended for most devices'
+                    : config.graphicsQuality === 'high' ? 'High — more detail, needs good GPU'
+                    : config.graphicsQuality === 'ultra' ? 'Ultra — maximum quality, GPU intensive'
+                    : 'Custom configuration'}
+                </p>
               </div>
-              <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => onUpdateConfig('chunkGenSpeed', v)} min={1} max={20} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
+              <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => { onUpdateConfig('chunkGenSpeed', v); if (config.graphicsQuality !== 'custom') onUpdateConfig('graphicsQuality', 'custom'); }} min={1} max={20} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
             </div>
           )}
 
