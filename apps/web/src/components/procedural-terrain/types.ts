@@ -69,7 +69,7 @@ export const DEFAULT_CONFIG: WorldConfig = {
   npcDistance: 8,
   npcScale: 0.5,
   npcMaxPerChunk: 6,
-  chunkFadeStart: 0.5,
+  chunkFadeStart: 0.35,
 };
 
 export type BiomeType = 'plains' | 'desert' | 'tundra' | 'forest' | 'mountains' | 'ocean' | 'city' | 'swamp' | 'village';
