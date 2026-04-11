@@ -278,9 +278,8 @@ export function ChunkMesh({
       distReveal = 1;
     } else {
       const t = normDist <= fadeStart ? 0 : (normDist - fadeStart) / (1 - fadeStart);
-      // smoothstep: 3t²−2t³  (starts & ends with zero derivative)
-      const s = t * t;
-      distReveal = 1 - (s * 3 - s * t * 2);
+      // smoothstep: 3t² − 2t³  (zero derivative at both endpoints)
+      distReveal = 1 - t * t * (3 - 2 * t);
     }
 
     /* ── Fade-in animation ── */
