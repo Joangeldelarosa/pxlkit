@@ -8,21 +8,27 @@
  *  Continuous distance-proportional atmospheric reveal:
  *  Chunks always track a distance-based target opacity via
  *  smoothstep falloff.  An exponential-smoothing approach
- *  (close = fast, far = slow) ensures new chunks emerge
- *  from fog without any pop or flash — no birth-time
- *  animation state that could break on remount.
+ *  (close = fast, far = slow) ensures natural atmospheric
+ *  fade without pop or flash.
+ *
+ *  Anti-darkness guarantees:
+ *  • revealRef starts at 1.0 (fully visible) — not 0.
+ *  • Shader default uChunkReveal = 1.0 — if onBeforeRender
+ *    misses the first frame, chunks appear visible not dark.
+ *  • useLayoutEffect (not useEffect) sets onBeforeRender
+ *    synchronously during commit — before the first render.
+ *  • Safety floor: chunks within 15% of render distance
+ *    always get reveal ≥ 0.85 regardless of fade settings.
  *
  *  Performance notes:
  *  • No per-chunk material allocation — 4 materials total.
  *  • Chunk world-pos cached in a ref (computed once).
  *  • Atmosphere color synced once per frame from TimeContext.
  *  • Single sqrt per chunk per frame for normDist.
- *  • Shader default uChunkReveal = 0.0 so first frame before
- *    onBeforeRender is set renders fog-colored (no flash).
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useEffect, useContext } from 'react';
+import { useRef, useEffect, useLayoutEffect, useContext } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { ChunkVoxelData } from '../types';
@@ -49,9 +55,9 @@ const paintGeo = (() => {
  *  Shared Atmospheric Materials (4 total)
  *
  *  onBeforeCompile injects uChunkReveal + uAtmoColor uniforms.
- *  Default uChunkReveal = 0.0 so the first frame (before
- *  onBeforeRender is attached via useEffect) renders fog-colored
- *  instead of flashing bright white.
+ *  Default uChunkReveal = 1.0 so if onBeforeRender hasn't been
+ *  attached yet (React defers effects), chunks render fully
+ *  visible instead of dark.  Close chunks should NEVER flash dark.
  *  GLSL uses a direct linear mix — the JS code already applies
  *  the smoothstep curve, so no double-smoothstep in the shader.
  * ═══════════════════════════════════════════════════════════════ */
@@ -61,11 +67,12 @@ const NOON_FOG_R = 0.69, NOON_FOG_G = 0.78, NOON_FOG_B = 0.88;
 
 function injectRevealShader(mat: THREE.MeshStandardMaterial): void {
   mat.onBeforeCompile = (shader) => {
-    /* Default 0.0 = fully fog-colored.  Prevents bright flash on the
-     * first frame before onBeforeRender can write the real value.
-     * onBeforeCompile runs during compilation, BEFORE onBeforeRender
-     * has had a chance to write, so the default is what the GPU sees. */
-    shader.uniforms.uChunkReveal = { value: 0.0 };
+    /* Default 1.0 = fully visible.  Prevents dark flash on the
+     * first frame if onBeforeRender hasn't been set yet (React defers
+     * useEffect).  Close chunks should always appear at full brightness;
+     * far chunks briefly flash visible then fade to their distance target
+     * within a few frames — much less noticeable than a dark flash. */
+    shader.uniforms.uChunkReveal = { value: 1.0 };
     shader.uniforms.uAtmoColor   = { value: new THREE.Color(NOON_FOG_R, NOON_FOG_G, NOON_FOG_B) };
 
     mat.userData._shaderRef = shader;
@@ -132,8 +139,7 @@ export function ChunkMesh({
   const miniRef  = useRef<THREE.InstancedMesh>(null);
   const paintRef = useRef<THREE.InstancedMesh>(null);
 
-  const revealRef      = useRef(0);
-  const firstFrameRef  = useRef(true);
+  const revealRef      = useRef(1);
   const atmoColorRef   = useRef(new THREE.Color(NOON_FOG_R, NOON_FOG_G, NOON_FOG_B));
   const timeRef        = useContext(TimeContext);
 
@@ -142,9 +148,14 @@ export function ChunkMesh({
   const chunkCz = useRef((data.chunkZ + 0.5) * CWS);
 
   /* ── onBeforeRender: write per-chunk uniforms before each draw ──
+   * useLayoutEffect ensures the callback is attached synchronously
+   * during React's commit phase — BEFORE the first Three.js render.
+   * This eliminates the timing gap where useEffect is deferred and
+   * chunks render with the shader default for one or more frames.
+   *
    * The callback reads _shaderRef lazily — if the shader hasn't
    * compiled yet on the first frame, it simply returns (the material
-   * defaults to uChunkReveal=0.0 → fog-colored, no flash).
+   * defaults to uChunkReveal=1.0 → fully visible, no dark flash).
    *
    * Critical: shared materials cause Three.js to skip custom uniform
    * re-upload for consecutive draw calls (same material.id → refreshMaterial=false).
@@ -152,7 +163,7 @@ export function ChunkMesh({
    * via renderer.properties, which writes to the GL uniform AND updates
    * the internal cache — keeping everything in sync.
    */
-  useEffect(() => {
+  useLayoutEffect(() => {
     const rv = revealRef;
     const ac = atmoColorRef;
     const callback = (
@@ -269,15 +280,17 @@ export function ChunkMesh({
 
   /* ── Per-frame: continuous distance-proportional atmospheric fade ──
    *
-   * No birth-time animation — just a distance-based target reveal
-   * with exponential smoothing.  Close chunks approach the target
-   * quickly (speed ≈ 12), far chunks gradually (speed ≈ 3).
+   * revealRef starts at 1.0 (fully visible).  Each frame it is driven
+   * toward a distance-based target via exponential smoothing.
+   * Close chunks (normDist ≈ 0) always target 1.0 and stay bright.
+   * Far chunks smoothly fade toward the atmosphere/fog color.
    *
-   * This eliminates flash-on-remount: when a chunk unmounts (frustum
-   * cull) and remounts, it starts at reveal=0 and smoothly approaches
-   * the correct value.  Close chunks get there in ~3 frames; far
-   * chunks emerge from fog over ~0.5 s — exactly how atmospheric
-   * scattering should behave.
+   * Speed scales with proximity: close chunks converge in ~2 frames,
+   * far chunks over ~0.5 s — mimicking atmospheric scattering.
+   *
+   * A safety floor ensures chunks within 15 % of render distance
+   * ALWAYS have reveal ≥ 0.85, no matter what fade settings are used.
+   * This prevents any configuration from making close terrain dark.
    */
   useFrame(({ camera }, frameDelta) => {
     const dt = Math.min(0.1, frameDelta); // cap for tab-switch safety
@@ -305,24 +318,23 @@ export function ChunkMesh({
       target = 1 - fade * str;
     }
 
-    /* ── First-frame snap: eliminate the ~250 ms dark fade-in ──
-     * Without this, revealRef starts at 0 and smoothly approaches
-     * the target over ~15 frames at 60 fps.  Close chunks would
-     * appear fog-colored (dark) for a quarter-second on mount.
-     * Snapping to target on the first frame makes close chunks
-     * fully visible immediately and far chunks correctly faded.  */
-    if (firstFrameRef.current) {
-      firstFrameRef.current = false;
-      revealRef.current = target;
-    } else {
-      /* ── Exponential approach — speed proportional to proximity ──
-       * Close chunks (normDist≈0): speed≈12 → ~95% in 0.25 s
-       * Far chunks   (normDist≈1): speed≈3  → ~95% in 1.0 s */
-      const speed = 3.0 + (1 - normDist) * 9.0;
-      const cur = revealRef.current;
-      const diff = target - cur;
-      revealRef.current = Math.abs(diff) < 0.003 ? target : cur + diff * Math.min(1, dt * speed);
+    /* ── Safety floor: close chunks must NEVER go dark ──
+     * Regardless of fade settings, chunks within 15 % of the render
+     * distance get a minimum reveal of 0.85.  This prevents any
+     * configuration or timing issue from making nearby terrain dark.  */
+    if (normDist < 0.15) {
+      target = Math.max(target, 0.85);
     }
+
+    /* ── Exponential approach — speed proportional to proximity ──
+     * Close chunks (normDist≈0): speed≈14 → converges in ~2 frames
+     * Far chunks   (normDist≈1): speed≈3  → converges in ~0.5 s
+     * revealRef starts at 1.0 so close chunks are instantly correct;
+     * far chunks smoothly dim from full brightness to their target. */
+    const speed = 3.0 + (1 - normDist) * 11.0;
+    const cur = revealRef.current;
+    const diff = target - cur;
+    revealRef.current = Math.abs(diff) < 0.003 ? target : cur + diff * Math.min(1, dt * speed);
 
     /* Sync atmosphere color from day/night cycle (once per frame) */
     if (timeRef) {
