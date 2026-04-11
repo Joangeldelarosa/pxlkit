@@ -272,6 +272,7 @@ export function SettingsPanel({
           {sections.atmosphere && (
             <div className="space-y-2 pl-1 pb-2">
               <ConfigSlider label="Fog Density" value={config.fogDensity} onChange={v => onUpdateConfig('fogDensity', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.fogDensity * 100)}%`} />
+              <ConfigSlider label="Distance Fade" value={config.chunkFadeStart} onChange={v => onUpdateConfig('chunkFadeStart', v)} min={0} max={1} step={0.05} color="text-retro-muted/80" displayValue={config.chunkFadeStart >= 0.95 ? 'None' : config.chunkFadeStart <= 0.05 ? 'Full' : `${Math.round(config.chunkFadeStart * 100)}%`} />
               <ConfigSlider label="Mountains" value={config.backgroundDetail} onChange={v => onUpdateConfig('backgroundDetail', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.backgroundDetail * 100)}%`} />
               <ConfigSlider label="Stars" value={config.starDensity} onChange={v => onUpdateConfig('starDensity', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.starDensity === 0 ? 'None' : config.starDensity >= 0.95 ? 'Maximum' : `${Math.round(config.starDensity * 100)}%`} />
 
