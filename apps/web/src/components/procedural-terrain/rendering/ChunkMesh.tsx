@@ -5,11 +5,15 @@
  *  callbacks that write chunk-specific reveal + atmosphere uniforms
  *  into the shader right before each draw call.
  *
- *  Continuous distance-proportional atmospheric reveal:
- *  Chunks always track a distance-based target opacity via
- *  smoothstep falloff.  An exponential-smoothing approach
- *  (close = fast, far = slow) ensures natural atmospheric
- *  fade without pop or flash.
+ *  Combined fog + atmospheric reveal (single pass):
+ *  Replaces the standard Three.js fog_fragment with a unified
+ *  system that merges per-pixel exponential fog with per-chunk
+ *  distance-based reveal into ONE visibility computation:
+ *    combinedVis = min(1 - fogFactor, chunkReveal)
+ *  The STRONGER fade always wins — no compound darkening.
+ *  Close chunks: fog ≈ 0 → combined = min(1, 1) → full brightness
+ *  Mid chunks:   fog moderate → combined = fog_vis (fog controls)
+ *  Far chunks:   reveal low → combined = reveal (hides render edge)
  *
  *  Anti-darkness guarantees:
  *  • revealRef starts at 1.0 (fully visible) — not 0.
@@ -18,7 +22,7 @@
  *  • useLayoutEffect (not useEffect) sets onBeforeRender
  *    synchronously during commit — before the first render.
  *  • Safety floor: chunks within 15% of render distance
- *    always get reveal ≥ 0.85 regardless of fade settings.
+ *    always get reveal = 1.0 regardless of fade settings.
  *
  *  Performance notes:
  *  • No per-chunk material allocation — 4 materials total.
@@ -54,12 +58,26 @@ const paintGeo = (() => {
 /* ═══════════════════════════════════════════════════════════════
  *  Shared Atmospheric Materials (4 total)
  *
- *  onBeforeCompile injects uChunkReveal + uAtmoColor uniforms.
+ *  onBeforeCompile injects uChunkReveal + uAtmoColor uniforms and
+ *  replaces Three.js's standard #include <fog_fragment> with a
+ *  combined fog + reveal system.
+ *
+ *  OLD approach (BROKEN — caused double-darkening):
+ *    1. #include <fog_fragment> → fog fades pixel toward fogColor
+ *    2. After #include <dithering_fragment> → reveal further fades
+ *       the ALREADY-FOGGED pixel toward uAtmoColor
+ *    Result: effective_visibility = (1-fog) × reveal → compound.
+ *    A chunk at mid-range with fog=0.3 and reveal=0.85 gets only
+ *    0.7 × 0.85 = 0.595 visibility instead of 0.7.
+ *
+ *  NEW approach (single pass, no compounding):
+ *    Replace #include <fog_fragment> with:
+ *      combinedVis = min(1 - fogFactor, chunkReveal)
+ *    The STRONGER fade wins. No separate post-dithering blend.
+ *    Same chunk now correctly gets min(0.7, 0.85) = 0.7 visibility.
+ *
  *  Default uChunkReveal = 1.0 so if onBeforeRender hasn't been
- *  attached yet (React defers effects), chunks render fully
- *  visible instead of dark.  Close chunks should NEVER flash dark.
- *  GLSL uses a direct linear mix — the JS code already applies
- *  the smoothstep curve, so no double-smoothstep in the shader.
+ *  attached yet, chunks render fully visible (not dark).
  * ═══════════════════════════════════════════════════════════════ */
 
 /* Default atmosphere color — matches DayNightCycle noon keyframe */
@@ -68,10 +86,7 @@ const NOON_FOG_R = 0.69, NOON_FOG_G = 0.78, NOON_FOG_B = 0.88;
 function injectRevealShader(mat: THREE.MeshStandardMaterial): void {
   mat.onBeforeCompile = (shader) => {
     /* Default 1.0 = fully visible.  Prevents dark flash on the
-     * first frame if onBeforeRender hasn't been set yet (React defers
-     * useEffect).  Close chunks should always appear at full brightness;
-     * far chunks briefly flash visible then fade to their distance target
-     * within a few frames — much less noticeable than a dark flash. */
+     * first frame if onBeforeRender hasn't been set yet. */
     shader.uniforms.uChunkReveal = { value: 1.0 };
     shader.uniforms.uAtmoColor   = { value: new THREE.Color(NOON_FOG_R, NOON_FOG_G, NOON_FOG_B) };
 
@@ -80,16 +95,39 @@ function injectRevealShader(mat: THREE.MeshStandardMaterial): void {
     shader.fragmentShader =
       'uniform float uChunkReveal;\nuniform vec3 uAtmoColor;\n' + shader.fragmentShader;
 
-    /* Direct linear blend — the JS useFrame already applies a
-     * smoothstep distance curve, so an additional GLSL smoothstep
-     * would over-curve the transition and narrow the effective
-     * fade zone.  Linear mix lets JS fully control the shape. */
+    /* ── Combined fog + atmospheric reveal (single pass) ──
+     *
+     * Replaces Three.js's standard #include <fog_fragment> to merge
+     * per-pixel exponential fog with per-chunk distance reveal into
+     * ONE visibility computation.
+     *
+     * combinedVis = min(fog_visibility, chunk_reveal)
+     *
+     * Close chunks:  fog ≈ 0  → combined = min(~1.0, 1.0) = 1.0
+     * Mid chunks:    fog 0.3  → combined = min(0.7, 0.85) = 0.7
+     * Far chunks:    reveal low → combined = min(0.3, 0.2) = 0.2
+     *
+     * Uses fogColor (authoritative, updated by DayNightLighting)
+     * when fog is active; falls back to uAtmoColor when no fog. */
     shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <dithering_fragment>',
-      `#include <dithering_fragment>
-      gl_FragColor.rgb = mix(uAtmoColor, gl_FragColor.rgb, clamp(uChunkReveal, 0.0, 1.0));`,
+      '#include <fog_fragment>',
+      `#ifdef USE_FOG
+        #ifdef FOG_EXP2
+          float fogFactor = 1.0 - exp( -fogDensity * fogDensity * vFogDepth * vFogDepth );
+        #else
+          float fogFactor = smoothstep( fogNear, fogFar, vFogDepth );
+        #endif
+        float chunkVis = clamp(uChunkReveal, 0.0, 1.0);
+        float combinedVis = min(1.0 - fogFactor, chunkVis);
+        gl_FragColor.rgb = mix(fogColor, gl_FragColor.rgb, combinedVis);
+      #else
+        gl_FragColor.rgb = mix(uAtmoColor, gl_FragColor.rgb, clamp(uChunkReveal, 0.0, 1.0));
+      #endif`,
     );
   };
+  /* Explicit program cache key ensures Three.js correctly caches
+   * the modified shader variant separately from unmodified materials. */
+  mat.customProgramCacheKey = () => 'chunk-atmo-reveal';
 }
 
 const sharedSolidMat = (() => {
@@ -285,12 +323,16 @@ export function ChunkMesh({
    * Close chunks (normDist ≈ 0) always target 1.0 and stay bright.
    * Far chunks smoothly fade toward the atmosphere/fog color.
    *
-   * Speed scales with proximity: close chunks converge in ~2 frames,
-   * far chunks over ~0.5 s — mimicking atmospheric scattering.
+   * With the combined fog+reveal shader, reveal only needs to control
+   * the render-distance edge (where chunks pop in/out).  Fog handles
+   * the smooth per-pixel atmospheric haze.  The min() in the shader
+   * ensures no double-darkening.
    *
-   * A safety floor ensures chunks within 15 % of render distance
-   * ALWAYS have reveal ≥ 0.85, no matter what fade settings are used.
-   * This prevents any configuration from making close terrain dark.
+   * Speed scales with proximity: close chunks converge in ~2 frames,
+   * far chunks over ~0.3 s — fast enough to prevent visible glitches.
+   *
+   * Safety floor: chunks within 15% of render distance always get
+   * reveal = 1.0 (fully visible), guaranteed.
    */
   useFrame(({ camera }, frameDelta) => {
     const dt = Math.min(0.1, frameDelta); // cap for tab-switch safety
@@ -318,20 +360,21 @@ export function ChunkMesh({
       target = 1 - fade * str;
     }
 
-    /* ── Safety floor: close chunks must NEVER go dark ──
+    /* ── Safety floor: close chunks are always fully visible ──
      * Regardless of fade settings, chunks within 15 % of the render
-     * distance get a minimum reveal of 0.85.  This prevents any
-     * configuration or timing issue from making nearby terrain dark.  */
+     * distance are locked to reveal = 1.0.  Combined with the
+     * min(fog, reveal) shader, this guarantees close terrain is
+     * ONLY affected by fog (smooth per-pixel), never the chunk fade. */
     if (normDist < 0.15) {
-      target = Math.max(target, 0.85);
+      target = 1;
     }
 
     /* ── Exponential approach — speed proportional to proximity ──
-     * Close chunks (normDist≈0): speed≈14 → converges in ~2 frames
-     * Far chunks   (normDist≈1): speed≈3  → converges in ~0.5 s
+     * Close chunks (normDist≈0): speed≈15 → converges in ~1-2 frames
+     * Far chunks   (normDist≈1): speed≈4  → converges in ~0.3 s
      * revealRef starts at 1.0 so close chunks are instantly correct;
      * far chunks smoothly dim from full brightness to their target. */
-    const speed = 3.0 + (1 - normDist) * 11.0;
+    const speed = 4.0 + (1 - normDist) * 11.0;
     const cur = revealRef.current;
     const diff = target - cur;
     revealRef.current = Math.abs(diff) < 0.003 ? target : cur + diff * Math.min(1, dt * speed);
