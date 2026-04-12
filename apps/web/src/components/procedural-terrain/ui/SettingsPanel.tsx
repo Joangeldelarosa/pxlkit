@@ -11,6 +11,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import type { WorldConfig, WorldMode } from '../types';
+import { GRAPHICS_PRESETS } from '../types';
 import { ConfigSlider } from './Controls';
 
 interface SettingsPanelProps {
@@ -238,17 +239,28 @@ export function SettingsPanel({
           {sections.graphics && (
             <div className="space-y-2 pl-1 pb-2">
               <div className="space-y-1">
-                <label className="font-pixel text-[7px] sm:text-[8px] text-retro-cyan/70 uppercase tracking-wider select-none">Quality</label>
-                <div className="flex gap-1">
-                  {(['low', 'medium', 'high'] as const).map(q => (
-                    <button key={q} onClick={() => onSetConfig(prev => ({ ...prev, graphicsQuality: q }))}
-                      className={`flex-1 py-1 rounded font-pixel text-[7px] transition-all cursor-pointer select-none border ${config.graphicsQuality === q ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/50 hover:bg-retro-surface/60'}`}>
-                      {q.toUpperCase()}
+                <label className="font-pixel text-[7px] sm:text-[8px] text-retro-cyan/70 uppercase tracking-wider select-none">Quality Preset</label>
+                <div className="flex gap-1 flex-wrap">
+                  {(['potato', 'low', 'medium', 'high', 'ultra'] as const).map(q => (
+                    <button key={q} onClick={() => onSetConfig(prev => ({ ...prev, ...GRAPHICS_PRESETS[q] }))}
+                      className={`flex-1 min-w-[3.5rem] py-1 rounded font-pixel text-[7px] transition-all cursor-pointer select-none border ${config.graphicsQuality === q ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/50 hover:bg-retro-surface/60'}`}>
+                      {q === 'potato' ? '🥔' : q === 'low' ? '📉' : q === 'medium' ? '⚖️' : q === 'high' ? '📈' : '🚀'} {q.toUpperCase()}
                     </button>
                   ))}
                 </div>
+                {config.graphicsQuality === 'custom' && (
+                  <p className="font-mono text-[7px] text-retro-gold/50 select-none">Custom — values modified from preset</p>
+                )}
+                <p className="font-mono text-[7px] text-retro-muted/40 select-none">
+                  {config.graphicsQuality === 'potato' ? 'Minimal — best for weak devices'
+                    : config.graphicsQuality === 'low' ? 'Low — reduced effects, smooth on mobile'
+                    : config.graphicsQuality === 'medium' ? 'Balanced — recommended for most devices'
+                    : config.graphicsQuality === 'high' ? 'High — more detail, needs good GPU'
+                    : config.graphicsQuality === 'ultra' ? 'Ultra — maximum quality, GPU intensive'
+                    : 'Custom configuration'}
+                </p>
               </div>
-              <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => onUpdateConfig('chunkGenSpeed', v)} min={1} max={20} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
+              <ConfigSlider label="Chunk Gen Speed" value={config.chunkGenSpeed} onChange={v => { onUpdateConfig('chunkGenSpeed', v); if (config.graphicsQuality !== 'custom') onUpdateConfig('graphicsQuality', 'custom'); }} min={1} max={20} step={1} color="text-retro-cyan/80" displayValue={`${config.chunkGenSpeed}/frame`} />
             </div>
           )}
 
@@ -272,6 +284,9 @@ export function SettingsPanel({
           {sections.atmosphere && (
             <div className="space-y-2 pl-1 pb-2">
               <ConfigSlider label="Fog Density" value={config.fogDensity} onChange={v => onUpdateConfig('fogDensity', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.fogDensity * 100)}%`} />
+              <ConfigSlider label="Distance Fade" value={config.chunkFadeStart} onChange={v => onUpdateConfig('chunkFadeStart', v)} min={0} max={1} step={0.05} color="text-retro-muted/80" displayValue={config.chunkFadeStart >= 0.95 ? 'None' : config.chunkFadeStart <= 0.05 ? 'Full' : `${Math.round(config.chunkFadeStart * 100)}%`} />
+              <ConfigSlider label="Fade Strength" value={config.chunkFadeStrength} onChange={v => onUpdateConfig('chunkFadeStrength', v)} min={0} max={1} step={0.05} color="text-retro-muted/80" displayValue={config.chunkFadeStrength <= 0.05 ? 'Off' : config.chunkFadeStrength >= 0.95 ? 'Maximum' : `${Math.round(config.chunkFadeStrength * 100)}%`} />
+              <ConfigSlider label="Fade Speed" value={config.chunkFadeSpeed} onChange={v => onUpdateConfig('chunkFadeSpeed', v)} min={0.5} max={3} step={0.1} color="text-retro-muted/80" displayValue={config.chunkFadeSpeed <= 0.6 ? 'Slow' : config.chunkFadeSpeed >= 2.8 ? 'Instant' : `${config.chunkFadeSpeed.toFixed(1)}×`} />
               <ConfigSlider label="Mountains" value={config.backgroundDetail} onChange={v => onUpdateConfig('backgroundDetail', v)} min={0} max={1} step={0.1} color="text-retro-muted/80" displayValue={`${Math.round(config.backgroundDetail * 100)}%`} />
               <ConfigSlider label="Stars" value={config.starDensity} onChange={v => onUpdateConfig('starDensity', v)} min={0} max={1} step={0.05} color="text-retro-gold/80" displayValue={config.starDensity === 0 ? 'None' : config.starDensity >= 0.95 ? 'Maximum' : `${Math.round(config.starDensity * 100)}%`} />
 
