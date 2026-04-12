@@ -234,7 +234,9 @@ export function generateChunkData(
           if (!isBoundary) continue;
 
           // Gaussian-weighted average with all 8 neighbors
-          // Center weight is higher on later passes for stability
+          // Center weight increases each pass (2.0 → 3.5) to prevent
+          // over-smoothing: early passes do heavy blending, later passes
+          // preserve the terrain character that's already been smoothed.
           const centerW = 2.0 + pass * 0.5;
           let sum = hMap[idx] * centerW;
           let w = centerW;
