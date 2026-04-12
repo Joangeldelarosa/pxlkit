@@ -11,10 +11,11 @@ import type { BiomeType, BiomeConfig, ChunkVoxelData, WorldConfig } from '../typ
 import {
   CHUNK_SIZE, VOXEL_SIZE, MAX_HEIGHT,
   BIOMES, BIOME_TYPES, BLOCK_SIZE, ROAD_W, LOT_INSET, AVENUE_W,
+  CONTINENT_PROFILES,
 } from '../constants';
 import { mulberry32, fbm } from '../utils/noise';
 import { varyColor, hashCoord } from '../utils/color';
-import { getBiome, getVariedBiome } from '../utils/biomes';
+import { getBiome, getVariedBiome, getContinent, getContinentElevation } from '../utils/biomes';
 import { classifyCityCell, getBuildingType, getBuildingHeight } from '../city/layout';
 import { generateBuildingColumn } from '../city/buildings';
 import type { PxlKitData } from '@pxlkit/core';
@@ -66,10 +67,11 @@ export function generateChunkData(
   structN: (x: number, y: number) => number,
   regionN: (x: number, y: number) => number,
   cfg: WorldConfig,
+  continentN?: (x: number, y: number) => number,
 ): ChunkVoxelData {
    // Buffer size accounts for wider roads (3× original), taller lampposts (40 mini-voxels ≈ 6 regular voxels),
-  // and larger building footprints from increased BLOCK_SIZE
-  const maxV = CHUNK_SIZE * CHUNK_SIZE * 24;
+  // larger building footprints from increased BLOCK_SIZE, and taller terrain from continent elevation
+  const maxV = CHUNK_SIZE * CHUNK_SIZE * 48;
   const posA = new Float32Array(maxV * 3);
   const colA = new Float32Array(maxV * 3);
   let sc = 0;
@@ -138,26 +140,53 @@ export function generateChunkData(
     for (let lz = -1; lz <= CHUNK_SIZE; lz++) {
       const wx = bX + lx, wz = bZ + lz;
       const idx = (lx + 1) * gW + (lz + 1);
-      const biome = getBiome(biomeN, tempN, wx, wz, cfg.cityFrequency);
+      const biome = getBiome(biomeN, tempN, wx, wz, cfg.cityFrequency, continentN);
       const base = BIOMES[biome];
-      const c = biome === 'city' ? base : getVariedBiome(base, wx, wz, regionN, cfg.biomeVariation, cfg.terrainRoughness);
+
+      /* ── Continent-aware height variation ── */
+      let continentElev = 0;
+      if (continentN) {
+        continentElev = getContinentElevation(continentN, wx, wz);
+        const contType = getContinent(continentN, wx, wz);
+        const contProfile = CONTINENT_PROFILES[contType];
+
+        // City biome: continent elevation affects city ground level
+        if (biome === 'city') {
+          const cityBase = Math.max(3, Math.min(MAX_HEIGHT - 20,
+            Math.floor(base.heightBase + continentElev * 0.3)));
+          const c: BiomeConfig = {
+            ...base,
+            heightBase: cityBase,
+            waterLevel: Math.max(0, base.waterLevel + contProfile.waterOffset),
+          };
+          if (lx >= 0 && lx < CHUNK_SIZE && lz >= 0 && lz < CHUNK_SIZE) {
+            variedConfigs[lx * CHUNK_SIZE + lz] = c;
+          }
+          let h = cityBase;
+          const fade = edgeFade(wx, wz);
+          if (fade <= 0) { hMap[idx] = -1; bMap[idx] = BIOME_TYPES.indexOf(biome); continue; }
+          if (fade < 1) h = Math.max(0, Math.floor(h * fade));
+          hMap[idx] = h;
+          bMap[idx] = BIOME_TYPES.indexOf(biome);
+          continue;
+        }
+      }
+
+      const c = getVariedBiome(base, wx, wz, regionN, cfg.biomeVariation, cfg.terrainRoughness, continentN);
 
       if (lx >= 0 && lx < CHUNK_SIZE && lz >= 0 && lz < CHUNK_SIZE) {
         variedConfigs[lx * CHUNK_SIZE + lz] = c;
       }
 
       let h: number;
-      if (biome === 'city') {
-        h = c.heightBase;
-      } else {
-        const base2 = fbm(heightN, wx * 0.02, wz * 0.02, 4, 2.0, 0.5);
-        const det = detailN(wx * 0.08, wz * 0.08) * (0.2 + cfg.terrainRoughness * 0.3);
-        let extra = 0;
-        if (biome === 'mountains') {
-          extra = Math.abs(fbm(detailN, wx * 0.015 + 200, wz * 0.015 + 200, 2)) * (4 + cfg.terrainRoughness * 4);
-        }
-        h = Math.max(0, Math.min(MAX_HEIGHT, Math.floor(c.heightBase + (base2 + det) * c.heightScale + extra)));
+      const base2 = fbm(heightN, wx * 0.02, wz * 0.02, 4, 2.0, 0.5);
+      const det = detailN(wx * 0.08, wz * 0.08) * (0.2 + cfg.terrainRoughness * 0.3);
+      let extra = 0;
+      if (biome === 'mountains') {
+        extra = Math.abs(fbm(detailN, wx * 0.015 + 200, wz * 0.015 + 200, 2)) * (6 + cfg.terrainRoughness * 6);
       }
+      h = Math.max(0, Math.min(MAX_HEIGHT, Math.floor(c.heightBase + (base2 + det) * c.heightScale + extra)));
+
       const fade = edgeFade(wx, wz);
       if (fade <= 0) { hMap[idx] = -1; bMap[idx] = BIOME_TYPES.indexOf(biome); continue; }
       if (fade < 1) h = Math.max(0, Math.floor(h * fade));
@@ -251,13 +280,29 @@ export function generateChunkData(
         if (!exposed) continue;
 
         let baseCol: string;
-        if (isTop && biome === 'mountains' && y > 16) {
+        // Snow line: mountains get snow cap above 60% of MAX_HEIGHT or above 30 voxels
+        const snowLine = Math.max(30, Math.floor(MAX_HEIGHT * 0.55));
+        // Rocky transition zone
+        const rockLine = Math.max(20, Math.floor(MAX_HEIGHT * 0.38));
+
+        if (isTop && biome === 'mountains' && y > snowLine) {
+          // Snow-capped peaks
+          baseCol = '#f0f4ff';
+        } else if (isTop && biome === 'mountains' && y > rockLine) {
+          // Exposed rock / accent color
           baseCol = c.colors.accent;
+        } else if (isTop && y > snowLine + 4) {
+          // Any biome at extreme heights gets snow
+          baseCol = '#eef2ff';
         } else if (isTop) {
           baseCol = c.colors.top;
         } else if (y >= h - 3) {
           baseCol = c.colors.mid;
+        } else if (y >= h - 8) {
+          // Deeper subsurface layer — more rock/earth variation
+          baseCol = c.colors.bottom;
         } else {
+          // Deep underground — darker
           baseCol = c.colors.bottom;
         }
         push((bX + lx) * VOXEL_SIZE, y * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
@@ -504,7 +549,15 @@ export function generateChunkData(
             structN, cell.lotWorldX, cell.lotWorldZ,
             cfg.structureDensity, cell.zone, cell.buildingW, cell.buildingD,
           );
-          const bh = getBuildingHeight(structN, cell.lotWorldX, cell.lotWorldZ, bType);
+          let bh = getBuildingHeight(structN, cell.lotWorldX, cell.lotWorldZ, bType);
+          // Apply continent-based building height multiplier
+          if (continentN) {
+            const contType = getContinent(continentN, wx, wz);
+            const contProfile = CONTINENT_PROFILES[contType];
+            bh = Math.max(0, Math.floor(bh * contProfile.buildingHeightMult));
+          }
+          // Clamp building height so it doesn't exceed MAX_HEIGHT
+          if (h + bh + 2 > MAX_HEIGHT) bh = Math.max(0, MAX_HEIGHT - h - 2);
           const baseFootprint = BLOCK_SIZE - ROAD_W - LOT_INSET * 2;
           // Single-lot: use actual per-dimension footprint for correct wall placement
           // Multi-lot: use ROAD_W-based baseFootprint for consistent cross-lot alignment

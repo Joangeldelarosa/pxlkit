@@ -2,11 +2,11 @@
  *  Procedural Terrain — Constants
  * ═══════════════════════════════════════════════════════════════ */
 
-import type { BiomeType, BiomeConfig } from './types';
+import type { BiomeType, BiomeConfig, ContinentType, ContinentProfile } from './types';
 
 export const CHUNK_SIZE = 16;
 export const VOXEL_SIZE = 0.5;
-export const MAX_HEIGHT = 32;
+export const MAX_HEIGHT = 64;
 export const DEFAULT_CHUNKS_PER_FRAME = 2;
 export const PLAYER_HEIGHT = 1.5;
 export const NO_FACE = MAX_HEIGHT + 1;
@@ -47,11 +47,11 @@ export const BIOMES: Record<BiomeType, BiomeConfig> = {
     colors: { top: '#339955', mid: '#886644', bottom: '#556655', accent: '#ee5544', water: '#55aacc' },
   },
   mountains: {
-    name: 'Mountains', heightScale: 18, heightBase: 5, waterLevel: 3,
+    name: 'Mountains', heightScale: 24, heightBase: 8, waterLevel: 3,
     colors: { top: '#bbccdd', mid: '#8899aa', bottom: '#667788', accent: '#eef4ff', water: '#6699bb' },
   },
   ocean: {
-    name: 'Ocean', heightScale: 3, heightBase: 2, waterLevel: 8,
+    name: 'Ocean', heightScale: 3, heightBase: 2, waterLevel: 10,
     colors: { top: '#ffeecc', mid: '#ddcc99', bottom: '#99aabb', accent: '#ff9999', water: '#4499cc' },
   },
   city: {
@@ -121,4 +121,119 @@ export const BUILDING_ROOF_COLORS: Record<string, string> = {
   restaurant: '#cc6633',
   fire_station: '#882222',
   library: '#886644',
+};
+
+/* ═══════════════════════════════════════════════════════════════
+ *  Continent / Territory System
+ *
+ *  Continents are the largest-scale procedural feature. They control
+ *  base elevation, biome distribution, and the overall "feel" of
+ *  huge world regions (100s of chunks across).
+ * ═══════════════════════════════════════════════════════════════ */
+
+/** Continent noise frequency — very low for massive landmasses */
+export const CONTINENT_SCALE = 0.0008;
+/** Secondary continent detail frequency */
+export const CONTINENT_DETAIL_SCALE = 0.002;
+
+export const CONTINENT_TYPES: ContinentType[] = [
+  'metropolis', 'wilderness', 'archipelago', 'highlands',
+  'wasteland', 'farmland', 'volcanic', 'coastal',
+];
+
+export const CONTINENT_PROFILES: Record<ContinentType, ContinentProfile> = {
+  metropolis: {
+    name: 'Metropolis',
+    elevationBase: 8,
+    elevationScale: 0.3,
+    cityDensity: 2.5,
+    villageDensity: 0.3,
+    waterOffset: -2,
+    buildingHeightMult: 1.5,
+    colorTint: [0, -0.05, 0.02],
+  },
+  wilderness: {
+    name: 'Wilderness',
+    elevationBase: 10,
+    elevationScale: 2.2,
+    cityDensity: 0,
+    villageDensity: 0.2,
+    waterOffset: 0,
+    buildingHeightMult: 1.0,
+    colorTint: [0.02, 0.08, -0.02],
+  },
+  archipelago: {
+    name: 'Archipelago',
+    elevationBase: -4,
+    elevationScale: 1.8,
+    cityDensity: 0.15,
+    villageDensity: 0.4,
+    waterOffset: 6,
+    buildingHeightMult: 0.8,
+    colorTint: [0.03, 0.04, 0.04],
+  },
+  highlands: {
+    name: 'Highlands',
+    elevationBase: 18,
+    elevationScale: 1.6,
+    cityDensity: 0.2,
+    villageDensity: 0.8,
+    waterOffset: -3,
+    buildingHeightMult: 0.7,
+    colorTint: [0, 0, 0.03],
+  },
+  wasteland: {
+    name: 'Wasteland',
+    elevationBase: 5,
+    elevationScale: 1.0,
+    cityDensity: 0.05,
+    villageDensity: 0.1,
+    waterOffset: -4,
+    buildingHeightMult: 0.6,
+    colorTint: [0.04, -0.08, 0.06],
+  },
+  farmland: {
+    name: 'Farmland',
+    elevationBase: 7,
+    elevationScale: 0.4,
+    cityDensity: 0.3,
+    villageDensity: 2.5,
+    waterOffset: -1,
+    buildingHeightMult: 0.5,
+    colorTint: [-0.01, 0.06, 0.02],
+  },
+  volcanic: {
+    name: 'Volcanic',
+    elevationBase: 12,
+    elevationScale: 3.0,
+    cityDensity: 0,
+    villageDensity: 0,
+    waterOffset: 2,
+    buildingHeightMult: 1.0,
+    colorTint: [0.06, -0.06, -0.04],
+  },
+  coastal: {
+    name: 'Coastal',
+    elevationBase: 4,
+    elevationScale: 1.2,
+    cityDensity: 0.6,
+    villageDensity: 1.2,
+    waterOffset: 2,
+    buildingHeightMult: 1.0,
+    colorTint: [0.01, 0.02, 0.02],
+  },
+};
+
+/* ── Expanded building wall palette variations ──
+ *  These are additional palettes that get mixed in based on continent type,
+ *  giving buildings in different territories distinct color characters. */
+export const CONTINENT_BUILDING_TINTS: Record<ContinentType, [number, number, number]> = {
+  metropolis:   [0, -0.04, 0.03],    // cooler, slightly brighter glass towers
+  wilderness:   [0.02, 0.05, -0.05], // warm wood tones
+  archipelago:  [0.03, 0, 0.06],     // sun-bleached pastel
+  highlands:    [0, -0.02, -0.02],   // stone-grey muted
+  wasteland:    [0.04, -0.08, 0.04], // sandy, desaturated
+  farmland:     [-0.01, 0.04, 0.02], // earthy warm
+  volcanic:     [0.05, -0.05, -0.06],// dark, reddish
+  coastal:      [0.02, 0, 0.04],     // bright, airy
 };
