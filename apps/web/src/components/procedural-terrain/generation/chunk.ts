@@ -69,9 +69,10 @@ export function generateChunkData(
   cfg: WorldConfig,
   continentN?: (x: number, y: number) => number,
 ): ChunkVoxelData {
-   // Buffer size accounts for wider roads (3× original), taller lampposts (40 mini-voxels ≈ 6 regular voxels),
-  // larger building footprints from increased BLOCK_SIZE, and taller terrain from continent elevation
-  const maxV = CHUNK_SIZE * CHUNK_SIZE * 48;
+   // Buffer size: CHUNK_SIZE² cells × MAX_VOXELS_PER_COLUMN (terrain + buildings + structures)
+  // 48 accounts for MAX_HEIGHT=64 exposed faces, building columns, and natural structures
+  const MAX_VOXELS_PER_COLUMN = 48;
+  const maxV = CHUNK_SIZE * CHUNK_SIZE * MAX_VOXELS_PER_COLUMN;
   const posA = new Float32Array(maxV * 3);
   const colA = new Float32Array(maxV * 3);
   let sc = 0;
@@ -253,6 +254,11 @@ export function generateChunkData(
 
   const chunkRand = mulberry32(cx * 73856093 + cz * 19349663);
 
+  /** Height threshold for snow-capped mountain peaks (55% of MAX_HEIGHT) */
+  const SNOW_LINE = Math.max(30, Math.floor(MAX_HEIGHT * 0.55));
+  /** Height threshold for exposed rock transition zone (38% of MAX_HEIGHT) */
+  const ROCK_LINE = Math.max(20, Math.floor(MAX_HEIGHT * 0.38));
+
   /* ════════════════════════ MAIN LOOP ════════════════════════ */
   for (let lx = 0; lx < CHUNK_SIZE; lx++) {
     for (let lz = 0; lz < CHUNK_SIZE; lz++) {
@@ -280,18 +286,14 @@ export function generateChunkData(
         if (!exposed) continue;
 
         let baseCol: string;
-        // Snow line: mountains get snow cap above 60% of MAX_HEIGHT or above 30 voxels
-        const snowLine = Math.max(30, Math.floor(MAX_HEIGHT * 0.55));
-        // Rocky transition zone
-        const rockLine = Math.max(20, Math.floor(MAX_HEIGHT * 0.38));
 
-        if (isTop && biome === 'mountains' && y > snowLine) {
+        if (isTop && biome === 'mountains' && y > SNOW_LINE) {
           // Snow-capped peaks
           baseCol = '#f0f4ff';
-        } else if (isTop && biome === 'mountains' && y > rockLine) {
+        } else if (isTop && biome === 'mountains' && y > ROCK_LINE) {
           // Exposed rock / accent color
           baseCol = c.colors.accent;
-        } else if (isTop && y > snowLine + 4) {
+        } else if (isTop && y > SNOW_LINE + 4) {
           // Any biome at extreme heights gets snow
           baseCol = '#eef2ff';
         } else if (isTop) {
