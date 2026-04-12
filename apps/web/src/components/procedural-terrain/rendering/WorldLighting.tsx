@@ -6,7 +6,6 @@
 import { useRef, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { CHUNK_SIZE, VOXEL_SIZE } from '../constants';
 
 export function WorldLighting() {
   return (
@@ -88,26 +87,9 @@ export function SkyGradient({ backgroundDetail }: { backgroundDetail: number }) 
   return <mesh ref={meshRef} material={mat}><sphereGeometry args={[500, 32, 32]} /></mesh>;
 }
 
-export function FogEffect({ density, renderDistance }: { density: number; renderDistance: number }) {
-  /* ── Atmospheric fog that scales with render distance ──
-   *
-   * FogExp2 visibility at distance d = exp(-(density × d)²).
-   *
-   * minDensity: guarantees a soft haze at the render-distance edge
-   *   even when the user sets fogDensity to 0.  At the edge:
-   *   exp(-(1.0)²) ≈ 0.37 → about 37 % visibility (gentle haze).
-   *
-   * userDensity: additive, scaled so the visual feel is consistent
-   *   regardless of render distance.
-   *
-   * Initial fog colour matches the DayNightCycle noon keyframe so
-   * there is no colour pop on the very first frame before the cycle
-   * updates it.  DayNightLighting then writes the correct colour
-   * every frame via scene.fog.color.copy().
-   */
-  const maxDist = renderDistance * CHUNK_SIZE * VOXEL_SIZE;
-  const minDensity  = 1.0 / maxDist;           // baseline atmospheric haze
-  const userDensity = density * (2.8 / maxDist); // user-controlled layer
-  /* #b0c8e0 → rgb(0.69, 0.78, 0.88) — noon fog from DayNightCycle */
-  return <fogExp2 attach="fog" args={['#b0c8e0', minDensity + userDensity]} />;
+export function FogEffect({ density }: { density: number }) {
+  /* Simple fixed formula — works well at all render distances.
+   * #b0c8e0 = noon sky colour from DayNightCycle.
+   * DayNightLighting overrides fog.color every frame. */
+  return <fogExp2 attach="fog" args={['#b0c8e0', 0.005 + density * 0.02]} />;
 }
