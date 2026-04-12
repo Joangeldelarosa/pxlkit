@@ -1,9 +1,14 @@
 /* ═══════════════════════════════════════════════════════════════
  *  Biome Classification & Variation + Continent System
+ *
+ *  Includes intelligent transitions:
+ *  - Smooth continent-boundary elevation blending (no cliff edges)
+ *  - Minimum city biome size enforcement (no tiny 1-block "cities")
+ *  - Cities cannot spawn below water level
  * ═══════════════════════════════════════════════════════════════ */
 
 import type { BiomeType, BiomeConfig, ContinentType, ContinentProfile } from '../types';
-import { REGION_SCALE, MAX_HEIGHT, CONTINENT_SCALE, CONTINENT_DETAIL_SCALE, CONTINENT_PROFILES } from '../constants';
+import { REGION_SCALE, MAX_HEIGHT, CONTINENT_SCALE, CONTINENT_DETAIL_SCALE, CONTINENT_PROFILES, BIOMES } from '../constants';
 import { shiftColor } from './color';
 import { fbm } from './noise';
 
@@ -52,7 +57,7 @@ export function getContinent(
   return 'archipelago';
 }
 
-/** Get the continent profile with smooth blending at borders */
+/** Get the continent profile */
 export function getContinentProfile(
   continentN: (x: number, y: number) => number,
   wx: number, wz: number,
@@ -60,27 +65,80 @@ export function getContinentProfile(
   return CONTINENT_PROFILES[getContinent(continentN, wx, wz)];
 }
 
+/* ── Smooth territory transition helper ──
+ *  At continent borders (where the type changes within a short distance),
+ *  we sample multiple nearby points and blend their elevations. This
+ *  eliminates the harsh cliff-like drops where two territories with
+ *  different elevationBase/elevationScale values meet. */
+
+/** Radius in voxels to sample for territory border blending */
+const TERRITORY_BLEND_RADIUS = 12;
+/** Number of sampling offsets for border detection */
+const BLEND_OFFSETS: [number, number][] = [
+  [0, 0],
+  [-TERRITORY_BLEND_RADIUS, 0], [TERRITORY_BLEND_RADIUS, 0],
+  [0, -TERRITORY_BLEND_RADIUS], [0, TERRITORY_BLEND_RADIUS],
+];
+
+/** Compute raw (un-blended) continent elevation for a specific profile */
+function rawContinentElevation(
+  continentN: (x: number, y: number) => number,
+  wx: number, wz: number,
+  profile: ContinentProfile,
+): number {
+  const elev1 = fbm(continentN, wx * 0.003, wz * 0.003, 3, 2.0, 0.5);
+  const elev2 = fbm(continentN, wx * 0.008 + 300, wz * 0.008 + 300, 2, 2.0, 0.4);
+  return profile.elevationBase + elev1 * profile.elevationScale * 8 + elev2 * profile.elevationScale * 3;
+}
+
 /**
  * Compute the continent-scale base elevation at a world position.
- * This creates the large-scale height variation: mountain ranges,
- * ocean basins, plateaus, etc.
+ * Uses neighborhood sampling to smoothly blend at territory boundaries —
+ * prevents harsh cliff-like drops between adjacent continents.
  */
 export function getContinentElevation(
   continentN: (x: number, y: number) => number,
   wx: number, wz: number,
 ): number {
-  const profile = getContinentProfile(continentN, wx, wz);
+  const centerType = getContinent(continentN, wx, wz);
+  const centerProfile = CONTINENT_PROFILES[centerType];
+  const centerElev = rawContinentElevation(continentN, wx, wz, centerProfile);
 
-  // Large-scale elevation from multi-octave FBM
-  const elev1 = fbm(continentN, wx * 0.003, wz * 0.003, 3, 2.0, 0.5);
-  // Medium-scale hills/valleys
-  const elev2 = fbm(continentN, wx * 0.008 + 300, wz * 0.008 + 300, 2, 2.0, 0.4);
+  // Quick check: if all neighbors are the same continent type, skip blending
+  let needsBlend = false;
+  for (let i = 1; i < BLEND_OFFSETS.length; i++) {
+    const [dx, dz] = BLEND_OFFSETS[i];
+    if (getContinent(continentN, wx + dx, wz + dz) !== centerType) {
+      needsBlend = true;
+      break;
+    }
+  }
+  if (!needsBlend) return centerElev;
 
-  return profile.elevationBase + elev1 * profile.elevationScale * 8 + elev2 * profile.elevationScale * 3;
+  // Blend: weighted average of this position's elevation using each neighbor's profile.
+  // Center point gets higher weight to keep the core intact.
+  let sum = centerElev * 3;
+  let weight = 3;
+  for (let i = 1; i < BLEND_OFFSETS.length; i++) {
+    const [dx, dz] = BLEND_OFFSETS[i];
+    const nProfile = getContinentProfile(continentN, wx + dx, wz + dz);
+    // Evaluate what this position's elevation would be under the neighbor's profile
+    const nElev = rawContinentElevation(continentN, wx, wz, nProfile);
+    sum += nElev;
+    weight += 1;
+  }
+  return sum / weight;
 }
 
 /* ═══════════════════════════════════════════════════════════════
  *  Biome Classification (continent-aware)
+ *
+ *  Includes:
+ *  - Minimum city biome size: cities require a strong-enough noise
+ *    signal in a wider area (low-frequency check) to prevent tiny
+ *    1-2 block "micro-cities" from generating.
+ *  - No cities below water: if continent elevation places the ground
+ *    below the city water level, the city biome is rejected.
  * ═══════════════════════════════════════════════════════════════ */
 
 /** Classify the biome at world coordinates, influenced by continent type */
@@ -124,8 +182,37 @@ export function getBiome(
 
   // City zones — controlled by cityFrequency config × continent multiplier
   const effectiveCityFreq = cityFreq * cityMult;
-  const cv = biomeN(wx * 0.006 + 500, wz * 0.006 + 500);
-  if (effectiveCityFreq > 0.01 && cv > 0.12 - effectiveCityFreq * 0.25 && Math.abs(bv) < 0.55 && Math.abs(tv) < 0.55) return 'city';
+  if (effectiveCityFreq > 0.01) {
+    const cv = biomeN(wx * 0.006 + 500, wz * 0.006 + 500);
+    const cityThreshold = 0.12 - effectiveCityFreq * 0.25;
+    if (cv > cityThreshold && Math.abs(bv) < 0.55 && Math.abs(tv) < 0.55) {
+      // ── Minimum city size check ──
+      // Use a lower-frequency sample to ensure the city patch is large enough.
+      // Small noise pockets that barely cross the threshold produce tiny cities.
+      // We require the low-freq city noise to also be above a stricter threshold.
+      const cvLowFreq = biomeN(wx * 0.003 + 500, wz * 0.003 + 500);
+      if (cvLowFreq <= cityThreshold + 0.08) {
+        // Not a large enough city patch — fall through to natural biome
+      } else {
+        // ── No cities below water ──
+        // If continent elevation puts the ground below the default city water level,
+        // reject city biome to prevent underwater/flooded city streets.
+        if (continentN) {
+          const cityElev = getContinentElevation(continentN, wx, wz);
+          const cityWaterLevel = BIOMES.city.waterLevel +
+            (continentType ? CONTINENT_PROFILES[continentType].waterOffset : 0);
+          const estimatedGround = BIOMES.city.heightBase + cityElev * 0.3;
+          if (estimatedGround < cityWaterLevel + 1) {
+            // Ground would be below water — reject city, fall through to natural biome
+          } else {
+            return 'city';
+          }
+        } else {
+          return 'city';
+        }
+      }
+    }
+  }
 
   // Village zones — rural settlements, modulated by continent
   const effectiveVillageThreshold = 0.35 - (villageMult - 1) * 0.12;
