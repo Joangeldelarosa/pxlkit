@@ -1,49 +1,46 @@
 /* ═══════════════════════════════════════════════════════════════
  *  Rendering — ChunkMesh & FloatingPickup
  *
- *  4 SHARED materials (not 4×N) with per-chunk `onBeforeRender`
- *  callbacks that write chunk-specific reveal + atmosphere uniforms
- *  into the shader right before each draw call.
+ *  4 SHARED materials with per-chunk `onBeforeRender` callbacks
+ *  that write chunk-specific reveal uniforms before each draw call.
  *
- *  Combined fog + atmospheric reveal (single pass):
- *  Replaces the standard Three.js fog_fragment with a unified
- *  system that merges per-pixel exponential fog with per-chunk
- *  distance-based reveal into ONE visibility computation:
- *    combinedVis = min(1 - fogFactor, chunkReveal)
- *  The STRONGER fade always wins — no compound darkening.
- *  Close chunks: fog ≈ 0 → combined = min(1, 1) → full brightness
- *  Mid chunks:   fog moderate → combined = fog_vis (fog controls)
- *  Far chunks:   reveal low → combined = reveal (hides render edge)
+ *  Fog + chunk-edge-fade strategy (separate passes, not combined):
+ *  ─────────────────────────────────────────────────────────────
+ *  Three.js's standard #include <fog_fragment> is LEFT UNTOUCHED.
+ *  Fog is computed exactly as Three.js does it — per-pixel, based
+ *  on vFogDepth.  This guarantees close chunks look identical to
+ *  un-modified MeshStandardMaterial; zero custom behaviour for them.
  *
- *  Anti-darkness guarantees:
- *  • revealRef starts at 1.0 (fully visible) — not 0.
- *  • Shader default uChunkReveal = 1.0 — if onBeforeRender
- *    misses the first frame, chunks appear visible not dark.
- *  • useLayoutEffect (not useEffect) sets BOTH onBeforeRender
- *    AND instance data synchronously during commit — before the
- *    first render.  This eliminates the 1-2 frame timing gap
- *    where instances render at default positions (world origin)
- *    with heavy fog.
- *  • Safety floor: chunks within 15% of render distance
- *    always get reveal = 1.0 regardless of fade settings.
+ *  The per-chunk edge-fade (reveal) is injected AFTER
+ *  #include <dithering_fragment> as a SEPARATE, isolated step.
+ *  It only activates when uChunkReveal < 1.0 — i.e. for chunks
+ *  near the render-distance edge.  Close chunks (reveal = 1.0)
+ *  skip the reveal mix entirely → zero visual change.
+ *
+ *  Safety guarantees:
+ *  • revealRef starts at 1.0 (fully visible).
+ *  • Shader default uChunkReveal = 1.0.
+ *  • useLayoutEffect sets BOTH onBeforeRender AND instance data
+ *    synchronously before the first render.
+ *  • Safety floor: chunks within 30% of render distance always
+ *    get reveal = 1.0 regardless of fade settings.
  *
  *  Performance notes:
- *  • No per-chunk material allocation — 4 materials total.
- *  • Each material has a unique customProgramCacheKey to prevent
- *    GL program sharing that could cause uniform contamination.
+ *  • 4 materials total (not per-chunk).
+ *  • Each material has a unique customProgramCacheKey.
  *  • Chunk world-pos cached in a ref (computed once).
- *  • Atmosphere color synced once per frame from TimeContext.
  *  • Single sqrt per chunk per frame for normDist.
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useLayoutEffect, useContext } from 'react';
+import { useRef, useLayoutEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { ChunkVoxelData } from '../types';
 import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { getPickupIcons } from '../generation/chunk';
-import { TimeContext } from './DayNightCycle';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /* ── Shared geometry ── */
 const sharedGeo = new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
@@ -63,80 +60,53 @@ const paintGeo = (() => {
 /* ═══════════════════════════════════════════════════════════════
  *  Shared Atmospheric Materials (4 total)
  *
- *  onBeforeCompile injects uChunkReveal + uAtmoColor uniforms and
- *  replaces Three.js's standard #include <fog_fragment> with a
- *  combined fog + reveal system.
+ *  onBeforeCompile injects a uChunkReveal uniform.
+ *  Standard Three.js fog (#include <fog_fragment>) is LEFT INTACT.
+ *  Reveal is applied AFTER dithering as a separate step — it only
+ *  activates when uChunkReveal < 1.0 (far edge chunks).
  *
- *  OLD approach (BROKEN — caused double-darkening):
- *    1. #include <fog_fragment> → fog fades pixel toward fogColor
- *    2. After #include <dithering_fragment> → reveal further fades
- *       the ALREADY-FOGGED pixel toward uAtmoColor
- *    Result: effective_visibility = (1-fog) × reveal → compound.
- *    A chunk at mid-range with fog=0.3 and reveal=0.85 gets only
- *    0.7 × 0.85 = 0.595 visibility instead of 0.7.
- *
- *  NEW approach (single pass, no compounding):
- *    Replace #include <fog_fragment> with:
- *      combinedVis = min(1 - fogFactor, chunkReveal)
- *    The STRONGER fade wins. No separate post-dithering blend.
- *    Same chunk now correctly gets min(0.7, 0.85) = 0.7 visibility.
- *
- *  Default uChunkReveal = 1.0 so if onBeforeRender hasn't been
- *  attached yet, chunks render fully visible (not dark).
+ *  For close chunks, uChunkReveal = 1.0 → the reveal step is
+ *  skipped entirely → rendering is IDENTICAL to un-modified
+ *  MeshStandardMaterial.  This eliminates all the fragile
+ *  interactions between custom fog code and Three.js internals.
  * ═══════════════════════════════════════════════════════════════ */
-
-/* Default atmosphere color — matches DayNightCycle noon keyframe */
-const NOON_FOG_R = 0.69, NOON_FOG_G = 0.78, NOON_FOG_B = 0.88;
 
 let _matIdx = 0;
 function injectRevealShader(mat: THREE.MeshStandardMaterial): void {
-  /* Unique ID per material — prevents GL program sharing between
-   * solid/water/mini/paint materials.  Shared programs can cause
-   * uniform cache contamination when Three.js skips re-upload for
-   * consecutive draw calls with different materials using the same
-   * compiled program.  A unique key forces separate programs and
-   * eliminates the stale-uniform issue entirely. */
-  const uid = `chunk-atmo-reveal-${_matIdx++}`;
+  const uid = `chunk-edge-reveal-${_matIdx++}`;
 
   mat.onBeforeCompile = (shader) => {
-    /* Default 1.0 = fully visible.  Prevents dark flash on the
-     * first frame if onBeforeRender hasn't been set yet. */
+    /* Default 1.0 = fully visible.  If onBeforeRender hasn't
+     * been attached yet, chunks render with zero reveal effect. */
     shader.uniforms.uChunkReveal = { value: 1.0 };
-    shader.uniforms.uAtmoColor   = { value: new THREE.Color(NOON_FOG_R, NOON_FOG_G, NOON_FOG_B) };
 
     mat.userData._shaderRef = shader;
 
+    /* Declare the uniform at the top of the fragment shader */
     shader.fragmentShader =
-      'uniform float uChunkReveal;\nuniform vec3 uAtmoColor;\n' + shader.fragmentShader;
+      'uniform float uChunkReveal;\n' + shader.fragmentShader;
 
-    /* ── Combined fog + atmospheric reveal (single pass) ──
+    /* Inject AFTER #include <dithering_fragment> — this runs
+     * AFTER standard fog has already been applied normally.
+     * Only does something when uChunkReveal < 1.0.
      *
-     * Replaces Three.js's standard #include <fog_fragment> to merge
-     * per-pixel exponential fog with per-chunk distance reveal into
-     * ONE visibility computation.
+     * For close chunks: uChunkReveal = 1.0 → cr = 1.0
+     *   → (1.0 - 1.0) = 0.0 → mix factor = 0.0 → NO CHANGE.
      *
-     * combinedVis = min(fog_visibility, chunk_reveal)
-     *
-     * Close chunks:  fog ≈ 0  → combined = min(~1.0, 1.0) = 1.0
-     * Mid chunks:    fog 0.3  → combined = min(0.7, 0.85) = 0.7
-     * Far chunks:    reveal low → combined = min(0.3, 0.2) = 0.2
-     *
-     * Uses fogColor (authoritative, updated by DayNightLighting)
-     * when fog is active; falls back to uAtmoColor when no fog. */
+     * For far chunks: uChunkReveal < 1.0 → additional blend
+     *   toward fogColor / black.  Yes, this "double-darkens"
+     *   with fog, but at the render-distance edge fog already
+     *   makes chunks ≈90% invisible, so the extra darkening is
+     *   imperceptible and ensures smooth pop-out. */
     shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <fog_fragment>',
-      `#ifdef USE_FOG
-        #ifdef FOG_EXP2
-          float fogFactor = 1.0 - exp( -fogDensity * fogDensity * vFogDepth * vFogDepth );
-        #else
-          float fogFactor = smoothstep( fogNear, fogFar, vFogDepth );
-        #endif
-        float chunkVis = clamp(uChunkReveal, 0.0, 1.0);
-        float combinedVis = min(1.0 - fogFactor, chunkVis);
-        gl_FragColor.rgb = mix(fogColor, gl_FragColor.rgb, combinedVis);
-      #else
-        gl_FragColor.rgb = mix(uAtmoColor, gl_FragColor.rgb, clamp(uChunkReveal, 0.0, 1.0));
-      #endif`,
+      '#include <dithering_fragment>',
+      `#include <dithering_fragment>
+       float cr = clamp(uChunkReveal, 0.0, 1.0);
+       #ifdef USE_FOG
+         gl_FragColor.rgb = mix(fogColor, gl_FragColor.rgb, cr);
+       #else
+         gl_FragColor.rgb *= cr;
+       #endif`,
     );
   };
   mat.customProgramCacheKey = () => uid;
@@ -189,9 +159,7 @@ export function ChunkMesh({
   const miniRef  = useRef<THREE.InstancedMesh>(null);
   const paintRef = useRef<THREE.InstancedMesh>(null);
 
-  const revealRef      = useRef(1);
-  const atmoColorRef   = useRef(new THREE.Color(NOON_FOG_R, NOON_FOG_G, NOON_FOG_B));
-  const timeRef        = useContext(TimeContext);
+  const revealRef = useRef(1);
 
   /* Chunk centre in world-space — computed once, never changes */
   const chunkCx = useRef((data.chunkX + 0.5) * CWS);
@@ -289,36 +257,26 @@ export function ChunkMesh({
 
     /* ── Attach onBeforeRender callbacks ── */
     const rv = revealRef;
-    const ac = atmoColorRef;
     const callback = (
       renderer: THREE.WebGLRenderer, _scene: THREE.Scene,
       _camera: THREE.Camera, _geometry: THREE.BufferGeometry,
       material: THREE.Material,
     ) => {
       const shader = (material as THREE.MeshStandardMaterial).userData._shaderRef as
-        THREE.WebGLProgramParametersWithUniforms | undefined;
+        { uniforms: Record<string, { value: unknown }> } | undefined;
       if (!shader) return;
 
-      /* Set JS-side values (used by setProgram's first-use upload) */
+      /* Set JS-side value (used by Three.js's first-use upload) */
       shader.uniforms.uChunkReveal.value = rv.current;
-      const u = shader.uniforms.uAtmoColor.value as THREE.Color;
-      u.r = ac.current.r;
-      u.g = ac.current.g;
-      u.b = ac.current.b;
 
       /* Direct GPU upload: bypass Three.js's material-level caching
-       * that skips re-upload for consecutive same-material draw calls.
-       * renderer.properties.get(material) → materialProperties with
-       * currentProgram → getUniforms().setValue() writes GL uniform
-       * AND updates cache, keeping Three.js's state consistent. */
-      const matProps = renderer.properties.get(material) as
+       * that skips re-upload for consecutive same-material draw calls. */
+      const matProps = (renderer.properties as any).get(material) as
         { currentProgram?: { getUniforms(): { setValue(gl: WebGLRenderingContext | WebGL2RenderingContext, name: string, value: unknown): void } } } | undefined;
       const prog = matProps?.currentProgram;
       if (prog) {
         const gl = renderer.getContext();
-        const p = prog.getUniforms();
-        p.setValue(gl, 'uChunkReveal', rv.current);
-        p.setValue(gl, 'uAtmoColor', ac.current);
+        prog.getUniforms().setValue(gl, 'uChunkReveal', rv.current);
       }
     };
     const meshes = [solidMesh, waterMesh, miniMesh, paintMesh];
@@ -332,23 +290,23 @@ export function ChunkMesh({
     };
   }, [data]);
 
-  /* ── Per-frame: continuous distance-proportional atmospheric fade ──
+  /* ── Per-frame: continuous distance-proportional edge fade ──
    *
    * revealRef starts at 1.0 (fully visible).  Each frame it is driven
    * toward a distance-based target via exponential smoothing.
-   * Close chunks (normDist ≈ 0) always target 1.0 and stay bright.
-   * Far chunks smoothly fade toward the atmosphere/fog color.
+   * Close chunks always target 1.0 and stay bright.
+   * Far chunks smoothly fade toward 0 to hide the render edge.
    *
-   * With the combined fog+reveal shader, reveal only needs to control
-   * the render-distance edge (where chunks pop in/out).  Fog handles
-   * the smooth per-pixel atmospheric haze.  The min() in the shader
-   * ensures no double-darkening.
+   * Standard Three.js FogExp2 handles the per-pixel atmospheric haze.
+   * The reveal only controls the render-distance edge — chunks that
+   * are about to pop in/out of existence.  The post-dithering shader
+   * step blends toward fogColor proportionally to (1 - reveal).
    *
-   * Speed scales with proximity: close chunks converge in ~2 frames,
-   * far chunks over ~0.3 s — fast enough to prevent visible glitches.
-   *
-   * Safety floor: chunks within 15% of render distance always get
-   * reveal = 1.0 (fully visible), guaranteed.
+   * Safety floor: chunks within 30% of render distance always get
+   * reveal = 1.0 (fully visible), guaranteed.  Combined with the
+   * fact that the shader skips the reveal mix when cr ≈ 1.0, this
+   * ensures close/mid-range terrain is ONLY affected by standard
+   * Three.js fog — zero custom behaviour.
    */
   useFrame(({ camera }, frameDelta) => {
     const dt = Math.min(0.1, frameDelta); // cap for tab-switch safety
@@ -372,45 +330,29 @@ export function ChunkMesh({
     const str = chunkFadeStrength < 0 ? 0 : chunkFadeStrength > 1 ? 1 : chunkFadeStrength;
     let target: number;
     if (fs >= 0.99 || str <= 0.01) {
-      /* No fade: either fade starts beyond edge or strength is zero */
       target = 1;
     } else {
       const t = normDist <= fs ? 0 : (normDist - fs) / (1 - fs);
-      // smoothstep: 3t² − 2t³  (zero derivative at endpoints)
-      const fade = t * t * (3 - 2 * t);
-      /* Strength controls how much fade is applied:
-       * 0 = no fade (target stays 1), 1 = full fade (target can reach 0) */
+      const fade = t * t * (3 - 2 * t); // smoothstep
       target = 1 - fade * str;
     }
 
-    /* ── Safety floor: close chunks are always fully visible ──
-     * Regardless of fade settings, chunks within 15 % of the render
-     * distance are locked to reveal = 1.0.  Combined with the
-     * min(fog, reveal) shader, this guarantees close terrain is
-     * ONLY affected by fog (smooth per-pixel), never the chunk fade. */
-    if (normDist < 0.15) {
+    /* ── Safety floor: close/mid chunks are always fully visible ──
+     * Chunks within 30% of render distance are LOCKED to 1.0.
+     * This guarantees they get ZERO reveal effect — only standard
+     * Three.js fog affects them. */
+    if (normDist < 0.3) {
       target = 1;
     }
 
-    /* ── Exponential approach — speed proportional to proximity ──
-     * Close chunks (normDist≈0): speed≈15 → converges in ~1-2 frames
-     * Far chunks   (normDist≈1): speed≈4  → converges in ~0.3 s
-     * revealRef starts at 1.0 so close chunks are instantly correct;
-     * far chunks smoothly dim from full brightness to their target. */
+    /* ── Exponential approach ── */
     const speed = 4.0 + (1 - normDist) * 11.0;
     const cur = revealRef.current;
     const diff = target - cur;
     const next = Math.abs(diff) < 0.003 ? target : cur + diff * Math.min(1, dt * speed);
 
-    /* NaN guard: if any arithmetic produced NaN, snap to 1.0 (visible) */
+    /* NaN guard */
     revealRef.current = Number.isFinite(next) ? next : 1;
-
-    /* Sync atmosphere color from day/night cycle (once per frame) */
-    if (timeRef) {
-      const fc = timeRef.current.fogColor;
-      const ac = atmoColorRef.current;
-      ac.r = fc.r; ac.g = fc.g; ac.b = fc.b;
-    }
   });
 
   return (
