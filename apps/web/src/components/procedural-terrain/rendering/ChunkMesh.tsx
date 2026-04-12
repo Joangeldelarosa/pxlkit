@@ -2,13 +2,15 @@
  *  Rendering — ChunkMesh & FloatingPickup
  *
  *  Uses plain MeshStandardMaterial (no shader modifications).
- *  Three.js's standard FogExp2 handles all distance fading
- *  naturally — chunks at the render-distance edge are ~99%
- *  invisible through fog alone.
+ *  Three.js's standard FogExp2 handles atmospheric distance haze.
  *
- *  Instance data is set up in useLayoutEffect (not useEffect)
- *  to avoid a 1-2 frame window where instances render at the
- *  world origin before positions are set.
+ *  Per-chunk fade-in:  new chunks animate Y-scale 0→1 ("rise from
+ *  ground") over ~0.5s, plus distance-based fade controlled by
+ *  chunkFadeStart / chunkFadeStrength config values.
+ *
+ *  Instance data is set up in useLayoutEffect (not useEffect) to
+ *  avoid a 1-2 frame window where instances render at the world
+ *  origin before positions are set.
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
@@ -16,7 +18,7 @@ import { useRef, useLayoutEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { ChunkVoxelData } from '../types';
-import { VOXEL_SIZE } from '../constants';
+import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { getPickupIcons } from '../generation/chunk';
 
 /* Shared geometry & materials — plain, no shader mods */
@@ -44,11 +46,32 @@ const paintMat = new THREE.MeshStandardMaterial({
   polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
 });
 
-export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
+/* Chunk world-space size */
+const CWS = CHUNK_SIZE * VOXEL_SIZE;
+
+/* Fade-in animation duration (seconds) */
+const FADE_IN_DURATION = 0.5;
+
+export function ChunkMesh({
+  data, renderDistance, chunkFadeStart, chunkFadeStrength,
+}: {
+  data: ChunkVoxelData;
+  renderDistance: number;
+  chunkFadeStart: number;
+  chunkFadeStrength: number;
+}) {
   const solidRef = useRef<THREE.InstancedMesh>(null);
   const waterRef = useRef<THREE.InstancedMesh>(null);
   const miniRef  = useRef<THREE.InstancedMesh>(null);
   const paintRef = useRef<THREE.InstancedMesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
+
+  /* Birth-time fade: tracks how far along the fade-in we are (0→1) */
+  const fadeProgress = useRef(0);
+
+  /* Chunk centre in world-space (for distance fade) */
+  const chunkCx = (data.chunkX + 0.5) * CWS;
+  const chunkCz = (data.chunkZ + 0.5) * CWS;
 
   /* All instance data in useLayoutEffect — positions are correct
    * before the first render, preventing the "origin fog flash"
@@ -122,8 +145,43 @@ export function ChunkMesh({ data }: { data: ChunkVoxelData }) {
     }
   }, [data]);
 
+  /* ── Per-frame: fade-in animation + distance-based fade ── */
+  useFrame(({ camera }, delta) => {
+    const g = groupRef.current;
+    if (!g) return;
+
+    /* ── Birth fade-in (Y-scale 0→1) ── */
+    const dt = Math.min(0.1, delta);
+    if (fadeProgress.current < 1) {
+      fadeProgress.current = Math.min(1, fadeProgress.current + dt / FADE_IN_DURATION);
+    }
+    /* Smooth ease-out: 1 - (1-t)^2 */
+    const eased = 1 - (1 - fadeProgress.current) * (1 - fadeProgress.current);
+
+    /* ── Distance-based fade (smoothstep falloff) ── */
+    const dx = camera.position.x - chunkCx;
+    const dz = camera.position.z - chunkCz;
+    const dist = Math.sqrt(dx * dx + dz * dz);
+    const maxDist = renderDistance * CWS;
+    let distFade = 1;
+    if (maxDist > 0 && chunkFadeStrength > 0.01) {
+      const normDist = Math.min(1, dist / maxDist);
+      const fs = Math.max(0, Math.min(1, chunkFadeStart));
+      if (normDist > fs) {
+        const t = (normDist - fs) / (1 - fs);
+        const ss = t * t * (3 - 2 * t); // smoothstep
+        distFade = 1 - ss * Math.min(1, chunkFadeStrength);
+      }
+    }
+
+    /* Combined: birth fade * distance fade */
+    const combined = eased * distFade;
+    g.scale.set(1, combined, 1);
+    g.visible = combined > 0.01;
+  });
+
   return (
-    <group>
+    <group ref={groupRef} scale={[1, 0, 1]}>
       {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, sharedSolidMat, data.count]} frustumCulled={false} />}
       {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />}
       {data.miniVoxelCount > 0 && <instancedMesh ref={miniRef} args={[miniGeo, miniMat, data.miniVoxelCount]} frustumCulled={false} />}
