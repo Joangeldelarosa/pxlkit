@@ -461,6 +461,7 @@ export default function ProceduralTerrain() {
 
   const noises = useMemo(() => ({
     biome: createNoise2D(seed + 2), temp: createNoise2D(seed + 3),
+    continent: createNoise2D(seed + 7),
   }), [seed]);
 
   useEffect(() => { speedRef.current = config.flySpeed; }, [config.flySpeed]);
