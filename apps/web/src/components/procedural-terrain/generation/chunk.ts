@@ -145,14 +145,13 @@ export function generateChunkData(
       const base = BIOMES[biome];
 
       /* ── Continent-aware height variation ── */
-      let continentElev = 0;
       if (continentN) {
-        continentElev = getContinentElevation(continentN, wx, wz);
         const contType = getContinent(continentN, wx, wz);
         const contProfile = CONTINENT_PROFILES[contType];
 
         // City biome: continent elevation affects city ground level
         if (biome === 'city') {
+          const continentElev = getContinentElevation(continentN, wx, wz);
           const cityBase = Math.max(3, Math.min(MAX_HEIGHT - 20,
             Math.floor(base.heightBase + continentElev * 0.3)));
           const c: BiomeConfig = {
@@ -193,6 +192,54 @@ export function generateChunkData(
       if (fade < 1) h = Math.max(0, Math.floor(h * fade));
       hMap[idx] = h;
       bMap[idx] = BIOME_TYPES.indexOf(biome);
+    }
+  }
+
+  /* ── Biome boundary height smoothing pass ──
+   *  Where two different biomes meet the height can jump dramatically
+   *  (e.g. city at 7 vs mountain at 30). This creates ugly cliffs.
+   *  We detect boundary cells (where any cardinal neighbor has a different biome)
+   *  and blend their height with the average of their neighbors.
+   *  Multiple passes widen the blend zone for a natural ramp. */
+  {
+    const BLEND_PASSES = 2;
+    const tmpH = new Int32Array(hMap.length);
+    for (let pass = 0; pass < BLEND_PASSES; pass++) {
+      tmpH.set(hMap);
+      for (let lx = 0; lx <= CHUNK_SIZE; lx++) {
+        for (let lz = 0; lz <= CHUNK_SIZE; lz++) {
+          const idx = (lx + 1) * gW + (lz + 1);
+          if (hMap[idx] < 0) continue;
+          const myBiome = bMap[idx];
+
+          // Check cardinal neighbors for biome boundary
+          const idxN = lx * gW + (lz + 1);
+          const idxS = (lx + 2) * gW + (lz + 1);
+          const idxE = (lx + 1) * gW + (lz + 2);
+          const idxW = (lx + 1) * gW + lz;
+
+          const isEdge =
+            (hMap[idxN] >= 0 && bMap[idxN] !== myBiome) ||
+            (hMap[idxS] >= 0 && bMap[idxS] !== myBiome) ||
+            (hMap[idxE] >= 0 && bMap[idxE] !== myBiome) ||
+            (hMap[idxW] >= 0 && bMap[idxW] !== myBiome);
+
+          if (!isEdge) continue;
+
+          // Blend: weighted average with 4 cardinal neighbors
+          let sum = hMap[idx] * 2;
+          let w = 2;
+          const neighbors = [idxN, idxS, idxE, idxW];
+          for (const ni of neighbors) {
+            if (hMap[ni] >= 0) {
+              sum += hMap[ni];
+              w += 1;
+            }
+          }
+          tmpH[idx] = Math.max(0, Math.min(MAX_HEIGHT, Math.floor(sum / w)));
+        }
+      }
+      hMap.set(tmpH);
     }
   }
 
