@@ -353,12 +353,17 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
 
     pendingKeys.current = [...newPending, ...pendingKeys.current.filter(k => !newPending.includes(k))];
 
+    /* ── Cache eviction — keep chunks in RAM 3× longer than render
+     * distance so revisiting nearby areas doesn't regenerate. ──
+     * Only evict when cache exceeds 3× the visible area. Evicted
+     * chunks are those beyond 3× the render distance. */
     const maxC = (rd * 2 + 2) ** 2;
-    if (chunkCacheRef.current.size > maxC * 2) {
+    if (chunkCacheRef.current.size > maxC * 3) {
+      const evictR2 = (rd * 3) ** 2;
       const del: string[] = [];
       for (const [k] of chunkCacheRef.current) {
         const [kx, kz] = k.split(',').map(Number);
-        if ((kx - ccx) ** 2 + (kz - ccz) ** 2 > (rd * 2) ** 2) del.push(k);
+        if ((kx - ccx) ** 2 + (kz - ccz) ** 2 > evictR2) del.push(k);
       }
       for (const k of del) chunkCacheRef.current.delete(k);
     }
@@ -376,7 +381,7 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
 
   return (
     <>
-      {entries.map(([key, data]) => <ChunkMesh key={key} data={data} />)}
+      {entries.map(([key, data]) => <ChunkMesh key={key} data={data} renderDistance={config.renderDistance} chunkFadeStart={config.chunkFadeStart} chunkFadeStrength={config.chunkFadeStrength} />)}
       {allPickups.map(p => <FloatingPickup key={p.key} position={[p.wx, p.wy, p.wz]} iconIdx={p.iconIdx} />)}
     </>
   );
