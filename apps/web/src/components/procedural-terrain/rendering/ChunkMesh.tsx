@@ -1,12 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════
  *  Rendering — ChunkMesh & FloatingPickup
  *
- *  Uses plain MeshStandardMaterial (no shader modifications).
- *  Three.js's standard FogExp2 handles atmospheric distance haze.
- *
- *  Per-chunk fade-in:  new chunks animate Y-scale 0→1 ("rise from
- *  ground") over ~0.5s, plus distance-based fade controlled by
- *  chunkFadeStart / chunkFadeStrength config values.
+ *  Per-chunk cloned MeshStandardMaterial gives a fog-style birth
+ *  fade-in (dark → clear) plus distance-based darkening.  No
+ *  shader modifications at all — only material.color is animated.
+ *  Three.js's standard FogExp2 handles atmospheric distance haze
+ *  on top of this.
  *
  *  Instance data is set up in useLayoutEffect (not useEffect) to
  *  avoid a 1-2 frame window where instances render at the world
@@ -14,34 +13,36 @@
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { ChunkVoxelData } from '../types';
 import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { getPickupIcons } from '../generation/chunk';
 
-/* Shared geometry & materials — plain, no shader mods */
+/* ── Shared geometry (reused across all chunks) ── */
 const sharedGeo = new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
-const sharedSolidMat = new THREE.MeshStandardMaterial({ roughness: 0.7 });
 const sharedWaterGeo = (() => {
   const g = new THREE.PlaneGeometry(VOXEL_SIZE, VOXEL_SIZE);
   g.rotateX(-Math.PI / 2);
   return g;
 })();
-const sharedWaterMat = new THREE.MeshStandardMaterial({
-  roughness: 0.2, metalness: 0.05, transparent: true, opacity: 0.6,
-  depthWrite: false, side: THREE.DoubleSide,
-});
 const MINI_VS = VOXEL_SIZE * 0.15;
 const miniGeo = new THREE.BoxGeometry(MINI_VS, MINI_VS, MINI_VS);
-const miniMat = new THREE.MeshStandardMaterial({ roughness: 0.5 });
 const paintGeo = (() => {
   const g = new THREE.PlaneGeometry(1, 1);
   g.rotateX(-Math.PI / 2);
   return g;
 })();
-const paintMat = new THREE.MeshStandardMaterial({
+
+/* ── Template materials (cloned per-chunk for fade control) ── */
+const solidTemplate = new THREE.MeshStandardMaterial({ roughness: 0.7 });
+const waterTemplate = new THREE.MeshStandardMaterial({
+  roughness: 0.2, metalness: 0.05, transparent: true, opacity: 0.6,
+  depthWrite: false, side: THREE.DoubleSide,
+});
+const miniTemplate = new THREE.MeshStandardMaterial({ roughness: 0.5 });
+const paintTemplate = new THREE.MeshStandardMaterial({
   roughness: 0.85, metalness: 0, depthWrite: true,
   polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
 });
@@ -49,16 +50,19 @@ const paintMat = new THREE.MeshStandardMaterial({
 /* Chunk world-space size */
 const CWS = CHUNK_SIZE * VOXEL_SIZE;
 
-/* Fade-in animation duration (seconds) */
-const FADE_IN_DURATION = 0.5;
+/* Fade colour: new chunks start dark and brighten to true colours */
+const FADE_DARK = new THREE.Color(0.12, 0.15, 0.20);
+const FADE_WHITE = new THREE.Color(1, 1, 1);
+const _tmpColor = new THREE.Color();
 
 export function ChunkMesh({
-  data, renderDistance, chunkFadeStart, chunkFadeStrength,
+  data, renderDistance, chunkFadeStart, chunkFadeStrength, chunkFadeSpeed,
 }: {
   data: ChunkVoxelData;
   renderDistance: number;
   chunkFadeStart: number;
   chunkFadeStrength: number;
+  chunkFadeSpeed: number;
 }) {
   const solidRef = useRef<THREE.InstancedMesh>(null);
   const waterRef = useRef<THREE.InstancedMesh>(null);
@@ -66,16 +70,31 @@ export function ChunkMesh({
   const paintRef = useRef<THREE.InstancedMesh>(null);
   const groupRef = useRef<THREE.Group>(null);
 
-  /* Birth-time fade: tracks how far along the fade-in we are (0→1) */
+  /* Per-chunk materials — cloned from templates, disposed on unmount.
+   * material.color is animated each frame to create the fade effect. */
+  const mats = useRef({
+    solid: solidTemplate.clone(),
+    water: waterTemplate.clone(),
+    mini: miniTemplate.clone(),
+    paint: paintTemplate.clone(),
+  });
+
+  /* Dispose cloned materials on unmount */
+  useEffect(() => () => {
+    mats.current.solid.dispose();
+    mats.current.water.dispose();
+    mats.current.mini.dispose();
+    mats.current.paint.dispose();
+  }, []);
+
+  /* Birth-time fade progress: 0 (dark) → 1 (clear) */
   const fadeProgress = useRef(0);
 
   /* Chunk centre in world-space (for distance fade) */
   const chunkCx = (data.chunkX + 0.5) * CWS;
   const chunkCz = (data.chunkZ + 0.5) * CWS;
 
-  /* All instance data in useLayoutEffect — positions are correct
-   * before the first render, preventing the "origin fog flash"
-   * that occurred with useEffect (deferred). */
+  /* ── Instance data setup (useLayoutEffect for first-frame correctness) ── */
   useLayoutEffect(() => {
     const tmpM = new THREE.Matrix4(), tmpC = new THREE.Color();
 
@@ -145,22 +164,23 @@ export function ChunkMesh({
     }
   }, [data]);
 
-  /* ── Per-frame: fade-in animation + distance-based fade ── */
+  /* ── Per-frame: fog-style birth fade + distance darkening ── */
   useFrame(({ camera }, delta) => {
     const g = groupRef.current;
     if (!g) return;
 
-    /* ── Birth fade-in (Y-scale 0→1) ── */
-    /* Cap delta to 100ms so tab-switch or frame stutter doesn't
-     * cause a single huge jump through the entire animation. */
+    /* ── Birth fade-in (dark → clear) ── */
+    const speed = Math.max(0.1, chunkFadeSpeed);
+    /* Cap delta to 100 ms so tab-switch or stutter doesn't skip the
+     * entire animation in one frame. */
     const dt = Math.min(0.1, delta);
     if (fadeProgress.current < 1) {
-      fadeProgress.current = Math.min(1, fadeProgress.current + dt / FADE_IN_DURATION);
+      fadeProgress.current = Math.min(1, fadeProgress.current + dt * speed);
     }
-    /* Smooth ease-out: 1 - (1-t)^2 */
+    /* Smooth ease-out: 1 - (1-t)² */
     const eased = 1 - (1 - fadeProgress.current) * (1 - fadeProgress.current);
 
-    /* ── Distance-based fade (smoothstep falloff) ── */
+    /* ── Distance-based darkening (smoothstep falloff) ── */
     const dx = camera.position.x - chunkCx;
     const dz = camera.position.z - chunkCz;
     const dist = Math.sqrt(dx * dx + dz * dz);
@@ -170,24 +190,34 @@ export function ChunkMesh({
       const normDist = Math.min(1, dist / maxDist);
       const fs = Math.max(0, Math.min(1, chunkFadeStart));
       if (normDist > fs) {
-        const t = (normDist - fs) / (1 - fs);
+        const t = (normDist - fs) / (1 - fs + 0.001);
         const ss = t * t * (3 - 2 * t); // smoothstep
         distFade = 1 - ss * Math.min(1, chunkFadeStrength);
       }
     }
 
-    /* Combined: birth fade * distance fade */
-    const combined = eased * distFade;
-    g.scale.set(1, combined, 1);
+    /* Combined visibility: birth fade × distance fade */
+    const combined = Math.max(0, eased * distFade);
+
+    /* Darken material colour: interpolate FADE_DARK → white */
+    _tmpColor.lerpColors(FADE_DARK, FADE_WHITE, combined);
+    mats.current.solid.color.copy(_tmpColor);
+    mats.current.mini.color.copy(_tmpColor);
+    mats.current.paint.color.copy(_tmpColor);
+    mats.current.water.color.copy(_tmpColor);
+    /* Water opacity also fades (base opacity 0.6) */
+    mats.current.water.opacity = 0.6 * Math.max(0.05, combined);
+
+    /* Hide chunks that are essentially invisible */
     g.visible = combined > 0.01;
   });
 
   return (
-    <group ref={groupRef} scale={[1, 0, 1]}>
-      {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, sharedSolidMat, data.count]} frustumCulled={false} />}
-      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, sharedWaterMat, data.waterCount]} frustumCulled={false} />}
-      {data.miniVoxelCount > 0 && <instancedMesh ref={miniRef} args={[miniGeo, miniMat, data.miniVoxelCount]} frustumCulled={false} />}
-      {data.paintCount > 0 && <instancedMesh ref={paintRef} args={[paintGeo, paintMat, data.paintCount]} frustumCulled={false} />}
+    <group ref={groupRef}>
+      {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, mats.current.solid, data.count]} frustumCulled={false} />}
+      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, mats.current.water, data.waterCount]} frustumCulled={false} />}
+      {data.miniVoxelCount > 0 && <instancedMesh ref={miniRef} args={[miniGeo, mats.current.mini, data.miniVoxelCount]} frustumCulled={false} />}
+      {data.paintCount > 0 && <instancedMesh ref={paintRef} args={[paintGeo, mats.current.paint, data.paintCount]} frustumCulled={false} />}
     </group>
   );
 }
