@@ -88,5 +88,8 @@ export function SkyGradient({ backgroundDetail }: { backgroundDetail: number }) 
 }
 
 export function FogEffect({ density }: { density: number }) {
+  /* Simple fixed formula — works well at all render distances.
+   * #b0c8e0 = noon sky colour from DayNightCycle.
+   * DayNightLighting overrides fog.color every frame. */
   return <fogExp2 attach="fog" args={['#b0c8e0', 0.005 + density * 0.02]} />;
 }
