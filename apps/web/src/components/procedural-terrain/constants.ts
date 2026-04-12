@@ -102,6 +102,27 @@ export const BUILDING_WALL_PALETTES: Record<string, string[]> = {
   restaurant:         ['#eeddcc', '#ddccbb', '#ffeecc'],
   fire_station:       ['#cc4444', '#bb3333', '#dd5555', '#aa2222'],
   library:            ['#ccbbaa', '#bbaa99', '#ddccbb', '#aa9988'],
+  /* ── New building palettes (v2) ── */
+  condo:              ['#c8b8a0', '#b8a890', '#d8c8b0', '#a89880'],
+  townhouse:          ['#cc9966', '#bb8855', '#ddaa77', '#aa7744'],
+  cinema:             ['#444455', '#333344', '#555566', '#222233'],
+  police_station:     ['#4466aa', '#3355aa', '#5577bb', '#335599'],
+  museum:             ['#e8e0d0', '#d8d0c0', '#f0e8e0', '#c8c0b0'],
+  convention_center:  ['#aabbcc', '#99aabb', '#bbccdd', '#88aacc'],
+  supermarket:        ['#eeeedd', '#ddddcc', '#ffffee', '#ccccbb'],
+  gym:                ['#dd8844', '#cc7733', '#ee9955', '#bb6622'],
+  bank:               ['#bbbbcc', '#aaaabc', '#ccccdd', '#9999ab'],
+  data_center:        ['#556666', '#445555', '#667777', '#334444'],
+  greenhouse:         ['#88cc88', '#77bb77', '#99dd99', '#66aa66'],
+  water_tower:        ['#999999', '#888888', '#aaaaaa', '#777777'],
+  radio_station:      ['#aaaaaa', '#999999', '#bbbbbb', '#888888'],
+  rooftop_garden:     ['#ccbbaa', '#bbaa99', '#ddccbb'],
+  mixed_use:          ['#c0b0a0', '#b0a090', '#d0c0b0', '#a09080'],
+  loft_building:      ['#aa7755', '#996644', '#bb8866', '#884433'],
+  penthouse_tower:    ['#90a0b0', '#80909f', '#a0b0c0', '#70808f'],
+  market_hall:        ['#ddbb88', '#ccaa77', '#eedd99', '#bb9966'],
+  transit_station:    ['#8899aa', '#7788aa', '#99aabb', '#667799'],
+  monument:           ['#ddddcc', '#ccccbb', '#eeeedd', '#bbbbaa'],
 };
 
 export const BUILDING_ROOF_COLORS: Record<string, string> = {
@@ -121,6 +142,14 @@ export const BUILDING_ROOF_COLORS: Record<string, string> = {
   restaurant: '#cc6633',
   fire_station: '#882222',
   library: '#886644',
+  /* ── New roof colors (v2) ── */
+  condo: '#887755', townhouse: '#995533', cinema: '#333344',
+  police_station: '#334488', museum: '#aa9977', convention_center: '#556688',
+  supermarket: '#998866', gym: '#aa5522', bank: '#777788',
+  data_center: '#445555', greenhouse: '#558855', water_tower: '#666666',
+  radio_station: '#777777', rooftop_garden: '#44aa55', mixed_use: '#887766',
+  loft_building: '#774433', penthouse_tower: '#556677', market_hall: '#aa8844',
+  transit_station: '#556677', monument: '#aaaaaa',
 };
 
 /* ═══════════════════════════════════════════════════════════════

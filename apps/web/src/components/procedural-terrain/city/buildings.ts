@@ -77,6 +77,27 @@ export function generateBuildingColumn(ctx: BuildCtx): void {
     case 'skyscraper_twin':    return genSkyscraperTwin(ctx);
     case 'skyscraper_stepped': return genSkyscraperStepped(ctx);
     case 'tower_telecom':  return genTelecomTower(ctx);
+    /* ── New building generators (v2) ── */
+    case 'condo':              return genCondo(ctx);
+    case 'townhouse':          return genTownhouse(ctx);
+    case 'cinema':             return genCinema(ctx);
+    case 'police_station':     return genPoliceStation(ctx);
+    case 'museum':             return genMuseum(ctx);
+    case 'convention_center':  return genConventionCenter(ctx);
+    case 'supermarket':        return genSupermarket(ctx);
+    case 'gym':                return genGym(ctx);
+    case 'bank':               return genBank(ctx);
+    case 'data_center':        return genDataCenter(ctx);
+    case 'greenhouse':         return genGreenhouse(ctx);
+    case 'water_tower':        return genWaterTower(ctx);
+    case 'radio_station':      return genRadioStation(ctx);
+    case 'rooftop_garden':     return genRooftopGarden(ctx);
+    case 'mixed_use':          return genMixedUse(ctx);
+    case 'loft_building':      return genLoftBuilding(ctx);
+    case 'penthouse_tower':    return genPenthouseTower(ctx);
+    case 'market_hall':        return genMarketHall(ctx);
+    case 'transit_station':    return genTransitStation(ctx);
+    case 'monument':           return genMonument(ctx);
     default:               return genStandardBuilding(ctx);
   }
 }
@@ -1275,5 +1296,675 @@ function genLibrary(ctx: BuildCtx) {
     trackH(lx, lz, h + bh + peakH);
   } else {
     trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ *  NEW BUILDING GENERATORS (v2) — 20 additional building types
+ *  for richer, more varied cityscapes
+ * ═══════════════════════════════════════════════════════════════ */
+
+/* ═══════════════ CONDO (tall residential, balconies every 3 floors) ═══════════════ */
+function genCondo(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('condo');
+  const roofCol = getRoofColor('condo');
+  const style = Math.abs((wx - blX) * 3 + (wz - blZ) * 7) % 3;
+  const accentBand = ['#aa9988', '#88aaaa', '#aaaa88'][style];
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor(roofCol, wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (by === 1 && blZ === 0 && blX >= 1 && blX <= 2) {
+      color = varyColor('#88ccee', wx, h + by, wz, 2, 0.04, 0.05);
+    } else if (onEdge && by > 1 && by < bh && by % 2 === 0) {
+      const isWinCol = (blZ === 0 || blZ === footD - 1) ? blX % 2 === 0 : blZ % 2 === 0;
+      if (isWinCol) {
+        color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+      }
+    } else if (onEdge && by % 3 === 0) {
+      color = varyColor(accentBand, wx, h + by, wz, 3, 0.03, 0.05);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Balconies on front every 3 floors
+  if (blZ === 0 && blX >= 1 && blX <= footW - 2 && bh > 4) {
+    for (let fl = 3; fl < bh; fl += 3) {
+      push((bX + lx) * VS, (h + fl) * VS, (bZ + lz - 1) * VS,
+        varyColor('#aaaaaa', wx, h + fl, wz - 1, 2, 0.03, 0.04));
+    }
+  }
+  trackH(lx, lz, h + bh);
+}
+
+/* ═══════════════ TOWNHOUSE (row of narrow units, peaked roofs) ═══════════════ */
+function genTownhouse(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const unitIdx = Math.floor(blX / 3);
+  const wallStyles = ['#cc9966', '#ddaa77', '#bb8855', '#ccbb88'];
+  const wallC = wallStyles[unitIdx % wallStyles.length];
+  const roofC = getRoofColor('townhouse');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor(roofC, wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (by === 1 && blZ === 0 && blX % 3 === 1) {
+      color = varyColor('#664422', wx, h + by, wz, 3, 0.04, 0.05);
+    } else if (onEdge && by === 2 && blZ === 0 && blX % 3 === 1) {
+      color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else if (onEdge && blX % 3 === 2 && by > 1 && by < bh) {
+      color = varyColor('#887766', wx, h + by, wz, 3, 0.04, 0.06);
+    } else {
+      color = varyColor(wallC, wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Small peaked roof per unit
+  if (onEdge) {
+    const unitMid = (unitIdx * 3) + 1;
+    const dist = Math.abs(blX - unitMid);
+    const roofExtra = Math.max(0, 1 - dist);
+    for (let ry = 1; ry <= roofExtra; ry++) {
+      push((bX + lx) * VS, (h + bh + ry) * VS, (bZ + lz) * VS,
+        varyColor(roofC, wx, h + bh + ry, wz, 4, 0.04, 0.06));
+    }
+    trackH(lx, lz, h + bh + roofExtra);
+  } else {
+    trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════ CINEMA (dark exterior, marquee sign) ═══════════════ */
+function genCinema(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('cinema');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#333344', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (by <= 2 && blZ === 0 && blX >= 1 && blX <= footW - 2) {
+      color = varyColor('#88ccee', wx, h + by, wz, 2, 0.04, 0.05);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Marquee sign
+  if (blZ === 0) {
+    const marqueeColors = ['#ff4444', '#ffdd44', '#44aaff'];
+    const mc = marqueeColors[(blX + Math.floor(wx / 3)) % 3];
+    push((bX + lx) * VS, (h + bh + 1) * VS, (bZ + lz - 1) * VS, varyColor(mc, wx, h + bh + 1, wz, 3, 0.04, 0.06));
+    trackH(lx, lz, h + bh + 1);
+  } else {
+    trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════ POLICE STATION (blue-trimmed civic building) ═══════════════ */
+function genPoliceStation(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('police_station');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#334488', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (by <= 2 && blZ === 0 && blX >= 1 && blX <= 3) {
+      color = varyColor('#555555', wx, h + by, wz, 2, 0.02, 0.04);
+    } else if (onEdge && by > 2 && by % 2 === 0) {
+      const isWin = (blZ === 0 || blZ === footD - 1) ? blX % 2 === 1 : blZ % 2 === 1;
+      if (isWin) {
+        color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+      }
+    } else if (onEdge && by === 1) {
+      color = varyColor('#3355aa', wx, h + by, wz, 3, 0.04, 0.06);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Beacon light on roof
+  if (blX === Math.floor(footW / 2) && blZ === Math.floor(footD / 2)) {
+    push((bX + lx) * VS, (h + bh + 1) * VS, (bZ + lz) * VS, '#4466ff');
+    trackH(lx, lz, h + bh + 1);
+  } else {
+    trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════ MUSEUM (grand classical facade, columns) ═══════════════ */
+function genMuseum(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('museum');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#aa9977', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (onEdge && by > 1 && by < bh - 1 && blX % 3 === 1) {
+      color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else if (onEdge && by === bh - 1) {
+      color = varyColor('#ccbb99', wx, h + by, wz, 3, 0.03, 0.05);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Front columns
+  if (blZ === 0 && blX >= 1 && blX <= footW - 2 && blX % 2 === 0) {
+    for (let py = 1; py <= bh; py++) {
+      push((bX + lx) * VS, (h + py) * VS, (bZ + lz - 1) * VS,
+        varyColor('#ddddcc', wx, h + py, wz - 1, 2, 0.02, 0.04));
+    }
+  }
+  // Pediment
+  if (onEdge && blZ === 0) {
+    const midX = Math.floor(footW / 2);
+    const dist = Math.abs(blX - midX);
+    const peakH = Math.max(0, 3 - dist);
+    for (let ry = 1; ry <= peakH; ry++) {
+      push((bX + lx) * VS, (h + bh + ry) * VS, (bZ + lz) * VS,
+        varyColor('#ddddcc', wx, h + bh + ry, wz, 3, 0.03, 0.05));
+    }
+    trackH(lx, lz, h + bh + peakH);
+  } else {
+    trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════ CONVENTION CENTER (wide glass facade) ═══════════════ */
+function genConventionCenter(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      const centerDist = Math.abs(blX - footW / 2) / (footW / 2);
+      color = varyColor(centerDist < 0.5 ? '#aabbcc' : '#99aabb', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (onEdge && by >= 2) {
+      color = varyColor('#88bbdd', wx, h + by, wz, 3, 0.05, 0.06);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else {
+      color = varyColor('#bbccdd', wx, h + by, wz, 4, 0.04, 0.06);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  trackH(lx, lz, h + bh);
+}
+
+/* ═══════════════ SUPERMARKET (flat commercial box, signage) ═══════════════ */
+function genSupermarket(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('supermarket');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#998866', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (by <= 2 && blZ === 0 && blX >= 2 && blX < footW - 2) {
+      color = varyColor('#88ccee', wx, h + by, wz, 2, 0.04, 0.05);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Brand color sign strip
+  const signColor = ['#dd3333', '#3388dd', '#33aa33'][Math.abs(wx - blX) % 3];
+  if (blZ === 0) {
+    push((bX + lx) * VS, (h + bh + 1) * VS, (bZ + lz) * VS,
+      varyColor(signColor, wx, h + bh + 1, wz, 3, 0.04, 0.06));
+    trackH(lx, lz, h + bh + 1);
+  } else {
+    trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════ GYM (bright accent, large ground floor windows) ═══════════════ */
+function genGym(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('gym');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#aa5522', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (by <= 2 && onEdge && blX >= 1 && blX <= footW - 2) {
+      color = varyColor('#88ccee', wx, h + by, wz, 2, 0.04, 0.05);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else if (onEdge && by === bh - 1) {
+      color = varyColor('#ee8844', wx, h + by, wz, 4, 0.04, 0.06);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  trackH(lx, lz, h + bh);
+}
+
+/* ═══════════════ BANK (stone facade, columns, vault look) ═══════════════ */
+function genBank(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('bank');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#777788', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (by === 1 && blZ === 0 && blX === Math.floor(footW / 2)) {
+      color = varyColor('#886644', wx, h + by, wz, 3, 0.04, 0.05);
+    } else if (onEdge && by > 2 && by < bh - 1 && blX % 2 === 0) {
+      color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else if (onEdge && (by === 1 || by === bh - 1)) {
+      color = varyColor('#999aab', wx, h + by, wz, 3, 0.03, 0.05);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Front columns
+  if (blZ === 0 && (blX === 1 || blX === footW - 2)) {
+    for (let py = 1; py <= bh; py++) {
+      push((bX + lx) * VS, (h + py) * VS, (bZ + lz - 1) * VS,
+        varyColor('#cccccc', wx, h + py, wz - 1, 2, 0.02, 0.04));
+    }
+  }
+  trackH(lx, lz, h + bh);
+}
+
+/* ═══════════════ DATA CENTER (no windows, ventilation units) ═══════════════ */
+function genDataCenter(ctx: BuildCtx) {
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('data_center');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#445555', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (by <= 2 && blZ === 0 && blX >= 1 && blX <= 2) {
+      color = varyColor('#555555', wx, h + by, wz, 2, 0.02, 0.04);
+    } else if (onEdge && by > 1 && by < bh && blX % 4 === 0) {
+      // Ventilation grilles (dark slits)
+      color = varyColor('#334444', wx, h + by, wz, 2, 0.02, 0.04);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // AC units on roof
+  if (blX % 3 === 1 && blZ % 3 === 1 && blX < footW - 1 && blZ < footD - 1) {
+    push((bX + lx) * VS, (h + bh + 1) * VS, (bZ + lz) * VS,
+      varyColor('#aaaaaa', wx, h + bh + 1, wz, 2, 0.02, 0.04));
+    trackH(lx, lz, h + bh + 1);
+  } else {
+    trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════ GREENHOUSE (translucent green glass panels) ═══════════════ */
+function genGreenhouse(ctx: BuildCtx) {
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#88cc88', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (onEdge) {
+      // Glass panels — alternating green tints
+      color = varyColor(blX % 2 === 0 ? '#88cc88' : '#77bb77', wx, h + by, wz, 4, 0.04, 0.06);
+    } else {
+      color = varyColor('#55aa55', wx, h + by, wz, 3, 0.04, 0.06);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Plants inside (on ground level)
+  if (!onEdge && blX > 0 && blX < footW - 1 && blZ > 0 && blZ < footD - 1) {
+    push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
+      varyColor('#44aa44', wx, h + 1, wz, 6, 0.06, 0.08));
+  }
+  trackH(lx, lz, h + bh);
+}
+
+/* ═══════════════ WATER TOWER (cylindrical tank on legs) ═══════════════ */
+function genWaterTower(ctx: BuildCtx) {
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const midX = Math.floor(footW / 2), midZ = Math.floor(footD / 2);
+  const dist = Math.sqrt((blX - midX) ** 2 + (blZ - midZ) ** 2);
+  const isLeg = dist < 1.5 && (blX === midX || blZ === midZ);
+  const tankR = Math.max(2, Math.floor(footW * 0.4));
+  const isTank = dist <= tankR;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const legH = Math.floor(bh * 0.6);
+  const tankH = bh;
+
+  if (isLeg) {
+    // Support legs
+    for (let by = 1; by <= legH; by++) {
+      push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS,
+        varyColor('#888888', wx, h + by, wz, 3, 0.03, 0.05));
+    }
+    trackH(lx, lz, h + legH);
+  }
+  if (isTank) {
+    // Tank body
+    const tankEdge = dist >= tankR - 0.5;
+    for (let by = legH + 1; by <= tankH; by++) {
+      if (!tankEdge && by < tankH) continue;
+      const color = by === tankH
+        ? varyColor('#777777', wx, h + by, wz, 3, 0.03, 0.05)
+        : varyColor('#999999', wx, h + by, wz, 4, 0.04, 0.06);
+      push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+    }
+    trackH(lx, lz, h + tankH);
+  } else if (!isLeg) {
+    // Ground pad
+    push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
+      varyColor(onEdge ? '#777777' : '#888888', wx, h + 1, wz, 2, 0.02, 0.04));
+    trackH(lx, lz, h + 1);
+  }
+}
+
+/* ═══════════════ RADIO STATION (small building + tall antenna) ═══════════════ */
+function genRadioStation(ctx: BuildCtx) {
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('radio_station');
+  const midX = Math.floor(footW / 2), midZ = Math.floor(footD / 2);
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS,
+      varyColor(by === bh ? '#777777' : walls[0], wx, h + by, wz, 4, 0.04, 0.06));
+  }
+  // Tall antenna at center
+  if (blX === midX && blZ === midZ) {
+    for (let ay = 1; ay <= 8; ay++) {
+      push((bX + lx) * VS, (h + bh + ay) * VS, (bZ + lz) * VS,
+        varyColor('#aaaaaa', wx, h + bh + ay, wz, 2, 0.02, 0.04));
+    }
+    push((bX + lx) * VS, (h + bh + 9) * VS, (bZ + lz) * VS, '#ff2222');
+    trackH(lx, lz, h + bh + 9);
+  } else {
+    trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════ ROOFTOP GARDEN (green open lot with paths) ═══════════════ */
+function genRooftopGarden(ctx: BuildCtx) {
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD } = ctx;
+  const isPath = blX === Math.floor(footW / 2) || blZ === Math.floor(footD / 2);
+  if (isPath) {
+    push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
+      varyColor('#bbaa88', wx, h + 1, wz, 2, 0.03, 0.04));
+  } else {
+    push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
+      varyColor('#55bb66', wx, h + 1, wz, 5, 0.06, 0.08));
+    // Occasional flowers
+    if ((blX + blZ) % 4 === 0) {
+      const flowerColors = ['#ff6688', '#ffaa44', '#ff44aa', '#aaddff', '#ffff44'];
+      push((bX + lx) * VS, (h + 2) * VS, (bZ + lz) * VS,
+        varyColor(flowerColors[(blX * 3 + blZ) % flowerColors.length], wx, h + 2, wz, 6, 0.06, 0.08));
+    }
+  }
+  // Benches
+  if (blX === 1 && blZ === Math.floor(footD / 2) + 1) {
+    push((bX + lx) * VS, (h + 2) * VS, (bZ + lz) * VS, varyColor('#885533', wx, h + 2, wz));
+  }
+  trackH(lx, lz, h + 1);
+}
+
+/* ═══════════════ MIXED USE (shops on ground, apartments above) ═══════════════ */
+function genMixedUse(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('mixed_use');
+  const shopFloor = 2; // first 2 floors are shops
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#887766', wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (by <= shopFloor && blZ === 0) {
+      // Shop front — large glass
+      color = varyColor('#88ccee', wx, h + by, wz, 2, 0.04, 0.05);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else if (by === shopFloor + 1 && onEdge) {
+      // Accent band between shop and apartments
+      color = varyColor('#887766', wx, h + by, wz, 3, 0.03, 0.05);
+    } else if (onEdge && by > shopFloor && by % 2 === 0) {
+      const isWin = (blZ === 0 || blZ === footD - 1) ? blX % 2 === 0 : blZ % 2 === 0;
+      if (isWin) {
+        color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+      }
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Awnings on shop front
+  if (blZ === 0 && blX % 3 === 0 && blX < footW - 1) {
+    const awningColors = ['#cc4444', '#44aa66', '#4488cc', '#ccaa44'];
+    push((bX + lx) * VS, (h + shopFloor + 1) * VS, (bZ + lz - 1) * VS,
+      varyColor(awningColors[blX % awningColors.length], wx, h + shopFloor + 1, wz - 1, 4, 0.04, 0.06));
+  }
+  trackH(lx, lz, h + bh);
+}
+
+/* ═══════════════ LOFT BUILDING (brick, industrial chic, fire escape) ═══════════════ */
+function genLoftBuilding(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('loft_building');
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#774433', wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (onEdge && by > 1 && by < bh && by % 2 === 0) {
+      // Large loft windows
+      const isWin = (blZ === 0 || blZ === footD - 1) ? blX >= 1 && blX <= footW - 2 : blZ >= 1 && blZ <= footD - 2;
+      if (isWin) {
+        color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+        pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+      } else {
+        color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+      }
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Fire escape on side
+  if (blX === footW - 1 && blZ >= 1 && blZ < footD - 1 && blZ % 2 === 0) {
+    for (let fl = 2; fl < bh; fl += 2) {
+      push((bX + lx + 1) * VS, (h + fl) * VS, (bZ + lz) * VS,
+        varyColor('#555555', wx + 1, h + fl, wz, 2, 0.02, 0.04));
+    }
+  }
+  trackH(lx, lz, h + bh);
+}
+
+/* ═══════════════ PENTHOUSE TOWER (luxury tall, glass-heavy, crown) ═══════════════ */
+function genPenthouseTower(ctx: BuildCtx) {
+  const { push, trackH, pushWin, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const walls = getWallPalette('penthouse_tower');
+
+  // Top 3 floors are "penthouse" with different styling
+  const penthouseStart = bh - 3;
+
+  for (let by = 1; by <= bh; by++) {
+    if (!onEdge && by < bh) continue;
+    let color: string;
+    if (by === bh) {
+      color = varyColor('#556677', wx, h + by, wz, 4, 0.04, 0.06);
+    } else if (by >= penthouseStart && onEdge) {
+      // Penthouse: full glass
+      color = varyColor('#88ccee', wx, h + by, wz, 3, 0.05, 0.06);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else if (onEdge && by > 1 && by % 2 === 0) {
+      // Regular floor windows
+      color = varyColor('#aaddff', wx, h + by, wz, 3, 0.05, 0.06);
+      pushWin((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS);
+    } else if (onEdge && by === penthouseStart - 1) {
+      // Crown ledge
+      color = varyColor('#ccccdd', wx, h + by, wz, 3, 0.03, 0.05);
+    } else {
+      color = varyColor(walls[0], wx, h + by, wz, 5, 0.06, 0.07);
+    }
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS, color);
+  }
+  // Spire at center
+  const midX = Math.floor(footW / 2), midZ = Math.floor(footD / 2);
+  if (blX === midX && blZ === midZ) {
+    for (let sy = 1; sy <= 3; sy++) {
+      push((bX + lx) * VS, (h + bh + sy) * VS, (bZ + lz) * VS,
+        varyColor('#aaaaaa', wx, h + bh + sy, wz, 2, 0.02, 0.04));
+    }
+    push((bX + lx) * VS, (h + bh + 4) * VS, (bZ + lz) * VS, '#ff4444');
+    trackH(lx, lz, h + bh + 4);
+  } else {
+    trackH(lx, lz, h + bh);
+  }
+}
+
+/* ═══════════════ MARKET HALL (open-air stalls with roof) ═══════════════ */
+function genMarketHall(ctx: BuildCtx) {
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const isPillar = (blX % 3 === 0 && blZ % 3 === 0);
+
+  // Ground slab
+  push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
+    varyColor('#bbaa88', wx, h + 1, wz, 2, 0.03, 0.04));
+
+  if (isPillar) {
+    // Support pillars
+    for (let py = 2; py <= bh; py++) {
+      push((bX + lx) * VS, (h + py) * VS, (bZ + lz) * VS,
+        varyColor('#887766', wx, h + py, wz, 3, 0.03, 0.05));
+    }
+  }
+  // Roof slab
+  push((bX + lx) * VS, (h + bh + 1) * VS, (bZ + lz) * VS,
+    varyColor('#aa8844', wx, h + bh + 1, wz, 3, 0.03, 0.05));
+
+  // Market stalls (colored awning blocks between pillars)
+  if (!isPillar && !onEdge && blX > 0 && blX < footW - 1 && blZ > 0 && blZ < footD - 1) {
+    if ((blX + blZ) % 4 < 2) {
+      const stallColors = ['#dd6644', '#44aa88', '#ddaa44', '#6688cc'];
+      push((bX + lx) * VS, (h + 2) * VS, (bZ + lz) * VS,
+        varyColor(stallColors[(blX + blZ) % stallColors.length], wx, h + 2, wz, 4, 0.04, 0.06));
+    }
+  }
+  trackH(lx, lz, h + bh + 1);
+}
+
+/* ═══════════════ TRANSIT STATION (platform with canopy) ═══════════════ */
+function genTransitStation(ctx: BuildCtx) {
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD, bh, forceEdge } = ctx;
+  const onEdge = isExposedWall(blX, blZ, footW, footD, forceEdge);
+  const isPlatformEdge = blZ === 0 || blZ === footD - 1;
+
+  // Platform base
+  push((bX + lx) * VS, (h + 1) * VS, (bZ + lz) * VS,
+    varyColor(isPlatformEdge ? '#ffdd44' : '#aaaaaa', wx, h + 1, wz, 2, 0.03, 0.04));
+
+  if (onEdge || (blX % 4 === 0)) {
+    // Pillars supporting canopy
+    for (let py = 2; py <= bh; py++) {
+      if (!onEdge && py < bh) continue;
+      push((bX + lx) * VS, (h + py) * VS, (bZ + lz) * VS,
+        varyColor(py === bh ? '#667799' : '#8899aa', wx, h + py, wz, 3, 0.03, 0.05));
+    }
+  }
+  // Canopy roof
+  push((bX + lx) * VS, (h + bh + 1) * VS, (bZ + lz) * VS,
+    varyColor('#556677', wx, h + bh + 1, wz, 3, 0.03, 0.05));
+
+  // Signs at entrances
+  if (blX === Math.floor(footW / 2) && (blZ === 0 || blZ === footD - 1)) {
+    push((bX + lx) * VS, (h + bh + 2) * VS, (bZ + lz) * VS,
+      varyColor('#4488ff', wx, h + bh + 2, wz, 3, 0.04, 0.06));
+    trackH(lx, lz, h + bh + 2);
+  } else {
+    trackH(lx, lz, h + bh + 1);
+  }
+}
+
+/* ═══════════════ MONUMENT (stone column/obelisk with steps) ═══════════════ */
+function genMonument(ctx: BuildCtx) {
+  const { push, trackH, bX, bZ, lx, lz, h, wx, wz, blX, blZ, footW, footD } = ctx;
+  const midX = Math.floor(footW / 2), midZ = Math.floor(footD / 2);
+  const dist = Math.max(Math.abs(blX - midX), Math.abs(blZ - midZ));
+
+  // Stepped base
+  const stepH = Math.max(0, 3 - dist);
+  for (let by = 1; by <= stepH; by++) {
+    push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS,
+      varyColor('#ccccbb', wx, h + by, wz, 3, 0.03, 0.05));
+  }
+
+  // Central obelisk
+  if (dist <= 1) {
+    const obeliskH = 8;
+    for (let by = stepH + 1; by <= stepH + obeliskH; by++) {
+      const taper = by > stepH + obeliskH - 2 && dist === 1;
+      if (taper) continue;
+      push((bX + lx) * VS, (h + by) * VS, (bZ + lz) * VS,
+        varyColor(by === stepH + obeliskH ? '#ffdd44' : '#ddddcc', wx, h + by, wz, 3, 0.03, 0.05));
+    }
+    if (blX === midX && blZ === midZ) {
+      // Pointed tip
+      push((bX + lx) * VS, (h + stepH + obeliskH + 1) * VS, (bZ + lz) * VS,
+        varyColor('#ffdd44', wx, h + stepH + obeliskH + 1, wz, 2, 0.02, 0.04));
+      trackH(lx, lz, h + stepH + obeliskH + 1);
+    } else {
+      trackH(lx, lz, h + stepH + obeliskH);
+    }
+  } else {
+    trackH(lx, lz, h + Math.max(1, stepH));
   }
 }

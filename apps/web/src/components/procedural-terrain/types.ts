@@ -308,12 +308,20 @@ export interface ChunkVoxelData {
 
 export type ZoneType = 'downtown' | 'commercial' | 'residential' | 'industrial' | 'civic';
 
+/** Open zone types for non-building areas within the city biome */
+export type OpenZoneType = 'none' | 'farmland' | 'highway_corridor' | 'green_buffer' | 'empty_lot' | 'suburban_yard';
+
 export interface CityCell {
   isRoad: boolean;
   isAvenue: boolean;       // wider major road
   isIntersection: boolean;
   isSidewalk: boolean;
   isBuilding: boolean;
+  /** True when this cell is part of an open zone (not a building, road, or sidewalk).
+   *  Open zones break up the city grid with farmland, green buffers, empty lots, etc. */
+  isOpenZone: boolean;
+  /** Type of open zone (only meaningful when isOpenZone is true) */
+  openZoneType: OpenZoneType;
   /** Local X within building footprint (0-based), -1 if not building */
   lotLocalX: number;
   /** Local Z within building footprint (0-based), -1 if not building */
@@ -333,6 +341,8 @@ export interface CityCell {
   roadWidthX: number;
   /** Road width in Z direction at this cell's block */
   roadWidthZ: number;
+  /** True if this road cell is on a highway (super-avenue) */
+  isHighway: boolean;
 }
 
 /** All building types available in the city */
@@ -352,7 +362,13 @@ export type BuildingType =
   | 'bridge_base'
   | 'apartment' | 'hotel'
   | 'gas_station' | 'restaurant'
-  | 'fire_station' | 'library';
+  | 'fire_station' | 'library'
+  /* ── New building types (v2) ── */
+  | 'condo' | 'townhouse' | 'cinema' | 'police_station'
+  | 'museum' | 'convention_center' | 'supermarket' | 'gym'
+  | 'bank' | 'data_center' | 'greenhouse' | 'water_tower'
+  | 'radio_station' | 'rooftop_garden' | 'mixed_use' | 'loft_building'
+  | 'penthouse_tower' | 'market_hall' | 'transit_station' | 'monument';
 
 /** Pickup sprite data */
 export interface PickupVoxel { x: number; y: number; color: string }
