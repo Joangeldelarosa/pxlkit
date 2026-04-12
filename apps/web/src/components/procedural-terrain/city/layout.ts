@@ -238,7 +238,7 @@ function classifyOpenZone(
 
   // Farmland: large patches at city edges (detected via very low-freq noise)
   // fabricN3 is the lowest frequency → creates very large patches
-  if (fabricN3 > 0.30 && zone !== 'downtown') {
+  if (fabricN3 > 0.30) {
     if (fabricN1 > -0.1) return 'farmland';
   }
 

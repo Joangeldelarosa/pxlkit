@@ -16,7 +16,7 @@ import {
 import { mulberry32, fbm } from '../utils/noise';
 import { varyColor, hashCoord } from '../utils/color';
 import { getBiome, getVariedBiome, getContinent, getContinentElevation } from '../utils/biomes';
-import { classifyCityCell, getBuildingType, getBuildingHeight, getSectorLampColors, isHighwayX, isHighwayZ, HIGHWAY_W } from '../city/layout';
+import { classifyCityCell, getBuildingType, getBuildingHeight, getSectorLampColors } from '../city/layout';
 import { generateBuildingColumn } from '../city/buildings';
 import type { PxlKitData } from '@pxlkit/core';
 
