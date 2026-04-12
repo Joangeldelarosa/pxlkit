@@ -10,7 +10,7 @@
  *  - Road details (lane markings, crosswalks) adapt to road width
  * ═══════════════════════════════════════════════════════════════ */
 
-import type { CityCell, ZoneType, BuildingType } from '../types';
+import type { CityCell, ZoneType, BuildingType, OpenZoneType } from '../types';
 import {
   BLOCK_SIZE, ROAD_W, AVENUE_W, LOT_INSET, AVENUE_INTERVAL,
   BUILDING_WALL_PALETTES, BUILDING_ROOF_COLORS,
@@ -166,6 +166,85 @@ function isRoadZClosed(blockX: number, blockZ: number): boolean {
   return h > 0.80;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+ *  Urban Fabric System — Open Zones
+ *
+ *  Cities shouldn't be solid grids of buildings. Real cities have:
+ *  - Farmland/agricultural fields at the periphery
+ *  - Highway corridors with wide open shoulders
+ *  - Green buffer zones (parks, nature strips)
+ *  - Empty lots / construction sites
+ *  - Suburban yards with scattered houses
+ *
+ *  This system uses multi-octave noise to carve organic "holes"
+ *  in the city fabric. The open zone type is determined by the
+ *  zone context: residential areas get yards, industrial gets
+ *  empty lots, edge areas get farmland, etc.
+ * ═══════════════════════════════════════════════════════════════ */
+
+/** Classify whether a block should be an open zone instead of a building.
+ *  Returns the open zone type, or 'none' if it should be a normal building lot. */
+function classifyOpenZone(
+  structN: (x: number, y: number) => number,
+  lotWX: number, lotWZ: number,
+  zone: ZoneType,
+  blockX: number, blockZ: number,
+): OpenZoneType {
+  // Use a dedicated low-frequency noise channel for urban fabric
+  // This creates large organic patches, not per-block randomness
+  const fabricN1 = structN(lotWX * 0.06 + 2000, lotWZ * 0.06 + 2000);
+  const fabricN2 = structN(lotWX * 0.12 + 3000, lotWZ * 0.12 + 3000);
+  const fabricN3 = structN(lotWX * 0.03 + 4000, lotWZ * 0.03 + 4000);
+
+  // Highway corridor: blocks adjacent to highways get open shoulders
+  const nearHwX = isHighwayX(blockX) || isHighwayX(blockX - 1) || isHighwayX(blockX + 1);
+  const nearHwZ = isHighwayZ(blockZ) || isHighwayZ(blockZ - 1) || isHighwayZ(blockZ + 1);
+  if ((nearHwX || nearHwZ) && fabricN2 > -0.1) {
+    // ~60% of highway-adjacent blocks become open corridor
+    if (fabricN1 > -0.2) return 'highway_corridor';
+  }
+
+  // Downtown zones are dense — very few open areas
+  if (zone === 'downtown') {
+    // Only occasional plazas (handled by building type selection, not open zones)
+    return 'none';
+  }
+
+  // Large-scale fabric noise: creates organic patches of non-building areas
+  // The threshold varies by zone — residential has more open space than commercial
+  const openThreshold = zone === 'residential' ? 0.18
+    : zone === 'industrial' ? 0.25
+    : zone === 'civic' ? 0.30
+    : 0.28; // commercial
+
+  if (fabricN1 > openThreshold) {
+    // Determine what kind of open zone based on secondary noise + zone
+    if (zone === 'residential') {
+      if (fabricN2 > 0.2) return 'suburban_yard';
+      if (fabricN3 > 0.1) return 'green_buffer';
+      return 'suburban_yard';
+    }
+    if (zone === 'industrial') {
+      if (fabricN2 > 0.15) return 'empty_lot';
+      return 'green_buffer';
+    }
+    if (zone === 'civic') {
+      return 'green_buffer';
+    }
+    // Commercial: mix of empty lots and green buffers
+    if (fabricN2 > 0.1) return 'empty_lot';
+    return 'green_buffer';
+  }
+
+  // Farmland: large patches at city edges (detected via very low-freq noise)
+  // fabricN3 is the lowest frequency → creates very large patches
+  if (fabricN3 > 0.30 && zone !== 'downtown') {
+    if (fabricN1 > -0.1) return 'farmland';
+  }
+
+  return 'none';
+}
+
 /* ── Main classification function ── */
 
 export function classifyCityCell(
@@ -191,6 +270,11 @@ export function classifyCityCell(
   const isIntersection = onRoadX && onRoadZ;
   const isAvenue = (onRoadX && rw >= AVENUE_W) || (onRoadZ && rdz >= AVENUE_W);
 
+  // Highway detection
+  const hwX = isHighwayX(blockX);
+  const hwZ = isHighwayZ(blockZ);
+  const isHw = isRoad && (hwX || hwZ);
+
   // Lot-local coordinates (per-dimension to handle avenue vs standard road)
   const lotRawX = modX - rw;
   const lotRawZ = modZ - rdz;
@@ -204,12 +288,14 @@ export function classifyCityCell(
   if (isRoad) {
     return {
       isRoad: true, isAvenue, isIntersection, isSidewalk: false, isBuilding: false,
+      isOpenZone: false, openZoneType: 'none',
       lotLocalX: -1, lotLocalZ: -1, lotWorldX, lotWorldZ,
       buildingW: 0, buildingD: 0,
       zone: 'downtown', // roads don't have zones
       roadWidth: effectiveRW,
       roadWidthX: rw,
       roadWidthZ: rdz,
+      isHighway: isHw,
     };
   }
 
@@ -221,9 +307,34 @@ export function classifyCityCell(
   let buildingW = 1, buildingD = 1;
   let localBX = lotRawX - LOT_INSET;
   let localBZ = lotRawZ - LOT_INSET;
+  let openZoneType: OpenZoneType = 'none';
 
   if (structN) {
     zone = getZone(structN, lotWorldX, lotWorldZ);
+
+    // Check if this block should be an open zone
+    openZoneType = classifyOpenZone(structN, lotWorldX, lotWorldZ, zone, blockX, blockZ);
+
+    if (openZoneType !== 'none') {
+      // Open zone overrides building — but we keep the sidewalk for edge definition
+      return {
+        isRoad: false, isAvenue: false, isIntersection: false,
+        isSidewalk,
+        isBuilding: false,
+        isOpenZone: !isSidewalk, // sidewalk cells remain sidewalk, interior becomes open
+        openZoneType: isSidewalk ? 'none' : openZoneType,
+        lotLocalX: localBX,
+        lotLocalZ: localBZ,
+        lotWorldX, lotWorldZ,
+        buildingW: 0, buildingD: 0,
+        zone,
+        roadWidth: effectiveRW,
+        roadWidthX: rw,
+        roadWidthZ: rdz,
+        isHighway: false,
+      };
+    }
+
     const anchor = findBuildingAnchor(structN, lotWorldX, lotWorldZ, zone);
     buildingW = anchor.w;
     buildingD = anchor.d;
@@ -240,6 +351,7 @@ export function classifyCityCell(
   return {
     isRoad: false, isAvenue: false, isIntersection: false, isSidewalk,
     isBuilding: !isSidewalk,
+    isOpenZone: false, openZoneType: 'none',
     lotLocalX: localBX,
     lotLocalZ: localBZ,
     lotWorldX, lotWorldZ,
@@ -248,6 +360,7 @@ export function classifyCityCell(
     roadWidth: effectiveRW,
     roadWidthX: rw,
     roadWidthZ: rdz,
+    isHighway: false,
   };
 }
 
@@ -265,69 +378,74 @@ export function getBuildingType(
 ): BuildingType {
   const v = structN(lotWX * 0.7 + 42, lotWZ * 0.7 + 42);
   const v2 = structN(lotWX * 1.3 + 77, lotWZ * 1.3 + 77);
+  const v3 = structN(lotWX * 0.9 + 131, lotWZ * 0.9 + 131);
   const area = buildingW * buildingD;
 
   // Large footprint buildings
-  if (area >= 12) return 'stadium';
+  if (area >= 12) {
+    if (zone === 'civic') return v > 0 ? 'convention_center' : 'stadium';
+    return 'stadium';
+  }
   if (area >= 6) {
-    if (zone === 'civic') return v > 0 ? 'hospital' : 'school';
-    if (zone === 'commercial') return 'mall';
-    if (zone === 'industrial') return 'factory';
-    if (zone === 'downtown') return 'airport_terminal';
+    if (zone === 'civic') return v > 0.3 ? 'convention_center' : v > 0 ? 'hospital' : 'museum';
+    if (zone === 'commercial') return v > 0.3 ? 'mall' : 'supermarket';
+    if (zone === 'industrial') return v > 0.3 ? 'factory' : 'data_center';
+    if (zone === 'downtown') return v > 0.3 ? 'airport_terminal' : 'transit_station';
     return 'stadium';
   }
   if (area >= 4) {
-    if (zone === 'downtown') return v > 0.3 ? 'skyscraper_twin' : 'skyscraper_stepped';
-    if (zone === 'commercial') return 'mall';
-    if (zone === 'civic') return v > 0 ? 'hospital' : 'school';
-    if (zone === 'industrial') return v > 0 ? 'factory' : 'warehouse';
-    if (zone === 'residential') return v > 0.2 ? 'castle' : 'mansion';
+    if (zone === 'downtown') return v > 0.5 ? 'skyscraper_twin' : v > 0.2 ? 'penthouse_tower' : 'skyscraper_stepped';
+    if (zone === 'commercial') return v > 0.5 ? 'mall' : v > 0.2 ? 'market_hall' : 'supermarket';
+    if (zone === 'civic') return v > 0.3 ? 'museum' : v > 0 ? 'hospital' : 'school';
+    if (zone === 'industrial') return v > 0.3 ? 'factory' : v > 0 ? 'data_center' : 'warehouse';
+    if (zone === 'residential') return v > 0.5 ? 'castle' : v > 0.2 ? 'mansion' : 'condo';
     return 'office_tall';
   }
   if (area >= 2) {
-    if (zone === 'residential') return v > 0.4 ? 'castle' : 'mansion';
-    if (zone === 'commercial') return v > 0.3 ? 'mall' : 'shop';
-    if (zone === 'industrial') return 'warehouse';
+    if (zone === 'residential') return v > 0.5 ? 'castle' : v > 0.2 ? 'townhouse' : 'mansion';
+    if (zone === 'commercial') return v > 0.5 ? 'mall' : v > 0.2 ? 'gym' : 'shop';
+    if (zone === 'industrial') return v > 0.3 ? 'warehouse' : 'data_center';
     return 'office_tall';
   }
 
-  // Single-lot buildings — zone-dependent selection
+  // Single-lot buildings — zone-dependent selection with more variety
   switch (zone) {
     case 'downtown':
-      if (v > 0.35 + (1 - density) * 0.15) return v2 > 0.3 ? 'skyscraper' : 'skyscraper_stepped';
-      if (v > 0.2) return v2 > 0.0 ? 'tower' : 'office_tall';
-      if (v > 0.05) return v2 > 0.5 ? 'hotel' : 'office';
-      if (v > -0.1) return 'parking_garage';
-      return v > -0.25 ? 'plaza' : 'fountain_plaza';
+      if (v > 0.35 + (1 - density) * 0.15) return v2 > 0.5 ? 'skyscraper' : v2 > 0.2 ? 'penthouse_tower' : 'skyscraper_stepped';
+      if (v > 0.2) return v2 > 0.3 ? 'tower' : v3 > 0.3 ? 'mixed_use' : 'office_tall';
+      if (v > 0.05) return v2 > 0.5 ? 'hotel' : v3 > 0.3 ? 'loft_building' : 'office';
+      if (v > -0.05) return v3 > 0.4 ? 'bank' : 'parking_garage';
+      if (v > -0.15) return v3 > 0.3 ? 'transit_station' : 'plaza';
+      return v > -0.25 ? 'monument' : 'fountain_plaza';
 
     case 'commercial':
-      if (v > 0.35) return 'hotel';
-      if (v > 0.2) return 'office';
-      if (v > 0.1) return v2 > 0.3 ? 'restaurant' : 'shop';
-      if (v > -0.05) return v2 > 0 ? 'gas_station' : 'parking';
+      if (v > 0.35) return v2 > 0.4 ? 'hotel' : 'cinema';
+      if (v > 0.2) return v2 > 0.3 ? 'office' : v3 > 0.4 ? 'bank' : 'gym';
+      if (v > 0.1) return v2 > 0.5 ? 'restaurant' : v3 > 0.3 ? 'supermarket' : 'shop';
+      if (v > -0.05) return v2 > 0.3 ? 'gas_station' : v3 > 0.4 ? 'market_hall' : 'parking';
       if (v > -0.2) return 'fountain_plaza';
       return 'park';
 
     case 'residential':
-      if (v > 0.35) return v2 > 0.5 ? 'apartment' : 'mansion';
-      if (v > 0.15) return v2 > 0.4 ? 'apartment' : 'house';
-      if (v > 0.05) return 'house';
-      if (v > -0.15) return 'park';
-      if (v > -0.3) return 'church';
+      if (v > 0.4) return v2 > 0.5 ? 'penthouse_tower' : v3 > 0.3 ? 'condo' : 'apartment';
+      if (v > 0.2) return v2 > 0.4 ? 'loft_building' : v3 > 0.3 ? 'townhouse' : 'apartment';
+      if (v > 0.05) return v2 > 0.5 ? 'mixed_use' : 'house';
+      if (v > -0.1) return v3 > 0.5 ? 'rooftop_garden' : 'park';
+      if (v > -0.2) return v3 > 0.3 ? 'greenhouse' : 'church';
       return 'parking';
 
     case 'industrial':
-      if (v > 0.25) return 'warehouse';
-      if (v > 0.0) return 'factory';
-      if (v > -0.15) return 'gas_station';
-      if (v > -0.3) return 'parking';
+      if (v > 0.25) return v2 > 0.4 ? 'warehouse' : 'data_center';
+      if (v > 0.05) return v2 > 0.3 ? 'factory' : 'water_tower';
+      if (v > -0.1) return v3 > 0.4 ? 'radio_station' : 'gas_station';
+      if (v > -0.25) return 'parking';
       return 'park';
 
     case 'civic':
-      if (v > 0.3) return v2 > 0 ? 'hospital' : 'school';
-      if (v > 0.15) return v2 > 0.3 ? 'library' : 'fire_station';
-      if (v > 0.05) return 'church';
-      if (v > -0.15) return 'fountain_plaza';
+      if (v > 0.3) return v2 > 0.4 ? 'museum' : v3 > 0.3 ? 'hospital' : 'school';
+      if (v > 0.15) return v2 > 0.4 ? 'police_station' : v3 > 0.3 ? 'library' : 'fire_station';
+      if (v > 0.05) return v3 > 0.4 ? 'monument' : 'church';
+      if (v > -0.1) return 'fountain_plaza';
       return 'plaza';
 
     default:
@@ -373,6 +491,27 @@ export function getBuildingHeight(
     case 'park':               return 0;
     case 'parking':            return 0;
     case 'bridge_base':        return 3 + Math.floor(v * 2);     // 3-5
+    /* ── New building heights (v2) ── */
+    case 'condo':              return 8 + Math.floor(v * 12);    // 8-20
+    case 'townhouse':          return 4 + Math.floor(v * 3);     // 4-7
+    case 'cinema':             return 5 + Math.floor(v * 4);     // 5-9
+    case 'police_station':     return 4 + Math.floor(v * 4);     // 4-8
+    case 'museum':             return 5 + Math.floor(v * 5);     // 5-10
+    case 'convention_center':  return 4 + Math.floor(v * 3);     // 4-7
+    case 'supermarket':        return 3 + Math.floor(v * 2);     // 3-5
+    case 'gym':                return 4 + Math.floor(v * 3);     // 4-7
+    case 'bank':               return 5 + Math.floor(v * 5);     // 5-10
+    case 'data_center':        return 4 + Math.floor(v * 3);     // 4-7
+    case 'greenhouse':         return 3 + Math.floor(v * 2);     // 3-5
+    case 'water_tower':        return 6 + Math.floor(v * 4);     // 6-10
+    case 'radio_station':      return 3 + Math.floor(v * 2);     // 3-5
+    case 'rooftop_garden':     return 0;
+    case 'mixed_use':          return 6 + Math.floor(v * 8);     // 6-14
+    case 'loft_building':      return 5 + Math.floor(v * 6);     // 5-11
+    case 'penthouse_tower':    return 10 + Math.floor(v * 14);   // 10-24
+    case 'market_hall':        return 4 + Math.floor(v * 3);     // 4-7
+    case 'transit_station':    return 4 + Math.floor(v * 3);     // 4-7
+    case 'monument':           return 0;
     default:                   return 0;
   }
 }
@@ -387,4 +526,69 @@ export function getWallPalette(type: BuildingType): string[] {
 export function getRoofColor(type: BuildingType): string {
   const key = type.replace(/_twin|_stepped|_tall|_telecom/g, '') as string;
   return BUILDING_ROOF_COLORS[type] || BUILDING_ROOF_COLORS[key] || '#cc6633';
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ *  Sector-based lamp/post color system
+ *
+ *  Different neighborhoods get distinct pole & lamp colors so large
+ *  cities don't look monotonous. Sector is determined by a low-frequency
+ *  hash of the block coordinates, giving ~5-block-wide color zones.
+ * ═══════════════════════════════════════════════════════════════ */
+
+/** Pole body colors by sector (muted metallics) */
+const SECTOR_POLE_COLORS = [
+  '#3a3a3a', // dark iron (default)
+  '#2a3a2a', // verdigris / green patina
+  '#3a2a2a', // rusty brown
+  '#2a2a3a', // blue-black
+  '#3a3a2a', // olive
+  '#4a3a3a', // warm brown
+];
+/** Lamp glow colors by sector */
+const SECTOR_LAMP_COLORS = [
+  ['#ffee88', '#ffdd66'], // warm yellow (default)
+  ['#ffeedd', '#ffddcc'], // warm white
+  ['#ddffee', '#cceecc'], // cool green-white
+  ['#ffeebb', '#ffddaa'], // sodium orange
+  ['#eeeeff', '#ddddff'], // cool blue-white
+  ['#ffe8cc', '#ffd8bb'], // peachy warm
+];
+
+/** Get pole and lamp colors for a sector based on world coordinates */
+export function getSectorLampColors(wx: number, wz: number): {
+  pole: string; lampA: string; lampB: string;
+} {
+  // Sector: every ~5 city blocks = 100 voxels ≈ distinct neighborhood
+  const sectorX = Math.floor(wx / 100);
+  const sectorZ = Math.floor(wz / 100);
+  const sectorHash = Math.abs(sectorX * 7919 + sectorZ * 6271) % SECTOR_POLE_COLORS.length;
+  return {
+    pole: SECTOR_POLE_COLORS[sectorHash],
+    lampA: SECTOR_LAMP_COLORS[sectorHash][0],
+    lampB: SECTOR_LAMP_COLORS[sectorHash][1],
+  };
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ *  Highway / Autopista System
+ *
+ *  Highways are mega-roads that run along "super-avenues" — every
+ *  HIGHWAY_INTERVAL blocks. They are wider than avenues and have
+ *  concrete barriers, wider medians, and distinct lane markings.
+ *  The highway grid provides the main artery structure for large cities.
+ * ═══════════════════════════════════════════════════════════════ */
+
+/** Highway interval: every N blocks, one block becomes a highway */
+export const HIGHWAY_INTERVAL = 16;
+/** Highway total width in voxels (12: barrier + 4 lanes + median + 4 lanes + barrier) */
+export const HIGHWAY_W = 12;
+
+/** Returns true if this block coordinate is on a highway in X */
+export function isHighwayX(blockX: number): boolean {
+  return ((blockX % HIGHWAY_INTERVAL) + HIGHWAY_INTERVAL) % HIGHWAY_INTERVAL === 0;
+}
+/** Returns true if this block coordinate is on a highway in Z */
+export function isHighwayZ(blockZ: number): boolean {
+  return ((blockZ % HIGHWAY_INTERVAL) + HIGHWAY_INTERVAL) % HIGHWAY_INTERVAL === 0;
 }

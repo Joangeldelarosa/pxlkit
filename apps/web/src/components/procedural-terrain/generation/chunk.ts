@@ -16,7 +16,7 @@ import {
 import { mulberry32, fbm } from '../utils/noise';
 import { varyColor, hashCoord } from '../utils/color';
 import { getBiome, getVariedBiome, getContinent, getContinentElevation } from '../utils/biomes';
-import { classifyCityCell, getBuildingType, getBuildingHeight } from '../city/layout';
+import { classifyCityCell, getBuildingType, getBuildingHeight, getSectorLampColors, isHighwayX, isHighwayZ, HIGHWAY_W } from '../city/layout';
 import { generateBuildingColumn } from '../city/buildings';
 import type { PxlKitData } from '@pxlkit/core';
 
@@ -198,13 +198,19 @@ export function generateChunkData(
   /* ── Biome boundary height smoothing pass ──
    *  Where two different biomes meet the height can jump dramatically
    *  (e.g. city at 7 vs mountain at 30). This creates ugly cliffs.
-   *  We detect boundary cells (where any cardinal neighbor has a different biome)
-   *  and blend their height with the average of their neighbors.
-   *  2 passes ≈ 2-voxel-wide smooth ramp, balancing visual quality
-   *  vs per-chunk generation cost (~0.1ms per pass). */
+   *  We detect boundary cells (where any cardinal/diagonal neighbor has a different biome)
+   *  and blend their height with a Gaussian-weighted average of neighbors.
+   *  4 passes with diagonal+cardinal sampling ≈ smooth 4-voxel-wide ramp,
+   *  producing natural-looking terrain transitions. */
   {
-    const BLEND_PASSES = 2;
+    const BLEND_PASSES = 4;
     const tmpH = new Int32Array(hMap.length);
+    /* 8-neighbor offsets: dx, dz pairs (cardinal + diagonal) with Gaussian weights.
+       Cardinal neighbors (dist 1) get weight 1.0, diagonals (dist √2) get ~0.7. */
+    const NEIGHBOR_OFFSETS: [number, number, number][] = [
+      [-1, 0, 1.0],  [1, 0, 1.0],  [0, -1, 1.0],  [0, 1, 1.0],   // cardinal
+      [-1, -1, 0.7], [1, -1, 0.7], [-1, 1, 0.7],   [1, 1, 0.7],   // diagonal
+    ];
     for (let pass = 0; pass < BLEND_PASSES; pass++) {
       tmpH.set(hMap);
       for (let lx = 0; lx <= CHUNK_SIZE; lx++) {
@@ -213,28 +219,33 @@ export function generateChunkData(
           if (hMap[idx] < 0) continue;
           const myBiome = bMap[idx];
 
-          // Check cardinal neighbors for biome boundary
-          const idxN = lx * gW + (lz + 1);
-          const idxS = (lx + 2) * gW + (lz + 1);
-          const idxE = (lx + 1) * gW + (lz + 2);
-          const idxW = (lx + 1) * gW + lz;
+          // Check all 8 neighbors for biome boundary
+          let isBoundary = false;
+          for (let n = 0; n < NEIGHBOR_OFFSETS.length; n++) {
+            const [dx, dz] = NEIGHBOR_OFFSETS[n];
+            const nx = lx + 1 + dx, nz = lz + 1 + dz;
+            if (nx < 0 || nx >= gW || nz < 0 || nz >= gW) continue;
+            const nIdx = nx * gW + nz;
+            if (hMap[nIdx] >= 0 && bMap[nIdx] !== myBiome) {
+              isBoundary = true;
+              break;
+            }
+          }
+          if (!isBoundary) continue;
 
-          const isEdge =
-            (hMap[idxN] >= 0 && bMap[idxN] !== myBiome) ||
-            (hMap[idxS] >= 0 && bMap[idxS] !== myBiome) ||
-            (hMap[idxE] >= 0 && bMap[idxE] !== myBiome) ||
-            (hMap[idxW] >= 0 && bMap[idxW] !== myBiome);
-
-          if (!isEdge) continue;
-
-          // Blend: weighted average with 4 cardinal neighbors
-          let sum = hMap[idx] * 2;
-          let w = 2;
-          const neighbors = [idxN, idxS, idxE, idxW];
-          for (const ni of neighbors) {
-            if (hMap[ni] >= 0) {
-              sum += hMap[ni];
-              w += 1;
+          // Gaussian-weighted average with all 8 neighbors
+          // Center weight is higher on later passes for stability
+          const centerW = 2.0 + pass * 0.5;
+          let sum = hMap[idx] * centerW;
+          let w = centerW;
+          for (let n = 0; n < NEIGHBOR_OFFSETS.length; n++) {
+            const [dx, dz, nw] = NEIGHBOR_OFFSETS[n];
+            const nx = lx + 1 + dx, nz = lz + 1 + dz;
+            if (nx < 0 || nx >= gW || nz < 0 || nz >= gW) continue;
+            const nIdx = nx * gW + nz;
+            if (hMap[nIdx] >= 0) {
+              sum += hMap[nIdx] * nw;
+              w += nw;
             }
           }
           tmpH[idx] = Math.max(0, Math.min(MAX_HEIGHT, Math.floor(sum / w)));
@@ -370,8 +381,9 @@ export function generateChunkData(
       /* ══════════════════ 3. CITY BIOME ══════════════════ */
       if (biome === 'city') {
         const cell = classifyCityCell(wx, wz, structN);
-        npcWalkableMap[lIdx] = (cell.isRoad || cell.isSidewalk) ? 1 : 0;
+        npcWalkableMap[lIdx] = (cell.isRoad || cell.isSidewalk || cell.isOpenZone) ? 1 : 0;
         if (cell.isRoad || cell.isSidewalk) groundHeightMap[lIdx] = h + 1;
+        if (cell.isOpenZone) groundHeightMap[lIdx] = h;
 
         if (cell.isRoad) {
           /* ── Road surface ── */
@@ -379,8 +391,9 @@ export function generateChunkData(
           const modZ = ((wz % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
           const rw = cell.roadWidth;
 
-          // Road surface color — avenues slightly lighter than standard
-          const roadBase = cell.isIntersection ? '#505050'
+          // Road surface color — highways darker, avenues slightly lighter
+          const roadBase = cell.isHighway ? '#2a2a2a'
+                         : cell.isIntersection ? '#505050'
                          : cell.isAvenue ? '#424242'
                          : '#383838';
           push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
@@ -489,6 +502,8 @@ export function generateChunkData(
             const rwZ = cell.roadWidthZ;
             const atCorner = (modX === 0 || modX === rwX - 1) && (modZ === 0 || modZ === rwZ - 1);
             if (atCorner) {
+              // Sector-based lamppost colors
+              const sectorColors = getSectorLampColors(wx, wz);
               // Pole base sits on the road surface: (h+1)*VOXEL_SIZE + VOXEL_SIZE*0.5
               const poleBaseY = (h + 1) * VOXEL_SIZE + VOXEL_SIZE * 0.5;
               const px = cellCx;
@@ -497,7 +512,7 @@ export function generateChunkData(
               for (let by = 0; by < 3; by++) {
                 for (let bx = -1; bx <= 0; bx++) {
                   for (let bz = -1; bz <= 0; bz++) {
-                    pushMini(px + bx * MVS, poleBaseY + by * MVS, pz + bz * MVS, '#3a3a3a');
+                    pushMini(px + bx * MVS, poleBaseY + by * MVS, pz + bz * MVS, sectorColors.pole);
                   }
                 }
               }
@@ -516,17 +531,17 @@ export function generateChunkData(
               for (let a = 1; a <= 4; a++) {
                 pushMini(px + a * armDx * MVS, poleBaseY + (shaftH - 1) * MVS, pz, '#666666');
               }
-              // Light at end of X arm (2×2 glow)
-              pushMini(px + 3 * armDx * MVS, poleBaseY + shaftH * MVS, pz, '#ffee88');
-              pushMini(px + 4 * armDx * MVS, poleBaseY + shaftH * MVS, pz, '#ffdd66');
+              // Light at end of X arm (2×2 glow) — sector colored
+              pushMini(px + 3 * armDx * MVS, poleBaseY + shaftH * MVS, pz, sectorColors.lampA);
+              pushMini(px + 4 * armDx * MVS, poleBaseY + shaftH * MVS, pz, sectorColors.lampB);
               // Register X-arm light for night illumination
               pushSL(px + 3.5 * armDx * MVS, poleBaseY + shaftH * MVS, pz);
               // Z-direction arm + light
               for (let a = 1; a <= 4; a++) {
                 pushMini(px, poleBaseY + (shaftH - 1) * MVS, pz + a * armDz * MVS, '#666666');
               }
-              pushMini(px, poleBaseY + shaftH * MVS, pz + 3 * armDz * MVS, '#ffee88');
-              pushMini(px, poleBaseY + shaftH * MVS, pz + 4 * armDz * MVS, '#ffdd66');
+              pushMini(px, poleBaseY + shaftH * MVS, pz + 3 * armDz * MVS, sectorColors.lampA);
+              pushMini(px, poleBaseY + shaftH * MVS, pz + 4 * armDz * MVS, sectorColors.lampB);
               // Register Z-arm light for night illumination
               pushSL(px, poleBaseY + shaftH * MVS, pz + 3.5 * armDz * MVS);
               // trackH still uses regular voxel grid height
@@ -590,6 +605,178 @@ export function generateChunkData(
                     varyColor('#55bb66', wx + dx, h + 3, wz + dz, 5, 0.06, 0.08));
                 }
               }
+            }
+          }
+
+        } else if (cell.isOpenZone) {
+          /* ═══════════════ Open Zone Rendering ═══════════════
+           *  These areas break up the city grid with natural/empty spaces.
+           *  Each type has distinct visual treatment. */
+          const ozType = cell.openZoneType;
+
+          if (ozType === 'farmland') {
+            /* ── Farmland: large crop fields with paths ── */
+            const fieldGridX = Math.floor(wx / 8);
+            const fieldGridZ = Math.floor(wz / 8);
+            const cropNoise = hashCoord(fieldGridX * 5 + 900, 0, fieldGridZ * 5 + 900);
+            const cropType = Math.floor(cropNoise * 7);
+            const rowPhase = ((wx % 3) + 3) % 3;
+
+            if (rowPhase <= 1) {
+              // Tilled soil
+              push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#6B4423', wx, h, wz, 3, 0.03, 0.05));
+              // Crop on soil
+              if (rowPhase === 0 && ((wz % 2 + 2) % 2 === 0)) {
+                const cropH = 1 + (Math.abs(wx * 5 + wz * 3) % 2);
+                const cc = CROP_COLORS[cropType % CROP_COLORS.length];
+                const sc2 = CROP_STALK_COLORS[cropType % CROP_STALK_COLORS.length];
+                for (let cy = 1; cy <= cropH; cy++) {
+                  push((bX + lx) * VOXEL_SIZE, (h + cy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                    varyColor(cy === cropH ? cc : sc2, wx, h + cy, wz, 8, 0.08, 0.08));
+                }
+                trackH(lx, lz, h + cropH);
+              }
+            } else {
+              // Path between crop rows
+              push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#9B8B6B', wx, h, wz, 2, 0.02, 0.04));
+            }
+            // Occasional fence posts at field borders
+            if ((wx % 8 === 0 || wz % 8 === 0) && (wx + wz) % 4 === 0) {
+              push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#886644', wx, h + 1, wz, 3, 0.04, 0.06));
+              push((bX + lx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#886644', wx, h + 2, wz, 3, 0.04, 0.06));
+            }
+
+          } else if (ozType === 'highway_corridor') {
+            /* ── Highway corridor: open land alongside highways ── */
+            // Flat gravel/dirt shoulder
+            const nearRoad = ((wx % BLOCK_SIZE + BLOCK_SIZE) % BLOCK_SIZE) < 3
+                          || ((wz % BLOCK_SIZE + BLOCK_SIZE) % BLOCK_SIZE) < 3;
+            if (nearRoad) {
+              // Gravel shoulder close to road
+              push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#999988', wx, h + 1, wz, 2, 0.03, 0.04));
+              trackH(lx, lz, h + 1);
+            } else {
+              // Wild grass / weeds
+              push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#77aa55', wx, h, wz, 5, 0.06, 0.08));
+              // Scattered wild bushes
+              if (hashCoord(wx, 0, wz) > 0.85) {
+                push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#559944', wx, h + 1, wz, 6, 0.06, 0.08));
+                trackH(lx, lz, h + 1);
+              }
+            }
+            // Highway barrier walls at regular intervals
+            if ((wx % 10 === 0 || wz % 10 === 0) && nearRoad) {
+              push((bX + lx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#888888', wx, h + 2, wz, 2, 0.02, 0.04));
+              trackH(lx, lz, h + 2);
+            }
+
+          } else if (ozType === 'green_buffer') {
+            /* ── Green buffer: mini-parks, tree lines, grass areas ── */
+            push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor('#55bb66', wx, h, wz, 5, 0.06, 0.08));
+            // Trees: dense canopy areas
+            const treeV = hashCoord(wx * 3, 0, wz * 3);
+            if (treeV > 0.7 && lx > 1 && lx < CHUNK_SIZE - 2 && lz > 1 && lz < CHUNK_SIZE - 2) {
+              const trunkH = 2 + Math.floor(treeV * 3);
+              for (let ty = 1; ty <= trunkH; ty++) {
+                push((bX + lx) * VOXEL_SIZE, (h + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#664422', wx, h + ty, wz, 4, 0.05, 0.06));
+              }
+              const cr = 2;
+              const cy2 = h + trunkH + cr;
+              for (let dx = -cr; dx <= cr; dx++) for (let dy = -cr; dy <= cr; dy++) for (let dz = -cr; dz <= cr; dz++) {
+                const d2 = dx * dx + dy * dy + dz * dz;
+                if (d2 > cr * cr + 0.5 || (cr > 1 && d2 < (cr - 1) * (cr - 1))) continue;
+                push((bX + lx + dx) * VOXEL_SIZE, (cy2 + dy) * VOXEL_SIZE, (bZ + lz + dz) * VOXEL_SIZE,
+                  varyColor('#44aa55', wx + dx, cy2 + dy, wz + dz, 8, 0.08, 0.08));
+              }
+              trackH(lx, lz, cy2 + cr);
+            } else if (treeV > 0.5) {
+              // Bush
+              push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#449955', wx, h + 1, wz, 6, 0.06, 0.08));
+              trackH(lx, lz, h + 1);
+            }
+            // Walking path through green buffer
+            if (((wx % 6) + 6) % 6 === 3 || ((wz % 6) + 6) % 6 === 3) {
+              push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#bbaa88', wx, h, wz, 2, 0.03, 0.04));
+            }
+
+          } else if (ozType === 'empty_lot') {
+            /* ── Empty lot: dirt, rubble, occasional junk ── */
+            const lotNoise = hashCoord(wx * 7, 0, wz * 7);
+            if (lotNoise > 0.9) {
+              // Rubble pile
+              push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#888877', wx, h, wz, 3, 0.04, 0.06));
+              push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#777766', wx, h + 1, wz, 3, 0.04, 0.06));
+              trackH(lx, lz, h + 1);
+            } else if (lotNoise > 0.6) {
+              // Weedy ground
+              push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#889966', wx, h, wz, 4, 0.05, 0.07));
+            } else {
+              // Bare dirt
+              push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#998877', wx, h, wz, 3, 0.03, 0.05));
+            }
+            // Chain-link fence at lot perimeter
+            if ((wx % BLOCK_SIZE === cell.roadWidthX + LOT_INSET) ||
+                (wz % BLOCK_SIZE === cell.roadWidthZ + LOT_INSET)) {
+              push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#aaaaaa', wx, h + 1, wz, 2, 0.02, 0.04));
+              if (wx % 4 === 0 || wz % 4 === 0) {
+                push((bX + lx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#aaaaaa', wx, h + 2, wz, 2, 0.02, 0.04));
+              }
+            }
+
+          } else if (ozType === 'suburban_yard') {
+            /* ── Suburban yard: lawn with occasional structures ── */
+            push((bX + lx) * VOXEL_SIZE, h * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor('#66bb55', wx, h, wz, 5, 0.06, 0.08));
+            const yardNoise = hashCoord(wx * 11, 0, wz * 11);
+            // Scattered garden features
+            if (yardNoise > 0.92) {
+              // Garden shed (1 voxel)
+              push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#885533', wx, h + 1, wz, 4, 0.05, 0.06));
+              push((bX + lx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#885533', wx, h + 2, wz, 4, 0.05, 0.06));
+              push((bX + lx) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#cc6633', wx, h + 3, wz, 4, 0.04, 0.06));
+              trackH(lx, lz, h + 3);
+            } else if (yardNoise > 0.82) {
+              // Flower bed
+              const flowerColors = ['#ff6688', '#ffaa44', '#ff44aa', '#aaddff', '#ffff44'];
+              push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor(flowerColors[Math.floor(yardNoise * 50) % flowerColors.length], wx, h + 1, wz, 6, 0.06, 0.08));
+              trackH(lx, lz, h + 1);
+            } else if (yardNoise > 0.7) {
+              // Small tree
+              push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#664422', wx, h + 1, wz, 4, 0.05, 0.06));
+              push((bX + lx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#664422', wx, h + 2, wz, 4, 0.05, 0.06));
+              push((bX + lx) * VOXEL_SIZE, (h + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#44aa55', wx, h + 3, wz, 6, 0.06, 0.08));
+              trackH(lx, lz, h + 3);
+            }
+            // Picket fence at yard boundary
+            if ((wx % BLOCK_SIZE === cell.roadWidthX + LOT_INSET) ||
+                (wz % BLOCK_SIZE === cell.roadWidthZ + LOT_INSET)) {
+              push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#ddddcc', wx, h + 1, wz, 2, 0.03, 0.04));
             }
           }
 
