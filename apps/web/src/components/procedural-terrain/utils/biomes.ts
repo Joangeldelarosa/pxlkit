@@ -191,7 +191,11 @@ export function getBiome(
       // Small noise pockets that barely cross the threshold produce tiny cities.
       // We require the low-freq city noise to also be above a stricter threshold.
       const cvLowFreq = biomeN(wx * 0.003 + 500, wz * 0.003 + 500);
-      if (cvLowFreq <= cityThreshold + 0.08) {
+      // 0.08 offset ensures the low-freq signal confirms a city patch at least
+      // ~50 voxels across (0.003 freq × 50 ≈ one noise period); smaller patches
+      // that only barely pass the high-freq check are filtered out.
+      const MIN_CITY_SIZE_MARGIN = 0.08;
+      if (cvLowFreq <= cityThreshold + MIN_CITY_SIZE_MARGIN) {
         // Not a large enough city patch — fall through to natural biome
       } else {
         // ── No cities below water ──
