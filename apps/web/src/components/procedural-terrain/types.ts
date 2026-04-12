@@ -36,7 +36,8 @@ export interface WorldConfig {
   npcScale: number;               // 0.25-2.0 NPC body scale multiplier
   npcMaxPerChunk: number;         // 1-50 max NPCs spawned per chunk
   chunkFadeStart: number;         // 0-1 where distance fade begins (0 = from camera, 1 = no fade). Chunks beyond this fraction of renderDistance start fading.
-  chunkFadeStrength: number;      // 0-1 intensity of the distance fade (0 = no fade, 1 = chunks at edge fully squished/hidden)
+  chunkFadeStrength: number;      // 0-1 intensity of the distance fade (0 = no fade, 1 = chunks at edge fully darkened)
+  chunkFadeSpeed: number;         // 0.5-3.0 how fast new chunks fade in from dark to clear (higher = faster)
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
@@ -72,6 +73,7 @@ export const DEFAULT_CONFIG: WorldConfig = {
   npcMaxPerChunk: 6,
   chunkFadeStart: 0.6,
   chunkFadeStrength: 0.8,
+  chunkFadeSpeed: 1.5,
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -88,7 +90,7 @@ export type GraphicsPresetName = 'potato' | 'low' | 'medium' | 'high' | 'ultra';
 /** Partial WorldConfig for the keys each preset controls */
 export type GraphicsPresetValues = Pick<WorldConfig,
   | 'renderDistance' | 'chunkGenSpeed' | 'fogDensity'
-  | 'chunkFadeStart' | 'chunkFadeStrength'
+  | 'chunkFadeStart' | 'chunkFadeStrength' | 'chunkFadeSpeed'
   | 'treeDensity' | 'structureDensity' | 'cityFrequency'
   | 'particleIntensity' | 'backgroundDetail'
   | 'boatDensity' | 'boatDistance'
@@ -105,6 +107,7 @@ export const GRAPHICS_PRESETS: Record<GraphicsPresetName, GraphicsPresetValues> 
     fogDensity: 0.6,
     chunkFadeStart: 0.5,
     chunkFadeStrength: 1,
+    chunkFadeSpeed: 2.0,
     treeDensity: 0.2,
     structureDensity: 0.2,
     cityFrequency: 0.2,
@@ -127,6 +130,7 @@ export const GRAPHICS_PRESETS: Record<GraphicsPresetName, GraphicsPresetValues> 
     fogDensity: 0.5,
     chunkFadeStart: 0.55,
     chunkFadeStrength: 0.9,
+    chunkFadeSpeed: 1.8,
     treeDensity: 0.4,
     structureDensity: 0.4,
     cityFrequency: 0.3,
@@ -149,6 +153,7 @@ export const GRAPHICS_PRESETS: Record<GraphicsPresetName, GraphicsPresetValues> 
     fogDensity: 0.4,
     chunkFadeStart: 0.6,
     chunkFadeStrength: 0.8,
+    chunkFadeSpeed: 1.5,
     treeDensity: 0.6,
     structureDensity: 0.6,
     cityFrequency: 0.45,
@@ -171,6 +176,7 @@ export const GRAPHICS_PRESETS: Record<GraphicsPresetName, GraphicsPresetValues> 
     fogDensity: 0.35,
     chunkFadeStart: 0.65,
     chunkFadeStrength: 0.75,
+    chunkFadeSpeed: 1.2,
     treeDensity: 0.8,
     structureDensity: 0.8,
     cityFrequency: 0.6,
@@ -193,6 +199,7 @@ export const GRAPHICS_PRESETS: Record<GraphicsPresetName, GraphicsPresetValues> 
     fogDensity: 0.3,
     chunkFadeStart: 0.7,
     chunkFadeStrength: 0.7,
+    chunkFadeSpeed: 1.0,
     treeDensity: 1,
     structureDensity: 1,
     cityFrequency: 0.8,
