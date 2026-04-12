@@ -35,8 +35,8 @@ export interface WorldConfig {
   npcDistance: number;            // 2-100 chunk radius for NPC population (max = renderDistance)
   npcScale: number;               // 0.25-2.0 NPC body scale multiplier
   npcMaxPerChunk: number;         // 1-50 max NPCs spawned per chunk
-  chunkFadeStart: number;         // 0-1 where distance fade begins (0 = from camera, 1 = no fade). Chunks beyond this start fading into atmosphere.
-  chunkFadeStrength: number;      // 0-1 intensity of the distance fade (0 = no fade effect, 1 = chunks at edge fully disappear into fog)
+  chunkFadeStart: number;         // 0-1 where distance fade begins (reserved for future use — currently FogExp2 handles all distance fading)
+  chunkFadeStrength: number;      // 0-1 intensity of the distance fade (reserved for future use — currently FogExp2 handles all distance fading)
 }
 
 export const DEFAULT_CONFIG: WorldConfig = {
