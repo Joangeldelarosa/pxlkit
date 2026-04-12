@@ -200,7 +200,8 @@ export function generateChunkData(
    *  (e.g. city at 7 vs mountain at 30). This creates ugly cliffs.
    *  We detect boundary cells (where any cardinal neighbor has a different biome)
    *  and blend their height with the average of their neighbors.
-   *  Multiple passes widen the blend zone for a natural ramp. */
+   *  2 passes ≈ 2-voxel-wide smooth ramp, balancing visual quality
+   *  vs per-chunk generation cost (~0.1ms per pass). */
   {
     const BLEND_PASSES = 2;
     const tmpH = new Int32Array(hMap.length);
@@ -301,10 +302,10 @@ export function generateChunkData(
 
   const chunkRand = mulberry32(cx * 73856093 + cz * 19349663);
 
-  /** Height threshold for snow-capped mountain peaks (55% of MAX_HEIGHT) */
-  const SNOW_LINE = Math.max(30, Math.floor(MAX_HEIGHT * 0.55));
-  /** Height threshold for exposed rock transition zone (38% of MAX_HEIGHT) */
-  const ROCK_LINE = Math.max(20, Math.floor(MAX_HEIGHT * 0.38));
+  /** Height threshold for snow-capped mountain peaks (55% of MAX_HEIGHT, min ~47%) */
+  const SNOW_LINE = Math.max(Math.floor(MAX_HEIGHT * 0.47), Math.floor(MAX_HEIGHT * 0.55));
+  /** Height threshold for exposed rock transition zone (38% of MAX_HEIGHT, min ~31%) */
+  const ROCK_LINE = Math.max(Math.floor(MAX_HEIGHT * 0.31), Math.floor(MAX_HEIGHT * 0.38));
 
   /* ════════════════════════ MAIN LOOP ════════════════════════ */
   for (let lx = 0; lx < CHUNK_SIZE; lx++) {
