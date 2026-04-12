@@ -13,7 +13,7 @@
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useRef, useLayoutEffect, useEffect } from 'react';
+import { useRef, useMemo, useLayoutEffect, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { ChunkVoxelData } from '../types';
@@ -71,21 +71,22 @@ export function ChunkMesh({
   const groupRef = useRef<THREE.Group>(null);
 
   /* Per-chunk materials — cloned from templates, disposed on unmount.
-   * material.color is animated each frame to create the fade effect. */
-  const mats = useRef({
+   * material.color is animated each frame to create the fade effect.
+   * useMemo (not useRef) so the materials are safe to read in JSX. */
+  const mats = useMemo(() => ({
     solid: solidTemplate.clone(),
     water: waterTemplate.clone(),
     mini: miniTemplate.clone(),
     paint: paintTemplate.clone(),
-  });
+  }), []);
 
   /* Dispose cloned materials on unmount */
   useEffect(() => () => {
-    mats.current.solid.dispose();
-    mats.current.water.dispose();
-    mats.current.mini.dispose();
-    mats.current.paint.dispose();
-  }, []);
+    mats.solid.dispose();
+    mats.water.dispose();
+    mats.mini.dispose();
+    mats.paint.dispose();
+  }, [mats]);
 
   /* Birth-time fade progress: 0 (dark) → 1 (clear) */
   const fadeProgress = useRef(0);
@@ -201,12 +202,13 @@ export function ChunkMesh({
 
     /* Darken material colour: interpolate FADE_DARK → white */
     _tmpColor.lerpColors(FADE_DARK, FADE_WHITE, combined);
-    mats.current.solid.color.copy(_tmpColor);
-    mats.current.mini.color.copy(_tmpColor);
-    mats.current.paint.color.copy(_tmpColor);
-    mats.current.water.color.copy(_tmpColor);
+    mats.solid.color.copy(_tmpColor);
+    mats.mini.color.copy(_tmpColor);
+    mats.paint.color.copy(_tmpColor);
+    mats.water.color.copy(_tmpColor);
     /* Water opacity also fades (base opacity 0.6) */
-    mats.current.water.opacity = 0.6 * Math.max(0.05, combined);
+    // eslint-disable-next-line react-hooks/immutability -- Three.js material mutation inside useFrame, not during render
+    mats.water.opacity = 0.6 * Math.max(0.05, combined);
 
     /* Hide chunks that are essentially invisible */
     g.visible = combined > 0.01;
@@ -214,10 +216,10 @@ export function ChunkMesh({
 
   return (
     <group ref={groupRef}>
-      {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, mats.current.solid, data.count]} frustumCulled={false} />}
-      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, mats.current.water, data.waterCount]} frustumCulled={false} />}
-      {data.miniVoxelCount > 0 && <instancedMesh ref={miniRef} args={[miniGeo, mats.current.mini, data.miniVoxelCount]} frustumCulled={false} />}
-      {data.paintCount > 0 && <instancedMesh ref={paintRef} args={[paintGeo, mats.current.paint, data.paintCount]} frustumCulled={false} />}
+      {data.count > 0 && <instancedMesh ref={solidRef} args={[sharedGeo, mats.solid, data.count]} frustumCulled={false} />}
+      {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, mats.water, data.waterCount]} frustumCulled={false} />}
+      {data.miniVoxelCount > 0 && <instancedMesh ref={miniRef} args={[miniGeo, mats.mini, data.miniVoxelCount]} frustumCulled={false} />}
+      {data.paintCount > 0 && <instancedMesh ref={paintRef} args={[paintGeo, mats.paint, data.paintCount]} frustumCulled={false} />}
     </group>
   );
 }
