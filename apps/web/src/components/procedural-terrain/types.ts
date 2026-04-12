@@ -227,6 +227,43 @@ export interface BiomeConfig {
   colors: { top: string; mid: string; bottom: string; accent: string; water: string };
 }
 
+/* ── Continent / Territory system ── */
+
+/**
+ * Large-scale territory types that control terrain elevation, biome distribution,
+ * and overall character of huge regions of the world.
+ */
+export type ContinentType =
+  | 'metropolis'    // Dense cityscape: mostly city biome, flat terrain, high buildings
+  | 'wilderness'    // Untamed nature: forests, mountains, no cities, dramatic elevation
+  | 'archipelago'   // Island chains: mostly ocean with scattered small islands
+  | 'highlands'     // Elevated plateaus: high base elevation, rolling hills, sparse villages
+  | 'wasteland'     // Barren desert: low vegetation, sand dunes, rare oases
+  | 'farmland'      // Rural countryside: flat terrain, villages, crop fields
+  | 'volcanic'      // Dramatic peaks: very high mountains, lava-colored accents
+  | 'coastal';      // Mixed coast: beaches transitioning to inland, moderate elevation
+
+/**
+ * Per-continent profile that modifies terrain generation at a large scale.
+ */
+export interface ContinentProfile {
+  name: string;
+  /** Base elevation offset added to the entire continent (can be negative for ocean) */
+  elevationBase: number;
+  /** Multiplier for height noise amplitude (>1 = more dramatic terrain) */
+  elevationScale: number;
+  /** How much city biome appears (multiplier on cityFrequency) */
+  cityDensity: number;
+  /** How much village biome appears (multiplier) */
+  villageDensity: number;
+  /** Water level offset (positive = more water / flooding) */
+  waterOffset: number;
+  /** Building height multiplier for city zones */
+  buildingHeightMult: number;
+  /** Extra color tint applied to terrain [hue, sat, lit] shifts */
+  colorTint: [number, number, number];
+}
+
 /** Data for one generated chunk */
 export interface ChunkVoxelData {
   positions: Float32Array;
