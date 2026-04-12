@@ -151,6 +151,8 @@ export function ChunkMesh({
     if (!g) return;
 
     /* ── Birth fade-in (Y-scale 0→1) ── */
+    /* Cap delta to 100ms so tab-switch or frame stutter doesn't
+     * cause a single huge jump through the entire animation. */
     const dt = Math.min(0.1, delta);
     if (fadeProgress.current < 1) {
       fadeProgress.current = Math.min(1, fadeProgress.current + dt / FADE_IN_DURATION);
