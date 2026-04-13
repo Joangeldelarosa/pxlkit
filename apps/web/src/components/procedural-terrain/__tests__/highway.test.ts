@@ -670,9 +670,8 @@ describe('Highway curves', () => {
     // Not all centers should be the same if curves are working
     const uniqueVals = new Set(centers);
     // With gentle curves (amplitude=3), we expect some variation
-    // but it's possible for small samples to be close — just verify not all identical
     if (centers.length >= 5) {
-      expect(uniqueVals.size).toBeGreaterThanOrEqual(1); // at minimum 1
+      expect(uniqueVals.size).toBeGreaterThan(1);
     }
   });
 });
