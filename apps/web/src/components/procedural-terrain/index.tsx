@@ -616,7 +616,7 @@ export default function ProceduralTerrain() {
             </PixelFadeIn>
             <PixelFadeIn duration={400} delay={300}>
               <p className="text-retro-muted/60 text-[10px] sm:text-xs max-w-sm mx-auto leading-relaxed select-none mb-5 sm:mb-6">
-                Infinite procedural voxel worlds with 9+ biomes, cities, highways, day/night cycles, and shareable scenes.
+                Infinite procedural voxel worlds with 9 biomes, cities, highways, day/night cycles, and shareable scenes.
                 <span className="text-retro-gold font-bold">{isMobile ? ' Tap to fly.' : ' Click to explore.'}</span>
               </p>
             </PixelFadeIn>
