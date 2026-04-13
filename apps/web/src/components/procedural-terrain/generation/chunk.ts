@@ -379,6 +379,46 @@ export function generateChunkData(
     }
   }
 
+  /* ── Terrain clearing zone: lower terrain near highways ──
+   *  For cells immediately adjacent to the highway corridor, cap their
+   *  terrain height to the highway road level. This prevents neighboring
+   *  terrain (crops, dirt, mountains) from visually protruding above the
+   *  highway surface. We extend 2 cells outward from any highway cell. */
+  const HW_CLEAR_RADIUS = 2;
+  for (let lx = 0; lx < CHUNK_SIZE; lx++) {
+    for (let lz = 0; lz < CHUNK_SIZE; lz++) {
+      const lIdx = lx * CHUNK_SIZE + lz;
+      if (hwLevelMap[lIdx] < 0) continue; // not a highway cell
+      if (hwTunnelMap[lIdx] === 1) continue; // tunnels keep terrain above
+
+      const roadLvl = hwLevelMap[lIdx];
+      const hmIdx = (lx + 1) * gW + (lz + 1);
+      const terrH = hMap[hmIdx];
+      // Only clear if terrain is above road level
+      if (terrH <= roadLvl) continue;
+
+      // Lower neighboring cells that are NOT on the highway
+      for (let dx = -HW_CLEAR_RADIUS; dx <= HW_CLEAR_RADIUS; dx++) {
+        for (let dz = -HW_CLEAR_RADIUS; dz <= HW_CLEAR_RADIUS; dz++) {
+          if (dx === 0 && dz === 0) continue;
+          const nx = lx + dx, nz = lz + dz;
+          if (nx < -1 || nx > CHUNK_SIZE || nz < -1 || nz > CHUNK_SIZE) continue;
+          const nHmIdx = (nx + 1) * gW + (nz + 1);
+          // Only lower if this neighbor is NOT itself a highway cell
+          const nLIdx = nx >= 0 && nx < CHUNK_SIZE && nz >= 0 && nz < CHUNK_SIZE
+            ? nx * CHUNK_SIZE + nz : -1;
+          if (nLIdx >= 0 && hwLevelMap[nLIdx] >= 0) continue; // neighbor is highway, skip
+          // Cap neighbor terrain to road level (smooth slope)
+          const dist = Math.max(Math.abs(dx), Math.abs(dz));
+          const maxH = roadLvl + dist; // allow slight slope outward
+          if (hMap[nHmIdx] > maxH) {
+            hMap[nHmIdx] = maxH;
+          }
+        }
+      }
+    }
+  }
+
   /* ── Helper: push solid voxel ── */
   function push(px: number, py: number, pz: number, hex: string) {
     if (sc >= maxV) return;
@@ -747,9 +787,9 @@ export function generateChunkData(
                   }
                 }
               }
-              // Main shaft: single column of mini-voxels, ~40 units tall
-              // Total real height: 40 * 0.075 = 3.0 world units (= 6 regular voxels)
-              const shaftH = 40;
+              // Main shaft: single column of mini-voxels, ~22 units tall
+              // Total real height: 22 * 0.075 = 1.65 world units (= ~3.3 regular voxels)
+              const shaftH = 22;
               for (let sy = 3; sy < shaftH; sy++) {
                 pushMini(px, poleBaseY + sy * MVS, pz, '#555555');
               }
@@ -758,23 +798,23 @@ export function generateChunkData(
               // Lamp arm extends toward road center from corner
               const armDx = (modX === 0) ? 1 : -1;
               const armDz = (modZ === 0) ? 1 : -1;
-              // X-direction arm (4 mini-voxels long) + light fixture
-              for (let a = 1; a <= 4; a++) {
+              // X-direction arm (3 mini-voxels long) + light fixture
+              for (let a = 1; a <= 3; a++) {
                 pushMini(px + a * armDx * MVS, poleBaseY + (shaftH - 1) * MVS, pz, '#666666');
               }
-              // Light at end of X arm (2×2 glow) — sector colored
-              pushMini(px + 3 * armDx * MVS, poleBaseY + shaftH * MVS, pz, sectorColors.lampA);
-              pushMini(px + 4 * armDx * MVS, poleBaseY + shaftH * MVS, pz, sectorColors.lampB);
+              // Light at end of X arm — sector colored
+              pushMini(px + 2 * armDx * MVS, poleBaseY + shaftH * MVS, pz, sectorColors.lampA);
+              pushMini(px + 3 * armDx * MVS, poleBaseY + shaftH * MVS, pz, sectorColors.lampB);
               // Register X-arm light for night illumination
-              pushSL(px + 3.5 * armDx * MVS, poleBaseY + shaftH * MVS, pz);
+              pushSL(px + 2.5 * armDx * MVS, poleBaseY + shaftH * MVS, pz);
               // Z-direction arm + light
-              for (let a = 1; a <= 4; a++) {
+              for (let a = 1; a <= 3; a++) {
                 pushMini(px, poleBaseY + (shaftH - 1) * MVS, pz + a * armDz * MVS, '#666666');
               }
-              pushMini(px, poleBaseY + shaftH * MVS, pz + 3 * armDz * MVS, sectorColors.lampA);
-              pushMini(px, poleBaseY + shaftH * MVS, pz + 4 * armDz * MVS, sectorColors.lampB);
+              pushMini(px, poleBaseY + shaftH * MVS, pz + 2 * armDz * MVS, sectorColors.lampA);
+              pushMini(px, poleBaseY + shaftH * MVS, pz + 3 * armDz * MVS, sectorColors.lampB);
               // Register Z-arm light for night illumination
-              pushSL(px, poleBaseY + shaftH * MVS, pz + 3.5 * armDz * MVS);
+              pushSL(px, poleBaseY + shaftH * MVS, pz + 2.5 * armDz * MVS);
               // trackH still uses regular voxel grid height
               trackH(lx, lz, h + 1 + Math.ceil((shaftH * MVS) / VOXEL_SIZE));
             }
@@ -790,7 +830,7 @@ export function generateChunkData(
             const axisPos = onRoadZ && !onRoadX ? wx : wz;
             // Lamp spacing: every 8 voxels along the axis
             if (isLampBarrier && ((axisPos % 8 + 8) % 8 === 0)) {
-              const lampH = 5;
+              const lampH = 2;
               for (let ly = 3; ly <= lampH + 2; ly++) {
                 push((bX + lx) * VOXEL_SIZE, (h + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                   varyColor('#555555', wx, h + ly, wz, 2, 0.02, 0.03));
@@ -1204,8 +1244,8 @@ export function generateChunkData(
             const furniture = getHighwayFurniture(wx, wz, hwClass, true, isTunnel, hi.onX);
 
             if (furniture.type === 'lamp_sodium' || furniture.type === 'lamp_led' || furniture.type === 'lamp_rural') {
-              // Tall highway lamp post
-              const lampH = furniture.type === 'lamp_rural' ? 3 : furniture.type === 'lamp_led' ? 5 : 4;
+              // Highway lamp post — scaled to match voxel world proportions
+              const lampH = furniture.type === 'lamp_rural' ? 1 : furniture.type === 'lamp_led' ? 2 : 2;
               const poleCol = '#555555';
               for (let ly = barrierH + 1; ly <= barrierH + lampH; ly++) {
                 push((bX + lx) * VOXEL_SIZE, (roadY + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
@@ -1219,8 +1259,8 @@ export function generateChunkData(
               pushSL((bX + lx) * VOXEL_SIZE, (roadY + barrierH + lampH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE);
               trackH(lx, lz, roadY + barrierH + lampH + 1);
             } else if (furniture.type === 'sign_direction') {
-              // Green highway direction sign: 2-voxel pole + 2-voxel wide green board
-              const signH = 4;
+              // Green highway direction sign: pole + green board
+              const signH = 2;
               for (let sy = barrierH + 1; sy <= barrierH + signH; sy++) {
                 push((bX + lx) * VOXEL_SIZE, (roadY + sy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                   varyColor('#555555', wx, roadY + sy, wz, 2, 0.02, 0.03));
@@ -1233,7 +1273,7 @@ export function generateChunkData(
               trackH(lx, lz, roadY + barrierH + signH + 2);
             } else if (furniture.type === 'sign_speed') {
               // White speed sign: short pole + white square
-              const postH = 3;
+              const postH = 2;
               for (let sy = barrierH + 1; sy <= barrierH + postH; sy++) {
                 push((bX + lx) * VOXEL_SIZE, (roadY + sy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                   varyColor('#555555', wx, roadY + sy, wz, 2, 0.02, 0.03));
@@ -1242,8 +1282,8 @@ export function generateChunkData(
                 varyColor('#eeeeee', wx, roadY + barrierH + postH + 1, wz, 2, 0.02, 0.02));
               trackH(lx, lz, roadY + barrierH + postH + 1);
             } else if (furniture.type === 'billboard') {
-              // Billboard: tall pole + wide colored board
-              const bbH = 5;
+              // Billboard: pole + colored board
+              const bbH = 3;
               for (let sy = barrierH + 1; sy <= barrierH + bbH; sy++) {
                 push((bX + lx) * VOXEL_SIZE, (roadY + sy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                   varyColor('#666666', wx, roadY + sy, wz, 2, 0.02, 0.03));
