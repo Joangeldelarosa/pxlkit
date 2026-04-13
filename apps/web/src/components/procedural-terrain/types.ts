@@ -227,6 +227,43 @@ export interface BiomeConfig {
   colors: { top: string; mid: string; bottom: string; accent: string; water: string };
 }
 
+/* ── Continent / Territory system ── */
+
+/**
+ * Large-scale territory types that control terrain elevation, biome distribution,
+ * and overall character of huge regions of the world.
+ */
+export type ContinentType =
+  | 'metropolis'    // Dense cityscape: mostly city biome, flat terrain, high buildings
+  | 'wilderness'    // Untamed nature: forests, mountains, no cities, dramatic elevation
+  | 'archipelago'   // Island chains: mostly ocean with scattered small islands
+  | 'highlands'     // Elevated plateaus: high base elevation, rolling hills, sparse villages
+  | 'wasteland'     // Barren desert: low vegetation, sand dunes, rare oases
+  | 'farmland'      // Rural countryside: flat terrain, villages, crop fields
+  | 'volcanic'      // Dramatic peaks: very high mountains, lava-colored accents
+  | 'coastal';      // Mixed coast: beaches transitioning to inland, moderate elevation
+
+/**
+ * Per-continent profile that modifies terrain generation at a large scale.
+ */
+export interface ContinentProfile {
+  name: string;
+  /** Base elevation offset added to the entire continent (can be negative for ocean) */
+  elevationBase: number;
+  /** Multiplier for height noise amplitude (>1 = more dramatic terrain) */
+  elevationScale: number;
+  /** How much city biome appears (multiplier on cityFrequency) */
+  cityDensity: number;
+  /** How much village biome appears (multiplier) */
+  villageDensity: number;
+  /** Water level offset (positive = more water / flooding) */
+  waterOffset: number;
+  /** Building height multiplier for city zones */
+  buildingHeightMult: number;
+  /** Extra color tint applied to terrain [hue, sat, lit] shifts */
+  colorTint: [number, number, number];
+}
+
 /** Data for one generated chunk */
 export interface ChunkVoxelData {
   positions: Float32Array;
@@ -271,12 +308,20 @@ export interface ChunkVoxelData {
 
 export type ZoneType = 'downtown' | 'commercial' | 'residential' | 'industrial' | 'civic';
 
+/** Open zone types for non-building areas within the city biome */
+export type OpenZoneType = 'none' | 'farmland' | 'highway_corridor' | 'green_buffer' | 'empty_lot' | 'suburban_yard';
+
 export interface CityCell {
   isRoad: boolean;
   isAvenue: boolean;       // wider major road
   isIntersection: boolean;
   isSidewalk: boolean;
   isBuilding: boolean;
+  /** True when this cell is part of an open zone (not a building, road, or sidewalk).
+   *  Open zones break up the city grid with farmland, green buffers, empty lots, etc. */
+  isOpenZone: boolean;
+  /** Type of open zone (only meaningful when isOpenZone is true) */
+  openZoneType: OpenZoneType;
   /** Local X within building footprint (0-based), -1 if not building */
   lotLocalX: number;
   /** Local Z within building footprint (0-based), -1 if not building */
@@ -296,6 +341,10 @@ export interface CityCell {
   roadWidthX: number;
   /** Road width in Z direction at this cell's block */
   roadWidthZ: number;
+  /** True if this road cell is on an intra-city highway (super-avenue) */
+  isHighway: boolean;
+  /** True if this is a wide city boulevard (12-voxel, 4+4 lane highway) */
+  isCityHighway: boolean;
 }
 
 /** All building types available in the city */
@@ -315,7 +364,13 @@ export type BuildingType =
   | 'bridge_base'
   | 'apartment' | 'hotel'
   | 'gas_station' | 'restaurant'
-  | 'fire_station' | 'library';
+  | 'fire_station' | 'library'
+  /* ── New building types (v2) ── */
+  | 'condo' | 'townhouse' | 'cinema' | 'police_station'
+  | 'museum' | 'convention_center' | 'supermarket' | 'gym'
+  | 'bank' | 'data_center' | 'greenhouse' | 'water_tower'
+  | 'radio_station' | 'rooftop_garden' | 'mixed_use' | 'loft_building'
+  | 'penthouse_tower' | 'market_hall' | 'transit_station' | 'monument';
 
 /** Pickup sprite data */
 export interface PickupVoxel { x: number; y: number; color: string }

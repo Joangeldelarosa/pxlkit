@@ -2,11 +2,11 @@
  *  Procedural Terrain — Constants
  * ═══════════════════════════════════════════════════════════════ */
 
-import type { BiomeType, BiomeConfig } from './types';
+import type { BiomeType, BiomeConfig, ContinentType, ContinentProfile } from './types';
 
 export const CHUNK_SIZE = 16;
 export const VOXEL_SIZE = 0.5;
-export const MAX_HEIGHT = 32;
+export const MAX_HEIGHT = 64;
 export const DEFAULT_CHUNKS_PER_FRAME = 2;
 export const PLAYER_HEIGHT = 1.5;
 export const NO_FACE = MAX_HEIGHT + 1;
@@ -26,6 +26,8 @@ export const AVENUE_W = 9;
 export const LOT_INSET = 2;
 /** Interval for major avenues (every N blocks) */
 export const AVENUE_INTERVAL = 4;
+/** City highway width in voxels (12-wide: 4 lanes + median + 4 lanes + barriers) */
+export const CITY_HW_W = 12;
 
 /* ── Biome definitions ── */
 
@@ -47,11 +49,11 @@ export const BIOMES: Record<BiomeType, BiomeConfig> = {
     colors: { top: '#339955', mid: '#886644', bottom: '#556655', accent: '#ee5544', water: '#55aacc' },
   },
   mountains: {
-    name: 'Mountains', heightScale: 18, heightBase: 5, waterLevel: 3,
+    name: 'Mountains', heightScale: 24, heightBase: 8, waterLevel: 3,
     colors: { top: '#bbccdd', mid: '#8899aa', bottom: '#667788', accent: '#eef4ff', water: '#6699bb' },
   },
   ocean: {
-    name: 'Ocean', heightScale: 3, heightBase: 2, waterLevel: 8,
+    name: 'Ocean', heightScale: 3, heightBase: 2, waterLevel: 10,
     colors: { top: '#ffeecc', mid: '#ddcc99', bottom: '#99aabb', accent: '#ff9999', water: '#4499cc' },
   },
   city: {
@@ -102,6 +104,27 @@ export const BUILDING_WALL_PALETTES: Record<string, string[]> = {
   restaurant:         ['#eeddcc', '#ddccbb', '#ffeecc'],
   fire_station:       ['#cc4444', '#bb3333', '#dd5555', '#aa2222'],
   library:            ['#ccbbaa', '#bbaa99', '#ddccbb', '#aa9988'],
+  /* ── New building palettes (v2) ── */
+  condo:              ['#c8b8a0', '#b8a890', '#d8c8b0', '#a89880'],
+  townhouse:          ['#cc9966', '#bb8855', '#ddaa77', '#aa7744'],
+  cinema:             ['#444455', '#333344', '#555566', '#222233'],
+  police_station:     ['#4466aa', '#3355aa', '#5577bb', '#335599'],
+  museum:             ['#e8e0d0', '#d8d0c0', '#f0e8e0', '#c8c0b0'],
+  convention_center:  ['#aabbcc', '#99aabb', '#bbccdd', '#88aacc'],
+  supermarket:        ['#eeeedd', '#ddddcc', '#ffffee', '#ccccbb'],
+  gym:                ['#dd8844', '#cc7733', '#ee9955', '#bb6622'],
+  bank:               ['#bbbbcc', '#aaaabc', '#ccccdd', '#9999ab'],
+  data_center:        ['#556666', '#445555', '#667777', '#334444'],
+  greenhouse:         ['#88cc88', '#77bb77', '#99dd99', '#66aa66'],
+  water_tower:        ['#999999', '#888888', '#aaaaaa', '#777777'],
+  radio_station:      ['#aaaaaa', '#999999', '#bbbbbb', '#888888'],
+  rooftop_garden:     ['#ccbbaa', '#bbaa99', '#ddccbb'],
+  mixed_use:          ['#c0b0a0', '#b0a090', '#d0c0b0', '#a09080'],
+  loft_building:      ['#aa7755', '#996644', '#bb8866', '#884433'],
+  penthouse_tower:    ['#90a0b0', '#80909f', '#a0b0c0', '#70808f'],
+  market_hall:        ['#ddbb88', '#ccaa77', '#eedd99', '#bb9966'],
+  transit_station:    ['#8899aa', '#7788aa', '#99aabb', '#667799'],
+  monument:           ['#ddddcc', '#ccccbb', '#eeeedd', '#bbbbaa'],
 };
 
 export const BUILDING_ROOF_COLORS: Record<string, string> = {
@@ -121,4 +144,127 @@ export const BUILDING_ROOF_COLORS: Record<string, string> = {
   restaurant: '#cc6633',
   fire_station: '#882222',
   library: '#886644',
+  /* ── New roof colors (v2) ── */
+  condo: '#887755', townhouse: '#995533', cinema: '#333344',
+  police_station: '#334488', museum: '#aa9977', convention_center: '#556688',
+  supermarket: '#998866', gym: '#aa5522', bank: '#777788',
+  data_center: '#445555', greenhouse: '#558855', water_tower: '#666666',
+  radio_station: '#777777', rooftop_garden: '#44aa55', mixed_use: '#887766',
+  loft_building: '#774433', penthouse_tower: '#556677', market_hall: '#aa8844',
+  transit_station: '#556677', monument: '#aaaaaa',
+};
+
+/* ═══════════════════════════════════════════════════════════════
+ *  Continent / Territory System
+ *
+ *  Continents are the largest-scale procedural feature. They control
+ *  base elevation, biome distribution, and the overall "feel" of
+ *  huge world regions (100s of chunks across).
+ * ═══════════════════════════════════════════════════════════════ */
+
+/** Continent noise frequency — very low for massive landmasses */
+export const CONTINENT_SCALE = 0.0008;
+/** Secondary continent detail frequency */
+export const CONTINENT_DETAIL_SCALE = 0.002;
+
+export const CONTINENT_TYPES: ContinentType[] = [
+  'metropolis', 'wilderness', 'archipelago', 'highlands',
+  'wasteland', 'farmland', 'volcanic', 'coastal',
+];
+
+export const CONTINENT_PROFILES: Record<ContinentType, ContinentProfile> = {
+  metropolis: {
+    name: 'Metropolis',
+    elevationBase: 8,
+    elevationScale: 0.3,
+    cityDensity: 2.5,
+    villageDensity: 0.3,
+    waterOffset: -2,
+    buildingHeightMult: 1.5,
+    colorTint: [0, -0.05, 0.02],
+  },
+  wilderness: {
+    name: 'Wilderness',
+    elevationBase: 10,
+    elevationScale: 2.2,
+    cityDensity: 0,
+    villageDensity: 0.2,
+    waterOffset: 0,
+    buildingHeightMult: 1.0,
+    colorTint: [0.02, 0.08, -0.02],
+  },
+  archipelago: {
+    name: 'Archipelago',
+    elevationBase: -4,
+    elevationScale: 1.8,
+    cityDensity: 0.15,
+    villageDensity: 0.4,
+    waterOffset: 6,
+    buildingHeightMult: 0.8,
+    colorTint: [0.03, 0.04, 0.04],
+  },
+  highlands: {
+    name: 'Highlands',
+    elevationBase: 18,
+    elevationScale: 1.6,
+    cityDensity: 0.2,
+    villageDensity: 0.8,
+    waterOffset: -3,
+    buildingHeightMult: 0.7,
+    colorTint: [0, 0, 0.03],
+  },
+  wasteland: {
+    name: 'Wasteland',
+    elevationBase: 5,
+    elevationScale: 1.0,
+    cityDensity: 0.05,
+    villageDensity: 0.1,
+    waterOffset: -4,
+    buildingHeightMult: 0.6,
+    colorTint: [0.04, -0.08, 0.06],
+  },
+  farmland: {
+    name: 'Farmland',
+    elevationBase: 7,
+    elevationScale: 0.4,
+    cityDensity: 0.3,
+    villageDensity: 2.5,
+    waterOffset: -1,
+    buildingHeightMult: 0.5,
+    colorTint: [-0.01, 0.06, 0.02],
+  },
+  volcanic: {
+    name: 'Volcanic',
+    elevationBase: 12,
+    elevationScale: 3.0,
+    cityDensity: 0,
+    villageDensity: 0,
+    waterOffset: 2,
+    buildingHeightMult: 1.0,
+    colorTint: [0.06, -0.06, -0.04],
+  },
+  coastal: {
+    name: 'Coastal',
+    elevationBase: 4,
+    elevationScale: 1.2,
+    cityDensity: 0.6,
+    villageDensity: 1.2,
+    waterOffset: 2,
+    buildingHeightMult: 1.0,
+    colorTint: [0.01, 0.02, 0.02],
+  },
+};
+
+/* ── Expanded building wall palette variations ──
+ *  These are additional palettes that get mixed in based on continent type,
+ *  giving buildings in different territories distinct color characters. */
+export const CONTINENT_BUILDING_TINTS: Record<ContinentType, [number, number, number]> = {
+  metropolis:   [0, -0.04, 0.03],    // cooler, slightly brighter glass towers
+  wilderness:   [0.02, 0.05, -0.05], // warm wood tones
+  archipelago:  [0.03, 0, 0.06],     // sun-bleached pastel
+  highlands:    [0, -0.02, -0.02],   // stone-grey muted
+  wasteland:    [0.04, -0.08, 0.04], // sandy, desaturated
+  farmland:     [-0.01, 0.04, 0.02], // earthy warm
+  volcanic:     [0.05, -0.05, -0.06],// dark, reddish
+  coastal:      [0.02, 0, 0.04],     // bright, airy
 };
