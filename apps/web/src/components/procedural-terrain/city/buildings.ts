@@ -1745,7 +1745,7 @@ function genRooftopGarden(ctx: BuildCtx) {
   }
   // Benches
   if (blX === 1 && blZ === Math.floor(footD / 2) + 1) {
-    push((bX + lx) * VS, (h + 2) * VS, (bZ + lz) * VS, varyColor('#885533', wx, h + 2, wz));
+    push((bX + lx) * VS, (h + 2) * VS, (bZ + lz) * VS, varyColor('#885533', wx, h + 2, wz, 4, 0.05, 0.06));
   }
   trackH(lx, lz, h + 1);
 }
