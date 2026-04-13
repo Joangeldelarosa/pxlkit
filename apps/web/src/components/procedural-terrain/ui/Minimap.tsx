@@ -155,7 +155,7 @@ export function Minimap({ visible, cameraPos, cameraYaw, chunkCacheRef, size = 1
       ctx.fillStyle = d.color;
       ctx.fillText(d.label, cx + dx2, cy + dy2);
     }
-  }, [visible, cameraPos, cameraYaw, chunkCacheRef, size]);
+  }, [visible, cameraPos, cameraYaw, chunkCacheRef]);
 
   useEffect(() => {
     if (!visible) return;

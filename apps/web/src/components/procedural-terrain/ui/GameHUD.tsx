@@ -121,7 +121,7 @@ export function GameHUD({
     const handler = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'm') setShowMinimap(prev => !prev);
       if (e.key.toLowerCase() === 'h') setShowStats(prev => !prev);
-      if (e.key.toLowerCase() === 'f2') { e.preventDefault(); onScreenshot(); }
+      if (e.key === 'F2') { e.preventDefault(); onScreenshot(); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);

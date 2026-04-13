@@ -76,7 +76,7 @@ export function SettingsPanel({
     <>
       {/* ── Backdrop (click to close) ── */}
       {open && (
-        <div className="absolute inset-0 z-25 bg-black/30" onClick={onClose} />
+        <div className="absolute inset-0 z-20 bg-black/30" onClick={onClose} />
       )}
       {/* ── Panel ── */}
       <div
