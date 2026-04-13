@@ -281,7 +281,8 @@ export function generateChunkData(
       const biome = BIOME_TYPES[bMap[idx]] as BiomeType;
 
       // Skip city biome — intra-city highways handle that
-      if (biome === 'city' || biome === 'ocean') continue;
+      // Ocean biome is NOT skipped — highways bridge over water
+      if (biome === 'city') continue;
 
       const hwInfo = getInterHighwayInfo(wx, wz);
       if (!hwInfo) continue;
@@ -294,30 +295,75 @@ export function generateChunkData(
 
       hwInfoMap[localIdx] = hwInfo;
 
-      // Compute the highway surface level:
-      // Take the minimum height in a small neighborhood along the highway
-      // to create a smooth, relatively flat road.
-      // For tunnels: road level is set to the minimum of surrounding terrain
-      // minus any extreme peaks (clamp to a reasonable level).
+      // Compute the highway surface level.
+      // The key challenge is cross-chunk continuity: each chunk only has
+      // terrain heights for its own cells (+1 border). To get a smooth,
+      // globally-consistent road grade we use a TWO-STEP approach:
+      //
+      // 1) LOCAL MINIMUM: sample nearby terrain heights within the chunk
+      //    to approximate the local valley/floor level.
+      // 2) GLOBAL NOISE FLOOR: also sample the raw terrain noise at extended
+      //    positions OUTSIDE the chunk (using the same deterministic noise
+      //    functions). This gives us a chunk-boundary-independent estimate.
+      //
+      // The final road level is the max of (waterLevel+2, blended estimate).
       const c = variedConfigs[localIdx] || BIOMES[biome];
       const waterLevel = c.waterLevel;
 
-      // Highway level = max(waterLevel + 2, min of nearby terrain + 1)
-      // This ensures the road is above water but cuts through hills
       let roadLevel = h;
+      let maxWL = waterLevel;
 
-      // Sample neighbors along the highway to find a good road level.
-      // Mountains skip this — they use current height and tunnel through instead.
-      const sampleRange = 4;
-      let minH = h;
       if (biome !== 'mountains') {
+        // ── Step 1: Local terrain sampling (within chunk border) ──
+        const sampleRange = Math.min(6, CHUNK_SIZE - 1);
+        let localMinH = h;
         for (let s = -sampleRange; s <= sampleRange; s++) {
-          const sIdx = (Math.max(0, Math.min(gW - 1, lx + 1 + (hwInfo.onX ? s : 0)))) * gW
-            + Math.max(0, Math.min(gW - 1, lz + 1 + (hwInfo.onZ ? s : 0)));
-          if (hMap[sIdx] >= 0 && hMap[sIdx] < minH) minH = hMap[sIdx];
+          // Cross-section (perpendicular to highway)
+          const sx1 = Math.max(0, Math.min(gW - 1, lx + 1 + (hwInfo.onX ? 0 : s)));
+          const sz1 = Math.max(0, Math.min(gW - 1, lz + 1 + (hwInfo.onZ ? 0 : s)));
+          const sIdx1 = sx1 * gW + sz1;
+          if (hMap[sIdx1] >= 0 && hMap[sIdx1] < localMinH) localMinH = hMap[sIdx1];
+          // Water level from neighbor configs
+          const sLx = sx1 - 1, sLz = sz1 - 1;
+          if (sLx >= 0 && sLx < CHUNK_SIZE && sLz >= 0 && sLz < CHUNK_SIZE) {
+            const sConf = variedConfigs[sLx * CHUNK_SIZE + sLz];
+            if (sConf && sConf.waterLevel > maxWL) maxWL = sConf.waterLevel;
+          }
+          // Along the highway direction
+          const sx2 = Math.max(0, Math.min(gW - 1, lx + 1 + (hwInfo.onX ? s : 0)));
+          const sz2 = Math.max(0, Math.min(gW - 1, lz + 1 + (hwInfo.onZ ? s : 0)));
+          const sIdx2 = sx2 * gW + sz2;
+          if (hMap[sIdx2] >= 0 && hMap[sIdx2] < localMinH) localMinH = hMap[sIdx2];
         }
+
+        // ── Step 2: Extended noise sampling (outside chunk) ──
+        // Sample terrain height at positions along the highway OUTSIDE the chunk.
+        // This uses the same noise functions to get a deterministic height estimate,
+        // ensuring adjacent chunks compute similar road levels at shared borders.
+        const EXT_RANGE = 16; // sample ±16 voxels along highway axis
+        let noiseMinH = h;
+        for (let s = -EXT_RANGE; s <= EXT_RANGE; s += 2) {
+          const swx = wx + (hwInfo.onX ? s : 0);
+          const swz = wz + (hwInfo.onZ ? s : 0);
+          const sBiome = getBiome(biomeN, tempN, swx, swz, cfg.cityFrequency, continentN);
+          const sBase = BIOMES[sBiome];
+          const sc2 = getVariedBiome(sBase, swx, swz, regionN, cfg.biomeVariation, cfg.terrainRoughness, continentN);
+          const sBase2 = fbm(heightN, swx * 0.02, swz * 0.02, 4, 2.0, 0.5);
+          const sDet = detailN(swx * 0.08, swz * 0.08) * (0.2 + cfg.terrainRoughness * 0.3);
+          let sExtra = 0;
+          if (sBiome === 'mountains') {
+            sExtra = Math.abs(fbm(detailN, swx * 0.015 + 200, swz * 0.015 + 200, 2)) * (6 + cfg.terrainRoughness * 6);
+          }
+          const sH = Math.max(0, Math.min(MAX_HEIGHT, Math.floor(sc2.heightBase + (sBase2 + sDet) * sc2.heightScale + sExtra)));
+          if (sH >= 0 && sH < noiseMinH) noiseMinH = sH;
+          if (sc2.waterLevel > maxWL) maxWL = sc2.waterLevel;
+        }
+
+        // Blend local and extended estimates — use the minimum of both
+        // This gives us a smooth, chunk-boundary-independent road level
+        roadLevel = Math.min(localMinH, noiseMinH);
       }
-      roadLevel = Math.max(waterLevel + 2, minH);
+      roadLevel = Math.max(maxWL + 2, roadLevel);
 
       // Tunnel detection: if terrain is significantly higher than road level
       const isTunnel = biome === 'mountains' && h > roadLevel + TUNNEL_HEIGHT + 2;
@@ -325,7 +371,7 @@ export function generateChunkData(
       if (isTunnel) {
         // For tunnels, set road level to a reasonable grade
         // (lower than the mountain but above water)
-        roadLevel = Math.max(waterLevel + 2, Math.min(roadLevel, h - TUNNEL_HEIGHT - 3));
+        roadLevel = Math.max(maxWL + 2, Math.min(roadLevel, h - TUNNEL_HEIGHT - 3));
       }
 
       hwLevelMap[localIdx] = roadLevel;
@@ -423,8 +469,17 @@ export function generateChunkData(
       const isOnInterHW = hwInfo !== null && hwLevel >= 0;
 
       /* ── 1. TERRAIN ── */
-      for (let y = 0; y <= h; y++) {
-        const isTop = y === h;
+      /* For highway cells we must carve the terrain:
+       *  - Non-tunnel highways: don't render any terrain above roadLevel
+       *    (the highway surface itself is rendered later in section 3b)
+       *  - Tunnel highways: don't render terrain in the cavity (roadLevel..roadLevel+TUNNEL_HEIGHT)
+       *    but DO render terrain above the tunnel ceiling (mountain continues above)
+       * This ensures highways are flat, clear of dirt/trees/snow. */
+      const terrainCap = isOnInterHW
+        ? (isTunnel ? h : hwLevel)   // tunnels keep terrain above ceiling; non-tunnel stops at road
+        : h;
+      for (let y = 0; y <= terrainCap; y++) {
+        const isTop = (y === terrainCap);
 
         // Tunnel carving: skip terrain voxels inside the tunnel cavity
         if (isOnInterHW && isTunnel) {
@@ -462,10 +517,12 @@ export function generateChunkData(
         push((bX + lx) * VOXEL_SIZE, y * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
           varyColor(baseCol, wx, y, wz));
       }
-      trackH(lx, lz, h);
+      trackH(lx, lz, terrainCap);
 
       /* ── 2. WATER — flat surface plane for seamless cross-chunk rendering ── */
-      if (h < wl) {
+      /* Skip water rendering under highway cells — the highway surface replaces it.
+       * When highway is over water we render bridge supports instead (section 3b). */
+      if (h < wl && !isOnInterHW) {
         pushW((bX + lx) * VOXEL_SIZE, wl * VOXEL_SIZE + VOXEL_SIZE * 0.5, (bZ + lz) * VOXEL_SIZE,
           varyColor(c.colors.water, wx, wl, wz, 4, 0.06, 0.06));
         trackH(lx, lz, wl);
@@ -926,11 +983,13 @@ export function generateChunkData(
       /* ══════════════════ 3b. INTER-BIOME HIGHWAY ══════════════════
        *  Highways that cross plains, forests, deserts, mountains etc.
        *  When in mountains: tunnels with internal walls/ceiling/lighting.
+       *  When over water: elevated bridge with support pillars.
        *  This section renders the highway surface, markings, barriers,
-       *  tunnel enclosure, and lighting for non-city biomes. */
+       *  tunnel enclosure, bridge supports, and lighting for non-city biomes. */
       if (isOnInterHW) {
         const onActualRoad = !hwInfo!.isShoulder;
         const roadY = hwLevel;
+        const isOverWater = h < wl;
         npcWalkableMap[lIdx] = 1;
 
         if (onActualRoad) {
@@ -946,6 +1005,42 @@ export function generateChunkData(
             varyColor(roadColor, wx, roadY, wz, 2, 0.02, 0.03));
           groundHeightMap[lIdx] = roadY;
           trackH(lx, lz, roadY);
+
+          // ── Fill terrain gap between ground and road when road is elevated ──
+          // When road is above terrain (hills, slopes), fill with support structure
+          if (!isTunnel && !isOverWater && h < roadY) {
+            // Embankment fill: render terrain-colored voxels from ground to road
+            for (let fy = h + 1; fy < roadY; fy++) {
+              push((bX + lx) * VOXEL_SIZE, fy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#776655', wx, fy, wz, 3, 0.03, 0.05));
+            }
+          }
+
+          // ── Bridge supports over water ──
+          if (isOverWater) {
+            // Bridge deck underside (1 voxel thick concrete slab under road)
+            if (roadY > 0) {
+              push((bX + lx) * VOXEL_SIZE, (roadY - 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#888888', wx, roadY - 1, wz, 2, 0.02, 0.04));
+            }
+
+            // Support pillars: on barrier positions, every 12 voxels
+            const pillarSpacing = 12;
+            const onPillarX = hwInfo!.onX && ((wx % pillarSpacing + pillarSpacing) % pillarSpacing === 0);
+            const onPillarZ = hwInfo!.onZ && ((wz % pillarSpacing + pillarSpacing) % pillarSpacing === 0);
+            if (isBarrier2 && (onPillarX || onPillarZ)) {
+              // Concrete pillar from ground/water-bed up to road deck
+              const pillarBottom = Math.max(0, h);
+              for (let py = pillarBottom; py < roadY - 1; py++) {
+                push((bX + lx) * VOXEL_SIZE, py * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#999999', wx, py, wz, 2, 0.02, 0.04));
+              }
+            }
+
+            // Water surface still visible alongside the bridge
+            pushW((bX + lx) * VOXEL_SIZE, wl * VOXEL_SIZE + VOXEL_SIZE * 0.5, (bZ + lz) * VOXEL_SIZE,
+              varyColor(c.colors.water, wx, wl, wz, 4, 0.06, 0.06));
+          }
 
           // ── Concrete barriers (raised 2 voxels) ──
           if (isBarrier2) {
