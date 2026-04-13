@@ -147,4 +147,10 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Screenshot flash animation */
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
 }
