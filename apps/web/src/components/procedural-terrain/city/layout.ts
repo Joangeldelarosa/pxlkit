@@ -467,57 +467,57 @@ export function getBuildingHeight(
 
   let base = 0;
   switch (type) {
-    case 'skyscraper':         base = 12 + Math.floor(v * 20);   break; // 12-32
-    case 'skyscraper_twin':    base = 10 + Math.floor(v * 18);   break; // 10-28
-    case 'skyscraper_stepped': base = 14 + Math.floor(v * 16);   break; // 14-30
-    case 'tower':              base = 8 + Math.floor(v * 14);    break; // 8-22
-    case 'tower_telecom':      base = 10 + Math.floor(v * 10);   break; // 10-20
-    case 'office':             base = 5 + Math.floor(v * 8);     break; // 5-13
-    case 'office_tall':        base = 7 + Math.floor(v * 10);    break; // 7-17
-    case 'warehouse':          base = 3 + Math.floor(v * 3);     break; // 3-6
-    case 'factory':            base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'shop':               base = 3 + Math.floor(v * 2);     break; // 3-5
-    case 'mall':               base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'house':              base = 3 + Math.floor(v * 3);     break; // 3-6
-    case 'mansion':            base = 5 + Math.floor(v * 5);     break; // 5-10
-    case 'castle':             base = 8 + Math.floor(v * 10);    break; // 8-18
-    case 'hospital':           base = 6 + Math.floor(v * 8);     break; // 6-14
-    case 'school':             base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'church':             base = 5 + Math.floor(v * 5);     break; // 5-10
-    case 'stadium':            base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'parking_garage':     base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'airport_terminal':   base = 4 + Math.floor(v * 3);     break; // 4-7
-    case 'apartment':          base = 6 + Math.floor(v * 14);    break; // 6-20
-    case 'hotel':              base = 8 + Math.floor(v * 16);    break; // 8-24
-    case 'gas_station':        base = 2 + Math.floor(v * 1);     break; // 2-3
-    case 'restaurant':         base = 3 + Math.floor(v * 3);     break; // 3-6
-    case 'fire_station':       base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'library':            base = 4 + Math.floor(v * 5);     break; // 4-9
+    case 'skyscraper':         base = 12 + Math.floor(v * 20);   break; // 12-31
+    case 'skyscraper_twin':    base = 10 + Math.floor(v * 18);   break; // 10-27
+    case 'skyscraper_stepped': base = 14 + Math.floor(v * 16);   break; // 14-29
+    case 'tower':              base = 8 + Math.floor(v * 14);    break; // 8-21
+    case 'tower_telecom':      base = 10 + Math.floor(v * 10);   break; // 10-19
+    case 'office':             base = 5 + Math.floor(v * 8);     break; // 5-12
+    case 'office_tall':        base = 7 + Math.floor(v * 10);    break; // 7-16
+    case 'warehouse':          base = 3 + Math.floor(v * 3);     break; // 3-5
+    case 'factory':            base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'shop':               base = 3 + Math.floor(v * 2);     break; // 3-4
+    case 'mall':               base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'house':              base = 3 + Math.floor(v * 3);     break; // 3-5
+    case 'mansion':            base = 5 + Math.floor(v * 5);     break; // 5-9
+    case 'castle':             base = 8 + Math.floor(v * 10);    break; // 8-17
+    case 'hospital':           base = 6 + Math.floor(v * 8);     break; // 6-13
+    case 'school':             base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'church':             base = 5 + Math.floor(v * 5);     break; // 5-9
+    case 'stadium':            base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'parking_garage':     base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'airport_terminal':   base = 4 + Math.floor(v * 3);     break; // 4-6
+    case 'apartment':          base = 6 + Math.floor(v * 14);    break; // 6-19
+    case 'hotel':              base = 8 + Math.floor(v * 16);    break; // 8-23
+    case 'gas_station':        base = 2 + Math.floor(v * 1);     break; // 2
+    case 'restaurant':         base = 3 + Math.floor(v * 3);     break; // 3-5
+    case 'fire_station':       base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'library':            base = 4 + Math.floor(v * 5);     break; // 4-8
     case 'plaza':              return 0;
     case 'fountain_plaza':     return 0;
     case 'park':               return 0;
     case 'parking':            return 0;
-    case 'bridge_base':        base = 3 + Math.floor(v * 3);     break; // 3-6
+    case 'bridge_base':        base = 3 + Math.floor(v * 3);     break; // 3-5
     /* ── New building heights (v2) ── */
-    case 'condo':              base = 8 + Math.floor(v * 16);    break; // 8-24
-    case 'townhouse':          base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'cinema':             base = 5 + Math.floor(v * 5);     break; // 5-10
-    case 'police_station':     base = 4 + Math.floor(v * 5);     break; // 4-9
-    case 'museum':             base = 5 + Math.floor(v * 6);     break; // 5-11
-    case 'convention_center':  base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'supermarket':        base = 3 + Math.floor(v * 3);     break; // 3-6
-    case 'gym':                base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'bank':               base = 5 + Math.floor(v * 6);     break; // 5-11
-    case 'data_center':        base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'greenhouse':         base = 3 + Math.floor(v * 3);     break; // 3-6
-    case 'water_tower':        base = 6 + Math.floor(v * 5);     break; // 6-11
-    case 'radio_station':      base = 3 + Math.floor(v * 3);     break; // 3-6
+    case 'condo':              base = 8 + Math.floor(v * 16);    break; // 8-23
+    case 'townhouse':          base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'cinema':             base = 5 + Math.floor(v * 5);     break; // 5-9
+    case 'police_station':     base = 4 + Math.floor(v * 5);     break; // 4-8
+    case 'museum':             base = 5 + Math.floor(v * 6);     break; // 5-10
+    case 'convention_center':  base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'supermarket':        base = 3 + Math.floor(v * 3);     break; // 3-5
+    case 'gym':                base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'bank':               base = 5 + Math.floor(v * 6);     break; // 5-10
+    case 'data_center':        base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'greenhouse':         base = 3 + Math.floor(v * 3);     break; // 3-5
+    case 'water_tower':        base = 6 + Math.floor(v * 5);     break; // 6-10
+    case 'radio_station':      base = 3 + Math.floor(v * 3);     break; // 3-5
     case 'rooftop_garden':     return 0;
-    case 'mixed_use':          base = 6 + Math.floor(v * 10);    break; // 6-16
-    case 'loft_building':      base = 5 + Math.floor(v * 8);     break; // 5-13
-    case 'penthouse_tower':    base = 10 + Math.floor(v * 18);   break; // 10-28
-    case 'market_hall':        base = 4 + Math.floor(v * 4);     break; // 4-8
-    case 'transit_station':    base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'mixed_use':          base = 6 + Math.floor(v * 10);    break; // 6-15
+    case 'loft_building':      base = 5 + Math.floor(v * 8);     break; // 5-12
+    case 'penthouse_tower':    base = 10 + Math.floor(v * 18);   break; // 10-27
+    case 'market_hall':        base = 4 + Math.floor(v * 4);     break; // 4-7
+    case 'transit_station':    base = 4 + Math.floor(v * 4);     break; // 4-7
     case 'monument':           return 0;
     default:                   return 0;
   }

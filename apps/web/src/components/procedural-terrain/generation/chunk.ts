@@ -69,9 +69,10 @@ export function generateChunkData(
   cfg: WorldConfig,
   continentN?: (x: number, y: number) => number,
 ): ChunkVoxelData {
-   // Buffer size: CHUNK_SIZE² cells × MAX_VOXELS_PER_COLUMN (terrain + buildings + structures)
-  // 48 accounts for MAX_HEIGHT=64 exposed faces, building columns, and natural structures
-  const MAX_VOXELS_PER_COLUMN = 48;
+   // Buffer size: CHUNK_SIZE² cells × MAX_VOXELS_PER_COLUMN (terrain + buildings + structures + tunnels)
+  // 80 accounts for MAX_HEIGHT=64 exposed faces, building columns (up to ~50 with spike boost),
+  // tunnel walls/ceiling, natural structures, and open zone decorations.
+  const MAX_VOXELS_PER_COLUMN = 80;
   const maxV = CHUNK_SIZE * CHUNK_SIZE * MAX_VOXELS_PER_COLUMN;
   const posA = new Float32Array(maxV * 3);
   const colA = new Float32Array(maxV * 3);
@@ -305,15 +306,16 @@ export function generateChunkData(
       // This ensures the road is above water but cuts through hills
       let roadLevel = h;
 
-      // Sample neighbors along the highway to find a good road level
+      // Sample neighbors along the highway to find a good road level.
+      // Mountains skip this — they use current height and tunnel through instead.
       const sampleRange = 4;
       let minH = h;
-      for (let s = -sampleRange; s <= sampleRange; s++) {
-        const sIdx = biome === 'mountains'
-          ? (lx + 1) * gW + (lz + 1) // use current for mountains (we'll tunnel)
-          : (Math.max(0, Math.min(gW - 1, lx + 1 + (hwInfo.onX ? s : 0)))) * gW
+      if (biome !== 'mountains') {
+        for (let s = -sampleRange; s <= sampleRange; s++) {
+          const sIdx = (Math.max(0, Math.min(gW - 1, lx + 1 + (hwInfo.onX ? s : 0)))) * gW
             + Math.max(0, Math.min(gW - 1, lz + 1 + (hwInfo.onZ ? s : 0)));
-        if (hMap[sIdx] >= 0 && hMap[sIdx] < minH) minH = hMap[sIdx];
+          if (hMap[sIdx] >= 0 && hMap[sIdx] < minH) minH = hMap[sIdx];
+        }
       }
       roadLevel = Math.max(waterLevel + 2, minH);
 
