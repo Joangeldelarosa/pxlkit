@@ -53,7 +53,8 @@ import {
   DIR_PRECISION, VIEW_DIR_WEIGHT, DIST_PENALTY,
 } from './constants';
 import { createNoise2D } from './utils/noise';
-import { getBiome } from './utils/biomes';
+import { getBiome, getContinent } from './utils/biomes';
+import { CONTINENT_PROFILES } from './constants';
 import { generateChunkData, setPickupIcons } from './generation/chunk';
 import { ChunkMesh, FloatingPickup } from './rendering/ChunkMesh';
 import { FogEffect } from './rendering/WorldLighting';
@@ -183,11 +184,12 @@ function decodeSceneFromURL(): { seed: number; pos: [number, number, number]; ro
  *  Camera Tracker (converts camera pos → biome name for HUD)
  * ═══════════════════════════════════════════════════════════════ */
 
-function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
+function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq, continentNoise }: {
   onUpdate: (pos: [number, number, number], biome: string, hour: number, rot: [number, number, number]) => void;
   biomeNoise: ((x: number, y: number) => number) | null;
   tempNoise: ((x: number, y: number) => number) | null;
   cityFreq: number;
+  continentNoise: ((x: number, y: number) => number) | null;
 }) {
   const { camera } = useThree();
   const timeRef = useContext(TimeContext);
@@ -199,7 +201,17 @@ function CameraTracker({ onUpdate, biomeNoise, tempNoise, cityFreq }: {
     const pos: [number, number, number] = [camera.position.x, camera.position.y, camera.position.z];
     let biome = 'Unknown';
     if (biomeNoise && tempNoise) {
-      biome = BIOMES[getBiome(biomeNoise, tempNoise, camera.position.x / VOXEL_SIZE, camera.position.z / VOXEL_SIZE, cityFreq)].name;
+      const wx = camera.position.x / VOXEL_SIZE;
+      const wz = camera.position.z / VOXEL_SIZE;
+      const biomeType = getBiome(biomeNoise, tempNoise, wx, wz, cityFreq, continentNoise ?? undefined);
+      const biomeName = BIOMES[biomeType].name;
+      if (continentNoise) {
+        const contType = getContinent(continentNoise, wx, wz);
+        const contProfile = CONTINENT_PROFILES[contType];
+        biome = `${contProfile.name} · ${biomeName}`;
+      } else {
+        biome = biomeName;
+      }
     }
     const hour = timeRef ? timeRef.current.hour : 12;
     _euler.setFromQuaternion(camera.quaternion);
@@ -236,13 +248,13 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
     height: createNoise2D(seed), detail: createNoise2D(seed + 1),
     biome: createNoise2D(seed + 2), temp: createNoise2D(seed + 3),
     tree: createNoise2D(seed + 4), struct: createNoise2D(seed + 5),
-    region: createNoise2D(seed + 6),
+    region: createNoise2D(seed + 6), continent: createNoise2D(seed + 7),
   }), [seed]);
 
   const genChunk = useCallback((ck: string) => {
     if (chunkCacheRef.current.has(ck)) return;
     const [pcx, pcz] = ck.split(',').map(Number);
-    const data = generateChunkData(pcx, pcz, noises.height, noises.detail, noises.biome, noises.temp, noises.tree, noises.struct, noises.region, config);
+    const data = generateChunkData(pcx, pcz, noises.height, noises.detail, noises.biome, noises.temp, noises.tree, noises.struct, noises.region, config, noises.continent);
     chunkCacheRef.current.set(ck, data);
   }, [noises, config, chunkCacheRef]);
 
@@ -449,6 +461,7 @@ export default function ProceduralTerrain() {
 
   const noises = useMemo(() => ({
     biome: createNoise2D(seed + 2), temp: createNoise2D(seed + 3),
+    continent: createNoise2D(seed + 7),
   }), [seed]);
 
   useEffect(() => { speedRef.current = config.flySpeed; }, [config.flySpeed]);
@@ -600,7 +613,7 @@ export default function ProceduralTerrain() {
           <FlyCamera keysRef={keysRef} speedRef={speedRef} chunkCacheRef={chunkCacheRef} worldConfig={config} initialPos={initialPos} initialRot={initialRot} />
           <CameraLook isLocked={isLocked} isMobile={isMobile} />
           <ChunkManagerWithCounter seed={seed} config={config} onChunkCount={handleChunkCount} chunkCacheRef={chunkCacheRef} />
-          <CameraTracker onUpdate={handleCameraUpdate} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} />
+          <CameraTracker onUpdate={handleCameraUpdate} biomeNoise={noises.biome} tempNoise={noises.temp} cityFreq={config.cityFrequency} continentNoise={noises.continent} />
           <AmbientParticles biome={currentBiome} intensity={config.particleIntensity} />
           <SkyBirds biome={currentBiome} intensity={config.particleIntensity} />
           <GroundCritters biome={currentBiome} npcDensity={config.npcDensity} npcDistance={config.npcDistance} npcScale={config.npcScale} npcMaxPerChunk={config.npcMaxPerChunk} chunkCacheRef={chunkCacheRef} />

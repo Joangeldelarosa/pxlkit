@@ -6,7 +6,9 @@
     "dev": "next dev --port 3333",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@paypal/react-paypal-js": "^9.0.1",
