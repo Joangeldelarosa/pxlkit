@@ -820,7 +820,7 @@ export function generateChunkData(
             }
           }
 
-          /* ── City highway barrier-mounted tall lamps ──
+          /* ── City highway barrier-mounted lamps (mini-voxel thin poles) ──
            *  Along city highways (not at intersections), place highway lamps
            *  on the barrier voxels (modX=0 or modX=width-1 for Z-running) */
           if (isCHW && !cell.isIntersection) {
@@ -830,15 +830,34 @@ export function generateChunkData(
             const axisPos = onRoadZ && !onRoadX ? wx : wz;
             // Lamp spacing: every 8 voxels along the axis
             if (isLampBarrier && ((axisPos % 8 + 8) % 8 === 0)) {
-              const lampH = 2;
-              for (let ly = 3; ly <= lampH + 2; ly++) {
-                push((bX + lx) * VOXEL_SIZE, (h + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                  varyColor('#555555', wx, h + ly, wz, 2, 0.02, 0.03));
+              // Mini-voxel pole sitting on top of barrier (h+2)
+              const lampBaseY = (h + 2) * VOXEL_SIZE + VOXEL_SIZE * 0.5;
+              const lampPx = (bX + lx) * VOXEL_SIZE;
+              const lampPz = (bZ + lz) * VOXEL_SIZE;
+              const cityLampH = 18; // mini-voxel units (~1.35 world units)
+              // Pole shaft
+              for (let sy = 0; sy < cityLampH; sy++) {
+                pushMini(lampPx, lampBaseY + sy * MVS, lampPz, '#555555');
               }
-              push((bX + lx) * VOXEL_SIZE, (h + lampH + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor('#eeeeff', wx, h + lampH + 3, wz, 3, 0.04, 0.06));
-              pushSL((bX + lx) * VOXEL_SIZE, (h + lampH + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE);
-              trackH(lx, lz, h + lampH + 3);
+              // Lamp arm extends 2 MVS toward road center
+              const armDir = hwModLamp === 0 ? 1 : -1;
+              const armAxis = onRoadZ && !onRoadX ? 'x' : 'z';
+              for (let a = 1; a <= 2; a++) {
+                if (armAxis === 'x') {
+                  pushMini(lampPx + a * armDir * MVS, lampBaseY + (cityLampH - 1) * MVS, lampPz, '#666666');
+                } else {
+                  pushMini(lampPx, lampBaseY + (cityLampH - 1) * MVS, lampPz + a * armDir * MVS, '#666666');
+                }
+              }
+              // Lamp head glow
+              const lampTopY = lampBaseY + cityLampH * MVS;
+              if (armAxis === 'x') {
+                pushMini(lampPx + 2 * armDir * MVS, lampTopY, lampPz, '#eeeeff');
+              } else {
+                pushMini(lampPx, lampTopY, lampPz + 2 * armDir * MVS, '#eeeeff');
+              }
+              pushSL(lampPx, lampTopY, lampPz);
+              trackH(lx, lz, h + 2 + Math.ceil((cityLampH * MVS) / VOXEL_SIZE));
             }
           }
 
@@ -1240,63 +1259,81 @@ export function generateChunkData(
             }
             trackH(lx, lz, roadY + barrierH);
 
-            // ── Highway furniture on barrier positions ──
+            // ── Highway furniture on barrier positions (mini-voxels for thin poles) ──
             const furniture = getHighwayFurniture(wx, wz, hwClass, true, isTunnel, hi.onX);
+            const furPx = (bX + lx) * VOXEL_SIZE;
+            const furPz = (bZ + lz) * VOXEL_SIZE;
+            const furBaseY = (roadY + barrierH) * VOXEL_SIZE + VOXEL_SIZE * 0.5;
 
             if (furniture.type === 'lamp_sodium' || furniture.type === 'lamp_led' || furniture.type === 'lamp_rural') {
-              // Highway lamp post — scaled to match voxel world proportions
-              const lampH = furniture.type === 'lamp_rural' ? 1 : furniture.type === 'lamp_led' ? 2 : 2;
-              const poleCol = '#555555';
-              for (let ly = barrierH + 1; ly <= barrierH + lampH; ly++) {
-                push((bX + lx) * VOXEL_SIZE, (roadY + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                  varyColor(poleCol, wx, roadY + ly, wz, 2, 0.02, 0.03));
+              // Highway lamp post — thin mini-voxel pole matching sidewalk lamppost scale
+              const hwLampH = furniture.type === 'lamp_rural' ? 12 : furniture.type === 'lamp_led' ? 18 : 16;
+              for (let sy = 0; sy < hwLampH; sy++) {
+                pushMini(furPx, furBaseY + sy * MVS, furPz, '#555555');
               }
-              // Lamp head
+              // Lamp arm: 2 MVS toward road center
+              const lampArmDir = hi.distFromCenterX > 0 ? -1 : 1;
+              for (let a = 1; a <= 2; a++) {
+                if (hi.onX) {
+                  pushMini(furPx, furBaseY + (hwLampH - 1) * MVS, furPz + a * lampArmDir * MVS, '#666666');
+                } else {
+                  pushMini(furPx + a * lampArmDir * MVS, furBaseY + (hwLampH - 1) * MVS, furPz, '#666666');
+                }
+              }
+              // Lamp head glow
               const lampGlow = furniture.type === 'lamp_sodium' ? '#ffcc44'
                 : furniture.type === 'lamp_led' ? '#eeeeff' : '#ffdd88';
-              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + lampH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor(lampGlow, wx, roadY + barrierH + lampH + 1, wz, 3, 0.04, 0.06));
-              pushSL((bX + lx) * VOXEL_SIZE, (roadY + barrierH + lampH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE);
-              trackH(lx, lz, roadY + barrierH + lampH + 1);
+              const lampTopY = furBaseY + hwLampH * MVS;
+              if (hi.onX) {
+                pushMini(furPx, lampTopY, furPz + 2 * lampArmDir * MVS, lampGlow);
+              } else {
+                pushMini(furPx + 2 * lampArmDir * MVS, lampTopY, furPz, lampGlow);
+              }
+              pushSL(furPx, lampTopY, furPz);
+              trackH(lx, lz, roadY + barrierH + Math.ceil((hwLampH * MVS) / VOXEL_SIZE));
             } else if (furniture.type === 'sign_direction') {
-              // Green highway direction sign: pole + green board
-              const signH = 2;
-              for (let sy = barrierH + 1; sy <= barrierH + signH; sy++) {
-                push((bX + lx) * VOXEL_SIZE, (roadY + sy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                  varyColor('#555555', wx, roadY + sy, wz, 2, 0.02, 0.03));
+              // Green highway direction sign — thin mini-voxel post
+              const signPostH = 14;
+              for (let sy = 0; sy < signPostH; sy++) {
+                pushMini(furPx, furBaseY + sy * MVS, furPz, '#555555');
               }
-              // Green sign board (2 voxels tall at top)
-              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + signH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor('#116633', wx, roadY + barrierH + signH + 1, wz, 2, 0.03, 0.04));
-              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + signH + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor('#117744', wx, roadY + barrierH + signH + 2, wz, 2, 0.03, 0.04));
-              trackH(lx, lz, roadY + barrierH + signH + 2);
+              // Green sign board: 3×2 mini-voxels at top
+              const signTopY = furBaseY + signPostH * MVS;
+              for (let dx = -1; dx <= 1; dx++) {
+                pushMini(furPx + dx * MVS, signTopY, furPz, '#116633');
+                pushMini(furPx + dx * MVS, signTopY + MVS, furPz, '#117744');
+              }
+              trackH(lx, lz, roadY + barrierH + Math.ceil(((signPostH + 2) * MVS) / VOXEL_SIZE));
             } else if (furniture.type === 'sign_speed') {
-              // White speed sign: short pole + white square
-              const postH = 2;
-              for (let sy = barrierH + 1; sy <= barrierH + postH; sy++) {
-                push((bX + lx) * VOXEL_SIZE, (roadY + sy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                  varyColor('#555555', wx, roadY + sy, wz, 2, 0.02, 0.03));
+              // White speed sign — thin mini-voxel post
+              const speedPostH = 10;
+              for (let sy = 0; sy < speedPostH; sy++) {
+                pushMini(furPx, furBaseY + sy * MVS, furPz, '#555555');
               }
-              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + postH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor('#eeeeee', wx, roadY + barrierH + postH + 1, wz, 2, 0.02, 0.02));
-              trackH(lx, lz, roadY + barrierH + postH + 1);
+              // White sign face: 2×2 mini-voxels
+              const speedTopY = furBaseY + speedPostH * MVS;
+              for (let dx = 0; dx <= 1; dx++) {
+                pushMini(furPx + dx * MVS, speedTopY, furPz, '#eeeeee');
+                pushMini(furPx + dx * MVS, speedTopY + MVS, furPz, '#dddddd');
+              }
+              trackH(lx, lz, roadY + barrierH + Math.ceil(((speedPostH + 2) * MVS) / VOXEL_SIZE));
             } else if (furniture.type === 'billboard') {
-              // Billboard: pole + colored board
-              const bbH = 3;
-              for (let sy = barrierH + 1; sy <= barrierH + bbH; sy++) {
-                push((bX + lx) * VOXEL_SIZE, (roadY + sy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                  varyColor('#666666', wx, roadY + sy, wz, 2, 0.02, 0.03));
+              // Billboard — thin mini-voxel pole with colored board
+              const bbPostH = 16;
+              for (let sy = 0; sy < bbPostH; sy++) {
+                pushMini(furPx, furBaseY + sy * MVS, furPz, '#666666');
               }
-              // Billboard face — hash-based color for variety
+              // Billboard face: 4×3 mini-voxels at top
               const bbHash = hashCoord(wx * 17, 0, wz * 31);
               const bbColors = ['#cc3333', '#3366cc', '#cc9933', '#33aa66', '#9933cc', '#cc6633'];
               const bbCol = bbColors[Math.floor(bbHash * bbColors.length)];
-              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + bbH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor(bbCol, wx, roadY + barrierH + bbH + 1, wz, 3, 0.04, 0.05));
-              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + bbH + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor(bbCol, wx, roadY + barrierH + bbH + 2, wz, 3, 0.04, 0.05));
-              trackH(lx, lz, roadY + barrierH + bbH + 2);
+              const bbTopY = furBaseY + bbPostH * MVS;
+              for (let dx = -1; dx <= 2; dx++) {
+                for (let dy = 0; dy < 3; dy++) {
+                  pushMini(furPx + dx * MVS, bbTopY + dy * MVS, furPz, bbCol);
+                }
+              }
+              trackH(lx, lz, roadY + barrierH + Math.ceil(((bbPostH + 3) * MVS) / VOXEL_SIZE));
             }
           }
 
