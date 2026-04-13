@@ -12,7 +12,7 @@
 
 import type { CityCell, ZoneType, BuildingType, OpenZoneType } from '../types';
 import {
-  BLOCK_SIZE, ROAD_W, AVENUE_W, LOT_INSET, AVENUE_INTERVAL,
+  BLOCK_SIZE, ROAD_W, AVENUE_W, LOT_INSET, AVENUE_INTERVAL, CITY_HW_W,
   BUILDING_WALL_PALETTES, BUILDING_ROOF_COLORS,
 } from '../constants';
 import { hashCoord } from '../utils/color';
@@ -116,7 +116,7 @@ export function findBuildingAnchor(
   return { anchorX: lotWX, anchorZ: lotWZ, w: 1, d: 1, localX: 0, localZ: 0 };
 }
 
-/* ── Road width detection (avenues are wider) ── */
+/* ── Road width detection (avenues are wider, city highways widest) ── */
 
 function isAvenueX(blockX: number): boolean {
   return ((blockX % AVENUE_INTERVAL) + AVENUE_INTERVAL) % AVENUE_INTERVAL === 0;
@@ -127,10 +127,12 @@ function isAvenueZ(blockZ: number): boolean {
 
 function getRoadWidthX(wx: number): number {
   const blockX = Math.floor(wx / BLOCK_SIZE);
+  if (isHighwayX(blockX)) return CITY_HW_W;
   return isAvenueX(blockX) ? AVENUE_W : ROAD_W;
 }
 function getRoadWidthZ(wz: number): number {
   const blockZ = Math.floor(wz / BLOCK_SIZE);
+  if (isHighwayZ(blockZ)) return CITY_HW_W;
   return isAvenueZ(blockZ) ? AVENUE_W : ROAD_W;
 }
 
@@ -274,6 +276,8 @@ export function classifyCityCell(
   const hwX = isHighwayX(blockX);
   const hwZ = isHighwayZ(blockZ);
   const isHw = isRoad && (hwX || hwZ);
+  // City highway: wide 12-voxel road (CITY_HW_W) with 4+4 lanes
+  const isCityHw = isRoad && ((onRoadX && rw >= CITY_HW_W) || (onRoadZ && rdz >= CITY_HW_W));
 
   // Lot-local coordinates (per-dimension to handle avenue vs standard road)
   const lotRawX = modX - rw;
@@ -296,6 +300,7 @@ export function classifyCityCell(
       roadWidthX: rw,
       roadWidthZ: rdz,
       isHighway: isHw,
+      isCityHighway: isCityHw,
     };
   }
 
@@ -332,6 +337,7 @@ export function classifyCityCell(
         roadWidthX: rw,
         roadWidthZ: rdz,
         isHighway: false,
+        isCityHighway: false,
       };
     }
 
@@ -361,6 +367,7 @@ export function classifyCityCell(
     roadWidthX: rw,
     roadWidthZ: rdz,
     isHighway: false,
+    isCityHighway: false,
   };
 }
 
