@@ -10,7 +10,9 @@
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { PxlKitIcon } from '@pxlkit/core';
+import { QuestMap } from '@pxlkit/gamification';
 import { PixelBadge, PixelSlideIn, PixelFadeIn } from '@pxlkit/ui-kit';
 import type { WorldMode, ChunkVoxelData } from '../types';
 import { VOXEL_SIZE } from '../constants';
@@ -19,18 +21,18 @@ import { Minimap } from './Minimap';
 /* ── FPS counter hook ── */
 function useFPS() {
   const [fps, setFps] = useState(0);
-  const frames = useRef(0);
-  const lastTime = useRef(performance.now());
 
   useEffect(() => {
+    let frames = 0;
+    let lastTime = performance.now();
     let raf: number;
     const tick = () => {
-      frames.current++;
+      frames++;
       const now = performance.now();
-      if (now - lastTime.current >= 1000) {
-        setFps(frames.current);
-        frames.current = 0;
-        lastTime.current = now;
+      if (now - lastTime >= 1000) {
+        setFps(frames);
+        frames = 0;
+        lastTime = now;
       }
       raf = requestAnimationFrame(tick);
     };
@@ -46,7 +48,7 @@ const COMPASS_DIRS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] as const;
 
 function getCompassDirection(yawRad: number): string {
   // Normalize to 0-360
-  let deg = (((-yawRad * 180 / Math.PI) % 360) + 360) % 360;
+  const deg = (((-yawRad * 180 / Math.PI) % 360) + 360) % 360;
   const idx = Math.round(deg / 45) % 8;
   return COMPASS_DIRS[idx];
 }
@@ -104,13 +106,17 @@ interface GameHUDProps {
   onShare: () => void;
   onSave: () => void;
   onExit: () => void;
+  isFullscreenMapOpen: boolean;
+  onToggleFullscreenMap: () => void;
   shareStatus: 'idle' | 'copied';
 }
 
 export function GameHUD({
   seed, chunkCount, position, biome, worldMode, worldSize, hour,
   cameraYaw, chunkCacheRef, isMobile,
-  onScreenshot, onShare, onSave, onExit, shareStatus,
+  onScreenshot, onShare, onSave, onExit,
+  isFullscreenMapOpen, onToggleFullscreenMap,
+  shareStatus,
 }: GameHUDProps) {
   const [showMinimap, setShowMinimap] = useState(true);
   const [showStats, setShowStats] = useState(true);
@@ -128,7 +134,6 @@ export function GameHUD({
   }, [onScreenshot]);
 
   const altitude = (position[1] / VOXEL_SIZE).toFixed(0);
-  const speed = 0; // Could be computed from position delta
 
   return (
     <>
@@ -177,6 +182,18 @@ export function GameHUD({
           💾
         </button>
 
+        {/* Fullscreen map */}
+        <button onClick={onToggleFullscreenMap}
+          className={`pointer-events-auto p-1.5 bg-retro-bg/50 backdrop-blur-sm border rounded-md text-[10px] transition-all cursor-pointer ${
+            isFullscreenMapOpen
+              ? 'text-retro-gold border-retro-gold/40 bg-retro-gold/10'
+              : 'text-retro-muted/50 border-retro-border/25 hover:text-retro-gold hover:border-retro-gold/30 hover:bg-retro-gold/10'
+          }`}
+          title={isFullscreenMapOpen ? 'Close fullscreen map' : 'Open fullscreen map'}
+          style={{ touchAction: 'none' }}>
+          <PxlKitIcon icon={QuestMap} size={12} colorful={isFullscreenMapOpen} />
+        </button>
+
         {/* Exit */}
         {isMobile ? (
           <button onClick={onExit}
@@ -200,7 +217,7 @@ export function GameHUD({
                 cameraPos={position}
                 cameraYaw={cameraYaw}
                 chunkCacheRef={chunkCacheRef}
-                size={140}
+                size={156}
               />
               {/* Minimap toggle hint */}
               <div className="absolute -top-5 left-1/2 -translate-x-1/2">
@@ -274,7 +291,7 @@ export function GameHUD({
             cameraPos={position}
             cameraYaw={cameraYaw}
             chunkCacheRef={chunkCacheRef}
-            size={100}
+            size={112}
           />
         </div>
       )}

@@ -13,7 +13,7 @@ import { useState, useCallback } from 'react';
 import type { WorldConfig, WorldMode } from '../types';
 import { GRAPHICS_PRESETS } from '../types';
 import { ConfigSlider } from './Controls';
-import { PixelButton, PixelBadge, PixelSlideIn, PixelFadeIn } from '@pxlkit/ui-kit';
+import { PixelButton } from '@pxlkit/ui-kit';
 
 interface SettingsPanelProps {
   config: WorldConfig;
