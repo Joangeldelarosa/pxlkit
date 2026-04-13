@@ -458,62 +458,71 @@ export function getBuildingHeight(
   lotWX: number, lotWZ: number,
   type: BuildingType,
 ): number {
+  // Primary noise — smooth, per-lot variation
   const v = Math.abs(structN(lotWX * 3.7 + 100, lotWZ * 3.7 + 100));
+  // Secondary noise — adds dramatic spikes (some buildings much taller than neighbours)
+  const spike = Math.abs(structN(lotWX * 7.3 + 200, lotWZ * 7.3 + 200));
+  // Spike multiplier: 10% of buildings get 1.3-1.6× height boost
+  const spikeBoost = spike > 0.85 ? 1.3 + (spike - 0.85) * 2.0 : 1.0;
+
+  let base = 0;
   switch (type) {
-    case 'skyscraper':         return 12 + Math.floor(v * 16);   // 12-28
-    case 'skyscraper_twin':    return 10 + Math.floor(v * 14);   // 10-24
-    case 'skyscraper_stepped': return 14 + Math.floor(v * 12);   // 14-26
-    case 'tower':              return 8 + Math.floor(v * 10);    // 8-18
-    case 'tower_telecom':      return 10 + Math.floor(v * 8);    // 10-18
-    case 'office':             return 5 + Math.floor(v * 6);     // 5-11
-    case 'office_tall':        return 7 + Math.floor(v * 8);     // 7-15
-    case 'warehouse':          return 3 + Math.floor(v * 2);     // 3-5
-    case 'factory':            return 4 + Math.floor(v * 3);     // 4-7
-    case 'shop':               return 3 + Math.floor(v * 2);     // 3-5
-    case 'mall':               return 4 + Math.floor(v * 3);     // 4-7
-    case 'house':              return 3 + Math.floor(v * 2);     // 3-5
-    case 'mansion':            return 5 + Math.floor(v * 4);     // 5-9 (taller)
-    case 'castle':             return 8 + Math.floor(v * 8);     // 8-16
-    case 'hospital':           return 6 + Math.floor(v * 6);     // 6-12
-    case 'school':             return 4 + Math.floor(v * 3);     // 4-7
-    case 'church':             return 5 + Math.floor(v * 4);     // 5-9
-    case 'stadium':            return 4 + Math.floor(v * 3);     // 4-7
-    case 'parking_garage':     return 4 + Math.floor(v * 3);     // 4-7
-    case 'airport_terminal':   return 4 + Math.floor(v * 2);     // 4-6
-    case 'apartment':          return 6 + Math.floor(v * 10);    // 6-16
-    case 'hotel':              return 8 + Math.floor(v * 12);    // 8-20
-    case 'gas_station':        return 2 + Math.floor(v * 1);     // 2-3
-    case 'restaurant':         return 3 + Math.floor(v * 2);     // 3-5
-    case 'fire_station':       return 4 + Math.floor(v * 3);     // 4-7
-    case 'library':            return 4 + Math.floor(v * 4);     // 4-8
+    case 'skyscraper':         base = 12 + Math.floor(v * 20);   break; // 12-32
+    case 'skyscraper_twin':    base = 10 + Math.floor(v * 18);   break; // 10-28
+    case 'skyscraper_stepped': base = 14 + Math.floor(v * 16);   break; // 14-30
+    case 'tower':              base = 8 + Math.floor(v * 14);    break; // 8-22
+    case 'tower_telecom':      base = 10 + Math.floor(v * 10);   break; // 10-20
+    case 'office':             base = 5 + Math.floor(v * 8);     break; // 5-13
+    case 'office_tall':        base = 7 + Math.floor(v * 10);    break; // 7-17
+    case 'warehouse':          base = 3 + Math.floor(v * 3);     break; // 3-6
+    case 'factory':            base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'shop':               base = 3 + Math.floor(v * 2);     break; // 3-5
+    case 'mall':               base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'house':              base = 3 + Math.floor(v * 3);     break; // 3-6
+    case 'mansion':            base = 5 + Math.floor(v * 5);     break; // 5-10
+    case 'castle':             base = 8 + Math.floor(v * 10);    break; // 8-18
+    case 'hospital':           base = 6 + Math.floor(v * 8);     break; // 6-14
+    case 'school':             base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'church':             base = 5 + Math.floor(v * 5);     break; // 5-10
+    case 'stadium':            base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'parking_garage':     base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'airport_terminal':   base = 4 + Math.floor(v * 3);     break; // 4-7
+    case 'apartment':          base = 6 + Math.floor(v * 14);    break; // 6-20
+    case 'hotel':              base = 8 + Math.floor(v * 16);    break; // 8-24
+    case 'gas_station':        base = 2 + Math.floor(v * 1);     break; // 2-3
+    case 'restaurant':         base = 3 + Math.floor(v * 3);     break; // 3-6
+    case 'fire_station':       base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'library':            base = 4 + Math.floor(v * 5);     break; // 4-9
     case 'plaza':              return 0;
     case 'fountain_plaza':     return 0;
     case 'park':               return 0;
     case 'parking':            return 0;
-    case 'bridge_base':        return 3 + Math.floor(v * 2);     // 3-5
+    case 'bridge_base':        base = 3 + Math.floor(v * 3);     break; // 3-6
     /* ── New building heights (v2) ── */
-    case 'condo':              return 8 + Math.floor(v * 12);    // 8-20
-    case 'townhouse':          return 4 + Math.floor(v * 3);     // 4-7
-    case 'cinema':             return 5 + Math.floor(v * 4);     // 5-9
-    case 'police_station':     return 4 + Math.floor(v * 4);     // 4-8
-    case 'museum':             return 5 + Math.floor(v * 5);     // 5-10
-    case 'convention_center':  return 4 + Math.floor(v * 3);     // 4-7
-    case 'supermarket':        return 3 + Math.floor(v * 2);     // 3-5
-    case 'gym':                return 4 + Math.floor(v * 3);     // 4-7
-    case 'bank':               return 5 + Math.floor(v * 5);     // 5-10
-    case 'data_center':        return 4 + Math.floor(v * 3);     // 4-7
-    case 'greenhouse':         return 3 + Math.floor(v * 2);     // 3-5
-    case 'water_tower':        return 6 + Math.floor(v * 4);     // 6-10
-    case 'radio_station':      return 3 + Math.floor(v * 2);     // 3-5
+    case 'condo':              base = 8 + Math.floor(v * 16);    break; // 8-24
+    case 'townhouse':          base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'cinema':             base = 5 + Math.floor(v * 5);     break; // 5-10
+    case 'police_station':     base = 4 + Math.floor(v * 5);     break; // 4-9
+    case 'museum':             base = 5 + Math.floor(v * 6);     break; // 5-11
+    case 'convention_center':  base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'supermarket':        base = 3 + Math.floor(v * 3);     break; // 3-6
+    case 'gym':                base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'bank':               base = 5 + Math.floor(v * 6);     break; // 5-11
+    case 'data_center':        base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'greenhouse':         base = 3 + Math.floor(v * 3);     break; // 3-6
+    case 'water_tower':        base = 6 + Math.floor(v * 5);     break; // 6-11
+    case 'radio_station':      base = 3 + Math.floor(v * 3);     break; // 3-6
     case 'rooftop_garden':     return 0;
-    case 'mixed_use':          return 6 + Math.floor(v * 8);     // 6-14
-    case 'loft_building':      return 5 + Math.floor(v * 6);     // 5-11
-    case 'penthouse_tower':    return 10 + Math.floor(v * 14);   // 10-24
-    case 'market_hall':        return 4 + Math.floor(v * 3);     // 4-7
-    case 'transit_station':    return 4 + Math.floor(v * 3);     // 4-7
+    case 'mixed_use':          base = 6 + Math.floor(v * 10);    break; // 6-16
+    case 'loft_building':      base = 5 + Math.floor(v * 8);     break; // 5-13
+    case 'penthouse_tower':    base = 10 + Math.floor(v * 18);   break; // 10-28
+    case 'market_hall':        base = 4 + Math.floor(v * 4);     break; // 4-8
+    case 'transit_station':    base = 4 + Math.floor(v * 4);     break; // 4-8
     case 'monument':           return 0;
     default:                   return 0;
   }
+  // Apply dramatic spike boost to ~10% of buildings
+  return Math.floor(base * spikeBoost);
 }
 
 /** Get the wall palette for a building type, with fallback */
@@ -573,22 +582,98 @@ export function getSectorLampColors(wx: number, wz: number): {
 /* ═══════════════════════════════════════════════════════════════
  *  Highway / Autopista System
  *
- *  Highways are mega-roads that run along "super-avenues" — every
- *  HIGHWAY_INTERVAL blocks. They are wider than avenues and have
- *  concrete barriers, wider medians, and distinct lane markings.
- *  The highway grid provides the main artery structure for large cities.
+ *  Two layers:
+ *  1) INTRA-CITY highways: mega-avenues inside city biomes (every
+ *     HIGHWAY_INTERVAL blocks). These are the main city arteries.
+ *  2) INTER-BIOME highways: long-distance highways that span the
+ *     ENTIRE world, connecting cities across plains, forests, deserts,
+ *     and mountains. When they hit mountains they become TUNNELS with
+ *     internal lighting.
+ *
+ *  The inter-biome system uses a quantized grid at INTER_HW_SPACING
+ *  intervals. At each world-cell we check if the cell falls within
+ *  INTER_HW_HALF_W of the nearest grid line in X or Z. This creates
+ *  a global highway grid that is independent of biome boundaries.
  * ═══════════════════════════════════════════════════════════════ */
 
-/** Highway interval: every N blocks, one block becomes a highway */
+/** Intra-city highway interval: every N blocks */
 export const HIGHWAY_INTERVAL = 16;
-/** Highway total width in voxels (12: barrier + 4 lanes + median + 4 lanes + barrier) */
+/** Highway total width in voxels (inside cities) */
 export const HIGHWAY_W = 12;
 
-/** Returns true if this block coordinate is on a highway in X */
+/** Returns true if this block coordinate is on an intra-city highway in X */
 export function isHighwayX(blockX: number): boolean {
   return ((blockX % HIGHWAY_INTERVAL) + HIGHWAY_INTERVAL) % HIGHWAY_INTERVAL === 0;
 }
-/** Returns true if this block coordinate is on a highway in Z */
+/** Returns true if this block coordinate is on an intra-city highway in Z */
 export function isHighwayZ(blockZ: number): boolean {
   return ((blockZ % HIGHWAY_INTERVAL) + HIGHWAY_INTERVAL) % HIGHWAY_INTERVAL === 0;
+}
+
+/* ── Inter-biome highway system ── */
+
+/** Spacing between inter-biome highways in world-voxel coordinates.
+ *  320 = 16 chunks × CHUNK_SIZE(16) + room for terrain variation.
+ *  This gives roughly 2 highways per render-distance at distance=20. */
+export const INTER_HW_SPACING = 320;
+
+/** Half-width of the inter-biome highway in voxels (total width = 2×HW = 10 voxels) */
+export const INTER_HW_HALF_W = 5;
+
+/** Tunnel internal height in voxels (floor to ceiling clearance) */
+export const TUNNEL_HEIGHT = 6;
+
+/** Check if a world-voxel coordinate is on an inter-biome highway.
+ *  Returns an object with info about the highway at this position,
+ *  or null if the position is not on a highway.
+ *
+ *  `onX` / `onZ` tell you which direction the highway runs.
+ *  `distFromCenter` is 0 at the median, ±HW at the edges.
+ *  `isMedian` is true for the 2-voxel center divider.
+ *  `isBarrier` is true for the outermost voxels (concrete barriers).
+ *  `isShoulder` is true for the 2-voxel gravel shoulders outside barriers.
+ */
+export interface InterHighwayInfo {
+  onX: boolean;          // highway runs along X axis
+  onZ: boolean;          // highway runs along Z axis
+  distFromCenterX: number; // signed distance from X-highway center
+  distFromCenterZ: number; // signed distance from Z-highway center
+  isMedian: boolean;     // center median (2 voxels wide)
+  isBarrier: boolean;    // outermost lane voxels (concrete barrier)
+  isShoulder: boolean;   // gravel shoulders outside the road
+  isIntersection: boolean; // X-highway crosses Z-highway
+}
+
+export function getInterHighwayInfo(wx: number, wz: number): InterHighwayInfo | null {
+  const HW = INTER_HW_HALF_W;
+  const SHOULDER = 2; // 2 extra voxels of gravel on each side
+
+  // Distance from nearest highway grid line
+  const snapX = Math.round(wz / INTER_HW_SPACING) * INTER_HW_SPACING;
+  const snapZ = Math.round(wx / INTER_HW_SPACING) * INTER_HW_SPACING;
+  const distX = wz - snapX; // distance from X-running highway
+  const distZ = wx - snapZ; // distance from Z-running highway
+
+  const onXroad = Math.abs(distX) <= HW;
+  const onZroad = Math.abs(distZ) <= HW;
+  const onXshoulder = !onXroad && Math.abs(distX) <= HW + SHOULDER;
+  const onZshoulder = !onZroad && Math.abs(distZ) <= HW + SHOULDER;
+
+  if (!onXroad && !onZroad && !onXshoulder && !onZshoulder) return null;
+
+  const isMedian = (onXroad && Math.abs(distX) <= 1) || (onZroad && Math.abs(distZ) <= 1);
+  const isBarrier = (onXroad && Math.abs(distX) >= HW - 1 && Math.abs(distX) <= HW)
+                 || (onZroad && Math.abs(distZ) >= HW - 1 && Math.abs(distZ) <= HW);
+  const isShoulder = onXshoulder || onZshoulder;
+
+  return {
+    onX: onXroad || onXshoulder,
+    onZ: onZroad || onZshoulder,
+    distFromCenterX: distX,
+    distFromCenterZ: distZ,
+    isMedian,
+    isBarrier,
+    isShoulder,
+    isIntersection: onXroad && onZroad,
+  };
 }
