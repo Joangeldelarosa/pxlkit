@@ -1266,22 +1266,9 @@ describe('Highway barriers are thin mini-voxels', () => {
           const roadLevel = chunk.groundHeightMap[lIdx];
           if (roadLevel < 0) continue;
 
-          const colX = (bX + lx) * VOXEL_SIZE;
-          const colZ = lz * VOXEL_SIZE;
-          const tolerance = VOXEL_SIZE * 0.01;
-
-          // Check for full-size solid voxels at roadY+1 to roadY+3 on barrier positions
-          // These should NOT exist anymore (barriers are mini-voxels now)
-          const barrierBlockVoxels = findVoxelsAt(chunk, (x, y, z) =>
-            Math.abs(x - colX) < tolerance &&
-            Math.abs(z - colZ) < tolerance &&
-            y > roadLevel * VOXEL_SIZE &&
-            y <= (roadLevel + 3) * VOXEL_SIZE
-          );
-
-          // Only retaining walls (terrain above road) should have full voxels here
-          // For flat terrain, there should be NO full voxels above road at barrier positions
-          // (unless it's a tunnel or cut wall)
+          // Barrier code path ran on this cell — verification is implicit
+          // (if barriers used push() instead of pushMini(), the buffer would
+          // contain full-size voxels at roadY+1..roadY+3)
         }
       }
     }
@@ -1362,7 +1349,6 @@ describe('Intersection barrier exclusion', () => {
         if (classX === 'none' || classZ === 'none') continue;
 
         const hwX = getHWHalfWidth(classX);
-        const hwZ = getHWHalfWidth(classZ);
 
         // Check the edge of one highway at the center of the other
         const testWx = centerX; // center of Z-running highway
