@@ -302,6 +302,10 @@ export interface ChunkVoxelData {
   paintCount: number;
   chunkX: number;
   chunkZ: number;
+  /** Dominant biome type name for this chunk (used by minimap) */
+  biome?: string;
+  /** Average ground height across chunk cells (used by minimap shading) */
+  avgHeight?: number;
 }
 
 /* ── City cell classification ── */

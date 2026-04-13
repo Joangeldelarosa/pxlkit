@@ -5,7 +5,7 @@
  *  - Slides in from the right edge
  *  - Close button to dismiss
  *  - Collapsible sections: World, Time, Graphics, Terrain, Effects
- *  - Separate from the welcome/start screen
+ *  - Uses @pxlkit/ui-kit components for coherence
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
@@ -13,6 +13,7 @@ import { useState, useCallback } from 'react';
 import type { WorldConfig, WorldMode } from '../types';
 import { GRAPHICS_PRESETS } from '../types';
 import { ConfigSlider } from './Controls';
+import { PixelButton, PixelBadge, PixelSlideIn, PixelFadeIn } from '@pxlkit/ui-kit';
 
 interface SettingsPanelProps {
   config: WorldConfig;
@@ -278,16 +279,14 @@ export function SettingsPanel({
           {/* ── Save & Share Buttons ── */}
           <div className="flex gap-2 mt-2 pt-2 border-t border-retro-border/20">
             {onSaveWorld && (
-              <button onClick={onSaveWorld}
-                className="flex-1 py-1.5 bg-retro-cyan/15 hover:bg-retro-cyan/25 border border-retro-cyan/40 rounded font-pixel text-[8px] sm:text-[9px] text-retro-cyan transition-all cursor-pointer select-none">
+              <PixelButton tone="cyan" variant="ghost" size="sm" onClick={onSaveWorld} className="flex-1">
                 💾 Save World
-              </button>
+              </PixelButton>
             )}
             {onShareScene && (
-              <button onClick={onShareScene}
-                className="flex-1 py-1.5 bg-retro-purple/15 hover:bg-retro-purple/25 border border-retro-purple/40 rounded font-pixel text-[8px] sm:text-[9px] text-retro-purple transition-all cursor-pointer select-none">
+              <PixelButton tone="purple" variant="ghost" size="sm" onClick={onShareScene} className="flex-1">
                 {shareStatus === 'copied' ? '✓ Link Copied!' : '🔗 Share Scene'}
-              </button>
+              </PixelButton>
             )}
           </div>
         </div>
