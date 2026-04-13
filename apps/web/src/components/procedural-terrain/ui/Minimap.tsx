@@ -9,8 +9,7 @@
 
 import { useRef, useEffect, useCallback } from 'react';
 import type { ChunkVoxelData } from '../types';
-import { CHUNK_SIZE, VOXEL_SIZE, BIOMES } from '../constants';
-import type { BiomeType } from '../types';
+import { CHUNK_SIZE, VOXEL_SIZE } from '../constants';
 
 /* ── Biome minimap colours ── */
 const BIOME_COLORS: Record<string, string> = {
@@ -35,6 +34,9 @@ interface MinimapProps {
 
 export function Minimap({ visible, cameraPos, cameraYaw, chunkCacheRef, size = 160 }: MinimapProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Higher radius = zoomed out minimap that shows more surrounding territory.
+  const radius = 6;
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -63,7 +65,6 @@ export function Minimap({ visible, cameraPos, cameraYaw, chunkCacheRef, size = 1
     const chunkWorldSize = CHUNK_SIZE * VOXEL_SIZE;
     const camChunkX = Math.floor(cameraPos[0] / chunkWorldSize);
     const camChunkZ = Math.floor(cameraPos[2] / chunkWorldSize);
-    const radius = 5; // chunks around camera
     const cellSize = w / (radius * 2 + 1);
 
     // Rotate the entire map around center by -cameraYaw so forward = up
@@ -155,7 +156,7 @@ export function Minimap({ visible, cameraPos, cameraYaw, chunkCacheRef, size = 1
       ctx.fillStyle = d.color;
       ctx.fillText(d.label, cx + dx2, cy + dy2);
     }
-  }, [visible, cameraPos, cameraYaw, chunkCacheRef]);
+  }, [visible, cameraPos, cameraYaw, chunkCacheRef, radius]);
 
   useEffect(() => {
     if (!visible) return;

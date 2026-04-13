@@ -42,9 +42,10 @@ import { Trophy, Star, Coin, Crown, Gem, Shield, Lightning, Key, Sword } from '@
 import { Heart } from '@pxlkit/social';
 import { Check, Package, SparkleSmall, Robot } from '@pxlkit/ui';
 import { Sun, Moon, Snowflake } from '@pxlkit/weather';
-import type { PxlKitData } from '@pxlkit/core';
+import { QuestMap as QuestMapIcon } from '@pxlkit/gamification';
+import { PxlKitIcon, type PxlKitData } from '@pxlkit/core';
 /* ── PxlKit UI Kit ── */
-import { PixelButton, PixelFadeIn, PixelSlideIn, PixelTypewriter, PixelBadge, PixelInput } from '@pxlkit/ui-kit';
+import { PixelButton, PixelFadeIn, PixelSlideIn, PixelBadge } from '@pxlkit/ui-kit';
 
 /* ── Internal modules ── */
 import type { WorldConfig, ChunkVoxelData } from './types';
@@ -72,6 +73,7 @@ import { CameraLook } from './camera/CameraLook';
 import { MobileTouchControls } from './ui/Controls';
 import { SettingsPanel } from './ui/SettingsPanel';
 import { GameHUD } from './ui/GameHUD';
+import { FullscreenMap } from './ui/FullscreenMap';
 
 /* ═══════════════════════════════════════════════════════════════
  *  Initialize Pickup Icons
@@ -431,6 +433,7 @@ export default function ProceduralTerrain() {
   const [isLocked, setIsLocked] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
+  const [showFullscreenMap, setShowFullscreenMap] = useState(false);
   const [screenshotFlash, setScreenshotFlash] = useState(false);
   const [cameraPos, setCameraPos] = useState<[number, number, number]>(initPos ?? [0, 12, 20]);
   const [cameraYaw, setCameraYaw] = useState(0);
@@ -490,9 +493,27 @@ export default function ProceduralTerrain() {
   }, []);
 
   const requestPointerLock = useCallback(() => {
+    setShowFullscreenMap(false);
     if (isMobile) { setShowControls(false); setIsLocked(true); return; }
     canvasRef.current?.querySelector('canvas')?.requestPointerLock();
   }, [isMobile]);
+
+  const toggleFullscreenMap = useCallback(() => {
+    setShowFullscreenMap((prev) => {
+      const next = !prev;
+      if (next && !isMobile && isLocked) {
+        document.exitPointerLock();
+      }
+      return next;
+    });
+  }, [isMobile, isLocked]);
+
+  const handleCanvasPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    if (isMobile || isLocked || showControls || showSettings || showFullscreenMap) return;
+    if (!(e.target instanceof HTMLCanvasElement)) return;
+    requestPointerLock();
+  }, [isMobile, isLocked, showControls, showSettings, showFullscreenMap, requestPointerLock]);
 
   useEffect(() => {
     const h = () => { const l = !!document.pointerLockElement; setIsLocked(l); if (l) setShowControls(false); };
@@ -507,7 +528,11 @@ export default function ProceduralTerrain() {
   const applySeed = useCallback(() => { const p = parseInt(seedInput, 10); if (!isNaN(p)) setSeed(Math.abs(p)); }, [seedInput]);
   const handleChunkCount = useCallback((c: number) => setChunkCount(c), []);
   const exitImmersive = useCallback(() => {
-    if (isMobile) { setIsLocked(false); setShowControls(true); } else document.exitPointerLock();
+    if (isMobile) {
+      setShowFullscreenMap(false);
+      setIsLocked(false);
+      setShowControls(true);
+    } else document.exitPointerLock();
   }, [isMobile]);
   const handleTouchKey = useCallback((key: string, active: boolean) => {
     if (active) keysRef.current.add(key); else keysRef.current.delete(key);
@@ -692,6 +717,16 @@ export default function ProceduralTerrain() {
         shareStatus={shareStatus}
       />
 
+      <FullscreenMap
+        open={showFullscreenMap}
+        onClose={() => setShowFullscreenMap(false)}
+        cameraPos={cameraPos}
+        cameraYaw={cameraYaw}
+        chunkCacheRef={chunkCacheRef}
+        worldMode={config.worldMode}
+        worldSize={config.worldSize}
+      />
+
       {/* ── Locked: Full Game HUD ── */}
       {isLocked && (
         <>
@@ -722,6 +757,8 @@ export default function ProceduralTerrain() {
             onShare={handleShareScene}
             onSave={handleSaveWorld}
             onExit={exitImmersive}
+            isFullscreenMapOpen={showFullscreenMap}
+            onToggleFullscreenMap={toggleFullscreenMap}
             shareStatus={shareStatus}
           />
 
@@ -740,10 +777,19 @@ export default function ProceduralTerrain() {
               <button onClick={handleShareScene}
                 className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-purple transition-all cursor-pointer select-none"
                 title="Share scene">{shareStatus === 'copied' ? '✓' : '🔗'}</button>
+              <button onClick={toggleFullscreenMap}
+                className={`p-2 bg-retro-bg/80 border rounded text-[11px] transition-all cursor-pointer select-none ${
+                  showFullscreenMap
+                    ? 'text-retro-gold border-retro-gold/60 bg-retro-gold/10'
+                    : 'text-retro-muted border-retro-border/50 hover:text-retro-gold hover:border-retro-gold/40'
+                }`}
+                title={showFullscreenMap ? 'Close fullscreen map' : 'Open fullscreen map'}>
+                <PxlKitIcon icon={QuestMapIcon} size={12} colorful={showFullscreenMap} />
+              </button>
               <button onClick={() => setShowSettings(true)}
                 className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none"
                 title="Settings">⚙</button>
-              <button onClick={() => setShowControls(true)}
+              <button onClick={() => { setShowFullscreenMap(false); setShowControls(true); }}
                 className="px-2.5 py-1.5 bg-retro-bg/80 border border-retro-border/50 rounded font-pixel text-[8px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none"
                 title="Back to menu">Menu</button>
             </div>
@@ -752,7 +798,12 @@ export default function ProceduralTerrain() {
       )}
 
       {/* ── Three.js Canvas ── */}
-      <div ref={canvasRef} className="w-full h-full" style={{ touchAction: 'none' }}>
+      <div
+        ref={canvasRef}
+        className="w-full h-full"
+        style={{ touchAction: 'none' }}
+        onPointerDown={handleCanvasPointerDown}
+      >
         <Canvas
           camera={{ fov: 65, near: 0.1, far: 600 }}
           dpr={gfxDpr}
