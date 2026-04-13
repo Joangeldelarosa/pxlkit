@@ -16,7 +16,7 @@ import {
 import { mulberry32, fbm } from '../utils/noise';
 import { varyColor, hashCoord } from '../utils/color';
 import { getBiome, getVariedBiome, getContinent, getContinentElevation } from '../utils/biomes';
-import { classifyCityCell, getBuildingType, getBuildingHeight, getSectorLampColors } from '../city/layout';
+import { classifyCityCell, getBuildingType, getBuildingHeight, getSectorLampColors, getInterHighwayInfo, INTER_HW_HALF_W, TUNNEL_HEIGHT } from '../city/layout';
 import { generateBuildingColumn } from '../city/buildings';
 import type { PxlKitData } from '@pxlkit/core';
 
@@ -257,6 +257,80 @@ export function generateChunkData(
     }
   }
 
+  /* ── Pre-compute inter-biome highway map ──
+   *  For each cell in the chunk, determine if it's on an inter-biome highway.
+   *  Store: highway level (road surface Y), whether it's a tunnel, and the
+   *  InterHighwayInfo for lane/barrier rendering later. */
+  const hwInfoMap: (ReturnType<typeof getInterHighwayInfo>)[] = new Array(CHUNK_SIZE * CHUNK_SIZE).fill(null);
+  /** Highway road surface level per cell (-1 = not on highway) */
+  const hwLevelMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE).fill(-1);
+  /** true if this highway cell is inside a tunnel (mountain above) */
+  const hwTunnelMap = new Uint8Array(CHUNK_SIZE * CHUNK_SIZE);
+  /** Original (pre-carve) terrain height at each cell — needed so we know
+   *  what the mountain looks like above the tunnel for rendering walls/ceiling. */
+  const origHMap = new Int32Array(gW * gW);
+  origHMap.set(hMap);
+
+  for (let lx = 0; lx < CHUNK_SIZE; lx++) {
+    for (let lz = 0; lz < CHUNK_SIZE; lz++) {
+      const wx = bX + lx, wz = bZ + lz;
+      const idx = (lx + 1) * gW + (lz + 1);
+      const h = hMap[idx];
+      if (h < 0) continue;
+      const biome = BIOME_TYPES[bMap[idx]] as BiomeType;
+
+      // Skip city biome — intra-city highways handle that
+      if (biome === 'city' || biome === 'ocean') continue;
+
+      const hwInfo = getInterHighwayInfo(wx, wz);
+      if (!hwInfo) continue;
+
+      const localIdx = lx * CHUNK_SIZE + lz;
+      // Only actual road surface (not just shoulder)
+      const onRoad = (Math.abs(hwInfo.distFromCenterX) <= INTER_HW_HALF_W && hwInfo.onX)
+                  || (Math.abs(hwInfo.distFromCenterZ) <= INTER_HW_HALF_W && hwInfo.onZ);
+      if (!onRoad && !hwInfo.isShoulder) continue;
+
+      hwInfoMap[localIdx] = hwInfo;
+
+      // Compute the highway surface level:
+      // Take the minimum height in a small neighborhood along the highway
+      // to create a smooth, relatively flat road.
+      // For tunnels: road level is set to the minimum of surrounding terrain
+      // minus any extreme peaks (clamp to a reasonable level).
+      const c = variedConfigs[localIdx] || BIOMES[biome];
+      const waterLevel = c.waterLevel;
+
+      // Highway level = max(waterLevel + 2, min of nearby terrain + 1)
+      // This ensures the road is above water but cuts through hills
+      let roadLevel = h;
+
+      // Sample neighbors along the highway to find a good road level
+      const sampleRange = 4;
+      let minH = h;
+      for (let s = -sampleRange; s <= sampleRange; s++) {
+        const sIdx = biome === 'mountains'
+          ? (lx + 1) * gW + (lz + 1) // use current for mountains (we'll tunnel)
+          : (Math.max(0, Math.min(gW - 1, lx + 1 + (hwInfo.onX ? s : 0)))) * gW
+            + Math.max(0, Math.min(gW - 1, lz + 1 + (hwInfo.onZ ? s : 0)));
+        if (hMap[sIdx] >= 0 && hMap[sIdx] < minH) minH = hMap[sIdx];
+      }
+      roadLevel = Math.max(waterLevel + 2, minH);
+
+      // Tunnel detection: if terrain is significantly higher than road level
+      const isTunnel = biome === 'mountains' && h > roadLevel + TUNNEL_HEIGHT + 2;
+
+      if (isTunnel) {
+        // For tunnels, set road level to a reasonable grade
+        // (lower than the mountain but above water)
+        roadLevel = Math.max(waterLevel + 2, Math.min(roadLevel, h - TUNNEL_HEIGHT - 3));
+      }
+
+      hwLevelMap[localIdx] = roadLevel;
+      hwTunnelMap[localIdx] = isTunnel ? 1 : 0;
+    }
+  }
+
   /* ── Helper: push solid voxel ── */
   function push(px: number, py: number, pz: number, hex: string) {
     if (sc >= maxV) return;
@@ -340,9 +414,24 @@ export function generateChunkData(
       groundHeightMap[lIdx] = h;
       npcWalkableMap[lIdx] = biome === 'city' ? 0 : 1;
 
+      /* ── Inter-biome highway/tunnel detection for this cell ── */
+      const hwInfo = hwInfoMap[lIdx];
+      const hwLevel = hwLevelMap[lIdx];
+      const isTunnel = hwTunnelMap[lIdx] === 1;
+      const isOnInterHW = hwInfo !== null && hwLevel >= 0;
+
       /* ── 1. TERRAIN ── */
       for (let y = 0; y <= h; y++) {
         const isTop = y === h;
+
+        // Tunnel carving: skip terrain voxels inside the tunnel cavity
+        if (isOnInterHW && isTunnel) {
+          const tunnelFloor = hwLevel;
+          const tunnelCeil = hwLevel + TUNNEL_HEIGHT;
+          // Don't render terrain inside the tunnel cavity
+          if (y > tunnelFloor && y <= tunnelCeil) continue;
+        }
+
         const exposed = isTop || y === 0 || y > hN || y > hS || y > hE || y > hWest;
         if (!exposed) continue;
 
@@ -830,6 +919,123 @@ export function generateChunkData(
           });
         }
         continue; // city biome handled
+      }
+
+      /* ══════════════════ 3b. INTER-BIOME HIGHWAY ══════════════════
+       *  Highways that cross plains, forests, deserts, mountains etc.
+       *  When in mountains: tunnels with internal walls/ceiling/lighting.
+       *  This section renders the highway surface, markings, barriers,
+       *  tunnel enclosure, and lighting for non-city biomes. */
+      if (isOnInterHW) {
+        const onActualRoad = !hwInfo!.isShoulder;
+        const roadY = hwLevel;
+        npcWalkableMap[lIdx] = 1;
+
+        if (onActualRoad) {
+          // ── Highway asphalt surface ──
+          const isMedian2 = hwInfo!.isMedian;
+          const isBarrier2 = hwInfo!.isBarrier;
+          const roadColor = isMedian2 ? '#448844'  // green median
+            : isBarrier2 ? '#888888'   // concrete barrier
+            : hwInfo!.isIntersection ? '#404040'
+            : '#333333';              // dark asphalt
+
+          push((bX + lx) * VOXEL_SIZE, roadY * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+            varyColor(roadColor, wx, roadY, wz, 2, 0.02, 0.03));
+          groundHeightMap[lIdx] = roadY;
+          trackH(lx, lz, roadY);
+
+          // ── Concrete barriers (raised 2 voxels) ──
+          if (isBarrier2) {
+            for (let by = 1; by <= 2; by++) {
+              push((bX + lx) * VOXEL_SIZE, (roadY + by) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#999999', wx, roadY + by, wz, 2, 0.02, 0.04));
+            }
+            trackH(lx, lz, roadY + 2);
+          }
+
+          // ── Lane markings (flat paint) ──
+          if (!isMedian2 && !isBarrier2 && !hwInfo!.isIntersection) {
+            const paintY2 = roadY * VOXEL_SIZE + VOXEL_SIZE * 0.5 + 0.005;
+            const cellCx2 = (bX + lx) * VOXEL_SIZE;
+            const cellCz2 = (bZ + lz) * VOXEL_SIZE;
+            const stripW2 = MVS * 1.5;
+            const cellLen2 = VOXEL_SIZE;
+
+            const absDistX = Math.abs(hwInfo!.distFromCenterX);
+            const absDistZ = Math.abs(hwInfo!.distFromCenterZ);
+
+            if (hwInfo!.onX && absDistX <= INTER_HW_HALF_W) {
+              // White edge lines
+              if (absDistX === INTER_HW_HALF_W - 1) {
+                pushPaint(cellCx2, paintY2, cellCz2, '#cccccc', cellLen2, stripW2);
+              }
+              // Dashed white lane dividers at 1/3 and 2/3
+              const laneW = INTER_HW_HALF_W - 2; // lanes between median and barrier
+              if (absDistX > 1 && absDistX < INTER_HW_HALF_W - 1) {
+                const lanePos = absDistX - 2;
+                if (lanePos === Math.floor(laneW / 2) && ((wx % 6 + 6) % 6 < 3)) {
+                  pushPaint(cellCx2, paintY2, cellCz2, '#aaaaaa', cellLen2 * 0.5, stripW2);
+                }
+              }
+            }
+            if (hwInfo!.onZ && absDistZ <= INTER_HW_HALF_W) {
+              if (absDistZ === INTER_HW_HALF_W - 1) {
+                pushPaint(cellCx2, paintY2, cellCz2, '#cccccc', stripW2, cellLen2);
+              }
+              const laneW2 = INTER_HW_HALF_W - 2;
+              if (absDistZ > 1 && absDistZ < INTER_HW_HALF_W - 1) {
+                const lanePos = absDistZ - 2;
+                if (lanePos === Math.floor(laneW2 / 2) && ((wz % 6 + 6) % 6 < 3)) {
+                  pushPaint(cellCx2, paintY2, cellCz2, '#aaaaaa', stripW2, cellLen2 * 0.5);
+                }
+              }
+            }
+          }
+
+          // ── Tunnel rendering ──
+          if (isTunnel) {
+            const tunnelCeil = roadY + TUNNEL_HEIGHT;
+
+            // Tunnel walls: on the barrier positions, extend up to ceiling
+            if (isBarrier2) {
+              for (let ty = 3; ty <= TUNNEL_HEIGHT; ty++) {
+                push((bX + lx) * VOXEL_SIZE, (roadY + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#777777', wx, roadY + ty, wz, 2, 0.02, 0.04));
+              }
+              trackH(lx, lz, tunnelCeil);
+            }
+
+            // Tunnel ceiling — render for ALL road cells (not just barriers)
+            // Ceiling is 1 voxel at tunnelCeil + 1
+            push((bX + lx) * VOXEL_SIZE, (tunnelCeil + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+              varyColor('#666666', wx, tunnelCeil + 1, wz, 2, 0.02, 0.04));
+            trackH(lx, lz, tunnelCeil + 1);
+
+            // Tunnel lighting: yellow lights every 8 voxels along the ceiling
+            if (!isBarrier2 && !isMedian2) {
+              const lightSpacing = 8;
+              const onLightX = hwInfo!.onX && ((wx % lightSpacing + lightSpacing) % lightSpacing === 0);
+              const onLightZ = hwInfo!.onZ && ((wz % lightSpacing + lightSpacing) % lightSpacing === 0);
+              if (onLightX || onLightZ) {
+                // Light fixture on ceiling
+                push((bX + lx) * VOXEL_SIZE, tunnelCeil * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#ffee88', wx, tunnelCeil, wz, 3, 0.04, 0.06));
+                // Register as street light for night illumination system
+                pushSL((bX + lx) * VOXEL_SIZE, tunnelCeil * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE);
+              }
+            }
+          }
+
+        } else if (hwInfo!.isShoulder) {
+          // ── Gravel shoulder ──
+          push((bX + lx) * VOXEL_SIZE, (h > roadY ? roadY : h) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+            varyColor('#999988', wx, roadY, wz, 2, 0.03, 0.04));
+          groundHeightMap[lIdx] = Math.min(h, roadY);
+        }
+
+        // Don't render natural structures on highway cells
+        continue;
       }
 
       /* ══════════════════ 4. NATURAL STRUCTURES ══════════════════ */
