@@ -603,11 +603,16 @@ export function generateChunkData(
             const isHwMedian = hwMod === mid || hwMod === mid - 1;
 
             if (isHwBarrier) {
-              roadBase = '#999999'; // concrete barrier
-              // Render barrier height (2 voxels above road surface)
-              push((bX + lx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor('#888888', wx, h + 2, wz, 2, 0.02, 0.04));
-              trackH(lx, lz, h + 2);
+              roadBase = '#555555'; // dark edge strip under barrier
+              // Mini-voxel curb: 5 MVS high (~0.375 world units) — proportional thin barrier
+              const curbPx = (bX + lx) * VOXEL_SIZE;
+              const curbPz = (bZ + lz) * VOXEL_SIZE;
+              const curbBaseY = (h + 1) * VOXEL_SIZE + VOXEL_SIZE * 0.5;
+              const cityCurbH = 5; // mini-voxel units
+              for (let cy = 0; cy < cityCurbH; cy++) {
+                pushMini(curbPx, curbBaseY + cy * MVS, curbPz, '#999999');
+              }
+              trackH(lx, lz, h + 1);
             } else if (isHwMedian) {
               roadBase = '#338833'; // green median divider
             } else {
@@ -830,34 +835,38 @@ export function generateChunkData(
             const axisPos = onRoadZ && !onRoadX ? wx : wz;
             // Lamp spacing: every 8 voxels along the axis
             if (isLampBarrier && ((axisPos % 8 + 8) % 8 === 0)) {
-              // Mini-voxel pole sitting on top of barrier (h+2)
-              const lampBaseY = (h + 2) * VOXEL_SIZE + VOXEL_SIZE * 0.5;
+              // Mini-voxel pole sitting on top of mini-voxel curb
+              // Curb top: road surface (h+1) + VOXEL_SIZE/2 + 5*MVS
+              const cityCurbTop = (h + 1) * VOXEL_SIZE + VOXEL_SIZE * 0.5 + 5 * MVS;
+              const lampBaseY = cityCurbTop;
               const lampPx = (bX + lx) * VOXEL_SIZE;
               const lampPz = (bZ + lz) * VOXEL_SIZE;
-              const cityLampH = 18; // mini-voxel units (~1.35 world units)
+              const cityLampH = 22; // mini-voxel units — taller for visibility
               // Pole shaft
               for (let sy = 0; sy < cityLampH; sy++) {
                 pushMini(lampPx, lampBaseY + sy * MVS, lampPz, '#555555');
               }
-              // Lamp arm extends 2 MVS toward road center
+              // Lamp arm extends 3 MVS toward road center
               const armDir = hwModLamp === 0 ? 1 : -1;
               const armAxis = onRoadZ && !onRoadX ? 'x' : 'z';
-              for (let a = 1; a <= 2; a++) {
+              for (let a = 1; a <= 3; a++) {
                 if (armAxis === 'x') {
                   pushMini(lampPx + a * armDir * MVS, lampBaseY + (cityLampH - 1) * MVS, lampPz, '#666666');
                 } else {
                   pushMini(lampPx, lampBaseY + (cityLampH - 1) * MVS, lampPz + a * armDir * MVS, '#666666');
                 }
               }
-              // Lamp head glow
+              // Lamp head glow — 2 MVS for visibility
               const lampTopY = lampBaseY + cityLampH * MVS;
               if (armAxis === 'x') {
-                pushMini(lampPx + 2 * armDir * MVS, lampTopY, lampPz, '#eeeeff');
+                pushMini(lampPx + 3 * armDir * MVS, lampTopY, lampPz, '#eeeeff');
+                pushMini(lampPx + 3 * armDir * MVS, lampTopY - MVS, lampPz, '#ddddef');
               } else {
-                pushMini(lampPx, lampTopY, lampPz + 2 * armDir * MVS, '#eeeeff');
+                pushMini(lampPx, lampTopY, lampPz + 3 * armDir * MVS, '#eeeeff');
+                pushMini(lampPx, lampTopY - MVS, lampPz + 3 * armDir * MVS, '#ddddef');
               }
               pushSL(lampPx, lampTopY, lampPz);
-              trackH(lx, lz, h + 2 + Math.ceil((cityLampH * MVS) / VOXEL_SIZE));
+              trackH(lx, lz, h + 1 + Math.ceil((5 * MVS + cityLampH * MVS) / VOXEL_SIZE));
             }
           }
 
@@ -1165,7 +1174,9 @@ export function generateChunkData(
         if (onActualRoad) {
           // ── Highway asphalt surface ──
           const isMedian2 = hi.isMedian;
-          const isBarrier2 = hi.isBarrier;
+          // At intersections, barriers from one highway should NOT block the other;
+          // disable barrier rendering at intersection cells to keep cross traffic clear
+          const isBarrier2 = hi.isBarrier && !hi.isIntersection;
 
           // Road color varies by class
           let roadColor: string;
@@ -1174,7 +1185,7 @@ export function generateChunkData(
               : hwClass === 'autopista' ? '#338833'      // lush green median
               : '#448844';                               // standard green median
           } else if (isBarrier2) {
-            roadColor = hwClass === 'autopista' ? '#aaaaaa' : '#888888';
+            roadColor = '#555555'; // dark edge strip — barrier curb sits on top
           } else if (hi.isIntersection) {
             roadColor = '#404040';
           } else {
@@ -1234,66 +1245,75 @@ export function generateChunkData(
               }
             }
 
-            // Bridge side railings on barriers (metal guardrail above barrier height)
+            // Bridge side railings on barriers (mini-voxel guardrails)
             if (isBarrier2) {
-              const railH = hwClass === 'rural' ? 1 : 2;
-              for (let ry = 1; ry <= railH; ry++) {
-                push((bX + lx) * VOXEL_SIZE, (roadY + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                  varyColor('#aaaaaa', wx, roadY + ry, wz, 2, 0.02, 0.04));
+              const railMVS = hwClass === 'rural' ? 5 : 8;
+              const railPx = (bX + lx) * VOXEL_SIZE;
+              const railPz = (bZ + lz) * VOXEL_SIZE;
+              const railBaseY = roadY * VOXEL_SIZE + VOXEL_SIZE * 0.5;
+              for (let ry = 0; ry < railMVS; ry++) {
+                pushMini(railPx, railBaseY + ry * MVS, railPz, '#aaaaaa');
               }
-              trackH(lx, lz, roadY + railH);
+              trackH(lx, lz, roadY);
             }
 
             pushW((bX + lx) * VOXEL_SIZE, wl * VOXEL_SIZE + VOXEL_SIZE * 0.5, (bZ + lz) * VOXEL_SIZE,
               varyColor(c.colors.water, wx, wl, wz, 4, 0.06, 0.06));
           }
 
-          // ── Barriers — height and style depends on highway class ──
+          // ── Barriers — thin mini-voxel curbs on road edges ──
           // Skip barrier rendering over water — bridge section handles railings
+          // Skip at intersections — cross traffic must not be blocked
           if (isBarrier2 && !isOverWater) {
-            const barrierH = hwClass === 'rural' ? 1 : hwClass === 'autopista' ? 3 : 2;
+            // Mini-voxel curb heights: proportional thin barriers
+            const barrierMVS = hwClass === 'rural' ? 3 : hwClass === 'autopista' ? 7 : 5;
             const barrierCol = hwClass === 'autopista' ? '#aaaaaa' : '#999999';
-            for (let by = 1; by <= barrierH; by++) {
-              push((bX + lx) * VOXEL_SIZE, (roadY + by) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor(barrierCol, wx, roadY + by, wz, 2, 0.02, 0.04));
+            const cellPxB = (bX + lx) * VOXEL_SIZE;
+            const cellPzB = (bZ + lz) * VOXEL_SIZE;
+            const barrierBaseY = roadY * VOXEL_SIZE + VOXEL_SIZE * 0.5;
+            for (let by = 0; by < barrierMVS; by++) {
+              pushMini(cellPxB, barrierBaseY + by * MVS, cellPzB, barrierCol);
             }
-            trackH(lx, lz, roadY + barrierH);
+            const barrierTopY = barrierBaseY + barrierMVS * MVS;
+            trackH(lx, lz, roadY);
 
             // ── Highway furniture on barrier positions (mini-voxels for thin poles) ──
             const furniture = getHighwayFurniture(wx, wz, hwClass, true, isTunnel, hi.onX);
-            const furPx = (bX + lx) * VOXEL_SIZE;
-            const furPz = (bZ + lz) * VOXEL_SIZE;
-            const furBaseY = (roadY + barrierH) * VOXEL_SIZE + VOXEL_SIZE * 0.5;
+            const furPx = cellPxB;
+            const furPz = cellPzB;
+            const furBaseY = barrierTopY;
 
             if (furniture.type === 'lamp_sodium' || furniture.type === 'lamp_led' || furniture.type === 'lamp_rural') {
-              // Highway lamp post — thin mini-voxel pole matching sidewalk lamppost scale
-              const hwLampH = furniture.type === 'lamp_rural' ? 12 : furniture.type === 'lamp_led' ? 18 : 16;
+              // Highway lamp post — thin mini-voxel pole, taller for visibility
+              const hwLampH = furniture.type === 'lamp_rural' ? 16 : furniture.type === 'lamp_led' ? 24 : 20;
               for (let sy = 0; sy < hwLampH; sy++) {
                 pushMini(furPx, furBaseY + sy * MVS, furPz, '#555555');
               }
-              // Lamp arm: 2 MVS toward road center
+              // Lamp arm: 3 MVS toward road center for visibility
               const lampArmDir = hi.distFromCenterX > 0 ? -1 : 1;
-              for (let a = 1; a <= 2; a++) {
+              for (let a = 1; a <= 3; a++) {
                 if (hi.onX) {
                   pushMini(furPx, furBaseY + (hwLampH - 1) * MVS, furPz + a * lampArmDir * MVS, '#666666');
                 } else {
                   pushMini(furPx + a * lampArmDir * MVS, furBaseY + (hwLampH - 1) * MVS, furPz, '#666666');
                 }
               }
-              // Lamp head glow
+              // Lamp head glow — 2 MVS for visibility
               const lampGlow = furniture.type === 'lamp_sodium' ? '#ffcc44'
                 : furniture.type === 'lamp_led' ? '#eeeeff' : '#ffdd88';
               const lampTopY = furBaseY + hwLampH * MVS;
               if (hi.onX) {
-                pushMini(furPx, lampTopY, furPz + 2 * lampArmDir * MVS, lampGlow);
+                pushMini(furPx, lampTopY, furPz + 3 * lampArmDir * MVS, lampGlow);
+                pushMini(furPx, lampTopY - MVS, furPz + 3 * lampArmDir * MVS, lampGlow);
               } else {
-                pushMini(furPx + 2 * lampArmDir * MVS, lampTopY, furPz, lampGlow);
+                pushMini(furPx + 3 * lampArmDir * MVS, lampTopY, furPz, lampGlow);
+                pushMini(furPx + 3 * lampArmDir * MVS, lampTopY - MVS, furPz, lampGlow);
               }
               pushSL(furPx, lampTopY, furPz);
-              trackH(lx, lz, roadY + barrierH + Math.ceil((hwLampH * MVS) / VOXEL_SIZE));
+              trackH(lx, lz, roadY + Math.ceil((barrierMVS * MVS + hwLampH * MVS) / VOXEL_SIZE));
             } else if (furniture.type === 'sign_direction') {
               // Green highway direction sign — thin mini-voxel post
-              const signPostH = 14;
+              const signPostH = 18;
               for (let sy = 0; sy < signPostH; sy++) {
                 pushMini(furPx, furBaseY + sy * MVS, furPz, '#555555');
               }
@@ -1303,10 +1323,10 @@ export function generateChunkData(
                 pushMini(furPx + dx * MVS, signTopY, furPz, '#116633');
                 pushMini(furPx + dx * MVS, signTopY + MVS, furPz, '#117744');
               }
-              trackH(lx, lz, roadY + barrierH + Math.ceil(((signPostH + 2) * MVS) / VOXEL_SIZE));
+              trackH(lx, lz, roadY + Math.ceil(((barrierMVS + signPostH + 2) * MVS) / VOXEL_SIZE));
             } else if (furniture.type === 'sign_speed') {
               // White speed sign — thin mini-voxel post
-              const speedPostH = 10;
+              const speedPostH = 14;
               for (let sy = 0; sy < speedPostH; sy++) {
                 pushMini(furPx, furBaseY + sy * MVS, furPz, '#555555');
               }
@@ -1316,10 +1336,10 @@ export function generateChunkData(
                 pushMini(furPx + dx * MVS, speedTopY, furPz, '#eeeeee');
                 pushMini(furPx + dx * MVS, speedTopY + MVS, furPz, '#dddddd');
               }
-              trackH(lx, lz, roadY + barrierH + Math.ceil(((speedPostH + 2) * MVS) / VOXEL_SIZE));
+              trackH(lx, lz, roadY + Math.ceil(((barrierMVS + speedPostH + 2) * MVS) / VOXEL_SIZE));
             } else if (furniture.type === 'billboard') {
               // Billboard — thin mini-voxel pole with colored board
-              const bbPostH = 16;
+              const bbPostH = 20;
               for (let sy = 0; sy < bbPostH; sy++) {
                 pushMini(furPx, furBaseY + sy * MVS, furPz, '#666666');
               }
@@ -1333,7 +1353,7 @@ export function generateChunkData(
                   pushMini(furPx + dx * MVS, bbTopY + dy * MVS, furPz, bbCol);
                 }
               }
-              trackH(lx, lz, roadY + barrierH + Math.ceil(((bbPostH + 3) * MVS) / VOXEL_SIZE));
+              trackH(lx, lz, roadY + Math.ceil(((barrierMVS + bbPostH + 3) * MVS) / VOXEL_SIZE));
             }
           }
 
@@ -1428,11 +1448,12 @@ export function generateChunkData(
               }
             }
 
-            // Tunnel walls — full height from barrier to ceiling
+            // Tunnel walls — full height from road surface to ceiling
+            // (barriers are now mini-voxels, so wall starts at road+1 instead of road+3)
             if (isBarrier2) {
               const wallCol = isPortalZone ? '#997766' : '#777777';
-              // Inner tunnel walls: from barrier top (3) to ceiling height
-              for (let ty = 3; ty <= TUNNEL_HEIGHT; ty++) {
+              // Inner tunnel walls: from just above road surface to ceiling height
+              for (let ty = 1; ty <= TUNNEL_HEIGHT; ty++) {
                 push((bX + lx) * VOXEL_SIZE, (roadY + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                   varyColor(wallCol, wx, roadY + ty, wz, 2, 0.02, 0.04));
               }
