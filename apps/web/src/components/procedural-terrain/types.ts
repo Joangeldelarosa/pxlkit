@@ -341,8 +341,10 @@ export interface CityCell {
   roadWidthX: number;
   /** Road width in Z direction at this cell's block */
   roadWidthZ: number;
-  /** True if this road cell is on a highway (super-avenue) */
+  /** True if this road cell is on an intra-city highway (super-avenue) */
   isHighway: boolean;
+  /** True if this is a wide city boulevard (12-voxel, 4+4 lane highway) */
+  isCityHighway: boolean;
 }
 
 /** All building types available in the city */

@@ -26,6 +26,8 @@ export const AVENUE_W = 9;
 export const LOT_INSET = 2;
 /** Interval for major avenues (every N blocks) */
 export const AVENUE_INTERVAL = 4;
+/** City highway width in voxels (12-wide: 4 lanes + median + 4 lanes + barriers) */
+export const CITY_HW_W = 12;
 
 /* ── Biome definitions ── */
 

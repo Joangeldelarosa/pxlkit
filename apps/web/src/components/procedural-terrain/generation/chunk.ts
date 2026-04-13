@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import type { BiomeType, BiomeConfig, ChunkVoxelData, WorldConfig } from '../types';
 import {
   CHUNK_SIZE, VOXEL_SIZE, MAX_HEIGHT,
-  BIOMES, BIOME_TYPES, BLOCK_SIZE, ROAD_W, LOT_INSET, AVENUE_W,
+  BIOMES, BIOME_TYPES, BLOCK_SIZE, ROAD_W, LOT_INSET, AVENUE_W, CITY_HW_W,
   CONTINENT_PROFILES,
 } from '../constants';
 import { mulberry32, fbm } from '../utils/noise';
@@ -541,11 +541,47 @@ export function generateChunkData(
           const modZ = ((wz % BLOCK_SIZE) + BLOCK_SIZE) % BLOCK_SIZE;
           const rw = cell.roadWidth;
 
-          // Road surface color — highways darker, avenues slightly lighter
-          const roadBase = cell.isHighway ? '#2a2a2a'
-                         : cell.isIntersection ? '#505050'
-                         : cell.isAvenue ? '#424242'
-                         : '#383838';
+          /* ── City Highway (12-wide boulevard): barrier, 4 lanes, median, 4 lanes, barrier ──
+           *  Cross-section (for road running along X, modZ is the transverse position):
+           *  0: concrete barrier  | 1-4: lanes (4 lanes) | 5: yellow center
+           *  6: green median      | 7: yellow center     | 8-11: lanes (4 lanes) | (12-1=11): barrier
+           *  For road running along Z, modX is the transverse position.
+           */
+          const isCHW = cell.isCityHighway;
+
+          // Road surface color
+          let roadBase: string;
+          if (isCHW) {
+            // City highway: detect sub-elements by position within the 12-wide road
+            const rwX2 = cell.roadWidthX;
+            const rwZ2 = cell.roadWidthZ;
+            const onHwZ = modZ < rwZ2 && rwZ2 >= CITY_HW_W;
+            const hwMod = onHwZ ? modZ : modX;
+            const hwW = onHwZ ? rwZ2 : rwX2;
+            const mid = Math.floor(hwW / 2); // 6 for width 12
+            const isHwBarrier = hwMod === 0 || hwMod === hwW - 1;
+            const isHwMedian = hwMod === mid || hwMod === mid - 1;
+
+            if (isHwBarrier) {
+              roadBase = '#999999'; // concrete barrier
+              // Render barrier height (2 voxels above road surface)
+              push((bX + lx) * VOXEL_SIZE, (h + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#888888', wx, h + 2, wz, 2, 0.02, 0.04));
+              trackH(lx, lz, h + 2);
+            } else if (isHwMedian) {
+              roadBase = '#338833'; // green median divider
+            } else {
+              roadBase = '#2a2a2a'; // dark asphalt
+            }
+          } else if (cell.isHighway) {
+            roadBase = '#2a2a2a';
+          } else if (cell.isIntersection) {
+            roadBase = '#505050';
+          } else if (cell.isAvenue) {
+            roadBase = '#424242';
+          } else {
+            roadBase = '#383838';
+          }
           push((bX + lx) * VOXEL_SIZE, (h + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
             varyColor(roadBase, wx, h + 1, wz, 2, 0.02, 0.03));
           trackH(lx, lz, h + 1);
@@ -563,7 +599,52 @@ export function generateChunkData(
 
           /* ── Lane markings as flat paint (non-intersection) ── */
           if (!cell.isIntersection) {
-            if (rw >= AVENUE_W) {
+            if (isCHW) {
+              /* City Highway markings (12 wide):
+                 0: barrier | 1: white edge | 2-3: lane dividers | 4: white edge
+                 5: yellow center | 6: green median | 7: yellow center
+                 8: white edge | 9-10: lane dividers | 11: barrier */
+              const rwForAxis = onRoadZ && !onRoadX ? cell.roadWidthZ : cell.roadWidthX;
+              if (rwForAxis >= CITY_HW_W) {
+                const hwMod2 = onRoadZ && !onRoadX ? modZ : modX;
+                const mid2 = Math.floor(rwForAxis / 2);
+                // Lane lines based on position
+                if (onRoadZ && !onRoadX) {
+                  // Highway runs along X
+                  if (hwMod2 === 1 || hwMod2 === rwForAxis - 2) {
+                    pushPaint(cellCx, paintY, cellCz, '#cccccc', cellLen, stripW);
+                  } else if (hwMod2 === mid2 - 2 || hwMod2 === mid2 + 1) {
+                    // Yellow center lines
+                    pushPaint(cellCx, paintY, cellCz, '#ffdd44', cellLen, stripW);
+                  } else if (hwMod2 > 1 && hwMod2 < mid2 - 2 && ((hwMod2 - 2) % 2 === 0)) {
+                    // Dashed white lane divider (every 2 voxels within lane area)
+                    if (((wx % 6) + 6) % 6 < 3) {
+                      pushPaint(cellCx, paintY, cellCz, '#aaaaaa', cellLen * 0.5, stripW);
+                    }
+                  } else if (hwMod2 > mid2 + 1 && hwMod2 < rwForAxis - 2 && ((hwMod2 - mid2 - 2) % 2 === 0)) {
+                    if (((wx % 6) + 6) % 6 < 3) {
+                      pushPaint(cellCx, paintY, cellCz, '#aaaaaa', cellLen * 0.5, stripW);
+                    }
+                  }
+                }
+                if (onRoadX && !onRoadZ) {
+                  // Highway runs along Z
+                  if (hwMod2 === 1 || hwMod2 === rwForAxis - 2) {
+                    pushPaint(cellCx, paintY, cellCz, '#cccccc', stripW, cellLen);
+                  } else if (hwMod2 === mid2 - 2 || hwMod2 === mid2 + 1) {
+                    pushPaint(cellCx, paintY, cellCz, '#ffdd44', stripW, cellLen);
+                  } else if (hwMod2 > 1 && hwMod2 < mid2 - 2 && ((hwMod2 - 2) % 2 === 0)) {
+                    if (((wz % 6) + 6) % 6 < 3) {
+                      pushPaint(cellCx, paintY, cellCz, '#aaaaaa', stripW, cellLen * 0.5);
+                    }
+                  } else if (hwMod2 > mid2 + 1 && hwMod2 < rwForAxis - 2 && ((hwMod2 - mid2 - 2) % 2 === 0)) {
+                    if (((wz % 6) + 6) % 6 < 3) {
+                      pushPaint(cellCx, paintY, cellCz, '#aaaaaa', stripW, cellLen * 0.5);
+                    }
+                  }
+                }
+              }
+            } else if (rw >= AVENUE_W) {
               /* Avenue markings (9 wide):
                  0: white edge | 1-2: lanes | 3: dashed divider
                  4: green median | 5: dashed divider | 6-7: lanes | 8: white edge */
@@ -696,6 +777,28 @@ export function generateChunkData(
               pushSL(px, poleBaseY + shaftH * MVS, pz + 3.5 * armDz * MVS);
               // trackH still uses regular voxel grid height
               trackH(lx, lz, h + 1 + Math.ceil((shaftH * MVS) / VOXEL_SIZE));
+            }
+          }
+
+          /* ── City highway barrier-mounted tall lamps ──
+           *  Along city highways (not at intersections), place highway lamps
+           *  on the barrier voxels (modX=0 or modX=width-1 for Z-running) */
+          if (isCHW && !cell.isIntersection) {
+            const rwForLamp = onRoadZ && !onRoadX ? cell.roadWidthZ : cell.roadWidthX;
+            const hwModLamp = onRoadZ && !onRoadX ? modZ : modX;
+            const isLampBarrier = hwModLamp === 0 || hwModLamp === rwForLamp - 1;
+            const axisPos = onRoadZ && !onRoadX ? wx : wz;
+            // Lamp spacing: every 8 voxels along the axis
+            if (isLampBarrier && ((axisPos % 8 + 8) % 8 === 0)) {
+              const lampH = 5;
+              for (let ly = 3; ly <= lampH + 2; ly++) {
+                push((bX + lx) * VOXEL_SIZE, (h + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#555555', wx, h + ly, wz, 2, 0.02, 0.03));
+              }
+              push((bX + lx) * VOXEL_SIZE, (h + lampH + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#eeeeff', wx, h + lampH + 3, wz, 3, 0.04, 0.06));
+              pushSL((bX + lx) * VOXEL_SIZE, (h + lampH + 3) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE);
+              trackH(lx, lz, h + lampH + 3);
             }
           }
 
@@ -1026,36 +1129,69 @@ export function generateChunkData(
           groundHeightMap[lIdx] = roadY;
           trackH(lx, lz, roadY);
 
-          // ── Fill terrain gap (embankment) ──
+          // ── Fill terrain gap (embankment) with retaining wall detail ──
           if (!isTunnel && !isOverWater && h < roadY) {
             for (let fy = h + 1; fy < roadY; fy++) {
+              // Barrier position gets concrete retaining wall look, interior gets earth fill
+              const isRetainingWall = isBarrier2;
               push((bX + lx) * VOXEL_SIZE, fy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor('#776655', wx, fy, wz, 3, 0.03, 0.05));
+                varyColor(isRetainingWall ? '#888888' : '#776655', wx, fy, wz, 3, 0.03, 0.05));
             }
           }
 
-          // ── Bridge supports over water ──
-          if (isOverWater) {
-            if (roadY > 0) {
-              push((bX + lx) * VOXEL_SIZE, (roadY - 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor('#888888', wx, roadY - 1, wz, 2, 0.02, 0.04));
+          // ── Shallow mountain road cut retaining walls ──
+          // When terrain is only slightly above road (1-4 voxels), create visible
+          // retaining walls so the road cut doesn't look invisible
+          if (!isTunnel && !isOverWater && isBarrier2 && h > roadY && h <= roadY + TUNNEL_HEIGHT) {
+            const cutH = h - roadY;
+            for (let ry = 1; ry <= cutH; ry++) {
+              push((bX + lx) * VOXEL_SIZE, (roadY + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#888888', wx, roadY + ry, wz, 2, 0.02, 0.04));
             }
-            const pillarSpacing = hwClass === 'autopista' ? 10 : 12;
+            trackH(lx, lz, roadY + cutH);
+          }
+
+          // ── Bridge over water — thick deck, prominent pillars, side railings ──
+          if (isOverWater) {
+            // Bridge deck: 2 voxels thick below the road surface (structural depth)
+            for (let dy = 1; dy <= 2; dy++) {
+              if (roadY - dy >= 0) {
+                push((bX + lx) * VOXEL_SIZE, (roadY - dy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor(dy === 1 ? '#888888' : '#777777', wx, roadY - dy, wz, 2, 0.02, 0.04));
+              }
+            }
+
+            // Bridge support pillars — wider and more frequent than before
+            const pillarSpacing = hwClass === 'autopista' ? 8 : hwClass === 'standard' ? 10 : 14;
             const onPillarX = hi.onX && ((wx % pillarSpacing + pillarSpacing) % pillarSpacing === 0);
             const onPillarZ = hi.onZ && ((wz % pillarSpacing + pillarSpacing) % pillarSpacing === 0);
-            if (isBarrier2 && (onPillarX || onPillarZ)) {
+            // Pillars on barrier AND median positions for structural realism
+            const isPillarPos = isBarrier2 || (isMedian2 && (onPillarX || onPillarZ));
+            if (isPillarPos && (onPillarX || onPillarZ)) {
               const pillarBottom = Math.max(0, h);
-              for (let py = pillarBottom; py < roadY - 1; py++) {
+              for (let py = pillarBottom; py < roadY - 2; py++) {
                 push((bX + lx) * VOXEL_SIZE, py * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                   varyColor('#999999', wx, py, wz, 2, 0.02, 0.04));
               }
             }
+
+            // Bridge side railings on barriers (metal guardrail above barrier height)
+            if (isBarrier2) {
+              const railH = hwClass === 'rural' ? 1 : 2;
+              for (let ry = 1; ry <= railH; ry++) {
+                push((bX + lx) * VOXEL_SIZE, (roadY + ry) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#aaaaaa', wx, roadY + ry, wz, 2, 0.02, 0.04));
+              }
+              trackH(lx, lz, roadY + railH);
+            }
+
             pushW((bX + lx) * VOXEL_SIZE, wl * VOXEL_SIZE + VOXEL_SIZE * 0.5, (bZ + lz) * VOXEL_SIZE,
               varyColor(c.colors.water, wx, wl, wz, 4, 0.06, 0.06));
           }
 
           // ── Barriers — height and style depends on highway class ──
-          if (isBarrier2) {
+          // Skip barrier rendering over water — bridge section handles railings
+          if (isBarrier2 && !isOverWater) {
             const barrierH = hwClass === 'rural' ? 1 : hwClass === 'autopista' ? 3 : 2;
             const barrierCol = hwClass === 'autopista' ? '#aaaaaa' : '#999999';
             for (let by = 1; by <= barrierH; by++) {
@@ -1183,18 +1319,21 @@ export function generateChunkData(
             const tunnelCeil = roadY + TUNNEL_HEIGHT;
 
             // Detect tunnel portal zone: check if nearby cells along highway
-            // are NOT tunnels — that means we're at the entrance
+            // are NOT tunnels — that means we're at the entrance.
+            // Also compute portal depth (distance from tunnel mouth)
             let isPortalZone = false;
-            const portalCheckRange = 4;
+            let portalDepth = 0; // 0 = deep inside tunnel, small = near mouth
+            const portalCheckRange = 6;
             for (let ps = 1; ps <= portalCheckRange; ps++) {
               // Check positions along the highway direction
-              const checkWx = wx + (hi.onX ? ps : 0) + (hi.onX ? 0 : 0);
-              const checkWz = wz + (hi.onZ ? ps : 0) + (hi.onZ ? 0 : 0);
+              const checkWx = wx + (hi.onX ? ps : 0);
+              const checkWz = wz + (hi.onZ ? ps : 0);
               const checkLx = checkWx - bX;
               const checkLz = checkWz - bZ;
               if (checkLx >= 0 && checkLx < CHUNK_SIZE && checkLz >= 0 && checkLz < CHUNK_SIZE) {
                 if (hwTunnelMap[checkLx * CHUNK_SIZE + checkLz] === 0) {
                   isPortalZone = true;
+                  portalDepth = ps;
                   break;
                 }
               }
@@ -1206,36 +1345,65 @@ export function generateChunkData(
               if (checkLx2 >= 0 && checkLx2 < CHUNK_SIZE && checkLz2 >= 0 && checkLz2 < CHUNK_SIZE) {
                 if (hwTunnelMap[checkLx2 * CHUNK_SIZE + checkLz2] === 0) {
                   isPortalZone = true;
+                  portalDepth = ps;
                   break;
                 }
               }
             }
 
-            // Tunnel walls
+            // Tunnel walls — full height from barrier to ceiling
             if (isBarrier2) {
-              const wallCol = isPortalZone ? '#997766' : '#777777'; // portal gets warmer concrete
+              const wallCol = isPortalZone ? '#997766' : '#777777';
+              // Inner tunnel walls: from barrier top (3) to ceiling height
               for (let ty = 3; ty <= TUNNEL_HEIGHT; ty++) {
                 push((bX + lx) * VOXEL_SIZE, (roadY + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                   varyColor(wallCol, wx, roadY + ty, wz, 2, 0.02, 0.04));
               }
               trackH(lx, lz, tunnelCeil);
 
-              // Portal arch: extra voxels forming the mouth of the tunnel
+              // Portal arch: concrete frame at tunnel entrance
+              // Deeper voxels near portal get progressively taller — forms the
+              // characteristic trumpet-shaped tunnel mouth with retaining walls
               if (isPortalZone) {
-                // Wider concrete lip at portal entrance
-                push((bX + lx) * VOXEL_SIZE, (tunnelCeil + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                  varyColor('#887766', wx, tunnelCeil + 1, wz, 2, 0.02, 0.04));
-                push((bX + lx) * VOXEL_SIZE, (tunnelCeil + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                  varyColor('#887766', wx, tunnelCeil + 2, wz, 2, 0.02, 0.04));
-                trackH(lx, lz, tunnelCeil + 2);
+                // Arch height tapers: closest to entrance (depth=1) gets tallest arch,
+                // further from entrance (depth=portalCheckRange) is flush with ceiling
+                const archExtra = Math.max(0, 3 - Math.floor(portalDepth * 0.5));
+                for (let ay = 1; ay <= archExtra; ay++) {
+                  push((bX + lx) * VOXEL_SIZE, (tunnelCeil + ay) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                    varyColor('#887766', wx, tunnelCeil + ay, wz, 2, 0.02, 0.04));
+                }
+                // Portal face keystone detail at depth 1-2
+                if (portalDepth <= 2) {
+                  push((bX + lx) * VOXEL_SIZE, (tunnelCeil + archExtra + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                    varyColor('#776655', wx, tunnelCeil + archExtra + 1, wz, 2, 0.02, 0.04));
+                }
+                trackH(lx, lz, tunnelCeil + archExtra + (portalDepth <= 2 ? 1 : 0));
               }
             }
 
-            // Tunnel ceiling
+            // Tunnel ceiling slab
             const ceilCol = isPortalZone ? '#887766' : '#666666';
             push((bX + lx) * VOXEL_SIZE, (tunnelCeil + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
               varyColor(ceilCol, wx, tunnelCeil + 1, wz, 2, 0.02, 0.04));
             trackH(lx, lz, tunnelCeil + 1);
+
+            // Portal ceiling arch: non-barrier cells near entrance also get concrete arch
+            // This creates the curved arch shape over the opening
+            if (isPortalZone && !isBarrier2 && !isMedian2) {
+              const distFromEdge = Math.min(
+                hi.onX ? Math.abs(hi.distFromCenterX) : effectiveHW,
+                hi.onZ ? Math.abs(hi.distFromCenterZ) : effectiveHW,
+              );
+              // Arch curve: higher at edges, lower at center
+              const archCurve = Math.max(0, Math.floor((distFromEdge / effectiveHW) * 2) - (portalDepth > 3 ? 1 : 0));
+              if (archCurve > 0 && portalDepth <= 3) {
+                for (let ay = 2; ay <= archCurve + 1; ay++) {
+                  push((bX + lx) * VOXEL_SIZE, (tunnelCeil + ay) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                    varyColor('#887766', wx, tunnelCeil + ay, wz, 2, 0.02, 0.04));
+                }
+                trackH(lx, lz, tunnelCeil + archCurve + 1);
+              }
+            }
 
             // Tunnel interior lighting and furniture
             if (!isBarrier2 && !isMedian2) {
