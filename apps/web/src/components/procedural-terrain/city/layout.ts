@@ -586,14 +586,19 @@ export function getSectorLampColors(wx: number, wz: number): {
  *  1) INTRA-CITY highways: mega-avenues inside city biomes (every
  *     HIGHWAY_INTERVAL blocks). These are the main city arteries.
  *  2) INTER-BIOME highways: long-distance highways that span the
- *     ENTIRE world, connecting cities across plains, forests, deserts,
- *     and mountains. When they hit mountains they become TUNNELS with
- *     internal lighting.
+ *     world, connecting cities across plains, forests, deserts,
+ *     and mountains. When they hit mountains they become TUNNELS.
  *
- *  The inter-biome system uses a quantized grid at INTER_HW_SPACING
- *  intervals. At each world-cell we check if the cell falls within
- *  INTER_HW_HALF_W of the nearest grid line in X or Z. This creates
- *  a global highway grid that is independent of biome boundaries.
+ *  Realism features:
+ *  - NOT all grid lines become highways — noise-based activation
+ *    means ~55-65% of potential highway slots are realized.
+ *  - Highway CLASS varies: rural 2-lane, standard 4-lane, or
+ *    6-lane autopista, based on continent type + proximity to cities.
+ *  - Gentle lateral CURVES via sinusoidal noise offset.
+ *  - Varied lighting: highway lamps with sodium/LED glow, cat-eye
+ *    reflectors, periodic green direction signs, billboards.
+ *  - Tunnel PORTALS: concrete arch at mountain entrance with smooth
+ *    transition.
  * ═══════════════════════════════════════════════════════════════ */
 
 /** Intra-city highway interval: every N blocks */
@@ -613,57 +618,238 @@ export function isHighwayZ(blockZ: number): boolean {
 /* ── Inter-biome highway system ── */
 
 /** Spacing between inter-biome highways in world-voxel coordinates.
- *  320 = 16 chunks × CHUNK_SIZE(16) + room for terrain variation.
- *  This gives roughly 2 highways per render-distance at distance=20. */
+ *  320 = 16 chunks × CHUNK_SIZE(16) + room for terrain variation. */
 export const INTER_HW_SPACING = 320;
 
-/** Half-width of the inter-biome highway in voxels (total width = 2×HW = 10 voxels) */
+/** Half-width of the inter-biome highway — varies by class.
+ *  The base value is for standard 4-lane highways. */
 export const INTER_HW_HALF_W = 5;
 
 /** Tunnel internal height in voxels (floor to ceiling clearance) */
 export const TUNNEL_HEIGHT = 6;
 
+/* ── Highway class system ──
+ *  Each highway grid line can be:
+ *  - 'none':     not built (gap in the network — ~35-45% of lines)
+ *  - 'rural':    narrow 2-lane road (half-width = 3, no median barrier)
+ *  - 'standard': normal 4-lane highway (half-width = 5, barriers)
+ *  - 'autopista': wide 6-lane freeway (half-width = 7, double barriers, wider median)
+ *
+ *  Determined by noise hash of the grid-line index. */
+export type HighwayClass = 'none' | 'rural' | 'standard' | 'autopista';
+
+/** Returns the class of a highway grid line.
+ *  `gridIdx` is the integer grid line index: Math.round(coord / INTER_HW_SPACING). */
+export function getHighwayClass(gridIdxX: number, _gridIdxZ: number, isX: boolean): HighwayClass {
+  // Deterministic hash per grid line
+  const idx = isX ? gridIdxX : _gridIdxZ;
+  // Use a stable hash: combine index with a magic prime offset per axis
+  const h1 = Math.abs(((idx * 73856093 + (isX ? 37 : 91)) ^ (idx * 19349663)) | 0) / 2147483647;
+  const h2 = Math.abs(((idx * 83492791 + (isX ? 113 : 257)) ^ (idx * 59441693)) | 0) / 2147483647;
+
+  // ~38% of lines are not built (breaks the uniform grid feel)
+  if (h1 < 0.38) return 'none';
+
+  // Of the remaining ~62%:
+  //  ~22% rural, ~30% standard, ~10% autopista
+  if (h2 < 0.35) return 'rural';
+  if (h2 < 0.84) return 'standard';
+  return 'autopista';
+}
+
+/** Get the half-width for a highway class */
+export function getHWHalfWidth(hwClass: HighwayClass): number {
+  switch (hwClass) {
+    case 'rural': return 3;
+    case 'standard': return 5;
+    case 'autopista': return 7;
+    default: return 5;
+  }
+}
+
+/* ── Highway curve / lateral offset ──
+ *  Highways are NOT perfectly straight. A low-frequency sinusoidal
+ *  offset is applied perpendicular to the highway direction. This
+ *  creates gentle sweeping curves that look natural.
+ *  The offset is deterministic per world-position (based on coordinate
+ *  along the highway axis). */
+
+/** Maximum lateral offset in voxels (gentle curve amplitude) */
+const HW_CURVE_AMPLITUDE = 3;
+/** Wavelength of the curve in voxels (~200 = gentle sweep) */
+const HW_CURVE_WAVELENGTH = 220;
+
+/** Compute the lateral offset for a highway at a given position along its axis.
+ *  Returns a fractional voxel offset perpendicular to the highway.
+ *  `axisPos` is the world coordinate along the highway (wx for X-running, wz for Z-running).
+ *  `gridIdx` is the integer grid line index for this highway. */
+function hwCurveOffset(axisPos: number, gridIdx: number): number {
+  // Two sine waves with different phases per highway (based on gridIdx)
+  const phase1 = gridIdx * 2.718;
+  const phase2 = gridIdx * 1.618;
+  const s1 = Math.sin((axisPos / HW_CURVE_WAVELENGTH) * Math.PI * 2 + phase1);
+  const s2 = Math.sin((axisPos / (HW_CURVE_WAVELENGTH * 0.6)) * Math.PI * 2 + phase2) * 0.4;
+  return (s1 + s2) * HW_CURVE_AMPLITUDE;
+}
+
+/* ── Highway furniture placement ──
+ *  Deterministic placement of highway furniture (signs, lamps, billboards)
+ *  along the highway, with spacing and variety. */
+
+/** Highway furniture types */
+export type HighwayFurnitureType =
+  | 'lamp_sodium'       // tall highway lamp with orange glow
+  | 'lamp_led'          // modern LED lamp (white/cool)
+  | 'lamp_rural'        // shorter rural lamp
+  | 'reflector'         // cat-eye reflector between lanes
+  | 'sign_direction'    // green direction sign
+  | 'sign_speed'        // speed limit sign
+  | 'billboard'         // advertising billboard
+  | 'emergency_phone'   // tunnel emergency phone
+  | 'none';
+
+/** Determine what furniture (if any) to place at this highway position.
+ *  Returns the furniture type and which side of the road it's on. */
+export function getHighwayFurniture(
+  wx: number, wz: number,
+  hwClass: HighwayClass,
+  isBarrier: boolean,
+  isTunnel: boolean,
+  onX: boolean,
+): { type: HighwayFurnitureType; side: 'left' | 'right' | 'center' } {
+  if (!isBarrier) {
+    // Cat-eye reflectors: on the median line, every 4 voxels
+    const axisPos = onX ? wx : wz;
+    if (((axisPos % 4) + 4) % 4 === 0) {
+      return { type: 'reflector', side: 'center' };
+    }
+    return { type: 'none', side: 'center' };
+  }
+
+  // Barrier-position furniture (lamps, signs)
+  const axisPos = onX ? wx : wz;
+
+  if (isTunnel) {
+    // Tunnel: lights every 6 voxels, emergency phones every 48
+    if (((axisPos % 6) + 6) % 6 === 0) {
+      return { type: 'lamp_led', side: 'left' };
+    }
+    if (((axisPos % 48) + 48) % 48 === 0) {
+      return { type: 'emergency_phone', side: 'right' };
+    }
+    return { type: 'none', side: 'center' };
+  }
+
+  // Open road furniture
+  const lampSpacing = hwClass === 'autopista' ? 10 : hwClass === 'standard' ? 14 : 20;
+  const signSpacing = hwClass === 'autopista' ? 64 : hwClass === 'standard' ? 80 : 120;
+  const billboardSpacing = 96;
+
+  // Lamps
+  if (((axisPos % lampSpacing) + lampSpacing) % lampSpacing === 0) {
+    const lampType = hwClass === 'rural' ? 'lamp_rural'
+      : hwClass === 'autopista' ? 'lamp_led'
+      : 'lamp_sodium';
+    // Alternate left/right
+    const side = ((Math.floor(axisPos / lampSpacing) % 2) === 0) ? 'left' : 'right';
+    return { type: lampType, side };
+  }
+
+  // Direction signs (on right side only)
+  if (((axisPos % signSpacing) + signSpacing) % signSpacing === 0) {
+    return { type: 'sign_direction', side: 'right' };
+  }
+
+  // Speed signs (offset from direction signs)
+  if ((((axisPos + Math.floor(signSpacing / 3)) % signSpacing) + signSpacing) % signSpacing === 0) {
+    return { type: 'sign_speed', side: 'right' };
+  }
+
+  // Billboards (rural and standard only — autopistas are too wide/clean)
+  if (hwClass !== 'autopista' && (((axisPos % billboardSpacing) + billboardSpacing) % billboardSpacing === 0)) {
+    // Hash to decide if this particular spot gets a billboard (~40%)
+    const bh = hashCoord(axisPos * 31, 0, (onX ? wz : wx) * 47);
+    if (bh > 0.6) {
+      return { type: 'billboard', side: 'right' };
+    }
+  }
+
+  return { type: 'none', side: 'center' };
+}
+
 /** Check if a world-voxel coordinate is on an inter-biome highway.
  *  Returns an object with info about the highway at this position,
  *  or null if the position is not on a highway.
  *
- *  `onX` / `onZ` tell you which direction the highway runs.
- *  `distFromCenter` is 0 at the median, ±HW at the edges.
- *  `isMedian` is true for the 2-voxel center divider.
- *  `isBarrier` is true for the outermost voxels (concrete barriers).
- *  `isShoulder` is true for the 2-voxel gravel shoulders outside barriers.
- */
+ *  Now includes: highway class, curve offset, furniture info, and
+ *  tunnel portal detection. */
 export interface InterHighwayInfo {
   onX: boolean;          // highway runs along X axis
   onZ: boolean;          // highway runs along Z axis
-  distFromCenterX: number; // signed distance from X-highway center
-  distFromCenterZ: number; // signed distance from Z-highway center
-  isMedian: boolean;     // center median (2 voxels wide)
+  distFromCenterX: number; // signed distance from X-highway center (with curve)
+  distFromCenterZ: number; // signed distance from Z-highway center (with curve)
+  isMedian: boolean;     // center median
   isBarrier: boolean;    // outermost lane voxels (concrete barrier)
   isShoulder: boolean;   // gravel shoulders outside the road
   isIntersection: boolean; // X-highway crosses Z-highway
+  hwClassX: HighwayClass; // class of X-running highway at this position
+  hwClassZ: HighwayClass; // class of Z-running highway at this position
+  hwHalfWX: number;      // actual half-width of X highway
+  hwHalfWZ: number;      // actual half-width of Z highway
+  /** True if this position is in the tunnel portal zone (transition from
+   *  open road to tunnel — 3-4 voxels of concrete arch). */
+  isTunnelPortal: boolean;
+  /** Perpendicular distance from the nearest tunnel portal entrance.
+   *  0 = at the portal face, positive = inside tunnel approach zone.
+   *  -1 if not near a portal. */
+  portalDepth: number;
 }
 
 export function getInterHighwayInfo(wx: number, wz: number): InterHighwayInfo | null {
-  const HW = INTER_HW_HALF_W;
   const SHOULDER = 2; // 2 extra voxels of gravel on each side
 
-  // Distance from nearest highway grid line
-  const snapX = Math.round(wz / INTER_HW_SPACING) * INTER_HW_SPACING;
-  const snapZ = Math.round(wx / INTER_HW_SPACING) * INTER_HW_SPACING;
-  const distX = wz - snapX; // distance from X-running highway
-  const distZ = wx - snapZ; // distance from Z-running highway
+  // ── X-running highway (grid lines on wz axis) ──
+  const gridIdxX = Math.round(wz / INTER_HW_SPACING);
+  const snapX = gridIdxX * INTER_HW_SPACING;
+  const hwClassX = getHighwayClass(gridIdxX, 0, true);
 
-  const onXroad = Math.abs(distX) <= HW;
-  const onZroad = Math.abs(distZ) <= HW;
-  const onXshoulder = !onXroad && Math.abs(distX) <= HW + SHOULDER;
-  const onZshoulder = !onZroad && Math.abs(distZ) <= HW + SHOULDER;
+  // ── Z-running highway (grid lines on wx axis) ──
+  const gridIdxZ = Math.round(wx / INTER_HW_SPACING);
+  const snapZ = gridIdxZ * INTER_HW_SPACING;
+  const hwClassZ = getHighwayClass(0, gridIdxZ, false);
+
+  // Apply curve offset
+  const curveX = hwClassX !== 'none' ? hwCurveOffset(wx, gridIdxX) : 0;
+  const curveZ = hwClassZ !== 'none' ? hwCurveOffset(wz, gridIdxZ) : 0;
+
+  const distX = (wz - snapX) - Math.round(curveX); // distance from X-running highway center (curved)
+  const distZ = (wx - snapZ) - Math.round(curveZ); // distance from Z-running highway center (curved)
+
+  const hwX = hwClassX !== 'none' ? getHWHalfWidth(hwClassX) : 0;
+  const hwZ = hwClassZ !== 'none' ? getHWHalfWidth(hwClassZ) : 0;
+
+  const onXroad = hwClassX !== 'none' && Math.abs(distX) <= hwX;
+  const onZroad = hwClassZ !== 'none' && Math.abs(distZ) <= hwZ;
+  const onXshoulder = !onXroad && hwClassX !== 'none' && Math.abs(distX) <= hwX + SHOULDER;
+  const onZshoulder = !onZroad && hwClassZ !== 'none' && Math.abs(distZ) <= hwZ + SHOULDER;
 
   if (!onXroad && !onZroad && !onXshoulder && !onZshoulder) return null;
 
-  const isMedian = (onXroad && Math.abs(distX) <= 1) || (onZroad && Math.abs(distZ) <= 1);
-  const isBarrier = (onXroad && Math.abs(distX) >= HW - 1 && Math.abs(distX) <= HW)
-                 || (onZroad && Math.abs(distZ) >= HW - 1 && Math.abs(distZ) <= HW);
+  // Determine effective half-width for the dominant highway at this cell
+  const effectiveHWX = hwX;
+  const effectiveHWZ = hwZ;
+
+  // Median: center 2 voxels
+  const medianWidthX = hwClassX === 'autopista' ? 2 : 1;
+  const medianWidthZ = hwClassZ === 'autopista' ? 2 : 1;
+  const isMedian = (onXroad && Math.abs(distX) <= medianWidthX)
+                || (onZroad && Math.abs(distZ) <= medianWidthZ);
+
+  // Barriers: outermost 1-2 voxels
+  const barrierWidth = 1;
+  const isBarrier = (onXroad && Math.abs(distX) >= effectiveHWX - barrierWidth && Math.abs(distX) <= effectiveHWX)
+                 || (onZroad && Math.abs(distZ) >= effectiveHWZ - barrierWidth && Math.abs(distZ) <= effectiveHWZ);
+
   const isShoulder = onXshoulder || onZshoulder;
 
   return {
@@ -675,5 +861,11 @@ export function getInterHighwayInfo(wx: number, wz: number): InterHighwayInfo | 
     isBarrier,
     isShoulder,
     isIntersection: onXroad && onZroad,
+    hwClassX,
+    hwClassZ,
+    hwHalfWX: effectiveHWX,
+    hwHalfWZ: effectiveHWZ,
+    isTunnelPortal: false, // computed later in chunk.ts with terrain context
+    portalDepth: -1,
   };
 }

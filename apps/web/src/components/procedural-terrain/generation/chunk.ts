@@ -16,7 +16,7 @@ import {
 import { mulberry32, fbm } from '../utils/noise';
 import { varyColor, hashCoord } from '../utils/color';
 import { getBiome, getVariedBiome, getContinent, getContinentElevation } from '../utils/biomes';
-import { classifyCityCell, getBuildingType, getBuildingHeight, getSectorLampColors, getInterHighwayInfo, INTER_HW_HALF_W, TUNNEL_HEIGHT } from '../city/layout';
+import { classifyCityCell, getBuildingType, getBuildingHeight, getSectorLampColors, getInterHighwayInfo, getHighwayFurniture, TUNNEL_HEIGHT } from '../city/layout';
 import { generateBuildingColumn } from '../city/buildings';
 import type { PxlKitData } from '@pxlkit/core';
 
@@ -288,9 +288,9 @@ export function generateChunkData(
       if (!hwInfo) continue;
 
       const localIdx = lx * CHUNK_SIZE + lz;
-      // Only actual road surface (not just shoulder)
-      const onRoad = (Math.abs(hwInfo.distFromCenterX) <= INTER_HW_HALF_W && hwInfo.onX)
-                  || (Math.abs(hwInfo.distFromCenterZ) <= INTER_HW_HALF_W && hwInfo.onZ);
+      // Only actual road surface (not just shoulder) — use per-class half-width
+      const onRoad = (Math.abs(hwInfo.distFromCenterX) <= hwInfo.hwHalfWX && hwInfo.onX)
+                  || (Math.abs(hwInfo.distFromCenterZ) <= hwInfo.hwHalfWZ && hwInfo.onZ);
       if (!onRoad && !hwInfo.isShoulder) continue;
 
       hwInfoMap[localIdx] = hwInfo;
@@ -981,35 +981,53 @@ export function generateChunkData(
       }
 
       /* ══════════════════ 3b. INTER-BIOME HIGHWAY ══════════════════
-       *  Highways that cross plains, forests, deserts, mountains etc.
-       *  When in mountains: tunnels with internal walls/ceiling/lighting.
-       *  When over water: elevated bridge with support pillars.
-       *  This section renders the highway surface, markings, barriers,
-       *  tunnel enclosure, bridge supports, and lighting for non-city biomes. */
+       *  Highways with variable class, gentle curves, furniture, tunnels,
+       *  bridges, and tunnel portals. Each highway class (rural/standard/
+       *  autopista) renders differently:
+       *  - Rural: narrow 2-lane, no median barrier, shorter lamps
+       *  - Standard: 4-lane with barriers, sodium lamps, occasional signs
+       *  - Autopista: 6-lane, double barriers, LED lamps, wide median
+       *
+       *  When in mountains: tunnels with portal entrances, interior lighting,
+       *  ventilation shafts, emergency phones, reflective markings.
+       *  When over water: elevated bridge with support pillars. */
       if (isOnInterHW) {
         const onActualRoad = !hwInfo!.isShoulder;
         const roadY = hwLevel;
         const isOverWater = h < wl;
+        const hi = hwInfo!;
+        const effectiveHW = Math.max(hi.hwHalfWX, hi.hwHalfWZ);
+        const hwClass = hi.hwClassX !== 'none' ? hi.hwClassX : hi.hwClassZ;
         npcWalkableMap[lIdx] = 1;
 
         if (onActualRoad) {
           // ── Highway asphalt surface ──
-          const isMedian2 = hwInfo!.isMedian;
-          const isBarrier2 = hwInfo!.isBarrier;
-          const roadColor = isMedian2 ? '#448844'  // green median
-            : isBarrier2 ? '#888888'   // concrete barrier
-            : hwInfo!.isIntersection ? '#404040'
-            : '#333333';              // dark asphalt
+          const isMedian2 = hi.isMedian;
+          const isBarrier2 = hi.isBarrier;
+
+          // Road color varies by class
+          let roadColor: string;
+          if (isMedian2) {
+            roadColor = hwClass === 'rural' ? '#667744' // grass median for rural
+              : hwClass === 'autopista' ? '#338833'      // lush green median
+              : '#448844';                               // standard green median
+          } else if (isBarrier2) {
+            roadColor = hwClass === 'autopista' ? '#aaaaaa' : '#888888';
+          } else if (hi.isIntersection) {
+            roadColor = '#404040';
+          } else {
+            roadColor = hwClass === 'rural' ? '#444444'      // lighter rural asphalt
+              : hwClass === 'autopista' ? '#2a2a2a'           // darker autopista
+              : '#333333';                                    // standard dark asphalt
+          }
 
           push((bX + lx) * VOXEL_SIZE, roadY * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
             varyColor(roadColor, wx, roadY, wz, 2, 0.02, 0.03));
           groundHeightMap[lIdx] = roadY;
           trackH(lx, lz, roadY);
 
-          // ── Fill terrain gap between ground and road when road is elevated ──
-          // When road is above terrain (hills, slopes), fill with support structure
+          // ── Fill terrain gap (embankment) ──
           if (!isTunnel && !isOverWater && h < roadY) {
-            // Embankment fill: render terrain-colored voxels from ground to road
             for (let fy = h + 1; fy < roadY; fy++) {
               push((bX + lx) * VOXEL_SIZE, fy * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                 varyColor('#776655', wx, fy, wz, 3, 0.03, 0.05));
@@ -1018,116 +1036,241 @@ export function generateChunkData(
 
           // ── Bridge supports over water ──
           if (isOverWater) {
-            // Bridge deck underside (1 voxel thick concrete slab under road)
             if (roadY > 0) {
               push((bX + lx) * VOXEL_SIZE, (roadY - 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                 varyColor('#888888', wx, roadY - 1, wz, 2, 0.02, 0.04));
             }
-
-            // Support pillars: on barrier positions, every 12 voxels
-            const pillarSpacing = 12;
-            const onPillarX = hwInfo!.onX && ((wx % pillarSpacing + pillarSpacing) % pillarSpacing === 0);
-            const onPillarZ = hwInfo!.onZ && ((wz % pillarSpacing + pillarSpacing) % pillarSpacing === 0);
+            const pillarSpacing = hwClass === 'autopista' ? 10 : 12;
+            const onPillarX = hi.onX && ((wx % pillarSpacing + pillarSpacing) % pillarSpacing === 0);
+            const onPillarZ = hi.onZ && ((wz % pillarSpacing + pillarSpacing) % pillarSpacing === 0);
             if (isBarrier2 && (onPillarX || onPillarZ)) {
-              // Concrete pillar from ground/water-bed up to road deck
               const pillarBottom = Math.max(0, h);
               for (let py = pillarBottom; py < roadY - 1; py++) {
                 push((bX + lx) * VOXEL_SIZE, py * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                   varyColor('#999999', wx, py, wz, 2, 0.02, 0.04));
               }
             }
-
-            // Water surface still visible alongside the bridge
             pushW((bX + lx) * VOXEL_SIZE, wl * VOXEL_SIZE + VOXEL_SIZE * 0.5, (bZ + lz) * VOXEL_SIZE,
               varyColor(c.colors.water, wx, wl, wz, 4, 0.06, 0.06));
           }
 
-          // ── Concrete barriers (raised 2 voxels) ──
+          // ── Barriers — height and style depends on highway class ──
           if (isBarrier2) {
-            for (let by = 1; by <= 2; by++) {
+            const barrierH = hwClass === 'rural' ? 1 : hwClass === 'autopista' ? 3 : 2;
+            const barrierCol = hwClass === 'autopista' ? '#aaaaaa' : '#999999';
+            for (let by = 1; by <= barrierH; by++) {
               push((bX + lx) * VOXEL_SIZE, (roadY + by) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                varyColor('#999999', wx, roadY + by, wz, 2, 0.02, 0.04));
+                varyColor(barrierCol, wx, roadY + by, wz, 2, 0.02, 0.04));
             }
-            trackH(lx, lz, roadY + 2);
+            trackH(lx, lz, roadY + barrierH);
+
+            // ── Highway furniture on barrier positions ──
+            const furniture = getHighwayFurniture(wx, wz, hwClass, true, isTunnel, hi.onX);
+
+            if (furniture.type === 'lamp_sodium' || furniture.type === 'lamp_led' || furniture.type === 'lamp_rural') {
+              // Tall highway lamp post
+              const lampH = furniture.type === 'lamp_rural' ? 3 : furniture.type === 'lamp_led' ? 5 : 4;
+              const poleCol = '#555555';
+              for (let ly = barrierH + 1; ly <= barrierH + lampH; ly++) {
+                push((bX + lx) * VOXEL_SIZE, (roadY + ly) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor(poleCol, wx, roadY + ly, wz, 2, 0.02, 0.03));
+              }
+              // Lamp head
+              const lampGlow = furniture.type === 'lamp_sodium' ? '#ffcc44'
+                : furniture.type === 'lamp_led' ? '#eeeeff' : '#ffdd88';
+              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + lampH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor(lampGlow, wx, roadY + barrierH + lampH + 1, wz, 3, 0.04, 0.06));
+              pushSL((bX + lx) * VOXEL_SIZE, (roadY + barrierH + lampH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE);
+              trackH(lx, lz, roadY + barrierH + lampH + 1);
+            } else if (furniture.type === 'sign_direction') {
+              // Green highway direction sign: 2-voxel pole + 2-voxel wide green board
+              const signH = 4;
+              for (let sy = barrierH + 1; sy <= barrierH + signH; sy++) {
+                push((bX + lx) * VOXEL_SIZE, (roadY + sy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#555555', wx, roadY + sy, wz, 2, 0.02, 0.03));
+              }
+              // Green sign board (2 voxels tall at top)
+              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + signH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#116633', wx, roadY + barrierH + signH + 1, wz, 2, 0.03, 0.04));
+              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + signH + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#117744', wx, roadY + barrierH + signH + 2, wz, 2, 0.03, 0.04));
+              trackH(lx, lz, roadY + barrierH + signH + 2);
+            } else if (furniture.type === 'sign_speed') {
+              // White speed sign: short pole + white square
+              const postH = 3;
+              for (let sy = barrierH + 1; sy <= barrierH + postH; sy++) {
+                push((bX + lx) * VOXEL_SIZE, (roadY + sy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#555555', wx, roadY + sy, wz, 2, 0.02, 0.03));
+              }
+              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + postH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor('#eeeeee', wx, roadY + barrierH + postH + 1, wz, 2, 0.02, 0.02));
+              trackH(lx, lz, roadY + barrierH + postH + 1);
+            } else if (furniture.type === 'billboard') {
+              // Billboard: tall pole + wide colored board
+              const bbH = 5;
+              for (let sy = barrierH + 1; sy <= barrierH + bbH; sy++) {
+                push((bX + lx) * VOXEL_SIZE, (roadY + sy) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#666666', wx, roadY + sy, wz, 2, 0.02, 0.03));
+              }
+              // Billboard face — hash-based color for variety
+              const bbHash = hashCoord(wx * 17, 0, wz * 31);
+              const bbColors = ['#cc3333', '#3366cc', '#cc9933', '#33aa66', '#9933cc', '#cc6633'];
+              const bbCol = bbColors[Math.floor(bbHash * bbColors.length)];
+              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + bbH + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor(bbCol, wx, roadY + barrierH + bbH + 1, wz, 3, 0.04, 0.05));
+              push((bX + lx) * VOXEL_SIZE, (roadY + barrierH + bbH + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                varyColor(bbCol, wx, roadY + barrierH + bbH + 2, wz, 3, 0.04, 0.05));
+              trackH(lx, lz, roadY + barrierH + bbH + 2);
+            }
           }
 
           // ── Lane markings (flat paint) ──
-          if (!isMedian2 && !isBarrier2 && !hwInfo!.isIntersection) {
+          if (!isMedian2 && !isBarrier2 && !hi.isIntersection) {
             const paintY2 = roadY * VOXEL_SIZE + VOXEL_SIZE * 0.5 + 0.005;
             const cellCx2 = (bX + lx) * VOXEL_SIZE;
             const cellCz2 = (bZ + lz) * VOXEL_SIZE;
             const stripW2 = MVS * 1.5;
             const cellLen2 = VOXEL_SIZE;
 
-            const absDistX = Math.abs(hwInfo!.distFromCenterX);
-            const absDistZ = Math.abs(hwInfo!.distFromCenterZ);
+            const absDistX = Math.abs(hi.distFromCenterX);
+            const absDistZ = Math.abs(hi.distFromCenterZ);
+            const localHWX = hi.hwHalfWX;
+            const localHWZ = hi.hwHalfWZ;
 
-            if (hwInfo!.onX && absDistX <= INTER_HW_HALF_W) {
+            if (hi.onX && absDistX <= localHWX) {
               // White edge lines
-              if (absDistX === INTER_HW_HALF_W - 1) {
+              if (absDistX === localHWX - 1) {
                 pushPaint(cellCx2, paintY2, cellCz2, '#cccccc', cellLen2, stripW2);
               }
-              // Dashed white lane dividers at 1/3 and 2/3
-              const laneW = INTER_HW_HALF_W - 2; // lanes between median and barrier
-              if (absDistX > 1 && absDistX < INTER_HW_HALF_W - 1) {
-                const lanePos = absDistX - 2;
-                if (lanePos === Math.floor(laneW / 2) && ((wx % 6 + 6) % 6 < 3)) {
+              // Dashed white lane dividers
+              const medW = hwClass === 'autopista' ? 2 : 1;
+              const laneW = localHWX - medW - 1;
+              if (absDistX > medW && absDistX < localHWX - 1 && laneW > 1) {
+                const lanePos = absDistX - medW - 1;
+                const dividerInterval = Math.max(1, Math.floor(laneW / 2));
+                if (lanePos > 0 && lanePos % dividerInterval === 0 && ((wx % 6 + 6) % 6 < 3)) {
                   pushPaint(cellCx2, paintY2, cellCz2, '#aaaaaa', cellLen2 * 0.5, stripW2);
                 }
               }
             }
-            if (hwInfo!.onZ && absDistZ <= INTER_HW_HALF_W) {
-              if (absDistZ === INTER_HW_HALF_W - 1) {
+            if (hi.onZ && absDistZ <= localHWZ) {
+              if (absDistZ === localHWZ - 1) {
                 pushPaint(cellCx2, paintY2, cellCz2, '#cccccc', stripW2, cellLen2);
               }
-              const laneW2 = INTER_HW_HALF_W - 2;
-              if (absDistZ > 1 && absDistZ < INTER_HW_HALF_W - 1) {
-                const lanePos = absDistZ - 2;
-                if (lanePos === Math.floor(laneW2 / 2) && ((wz % 6 + 6) % 6 < 3)) {
+              const medW2 = hwClass === 'autopista' ? 2 : 1;
+              const laneW2 = localHWZ - medW2 - 1;
+              if (absDistZ > medW2 && absDistZ < localHWZ - 1 && laneW2 > 1) {
+                const lanePos = absDistZ - medW2 - 1;
+                const dividerInterval = Math.max(1, Math.floor(laneW2 / 2));
+                if (lanePos > 0 && lanePos % dividerInterval === 0 && ((wz % 6 + 6) % 6 < 3)) {
                   pushPaint(cellCx2, paintY2, cellCz2, '#aaaaaa', stripW2, cellLen2 * 0.5);
                 }
               }
             }
+
+            // ── Cat-eye reflectors on median line ──
+            const furniture2 = getHighwayFurniture(wx, wz, hwClass, false, isTunnel, hi.onX);
+            if (furniture2.type === 'reflector') {
+              const medWC = hwClass === 'autopista' ? 2 : 1;
+              if ((hi.onX && absDistX <= medWC) || (hi.onZ && absDistZ <= medWC)) {
+                pushMini(cellCx2, paintY2, cellCz2, '#ffee44');
+              }
+            }
           }
 
-          // ── Tunnel rendering ──
+          // ── Tunnel rendering with portal ──
           if (isTunnel) {
             const tunnelCeil = roadY + TUNNEL_HEIGHT;
 
-            // Tunnel walls: on the barrier positions, extend up to ceiling
-            if (isBarrier2) {
-              for (let ty = 3; ty <= TUNNEL_HEIGHT; ty++) {
-                push((bX + lx) * VOXEL_SIZE, (roadY + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                  varyColor('#777777', wx, roadY + ty, wz, 2, 0.02, 0.04));
+            // Detect tunnel portal zone: check if nearby cells along highway
+            // are NOT tunnels — that means we're at the entrance
+            let isPortalZone = false;
+            const portalCheckRange = 4;
+            for (let ps = 1; ps <= portalCheckRange; ps++) {
+              // Check positions along the highway direction
+              const checkWx = wx + (hi.onX ? ps : 0) + (hi.onX ? 0 : 0);
+              const checkWz = wz + (hi.onZ ? ps : 0) + (hi.onZ ? 0 : 0);
+              const checkLx = checkWx - bX;
+              const checkLz = checkWz - bZ;
+              if (checkLx >= 0 && checkLx < CHUNK_SIZE && checkLz >= 0 && checkLz < CHUNK_SIZE) {
+                if (hwTunnelMap[checkLx * CHUNK_SIZE + checkLz] === 0) {
+                  isPortalZone = true;
+                  break;
+                }
               }
-              trackH(lx, lz, tunnelCeil);
+              // Also check negative direction
+              const checkWx2 = wx - (hi.onX ? ps : 0);
+              const checkWz2 = wz - (hi.onZ ? ps : 0);
+              const checkLx2 = checkWx2 - bX;
+              const checkLz2 = checkWz2 - bZ;
+              if (checkLx2 >= 0 && checkLx2 < CHUNK_SIZE && checkLz2 >= 0 && checkLz2 < CHUNK_SIZE) {
+                if (hwTunnelMap[checkLx2 * CHUNK_SIZE + checkLz2] === 0) {
+                  isPortalZone = true;
+                  break;
+                }
+              }
             }
 
-            // Tunnel ceiling — render for ALL road cells (not just barriers)
-            // Ceiling is 1 voxel at tunnelCeil + 1
+            // Tunnel walls
+            if (isBarrier2) {
+              const wallCol = isPortalZone ? '#997766' : '#777777'; // portal gets warmer concrete
+              for (let ty = 3; ty <= TUNNEL_HEIGHT; ty++) {
+                push((bX + lx) * VOXEL_SIZE, (roadY + ty) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor(wallCol, wx, roadY + ty, wz, 2, 0.02, 0.04));
+              }
+              trackH(lx, lz, tunnelCeil);
+
+              // Portal arch: extra voxels forming the mouth of the tunnel
+              if (isPortalZone) {
+                // Wider concrete lip at portal entrance
+                push((bX + lx) * VOXEL_SIZE, (tunnelCeil + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#887766', wx, tunnelCeil + 1, wz, 2, 0.02, 0.04));
+                push((bX + lx) * VOXEL_SIZE, (tunnelCeil + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#887766', wx, tunnelCeil + 2, wz, 2, 0.02, 0.04));
+                trackH(lx, lz, tunnelCeil + 2);
+              }
+            }
+
+            // Tunnel ceiling
+            const ceilCol = isPortalZone ? '#887766' : '#666666';
             push((bX + lx) * VOXEL_SIZE, (tunnelCeil + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-              varyColor('#666666', wx, tunnelCeil + 1, wz, 2, 0.02, 0.04));
+              varyColor(ceilCol, wx, tunnelCeil + 1, wz, 2, 0.02, 0.04));
             trackH(lx, lz, tunnelCeil + 1);
 
-            // Tunnel lighting: yellow lights every 8 voxels along the ceiling
+            // Tunnel interior lighting and furniture
             if (!isBarrier2 && !isMedian2) {
-              const lightSpacing = 8;
-              const onLightX = hwInfo!.onX && ((wx % lightSpacing + lightSpacing) % lightSpacing === 0);
-              const onLightZ = hwInfo!.onZ && ((wz % lightSpacing + lightSpacing) % lightSpacing === 0);
-              if (onLightX || onLightZ) {
-                // Light fixture on ceiling
+              const tFurniture = getHighwayFurniture(wx, wz, hwClass, true, true, hi.onX);
+
+              if (tFurniture.type === 'lamp_led') {
+                // Flush LED strip on ceiling
                 push((bX + lx) * VOXEL_SIZE, tunnelCeil * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-                  varyColor('#ffee88', wx, tunnelCeil, wz, 3, 0.04, 0.06));
-                // Register as street light for night illumination system
+                  varyColor('#eeeeff', wx, tunnelCeil, wz, 3, 0.04, 0.06));
                 pushSL((bX + lx) * VOXEL_SIZE, tunnelCeil * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE);
+              } else if (tFurniture.type === 'emergency_phone') {
+                // Emergency phone bay: small orange box on wall level
+                push((bX + lx) * VOXEL_SIZE, (roadY + 2) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
+                  varyColor('#ff8800', wx, roadY + 2, wz, 3, 0.04, 0.06));
+              }
+            }
+
+            // Reflective lane edge strips inside tunnel (more visible than outdoor)
+            if (!isBarrier2 && !isMedian2) {
+              const absDistX2 = Math.abs(hi.distFromCenterX);
+              const absDistZ2 = Math.abs(hi.distFromCenterZ);
+              const localHW2 = effectiveHW;
+              if ((hi.onX && absDistX2 === localHW2 - 2) || (hi.onZ && absDistZ2 === localHW2 - 2)) {
+                // Reflective strip along inner edge of lanes
+                pushMini((bX + lx) * VOXEL_SIZE, roadY * VOXEL_SIZE + VOXEL_SIZE * 0.5 + 0.01,
+                  (bZ + lz) * VOXEL_SIZE, '#ffcc22');
               }
             }
           }
 
-        } else if (hwInfo!.isShoulder) {
+        } else if (hi.isShoulder) {
           // ── Gravel shoulder ──
+          const shoulderCol = hwClass === 'rural' ? '#aa9977' : '#999988';
           push((bX + lx) * VOXEL_SIZE, (h > roadY ? roadY : h) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-            varyColor('#999988', wx, roadY, wz, 2, 0.03, 0.04));
+            varyColor(shoulderCol, wx, roadY, wz, 2, 0.03, 0.04));
           groundHeightMap[lIdx] = Math.min(h, roadY);
         }
 
