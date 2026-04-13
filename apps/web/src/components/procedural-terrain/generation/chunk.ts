@@ -1789,6 +1789,24 @@ export function generateChunkData(
     }
   }
 
+  /* ── Compute dominant biome and average height for minimap ── */
+  const biomeCounts = new Uint16Array(16);
+  let heightSum = 0;
+  for (let lx = 0; lx < CHUNK_SIZE; lx++) {
+    for (let lz = 0; lz < CHUNK_SIZE; lz++) {
+      const idx2 = (lx + 1) * gW + (lz + 1);
+      const b = bMap[idx2];
+      if (b < biomeCounts.length) biomeCounts[b]++;
+      heightSum += groundHeightMap[lx * CHUNK_SIZE + lz];
+    }
+  }
+  let domBiomeIdx = 0;
+  for (let i = 1; i < biomeCounts.length; i++) {
+    if (biomeCounts[i] > biomeCounts[domBiomeIdx]) domBiomeIdx = i;
+  }
+  const domBiome = BIOME_TYPES[domBiomeIdx] ?? 'plains';
+  const avgH = heightSum / (CHUNK_SIZE * CHUNK_SIZE);
+
   return {
     positions: posA.subarray(0, sc * 3), colors: colA.subarray(0, sc * 3), count: sc,
     waterPositions: wPosA.subarray(0, wc * 3), waterColors: wColA.subarray(0, wc * 3), waterCount: wc,
@@ -1803,5 +1821,7 @@ export function generateChunkData(
     paintScales: paintScaleA.subarray(0, paintC * 2),
     paintCount: paintC,
     chunkX: cx, chunkZ: cz,
+    biome: domBiome,
+    avgHeight: avgH,
   };
 }

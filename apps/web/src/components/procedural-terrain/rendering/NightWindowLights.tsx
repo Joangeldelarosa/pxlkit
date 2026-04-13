@@ -83,6 +83,10 @@ function winHash(x: number, y: number, z: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
+function setMaterialOpacity(mat: THREE.MeshBasicMaterial, opacity: number) {
+  mat.opacity = opacity;
+}
+
 /** Warm window light colors — saturated for additive blending visibility */
 const WARM_COLORS = [
   new THREE.Color('#ffdd88'),
@@ -198,14 +202,10 @@ export function NightWindowLights({
     const effectiveLitProb = windowLitProbability * sleepFactor;
 
     if (nightFactor <= 0.01) {
-      // eslint-disable-next-line react-hooks/immutability
-      innerMat.opacity = 0;
-      // eslint-disable-next-line react-hooks/immutability
-      outerMat.opacity = 0;
-      // eslint-disable-next-line react-hooks/immutability
-      lampFixtureMat.opacity = 0;
-      // eslint-disable-next-line react-hooks/immutability
-      lampGroundMat.opacity = 0;
+      setMaterialOpacity(innerMat, 0);
+      setMaterialOpacity(outerMat, 0);
+      setMaterialOpacity(lampFixtureMat, 0);
+      setMaterialOpacity(lampGroundMat, 0);
       inner.count = 0;
       outer.count = 0;
       lampFixture.count = 0;
@@ -218,14 +218,10 @@ export function NightWindowLights({
     }
 
     const brightMul = lampBrightness;
-    // eslint-disable-next-line react-hooks/immutability
-    innerMat.opacity = nightFactor * 0.95;
-    // eslint-disable-next-line react-hooks/immutability
-    outerMat.opacity = nightFactor * 0.25;
-    // eslint-disable-next-line react-hooks/immutability
-    lampFixtureMat.opacity = nightFactor * Math.min(1.0, 0.85 * brightMul);
-    // eslint-disable-next-line react-hooks/immutability
-    lampGroundMat.opacity = nightFactor * Math.min(1.0, 0.35 * brightMul);
+    setMaterialOpacity(innerMat, nightFactor * 0.95);
+    setMaterialOpacity(outerMat, nightFactor * 0.25);
+    setMaterialOpacity(lampFixtureMat, nightFactor * Math.min(1.0, 0.85 * brightMul));
+    setMaterialOpacity(lampGroundMat, nightFactor * Math.min(1.0, 0.35 * brightMul));
 
     const cache = chunkCacheRef.current;
     if (!cache) return;

@@ -42,7 +42,10 @@ import { Trophy, Star, Coin, Crown, Gem, Shield, Lightning, Key, Sword } from '@
 import { Heart } from '@pxlkit/social';
 import { Check, Package, SparkleSmall, Robot } from '@pxlkit/ui';
 import { Sun, Moon, Snowflake } from '@pxlkit/weather';
-import type { PxlKitData } from '@pxlkit/core';
+import { QuestMap as QuestMapIcon } from '@pxlkit/gamification';
+import { PxlKitIcon, type PxlKitData } from '@pxlkit/core';
+/* ── PxlKit UI Kit ── */
+import { PixelButton, PixelFadeIn, PixelSlideIn, PixelBadge } from '@pxlkit/ui-kit';
 
 /* ── Internal modules ── */
 import type { WorldConfig, ChunkVoxelData } from './types';
@@ -67,8 +70,10 @@ import { GroundCritters } from './effects/GroundCritters';
 import { WaterBoats } from './effects/WaterBoats';
 import { FlyCamera } from './camera/FlyCamera';
 import { CameraLook } from './camera/CameraLook';
-import { OverlayStats, MobileTouchControls } from './ui/Controls';
+import { MobileTouchControls } from './ui/Controls';
 import { SettingsPanel } from './ui/SettingsPanel';
+import { GameHUD } from './ui/GameHUD';
+import { FullscreenMap } from './ui/FullscreenMap';
 
 /* ═══════════════════════════════════════════════════════════════
  *  Initialize Pickup Icons
@@ -427,7 +432,11 @@ export default function ProceduralTerrain() {
   const [config, setConfig] = useState<WorldConfig>(savedConfig ?? DEFAULT_CONFIG);
   const [isLocked, setIsLocked] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showFullscreenMap, setShowFullscreenMap] = useState(false);
+  const [screenshotFlash, setScreenshotFlash] = useState(false);
   const [cameraPos, setCameraPos] = useState<[number, number, number]>(initPos ?? [0, 12, 20]);
+  const [cameraYaw, setCameraYaw] = useState(0);
   const [currentBiome, setCurrentBiome] = useState('Plains');
   const [chunkCount, setChunkCount] = useState(0);
   const [seedInput, setSeedInput] = useState(String(initSeed));
@@ -484,9 +493,27 @@ export default function ProceduralTerrain() {
   }, []);
 
   const requestPointerLock = useCallback(() => {
+    setShowFullscreenMap(false);
     if (isMobile) { setShowControls(false); setIsLocked(true); return; }
     canvasRef.current?.querySelector('canvas')?.requestPointerLock();
   }, [isMobile]);
+
+  const toggleFullscreenMap = useCallback(() => {
+    setShowFullscreenMap((prev) => {
+      const next = !prev;
+      if (next && !isMobile && isLocked) {
+        document.exitPointerLock();
+      }
+      return next;
+    });
+  }, [isMobile, isLocked]);
+
+  const handleCanvasPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0) return;
+    if (isMobile || isLocked || showControls || showSettings || showFullscreenMap) return;
+    if (!(e.target instanceof HTMLCanvasElement)) return;
+    requestPointerLock();
+  }, [isMobile, isLocked, showControls, showSettings, showFullscreenMap, requestPointerLock]);
 
   useEffect(() => {
     const h = () => { const l = !!document.pointerLockElement; setIsLocked(l); if (l) setShowControls(false); };
@@ -495,13 +522,17 @@ export default function ProceduralTerrain() {
   }, []);
 
   const handleCameraUpdate = useCallback((pos: [number, number, number], biome: string, hour: number, rot: [number, number, number]) => {
-    setCameraPos(pos); setCurrentBiome(biome); setDisplayHour(hour); cameraRotRef.current = rot;
+    setCameraPos(pos); setCurrentBiome(biome); setDisplayHour(hour); cameraRotRef.current = rot; setCameraYaw(rot[1]);
   }, []);
   const generateNewSeed = useCallback(() => { const s = Math.floor(Math.random() * 999999); setSeed(s); setSeedInput(String(s)); }, []);
   const applySeed = useCallback(() => { const p = parseInt(seedInput, 10); if (!isNaN(p)) setSeed(Math.abs(p)); }, [seedInput]);
   const handleChunkCount = useCallback((c: number) => setChunkCount(c), []);
   const exitImmersive = useCallback(() => {
-    if (isMobile) { setIsLocked(false); setShowControls(true); } else document.exitPointerLock();
+    if (isMobile) {
+      setShowFullscreenMap(false);
+      setIsLocked(false);
+      setShowControls(true);
+    } else document.exitPointerLock();
   }, [isMobile]);
   const handleTouchKey = useCallback((key: string, active: boolean) => {
     if (active) keysRef.current.add(key); else keysRef.current.delete(key);
@@ -528,6 +559,25 @@ export default function ProceduralTerrain() {
     });
   }, [seed, cameraPos]);
 
+  /* ── Screenshot — capture canvas as PNG and download ── */
+  const handleScreenshot = useCallback(() => {
+    const canvas = canvasRef.current?.querySelector('canvas');
+    if (!canvas) return;
+    // Flash effect
+    setScreenshotFlash(true);
+    setTimeout(() => setScreenshotFlash(false), 200);
+    // Capture
+    try {
+      const dataURL = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `pxlkit-world-${seed}-${Date.now()}.png`;
+      link.href = dataURL;
+      link.click();
+    } catch {
+      // WebGL may require preserveDrawingBuffer
+    }
+  }, [seed]);
+
   const gfxDpr: [number, number] =
     config.graphicsQuality === 'potato' ? [0.5, 0.75] :
     config.graphicsQuality === 'low'    ? [0.75, 1] :
@@ -538,72 +588,226 @@ export default function ProceduralTerrain() {
 
   return (
     <div className="relative w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] overflow-hidden bg-black select-none" style={{ touchAction: 'none', WebkitUserSelect: 'none' }}>
-      {/* ── Controls Overlay ── */}
+
+      {/* ── Screenshot Flash ── */}
+      {screenshotFlash && (
+        <div className="absolute inset-0 z-50 bg-white/80 pointer-events-none animate-[fadeOut_200ms_ease-out_forwards]" />
+      )}
+
+      {/* ── Welcome Screen (game-start style) ── */}
       {showControls && !isLocked && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none select-none">
+          {/* Back button */}
           <div className="absolute top-3 left-3 sm:top-4 sm:left-4 pointer-events-auto">
-            <Link href="/" className="flex items-center gap-1.5 px-2.5 py-1.5 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-muted hover:text-retro-green hover:border-retro-green/40 transition-all select-none">← Back</Link>
+            <PixelFadeIn duration={300}>
+              <Link href="/" className="flex items-center gap-1.5 px-2.5 py-1.5 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-muted hover:text-retro-green hover:border-retro-green/40 transition-all select-none">← Back</Link>
+            </PixelFadeIn>
           </div>
-          <div className="text-center pointer-events-auto mb-4 sm:mb-6 select-none">
-            <h1 className="font-pixel text-lg sm:text-2xl md:text-3xl lg:text-4xl text-retro-green text-glow mb-2 sm:mb-3 drop-shadow-lg select-none">PROCEDURAL WORLDS</h1>
-            <p className="font-pixel text-[8px] sm:text-[10px] md:text-xs text-retro-purple/80 mb-1 drop-shadow select-none">@pxlkit/voxel — Coming Soon</p>
-            <p className="text-retro-muted/70 text-[10px] sm:text-xs md:text-sm max-w-md mx-auto px-4 leading-relaxed select-none">
-              {config.worldMode === 'infinite'
-                ? 'Infinite procedural voxel worlds with cities, villages, swamps, and dynamic day/night.'
-                : `Floating ${config.worldSize}×${config.worldSize} island with tapered edges and full biome variety.`}
-              <span className="text-retro-gold font-bold">{isMobile ? ' Tap to fly.' : ' Click to fly.'}</span>
-            </p>
+
+          {/* Top-right action buttons */}
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 pointer-events-auto flex items-center gap-2">
+            <PixelFadeIn duration={300} delay={100}>
+              <div className="flex items-center gap-2">
+                <button onClick={handleScreenshot}
+                  className="p-2 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-cyan hover:border-retro-cyan/40 transition-all cursor-pointer select-none"
+                  title="Screenshot">
+                  📸
+                </button>
+                <button onClick={() => setShowSettings(true)}
+                  className="p-2 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-green hover:border-retro-green/40 transition-all cursor-pointer select-none"
+                  title="Settings">
+                  ⚙
+                </button>
+              </div>
+            </PixelFadeIn>
           </div>
-          <SettingsPanel
-            config={config}
-            onUpdateConfig={updateConfig}
-            onSetConfig={setConfig}
-            seed={seedInput}
-            onSeedChange={setSeedInput}
-            onApplySeed={applySeed}
-            onRandomSeed={generateNewSeed}
-            onStartExplore={requestPointerLock}
-            isMobile={isMobile}
-            onSaveWorld={handleSaveWorld}
-            onShareScene={handleShareScene}
-            shareStatus={shareStatus}
-          />
+
+          {/* Center: Title + Seed + Explore */}
+          <div className="text-center pointer-events-auto select-none max-w-md w-[calc(100%-2rem)] px-4">
+            <PixelFadeIn duration={500}>
+              <h1 className="font-pixel text-xl sm:text-3xl md:text-4xl lg:text-5xl text-retro-green text-glow mb-1 sm:mb-2 drop-shadow-lg select-none tracking-wide">
+                PROCEDURAL WORLDS
+              </h1>
+            </PixelFadeIn>
+            <PixelFadeIn duration={400} delay={200}>
+              <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
+                <PixelBadge tone="purple">
+                  <span className="text-[8px] sm:text-[9px]">@pxlkit/voxel</span>
+                </PixelBadge>
+                <PixelBadge tone="green">
+                  <span className="text-[8px] sm:text-[9px]">Open Source</span>
+                </PixelBadge>
+              </div>
+            </PixelFadeIn>
+            <PixelFadeIn duration={400} delay={300}>
+              <p className="text-retro-muted/60 text-[10px] sm:text-xs max-w-sm mx-auto leading-relaxed select-none mb-5 sm:mb-6">
+                Infinite procedural voxel worlds with 9 biomes, cities, highways, day/night cycles, and shareable scenes.
+                <span className="text-retro-gold font-bold">{isMobile ? ' Tap to fly.' : ' Click to explore.'}</span>
+              </p>
+            </PixelFadeIn>
+
+            {/* Seed input card */}
+            <PixelSlideIn from="down" duration={400} delay={400}>
+              <div className="bg-retro-bg/70 backdrop-blur-md border border-retro-border/40 rounded-xl p-4 sm:p-5 space-y-3 shadow-2xl">
+                {/* Seed row */}
+                <div className="space-y-1.5">
+                  <label className="font-pixel text-[8px] sm:text-[9px] text-retro-green/80 uppercase tracking-wider select-none">World Seed</label>
+                  <div className="flex gap-2 items-center">
+                    <input type="text" inputMode="numeric" pattern="[0-9]*" value={seedInput}
+                      onChange={e => setSeedInput(e.target.value.replace(/[^0-9]/g, ''))}
+                      onKeyDown={e => e.key === 'Enter' && applySeed()}
+                      className="flex-1 bg-retro-surface/80 border border-retro-border/50 rounded-lg px-3 py-2.5 font-mono text-sm sm:text-base text-retro-text focus:border-retro-green/60 focus:outline-none transition-colors select-text text-center tracking-widest" placeholder="Enter seed..." />
+                    <PixelButton tone="green" size="sm" onClick={applySeed}>GO</PixelButton>
+                  </div>
+                </div>
+
+                {/* Random world */}
+                <PixelButton tone="purple" variant="ghost" onClick={generateNewSeed} className="w-full">
+                  🎲 RANDOM WORLD
+                </PixelButton>
+
+                {/* Explore button */}
+                <button onClick={requestPointerLock}
+                  className="w-full py-3 sm:py-3.5 bg-retro-green/20 hover:bg-retro-green/30 border-2 border-retro-green/60 rounded-lg font-pixel text-[10px] sm:text-xs md:text-sm text-retro-green transition-all cursor-pointer hover:shadow-[0_0_24px_rgba(74,222,128,0.25)] select-none group">
+                  <span className="group-hover:tracking-widest transition-all">▶ {isMobile ? 'TAP TO EXPLORE' : 'CLICK TO EXPLORE'}</span>
+                </button>
+
+                {/* Version info */}
+                <div className="flex items-center justify-center gap-2 pt-1">
+                  <span className="font-mono text-[7px] text-retro-muted/30">v0.1.0-alpha</span>
+                  <span className="text-retro-muted/15">·</span>
+                  <span className="font-mono text-[7px] text-retro-muted/30">Seed-based · Shareable</span>
+                </div>
+              </div>
+            </PixelSlideIn>
+
+            {/* Controls hint */}
+            <PixelFadeIn duration={300} delay={600}>
+              <div className="mt-3 sm:mt-4 space-y-0.5 select-none">
+                {isMobile ? (
+                  <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/35">Drag to look · D-pad to move · Tap ✕ to exit</p>
+                ) : (
+                  <div className="flex items-center justify-center gap-3 font-mono text-[8px] text-retro-muted/30">
+                    <span><span className="text-retro-muted/50 bg-retro-bg/30 px-1 py-0.5 rounded text-[7px] border border-retro-border/15">WASD</span> Move</span>
+                    <span><span className="text-retro-muted/50 bg-retro-bg/30 px-1 py-0.5 rounded text-[7px] border border-retro-border/15">Space</span> Up</span>
+                    <span><span className="text-retro-muted/50 bg-retro-bg/30 px-1 py-0.5 rounded text-[7px] border border-retro-border/15">Shift</span> Down</span>
+                    <span><span className="text-retro-muted/50 bg-retro-bg/30 px-1 py-0.5 rounded text-[7px] border border-retro-border/15">ESC</span> Release</span>
+                  </div>
+                )}
+              </div>
+            </PixelFadeIn>
+          </div>
         </div>
       )}
 
-      {/* ── Locked HUD ── */}
+      {/* ── Settings Panel (slides from right) ── */}
+      <SettingsPanel
+        config={config}
+        onUpdateConfig={updateConfig}
+        onSetConfig={setConfig}
+        seed={seedInput}
+        onSeedChange={setSeedInput}
+        onApplySeed={applySeed}
+        onRandomSeed={generateNewSeed}
+        isMobile={isMobile}
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        onSaveWorld={handleSaveWorld}
+        onShareScene={handleShareScene}
+        shareStatus={shareStatus}
+      />
+
+      <FullscreenMap
+        open={showFullscreenMap}
+        onClose={() => setShowFullscreenMap(false)}
+        cameraPos={cameraPos}
+        cameraYaw={cameraYaw}
+        chunkCacheRef={chunkCacheRef}
+        worldMode={config.worldMode}
+        worldSize={config.worldSize}
+      />
+
+      {/* ── Locked: Full Game HUD ── */}
       {isLocked && (
         <>
+          {/* Crosshair */}
           {!isMobile && (
             <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none select-none">
-              <div className="w-4 h-4 sm:w-5 sm:h-5 relative opacity-40">
+              <div className="w-5 h-5 relative opacity-30">
                 <div className="absolute top-1/2 left-0 right-0 h-px bg-white" />
                 <div className="absolute left-1/2 top-0 bottom-0 w-px bg-white" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-white/50" />
               </div>
             </div>
           )}
-          <OverlayStats seed={seed} chunkCount={chunkCount} position={cameraPos} biome={currentBiome} worldMode={config.worldMode} worldSize={config.worldSize} hour={displayHour} />
-          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 select-none" style={{ touchAction: 'none' }}>
-            {isMobile ? (
-              <button onClick={exitImmersive} className="p-2 bg-retro-bg/70 backdrop-blur-sm border border-retro-border/30 rounded font-pixel text-[9px] text-retro-muted/60 hover:text-retro-red transition-all cursor-pointer select-none" style={{ touchAction: 'none' }}>✕</button>
-            ) : (
-              <span className="font-pixel text-[7px] sm:text-[8px] text-retro-muted/40 bg-retro-bg/40 px-2 py-1 rounded border border-retro-border/20 pointer-events-none select-none">ESC to release</span>
-            )}
-          </div>
+
+          {/* Game HUD */}
+          <GameHUD
+            seed={seed}
+            chunkCount={chunkCount}
+            position={cameraPos}
+            biome={currentBiome}
+            worldMode={config.worldMode}
+            worldSize={config.worldSize}
+            hour={displayHour}
+            cameraYaw={cameraYaw}
+            chunkCacheRef={chunkCacheRef}
+            isMobile={isMobile}
+            onScreenshot={handleScreenshot}
+            onShare={handleShareScene}
+            onSave={handleSaveWorld}
+            onExit={exitImmersive}
+            isFullscreenMapOpen={showFullscreenMap}
+            onToggleFullscreenMap={toggleFullscreenMap}
+            shareStatus={shareStatus}
+          />
+
           {isMobile && <MobileTouchControls onKey={handleTouchKey} />}
         </>
       )}
 
+      {/* ── Paused state: Quick-access buttons ── */}
       {!isLocked && !showControls && (
-        <button onClick={() => setShowControls(true)} className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 p-2 bg-retro-bg/80 border border-retro-border/50 rounded font-pixel text-[9px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none">⚙ Settings</button>
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex items-center gap-2">
+          <PixelFadeIn duration={200}>
+            <div className="flex items-center gap-2">
+              <button onClick={handleScreenshot}
+                className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-cyan transition-all cursor-pointer select-none"
+                title="Screenshot">📸</button>
+              <button onClick={handleShareScene}
+                className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-purple transition-all cursor-pointer select-none"
+                title="Share scene">{shareStatus === 'copied' ? '✓' : '🔗'}</button>
+              <button onClick={toggleFullscreenMap}
+                className={`p-2 bg-retro-bg/80 border rounded text-[11px] transition-all cursor-pointer select-none ${
+                  showFullscreenMap
+                    ? 'text-retro-gold border-retro-gold/60 bg-retro-gold/10'
+                    : 'text-retro-muted border-retro-border/50 hover:text-retro-gold hover:border-retro-gold/40'
+                }`}
+                title={showFullscreenMap ? 'Close fullscreen map' : 'Open fullscreen map'}>
+                <PxlKitIcon icon={QuestMapIcon} size={12} colorful={showFullscreenMap} />
+              </button>
+              <button onClick={() => setShowSettings(true)}
+                className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none"
+                title="Settings">⚙</button>
+              <button onClick={() => { setShowFullscreenMap(false); setShowControls(true); }}
+                className="px-2.5 py-1.5 bg-retro-bg/80 border border-retro-border/50 rounded font-pixel text-[8px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none"
+                title="Back to menu">Menu</button>
+            </div>
+          </PixelFadeIn>
+        </div>
       )}
 
       {/* ── Three.js Canvas ── */}
-      <div ref={canvasRef} className="w-full h-full" style={{ touchAction: 'none' }}>
+      <div
+        ref={canvasRef}
+        className="w-full h-full"
+        style={{ touchAction: 'none' }}
+        onPointerDown={handleCanvasPointerDown}
+      >
         <Canvas
           camera={{ fov: 65, near: 0.1, far: 600 }}
           dpr={gfxDpr}
-          gl={{ antialias: gfxAA, toneMapping: THREE.NoToneMapping, powerPreference: 'high-performance' }}
+          gl={{ antialias: gfxAA, toneMapping: THREE.NoToneMapping, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
           style={{ background: 'transparent', touchAction: 'none' }}
         >
           <TimeContext.Provider value={timeStateRef}>
