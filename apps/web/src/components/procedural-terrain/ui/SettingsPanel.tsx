@@ -1,15 +1,15 @@
 /* ═══════════════════════════════════════════════════════════════
- *  Settings Panel — Draggable, Minimizable, Organized by Sections
+ *  Settings Panel — Right-side slide-out, organized by sections
  *
  *  Features:
- *  - Drag by title bar to reposition
- *  - Minimize/restore toggle
+ *  - Slides in from the right edge
+ *  - Close button to dismiss
  *  - Collapsible sections: World, Time, Graphics, Terrain, Effects
- *  - Works alongside the initial welcome overlay
+ *  - Separate from the welcome/start screen
  * ═══════════════════════════════════════════════════════════════ */
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import type { WorldConfig, WorldMode } from '../types';
 import { GRAPHICS_PRESETS } from '../types';
 import { ConfigSlider } from './Controls';
@@ -22,8 +22,9 @@ interface SettingsPanelProps {
   onSeedChange: (v: string) => void;
   onApplySeed: () => void;
   onRandomSeed: () => void;
-  onStartExplore: () => void;
   isMobile: boolean;
+  open: boolean;
+  onClose: () => void;
   onSaveWorld?: () => void;
   onShareScene?: () => void;
   shareStatus?: 'idle' | 'copied';
@@ -47,15 +48,9 @@ function SectionHeader({ title, icon, open, onToggle, color }: {
 }
 
 export function SettingsPanel({
-  config, onUpdateConfig, onSetConfig, seed, onSeedChange, onApplySeed, onRandomSeed, onStartExplore, isMobile,
-  onSaveWorld, onShareScene, shareStatus,
+  config, onUpdateConfig, onSetConfig, seed, onSeedChange, onApplySeed, onRandomSeed, isMobile,
+  open, onClose, onSaveWorld, onShareScene, shareStatus,
 }: SettingsPanelProps) {
-  const [minimized, setMinimized] = useState(false);
-  const [position, setPosition] = useState({ x: -1, y: -1 }); // -1 = centered
-  const [dragging, setDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const panelRef = useRef<HTMLDivElement>(null);
-
   /* Section collapse state */
   const [sections, setSections] = useState({
     world: true,
@@ -69,34 +64,6 @@ export function SettingsPanel({
     setSections(prev => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
-  /* ── Drag handling ── */
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (isMobile) return;
-    e.preventDefault();
-    const panel = panelRef.current;
-    if (!panel) return;
-    const rect = panel.getBoundingClientRect();
-    setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-    setDragging(true);
-  }, [isMobile]);
-
-  useEffect(() => {
-    if (!dragging) return;
-    const handleMove = (e: MouseEvent) => {
-      setPosition({
-        x: Math.max(0, e.clientX - dragOffset.x),
-        y: Math.max(0, e.clientY - dragOffset.y),
-      });
-    };
-    const handleUp = () => setDragging(false);
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseup', handleUp);
-    return () => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('mouseup', handleUp);
-    };
-  }, [dragging, dragOffset]);
-
   /* Format duration for display */
   const formatDuration = (secs: number) => {
     if (secs < 60) return `${secs}s`;
@@ -104,46 +71,37 @@ export function SettingsPanel({
     return `${(secs / 3600).toFixed(1)}hr`;
   };
 
-  const posStyle = position.x >= 0
-    ? { left: position.x, top: position.y, transform: 'none' }
-    : {};
-
   return (
-    <div
-      ref={panelRef}
-      className={`pointer-events-auto bg-retro-bg/90 backdrop-blur-md border border-retro-border/60 rounded-xl shadow-2xl select-none transition-shadow ${dragging ? 'shadow-[0_0_30px_rgba(74,222,128,0.15)]' : ''}`}
-      style={{
-        ...posStyle,
-        width: isMobile ? 'calc(100% - 1.5rem)' : '520px',
-        maxWidth: isMobile ? '420px' : '560px',
-        maxHeight: minimized ? undefined : '80vh',
-        ...(position.x < 0 ? {} : { position: 'absolute' as const }),
-        zIndex: 30,
-      }}
-    >
-      {/* ── Title Bar (draggable) ── */}
+    <>
+      {/* ── Backdrop (click to close) ── */}
+      {open && (
+        <div className="absolute inset-0 z-25 bg-black/30" onClick={onClose} />
+      )}
+      {/* ── Panel ── */}
       <div
-        className={`flex items-center justify-between px-3 py-2 border-b border-retro-border/30 rounded-t-xl ${dragging ? 'cursor-grabbing' : 'cursor-grab'} select-none`}
-        onMouseDown={handleMouseDown}
+        className={`absolute top-0 right-0 z-30 h-full pointer-events-auto bg-retro-bg/95 backdrop-blur-xl border-l border-retro-border/60 shadow-2xl select-none transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
+        style={{
+          width: isMobile ? '100%' : '380px',
+          maxWidth: '420px',
+        }}
       >
-        <div className="flex items-center gap-2">
-          <span className="text-[11px]">⚙</span>
-          <span className="font-pixel text-[9px] sm:text-[10px] text-retro-green uppercase tracking-wider">Settings</span>
-        </div>
-        <div className="flex items-center gap-1.5">
+        {/* ── Title Bar ── */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-retro-border/30 select-none">
+          <div className="flex items-center gap-2">
+            <span className="text-[12px]">⚙</span>
+            <span className="font-pixel text-[10px] sm:text-[11px] text-retro-green uppercase tracking-wider">Settings</span>
+          </div>
           <button
-            onClick={() => setMinimized(!minimized)}
-            className="w-5 h-5 flex items-center justify-center rounded bg-retro-surface/60 hover:bg-retro-surface border border-retro-border/30 text-[10px] text-retro-muted/70 hover:text-retro-gold transition-all cursor-pointer select-none"
-            title={minimized ? 'Expand' : 'Minimize'}
+            onClick={onClose}
+            className="w-6 h-6 flex items-center justify-center rounded bg-retro-surface/60 hover:bg-retro-red/20 border border-retro-border/30 text-[11px] text-retro-muted/70 hover:text-retro-red transition-all cursor-pointer select-none"
+            title="Close settings"
           >
-            {minimized ? '□' : '—'}
+            ✕
           </button>
         </div>
-      </div>
 
-      {/* ── Panel Content ── */}
-      {!minimized && (
-        <div className="p-3 space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(80vh - 3rem)' }}>
+        {/* ── Panel Content ── */}
+        <div className="p-4 space-y-2 overflow-y-auto" style={{ maxHeight: 'calc(100% - 3.5rem)' }}>
 
           {/* ══════ WORLD SECTION ══════ */}
           <SectionHeader title="World" icon="🌍" open={sections.world} onToggle={() => toggleSection('world')} color="text-retro-green/80" />
@@ -317,14 +275,8 @@ export function SettingsPanel({
             </div>
           )}
 
-          {/* ── Explore Button ── */}
-          <button onClick={onStartExplore}
-            className="w-full py-2 sm:py-2.5 bg-retro-green/20 hover:bg-retro-green/30 border-2 border-retro-green/60 rounded-lg font-pixel text-[9px] sm:text-[10px] text-retro-green transition-all cursor-pointer hover:shadow-[0_0_20px_rgba(74,222,128,0.2)] select-none mt-1">
-            ▶ {isMobile ? 'TAP TO EXPLORE' : 'CLICK TO EXPLORE'}
-          </button>
-
           {/* ── Save & Share Buttons ── */}
-          <div className="flex gap-2 mt-1">
+          <div className="flex gap-2 mt-2 pt-2 border-t border-retro-border/20">
             {onSaveWorld && (
               <button onClick={onSaveWorld}
                 className="flex-1 py-1.5 bg-retro-cyan/15 hover:bg-retro-cyan/25 border border-retro-cyan/40 rounded font-pixel text-[8px] sm:text-[9px] text-retro-cyan transition-all cursor-pointer select-none">
@@ -338,19 +290,8 @@ export function SettingsPanel({
               </button>
             )}
           </div>
-
-          {/* ── Controls Help ── */}
-          <div className="text-center space-y-0.5 select-none pt-1">
-            {isMobile ? (
-              <p className="font-mono text-[7px] sm:text-[8px] text-retro-muted/40">Drag canvas to look · D-pad to move · Tap ✕ to exit</p>
-            ) : (
-              <>
-                <p className="font-mono text-[7px] sm:text-[8px] text-retro-muted/40">WASD = Move · Space/Shift = Up/Down · Mouse = Look · ESC = Release</p>
-              </>
-            )}
-          </div>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

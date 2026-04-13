@@ -427,6 +427,8 @@ export default function ProceduralTerrain() {
   const [config, setConfig] = useState<WorldConfig>(savedConfig ?? DEFAULT_CONFIG);
   const [isLocked, setIsLocked] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [screenshotFlash, setScreenshotFlash] = useState(false);
   const [cameraPos, setCameraPos] = useState<[number, number, number]>(initPos ?? [0, 12, 20]);
   const [currentBiome, setCurrentBiome] = useState('Plains');
   const [chunkCount, setChunkCount] = useState(0);
@@ -528,6 +530,25 @@ export default function ProceduralTerrain() {
     });
   }, [seed, cameraPos]);
 
+  /* ── Screenshot — capture canvas as PNG and download ── */
+  const handleScreenshot = useCallback(() => {
+    const canvas = canvasRef.current?.querySelector('canvas');
+    if (!canvas) return;
+    // Flash effect
+    setScreenshotFlash(true);
+    setTimeout(() => setScreenshotFlash(false), 200);
+    // Capture
+    try {
+      const dataURL = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `pxlkit-world-${seed}-${Date.now()}.png`;
+      link.href = dataURL;
+      link.click();
+    } catch {
+      // WebGL may require preserveDrawingBuffer
+    }
+  }, [seed]);
+
   const gfxDpr: [number, number] =
     config.graphicsQuality === 'potato' ? [0.5, 0.75] :
     config.graphicsQuality === 'low'    ? [0.75, 1] :
@@ -538,42 +559,100 @@ export default function ProceduralTerrain() {
 
   return (
     <div className="relative w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] overflow-hidden bg-black select-none" style={{ touchAction: 'none', WebkitUserSelect: 'none' }}>
-      {/* ── Controls Overlay ── */}
+
+      {/* ── Screenshot Flash ── */}
+      {screenshotFlash && (
+        <div className="absolute inset-0 z-50 bg-white/80 pointer-events-none animate-[fadeOut_200ms_ease-out_forwards]" />
+      )}
+
+      {/* ── Welcome Screen (game-start style) ── */}
       {showControls && !isLocked && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none select-none">
+          {/* Back button */}
           <div className="absolute top-3 left-3 sm:top-4 sm:left-4 pointer-events-auto">
             <Link href="/" className="flex items-center gap-1.5 px-2.5 py-1.5 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-muted hover:text-retro-green hover:border-retro-green/40 transition-all select-none">← Back</Link>
           </div>
-          <div className="text-center pointer-events-auto mb-4 sm:mb-6 select-none">
-            <h1 className="font-pixel text-lg sm:text-2xl md:text-3xl lg:text-4xl text-retro-green text-glow mb-2 sm:mb-3 drop-shadow-lg select-none">PROCEDURAL WORLDS</h1>
-            <p className="font-pixel text-[8px] sm:text-[10px] md:text-xs text-retro-purple/80 mb-1 drop-shadow select-none">@pxlkit/voxel — Coming Soon</p>
-            <p className="text-retro-muted/70 text-[10px] sm:text-xs md:text-sm max-w-md mx-auto px-4 leading-relaxed select-none">
-              {config.worldMode === 'infinite'
-                ? 'Infinite procedural voxel worlds with cities, villages, swamps, and dynamic day/night.'
-                : `Floating ${config.worldSize}×${config.worldSize} island with tapered edges and full biome variety.`}
-              <span className="text-retro-gold font-bold">{isMobile ? ' Tap to fly.' : ' Click to fly.'}</span>
-            </p>
+
+          {/* Top-right action buttons */}
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 pointer-events-auto flex items-center gap-2">
+            <button onClick={handleScreenshot}
+              className="p-2 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded font-pixel text-[9px] text-retro-muted hover:text-retro-cyan hover:border-retro-cyan/40 transition-all cursor-pointer select-none"
+              title="Screenshot">
+              📸
+            </button>
+            <button onClick={() => setShowSettings(true)}
+              className="p-2 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded font-pixel text-[9px] text-retro-muted hover:text-retro-green hover:border-retro-green/40 transition-all cursor-pointer select-none"
+              title="Settings">
+              ⚙
+            </button>
           </div>
-          <SettingsPanel
-            config={config}
-            onUpdateConfig={updateConfig}
-            onSetConfig={setConfig}
-            seed={seedInput}
-            onSeedChange={setSeedInput}
-            onApplySeed={applySeed}
-            onRandomSeed={generateNewSeed}
-            onStartExplore={requestPointerLock}
-            isMobile={isMobile}
-            onSaveWorld={handleSaveWorld}
-            onShareScene={handleShareScene}
-            shareStatus={shareStatus}
-          />
+
+          {/* Center: Title + Seed + Explore */}
+          <div className="text-center pointer-events-auto select-none max-w-md w-[calc(100%-2rem)] px-4">
+            <h1 className="font-pixel text-xl sm:text-3xl md:text-4xl lg:text-5xl text-retro-green text-glow mb-2 sm:mb-3 drop-shadow-lg select-none tracking-wide">PROCEDURAL WORLDS</h1>
+            <p className="font-pixel text-[8px] sm:text-[10px] md:text-xs text-retro-purple/80 mb-3 sm:mb-4 drop-shadow select-none">@pxlkit/voxel — Open Source Game Engine</p>
+            <p className="text-retro-muted/60 text-[10px] sm:text-xs max-w-sm mx-auto leading-relaxed select-none mb-5 sm:mb-6">
+              Explore infinite voxel worlds with 9+ biomes, cities, day/night cycles, and more.
+              <span className="text-retro-gold font-bold">{isMobile ? ' Tap to fly.' : ' Click to explore.'}</span>
+            </p>
+
+            {/* Seed input */}
+            <div className="bg-retro-bg/70 backdrop-blur-md border border-retro-border/40 rounded-xl p-4 sm:p-5 space-y-3 shadow-xl">
+              <div className="space-y-1.5">
+                <label className="font-pixel text-[8px] sm:text-[9px] text-retro-green/80 uppercase tracking-wider select-none">World Seed</label>
+                <div className="flex gap-2">
+                  <input type="text" inputMode="numeric" pattern="[0-9]*" value={seedInput}
+                    onChange={e => setSeedInput(e.target.value.replace(/[^0-9]/g, ''))}
+                    onKeyDown={e => e.key === 'Enter' && applySeed()}
+                    className="flex-1 bg-retro-surface/80 border border-retro-border/50 rounded px-3 py-2 font-mono text-xs sm:text-sm text-retro-text focus:border-retro-green/60 focus:outline-none transition-colors select-text text-center" placeholder="Enter seed..." />
+                  <button onClick={applySeed} className="px-3 py-2 bg-retro-green/20 hover:bg-retro-green/30 border border-retro-green/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-green transition-all cursor-pointer select-none">GO</button>
+                </div>
+              </div>
+              <button onClick={generateNewSeed} className="w-full py-2 bg-retro-purple/15 hover:bg-retro-purple/25 border border-retro-purple/40 rounded-lg font-pixel text-[8px] sm:text-[9px] text-retro-purple transition-all cursor-pointer select-none">
+                🎲 RANDOM WORLD
+              </button>
+              <button onClick={requestPointerLock}
+                className="w-full py-3 sm:py-3.5 bg-retro-green/20 hover:bg-retro-green/30 border-2 border-retro-green/60 rounded-lg font-pixel text-[10px] sm:text-xs md:text-sm text-retro-green transition-all cursor-pointer hover:shadow-[0_0_24px_rgba(74,222,128,0.25)] select-none">
+                ▶ {isMobile ? 'TAP TO EXPLORE' : 'CLICK TO EXPLORE'}
+              </button>
+            </div>
+
+            {/* Controls hint */}
+            <div className="mt-3 sm:mt-4 space-y-0.5 select-none">
+              {isMobile ? (
+                <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/40">Drag to look · D-pad to move · Tap ✕ to exit</p>
+              ) : (
+                <>
+                  <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/40">WASD = Move · Space / Shift = Up / Down</p>
+                  <p className="font-mono text-[8px] sm:text-[9px] text-retro-muted/40">Mouse = Look · ESC = Release cursor</p>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
-      {/* ── Locked HUD ── */}
+      {/* ── Settings Panel (slides from right) ── */}
+      <SettingsPanel
+        config={config}
+        onUpdateConfig={updateConfig}
+        onSetConfig={setConfig}
+        seed={seedInput}
+        onSeedChange={setSeedInput}
+        onApplySeed={applySeed}
+        onRandomSeed={generateNewSeed}
+        isMobile={isMobile}
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        onSaveWorld={handleSaveWorld}
+        onShareScene={handleShareScene}
+        shareStatus={shareStatus}
+      />
+
+      {/* ── Locked HUD (exploring) ── */}
       {isLocked && (
         <>
+          {/* Crosshair */}
           {!isMobile && (
             <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none select-none">
               <div className="w-4 h-4 sm:w-5 sm:h-5 relative opacity-40">
@@ -582,20 +661,46 @@ export default function ProceduralTerrain() {
               </div>
             </div>
           )}
+
+          {/* Stats overlay */}
           <OverlayStats seed={seed} chunkCount={chunkCount} position={cameraPos} biome={currentBiome} worldMode={config.worldMode} worldSize={config.worldSize} hour={displayHour} />
-          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 select-none" style={{ touchAction: 'none' }}>
+
+          {/* Top-right HUD buttons */}
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex items-center gap-2 select-none" style={{ touchAction: 'none' }}>
+            {/* Screenshot */}
+            <button onClick={handleScreenshot}
+              className="p-2 bg-retro-bg/60 backdrop-blur-sm border border-retro-border/30 rounded text-[10px] text-retro-muted/60 hover:text-retro-cyan hover:border-retro-cyan/40 transition-all cursor-pointer select-none pointer-events-auto"
+              title="Screenshot" style={{ touchAction: 'none' }}>
+              📸
+            </button>
+            {/* Share */}
+            <button onClick={handleShareScene}
+              className="p-2 bg-retro-bg/60 backdrop-blur-sm border border-retro-border/30 rounded text-[10px] text-retro-muted/60 hover:text-retro-purple hover:border-retro-purple/40 transition-all cursor-pointer select-none pointer-events-auto"
+              title={shareStatus === 'copied' ? 'Link copied!' : 'Share scene'} style={{ touchAction: 'none' }}>
+              {shareStatus === 'copied' ? '✓' : '🔗'}
+            </button>
+            {/* Exit */}
             {isMobile ? (
-              <button onClick={exitImmersive} className="p-2 bg-retro-bg/70 backdrop-blur-sm border border-retro-border/30 rounded font-pixel text-[9px] text-retro-muted/60 hover:text-retro-red transition-all cursor-pointer select-none" style={{ touchAction: 'none' }}>✕</button>
+              <button onClick={exitImmersive} className="p-2 bg-retro-bg/60 backdrop-blur-sm border border-retro-border/30 rounded font-pixel text-[9px] text-retro-muted/60 hover:text-retro-red transition-all cursor-pointer select-none pointer-events-auto" style={{ touchAction: 'none' }}>✕</button>
             ) : (
-              <span className="font-pixel text-[7px] sm:text-[8px] text-retro-muted/40 bg-retro-bg/40 px-2 py-1 rounded border border-retro-border/20 pointer-events-none select-none">ESC to release</span>
+              <span className="font-pixel text-[7px] sm:text-[8px] text-retro-muted/40 bg-retro-bg/40 px-2 py-1 rounded border border-retro-border/20 pointer-events-none select-none">ESC</span>
             )}
           </div>
+
           {isMobile && <MobileTouchControls onKey={handleTouchKey} />}
         </>
       )}
 
+      {/* ── Minimized state: Settings + Screenshot buttons ── */}
       {!isLocked && !showControls && (
-        <button onClick={() => setShowControls(true)} className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 p-2 bg-retro-bg/80 border border-retro-border/50 rounded font-pixel text-[9px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none">⚙ Settings</button>
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 flex items-center gap-2">
+          <button onClick={handleScreenshot}
+            className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded font-pixel text-[9px] text-retro-muted hover:text-retro-cyan transition-all cursor-pointer select-none"
+            title="Screenshot">📸</button>
+          <button onClick={() => setShowSettings(true)}
+            className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded font-pixel text-[9px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none"
+            title="Settings">⚙</button>
+        </div>
       )}
 
       {/* ── Three.js Canvas ── */}
@@ -603,7 +708,7 @@ export default function ProceduralTerrain() {
         <Canvas
           camera={{ fov: 65, near: 0.1, far: 600 }}
           dpr={gfxDpr}
-          gl={{ antialias: gfxAA, toneMapping: THREE.NoToneMapping, powerPreference: 'high-performance' }}
+          gl={{ antialias: gfxAA, toneMapping: THREE.NoToneMapping, powerPreference: 'high-performance', preserveDrawingBuffer: true }}
           style={{ background: 'transparent', touchAction: 'none' }}
         >
           <TimeContext.Provider value={timeStateRef}>
