@@ -204,7 +204,7 @@ export function HeaderDropdownPreview() {
                         <span>
                           <span className="flex items-center gap-1.5 font-mono text-sm text-retro-text group-hover:text-retro-cyan transition-colors">
                             {menuItem.label}
-                            {'isNew' in menuItem && menuItem.isNew && (
+                            {'isNew' in menuItem && (menuItem as { isNew?: boolean }).isNew && (
                               <PixelBadge tone="green">
                                 <span className="text-[9px]">New</span>
                               </PixelBadge>
