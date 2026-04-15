@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
-import { Check, Copy, ArrowRight, Grid, List } from '@pxlkit/ui';
+import { Check, Copy, ArrowRight, Grid, ExternalLink } from '@pxlkit/ui';
 import {
   PixelButton,
   PixelBadge,
@@ -10,6 +10,7 @@ import {
   PixelDivider,
 } from '@pxlkit/ui-kit';
 import { TEMPLATE_SECTIONS, FULL_PAGE_TEMPLATES } from './data';
+import { PREVIEW_MAP } from './previews';
 import type { TemplateVariant, FullPageTemplate } from './types';
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -91,7 +92,8 @@ function InstallCmd({ cmd }: { cmd: string }) {
    Section Variant Card
    ───────────────────────────────────────────────────────────────────────── */
 function VariantCard({ variant }: { variant: TemplateVariant }) {
-  const [tab, setTab] = useState<'code' | 'install'>('code');
+  const [tab, setTab] = useState<'preview' | 'code' | 'install'>('preview');
+  const Preview = PREVIEW_MAP[variant.id];
 
   return (
     <div className="border border-retro-border bg-retro-bg rounded-sm overflow-hidden">
@@ -101,14 +103,25 @@ function VariantCard({ variant }: { variant: TemplateVariant }) {
           <h4 className="font-pixel text-[10px] text-retro-text leading-relaxed">{variant.name}</h4>
           <p className="font-mono text-[10px] text-retro-muted mt-0.5">{variant.description}</p>
         </div>
-        <span className="hidden sm:block">
+        <div className="hidden sm:flex items-center gap-2">
           <PixelBadge tone="cyan">Component</PixelBadge>
-        </span>
+          {Preview && (
+            <a
+              href={`/templates/preview?id=${variant.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 px-2 py-1 text-[9px] font-mono text-retro-muted border border-retro-border rounded-sm hover:text-retro-green hover:border-retro-green/40 transition-all"
+            >
+              <PxlKitIcon icon={ExternalLink} size={10} />
+              Open
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
       <div className="flex border-b border-retro-border">
-        {(['code', 'install'] as const).map((t) => (
+        {(['preview', 'code', 'install'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -118,14 +131,24 @@ function VariantCard({ variant }: { variant: TemplateVariant }) {
                 : 'text-retro-muted hover:text-retro-text'
             }`}
           >
-            {t === 'code' ? 'Code' : 'Install'}
+            {t === 'preview' ? 'Preview' : t === 'code' ? 'Code' : 'Install'}
           </button>
         ))}
       </div>
 
       {/* Content */}
       <div className="p-4">
-        {tab === 'code' ? (
+        {tab === 'preview' ? (
+          Preview ? (
+            <div className="border border-retro-border rounded-sm overflow-hidden bg-retro-bg">
+              <Preview />
+            </div>
+          ) : (
+            <div className="py-10 text-center text-retro-muted font-mono text-xs">
+              Preview not available
+            </div>
+          )
+        ) : tab === 'code' ? (
           <CodeBlock code={variant.code} />
         ) : (
           <div className="space-y-3">
@@ -145,7 +168,8 @@ function VariantCard({ variant }: { variant: TemplateVariant }) {
    Full Page Template Card
    ───────────────────────────────────────────────────────────────────────── */
 function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
-  const [tab, setTab] = useState<'code' | 'install'>('code');
+  const [tab, setTab] = useState<'preview' | 'code' | 'install'>('preview');
+  const Preview = PREVIEW_MAP[tpl.id];
 
   return (
     <div className="border border-retro-border bg-retro-bg rounded-sm overflow-hidden">
@@ -157,13 +181,24 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
             <p className="font-mono text-[10px] text-retro-muted mt-0.5 max-w-md">{tpl.description}</p>
           </div>
         </div>
-        <span className="hidden sm:block">
+        <div className="hidden sm:flex items-center gap-2">
           <PixelBadge tone="gold">Full Page</PixelBadge>
-        </span>
+          {Preview && (
+            <a
+              href={`/templates/preview?id=${tpl.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 px-2 py-1 text-[9px] font-mono text-retro-muted border border-retro-border rounded-sm hover:text-retro-gold hover:border-retro-gold/40 transition-all"
+            >
+              <PxlKitIcon icon={ExternalLink} size={10} />
+              Open
+            </a>
+          )}
+        </div>
       </div>
 
       <div className="flex border-b border-retro-border">
-        {(['code', 'install'] as const).map((t) => (
+        {(['preview', 'code', 'install'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -173,13 +208,23 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
                 : 'text-retro-muted hover:text-retro-text'
             }`}
           >
-            {t === 'code' ? 'Code' : 'Install'}
+            {t === 'preview' ? 'Preview' : t === 'code' ? 'Code' : 'Install'}
           </button>
         ))}
       </div>
 
       <div className="p-4">
-        {tab === 'code' ? (
+        {tab === 'preview' ? (
+          Preview ? (
+            <div className="border border-retro-border rounded-sm overflow-hidden bg-retro-bg">
+              <Preview />
+            </div>
+          ) : (
+            <div className="py-10 text-center text-retro-muted font-mono text-xs">
+              Preview not available
+            </div>
+          )
+        ) : tab === 'code' ? (
           <CodeBlock code={tpl.code} />
         ) : (
           <div className="space-y-3">
