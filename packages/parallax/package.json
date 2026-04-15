@@ -1,6 +1,6 @@
 {
   "name": "@pxlkit/parallax",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Multi-layer 3D parallax pixel art icons \u2014 10 interactive depth-based mouse-tracking icons with configurable perspective and layer separation",
   "author": {
     "name": "Joangel De La Rosa",
@@ -32,7 +32,7 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.0.0"
+    "@pxlkit/core": "^1.2.3"
   },
   "devDependencies": {
     "tsup": "^8.5.0",

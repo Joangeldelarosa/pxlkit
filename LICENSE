@@ -18,6 +18,9 @@ Pxlkit uses a split licensing model so that software code, icon/art assets, and 
 5. Third-party notices — see `THIRD_PARTY_NOTICES`
    Third-party software, SDKs, fonts, and assets remain subject to their own licenses.
 
+6. Contributor terms — see `CONTRIBUTOR_LICENSE.md`
+   Contributions are accepted under terms that keep code MIT-compatible while allowing asset contributions to remain usable under the repository's asset and commercial model.
+
 If there is any conflict between these documents, the more specific document for the relevant file or asset controls.
 
 Licensing questions: info@pxlkit.xyz

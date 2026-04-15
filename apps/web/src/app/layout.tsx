@@ -211,7 +211,7 @@ const JSON_LD = {
           name: 'Indie License',
           price: '9.50',
           priceCurrency: 'USD',
-          description: 'One commercial project, no attribution, lifetime updates',
+          description: 'One commercial project, no asset attribution, lifetime updates',
         },
         {
           '@type': 'Offer',
