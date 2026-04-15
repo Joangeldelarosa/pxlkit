@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
+import { ConditionalShell } from '../components/ConditionalShell';
 import { ThemeProvider } from '../components/ThemeProvider';
 import { ToastProvider } from '../components/ToastProvider';
 import './globals.css';
@@ -459,9 +458,9 @@ export default function RootLayout({
             <div className="fixed inset-0 pointer-events-none opacity-60 bg-grid-pattern" data-pxlkit="grid-bg" />
 
             <div className="relative z-10 flex flex-col min-h-screen">
-              <Navbar />
-              <main className="flex-1">{children}</main>
-              <Footer />
+              <ConditionalShell>
+                {children}
+              </ConditionalShell>
             </div>
           </ToastProvider>
         </ThemeProvider>
