@@ -1,8 +1,10 @@
 'use client';
 
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
-import { ArrowRight, Grid, Check } from '@pxlkit/ui';
-import { SparkleStar, Trophy, Shield, Lightning, Star } from '@pxlkit/gamification';
+import { ArrowRight, Grid, Check, Settings, Search, Pencil } from '@pxlkit/ui';
+import { SparkleStar, Trophy, Shield, Lightning, Star, Sword, Crown, Heart } from '@pxlkit/gamification';
+import { User, Globe } from '@pxlkit/social';
+import { Bell } from '@pxlkit/feedback';
 import {
   PixelButton,
   PixelBadge,
@@ -153,7 +155,7 @@ export function PagePortfolioPreview() {
       <section className="flex flex-col items-center text-center px-6 py-20 sm:py-24">
         <PixelAvatar name="Jane Dev" size="lg" tone="cyan" />
         <h1 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mt-6 mb-3">
-          Hi, I&apos;m Jane 👋
+          Hi, I&apos;m Jane
         </h1>
         <p className="text-retro-muted font-mono text-sm sm:text-base mb-8 max-w-md leading-relaxed">
           Full-stack developer & pixel artist. I build fast, accessible, and
@@ -207,7 +209,7 @@ export function PagePortfolioPreview() {
       {/* Footer */}
       <footer className="px-6 py-5 border-t border-retro-border mt-auto">
         <div className="max-w-4xl mx-auto flex items-center justify-center">
-          <span className="font-mono text-sm text-retro-muted/50">Made with ♥ and pixels</span>
+          <span className="font-mono text-sm text-retro-muted/50 inline-flex items-center gap-1">Made with <PxlKitIcon icon={Heart} size={12} colorful /> and pixels</span>
         </div>
       </footer>
     </div>
@@ -220,7 +222,7 @@ export function PageIndieGamePreview() {
     <div className="bg-retro-bg text-retro-text min-h-screen flex flex-col">
       {/* Nav */}
       <header className="flex items-center justify-between px-6 h-16 border-b border-retro-gold/20 shrink-0">
-        <span className="font-pixel text-sm text-retro-gold">⚔️ PixelQuest</span>
+        <span className="font-pixel text-sm text-retro-gold inline-flex items-center gap-1.5"><PxlKitIcon icon={Sword} size={16} colorful /> PixelQuest</span>
         <nav className="hidden sm:flex items-center gap-6 font-mono text-sm text-retro-muted">
           <span className="cursor-pointer hover:text-retro-gold transition-colors">Story</span>
           <span className="cursor-pointer hover:text-retro-gold transition-colors">Screenshots</span>
@@ -325,10 +327,10 @@ export function PageDashboardPreview() {
         {/* Sidebar */}
         <aside className="w-48 border-r border-retro-border py-4 px-3 flex flex-col gap-1 shrink-0">
           {[
-            { label: 'Dashboard', emoji: '📊', active: true },
-            { label: 'Users', emoji: '👤', active: false },
-            { label: 'Analytics', emoji: '📈', active: false },
-            { label: 'Settings', emoji: '⚙️', active: false },
+            { label: 'Dashboard', icon: Grid, active: true },
+            { label: 'Users', icon: User, active: false },
+            { label: 'Analytics', icon: Lightning, active: false },
+            { label: 'Settings', icon: Settings, active: false },
           ].map((item) => (
             <div
               key={item.label}
@@ -338,7 +340,7 @@ export function PageDashboardPreview() {
                   : 'text-retro-muted hover:bg-retro-surface/40 hover:text-retro-text'
               }`}
             >
-              <span>{item.emoji}</span>
+              <PxlKitIcon icon={item.icon} size={14} colorful />
               <span>{item.label}</span>
             </div>
           ))}
@@ -398,7 +400,7 @@ export function PageBlogPreview() {
     <div className="bg-retro-bg text-retro-text min-h-screen flex flex-col">
       {/* Nav */}
       <header className="flex items-center justify-between px-6 h-16 border-b border-retro-border shrink-0">
-        <span className="font-pixel text-sm">📝 DevBlog</span>
+        <span className="font-pixel text-sm inline-flex items-center gap-1.5"><PxlKitIcon icon={Pencil} size={14} colorful /> DevBlog</span>
         <nav className="hidden sm:flex items-center gap-6 font-mono text-sm text-retro-muted">
           <span className="cursor-pointer hover:text-retro-green transition-colors">Posts</span>
           <span className="cursor-pointer hover:text-retro-green transition-colors">Tags</span>
@@ -466,7 +468,7 @@ export function PageBlogPreview() {
       {/* Footer */}
       <footer className="px-6 py-5 border-t border-retro-border mt-auto">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span className="font-pixel text-xs">📝 DevBlog</span>
+          <span className="font-pixel text-xs inline-flex items-center gap-1.5"><PxlKitIcon icon={Pencil} size={12} colorful /> DevBlog</span>
           <span className="font-mono text-sm text-retro-muted/50">© 2026 DevBlog</span>
         </div>
       </footer>
