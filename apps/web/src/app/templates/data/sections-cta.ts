@@ -5,7 +5,7 @@ const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/gamification';
 const bannerCta = `\
 'use client';
 import '@pxlkit/ui-kit/styles.css';
-import { AnimatedPxlKitIcon } from '@pxlkit/core';
+import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { SparkleStar } from '@pxlkit/gamification';
 import {
@@ -113,7 +113,7 @@ export function SplitCta() {
 const cardCta = `\
 'use client';
 import '@pxlkit/ui-kit/styles.css';
-import { AnimatedPxlKitIcon } from '@pxlkit/core';
+import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { FireSword } from '@pxlkit/gamification';
 import {
