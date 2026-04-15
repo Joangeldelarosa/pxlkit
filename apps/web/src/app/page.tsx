@@ -146,7 +146,7 @@ function HeroSection() {
             <div className="space-y-4 sm:space-y-5 md:space-y-6">
               {/* Status badges */}
               <div className="flex flex-wrap justify-center lg:justify-start gap-2">
-                <PixelBadge tone="green">MIT Code + Icon Licenses</PixelBadge>
+                <PixelBadge tone="green">MIT Code · Licensed Assets</PixelBadge>
                 <PixelBadge tone="gold"><span aria-label="50 percent off launch price">🔥 50% Off Launch</span></PixelBadge>
               </div>
 
@@ -1457,4 +1457,3 @@ function CTASection() {
     </section>
   );
 }
-
