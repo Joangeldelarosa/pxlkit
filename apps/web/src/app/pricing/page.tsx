@@ -8,6 +8,8 @@ import { useToast } from '../../components/ToastProvider';
 import { PixelButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
 
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
+const ICON_COUNT_LABEL = '226+';
+const ICON_PACK_COUNT_LABEL = '7';
 
 /* ─── Animation helpers ─── */
 const fadeInUp = {
@@ -82,8 +84,8 @@ const PLANS: Plan[] = [
     cta: 'Get Started',
     ctaHref: '/docs',
     features: [
-      { text: '226+ pixel art icons', included: true },
-      { text: '7 thematic icon packs', included: true },
+      { text: `${ICON_COUNT_LABEL} pixel art icons`, included: true },
+      { text: `${ICON_PACK_COUNT_LABEL} thematic icon packs`, included: true },
       { text: 'Static & animated icons', included: true },
       { text: 'MIT code packages', included: true },
       { text: 'Visual Icon Builder', included: true },
@@ -273,7 +275,7 @@ function HeroSection() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.4 }}
       >
-        {UI_COMPONENTS_COUNT} React components · 226+ pixel icons · 7 packs · Lifetime asset licenses
+        {UI_COMPONENTS_COUNT} React components · {ICON_COUNT_LABEL} pixel icons · {ICON_PACK_COUNT_LABEL} packs · Lifetime asset licenses
       </motion.p>
     </section>
   );
@@ -559,7 +561,7 @@ function PurchaseCheckout({ plan, buttonClass }: { plan: Plan, buttonClass: stri
 /* ──────────────── COMPARISON TABLE ──────────────── */
 function ComparisonTable() {
   const rows = [
-    { feature: '226+ pixel art icons', community: true, indie: true, team: true },
+    { feature: `${ICON_COUNT_LABEL} pixel art icons`, community: true, indie: true, team: true },
     { feature: 'React components & SVG export', community: true, indie: true, team: true },
     { feature: 'Visual Icon Builder', community: true, indie: true, team: true },
     { feature: 'Toast notification system', community: true, indie: true, team: true },
