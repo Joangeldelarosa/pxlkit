@@ -1,6 +1,6 @@
 {
   "name": "@pxlkit/feedback",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Feedback and notification pixel art icon pack \u2014 33 icons for alerts, status indicators, checkmarks, shields, bugs, badges, and toast notifications",
   "author": {
     "name": "Joangel De La Rosa",
@@ -29,7 +29,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.0.0"
+    "@pxlkit/core": "^1.2.3"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

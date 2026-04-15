@@ -129,7 +129,7 @@ export default async function Image() {
           <span style={{ color: '#2A2A3E' }}>•</span>
           <span>MIT Code + Licensed Assets</span>
           <span style={{ color: '#2A2A3E' }}>•</span>
-          <span>Pxlkit License v1.0</span>
+          <span>Split Licensing</span>
         </div>
       </div>
     ),

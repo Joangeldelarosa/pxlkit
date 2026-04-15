@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@pxlkit/core"><img src="https://img.shields.io/npm/v/@pxlkit/core?color=blue" alt="npm version" /></a>
-  <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Pxlkit%20v1.0-blue.svg" alt="Pxlkit License" /></a>
+  <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE-CODE"><img src="https://img.shields.io/badge/license-MIT-22c55e.svg" alt="MIT License" /></a>
   <img src="https://img.shields.io/badge/react-%E2%89%A518-61DAFB?logo=react&logoColor=white" alt="React ≥18" />
   <img src="https://img.shields.io/badge/typescript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict" />
 </p>
@@ -220,6 +220,6 @@ Browse all icons, try the visual builder, and explore the full docs at **[pxlkit
 
 ## License
 
-[Pxlkit License v1.0](https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE) — Free with attribution, commercial licenses available.
+[MIT License](https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE-CODE) — code package. See the [repo licensing overview](https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE) for split-license scope details.
 
 Created by [Joangel De La Rosa](https://github.com/joangeldelarosa)

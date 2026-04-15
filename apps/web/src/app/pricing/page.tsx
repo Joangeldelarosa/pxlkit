@@ -559,13 +559,13 @@ function PurchaseCheckout({ plan, buttonClass }: { plan: Plan, buttonClass: stri
 /* ──────────────── COMPARISON TABLE ──────────────── */
 function ComparisonTable() {
   const rows = [
-    { feature: '204+ pixel art icons', community: true, indie: true, team: true },
+    { feature: '226+ pixel art icons', community: true, indie: true, team: true },
     { feature: 'React components & SVG export', community: true, indie: true, team: true },
     { feature: 'Visual Icon Builder', community: true, indie: true, team: true },
     { feature: 'Toast notification system', community: true, indie: true, team: true },
     { feature: 'Static & animated icons', community: true, indie: true, team: true },
     { feature: 'Commercial use', community: true, indie: true, team: true },
-    { feature: 'Attribution required', community: true, indie: false, team: false },
+    { feature: 'Asset attribution required', community: true, indie: false, team: false },
     { feature: 'Projects included', community: '∞', indie: '1', team: '∞' },
     { feature: 'Future icon packs', community: true, indie: false, team: true },
     { feature: 'Priority support', community: false, indie: false, team: true },
@@ -631,8 +631,8 @@ function CellValue({ value, row }: { value: boolean | string; row: string }) {
   if (typeof value === 'string') {
     return <span className="text-retro-text/70 text-xs sm:text-sm font-medium">{value}</span>;
   }
-  // "Attribution required" row: true = required (bad/neutral), false = not required (good)
-  if (row === 'Attribution required') {
+  // "Asset attribution required" row: true = required (bad/neutral), false = not required (good)
+  if (row === 'Asset attribution required') {
     return value ? (
       <span className="text-retro-gold/70 text-xs">Required</span>
     ) : (

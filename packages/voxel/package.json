@@ -1,6 +1,6 @@
 {
   "name": "@pxlkit/voxel",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "MIT-licensed 3D voxel game engine for React \u2014 procedural world generation, biome systems, chunk-based terrain streaming, day/night cycles, physics, NPC frameworks, and entity management built on Three.js and React Three Fiber",
   "author": {
     "name": "Joangel De La Rosa",
@@ -29,7 +29,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.0.0"
+    "@pxlkit/core": "^1.2.3"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

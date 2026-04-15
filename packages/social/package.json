@@ -1,6 +1,6 @@
 {
   "name": "@pxlkit/social",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Social and media pixel art icon pack \u2014 43 icons for community, emojis, messaging, hearts, shares, users, reactions, and social media UI",
   "author": {
     "name": "Joangel De La Rosa",
@@ -29,7 +29,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.0.0"
+    "@pxlkit/core": "^1.2.3"
   },
   "devDependencies": {
     "tsup": "^8.3.0",
