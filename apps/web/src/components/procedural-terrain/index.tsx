@@ -635,7 +635,7 @@ export default function ProceduralTerrain() {
                   <span className="text-[8px] sm:text-[9px]">@pxlkit/voxel</span>
                 </PixelBadge>
                 <PixelBadge tone="green">
-                  <span className="text-[8px] sm:text-[9px]">Open Source</span>
+                  <span className="text-[8px] sm:text-[9px]">MIT Licensed</span>
                 </PixelBadge>
               </div>
             </PixelFadeIn>

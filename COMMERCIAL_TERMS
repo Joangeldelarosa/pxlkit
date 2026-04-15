@@ -1,0 +1,40 @@
+Pxlkit Commercial Terms
+=======================
+
+These terms apply only to assets covered by `LICENSE-ASSETS`.
+MIT-licensed code packages such as `@pxlkit/core`, `@pxlkit/ui-kit`, and `@pxlkit/voxel`
+do not require a paid license or attribution.
+
+License tiers
+-------------
+
+1. Community (free)
+- Scope: icon packs and other Pxlkit assets
+- Projects: unlimited
+- Commercial use: yes
+- Attribution: required
+- Includes: all current asset packs available in this repository
+
+2. Indie ($9.50 one-time)
+- Scope: icon packs and other Pxlkit assets
+- Projects: 1 shipped product
+- Commercial use: yes
+- Attribution: not required
+- Includes: lifetime rights for that product and updates available at time of purchase
+
+3. Team ($24.50 one-time)
+- Scope: icon packs and other Pxlkit assets
+- Projects: unlimited
+- Commercial use: yes
+- Attribution: not required
+- Includes: lifetime rights, all current and future asset packs, and priority support
+
+Clarifications
+--------------
+- SaaS, client work, internal tools, closed-source apps, and marketing sites are allowed under all tiers.
+- The paid tiers remove attribution for assets; they do not change the trademark policy.
+- End users of your shipped product do not need their own license.
+- A `project` means one product, app, or site identified by a single product name, domain, or app-store listing.
+- Existing paying customers keep their previously purchased rights. This licensing cleanup is intended to clarify scope, not reduce rights that were already granted for valid Indie or Team purchases.
+
+For purchases or custom terms: https://pxlkit.xyz/pricing or info@pxlkit.xyz

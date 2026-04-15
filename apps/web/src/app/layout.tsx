@@ -11,7 +11,7 @@ const SITE_NAME = 'Pxlkit';
 const SITE_URL = 'https://pxlkit.xyz';
 const SITE_TAGLINE = 'Retro React UI Kit — Pixel-Art Components, Icons, 3D Voxel Engine & Procedural Worlds';
 const SITE_DESCRIPTION =
-  'Ship retro-styled React interfaces and build 3D voxel games in minutes. Pxlkit is a free, open-source toolkit with 40+ pixel-art UI components, 226+ hand-crafted SVG icons, a voxel game engine powered by Three.js & React Three Fiber, procedural world generation, 3D parallax effects, toast notifications, and a visual icon builder. TypeScript, Tailwind CSS, tree-shakeable — zero native browser UI.';
+  'Ship retro-styled React interfaces and build 3D voxel games in minutes. Pxlkit is a split-licensed toolkit with MIT-licensed UI and voxel engine packages, 226+ hand-crafted SVG icons under a commercial-friendly asset license, 3D parallax effects, toast notifications, and a visual icon builder. TypeScript, Tailwind CSS, tree-shakeable — zero native browser UI.';
 
 export const viewport: Viewport = {
   themeColor: [
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     'nostalgic ui kit',
     'retro web design',
     'indie game ui',
-    'open source react ui',
+    'mit react ui kit',
     'typescript ui kit',
     /* ── Icons ── */
     'pixel art icons',
@@ -85,7 +85,7 @@ export const metadata: Metadata = {
     'three.js voxel engine',
     'procedural world generation',
     'procedural terrain react',
-    'open source game engine',
+    'mit game engine',
     'react game engine',
     'voxel world builder',
     'procedural generation library',
@@ -96,7 +96,7 @@ export const metadata: Metadata = {
     'threejs procedural terrain',
     'voxel physics engine',
     'npc game engine react',
-    'open source voxel engine',
+    'mit voxel engine',
     'minecraft-like engine react',
     'procedural world react',
     '3d game library react',
@@ -194,24 +194,24 @@ const JSON_LD = {
       applicationSubCategory: 'React Component Library',
       operatingSystem: 'Web',
       description:
-        'Open-source retro React UI kit with 40+ pixel-art components, 226+ hand-crafted SVG icons across 10 npm packages, 3D parallax effects, animated icons, a visual builder, and toast notifications. TypeScript-first, Tailwind CSS-powered, fully tree-shakeable.',
+        'MIT-licensed retro React UI kit with 40+ pixel-art components, plus Pxlkit icon packs and a visual builder under separate asset terms. TypeScript-first, Tailwind CSS-powered, fully tree-shakeable.',
       url: SITE_URL,
       author: { '@id': `${SITE_URL}/#organization` },
-      license: 'https://pxlkit.xyz/pricing',
+      license: 'https://github.com/Joangeldelarosa/pxlkit/blob/main/LICENSE',
       offers: [
         {
           '@type': 'Offer',
           name: 'Community',
           price: '0',
           priceCurrency: 'USD',
-          description: 'Free with attribution — all components and icons',
+          description: 'MIT code packages plus icon packs free with attribution',
         },
         {
           '@type': 'Offer',
           name: 'Indie License',
           price: '9.50',
           priceCurrency: 'USD',
-          description: 'One commercial project, no attribution, lifetime updates',
+          description: 'One commercial project, no asset attribution, lifetime updates',
         },
         {
           '@type': 'Offer',
@@ -241,36 +241,36 @@ const JSON_LD = {
     {
       '@type': 'SoftwareSourceCode',
       '@id': `${SITE_URL}/#voxel-engine`,
-      name: '@pxlkit/voxels',
+      name: '@pxlkit/voxel',
       description:
-        'Open-source 3D voxel game engine built with Three.js and React Three Fiber. Features procedural world generation with 9+ biomes, chunk-based terrain streaming, day/night cycles, NPC systems, physics integration, and a full entity framework for building browser-based voxel games.',
+        'MIT-licensed 3D voxel game engine built with Three.js and React Three Fiber. Features procedural world generation with 9+ biomes, chunk-based terrain streaming, day/night cycles, NPC systems, physics integration, and a full entity framework for building browser-based voxel games.',
       url: `${SITE_URL}/explore`,
       codeRepository: 'https://github.com/Joangeldelarosa/pxlkit',
       programmingLanguage: ['TypeScript', 'React', 'GLSL'],
       runtimePlatform: 'Web Browser',
       targetProduct: {
         '@type': 'SoftwareApplication',
-        name: '@pxlkit/voxels — React Voxel Game Engine',
+        name: '@pxlkit/voxel — React Voxel Game Engine',
         applicationCategory: 'GameApplication',
         applicationSubCategory: 'Voxel Game Engine',
         operatingSystem: 'Web',
         description:
-          'Build 3D voxel games in the browser with React. Procedural world generation, physics, NPCs, biomes, day/night cycles — open-source game engine powered by Three.js and React Three Fiber.',
+          'Build 3D voxel games in the browser with React. Procedural world generation, physics, NPCs, biomes, day/night cycles — MIT-licensed game engine powered by Three.js and React Three Fiber.',
         offers: {
           '@type': 'Offer',
           price: '0',
           priceCurrency: 'USD',
-          description: 'Free and open source',
+          description: 'Free under MIT',
         },
       },
       author: { '@id': `${SITE_URL}/#organization` },
-      license: 'https://pxlkit.xyz/pricing',
+      license: 'https://github.com/Joangeldelarosa/pxlkit/blob/main/LICENSE-CODE',
     },
     /* ── ItemList — npm Packages ── */
     {
       '@type': 'ItemList',
       name: 'Pxlkit npm Packages',
-      description: 'All open-source npm packages in the Pxlkit ecosystem',
+      description: 'MIT code packages and source-available icon packages in the Pxlkit ecosystem',
       numberOfItems: 10,
       itemListElement: [
         {
@@ -354,7 +354,7 @@ const JSON_LD = {
           name: 'Is Pxlkit free to use?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. Pxlkit is open source and free with attribution. Paid licenses remove the attribution requirement and unlock priority support.',
+            text: 'Pxlkit uses split licensing: MIT for code packages, and free-with-attribution asset terms for icon packs. Paid licenses only remove attribution for the asset side.',
           },
         },
         {
@@ -383,10 +383,10 @@ const JSON_LD = {
         },
         {
           '@type': 'Question',
-          name: 'What is @pxlkit/voxels?',
+          name: 'What is @pxlkit/voxel?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: '@pxlkit/voxels is an open-source 3D voxel game engine built on Three.js and React Three Fiber. It features procedural world generation with 9+ biomes, chunk-based terrain, day/night cycles, physics, NPC systems, and a full entity framework for building browser-based voxel games with React.',
+            text: '@pxlkit/voxel is an MIT-licensed 3D voxel game engine built on Three.js and React Three Fiber. It features procedural world generation with 9+ biomes, chunk-based terrain, day/night cycles, physics, NPC systems, and a full entity framework for building browser-based voxel games with React.',
           },
         },
         {
@@ -394,7 +394,7 @@ const JSON_LD = {
           name: 'Can I build games with Pxlkit?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. The @pxlkit/voxels engine lets you create 3D voxel games in the browser using React. It provides procedural terrain generation, biome systems (plains, desert, tundra, forest, mountains, ocean, city, swamp, village), physics integration, NPC creation, and real-time chunk streaming — everything you need for a Minecraft-like game in React.',
+            text: 'Yes. The @pxlkit/voxel engine lets you create 3D voxel games in the browser using React. It provides procedural terrain generation, biome systems (plains, desert, tundra, forest, mountains, ocean, city, swamp, village), physics integration, NPC creation, and real-time chunk streaming — everything you need for a Minecraft-like game in React.',
           },
         },
         {
