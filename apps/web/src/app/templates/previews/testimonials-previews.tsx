@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { Star, SparkleStar, Crown } from '@pxlkit/gamification';
@@ -11,6 +12,9 @@ import {
   PixelButton,
   PixelFadeIn,
   PixelFloat,
+  PixelTooltip,
+  PixelTextLink,
+  PixelPulse,
 } from '@pxlkit/ui-kit';
 
 /* ── Shared data ────────────────────────────────────────────────────────── */
@@ -80,16 +84,22 @@ export function TestimonialsCardsPreview() {
           {TESTIMONIALS.map((t, i) => (
             <PixelFadeIn key={t.name} delay={i * 100}>
               <div
-                className={`rounded-xl border ${t.border} ${t.bg} p-6 flex flex-col h-full transition-shadow hover:shadow-lg`}
+                className={`rounded-xl border ${t.border} ${t.bg} p-6 flex flex-col h-full transition-all hover:shadow-lg hover:-translate-y-1`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <Stars />
-                  <PxlKitIcon icon={Verified} size={16} colorful />
+                  <PixelTooltip content="Verified customer" position="top">
+                    <PxlKitIcon icon={Verified} size={16} colorful />
+                  </PixelTooltip>
                 </div>
 
-                <p className="font-mono text-sm text-retro-muted leading-relaxed flex-1 italic mb-6">
+                <p className="font-mono text-sm text-retro-muted leading-relaxed flex-1 italic mb-4">
                   &quot;{t.quote}&quot;
                 </p>
+
+                <div className="mb-4">
+                  <PixelTextLink href="#" tone="green">Read full review</PixelTextLink>
+                </div>
 
                 <div className="flex items-center gap-3">
                   <PixelAvatar name={t.name} size="md" tone={t.tone} />
@@ -111,17 +121,24 @@ export function TestimonialsCardsPreview() {
 
 /* ── Testimonials Large Quote ───────────────────────────────────────────── */
 export function TestimonialsLargeQuotePreview() {
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  const current = TESTIMONIALS[quoteIndex];
+
+  const goNext = () => setQuoteIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+  const goPrev = () =>
+    setQuoteIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+
   return (
     <section className="py-20 sm:py-28 px-6 bg-retro-bg">
       <div className="relative max-w-3xl mx-auto text-center">
-        {/* Floating animated accent — top-right */}
+        {/* Floating animated accent -- top-right */}
         <span className="absolute -top-4 right-4 sm:right-0 opacity-40 pointer-events-none">
           <PixelFloat duration={3200} distance={6}>
             <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful />
           </PixelFloat>
         </span>
 
-        {/* Floating animated accent — bottom-left */}
+        {/* Floating animated accent -- bottom-left */}
         <span className="absolute -bottom-2 left-4 sm:left-0 opacity-30 pointer-events-none">
           <PixelFloat duration={2800} distance={5}>
             <PxlKitIcon icon={Sparkles} size={22} colorful />
@@ -129,7 +146,9 @@ export function TestimonialsLargeQuotePreview() {
         </span>
 
         <div className="flex justify-center">
-          <Stars />
+          <PixelPulse trigger="hover">
+            <Stars />
+          </PixelPulse>
         </div>
 
         <div className="mt-8 mb-8 relative">
@@ -137,8 +156,7 @@ export function TestimonialsLargeQuotePreview() {
             &ldquo;
           </span>
           <p className="font-mono text-base sm:text-lg text-retro-text leading-relaxed px-6 sm:px-10 -mt-4">
-            Pxlkit saved us weeks of design work. The retro aesthetic is iconic and our users
-            absolutely love it. Nothing else on the market even comes close.
+            {current.quote}
           </p>
           <span className="font-pixel text-6xl sm:text-7xl text-retro-green/20 leading-none select-none block text-right">
             &rdquo;
@@ -146,14 +164,29 @@ export function TestimonialsLargeQuotePreview() {
         </div>
 
         <div className="flex items-center justify-center gap-4">
-          <PixelAvatar name="Alice Johnson" size="lg" tone="green" />
+          <PixelAvatar name={current.name} size="lg" tone={current.tone} />
           <div className="text-left">
             <div className="flex items-center gap-2">
-              <p className="font-pixel text-sm text-retro-text">Alice Johnson</p>
+              <p className="font-pixel text-sm text-retro-text">{current.name}</p>
               <PxlKitIcon icon={Verified} size={14} colorful />
             </div>
-            <p className="font-mono text-sm text-retro-muted">Frontend Lead · Acme Inc.</p>
+            <p className="font-mono text-sm text-retro-muted">
+              {current.role} · {current.company}
+            </p>
           </div>
+        </div>
+
+        {/* Prev / Next navigation */}
+        <div className="flex items-center justify-center gap-4 mt-8">
+          <PixelButton tone="green" size="sm" onClick={goPrev} aria-label="Previous quote">
+            <PxlKitIcon icon={ArrowRight} size={14} className="rotate-180" />
+          </PixelButton>
+          <span className="font-mono text-xs text-retro-muted">
+            {quoteIndex + 1} of {TESTIMONIALS.length}
+          </span>
+          <PixelButton tone="green" size="sm" onClick={goNext} aria-label="Next quote">
+            <PxlKitIcon icon={ArrowRight} size={14} />
+          </PixelButton>
         </div>
 
         {/* Company logo placeholder area */}
@@ -165,7 +198,7 @@ export function TestimonialsLargeQuotePreview() {
             {['Acme Inc.', 'PixelForge', 'Studio Pixel', 'RetroLabs'].map((name) => (
               <span
                 key={name}
-                className="font-pixel text-xs text-retro-muted/50 px-3 py-1.5 rounded-md border border-retro-border/20 bg-retro-surface/20"
+                className="font-pixel text-xs text-retro-muted/50 px-3 py-1.5 rounded-md border border-retro-border/20 bg-retro-surface/20 hover:border-retro-green/40 hover:text-retro-green hover:bg-retro-surface/30 transition-all cursor-pointer"
               >
                 {name}
               </span>
@@ -179,6 +212,13 @@ export function TestimonialsLargeQuotePreview() {
 
 /* ── Testimonials Slider ────────────────────────────────────────────────── */
 export function TestimonialsSliderPreview() {
+  const [slideIndex, setSlideIndex] = useState(0);
+  const current = TESTIMONIALS[slideIndex];
+
+  const goNext = () => setSlideIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+  const goPrev = () =>
+    setSlideIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+
   return (
     <section className="py-20 sm:py-28 px-6 bg-retro-bg">
       <div className="max-w-xl mx-auto">
@@ -191,43 +231,55 @@ export function TestimonialsSliderPreview() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-retro-green/30 bg-retro-green/5 p-8 text-center">
+        <div
+          className={`rounded-xl border ${current.border} ${current.bg} p-8 text-center transition-colors`}
+        >
           <div className="flex justify-center mb-5">
             <Stars />
           </div>
           <p className="font-mono text-sm sm:text-base text-retro-muted leading-relaxed mb-6 italic max-w-md mx-auto">
-            &quot;Best component library I&apos;ve used. Customers love the pixel style —
-            it&apos;s unlike anything else out there.&quot;
+            &quot;{current.quote}&quot;
           </p>
           <div className="flex flex-col items-center gap-2 mb-6">
-            <PixelAvatar name="Bob Smith" size="md" tone="cyan" />
+            <PixelAvatar name={current.name} size="md" tone={current.tone} />
             <div>
               <div className="flex items-center justify-center gap-1.5">
-                <p className="font-pixel text-xs text-retro-text">Bob Smith</p>
+                <p className="font-pixel text-xs text-retro-text">{current.name}</p>
                 <PxlKitIcon icon={Verified} size={12} colorful />
               </div>
-              <p className="font-mono text-xs text-retro-muted">Indie Maker · PixelForge</p>
+              <p className="font-mono text-xs text-retro-muted">
+                {current.role} · {current.company}
+              </p>
             </div>
           </div>
 
           {/* Navigation controls */}
           <div className="flex items-center justify-center gap-4">
-            <PixelButton tone="green" size="sm" aria-label="Previous testimonial">
+            <PixelButton tone="green" size="sm" onClick={goPrev} aria-label="Previous testimonial">
               <PxlKitIcon icon={ArrowRight} size={14} className="rotate-180" />
             </PixelButton>
 
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-retro-muted/30 transition-colors" />
-              <span className="w-2.5 h-2.5 rounded-full bg-retro-green transition-colors" />
-              <span className="w-2 h-2 rounded-full bg-retro-muted/30 transition-colors" />
+              {TESTIMONIALS.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`rounded-full transition-all ${
+                    idx === slideIndex
+                      ? 'w-2.5 h-2.5 bg-retro-green'
+                      : 'w-2 h-2 bg-retro-muted/30'
+                  }`}
+                />
+              ))}
             </div>
 
-            <PixelButton tone="green" size="sm" aria-label="Next testimonial">
+            <PixelButton tone="green" size="sm" onClick={goNext} aria-label="Next testimonial">
               <PxlKitIcon icon={ArrowRight} size={14} />
             </PixelButton>
           </div>
 
-          <p className="font-mono text-xs text-retro-muted/50 mt-4">2 of 3</p>
+          <p className="font-mono text-xs text-retro-muted/50 mt-4">
+            {slideIndex + 1} of {TESTIMONIALS.length}
+          </p>
         </div>
       </div>
     </section>
