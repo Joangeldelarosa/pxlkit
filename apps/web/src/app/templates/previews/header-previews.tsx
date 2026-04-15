@@ -6,10 +6,19 @@ import { Grid, Package, Search, Settings, Home } from '@pxlkit/ui';
 import { Trophy, Shield, Lightning, Crown, Gem, Star } from '@pxlkit/gamification';
 import { Globe, User } from '@pxlkit/social';
 import { ShieldCheck, Bell } from '@pxlkit/feedback';
-import { PixelButton, PixelBadge } from '@pxlkit/ui-kit';
+import { PixelButton, PixelBadge, PixelTooltip } from '@pxlkit/ui-kit';
 
 /* ── Header Simple ──────────────────────────────────────────────────────── */
 export function HeaderSimplePreview() {
+  const [activeNav, setActiveNav] = useState('Home');
+
+  const navItems = [
+    { label: 'Home', icon: Home },
+    { label: 'Features', icon: Star },
+    { label: 'Pricing', icon: Gem },
+    { label: 'Docs', icon: Package },
+  ];
+
   return (
     <div className="bg-retro-bg">
       <header className="flex items-center justify-between px-6 h-16 border-b border-retro-border">
@@ -19,32 +28,38 @@ export function HeaderSimplePreview() {
         </div>
 
         <nav className="hidden sm:flex items-center gap-6">
-          {[
-            { label: 'Home', icon: Home },
-            { label: 'Features', icon: Star },
-            { label: 'Pricing', icon: Gem },
-            { label: 'Docs', icon: Package },
-          ].map((item) => (
+          {navItems.map((item) => (
             <span
               key={item.label}
-              className="group flex items-center gap-1.5 font-mono text-sm text-retro-muted hover:text-retro-green cursor-pointer transition-colors"
+              onClick={() => setActiveNav(item.label)}
+              className={`group flex items-center gap-1.5 font-mono text-sm cursor-pointer transition-colors ${
+                activeNav === item.label
+                  ? 'text-retro-green'
+                  : 'text-retro-muted hover:text-retro-green'
+              }`}
             >
               <PxlKitIcon icon={item.icon} size={14} colorful />
               <span className="relative">
                 {item.label}
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-retro-green transition-all group-hover:w-full" />
+                <span
+                  className={`absolute -bottom-1 left-0 h-px bg-retro-green transition-all ${
+                    activeNav === item.label ? 'w-full' : 'w-0 group-hover:w-full'
+                  }`}
+                />
               </span>
             </span>
           ))}
         </nav>
 
         <div className="flex items-center gap-2">
-          <button
-            className="p-2 rounded text-retro-muted hover:text-retro-green hover:bg-retro-surface/40 transition-colors"
-            aria-label="Search"
-          >
-            <PxlKitIcon icon={Search} size={16} colorful />
-          </button>
+          <PixelTooltip content="Search docs" position="bottom">
+            <button
+              className="p-2 rounded text-retro-muted hover:text-retro-green hover:bg-retro-surface/40 transition-colors"
+              aria-label="Search"
+            >
+              <PxlKitIcon icon={Search} size={16} colorful />
+            </button>
+          </PixelTooltip>
           <PixelButton tone="green" size="sm">Sign Up</PixelButton>
         </div>
       </header>
@@ -83,7 +98,7 @@ export function HeaderSimplePreview() {
 /* ── Header Dropdown ────────────────────────────────────────────────────── */
 const PRODUCTS_MENU = [
   { label: 'Icon Library', icon: Grid, desc: 'Pixel-perfect icon sets' },
-  { label: 'UI Components', icon: Package, desc: 'Ready-to-use building blocks' },
+  { label: 'UI Components', icon: Package, desc: 'Ready-to-use building blocks', isNew: true },
   { label: 'Gamification', icon: Trophy, desc: 'Engagement and rewards' },
   { label: 'Security Suite', icon: ShieldCheck, desc: 'Auth and protection tools' },
 ];
@@ -105,8 +120,15 @@ export function HeaderDropdownPreview() {
         setOpenMenu(null);
       }
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpenMenu(null);
+    }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const navItems = [
@@ -180,8 +202,13 @@ export function HeaderDropdownPreview() {
                           />
                         </span>
                         <span>
-                          <span className="block font-mono text-sm text-retro-text group-hover:text-retro-cyan transition-colors">
+                          <span className="flex items-center gap-1.5 font-mono text-sm text-retro-text group-hover:text-retro-cyan transition-colors">
                             {menuItem.label}
+                            {'isNew' in menuItem && menuItem.isNew && (
+                              <PixelBadge tone="green">
+                                <span className="text-[9px]">New</span>
+                              </PixelBadge>
+                            )}
                           </span>
                           <span className="block font-mono text-xs text-retro-muted/70 mt-0.5">
                             {menuItem.desc}
@@ -189,6 +216,11 @@ export function HeaderDropdownPreview() {
                         </span>
                       </button>
                     ))}
+                    <div className="border-t border-retro-border/30 mt-1 pt-1 px-3 py-1.5">
+                      <span className="font-mono text-[10px] text-retro-muted/40">
+                        Press ESC to close
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -198,10 +230,13 @@ export function HeaderDropdownPreview() {
 
         <div className="flex items-center gap-3">
           <button
-            className="p-2 rounded text-retro-muted hover:text-retro-cyan hover:bg-retro-surface/40 transition-colors"
+            className="relative p-2 rounded text-retro-muted hover:text-retro-cyan hover:bg-retro-surface/40 transition-colors"
             aria-label="Notifications"
           >
             <PxlKitIcon icon={Bell} size={16} colorful />
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full bg-retro-red text-white font-mono text-[9px] flex items-center justify-center px-1">
+              3
+            </span>
           </button>
           <PixelButton tone="neutral" size="sm" variant="ghost">
             Login
@@ -244,6 +279,8 @@ export function HeaderDropdownPreview() {
 
 /* ── Header Centered Logo ───────────────────────────────────────────────── */
 export function HeaderCenteredLogoPreview() {
+  const [activeNav, setActiveNav] = useState('About');
+
   return (
     <div className="bg-retro-bg">
       <header className="border-b border-retro-border">
@@ -255,10 +292,22 @@ export function HeaderCenteredLogoPreview() {
             ].map((item) => (
               <span
                 key={item.label}
-                className="group flex items-center gap-1.5 font-mono text-sm text-retro-muted hover:text-retro-gold cursor-pointer transition-colors"
+                onClick={() => setActiveNav(item.label)}
+                className={`group flex items-center gap-1.5 font-mono text-sm cursor-pointer transition-colors ${
+                  activeNav === item.label
+                    ? 'text-retro-gold'
+                    : 'text-retro-muted hover:text-retro-gold'
+                }`}
               >
                 <PxlKitIcon icon={item.icon} size={14} colorful />
-                {item.label}
+                <span className="relative">
+                  {item.label}
+                  <span
+                    className={`absolute -bottom-1 left-0 h-px bg-retro-gold transition-all ${
+                      activeNav === item.label ? 'w-full' : 'w-0 group-hover:w-full'
+                    }`}
+                  />
+                </span>
               </span>
             ))}
           </nav>
@@ -278,18 +327,32 @@ export function HeaderCenteredLogoPreview() {
             ].map((item) => (
               <span
                 key={item.label}
-                className="group flex items-center gap-1.5 font-mono text-sm text-retro-muted hover:text-retro-gold cursor-pointer transition-colors"
+                onClick={() => setActiveNav(item.label)}
+                className={`group flex items-center gap-1.5 font-mono text-sm cursor-pointer transition-colors ${
+                  activeNav === item.label
+                    ? 'text-retro-gold'
+                    : 'text-retro-muted hover:text-retro-gold'
+                }`}
               >
                 <PxlKitIcon icon={item.icon} size={14} colorful />
-                {item.label}
+                <span className="relative">
+                  {item.label}
+                  <span
+                    className={`absolute -bottom-1 left-0 h-px bg-retro-gold transition-all ${
+                      activeNav === item.label ? 'w-full' : 'w-0 group-hover:w-full'
+                    }`}
+                  />
+                </span>
               </span>
             ))}
-            <button
-              className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
-              aria-label="Settings"
-            >
-              <PxlKitIcon icon={Settings} size={16} colorful />
-            </button>
+            <PixelTooltip content="App settings" position="bottom">
+              <button
+                className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
+                aria-label="Settings"
+              >
+                <PxlKitIcon icon={Settings} size={16} colorful />
+              </button>
+            </PixelTooltip>
           </nav>
         </div>
       </header>
