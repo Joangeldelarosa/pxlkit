@@ -1,8 +1,24 @@
 'use client';
 
 import { PxlKitIcon } from '@pxlkit/core';
-import { Grid, ArrowRight } from '@pxlkit/ui';
+import { Grid, ArrowRight, ExternalLink } from '@pxlkit/ui';
+import { Globe, ChatBubble, Community } from '@pxlkit/social';
+import { Mail, Sparkles, ShieldCheck } from '@pxlkit/feedback';
+import { Lightning } from '@pxlkit/gamification';
 import { PixelButton, PixelDivider } from '@pxlkit/ui-kit';
+
+const socialLinks = [
+  { icon: Globe, label: 'Website' },
+  { icon: ChatBubble, label: 'Discord' },
+  { icon: Mail, label: 'Email' },
+] as const;
+
+const columns = {
+  Product: ['Features', 'Pricing', 'Changelog', 'Roadmap'],
+  Resources: ['Documentation', 'Tutorials', 'Blog', 'Examples'],
+  Company: ['About', 'Careers', 'Press Kit', 'Contact'],
+  Legal: ['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'Licenses'],
+};
 
 /* ── Footer Minimal ─────────────────────────────────────────────────────── */
 export function FooterMinimalPreview() {
@@ -19,15 +35,25 @@ export function FooterMinimalPreview() {
       <footer className="px-6 py-5 border-t border-retro-border">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <PxlKitIcon icon={Grid} size={18} className="text-retro-green" />
+            <PxlKitIcon icon={Grid} size={18} colorful />
             <span className="font-pixel text-sm text-retro-text">MyApp</span>
           </div>
           <nav className="flex items-center gap-6 font-mono text-sm text-retro-muted">
+            <span className="cursor-pointer hover:text-retro-green transition-colors">Docs</span>
             <span className="cursor-pointer hover:text-retro-green transition-colors">Privacy</span>
             <span className="cursor-pointer hover:text-retro-green transition-colors">Terms</span>
-            <span className="cursor-pointer hover:text-retro-green transition-colors">GitHub</span>
+            <span className="inline-flex items-center gap-1 cursor-pointer hover:text-retro-green transition-colors">
+              GitHub
+              <PxlKitIcon icon={ExternalLink} size={12} className="text-retro-muted" />
+            </span>
           </nav>
-          <span className="font-mono text-sm text-retro-muted/50">© 2026 MyApp</span>
+          <div className="flex items-center gap-3">
+            {socialLinks.map(({ icon, label }) => (
+              <span key={label} className="cursor-pointer opacity-50 hover:opacity-100 transition-opacity">
+                <PxlKitIcon icon={icon} size={16} colorful />
+              </span>
+            ))}
+          </div>
         </div>
       </footer>
     </div>
@@ -48,12 +74,27 @@ export function FooterMultiColumnPreview() {
       </div>
       <footer className="border-t border-retro-border bg-retro-bg">
         <div className="max-w-5xl mx-auto px-6 pt-10 pb-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-8">
-            {['Product', 'Resources', 'Company', 'Legal'].map((title) => (
+          {/* Brand + columns */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-8 mb-8">
+            <div className="col-span-2 sm:col-span-1">
+              <div className="flex items-center gap-2 mb-3">
+                <PxlKitIcon icon={Grid} size={20} colorful />
+                <span className="font-pixel text-sm text-retro-text">DevKit</span>
+              </div>
+              <p className="font-mono text-xs text-retro-muted leading-relaxed mb-4">
+                Ship pixel-perfect interfaces with retro flair and modern tooling.
+              </p>
+              <div className="flex items-center gap-1.5">
+                <span className="inline-block w-2 h-2 rounded-full bg-retro-green animate-pulse" />
+                <span className="font-mono text-xs text-retro-green">All systems operational</span>
+              </div>
+            </div>
+
+            {Object.entries(columns).map(([title, links]) => (
               <div key={title}>
                 <p className="font-pixel text-xs text-retro-text mb-3">{title}</p>
                 <ul className="space-y-2">
-                  {['Overview', 'Changelog', 'Contact'].map((link) => (
+                  {links.map((link) => (
                     <li
                       key={link}
                       className="font-mono text-sm text-retro-muted cursor-pointer hover:text-retro-green transition-colors"
@@ -65,18 +106,21 @@ export function FooterMultiColumnPreview() {
               </div>
             ))}
           </div>
+
           <PixelDivider tone="neutral" />
+
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-5">
             <span className="font-mono text-sm text-retro-muted/50">
               © 2026 DevKit. All rights reserved.
             </span>
-            <div className="flex gap-4">
-              {['🐦', '💬', '📧'].map((e) => (
+            <div className="flex items-center gap-4">
+              {socialLinks.map(({ icon, label }) => (
                 <span
-                  key={e}
-                  className="text-xl cursor-pointer opacity-40 hover:opacity-100 transition-opacity"
+                  key={label}
+                  className="cursor-pointer opacity-40 hover:opacity-100 transition-opacity"
+                  title={label}
                 >
-                  {e}
+                  <PxlKitIcon icon={icon} size={18} colorful />
                 </span>
               ))}
             </div>
@@ -101,27 +145,52 @@ export function FooterCtaPreview() {
       </div>
       <footer className="border-t border-retro-border bg-retro-bg">
         <div className="max-w-5xl mx-auto px-6 py-8">
-          <div className="rounded-xl border border-retro-green/30 bg-retro-green/5 px-6 py-8 text-center mb-8">
+          <div className="rounded-xl border border-retro-green/30 bg-retro-green/5 px-6 py-10 text-center mb-8">
+            <div className="mb-4">
+              <PxlKitIcon icon={Lightning} size={28} colorful />
+            </div>
             <p className="font-pixel text-sm sm:text-base text-retro-text mb-2">
-              Ready to ship?
+              Ready to ship something great?
             </p>
-            <p className="font-mono text-sm text-retro-muted mb-5">
-              Get started with Pxlkit in under 2 minutes.
+            <p className="font-mono text-sm text-retro-muted mb-6 max-w-md mx-auto">
+              Get started with Pxlkit in under 2 minutes — pixel-perfect components, zero config.
             </p>
-            <PixelButton
-              tone="green"
-              size="md"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
-            >
-              Start Building
-            </PixelButton>
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <PixelButton
+                tone="green"
+                size="md"
+                iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+              >
+                Start Building
+              </PixelButton>
+              <PixelButton
+                tone="neutral"
+                size="md"
+                iconRight={<PxlKitIcon icon={ExternalLink} size={14} />}
+              >
+                View Docs
+              </PixelButton>
+            </div>
           </div>
+
           <PixelDivider tone="neutral" />
+
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-5">
-            <span className="font-mono text-sm text-retro-muted/50">© 2026 Pxlkit</span>
-            <nav className="flex gap-6 font-mono text-sm text-retro-muted">
+            <div className="flex items-center gap-4">
+              <span className="font-mono text-sm text-retro-muted/50">© 2026 Pxlkit</span>
+              <span className="inline-flex items-center gap-1 font-mono text-xs text-retro-muted/40">
+                <PxlKitIcon icon={ShieldCheck} size={12} colorful />
+                SOC 2 Compliant
+              </span>
+            </div>
+            <nav className="flex items-center gap-6 font-mono text-sm text-retro-muted">
               <span className="cursor-pointer hover:text-retro-green transition-colors">Terms</span>
               <span className="cursor-pointer hover:text-retro-green transition-colors">Privacy</span>
+              <span className="cursor-pointer hover:text-retro-green transition-colors">Security</span>
+              <span className="inline-flex items-center gap-1 cursor-pointer hover:text-retro-green transition-colors">
+                Status
+                <PxlKitIcon icon={Sparkles} size={12} colorful />
+              </span>
             </nav>
           </div>
         </div>
