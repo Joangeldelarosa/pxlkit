@@ -64,33 +64,7 @@ export function HeaderSimplePreview() {
         </div>
       </header>
 
-      <div className="flex flex-col items-center justify-center px-6 py-24 gap-5 text-center">
-        <div className="flex items-center gap-2">
-          <PxlKitIcon icon={Lightning} size={16} colorful />
-          <p className="font-pixel text-xs text-retro-muted/60 tracking-widest uppercase">
-            Simple Header
-          </p>
-          <PxlKitIcon icon={Lightning} size={16} colorful />
-        </div>
-        <p className="font-mono text-sm text-retro-muted max-w-md">
-          Logo left with brand icon, nav center with icon accents and hover
-          underlines, search button and CTA right. Clean and polished.
-        </p>
-        <div className="flex items-center gap-4 mt-2">
-          <span className="flex items-center gap-1.5 font-mono text-xs text-retro-muted/50">
-            <PxlKitIcon icon={Home} size={12} colorful />
-            Icon nav items
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-xs text-retro-muted/50">
-            <PxlKitIcon icon={Search} size={12} colorful />
-            Search action
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-xs text-retro-muted/50">
-            <PxlKitIcon icon={Star} size={12} colorful />
-            Hover underline
-          </span>
-        </div>
-      </div>
+
     </div>
   );
 }
@@ -169,19 +143,17 @@ export function HeaderDropdownPreview() {
                   {item.label}
                   {item.hasDropdown && (
                     <span
-                      className={`inline-block text-[10px] transition-transform ${
+                      className={`inline-flex transition-transform ${
                         openMenu === item.label ? 'rotate-180' : ''
                       }`}
                     >
-                      <PxlKitIcon
-                        icon={Grid}
-                        size={8}
-                        className={
-                          openMenu === item.label
-                            ? 'text-retro-cyan'
-                            : 'text-retro-muted'
-                        }
-                      />
+                      <svg viewBox="0 0 8 8" className="h-2.5 w-2.5 shrink-0" shapeRendering="crispEdges" fill="currentColor">
+                        <rect x="1" y="2" width="1" height="1" />
+                        <rect x="2" y="3" width="1" height="1" />
+                        <rect x="3" y="4" width="2" height="1" />
+                        <rect x="5" y="3" width="1" height="1" />
+                        <rect x="6" y="2" width="1" height="1" />
+                      </svg>
                     </span>
                   )}
                 </button>
@@ -245,34 +217,7 @@ export function HeaderDropdownPreview() {
         </div>
       </header>
 
-      <div className="flex flex-col items-center justify-center px-6 py-24 gap-5 text-center">
-        <div className="flex items-center gap-2">
-          <PxlKitIcon icon={Crown} size={16} colorful />
-          <p className="font-pixel text-xs text-retro-muted/60 tracking-widest uppercase">
-            Dropdown Header
-          </p>
-          <PxlKitIcon icon={Crown} size={16} colorful />
-        </div>
-        <p className="font-mono text-sm text-retro-muted max-w-md">
-          Logo with version badge, interactive dropdown nav with icon-rich
-          menus, notification bell, and dual CTAs. Click &ldquo;Products&rdquo;
-          or &ldquo;Resources&rdquo; to open dropdown panels.
-        </p>
-        <div className="flex items-center gap-4 mt-2">
-          <span className="flex items-center gap-1.5 font-mono text-xs text-retro-muted/50">
-            <PxlKitIcon icon={Trophy} size={12} colorful />
-            Interactive menus
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-xs text-retro-muted/50">
-            <PxlKitIcon icon={Bell} size={12} colorful />
-            Notifications
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-xs text-retro-muted/50">
-            <PxlKitIcon icon={ShieldCheck} size={12} colorful />
-            Click outside to close
-          </span>
-        </div>
-      </div>
+
     </div>
   );
 }
@@ -357,33 +302,7 @@ export function HeaderCenteredLogoPreview() {
         </div>
       </header>
 
-      <div className="flex flex-col items-center justify-center px-6 py-24 gap-5 text-center">
-        <div className="flex items-center gap-2">
-          <PxlKitIcon icon={Gem} size={16} colorful />
-          <p className="font-pixel text-xs text-retro-muted/60 tracking-widest uppercase">
-            Centered Logo Header
-          </p>
-          <PxlKitIcon icon={Gem} size={16} colorful />
-        </div>
-        <p className="font-mono text-sm text-retro-muted max-w-md">
-          Symmetric layout with centered crown brand logo, balanced icon
-          navigation on each side, settings action, and a pro badge accent.
-        </p>
-        <div className="flex items-center gap-4 mt-2">
-          <span className="flex items-center gap-1.5 font-mono text-xs text-retro-muted/50">
-            <PxlKitIcon icon={Crown} size={12} colorful />
-            Centered brand
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-xs text-retro-muted/50">
-            <PxlKitIcon icon={Globe} size={12} colorful />
-            Icon nav links
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-xs text-retro-muted/50">
-            <PxlKitIcon icon={Settings} size={12} colorful />
-            Settings action
-          </span>
-        </div>
-      </div>
+
     </div>
   );
 }

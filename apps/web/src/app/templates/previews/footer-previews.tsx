@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Grid, ArrowRight, ExternalLink } from '@pxlkit/ui';
-import { Globe, ChatBubble, Community } from '@pxlkit/social';
+import { Globe, ChatBubble } from '@pxlkit/social';
 import { Mail, Sparkles, ShieldCheck } from '@pxlkit/feedback';
 import { Lightning } from '@pxlkit/gamification';
 import { PixelButton, PixelDivider, PixelTooltip, PixelInput, PixelChip } from '@pxlkit/ui-kit';
@@ -25,14 +25,6 @@ const columns: Record<string, string[]> = {
 export function FooterMinimalPreview() {
   return (
     <div className="bg-retro-bg">
-      <div className="flex flex-col items-center justify-center px-6 py-20 gap-3 text-center">
-        <p className="font-pixel text-xs text-retro-muted/60 tracking-widest uppercase">
-          Footer Preview
-        </p>
-        <p className="font-mono text-sm text-retro-muted max-w-sm">
-          Minimal one-line footer with brand, links, and copyright.
-        </p>
-      </div>
       <footer className="px-6 py-5 border-t border-retro-border">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -69,14 +61,6 @@ export function FooterMultiColumnPreview() {
 
   return (
     <div className="bg-retro-bg">
-      <div className="flex flex-col items-center justify-center px-6 py-16 gap-3 text-center">
-        <p className="font-pixel text-xs text-retro-muted/60 tracking-widest uppercase">
-          Footer Preview
-        </p>
-        <p className="font-mono text-sm text-retro-muted max-w-sm">
-          Multi-column footer with organized link categories.
-        </p>
-      </div>
       <footer className="border-t border-retro-border bg-retro-bg">
         <div className="max-w-5xl mx-auto px-6 pt-10 pb-6">
           {/* Brand + columns */}
@@ -156,14 +140,6 @@ export function FooterMultiColumnPreview() {
 export function FooterCtaPreview() {
   return (
     <div className="bg-retro-bg">
-      <div className="flex flex-col items-center justify-center px-6 py-16 gap-3 text-center">
-        <p className="font-pixel text-xs text-retro-muted/60 tracking-widest uppercase">
-          Footer Preview
-        </p>
-        <p className="font-mono text-sm text-retro-muted max-w-sm">
-          Footer with an embedded CTA banner above copyright links.
-        </p>
-      </div>
       <footer className="border-t border-retro-border bg-retro-bg">
         <div className="max-w-5xl mx-auto px-6 py-8">
           <div className="rounded-xl border border-retro-green/30 bg-retro-green/5 px-6 py-10 text-center mb-8 hover:scale-[1.01] transition-transform">
