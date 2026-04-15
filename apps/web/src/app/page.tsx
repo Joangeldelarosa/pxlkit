@@ -146,7 +146,7 @@ function HeroSection() {
             <div className="space-y-4 sm:space-y-5 md:space-y-6">
               {/* Status badges */}
               <div className="flex flex-wrap justify-center lg:justify-start gap-2">
-                <PixelBadge tone="green">Free &amp; Open Source</PixelBadge>
+                <PixelBadge tone="green">MIT Code + Icon Licenses</PixelBadge>
                 <PixelBadge tone="gold"><span aria-label="50 percent off launch price">🔥 50% Off Launch</span></PixelBadge>
               </div>
 
@@ -402,7 +402,7 @@ const FEATURES: { icon: PxlKitData | AnyIcon; title: string; description: string
     icon: Lightning,
     title: 'Icons That Load in Microseconds',
     description:
-      `${TOTAL_ICON_COUNT}+ hand-crafted 16×16 SVG icons across 6 thematic packs. Tree-shakeable — your bundle only includes what you actually use.`,
+      `${TOTAL_ICON_COUNT}+ hand-crafted 16×16 SVG icons across 7 thematic packs. Tree-shakeable — your bundle only includes what you actually use.`,
     color: 'text-retro-gold',
   },
   {
@@ -1211,7 +1211,7 @@ function PricingPreview() {
       price: 'Free',
       suffix: 'forever — no credit card',
       color: 'green' as const,
-      features: [`${TOTAL_ICON_COUNT}+ pixel art icons`, '6 thematic packs', `${UI_COMPONENTS_COUNT}+ React components`, 'Attribution required'],
+      features: [`${TOTAL_ICON_COUNT}+ pixel art icons`, '7 thematic packs', `${UI_COMPONENTS_COUNT}+ React components`, 'Asset attribution required'],
     },
     {
       name: 'Indie',
@@ -1254,7 +1254,7 @@ function PricingPreview() {
             PAY ONCE, USE FOREVER
           </h2>
           <p className="text-retro-muted max-w-lg mx-auto text-xs sm:text-sm px-2">
-            Free for everyone with attribution. Need commercial use?{' '}
+            MIT code is free, and icon packs are free with attribution. Need no-attribution asset use?{' '}
             <span className="text-retro-gold font-bold">Grab a lifetime license at 50% off</span> — this price won&apos;t last.
             One payment, no subscriptions, no surprises.
           </p>
@@ -1325,7 +1325,7 @@ function FAQSection() {
   const faqs = [
     {
       q: 'Is Pxlkit really free?',
-      a: 'Yes! The Community plan is 100% free and includes all components, icons, and features. The only requirement is a small attribution link. Paid licenses simply remove that requirement for commercial projects.',
+      a: 'Yes. The code packages are MIT-licensed and free to use. The icon packs are free under the Community asset terms with a small attribution link, and paid licenses remove that asset attribution requirement.',
     },
     {
       q: 'What frameworks does Pxlkit work with?',
@@ -1337,7 +1337,7 @@ function FAQSection() {
     },
     {
       q: 'Can I use Pxlkit in a commercial product?',
-      a: 'Absolutely. The free Community plan requires attribution. For commercial projects without attribution, grab an Indie ($9.50) or Team ($24.50) license — both are one-time payments with lifetime updates.',
+      a: 'Absolutely. MIT code packages can be used commercially without attribution. If you ship the icon packs and want to remove attribution there too, grab an Indie ($9.50) or Team ($24.50) asset license.',
     },
     {
       q: 'How do I create custom icons?',
@@ -1434,7 +1434,7 @@ function CTASection() {
             </h2>
             <p className="text-retro-muted mb-4 sm:mb-5 max-w-md mx-auto text-xs sm:text-sm px-2">
               Join developers who are shipping retro-styled interfaces in minutes instead of days.
-              Free, open source, and ready when you are.
+              MIT code, flexible icon licensing, and ready when you are.
             </p>
             <div className="rounded-lg border border-retro-border bg-retro-bg/80 px-3 sm:px-4 py-2 sm:py-3 font-mono text-[10px] sm:text-xs text-retro-muted overflow-x-auto max-w-sm mx-auto mb-6 sm:mb-8">
               <span className="text-retro-green mr-2">$</span>
@@ -1457,5 +1457,4 @@ function CTASection() {
     </section>
   );
 }
-
 

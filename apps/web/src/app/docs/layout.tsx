@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Documentation — Installation, API & Guides',
   description:
-    'Complete documentation for the Pxlkit ecosystem: retro pixel-art React UI Kit, 226+ SVG icon library, 3D parallax components, animated icons, toast notifications, visual icon builder, and the @pxlkit/voxels 3D game engine. Installation guides, API reference, TypeScript types, design tokens, and code examples for every package.',
+    'Complete documentation for the Pxlkit ecosystem: retro pixel-art React UI Kit, 226+ SVG icon library, 3D parallax components, animated icons, toast notifications, visual icon builder, and the @pxlkit/voxel 3D game engine. Installation guides, API reference, TypeScript types, design tokens, and code examples for every package.',
   keywords: [
     'pxlkit documentation',
     'pixel art icons docs',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Documentation — Pxlkit',
     description:
-      'Installation, API reference, and usage guides for the Pxlkit React UI Kit, 226+ pixel art icons, and @pxlkit/voxels 3D game engine.',
+      'Installation, API reference, and usage guides for the Pxlkit React UI Kit, 226+ pixel art icons, and @pxlkit/voxel 3D game engine.',
     url: 'https://pxlkit.xyz/docs',
   },
   twitter: {

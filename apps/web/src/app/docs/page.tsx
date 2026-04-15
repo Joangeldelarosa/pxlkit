@@ -208,7 +208,7 @@ export default function DocsPage() {
           <div className="text-center pt-8 mb-4">
             <h1 className="font-pixel text-xl text-retro-cyan mb-3">DOCUMENTATION</h1>
             <p className="text-retro-muted font-mono text-sm">
-              Everything you need to use Pxlkit — the open source retro React UI kit + icon library
+              Everything you need to use Pxlkit — MIT React UI code + source-available icon packs
             </p>
             <p className="font-mono text-[10px] text-retro-muted/50 mt-2">
               {UI_COMPONENTS_COUNT} components · PixelToast guide · {TOTAL_ICONS} icons across {ALL_PACKS.length} packs · 3D Parallax
@@ -218,9 +218,9 @@ export default function DocsPage() {
           {/* Getting Started */}
           <Section id="getting-started" title="Getting Started">
             <P>
-              Pxlkit is an open-source retro React UI kit and pixel art icon library.
+              Pxlkit combines MIT-licensed React UI code with source-available pixel art icon packs.
               It ships with {UI_COMPONENTS_COUNT} production-ready components and {TOTAL_ICONS}+ hand-crafted SVG icons
-              across 6 thematic packs. Each icon pack is a separate npm package under
+              across {ALL_PACKS.length} thematic packs. Each icon pack is a separate npm package under
               the <Code>@pxlkit</Code> scope.
             </P>
             <CodeBlock title="Install">{INSTALL_CMD}</CodeBlock>
@@ -833,7 +833,7 @@ import { Trophy } from '@pxlkit/gamification';
           {/* Contributing */}
           <Section id="contributing" title="Contributing">
             <P>
-              Pxlkit is open source and community-driven. Here&apos;s how you can contribute:
+              Pxlkit is community-driven, with MIT code packages and source-available asset packs. Here&apos;s how you can contribute:
             </P>
             <ul className="space-y-2 text-sm text-retro-muted ml-4 list-disc list-outside">
               <li>
