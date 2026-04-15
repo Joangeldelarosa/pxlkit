@@ -12,9 +12,18 @@ import {
   PixelSlideIn,
   PixelDivider,
   PixelSwitch,
+  PixelTooltip,
+  PixelTextLink,
+  PixelBounce,
 } from '@pxlkit/ui-kit';
 
 type PlanTone = 'neutral' | 'green' | 'cyan';
+
+interface PlanFeature {
+  label: string;
+  tooltip: string;
+  html?: boolean;
+}
 
 interface Plan {
   name: string;
@@ -24,7 +33,7 @@ interface Plan {
   tone: PlanTone;
   icon: typeof Coin;
   popular?: boolean;
-  features: string[];
+  features: PlanFeature[];
   cta: string;
 }
 
@@ -37,11 +46,11 @@ const CARDS_PLANS: Plan[] = [
     tone: 'neutral',
     icon: Coin,
     features: [
-      '50 pixel-art icons',
-      '3 core packages',
-      'Community Discord support',
-      'Personal use license',
-      '6 months of updates',
+      { label: '50 pixel-art icons', tooltip: 'Hand-crafted pixel icons from the core set' },
+      { label: '3 core packages', tooltip: 'Includes ui, feedback, and core icon packs' },
+      { label: 'Community Discord support', tooltip: 'Get help from the community on Discord' },
+      { label: 'Personal use license', tooltip: 'Use in non-commercial personal projects only' },
+      { label: '6 months of updates', tooltip: 'Receive new icons and fixes for 6 months' },
     ],
     cta: 'Get Started Free',
   },
@@ -54,12 +63,12 @@ const CARDS_PLANS: Plan[] = [
     icon: Trophy,
     popular: true,
     features: [
-      '226+ icons across all packs',
-      'All 10 packages included',
-      'Email &amp; priority support',
-      'Commercial use license',
-      'Lifetime updates',
-      'Early access to new icons',
+      { label: '226+ icons across all packs', tooltip: 'Full access to every icon in every pack' },
+      { label: 'All 10 packages included', tooltip: 'Every current and future icon package' },
+      { label: 'Email &amp; priority support', tooltip: 'Direct email line with faster response times', html: true },
+      { label: 'Commercial use license', tooltip: 'Ship in client and commercial projects' },
+      { label: 'Lifetime updates', tooltip: 'Every new icon and update, forever' },
+      { label: 'Early access to new icons', tooltip: 'Preview and use icons before public release' },
     ],
     cta: 'Upgrade to Pro',
   },
@@ -71,12 +80,12 @@ const CARDS_PLANS: Plan[] = [
     tone: 'cyan',
     icon: Crown,
     features: [
-      '226+ icons across all packs',
-      'All 10 packages included',
-      'Dedicated Slack channel',
-      'Multi-seat team license',
-      'Lifetime updates',
-      'Custom icon requests',
+      { label: '226+ icons across all packs', tooltip: 'Full library access for your entire team' },
+      { label: 'All 10 packages included', tooltip: 'Every current and future icon package' },
+      { label: 'Dedicated Slack channel', tooltip: 'Private Slack channel with direct team support' },
+      { label: 'Multi-seat team license', tooltip: 'Cover up to 25 developers under one license' },
+      { label: 'Lifetime updates', tooltip: 'Every new icon and update, forever' },
+      { label: 'Custom icon requests', tooltip: 'Request bespoke icons tailored to your brand' },
     ],
     cta: 'Start Team Plan',
   },
@@ -129,7 +138,7 @@ export function PricingCardsPreview() {
             <PixelFadeIn key={plan.name}>
               <PixelSlideIn from={idx === 0 ? 'left' : idx === 2 ? 'right' : 'left'}>
                 <div
-                  className={`rounded-xl border p-8 flex flex-col h-full relative transition-all ${TONE_STYLES[plan.tone].border} ${TONE_STYLES[plan.tone].bg} ${plan.popular ? TONE_STYLES[plan.tone].glow : ''}`}
+                  className={`rounded-xl border p-8 flex flex-col h-full relative hover:scale-[1.02] transition-transform ${TONE_STYLES[plan.tone].border} ${TONE_STYLES[plan.tone].bg} ${plan.popular ? TONE_STYLES[plan.tone].glow : ''}`}
                 >
                   {plan.popular && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -162,9 +171,15 @@ export function PricingCardsPreview() {
                   {/* Features */}
                   <ul className="space-y-3 mb-8 flex-1">
                     {plan.features.map((f) => (
-                      <li key={f} className="font-mono text-sm text-retro-muted flex items-start gap-2.5">
+                      <li key={f.label} className="font-mono text-sm text-retro-muted flex items-start gap-2.5">
                         <PxlKitIcon icon={CheckCircle} size={14} colorful className="flex-shrink-0 mt-0.5" />
-                        <span dangerouslySetInnerHTML={{ __html: f }} />
+                        <PixelTooltip content={f.tooltip} position="top">
+                          {f.html ? (
+                            <span dangerouslySetInnerHTML={{ __html: f.label }} />
+                          ) : (
+                            <span>{f.label}</span>
+                          )}
+                        </PixelTooltip>
                       </li>
                     ))}
                   </ul>
@@ -185,11 +200,14 @@ export function PricingCardsPreview() {
         </div>
 
         {/* Guarantee */}
-        <div className="text-center mt-10">
+        <div className="text-center mt-10 space-y-3">
           <p className="inline-flex items-center gap-2 font-mono text-xs text-retro-muted">
             <PxlKitIcon icon={ShieldCheck} size={14} colorful />
             30-day money-back guarantee &middot; Cancel anytime
           </p>
+          <div>
+            <PixelTextLink href="#" tone="green">Compare plans in detail</PixelTextLink>
+          </div>
         </div>
       </div>
     </section>
@@ -216,6 +234,23 @@ const TIERS = [
   { name: 'Pro', icon: Trophy, tone: 'text-retro-green', recommended: true },
   { name: 'Team', icon: Crown, tone: 'text-retro-cyan', recommended: false },
 ] as const;
+
+const FEATURE_TOOLTIPS: Record<string, string> = {
+  'Pixel-art icons': 'Total number of hand-crafted pixel icons available',
+  'Icon packages': 'Themed icon collections you can install independently',
+  'Projects': 'Number of projects covered by your license',
+  'Commercial license': 'Use icons in commercial and client projects',
+  'Priority support': 'Faster response times via dedicated support channels',
+  'Lifetime updates': 'Receive every future icon and patch at no extra cost',
+  'Early access': 'Preview and use new icons before they launch publicly',
+  'Custom icon requests': 'Request bespoke icons designed for your brand',
+};
+
+const TIER_CTA: { label: string; tone: PlanTone }[] = [
+  { label: 'Get Started Free', tone: 'neutral' },
+  { label: 'Upgrade to Pro', tone: 'green' },
+  { label: 'Start Team Plan', tone: 'cyan' },
+];
 
 function TableCell({ value }: { value: CellValue }) {
   if (value === true) {
@@ -270,11 +305,15 @@ export function PricingTablePreview() {
                 {TABLE_FEATURES.map(([feat, free, pro, team], idx) => (
                   <tr
                     key={feat}
-                    className={`border-b border-retro-border/30 hover:bg-retro-surface/20 transition-colors ${
+                    className={`border-b border-retro-border/30 hover:bg-retro-surface/40 hover:shadow-sm transition-colors ${
                       idx % 2 === 1 ? 'bg-retro-surface/10' : ''
                     }`}
                   >
-                    <td className="px-6 py-3.5 text-retro-text">{feat}</td>
+                    <td className="px-6 py-3.5 text-retro-text">
+                      <PixelTooltip content={FEATURE_TOOLTIPS[feat] ?? feat} position="top">
+                        <span className="cursor-help border-b border-dotted border-retro-border/50">{feat}</span>
+                      </PixelTooltip>
+                    </td>
                     <td className="text-center px-6 py-3.5 text-retro-muted">
                       <div className="flex justify-center"><TableCell value={free} /></div>
                     </td>
@@ -287,6 +326,23 @@ export function PricingTablePreview() {
                   </tr>
                 ))}
               </tbody>
+              <tfoot>
+                <tr className="border-t border-retro-border">
+                  <td className="px-6 py-5" />
+                  {TIER_CTA.map((cta) => (
+                    <td key={cta.label} className="text-center px-6 py-5">
+                      <PixelButton
+                        tone={cta.tone}
+                        size="sm"
+                        className="w-full justify-center"
+                        iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                      >
+                        {cta.label}
+                      </PixelButton>
+                    </td>
+                  ))}
+                </tr>
+              </tfoot>
             </table>
           </div>
         </PixelFadeIn>
@@ -386,12 +442,14 @@ export function PricingTogglePreview() {
             >
               Yearly
             </span>
-            <PixelBadge tone="gold">
-              <span className="inline-flex items-center gap-1">
-                <PxlKitIcon icon={Lightning} size={10} colorful />
-                Save 20%
-              </span>
-            </PixelBadge>
+            <PixelBounce trigger={isYearly}>
+              <PixelBadge tone="gold">
+                <span className="inline-flex items-center gap-1">
+                  <PxlKitIcon icon={Lightning} size={10} colorful />
+                  Save 20%
+                </span>
+              </PixelBadge>
+            </PixelBounce>
           </div>
         </div>
 
@@ -419,9 +477,11 @@ export function PricingTogglePreview() {
                   )}
 
                   <div className="text-center mb-4 pt-2">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg border border-retro-border/50 bg-retro-surface/40 mb-3">
-                      <PxlKitIcon icon={plan.icon} size={28} colorful />
-                    </div>
+                    <PixelTooltip content={`${plan.name} plan`} position="top">
+                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg border border-retro-border/50 bg-retro-surface/40 mb-3">
+                        <PxlKitIcon icon={plan.icon} size={28} colorful />
+                      </div>
+                    </PixelTooltip>
                     <h3 className="font-pixel text-lg text-retro-text mb-1">{plan.name}</h3>
                     <p className="font-mono text-xs text-retro-muted">{plan.description}</p>
                   </div>
@@ -436,9 +496,11 @@ export function PricingTogglePreview() {
                       </span>
                     </div>
                     {isYearly && (
-                      <p className="font-mono text-xs text-retro-green mt-1">
-                        ${perMonth}/mo &middot; You save ${savings}/yr
-                      </p>
+                      <PixelFadeIn>
+                        <p className="font-mono text-xs text-retro-green mt-1">
+                          ${perMonth}/mo &middot; You save ${savings}/yr
+                        </p>
+                      </PixelFadeIn>
                     )}
                   </div>
 
