@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/feedback",
   "version": "1.2.2",
-  "description": "Feedback and notification pixel art icon pack — 33 icons for alerts, status indicators, checkmarks, shields, bugs, badges, and toast notifications",
+  "description": "Feedback and notification pixel art icon pack \u2014 33 icons for alerts, status indicators, checkmarks, shields, bugs, badges, and toast notifications",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
@@ -53,7 +53,7 @@
     "svg-icons",
     "react-icons",
     "pxlkit",
-    "open-source-icons",
+    "source-available-icons",
     "free-notification-icons",
     "8-bit-icons",
     "retro-icons"

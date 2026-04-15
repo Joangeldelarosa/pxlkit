@@ -3,14 +3,14 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Explore Procedural Voxel Worlds — 3D Game Engine Demo',
   description:
-    'Fly through infinite procedural voxel worlds powered by @pxlkit/voxels — an open-source 3D game engine built with Three.js and React Three Fiber. Features 9+ biomes, day/night cycles, dynamic cities, physics, NPC systems, chunk-based terrain streaming, and real-time world generation. Build your own Minecraft-like browser game with React.',
+    'Fly through infinite procedural voxel worlds powered by @pxlkit/voxel — an MIT-licensed 3D game engine built with Three.js and React Three Fiber. Features 9+ biomes, day/night cycles, dynamic cities, physics, NPC systems, chunk-based terrain streaming, and real-time world generation. Build your own Minecraft-like browser game with React.',
   keywords: [
     /* ── Core Engine ── */
     'procedural terrain',
     'voxel world',
     'voxel engine',
     'voxel game engine',
-    'open source game engine',
+    'mit game engine',
     'react game engine',
     'three.js game engine',
     'react three fiber game engine',
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     'r3f game',
     /* ── Pxlkit Specific ── */
     'pxlkit voxel',
-    'pxlkit voxels',
+    'pxlkit voxel',
     'pxlkit game engine',
     'pxlkit explore',
     'pxlkit 3d',
@@ -82,13 +82,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Explore Procedural Voxel Worlds — Pxlkit 3D Game Engine',
     description:
-      'Fly through infinite procedural voxel worlds with 9+ biomes, day/night cycles, dynamic cities, and real-time terrain generation. Open-source engine built with Three.js & React Three Fiber.',
+      'Fly through infinite procedural voxel worlds with 9+ biomes, day/night cycles, dynamic cities, and real-time terrain generation. MIT-licensed engine built with Three.js & React Three Fiber.',
     url: 'https://pxlkit.xyz/explore',
   },
   twitter: {
     title: 'Explore Procedural Voxel Worlds — Pxlkit 3D Game Engine',
     description:
-      'Infinite procedural voxel worlds with 9+ biomes, day/night cycles, physics, NPCs, and dynamic cities. Open-source React game engine powered by Three.js.',
+      'Infinite procedural voxel worlds with 9+ biomes, day/night cycles, physics, NPCs, and dynamic cities. MIT-licensed React game engine powered by Three.js.',
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/explore',

@@ -1,12 +1,12 @@
 {
   "name": "@pxlkit/ui-kit",
   "version": "1.3.2",
-  "description": "Retro pixel art UI kit — 40+ production-ready React components with TypeScript, Tailwind CSS design tokens, dark mode, and accessible retro-styled buttons, forms, modals, tables, cards, toasts, and more",
+  "description": "Retro pixel art UI kit \u2014 40+ production-ready React components with TypeScript, Tailwind CSS design tokens, dark mode, and accessible retro-styled buttons, forms, modals, tables, cards, toasts, and more",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -73,7 +73,7 @@
     "toast-notifications",
     "dark-mode",
     "accessible-ui",
-    "open-source-ui",
+    "mit-react-ui",
     "tree-shakeable",
     "next-js",
     "game-ui",
