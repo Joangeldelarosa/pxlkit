@@ -1,30 +1,50 @@
 'use client';
 
-import { PxlKitIcon } from '@pxlkit/core';
-import { Star } from '@pxlkit/gamification';
-import { PixelAvatar, PixelFadeIn } from '@pxlkit/ui-kit';
+import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
+import { ArrowRight } from '@pxlkit/ui';
+import { Star, SparkleStar, Crown } from '@pxlkit/gamification';
+import { Verified } from '@pxlkit/social';
+import { Sparkles } from '@pxlkit/feedback';
+import {
+  PixelAvatar,
+  PixelBadge,
+  PixelButton,
+  PixelFadeIn,
+  PixelFloat,
+} from '@pxlkit/ui-kit';
+
+/* ── Shared data ────────────────────────────────────────────────────────── */
 
 const TESTIMONIALS = [
   {
     name: 'Alice Johnson',
     role: 'Frontend Lead',
     company: 'Acme Inc.',
-    quote: 'Pxlkit saved us weeks of design work. The retro aesthetic is iconic and our users absolutely love it.',
+    quote:
+      'Pxlkit saved us weeks of design work. The retro aesthetic is iconic and our users absolutely love it. The component quality is outstanding.',
     tone: 'green' as const,
+    border: 'border-retro-green/20',
+    bg: 'bg-retro-green/5',
   },
   {
     name: 'Bob Smith',
     role: 'Indie Maker',
-    company: 'Solo Founder',
-    quote: "Best component library I've used. Customers love the pixel style — it's unlike anything else out there.",
+    company: 'PixelForge',
+    quote:
+      "Best component library I've used. Customers love the pixel style — it's unlike anything else out there. Shipped my SaaS in half the time.",
     tone: 'cyan' as const,
+    border: 'border-retro-cyan/20',
+    bg: 'bg-retro-cyan/5',
   },
   {
     name: 'Carol Lee',
     role: 'UX Designer',
     company: 'Studio Pixel',
-    quote: "Finally, pixel-art UI that's actually accessible and production-ready. It's been a game changer.",
+    quote:
+      "Finally, pixel-art UI that's actually accessible and production-ready. It's been a game changer for every project we touch.",
     tone: 'gold' as const,
+    border: 'border-retro-gold/20',
+    bg: 'bg-retro-gold/5',
   },
 ];
 
@@ -32,7 +52,7 @@ function Stars({ count = 5 }: { count?: number }) {
   return (
     <div className="flex gap-1">
       {Array.from({ length: count }).map((_, i) => (
-        <PxlKitIcon key={i} icon={Star} size={14} className="text-retro-gold" />
+        <PxlKitIcon key={i} icon={Star} size={14} colorful />
       ))}
     </div>
   );
@@ -44,27 +64,40 @@ export function TestimonialsCardsPreview() {
     <section className="py-20 sm:py-28 px-6 bg-retro-bg">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-3">
+          <PixelBadge tone="gold">
+            <PxlKitIcon icon={Crown} size={12} colorful />
+            <span className="ml-1.5">Testimonials</span>
+          </PixelBadge>
+          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-3 mt-4">
             Loved by developers
           </h2>
-          <p className="text-retro-muted font-mono text-sm sm:text-base">
-            Don&apos;t take our word for it.
+          <p className="text-retro-muted font-mono text-sm sm:text-base max-w-lg mx-auto">
+            Don&apos;t take our word for it — here&apos;s what our community has to say.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((t) => (
-            <PixelFadeIn key={t.name}>
-              <div className="rounded-xl border border-retro-border bg-retro-surface/30 p-6 flex flex-col h-full">
-                <Stars />
-                <p className="font-mono text-sm text-retro-muted mt-4 mb-6 leading-relaxed flex-1 italic">
+          {TESTIMONIALS.map((t, i) => (
+            <PixelFadeIn key={t.name} delay={i * 100}>
+              <div
+                className={`rounded-xl border ${t.border} ${t.bg} p-6 flex flex-col h-full transition-shadow hover:shadow-lg`}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <Stars />
+                  <PxlKitIcon icon={Verified} size={16} colorful />
+                </div>
+
+                <p className="font-mono text-sm text-retro-muted leading-relaxed flex-1 italic mb-6">
                   &quot;{t.quote}&quot;
                 </p>
+
                 <div className="flex items-center gap-3">
                   <PixelAvatar name={t.name} size="md" tone={t.tone} />
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="font-pixel text-xs text-retro-text">{t.name}</p>
-                    <p className="font-mono text-xs text-retro-muted">{t.role}</p>
+                    <p className="font-mono text-xs text-retro-muted truncate">
+                      {t.role} · {t.company}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -80,22 +113,63 @@ export function TestimonialsCardsPreview() {
 export function TestimonialsLargeQuotePreview() {
   return (
     <section className="py-20 sm:py-28 px-6 bg-retro-bg">
-      <div className="max-w-3xl mx-auto text-center">
-        <Stars />
-        <div className="mt-8 mb-8">
-          <span className="font-pixel text-5xl text-retro-green/30 leading-none select-none">&ldquo;</span>
-          <p className="font-mono text-base sm:text-lg text-retro-text leading-relaxed px-4 -mt-2">
-            Pxlkit saved us weeks of design work. The retro look is iconic and
-            our users absolutely love it. Nothing else compares.
+      <div className="relative max-w-3xl mx-auto text-center">
+        {/* Floating animated accent — top-right */}
+        <span className="absolute -top-4 right-4 sm:right-0 opacity-40 pointer-events-none">
+          <PixelFloat duration={3200} distance={6}>
+            <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful />
+          </PixelFloat>
+        </span>
+
+        {/* Floating animated accent — bottom-left */}
+        <span className="absolute -bottom-2 left-4 sm:left-0 opacity-30 pointer-events-none">
+          <PixelFloat duration={2800} distance={5}>
+            <PxlKitIcon icon={Sparkles} size={22} colorful />
+          </PixelFloat>
+        </span>
+
+        <div className="flex justify-center">
+          <Stars />
+        </div>
+
+        <div className="mt-8 mb-8 relative">
+          <span className="font-pixel text-6xl sm:text-7xl text-retro-green/20 leading-none select-none block">
+            &ldquo;
+          </span>
+          <p className="font-mono text-base sm:text-lg text-retro-text leading-relaxed px-6 sm:px-10 -mt-4">
+            Pxlkit saved us weeks of design work. The retro aesthetic is iconic and our users
+            absolutely love it. Nothing else on the market even comes close.
           </p>
-          <span className="font-pixel text-5xl text-retro-green/30 leading-none select-none">&rdquo;</span>
+          <span className="font-pixel text-6xl sm:text-7xl text-retro-green/20 leading-none select-none block text-right">
+            &rdquo;
+          </span>
         </div>
 
         <div className="flex items-center justify-center gap-4">
           <PixelAvatar name="Alice Johnson" size="lg" tone="green" />
           <div className="text-left">
-            <p className="font-pixel text-sm text-retro-text">Alice Johnson</p>
+            <div className="flex items-center gap-2">
+              <p className="font-pixel text-sm text-retro-text">Alice Johnson</p>
+              <PxlKitIcon icon={Verified} size={14} colorful />
+            </div>
             <p className="font-mono text-sm text-retro-muted">Frontend Lead · Acme Inc.</p>
+          </div>
+        </div>
+
+        {/* Company logo placeholder area */}
+        <div className="mt-10 pt-8 border-t border-retro-border/30">
+          <p className="font-mono text-xs text-retro-muted/60 mb-4 uppercase tracking-wider">
+            Trusted by teams at
+          </p>
+          <div className="flex items-center justify-center gap-6 flex-wrap">
+            {['Acme Inc.', 'PixelForge', 'Studio Pixel', 'RetroLabs'].map((name) => (
+              <span
+                key={name}
+                className="font-pixel text-xs text-retro-muted/50 px-3 py-1.5 rounded-md border border-retro-border/20 bg-retro-surface/20"
+              >
+                {name}
+              </span>
+            ))}
           </div>
         </div>
       </div>
@@ -112,6 +186,9 @@ export function TestimonialsSliderPreview() {
           <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose">
             What devs say
           </h2>
+          <p className="text-retro-muted font-mono text-sm mt-2">
+            Hear from developers who ship with PxlKit every day.
+          </p>
         </div>
 
         <div className="rounded-xl border border-retro-green/30 bg-retro-green/5 p-8 text-center">
@@ -122,19 +199,35 @@ export function TestimonialsSliderPreview() {
             &quot;Best component library I&apos;ve used. Customers love the pixel style —
             it&apos;s unlike anything else out there.&quot;
           </p>
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-2 mb-6">
             <PixelAvatar name="Bob Smith" size="md" tone="cyan" />
             <div>
-              <p className="font-pixel text-xs text-retro-text">Bob Smith</p>
-              <p className="font-mono text-xs text-retro-muted">Indie Maker</p>
+              <div className="flex items-center justify-center gap-1.5">
+                <p className="font-pixel text-xs text-retro-text">Bob Smith</p>
+                <PxlKitIcon icon={Verified} size={12} colorful />
+              </div>
+              <p className="font-mono text-xs text-retro-muted">Indie Maker · PixelForge</p>
             </div>
           </div>
-          {/* Pagination dots */}
-          <div className="flex justify-center gap-2 mt-6">
-            <span className="w-2 h-2 rounded-full bg-retro-muted/30" />
-            <span className="w-2 h-2 rounded-full bg-retro-green" />
-            <span className="w-2 h-2 rounded-full bg-retro-muted/30" />
+
+          {/* Navigation controls */}
+          <div className="flex items-center justify-center gap-4">
+            <PixelButton tone="green" size="sm" aria-label="Previous testimonial">
+              <PxlKitIcon icon={ArrowRight} size={14} className="rotate-180" />
+            </PixelButton>
+
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-retro-muted/30 transition-colors" />
+              <span className="w-2.5 h-2.5 rounded-full bg-retro-green transition-colors" />
+              <span className="w-2 h-2 rounded-full bg-retro-muted/30 transition-colors" />
+            </div>
+
+            <PixelButton tone="green" size="sm" aria-label="Next testimonial">
+              <PxlKitIcon icon={ArrowRight} size={14} />
+            </PixelButton>
           </div>
+
+          <p className="font-mono text-xs text-retro-muted/50 mt-4">2 of 3</p>
         </div>
       </div>
     </section>
