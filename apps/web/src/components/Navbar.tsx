@@ -10,6 +10,7 @@ const NAV_ITEMS: { href: string; label: string; badge?: string }[] = [
   { href: '/icons', label: 'Icons' },
   { href: '/builder', label: 'Builder' },
   { href: '/ui-kit', label: 'UI Kit' },
+  { href: '/templates', label: 'Templates' },
   { href: '/explore', label: 'Worlds', badge: '🚧' },
   { href: '/docs', label: 'Docs' },
   { href: '/pricing', label: 'Pricing' },
