@@ -37,7 +37,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono border transition-all rounded-sm ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono border transition-all rounded-sm ${
         copied
           ? 'bg-retro-green/20 text-retro-green border-retro-green/40'
           : 'bg-retro-surface text-retro-muted border-retro-border hover:text-retro-green hover:border-retro-green/40'
@@ -58,7 +58,7 @@ function CodeBlock({ code, title }: { code: string; title?: string }) {
     <div className="relative border border-retro-border bg-retro-bg rounded-sm overflow-hidden">
       {title && (
         <div className="flex items-center justify-between px-4 py-2 border-b border-retro-border bg-retro-surface/40">
-          <span className="text-[10px] font-mono text-retro-muted">{title}</span>
+          <span className="text-xs font-mono text-retro-muted">{title}</span>
           <CopyButton text={code} />
         </div>
       )}
@@ -100,8 +100,8 @@ function VariantCard({ variant }: { variant: TemplateVariant }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-retro-border bg-retro-surface/30">
         <div>
-          <h4 className="font-pixel text-[10px] text-retro-text leading-relaxed">{variant.name}</h4>
-          <p className="font-mono text-[10px] text-retro-muted mt-0.5">{variant.description}</p>
+          <h4 className="font-pixel text-xs text-retro-text leading-relaxed">{variant.name}</h4>
+          <p className="font-mono text-xs text-retro-muted mt-0.5">{variant.description}</p>
         </div>
         <div className="hidden sm:flex items-center gap-2">
           <PixelBadge tone="cyan">Component</PixelBadge>
@@ -110,7 +110,7 @@ function VariantCard({ variant }: { variant: TemplateVariant }) {
               href={`/templates/preview?id=${variant.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 px-2 py-1 text-[9px] font-mono text-retro-muted border border-retro-border rounded-sm hover:text-retro-green hover:border-retro-green/40 transition-all"
+          className="flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-retro-muted border border-retro-border rounded-sm hover:text-retro-green hover:border-retro-green/40 transition-all"
             >
               <PxlKitIcon icon={ExternalLink} size={10} />
               Open
@@ -125,7 +125,7 @@ function VariantCard({ variant }: { variant: TemplateVariant }) {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-2 text-[10px] font-mono uppercase transition-all ${
+            className={`px-4 py-2 text-xs font-mono uppercase transition-all ${
               tab === t
                 ? 'text-retro-green border-b-2 border-retro-green bg-retro-green/5'
                 : 'text-retro-muted hover:text-retro-text'
@@ -140,7 +140,7 @@ function VariantCard({ variant }: { variant: TemplateVariant }) {
       <div className="p-4">
         {tab === 'preview' ? (
           Preview ? (
-            <div className="border border-retro-border rounded-sm overflow-hidden bg-retro-bg">
+            <div className="border border-retro-border rounded-sm overflow-hidden overflow-y-auto bg-retro-bg max-h-[520px]">
               <Preview />
             </div>
           ) : (
@@ -154,7 +154,7 @@ function VariantCard({ variant }: { variant: TemplateVariant }) {
           <div className="space-y-3">
             <p className="font-mono text-xs text-retro-muted">Install required packages:</p>
             <InstallCmd cmd={variant.installCmd} />
-            <p className="font-mono text-[10px] text-retro-muted/60">
+            <p className="font-mono text-xs text-retro-muted/60">
               Then import the component from the code tab above.
             </p>
           </div>
@@ -177,8 +177,8 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
         <div className="flex items-center gap-3">
           <span className="text-2xl" role="img" aria-hidden>{tpl.icon}</span>
           <div>
-            <h3 className="font-pixel text-[10px] text-retro-text leading-relaxed">{tpl.name}</h3>
-            <p className="font-mono text-[10px] text-retro-muted mt-0.5 max-w-md">{tpl.description}</p>
+            <h3 className="font-pixel text-xs text-retro-text leading-relaxed">{tpl.name}</h3>
+            <p className="font-mono text-xs text-retro-muted mt-0.5 max-w-md">{tpl.description}</p>
           </div>
         </div>
         <div className="hidden sm:flex items-center gap-2">
@@ -188,7 +188,7 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
               href={`/templates/preview?id=${tpl.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 px-2 py-1 text-[9px] font-mono text-retro-muted border border-retro-border rounded-sm hover:text-retro-gold hover:border-retro-gold/40 transition-all"
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-retro-muted border border-retro-border rounded-sm hover:text-retro-gold hover:border-retro-gold/40 transition-all"
             >
               <PxlKitIcon icon={ExternalLink} size={10} />
               Open
@@ -202,7 +202,7 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-2 text-[10px] font-mono uppercase transition-all ${
+            className={`px-4 py-2 text-xs font-mono uppercase transition-all ${
               tab === t
                 ? 'text-retro-gold border-b-2 border-retro-gold bg-retro-gold/5'
                 : 'text-retro-muted hover:text-retro-text'
@@ -216,7 +216,7 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
       <div className="p-4">
         {tab === 'preview' ? (
           Preview ? (
-            <div className="border border-retro-border rounded-sm overflow-hidden bg-retro-bg">
+            <div className="border border-retro-border rounded-sm overflow-hidden overflow-y-auto bg-retro-bg max-h-[600px]">
               <Preview />
             </div>
           ) : (
@@ -275,7 +275,7 @@ export default function TemplatesPage() {
           {/* Sidebar navigation */}
           <aside className="hidden lg:block w-56 flex-shrink-0">
             <div className="sticky top-20">
-              <p className="font-pixel text-[9px] text-retro-muted mb-3 uppercase">Sections</p>
+              <p className="font-pixel text-xs text-retro-muted mb-3 uppercase">Sections</p>
               <nav className="space-y-0.5">
                 {TEMPLATE_SECTIONS.map((section) => (
                   <button
@@ -295,7 +295,7 @@ export default function TemplatesPage() {
 
               <PixelDivider tone="neutral" spacing="sm" className="my-3" />
 
-              <p className="font-pixel text-[9px] text-retro-muted mb-3 uppercase">Full Pages</p>
+              <p className="font-pixel text-xs text-retro-muted mb-3 uppercase">Full Pages</p>
               <button
                 onClick={() => setActiveSection('__pages__')}
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-mono rounded transition-all text-left ${
