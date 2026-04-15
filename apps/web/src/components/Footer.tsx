@@ -37,7 +37,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-retro-muted text-sm font-mono max-w-sm">
-              The open-source retro React UI kit that developers love.
+              The retro React toolkit with MIT code packages and licensed icon assets.
               Ship pixel-perfect interfaces with components, icons, and 3D effects — all from code.
             </p>
           </div>
@@ -117,11 +117,11 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-retro-border/30 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-retro-muted text-xs font-mono">
-            Pxlkit License v1.0 © {new Date().getFullYear()} Pxlkit Contributors
+            Split licensing • MIT code + asset terms © {new Date().getFullYear()} Pxlkit Contributors
           </p>
           <div className="flex flex-col items-center sm:items-end gap-1">
             <p className="text-retro-muted/50 text-xs font-mono">
-              v1.0.0 — Built with <PxlKitIcon icon={Heart} size={12} colorful className="inline-block mx-1" /> and pixels
+              v1.0.2 — Built with <PxlKitIcon icon={Heart} size={12} colorful className="inline-block mx-1" /> and pixels
             </p>
             <p className="text-retro-muted/40 text-[10px] font-mono">
               Created by{' '}

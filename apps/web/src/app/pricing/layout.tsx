@@ -3,12 +3,12 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Pricing & Licensing — Free, Indie & Team Plans',
   description:
-    'Pxlkit is free and open-source under a Community License with attribution. Upgrade to Indie ($9.50) or Team ($24.50) for commercial use without attribution, priority support, and lifetime updates. Simple one-time pricing, no subscriptions. Covers all 226+ icons, 40+ components, and the voxel game engine.',
+    'Pxlkit uses split licensing: MIT for code packages like @pxlkit/ui-kit and @pxlkit/voxel, plus free-with-attribution asset terms for the icon packs. Upgrade to Indie ($9.50) or Team ($24.50) to remove attribution for shipped asset usage.',
   keywords: [
     'pxlkit pricing',
     'pixel icons license',
     'react ui kit pricing',
-    'open source license',
+    'mit code license',
     'commercial license',
     'pixel art icons price',
     'retro ui license',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     'developer license',
     'no subscription',
     'free react ui kit',
-    'open source icon license',
+    'source available icon license',
     'commercial icon license',
     'indie developer license',
     'team license',
@@ -34,13 +34,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Pricing & Licensing — Pxlkit',
     description:
-      'Free Community plan. Indie at $9.50 and Team at $24.50 for commercial use. One-time payment, no subscription, lifetime updates.',
+      'MIT code packages plus icon packs free with attribution. Indie at $9.50 and Team at $24.50 remove attribution for shipped asset usage.',
     url: 'https://pxlkit.xyz/pricing',
   },
   twitter: {
     title: 'Pricing & Licensing — Pxlkit',
     description:
-      'Free, Indie ($9.50), and Team ($24.50) plans. Commercial use, no attribution, one-time payment, lifetime updates.',
+      'MIT code is free. Icon packs are free with attribution, or use Indie ($9.50) / Team ($24.50) to remove attribution.',
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/pricing',

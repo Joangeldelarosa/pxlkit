@@ -1,0 +1,47 @@
+Pxlkit Asset License
+====================
+
+Copyright (c) 2026 Joangel De La Rosa and Pxlkit Contributors
+
+This license applies to the Pxlkit icon packs, icon data, artwork, illustrations,
+screenshots, marketing graphics, and other visual assets that are not covered by
+`LICENSE-CODE` or a third-party notice.
+
+Community use (free)
+--------------------
+You may use, copy, modify, and ship the assets in personal projects, internal tools,
+client work, SaaS products, games, commercial apps, and closed-source software, provided that:
+
+- you keep the copyright/license notice in source distributions of the assets; and
+- shipped products that use the assets include visible attribution such as
+  `Icons by Pxlkit` or `Powered by Pxlkit`, with a link to `https://pxlkit.xyz`
+  where linking is reasonably possible.
+
+Paid commercial terms
+---------------------
+If you want to remove the attribution requirement for shipped products, you can use the
+paid terms in `COMMERCIAL_TERMS`. Those terms apply only to assets covered by this license.
+
+What is allowed
+---------------
+- using the assets in websites, mobile apps, desktop apps, games, videos, demos, client work, and marketing sites
+- modifying colors, animation, composition, and layout for your own product
+- bundling the assets inside a larger product that provides substantial functionality beyond the assets themselves
+- creating wrappers, UI implementations, or internal tooling that consume the assets as part of your product
+
+What is not allowed
+-------------------
+- redistributing the assets or substantial portions of them as a standalone icon pack, design kit, stock asset bundle, template, or competing library
+- reselling the assets as downloadable files whose primary value is the assets themselves
+- sublicensing the assets as a standalone product
+- removing attribution without a paid no-attribution asset license
+- using Pxlkit trademarks except as allowed by `TRADEMARK_POLICY`
+
+No trademark rights are granted by this license.
+
+THE ASSETS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE ASSETS OR THE USE OR OTHER
+DEALINGS IN THE ASSETS.

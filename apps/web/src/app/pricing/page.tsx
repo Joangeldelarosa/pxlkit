@@ -8,6 +8,8 @@ import { useToast } from '../../components/ToastProvider';
 import { PixelButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
 
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
+const ICON_COUNT_LABEL = '226+';
+const ICON_PACK_COUNT_LABEL = '7';
 
 /* ─── Animation helpers ─── */
 const fadeInUp = {
@@ -77,19 +79,19 @@ const PLANS: Plan[] = [
     name: 'Community',
     price: 'Free',
     priceSuffix: 'forever',
-    description: 'Perfect for personal projects, learning, and open source. All icons included — just add attribution.',
+    description: 'MIT code packages stay free. Use all icon packs in personal or commercial projects with attribution.',
     color: 'green',
     cta: 'Get Started',
     ctaHref: '/docs',
     features: [
-      { text: '204+ pixel art icons', included: true },
-      { text: '6 thematic icon packs', included: true },
+      { text: `${ICON_COUNT_LABEL} pixel art icons`, included: true },
+      { text: `${ICON_PACK_COUNT_LABEL} thematic icon packs`, included: true },
       { text: 'Static & animated icons', included: true },
-      { text: 'React UI kit components', included: true },
+      { text: 'MIT code packages', included: true },
       { text: 'Visual Icon Builder', included: true },
       { text: 'Toast notification system', included: true },
-      { text: 'Commercial use', included: true },
-      { text: 'Attribution required', included: true, highlight: true },
+      { text: 'Commercial use for asset packs', included: true },
+      { text: 'Asset attribution required', included: true, highlight: true },
       { text: 'Remove attribution', included: false },
     ],
   },
@@ -98,14 +100,14 @@ const PLANS: Plan[] = [
     price: '$9.50',
     originalPrice: '$19',
     priceSuffix: 'one-time · 1 project',
-    description: 'Ship your product without attribution. One project, lifetime license, all current icons.',
+    description: 'Remove attribution for icon assets in one shipped product. MIT code packages remain free either way.',
     color: 'gold',
     popular: true,
     cta: 'Buy Indie License',
     ctaHref: 'mailto:info@pxlkit.xyz?subject=Indie%20License%20Purchase',
     features: [
       { text: 'Everything in Community', included: true },
-      { text: 'No attribution required', included: true, highlight: true },
+      { text: 'No asset attribution required', included: true, highlight: true },
       { text: '1 commercial project', included: true },
       { text: 'Lifetime license', included: true },
       { text: 'All current icon packs', included: true },
@@ -119,13 +121,13 @@ const PLANS: Plan[] = [
     price: '$24.50',
     originalPrice: '$49',
     priceSuffix: 'one-time · unlimited projects',
-    description: 'The ultimate license for agencies and teams. Unlimited projects, all future packs, priority support.',
+    description: 'The ultimate asset license for agencies and teams. Unlimited shipped products, all future packs, priority support.',
     color: 'cyan',
     cta: 'Buy Team License',
     ctaHref: 'mailto:info@pxlkit.xyz?subject=Team%20License%20Purchase',
     features: [
       { text: 'Everything in Indie', included: true },
-      { text: 'No attribution required', included: true, highlight: true },
+      { text: 'No asset attribution required', included: true, highlight: true },
       { text: 'Unlimited projects', included: true, highlight: true },
       { text: 'Lifetime license', included: true },
       { text: 'All current & future packs', included: true },
@@ -178,7 +180,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Can I use the free version for commercial projects?',
-    a: 'Yes! The Community license allows full commercial use. The only requirement is that you include the attribution credit. You can build SaaS products, client sites, apps — anything.',
+    a: 'Yes. MIT code packages can be used commercially with no attribution. The icon packs are also allowed in commercial projects under the free Community asset terms, as long as you include the attribution credit.',
   },
   {
     q: 'What is a "project"?',
@@ -202,7 +204,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Is the source code still open?',
-    a: 'Absolutely. The full source code is on GitHub. You can read it, learn from it, fork it for personal use, and contribute. The license simply requires attribution for usage in shipped products (or a paid license to remove it).',
+    a: 'Yes. The core code packages are MIT-licensed and fully available on GitHub. Attribution and paid tiers only apply to the icon and visual asset packages.',
   },
 ];
 
@@ -241,7 +243,7 @@ function HeroSection() {
         <br />
         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-retro-gold/30 bg-retro-bg/80 backdrop-blur-sm text-retro-gold font-mono text-xs mb-6">
           <span className="w-2 h-2 bg-retro-gold rounded-full animate-pulse" />
-          Open Source · Fair Pricing
+          MIT Code · Licensed Assets
         </span>
       </motion.div>
 
@@ -262,9 +264,9 @@ function HeroSection() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.3 }}
       >
-        Free forever with attribution. Pay once to remove it.
+        MIT code is free forever. Icon packs are free with attribution, or pay once to remove it.
         <br />
-        <span className="text-retro-text/70">The full UI kit + icon library. No subscriptions. No gotchas.</span>
+        <span className="text-retro-text/70">Clear split licensing for code, icon assets, and branding. No subscriptions. No gotchas.</span>
       </motion.p>
 
       <motion.p
@@ -273,7 +275,7 @@ function HeroSection() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.4 }}
       >
-        {UI_COMPONENTS_COUNT} React components · 204+ pixel icons · 6 packs · Lifetime licenses
+        {UI_COMPONENTS_COUNT} React components · {ICON_COUNT_LABEL} pixel icons · {ICON_PACK_COUNT_LABEL} packs · Lifetime asset licenses
       </motion.p>
     </section>
   );
@@ -559,13 +561,13 @@ function PurchaseCheckout({ plan, buttonClass }: { plan: Plan, buttonClass: stri
 /* ──────────────── COMPARISON TABLE ──────────────── */
 function ComparisonTable() {
   const rows = [
-    { feature: '204+ pixel art icons', community: true, indie: true, team: true },
+    { feature: `${ICON_COUNT_LABEL} pixel art icons`, community: true, indie: true, team: true },
     { feature: 'React components & SVG export', community: true, indie: true, team: true },
     { feature: 'Visual Icon Builder', community: true, indie: true, team: true },
     { feature: 'Toast notification system', community: true, indie: true, team: true },
     { feature: 'Static & animated icons', community: true, indie: true, team: true },
     { feature: 'Commercial use', community: true, indie: true, team: true },
-    { feature: 'Attribution required', community: true, indie: false, team: false },
+    { feature: 'Asset attribution required', community: true, indie: false, team: false },
     { feature: 'Projects included', community: '∞', indie: '1', team: '∞' },
     { feature: 'Future icon packs', community: true, indie: false, team: true },
     { feature: 'Priority support', community: false, indie: false, team: true },
@@ -631,8 +633,8 @@ function CellValue({ value, row }: { value: boolean | string; row: string }) {
   if (typeof value === 'string') {
     return <span className="text-retro-text/70 text-xs sm:text-sm font-medium">{value}</span>;
   }
-  // "Attribution required" row: true = required (bad/neutral), false = not required (good)
-  if (row === 'Attribution required') {
+  // "Asset attribution required" row: true = required (bad/neutral), false = not required (good)
+  if (row === 'Asset attribution required') {
     return value ? (
       <span className="text-retro-gold/70 text-xs">Required</span>
     ) : (
@@ -728,7 +730,7 @@ function CTASection() {
           START BUILDING
         </h2>
         <p className="text-retro-muted text-base sm:text-lg font-body mb-8 max-w-lg mx-auto">
-          Get started for free in seconds. Add pixel art icons to your project today — no sign-up required.
+          Get started in seconds. MIT code is free, and the icon packs are free with attribution — no sign-up required.
         </p>
 
         {/* Install command */}
@@ -758,15 +760,15 @@ function CTASection() {
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
           <div className="p-4 rounded-lg border border-retro-green/20 bg-retro-green/5">
             <p className="font-pixel text-[10px] text-retro-green mb-1">COMMUNITY</p>
-            <p className="text-retro-muted text-xs font-mono">Free with attribution</p>
+            <p className="text-retro-muted text-xs font-mono">Icon packs free with attribution</p>
           </div>
           <div className="p-4 rounded-lg border border-retro-gold/20 bg-retro-gold/5">
             <p className="font-pixel text-[10px] text-retro-gold mb-1">INDIE — $19</p>
-            <p className="text-retro-muted text-xs font-mono">1 project, no attribution</p>
+            <p className="text-retro-muted text-xs font-mono">1 product, no asset attribution</p>
           </div>
           <div className="p-4 rounded-lg border border-retro-cyan/20 bg-retro-cyan/5">
             <p className="font-pixel text-[10px] text-retro-cyan mb-1">TEAM — $49</p>
-            <p className="text-retro-muted text-xs font-mono">Unlimited, no attribution</p>
+            <p className="text-retro-muted text-xs font-mono">Unlimited, no asset attribution</p>
           </div>
         </div>
       </motion.div>
