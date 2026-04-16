@@ -6,10 +6,32 @@ import { Grid, Package, Search, Settings, Home } from '@pxlkit/ui';
 import { Trophy, Shield, Lightning, Crown, Gem, Star } from '@pxlkit/gamification';
 import { Globe, User } from '@pxlkit/social';
 import { ShieldCheck, Bell } from '@pxlkit/feedback';
+import { Sun, Moon } from '@pxlkit/weather';
 import { PixelButton, PixelBadge, PixelTooltip } from '@pxlkit/ui-kit';
 
+/* ── Shared theme toggle props ──────────────────────────────────────────── */
+export interface ThemeToggleProps {
+  isDark?: boolean;
+  onToggleTheme?: () => void;
+}
+
+function ThemeToggleButton({ isDark, onToggleTheme }: ThemeToggleProps) {
+  if (!onToggleTheme) return null;
+  return (
+    <PixelTooltip content={isDark ? 'Switch to light' : 'Switch to dark'} position="bottom">
+      <button
+        onClick={onToggleTheme}
+        className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
+        aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      >
+        <PxlKitIcon icon={isDark ? Sun : Moon} size={16} colorful />
+      </button>
+    </PixelTooltip>
+  );
+}
+
 /* ── Header Simple ──────────────────────────────────────────────────────── */
-export function HeaderSimplePreview() {
+export function HeaderSimplePreview({ isDark, onToggleTheme }: ThemeToggleProps) {
   const [activeNav, setActiveNav] = useState('Home');
 
   const navItems = [
@@ -52,6 +74,7 @@ export function HeaderSimplePreview() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggleButton isDark={isDark} onToggleTheme={onToggleTheme} />
           <PixelTooltip content="Search docs" position="bottom">
             <button
               className="p-2 rounded text-retro-muted hover:text-retro-green hover:bg-retro-surface/40 transition-colors"
@@ -84,7 +107,7 @@ const RESOURCES_MENU = [
   { label: 'Status', icon: Shield, desc: 'System health and uptime' },
 ];
 
-export function HeaderDropdownPreview() {
+export function HeaderDropdownPreview({ isDark, onToggleTheme }: ThemeToggleProps) {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
@@ -201,6 +224,7 @@ export function HeaderDropdownPreview() {
         </div>
 
         <div className="flex items-center gap-3">
+          <ThemeToggleButton isDark={isDark} onToggleTheme={onToggleTheme} />
           <button
             className="relative p-2 rounded text-retro-muted hover:text-retro-cyan hover:bg-retro-surface/40 transition-colors"
             aria-label="Notifications"
@@ -223,7 +247,7 @@ export function HeaderDropdownPreview() {
 }
 
 /* ── Header Centered Logo ───────────────────────────────────────────────── */
-export function HeaderCenteredLogoPreview() {
+export function HeaderCenteredLogoPreview({ isDark, onToggleTheme }: ThemeToggleProps) {
   const [activeNav, setActiveNav] = useState('About');
 
   return (
@@ -290,6 +314,7 @@ export function HeaderCenteredLogoPreview() {
                 </span>
               </span>
             ))}
+            <ThemeToggleButton isDark={isDark} onToggleTheme={onToggleTheme} />
             <PixelTooltip content="App settings" position="bottom">
               <button
                 className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
