@@ -1,10 +1,11 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Sun, Moon } from '@pxlkit/weather';
 import { PixelTooltip } from '@pxlkit/ui-kit';
+import { useTheme } from '../../components/ThemeProvider';
 import { PREVIEW_MAP } from '../previews';
 
 /** IDs that are full-page templates (they carry their own theme toggle in the header). */
@@ -20,7 +21,13 @@ function PreviewContent() {
   const params = useSearchParams();
   const id = params.get('id') ?? '';
   const Preview = PREVIEW_MAP[id];
-  const [dark, setDark] = useState(true);
+  const { theme, toggleTheme } = useTheme();
+  const dark = theme === 'dark';
+
+  /* Default previews to dark on first mount so they always start consistent */
+  useEffect(() => {
+    // no-op — we simply read from global ThemeProvider
+  }, []);
 
   if (!Preview) {
     return (
@@ -44,26 +51,24 @@ function PreviewContent() {
     );
   }
 
-  /* Section previews: wrap with theme class + floating toggle */
+  /* Section previews: use global theme + floating toggle */
   return (
-    <div className={dark ? 'dark' : 'light'}>
-      <div className="min-h-screen bg-retro-bg text-retro-text">
-        <div className="sticky top-0 z-50 flex items-center justify-end gap-2 px-4 py-2 bg-retro-bg/80 backdrop-blur-sm border-b border-retro-border/30">
-          <PixelTooltip content={dark ? 'Switch to light' : 'Switch to dark'} position="bottom">
-            <button
-              onClick={() => setDark((d) => !d)}
-              className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
-              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              <PxlKitIcon icon={dark ? Sun : Moon} size={16} colorful />
-            </button>
-          </PixelTooltip>
-          <span className="font-mono text-xs text-retro-muted/60 select-none">
-            {dark ? 'Dark' : 'Light'}
-          </span>
-        </div>
-        <Preview />
+    <div className="min-h-screen bg-retro-bg text-retro-text">
+      <div className="sticky top-0 z-50 flex items-center justify-end gap-2 px-4 py-2 bg-retro-bg/80 backdrop-blur-sm border-b border-retro-border/30">
+        <PixelTooltip content={dark ? 'Switch to light' : 'Switch to dark'} position="bottom">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
+            aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            <PxlKitIcon icon={dark ? Sun : Moon} size={16} colorful />
+          </button>
+        </PixelTooltip>
+        <span className="font-mono text-xs text-retro-muted/60 select-none">
+          {dark ? 'Dark' : 'Light'}
+        </span>
       </div>
+      <Preview />
     </div>
   );
 }
