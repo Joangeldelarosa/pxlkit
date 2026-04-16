@@ -23,25 +23,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1.0,
     },
     {
-      url: `${SITE_URL}/icons`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
       url: `${SITE_URL}/ui-kit`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${SITE_URL}/explore`,
+      url: `${SITE_URL}/templates`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: `${SITE_URL}/templates`,
+      url: `${SITE_URL}/icons`,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
@@ -63,6 +57,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.7,
+    },
+    {
+      url: `${SITE_URL}/explore`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.6,
     },
   ];
 }

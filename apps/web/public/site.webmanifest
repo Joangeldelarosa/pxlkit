@@ -1,12 +1,12 @@
 {
-  "name": "Pxlkit — Retro React UI Kit, Pixel Art Icons & 3D Voxel Game Engine",
+  "name": "Pxlkit — Retro React UI Kit, 226+ Pixel Art Icons & Ready-to-Use Templates",
   "short_name": "Pxlkit",
-  "description": "Open-source React toolkit: 226+ pixel art SVG icons, 40+ retro UI components, 3D parallax effects, animated icons, visual icon builder, toast notifications, and a voxel game engine with procedural world generation powered by Three.js & React Three Fiber.",
+  "description": "Retro pixel-art React toolkit: 226+ SVG icons, 40+ UI components, ready-to-use templates & sections, visual icon builder, and Tailwind CSS integration. TypeScript-first, MIT-licensed code.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0A0A0F",
   "theme_color": "#00FF88",
-  "categories": ["developer tools", "games", "design", "graphics"],
+  "categories": ["developer tools", "design", "graphics", "productivity"],
   "icons": [
     {
       "src": "/icon-192.png",
