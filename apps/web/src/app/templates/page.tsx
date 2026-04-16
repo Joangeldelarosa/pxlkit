@@ -328,6 +328,37 @@ export default function TemplatesPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Mobile nav strip */}
+        <div className="lg:hidden mb-5">
+          <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:thin]" role="tablist" tabIndex={0}>
+            {TEMPLATE_SECTIONS.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-mono rounded border transition-all whitespace-nowrap ${
+                  activeSection === section.id && !isPagesView
+                    ? 'text-retro-green border-retro-green/40 bg-retro-green/10'
+                    : 'text-retro-muted border-retro-border hover:text-retro-text hover:bg-retro-surface'
+                }`}
+              >
+                <span aria-hidden><PxlKitIcon icon={section.icon} size={14} colorful /></span>
+                {section.name}
+              </button>
+            ))}
+            <button
+              onClick={() => setActiveSection('__pages__')}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-mono rounded border transition-all whitespace-nowrap ${
+                isPagesView
+                  ? 'text-retro-gold border-retro-gold/40 bg-retro-gold/10'
+                  : 'text-retro-muted border-retro-border hover:text-retro-text hover:bg-retro-surface'
+              }`}
+            >
+              <span aria-hidden><PxlKitIcon icon={Scroll} size={14} colorful /></span>
+              Full Pages
+            </button>
+          </div>
+        </div>
+
         <div className="flex gap-6 lg:gap-8">
           {/* Sidebar navigation */}
           <aside className="hidden lg:block w-56 flex-shrink-0">
@@ -368,50 +399,19 @@ export default function TemplatesPage() {
             </div>
           </aside>
 
-          {/* Mobile nav strip */}
-          <div className="lg:hidden w-full mb-5">
-            <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:thin]">
-              {TEMPLATE_SECTIONS.map((section) => (
-                <button
-                  key={section.id}
-                  onClick={() => setActiveSection(section.id)}
-                  className={`shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-mono rounded border transition-all whitespace-nowrap ${
-                    activeSection === section.id && !isPagesView
-                      ? 'text-retro-green border-retro-green/40 bg-retro-green/10'
-                      : 'text-retro-muted border-retro-border hover:text-retro-text hover:bg-retro-surface'
-                  }`}
-                >
-                  <span aria-hidden><PxlKitIcon icon={section.icon} size={14} colorful /></span>
-                  {section.name}
-                </button>
-              ))}
-                <button
-                  onClick={() => setActiveSection('__pages__')}
-                  className={`shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-mono rounded border transition-all whitespace-nowrap ${
-                    isPagesView
-                      ? 'text-retro-gold border-retro-gold/40 bg-retro-gold/10'
-                      : 'text-retro-muted border-retro-border hover:text-retro-text hover:bg-retro-surface'
-                }`}
-              >
-                <span aria-hidden><PxlKitIcon icon={Scroll} size={14} colorful /></span>
-                Full Pages
-              </button>
-            </div>
-          </div>
-
           {/* Main content */}
-          <main className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0">
             {isPagesView ? (
               <PixelFadeIn>
                 <div className="mb-6">
                   <h2 className="font-pixel text-base text-retro-text leading-loose">
                     Full Page Templates
                   </h2>
-                  <p className="text-retro-muted font-mono text-sm mt-1">
+                  <p className="text-retro-muted font-mono text-xs sm:text-sm mt-1">
                     Complete page layouts ready to drop into your project.
                   </p>
                 </div>
-                <div className="space-y-8">
+                <div className="space-y-6 sm:space-y-8">
                   {FULL_PAGE_TEMPLATES.map((tpl) => (
                     <PageTemplateCard key={tpl.id} tpl={tpl} />
                   ))}
@@ -420,25 +420,25 @@ export default function TemplatesPage() {
             ) : currentSection ? (
               <PixelFadeIn key={currentSection.id}>
                 <div className="mb-6">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                     <span aria-hidden><PxlKitIcon icon={currentSection.icon} size={28} colorful /></span>
-                    <h2 className="font-pixel text-base text-retro-text leading-loose">
+                    <h2 className="font-pixel text-sm sm:text-base text-retro-text leading-loose">
                       {currentSection.name}
                     </h2>
                     <PixelBadge tone="neutral">
                       {currentSection.variants.length} variants
                     </PixelBadge>
                   </div>
-                  <p className="text-retro-muted font-mono text-sm">{currentSection.description}</p>
+                  <p className="text-retro-muted font-mono text-xs sm:text-sm">{currentSection.description}</p>
                 </div>
-                <div className="space-y-8">
+                <div className="space-y-6 sm:space-y-8">
                   {currentSection.variants.map((variant) => (
                     <VariantCard key={variant.id} variant={variant} />
                   ))}
                 </div>
               </PixelFadeIn>
             ) : null}
-          </main>
+          </div>
         </div>
       </div>
     </div>
