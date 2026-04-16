@@ -1,0 +1,23 @@
+Pxlkit Third-Party Notices
+==========================
+
+This repository includes or depends on third-party software and services that remain
+subject to their own licenses and terms.
+
+Key examples used by the web app and packages include:
+- React and React DOM
+- Next.js
+- Three.js
+- React Three Fiber and @react-three/drei
+- Framer Motion
+- Tailwind CSS
+- PayPal JavaScript SDK / @paypal/react-paypal-js
+- Vercel Analytics and Vercel KV
+
+Fonts and hosted assets
+-----------------------
+- `apps/web/src/app/globals.css` imports Google Fonts (`Press Start 2P`, `JetBrains Mono`, and `Inter`) from `fonts.googleapis.com`.
+- If you need stricter privacy/compliance controls, self-host those fonts before production use.
+
+You are responsible for complying with third-party license, attribution, privacy,
+and usage requirements when distributing or hosting your own product.

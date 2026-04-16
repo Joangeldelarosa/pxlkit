@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/ui",
-  "version": "1.2.2",
-  "description": "UI & interface pixel art icon pack — 41 icons for tools, controls, navigation, editor elements, home, search, settings, menus, and layout",
+  "version": "1.2.3",
+  "description": "UI & interface pixel art icon pack \u2014 41 icons for tools, controls, navigation, editor elements, home, search, settings, menus, and layout",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
@@ -29,7 +29,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.0.0"
+    "@pxlkit/core": "^1.2.3"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
@@ -53,7 +53,7 @@
     "layout-icons",
     "svg-icons",
     "react-icons",
-    "open-source-icons",
+    "source-available-icons",
     "free-ui-icons",
     "8-bit-icons"
   ]

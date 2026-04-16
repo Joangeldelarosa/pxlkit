@@ -86,7 +86,7 @@ apps/
 
 ## Contributor License
 
-By submitting code, icons, or other material, you agree to the contributor license terms in [LICENSE](./LICENSE) Section 4. In short: you grant the project a perpetual, worldwide license to use your contribution under any license terms, including commercial licenses.
+By submitting code, icons, or other material, you agree to the contributor terms in [CONTRIBUTOR_LICENSE.md](./CONTRIBUTOR_LICENSE.md). In short: code contributions stay MIT-compatible, asset contributions may be distributed under the repository's asset and commercial terms, and you confirm you have the rights needed to contribute.
 
 **Contributors who have accepted icons, code, or significant documentation merged into the project receive a free Team license** as a thank-you.
 
