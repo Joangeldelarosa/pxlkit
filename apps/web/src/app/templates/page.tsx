@@ -2,10 +2,9 @@
 
 import { useState, useCallback } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
-import { Check, Copy, ArrowRight, Grid, ExternalLink } from '@pxlkit/ui';
+import { Check, Copy, Grid, ExternalLink } from '@pxlkit/ui';
 import { Sun, Moon } from '@pxlkit/weather';
 import {
-  PixelButton,
   PixelBadge,
   PixelFadeIn,
   PixelDivider,
