@@ -15,6 +15,10 @@
     --grid-line: rgba(255, 255, 255, 0.04);
   }
 
+  .light {
+    --grid-line: rgba(0, 0, 0, 0.06);
+  }
+
   * {
     image-rendering: pixelated;
     -webkit-tap-highlight-color: transparent;
