@@ -943,7 +943,7 @@ export default function BuilderPage() {
 
           {/* Active color */}
           <div
-            className="shrink-0 w-6 h-6 rounded border-2 border-white/50 shadow"
+            className="shrink-0 w-6 h-6 rounded border-2 border-retro-text/50 shadow"
             style={{ backgroundColor: state.activeColor }}
           />
 
@@ -1093,7 +1093,7 @@ export default function BuilderPage() {
                   onClick={() => dispatch({ type: 'SET_ACTIVE_COLOR', char })}
                   className={`relative w-8 h-8 rounded border-2 transition-all ${
                     state.activeChar === char
-                      ? 'border-white scale-110 shadow-lg'
+                      ? 'border-retro-text scale-110 shadow-lg'
                       : 'border-retro-border/50 hover:scale-105'
                   }`}
                   style={{ backgroundColor: color }}
