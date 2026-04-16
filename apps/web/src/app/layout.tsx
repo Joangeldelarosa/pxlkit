@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
+import { ConditionalShell } from '../components/ConditionalShell';
 import { ThemeProvider } from '../components/ThemeProvider';
 import { ToastProvider } from '../components/ToastProvider';
 import './globals.css';
@@ -428,8 +427,10 @@ const THEME_INIT_SCRIPT = `
     var t = localStorage.getItem('pxlkit-theme');
     if (t === 'light') {
       document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
     } else {
       document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
     }
   } catch(e){}
 })();
@@ -459,9 +460,9 @@ export default function RootLayout({
             <div className="fixed inset-0 pointer-events-none opacity-60 bg-grid-pattern" data-pxlkit="grid-bg" />
 
             <div className="relative z-10 flex flex-col min-h-screen">
-              <Navbar />
-              <main className="flex-1">{children}</main>
-              <Footer />
+              <ConditionalShell>
+                {children}
+              </ConditionalShell>
             </div>
           </ToastProvider>
         </ThemeProvider>

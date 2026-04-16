@@ -1,16 +1,41 @@
+/*
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║  @pxlkit/ui-kit — Theme & Design Tokens                    ║
+ * ║                                                              ║
+ * ║  Tailwind CSS v4 (CSS-first configuration)                   ║
+ * ║                                                              ║
+ * ║  HOW TO CUSTOMIZE:                                           ║
+ * ║  Override any --retro-* variable on :root (light) or .dark   ║
+ * ║  to change the entire palette. All components and utilities  ║
+ * ║  reference these tokens — one change updates everything.     ║
+ * ║                                                              ║
+ * ║  Example (in your app's CSS, after importing this file):     ║
+ * ║    :root { --retro-primary: #2563eb; }                       ║
+ * ║    .dark { --retro-primary: #60a5fa; }                       ║
+ * ╚══════════════════════════════════════════════════════════════╝
+ */
 @import "tailwindcss";
 
+/* ─── Design Tokens (Tailwind v4 @theme) ──────────────────────
+ * Maps CSS custom properties to Tailwind utility classes.
+ * e.g. --color-retro-bg → bg-retro-bg, text-retro-bg, etc.
+ * Values resolve at runtime via var() so they adapt to theme.
+ * ──────────────────────────────────────────────────────────── */
 @theme {
+  /* ── Surface & Layout Colors ── */
   --color-retro-bg: var(--retro-bg);
   --color-retro-surface: var(--retro-surface);
   --color-retro-card: var(--retro-card);
   --color-retro-text: var(--retro-text);
   --color-retro-border: var(--retro-border);
+
+  /* ── Semantic Colors ── */
   --color-retro-primary: var(--retro-primary);
   --color-retro-secondary: var(--retro-secondary);
   --color-retro-accent: var(--retro-accent);
   --color-retro-muted: var(--retro-muted);
 
+  /* ── Tone Colors (component system) ── */
   --color-retro-green: var(--retro-green);
   --color-retro-green-hover: var(--retro-green-hover);
   --color-retro-cyan: var(--retro-cyan);
@@ -19,15 +44,18 @@
   --color-retro-purple: var(--retro-purple);
   --color-retro-pink: var(--retro-pink);
 
+  /* ── Typography ── */
   --font-pixel: "Press Start 2P", monospace;
   --font-sans: "Inter", sans-serif;
-  
+
+  /* ── Shadows (theme-aware via CSS variables) ── */
   --shadow-retro: 4px 4px 0px 0px currentColor;
   --shadow-retro-hover: 2px 2px 0px 0px currentColor;
-  --shadow-pixel: 4px 4px 0px 0px rgba(0, 255, 136, 0.3);
-  --shadow-pixel-lg: 6px 6px 0px 0px rgba(0, 255, 136, 0.2);
-  --shadow-pixel-gold: 4px 4px 0px 0px rgba(255, 215, 0, 0.3);
+  --shadow-pixel: 4px 4px 0px 0px var(--retro-shadow-green);
+  --shadow-pixel-lg: 6px 6px 0px 0px var(--retro-shadow-green-lg);
+  --shadow-pixel-gold: 4px 4px 0px 0px var(--retro-shadow-gold);
 
+  /* ── Animations ── */
   --animate-float: float 3s ease-in-out infinite;
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-scanlines: scanlines 8s linear infinite;
@@ -42,9 +70,21 @@
   }
 }
 
+/* ─── Theme Color Definitions ─────────────────────────────────
+ * Light theme: :root / :host (default)
+ * Dark theme:  .dark class on <html> or any ancestor
+ * Light override: .light class (for nested previews inside .dark)
+ *
+ * To customize, override these variables in your own CSS file
+ * AFTER importing @pxlkit/ui-kit/styles.css:
+ *
+ *   @import "@pxlkit/ui-kit/styles.css";
+ *   :root  { --retro-green: #22c55e; --retro-bg: #fafaf9; }
+ *   .dark  { --retro-green: #4ade80; --retro-bg: #0c0a09; }
+ * ──────────────────────────────────────────────────────────── */
 @layer base {
   :root, :host {
-    /* Light Theme Hex Colors */
+    /* ── Light Theme ── */
     --retro-bg: #F2F0EB;
     --retro-surface: #E6E2DC;
     --retro-card: #DCD8D0;
@@ -54,7 +94,7 @@
     --retro-secondary: #FBBF24;
     --retro-accent: #10B981;
     --retro-muted: #646478;
-    
+
     --retro-green: #008C4B;
     --retro-green-hover: #006E3A;
     --retro-cyan: #24827A;
@@ -62,10 +102,15 @@
     --retro-gold: #B48700;
     --retro-purple: #8237C8;
     --retro-pink: #C84678;
+
+    /* Shadow colors (light) */
+    --retro-shadow-green: rgba(0, 140, 75, 0.3);
+    --retro-shadow-green-lg: rgba(0, 140, 75, 0.2);
+    --retro-shadow-gold: rgba(180, 135, 0, 0.3);
   }
 
   .dark {
-    /* Dark Theme Hex Colors */
+    /* ── Dark Theme ── */
     --retro-bg: #0A0A0F;
     --retro-surface: #12121A;
     --retro-card: #1A1A2E;
@@ -75,7 +120,7 @@
     --retro-secondary: #FCD34D;
     --retro-accent: #34D399;
     --retro-muted: #8888AA;
-    
+
     --retro-green: #00FF88;
     --retro-green-hover: #00CC6A;
     --retro-cyan: #4ECDC4;
@@ -83,6 +128,38 @@
     --retro-gold: #FFD700;
     --retro-purple: #A855F7;
     --retro-pink: #FF77A8;
+
+    /* Shadow colors (dark — neon glow) */
+    --retro-shadow-green: rgba(0, 255, 136, 0.3);
+    --retro-shadow-green-lg: rgba(0, 255, 136, 0.2);
+    --retro-shadow-gold: rgba(255, 215, 0, 0.3);
+  }
+
+  /* Explicit light theme — used inside nested previews to override
+     inherited dark-mode CSS variables from ancestor .dark elements. */
+  .light {
+    --retro-bg: #F2F0EB;
+    --retro-surface: #E6E2DC;
+    --retro-card: #DCD8D0;
+    --retro-text: #1A1A2E;
+    --retro-border: #BEBAA2;
+    --retro-primary: #4F46E5;
+    --retro-secondary: #FBBF24;
+    --retro-accent: #10B981;
+    --retro-muted: #646478;
+
+    --retro-green: #008C4B;
+    --retro-green-hover: #006E3A;
+    --retro-cyan: #24827A;
+    --retro-red: #C83741;
+    --retro-gold: #B48700;
+    --retro-purple: #8237C8;
+    --retro-pink: #C84678;
+
+    /* Shadow colors (light) */
+    --retro-shadow-green: rgba(0, 140, 75, 0.3);
+    --retro-shadow-green-lg: rgba(0, 140, 75, 0.2);
+    --retro-shadow-gold: rgba(180, 135, 0, 0.3);
   }
 
   /*
@@ -101,6 +178,9 @@
    */
 }
 
+/* ─── Utility Classes ─────────────────────────────────────────
+ * Retro pixel-art utility classes for borders, shadows, and FX.
+ * ──────────────────────────────────────────────────────────── */
 @layer utilities {
   .pixel-corners {
     clip-path: polygon(

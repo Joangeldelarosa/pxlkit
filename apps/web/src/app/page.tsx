@@ -99,7 +99,7 @@ function HeroSection() {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="relative order-2 lg:order-1 w-full max-w-lg mx-auto lg:max-w-none"
           >
-            <div className="relative rounded-xl border border-retro-border/30 overflow-hidden bg-[#0d1117]/60 backdrop-blur-sm">
+            <div className="relative rounded-xl border border-retro-border/30 overflow-hidden bg-retro-surface/60 backdrop-blur-sm">
               {/* Corner accents */}
               <div className="absolute top-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-l-2 border-retro-green/50 rounded-tl-xl" />
               <div className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-t-2 border-r-2 border-retro-green/50 rounded-tr-xl" />
@@ -296,7 +296,7 @@ function VoxelComingSoon() {
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
         >
-          <div className="relative rounded-xl border border-retro-border/40 overflow-hidden bg-[#0d1117]/80 backdrop-blur-sm">
+          <div className="relative rounded-xl border border-retro-border/40 overflow-hidden bg-retro-surface/80 backdrop-blur-sm">
             {/* Corner accents */}
             <div className="absolute top-0 left-0 w-6 h-6 sm:w-10 sm:h-10 border-t-2 border-l-2 border-retro-green/60 rounded-tl-xl" />
             <div className="absolute top-0 right-0 w-6 h-6 sm:w-10 sm:h-10 border-t-2 border-r-2 border-retro-green/60 rounded-tr-xl" />
