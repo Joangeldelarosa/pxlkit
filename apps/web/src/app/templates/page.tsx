@@ -327,7 +327,7 @@ export default function TemplatesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Mobile nav strip */}
         <div className="lg:hidden mb-5">
-          <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:thin]">
+          <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:thin]" role="tablist" tabIndex={0}>
             {TEMPLATE_SECTIONS.map((section) => (
               <button
                 key={section.id}
