@@ -65,6 +65,7 @@ const TONE_THEME: Record<ToastTone, {
   bg: string;
   border: string;
   accent: string;
+  text: string;
   glow: string;
   progressFrom: string;
   progressTo: string;
@@ -73,6 +74,7 @@ const TONE_THEME: Record<ToastTone, {
     bg: '#0c1f14',
     border: '#1a4a2e',
     accent: '#00ff88',
+    text: '#e8e6e3',
     glow: 'rgba(0, 255, 136, 0.15)',
     progressFrom: '#00ff88',
     progressTo: '#00cc6a',
@@ -81,6 +83,7 @@ const TONE_THEME: Record<ToastTone, {
     bg: '#1f0c0c',
     border: '#4a1a1a',
     accent: '#ff6b6b',
+    text: '#e8e6e3',
     glow: 'rgba(255, 107, 107, 0.15)',
     progressFrom: '#ff6b6b',
     progressTo: '#cc4444',
@@ -89,6 +92,7 @@ const TONE_THEME: Record<ToastTone, {
     bg: '#0c1a1f',
     border: '#1a3a4a',
     accent: '#4ecdc4',
+    text: '#e8e6e3',
     glow: 'rgba(78, 205, 196, 0.15)',
     progressFrom: '#4ecdc4',
     progressTo: '#3ab3aa',
@@ -97,6 +101,7 @@ const TONE_THEME: Record<ToastTone, {
     bg: '#1f1a0c',
     border: '#4a3a1a',
     accent: '#ffa300',
+    text: '#e8e6e3',
     glow: 'rgba(255, 163, 0, 0.15)',
     progressFrom: '#ffa300',
     progressTo: '#cc8200',
@@ -249,7 +254,7 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: () => void
                 {item.title}
               </p>
               {item.message && (
-                <p className="font-mono text-xs leading-relaxed opacity-80 mt-1 break-words" style={{ color: '#e8e6e3' }}>
+                <p className="font-mono text-xs leading-relaxed opacity-80 mt-1 break-words" style={{ color: theme.text }}>
                   {item.message}
                 </p>
               )}
