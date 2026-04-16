@@ -1,11 +1,11 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Sun, Moon } from '@pxlkit/weather';
 import { PixelTooltip } from '@pxlkit/ui-kit';
-import { useTheme } from '../../components/ThemeProvider';
+import { useTheme } from '../../../components/ThemeProvider';
 import { PREVIEW_MAP } from '../previews';
 
 /** IDs that are full-page templates (they carry their own theme toggle in the header). */
@@ -23,11 +23,6 @@ function PreviewContent() {
   const Preview = PREVIEW_MAP[id];
   const { theme, toggleTheme } = useTheme();
   const dark = theme === 'dark';
-
-  /* Default previews to dark on first mount so they always start consistent */
-  useEffect(() => {
-    // no-op — we simply read from global ThemeProvider
-  }, []);
 
   if (!Preview) {
     return (

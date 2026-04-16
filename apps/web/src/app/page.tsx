@@ -911,7 +911,7 @@ import { Trophy } from '@pxlkit/gamification';
             FROM NPM INSTALL TO PIXEL-PERFECT IN 3 STEPS
           </h2>
           <p className="text-retro-muted max-w-xl mx-auto text-xs sm:text-sm px-2">
-            Icons are simple character grids — each character maps to a colour.
+            Icons are simple character grids — each character maps to a color.
             No complex APIs, no config files, no learning curve. Install, import, render.
           </p>
         </motion.div>
