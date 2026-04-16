@@ -1,4 +1,5 @@
 import type { TemplateSection } from '../types';
+import { Star } from '@pxlkit/gamification';
 
 const INSTALL_CORE_UIKIT = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/gamification';
 const INSTALL_PARALLAX = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/parallax';
@@ -189,7 +190,7 @@ export const heroSection: TemplateSection = {
   id: 'hero',
   name: 'Hero Sections',
   description: 'Full-width hero sections for landing pages — centered, split layout, and parallax.',
-  icon: '🚀',
+  icon: Star,
   variants: [
     {
       id: 'hero-centered',

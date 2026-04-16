@@ -4,6 +4,12 @@ import { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Float } from '@react-three/drei';
 import * as THREE from 'three';
+import { PxlKitIcon } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core';
+import { Sun } from '@pxlkit/weather';
+import { Globe } from '@pxlkit/social';
+import { Robot } from '@pxlkit/ui';
+import { QuestCompass } from '@pxlkit/gamification';
 
 /* ═══════════════════════════════════════════════════════════
  *  Types
@@ -1029,11 +1035,11 @@ function WorldScene() {
  *  Main Export — Canvas + Tab Switcher
  * ═══════════════════════════════════════════════════════════ */
 
-const TABS: { id: SceneTab; label: string; icon: string }[] = [
-  { id: 'island', label: 'Island', icon: '🏝️' },
-  { id: 'terrain', label: 'Terrain', icon: '🌍' },
-  { id: 'character', label: 'Character', icon: '🤖' },
-  { id: 'world', label: 'World', icon: '🏔️' },
+const TABS: { id: SceneTab; label: string; icon: PxlKitData }[] = [
+  { id: 'island', label: 'Island', icon: Sun },
+  { id: 'terrain', label: 'Terrain', icon: Globe },
+  { id: 'character', label: 'Character', icon: Robot },
+  { id: 'world', label: 'World', icon: QuestCompass },
 ];
 
 export default function VoxelPreview({ onTabChange, initialTab = 'island', showTabs = true }: { onTabChange?: (tab: SceneTab) => void; initialTab?: SceneTab; showTabs?: boolean }) {
@@ -1062,7 +1068,7 @@ export default function VoxelPreview({ onTabChange, initialTab = 'island', showT
                 }
               `}
             >
-              <span className="mr-0.5 sm:mr-1">{t.icon}</span>
+              <span className="mr-0.5 sm:mr-1"><PxlKitIcon icon={t.icon} size={10} colorful /></span>
               <span className="hidden sm:inline">{t.label}</span>
             </button>
           ))}

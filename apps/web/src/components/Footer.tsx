@@ -14,22 +14,22 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-3 mb-4">
               <div className="w-6 h-6">
                 <svg viewBox="0 0 32 32" className="w-full h-full" shapeRendering="crispEdges">
-                  <rect width="32" height="32" fill="rgb(var(--retro-bg))" rx="4" />
-                  <rect x="4" y="2" width="24" height="2" fill="rgb(var(--retro-green))" />
-                  <rect x="2" y="4" width="2" height="24" fill="rgb(var(--retro-green))" />
-                  <rect x="28" y="4" width="2" height="24" fill="rgb(var(--retro-cyan))" />
-                  <rect x="4" y="28" width="24" height="2" fill="rgb(var(--retro-cyan))" />
-                  <rect x="4" y="4" width="2" height="2" fill="rgb(var(--retro-green))" />
-                  <rect x="26" y="4" width="2" height="2" fill="rgb(var(--retro-cyan))" />
-                  <rect x="4" y="26" width="2" height="2" fill="rgb(var(--retro-cyan))" />
-                  <rect x="26" y="26" width="2" height="2" fill="rgb(var(--retro-cyan))" />
-                  <rect x="8" y="8" width="2" height="14" fill="rgb(var(--retro-gold))" />
-                  <rect x="10" y="8" width="8" height="2" fill="rgb(var(--retro-gold))" />
-                  <rect x="18" y="10" width="2" height="6" fill="rgb(var(--retro-gold))" />
-                  <rect x="10" y="14" width="8" height="2" fill="rgb(var(--retro-gold))" />
-                  <rect x="22" y="20" width="2" height="2" fill="rgb(var(--retro-red))" />
-                  <rect x="24" y="18" width="2" height="2" fill="rgb(var(--retro-red))" />
-                  <rect x="22" y="22" width="4" height="2" fill="rgb(var(--retro-red))" />
+                  <rect width="32" height="32" fill="var(--retro-bg)" rx="4" />
+                  <rect x="4" y="2" width="24" height="2" fill="var(--retro-green)" />
+                  <rect x="2" y="4" width="2" height="24" fill="var(--retro-green)" />
+                  <rect x="28" y="4" width="2" height="24" fill="var(--retro-cyan)" />
+                  <rect x="4" y="28" width="24" height="2" fill="var(--retro-cyan)" />
+                  <rect x="4" y="4" width="2" height="2" fill="var(--retro-green)" />
+                  <rect x="26" y="4" width="2" height="2" fill="var(--retro-cyan)" />
+                  <rect x="4" y="26" width="2" height="2" fill="var(--retro-cyan)" />
+                  <rect x="26" y="26" width="2" height="2" fill="var(--retro-cyan)" />
+                  <rect x="8" y="8" width="2" height="14" fill="var(--retro-gold)" />
+                  <rect x="10" y="8" width="8" height="2" fill="var(--retro-gold)" />
+                  <rect x="18" y="10" width="2" height="6" fill="var(--retro-gold)" />
+                  <rect x="10" y="14" width="8" height="2" fill="var(--retro-gold)" />
+                  <rect x="22" y="20" width="2" height="2" fill="var(--retro-red)" />
+                  <rect x="24" y="18" width="2" height="2" fill="var(--retro-red)" />
+                  <rect x="22" y="22" width="4" height="2" fill="var(--retro-red)" />
                 </svg>
               </div>
               <span className="font-pixel text-[10px] text-retro-green">

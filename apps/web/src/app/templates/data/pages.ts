@@ -1,4 +1,6 @@
 import type { FullPageTemplate } from '../types';
+import { Star, Sword, Scroll } from '@pxlkit/gamification';
+import { Robot, Grid } from '@pxlkit/ui';
 
 /* ─────────────────────────────────────────────────────────────────────────
    1. SaaS Landing Page
@@ -804,7 +806,7 @@ export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
     id: 'page-saas-landing',
     name: 'SaaS Landing Page',
     description: 'Complete SaaS landing composing 8 rich sections: dropdown header, centered hero, icon-grid features, testimonial cards, pricing cards, FAQ accordion, CTA banner, and multi-column footer — all with micro-interactions, tooltips, and animations.',
-    icon: '🚀',
+    icon: Star,
     installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/feedback @pxlkit/gamification',
     code: saasLanding,
   },
@@ -812,7 +814,7 @@ export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
     id: 'page-portfolio',
     name: 'Portfolio / Agency',
     description: 'Creative portfolio built from 7 sections: centered-logo header, parallax hero with floating icons, bento features grid, large-quote testimonial, split CTA, two-column FAQ, and CTA footer — immersive parallax effects throughout.',
-    icon: '🧑‍💻',
+    icon: Robot,
     installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/social @pxlkit/parallax',
     code: devPortfolio,
   },
@@ -820,7 +822,7 @@ export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
     id: 'page-indie-game',
     name: 'Indie Game / Product Launch',
     description: 'High-energy product launch with 7 sections: simple header, split hero, alternating features, testimonial slider, toggle pricing, card CTA, and minimal footer — bold visuals and gamification icons.',
-    icon: '🎮',
+    icon: Sword,
     installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/gamification @pxlkit/effects',
     code: indieGame,
   },
@@ -828,7 +830,7 @@ export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
     id: 'page-admin-dashboard',
     name: 'Enterprise / SaaS App',
     description: 'Enterprise-grade page with 6 sections: dropdown header, bento features, comparison pricing table, tabbed FAQ, CTA banner, and multi-column footer — data-rich layout with interactive tables and tabs.',
-    icon: '📊',
+    icon: Grid,
     installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/feedback',
     code: adminDashboard,
   },
@@ -836,7 +838,7 @@ export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
     id: 'page-blog',
     name: 'Blog / Content Site',
     description: 'Content-first blog with 7 sections: simple header, centered hero, alternating features, testimonial cards, FAQ accordion, split CTA, and CTA footer — clean typography with engaging micro-interactions.',
-    icon: '📝',
+    icon: Scroll,
     installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/social @pxlkit/feedback',
     code: blogSite,
   },

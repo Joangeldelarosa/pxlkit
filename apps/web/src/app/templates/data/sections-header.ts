@@ -1,4 +1,5 @@
 import type { TemplateSection } from '../types';
+import { Compass } from '@pxlkit/weather';
 
 const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui';
 
@@ -244,7 +245,7 @@ export const headerSection: TemplateSection = {
   id: 'header',
   name: 'Headers & Navbars',
   description: 'Sticky navigation headers with links, CTAs, dropdowns, and mobile menus.',
-  icon: '🧭',
+  icon: Compass,
   variants: [
     {
       id: 'header-simple',

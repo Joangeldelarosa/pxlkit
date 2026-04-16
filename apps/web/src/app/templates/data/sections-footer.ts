@@ -1,4 +1,5 @@
 import type { TemplateSection } from '../types';
+import { ChainLink } from '@pxlkit/ui';
 
 const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/social';
 
@@ -200,7 +201,7 @@ export const footerSection: TemplateSection = {
   id: 'footer',
   name: 'Footers',
   description: 'Site footers ranging from minimal single-row to full multi-column with newsletter.',
-  icon: '🔻',
+  icon: ChainLink,
   variants: [
     {
       id: 'footer-minimal',

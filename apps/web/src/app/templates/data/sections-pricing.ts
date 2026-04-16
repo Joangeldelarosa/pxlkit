@@ -1,4 +1,5 @@
 import type { TemplateSection } from '../types';
+import { Gem } from '@pxlkit/gamification';
 
 const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui';
 
@@ -282,7 +283,7 @@ export const pricingSection: TemplateSection = {
   id: 'pricing',
   name: 'Pricing Tables',
   description: 'Pricing sections with cards, comparison table, and monthly/yearly toggle.',
-  icon: '💎',
+  icon: Gem,
   variants: [
     {
       id: 'pricing-cards',

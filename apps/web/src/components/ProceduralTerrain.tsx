@@ -4,11 +4,12 @@ import { useRef, useMemo, useEffect, useState, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import Link from 'next/link';
-import { Trophy, Star, Coin, Crown, Gem, Shield, Lightning, Key, Sword } from '@pxlkit/gamification';
+import { Trophy, Star, Coin, Crown, Gem, Shield, Lightning, Key, Sword, Dice } from '@pxlkit/gamification';
 import { Heart } from '@pxlkit/social';
-import { Check, Package, SparkleSmall, Robot } from '@pxlkit/ui';
+import { Check, Package, SparkleSmall, Robot, Settings as SettingsIcon } from '@pxlkit/ui';
 import { Sun, Moon, Snowflake } from '@pxlkit/weather';
 import type { PxlKitData } from '@pxlkit/core';
+import { PxlKitIcon } from '@pxlkit/core';
 
 /* ═══════════════════════════════════════════════════════════════
  *  World Configuration — user-adjustable from the settings panel
@@ -2193,7 +2194,7 @@ export default function ProceduralTerrain() {
                 <button onClick={applySeed} className="px-2 sm:px-3 py-1.5 bg-retro-green/20 hover:bg-retro-green/30 border border-retro-green/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-green transition-all cursor-pointer select-none">GO</button>
               </div>
             </div>
-            <button onClick={generateNewSeed} className="w-full py-2 bg-retro-purple/20 hover:bg-retro-purple/30 border border-retro-purple/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-purple transition-all cursor-pointer select-none">🎲 RANDOM WORLD</button>
+            <button onClick={generateNewSeed} className="w-full py-2 bg-retro-purple/20 hover:bg-retro-purple/30 border border-retro-purple/50 rounded font-pixel text-[8px] sm:text-[9px] text-retro-purple transition-all cursor-pointer select-none inline-flex items-center justify-center gap-1"><PxlKitIcon icon={Dice} size={12} colorful /> RANDOM WORLD</button>
             {/* World Mode Toggle */}
             <div className="space-y-1">
               <label className="font-pixel text-[8px] sm:text-[9px] text-retro-purple/80 uppercase tracking-wider select-none">World Mode</label>
@@ -2310,7 +2311,7 @@ export default function ProceduralTerrain() {
       )}
 
       {!isLocked && !showControls && (
-        <button onClick={() => setShowControls(true)} className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 p-2 bg-retro-bg/80 border border-retro-border/50 rounded font-pixel text-[9px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none">⚙ Settings</button>
+        <button onClick={() => setShowControls(true)} className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 p-2 bg-retro-bg/80 border border-retro-border/50 rounded font-pixel text-[9px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none inline-flex items-center gap-1"><PxlKitIcon icon={SettingsIcon} size={10} colorful /> Settings</button>
       )}
 
       {/* ── Three.js Canvas ── */}

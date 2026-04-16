@@ -4,14 +4,17 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useTheme } from './ThemeProvider';
+import { PxlKitIcon } from '@pxlkit/core';
+import { Caution } from '@pxlkit/feedback';
+import type { PxlKitData } from '@pxlkit/core';
 
-const NAV_ITEMS: { href: string; label: string; badge?: string }[] = [
+const NAV_ITEMS: { href: string; label: string; badge?: PxlKitData }[] = [
   { href: '/', label: 'Home' },
   { href: '/icons', label: 'Icons' },
   { href: '/builder', label: 'Builder' },
   { href: '/ui-kit', label: 'UI Kit' },
   { href: '/templates', label: 'Templates' },
-  { href: '/explore', label: 'Worlds', badge: '🚧' },
+  { href: '/explore', label: 'Worlds', badge: Caution },
   { href: '/docs', label: 'Docs' },
   { href: '/pricing', label: 'Pricing' },
 ];
@@ -132,7 +135,7 @@ export function Navbar() {
               >
                 {item.label}
                 {item.badge && (
-                  <span className="ml-1 text-[10px]" title="Coming Soon">{item.badge}</span>
+                  <span className="ml-1" title="Coming Soon"><PxlKitIcon icon={item.badge} size={10} colorful /></span>
                 )}
               </Link>
             );
@@ -233,7 +236,7 @@ export function Navbar() {
                 >
                   {item.label}
                   {item.badge && (
-                    <span className="ml-1 text-[10px]" title="Coming Soon">{item.badge}</span>
+                    <span className="ml-1" title="Coming Soon"><PxlKitIcon icon={item.badge} size={10} colorful /></span>
                   )}
                 </Link>
               );

@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Check, Copy, Grid, ExternalLink } from '@pxlkit/ui';
+import { Scroll } from '@pxlkit/gamification';
 import { Sun, Moon } from '@pxlkit/weather';
 import {
   PixelBadge,
@@ -38,7 +39,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-[10px] sm:text-xs font-mono border transition-all rounded-sm whitespace-nowrap ${
+      className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-[10px] sm:text-xs font-mono border transition-all rounded-sm whitespace-nowrap ${
         copied
           ? 'bg-retro-green/20 text-retro-green border-retro-green/40'
           : 'bg-retro-surface text-retro-muted border-retro-border hover:text-retro-green hover:border-retro-green/40'
@@ -218,7 +219,9 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
       <div className="flex flex-col gap-3 px-3 sm:px-4 py-3 border-b border-retro-border bg-retro-surface/30">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 min-w-0">
-          <span className="text-2xl" role="img" aria-hidden>{tpl.icon}</span>
+            <span className="text-2xl leading-none" aria-hidden>
+              <PxlKitIcon icon={tpl.icon} size={24} colorful />
+            </span>
             <div className="min-w-0">
             <h3 className="font-pixel text-xs text-retro-text leading-relaxed">{tpl.name}</h3>
               <p className="font-mono text-xs text-retro-muted mt-0.5">{tpl.description}</p>
@@ -251,7 +254,7 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
           )}
         </div>
       </div>
-      
+
       <div className="grid grid-cols-3 border-b border-retro-border">
         {(['preview', 'code', 'install'] as const).map((t) => (
           <button
@@ -338,7 +341,7 @@ export default function TemplatesPage() {
                     : 'text-retro-muted border-retro-border hover:text-retro-text hover:bg-retro-surface'
                 }`}
               >
-                <span role="img" aria-hidden>{section.icon}</span>
+                <span aria-hidden><PxlKitIcon icon={section.icon} size={14} colorful /></span>
                 {section.name}
               </button>
             ))}
@@ -350,7 +353,7 @@ export default function TemplatesPage() {
                   : 'text-retro-muted border-retro-border hover:text-retro-text hover:bg-retro-surface'
               }`}
             >
-              <span role="img" aria-hidden>📄</span>
+              <span aria-hidden><PxlKitIcon icon={Scroll} size={14} colorful /></span>
               Full Pages
             </button>
           </div>
@@ -372,7 +375,7 @@ export default function TemplatesPage() {
                         : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
                     }`}
                   >
-                    <span className="text-base leading-none" role="img" aria-hidden>{section.icon}</span>
+                    <span className="text-base leading-none" aria-hidden><PxlKitIcon icon={section.icon} size={16} colorful /></span>
                     {section.name}
                   </button>
                 ))}
@@ -389,7 +392,7 @@ export default function TemplatesPage() {
                     : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
                 }`}
               >
-                <span className="text-base leading-none" role="img" aria-hidden>📄</span>
+                <span className="text-base leading-none" aria-hidden><PxlKitIcon icon={Scroll} size={16} colorful /></span>
                 Page Templates
                 <span className="ml-auto"><PixelBadge tone="gold">{FULL_PAGE_TEMPLATES.length}</PixelBadge></span>
               </button>
@@ -418,7 +421,7 @@ export default function TemplatesPage() {
               <PixelFadeIn key={currentSection.id}>
                 <div className="mb-6">
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                    <span className="text-2xl sm:text-3xl" role="img" aria-hidden>{currentSection.icon}</span>
+                    <span aria-hidden><PxlKitIcon icon={currentSection.icon} size={28} colorful /></span>
                     <h2 className="font-pixel text-sm sm:text-base text-retro-text leading-loose">
                       {currentSection.name}
                     </h2>

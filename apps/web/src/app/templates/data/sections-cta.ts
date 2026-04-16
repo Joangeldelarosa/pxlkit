@@ -1,4 +1,5 @@
 import type { TemplateSection } from '../types';
+import { Lightning } from '@pxlkit/gamification';
 
 const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/gamification';
 
@@ -161,7 +162,7 @@ export const ctaSection: TemplateSection = {
   id: 'cta',
   name: 'CTA Sections',
   description: 'Call-to-action sections to convert visitors — banner, split, and card styles.',
-  icon: '⚡',
+  icon: Lightning,
   variants: [
     {
       id: 'cta-banner',
