@@ -15,6 +15,8 @@ import { PxlKitIcon } from '@pxlkit/core';
 import type { PxlKitData } from '@pxlkit/core';
 import { QuestMap, Chest } from '@pxlkit/gamification';
 import { Moon, Sunrise, Sun, Sunset } from '@pxlkit/weather';
+import { Camera } from '@pxlkit/social';
+import { ChainLink } from '@pxlkit/ui';
 import { PixelBadge, PixelSlideIn, PixelFadeIn } from '@pxlkit/ui-kit';
 import type { WorldMode, ChunkVoxelData } from '../types';
 import { VOXEL_SIZE } from '../constants';
@@ -167,14 +169,14 @@ export function GameHUD({
         <button onClick={onScreenshot}
           className="pointer-events-auto p-1.5 bg-retro-bg/50 backdrop-blur-sm border border-retro-border/25 rounded-md text-[10px] text-retro-muted/50 hover:text-retro-cyan hover:border-retro-cyan/30 hover:bg-retro-cyan/10 transition-all cursor-pointer"
           title="Screenshot (F2)" style={{ touchAction: 'none' }}>
-          📸
+          <PxlKitIcon icon={Camera} size={12} colorful />
         </button>
 
         {/* Share */}
         <button onClick={onShare}
           className="pointer-events-auto p-1.5 bg-retro-bg/50 backdrop-blur-sm border border-retro-border/25 rounded-md text-[10px] text-retro-muted/50 hover:text-retro-purple hover:border-retro-purple/30 hover:bg-retro-purple/10 transition-all cursor-pointer"
           title="Share scene" style={{ touchAction: 'none' }}>
-          {shareStatus === 'copied' ? '✓' : '🔗'}
+          {shareStatus === 'copied' ? '✓' : <PxlKitIcon icon={ChainLink} size={12} colorful />}
         </button>
 
         {/* Save */}

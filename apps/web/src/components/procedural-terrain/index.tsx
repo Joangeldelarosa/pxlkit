@@ -40,9 +40,10 @@ import Link from 'next/link';
 /* ── PxlKit icon imports (for pickup sprites) ── */
 import { Trophy, Star, Coin, Crown, Gem, Shield, Lightning, Key, Sword, Dice } from '@pxlkit/gamification';
 import { Heart } from '@pxlkit/social';
-import { Check, Package, SparkleSmall, Robot } from '@pxlkit/ui';
+import { Check, Package, SparkleSmall, Robot, Settings, ChainLink } from '@pxlkit/ui';
 import { Sun, Moon, Snowflake } from '@pxlkit/weather';
 import { QuestMap as QuestMapIcon } from '@pxlkit/gamification';
+import { Camera } from '@pxlkit/social';
 import { PxlKitIcon, type PxlKitData } from '@pxlkit/core';
 /* ── PxlKit UI Kit ── */
 import { PixelButton, PixelFadeIn, PixelSlideIn, PixelBadge } from '@pxlkit/ui-kit';
@@ -611,12 +612,12 @@ export default function ProceduralTerrain() {
                 <button onClick={handleScreenshot}
                   className="p-2 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-cyan hover:border-retro-cyan/40 transition-all cursor-pointer select-none"
                   title="Screenshot">
-                  📸
+                  <PxlKitIcon icon={Camera} size={12} colorful />
                 </button>
                 <button onClick={() => setShowSettings(true)}
                   className="p-2 bg-retro-bg/80 backdrop-blur-sm border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-green hover:border-retro-green/40 transition-all cursor-pointer select-none"
                   title="Settings">
-                  ⚙
+                  <PxlKitIcon icon={Settings} size={12} colorful />
                 </button>
               </div>
             </PixelFadeIn>
@@ -773,10 +774,10 @@ export default function ProceduralTerrain() {
             <div className="flex items-center gap-2">
               <button onClick={handleScreenshot}
                 className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-cyan transition-all cursor-pointer select-none"
-                title="Screenshot">📸</button>
+                title="Screenshot"><PxlKitIcon icon={Camera} size={12} colorful /></button>
               <button onClick={handleShareScene}
                 className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-purple transition-all cursor-pointer select-none"
-                title="Share scene">{shareStatus === 'copied' ? '✓' : '🔗'}</button>
+                title="Share scene">{shareStatus === 'copied' ? '✓' : <PxlKitIcon icon={ChainLink} size={12} colorful />}</button>
               <button onClick={toggleFullscreenMap}
                 className={`p-2 bg-retro-bg/80 border rounded text-[11px] transition-all cursor-pointer select-none ${
                   showFullscreenMap
@@ -788,7 +789,7 @@ export default function ProceduralTerrain() {
               </button>
               <button onClick={() => setShowSettings(true)}
                 className="p-2 bg-retro-bg/80 border border-retro-border/50 rounded text-[11px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none"
-                title="Settings">⚙</button>
+                title="Settings"><PxlKitIcon icon={Settings} size={12} colorful /></button>
               <button onClick={() => { setShowFullscreenMap(false); setShowControls(true); }}
                 className="px-2.5 py-1.5 bg-retro-bg/80 border border-retro-border/50 rounded font-pixel text-[8px] text-retro-muted hover:text-retro-green transition-all cursor-pointer select-none"
                 title="Back to menu">Menu</button>

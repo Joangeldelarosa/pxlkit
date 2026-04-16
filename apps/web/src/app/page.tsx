@@ -441,7 +441,7 @@ function VoxelComingSoon() {
             </div>
             <div className="absolute bottom-2 left-0 right-0 flex justify-center pointer-events-none">
               <span className="bg-retro-bg/80 backdrop-blur-sm border border-retro-border/40 rounded px-2 py-0.5 font-mono text-[8px] sm:text-[10px] text-retro-muted/60">
-                🎮 Drag to orbit · @pxlkit/voxel preview
+                Drag to orbit · @pxlkit/voxel preview
               </span>
             </div>
           </div>

@@ -16,10 +16,10 @@ import { ConfigSlider } from './Controls';
 import { PixelButton } from '@pxlkit/ui-kit';
 import { PxlKitIcon } from '@pxlkit/core';
 import type { PxlKitData } from '@pxlkit/core';
-import { Dice, Skull, Shield, Star, Trophy, Sword, QuestCompass } from '@pxlkit/gamification';
+import { Dice, Skull, Shield, Star, Trophy, Sword, QuestCompass, Chest } from '@pxlkit/gamification';
 import { Moon, Sunrise, Sun, Sunset, Cloud } from '@pxlkit/weather';
 import { Globe } from '@pxlkit/social';
-import { Settings, SparkleSmall } from '@pxlkit/ui';
+import { Settings, SparkleSmall, ChainLink } from '@pxlkit/ui';
 
 interface SettingsPanelProps {
   config: WorldConfig;
@@ -95,7 +95,7 @@ export function SettingsPanel({
         {/* ── Title Bar ── */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-retro-border/30 select-none">
           <div className="flex items-center gap-2">
-            <span className="text-[12px]">⚙</span>
+            <span className="text-[12px]"><PxlKitIcon icon={Settings} size={12} colorful /></span>
             <span className="font-pixel text-[10px] sm:text-[11px] text-retro-green uppercase tracking-wider">Settings</span>
           </div>
           <button
@@ -159,12 +159,12 @@ export function SettingsPanel({
                 <label className="font-pixel text-[7px] sm:text-[8px] text-retro-gold/70 uppercase tracking-wider select-none">Time Mode</label>
                 <div className="flex gap-1.5">
                   <button onClick={() => onSetConfig(prev => ({ ...prev, timeMode: 'cycle' as const }))}
-                    className={`flex-1 py-1 rounded font-pixel text-[7px] sm:text-[8px] transition-all cursor-pointer select-none border ${config.timeMode === 'cycle' ? 'bg-retro-gold/30 border-retro-gold/60 text-retro-gold' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/60 hover:bg-retro-surface/60'}`}>
-                    ☀ CYCLE
+                    className={`flex-1 py-1 rounded font-pixel text-[7px] sm:text-[8px] transition-all cursor-pointer select-none border inline-flex items-center justify-center gap-0.5 ${config.timeMode === 'cycle' ? 'bg-retro-gold/30 border-retro-gold/60 text-retro-gold' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/60 hover:bg-retro-surface/60'}`}>
+                    <PxlKitIcon icon={Sun} size={8} colorful /> CYCLE
                   </button>
                   <button onClick={() => onSetConfig(prev => ({ ...prev, timeMode: 'fixed' as const }))}
-                    className={`flex-1 py-1 rounded font-pixel text-[7px] sm:text-[8px] transition-all cursor-pointer select-none border ${config.timeMode === 'fixed' ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/60 hover:bg-retro-surface/60'}`}>
-                    🔒 FIXED
+                    className={`flex-1 py-1 rounded font-pixel text-[7px] sm:text-[8px] transition-all cursor-pointer select-none border inline-flex items-center justify-center gap-0.5 ${config.timeMode === 'fixed' ? 'bg-retro-cyan/30 border-retro-cyan/60 text-retro-cyan' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/60 hover:bg-retro-surface/60'}`}>
+                    <PxlKitIcon icon={Moon} size={8} colorful /> FIXED
                   </button>
                 </div>
                 <p className="font-mono text-[7px] text-retro-muted/40 select-none">
@@ -268,8 +268,8 @@ export function SettingsPanel({
                     <div className="flex gap-1">
                       {(['sodium', 'warm', 'neutral', 'cool'] as const).map(ct => (
                         <button key={ct} onClick={() => onSetConfig(prev => ({ ...prev, lampColorTemp: ct }))}
-                          className={`flex-1 py-1 rounded font-pixel text-[7px] transition-all cursor-pointer select-none border ${config.lampColorTemp === ct ? 'bg-retro-gold/30 border-retro-gold/60 text-retro-gold' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/50 hover:bg-retro-surface/60'}`}>
-                          {ct === 'sodium' ? '🟠' : ct === 'warm' ? '🟡' : ct === 'neutral' ? '⚪' : '🔵'} {ct.charAt(0).toUpperCase() + ct.slice(1)}
+                          className={`flex-1 py-1 rounded font-pixel text-[7px] transition-all cursor-pointer select-none border inline-flex items-center justify-center gap-0.5 ${config.lampColorTemp === ct ? 'bg-retro-gold/30 border-retro-gold/60 text-retro-gold' : 'bg-retro-surface/40 border-retro-border/30 text-retro-muted/50 hover:bg-retro-surface/60'}`}>
+                          <span className={`inline-block w-1.5 h-1.5 rounded-full ${ct === 'sodium' ? 'bg-orange-400' : ct === 'warm' ? 'bg-yellow-300' : ct === 'neutral' ? 'bg-gray-200' : 'bg-blue-400'}`} /> {ct.charAt(0).toUpperCase() + ct.slice(1)}
                         </button>
                       ))}
                     </div>
@@ -286,12 +286,12 @@ export function SettingsPanel({
           <div className="flex gap-2 mt-2 pt-2 border-t border-retro-border/20">
             {onSaveWorld && (
               <PixelButton tone="cyan" variant="ghost" size="sm" onClick={onSaveWorld} className="flex-1">
-                💾 Save World
+                <PxlKitIcon icon={Chest} size={10} colorful className="inline-block mr-0.5" /> Save World
               </PixelButton>
             )}
             {onShareScene && (
               <PixelButton tone="purple" variant="ghost" size="sm" onClick={onShareScene} className="flex-1">
-                {shareStatus === 'copied' ? '✓ Link Copied!' : '🔗 Share Scene'}
+                {shareStatus === 'copied' ? '✓ Link Copied!' : <><PxlKitIcon icon={ChainLink} size={10} colorful className="inline-block mr-0.5" /> Share Scene</>}
               </PixelButton>
             )}
           </div>
