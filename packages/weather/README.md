@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@pxlkit/weather"><img src="https://img.shields.io/npm/v/@pxlkit/weather?color=blue" alt="npm version" /></a>
-  <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Pxlkit%20v1.0-blue.svg" alt="Pxlkit License" /></a>
+  <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE-ASSETS"><img src="https://img.shields.io/badge/license-asset%20terms-blue.svg" alt="Pxlkit Asset License" /></a>
   <img src="https://img.shields.io/badge/icons-36-FFD700?style=flat" alt="36 icons" />
 </p>
 
@@ -124,6 +124,6 @@ Browse all icons and try the visual builder at **[pxlkit.xyz](https://pxlkit.xyz
 
 ## License
 
-[Pxlkit License v1.0](https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE) — Free with attribution, commercial licenses available.
+[Pxlkit Asset License](https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE-ASSETS) — free with attribution, with paid no-attribution terms in [COMMERCIAL_TERMS](https://github.com/joangeldelarosa/pxlkit/blob/main/COMMERCIAL_TERMS).
 
 Created by [Joangel De La Rosa](https://github.com/joangeldelarosa)

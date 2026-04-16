@@ -1,12 +1,12 @@
 {
   "name": "pxlkit-monorepo",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
-  "description": "Open-source retro React UI toolkit — 226+ pixel art SVG icons, 40+ UI components, 3D parallax effects, animated icons, visual builder, toast notifications, and a voxel 3D game engine with procedural world generation powered by Three.js & React Three Fiber",
+  "description": "Source-available retro React toolkit \u2014 MIT-licensed UI and voxel engine packages, 226+ pixel art SVG icons under a commercial-friendly asset license, 40+ UI components, 3D parallax effects, animated icons, visual builder, toast notifications, and procedural voxel worlds powered by Three.js & React Three Fiber",
   "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "homepage": "https://pxlkit.xyz",
   "license": "SEE LICENSE IN LICENSE",
@@ -25,7 +25,7 @@
     "react-three-fiber",
     "typescript",
     "tailwind-css",
-    "open-source"
+    "source-available"
   ],
   "workspaces": [
     "packages/*",

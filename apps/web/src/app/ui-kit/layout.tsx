@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'retro design system',
     'typescript react components',
     'tailwind css ui kit',
-    'open source ui kit',
+    'mit react ui kit',
     'free react components',
     'pixel card component',
     'pixel toast react',
@@ -47,13 +47,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Pxlkit UI Kit — 40+ Retro Pixel Art React Components',
     description:
-      '40+ hand-crafted retro React components: buttons, forms, modals, tables, toast notifications, and more. TypeScript-first, Tailwind-powered, zero native UI. Free and open source.',
+      '40+ hand-crafted retro React components: buttons, forms, modals, tables, toast notifications, and more. TypeScript-first, Tailwind-powered, zero native UI. MIT-licensed and free to use.',
     url: 'https://pxlkit.xyz/ui-kit',
   },
   twitter: {
     title: 'Pxlkit UI Kit — 40+ Retro Pixel Art React Components',
     description:
-      '40+ production-ready retro pixel-art React components. TypeScript, Tailwind CSS, tree-shakeable. Free & open source.',
+      '40+ production-ready retro pixel-art React components. TypeScript, Tailwind CSS, tree-shakeable. MIT-licensed.',
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/ui-kit',

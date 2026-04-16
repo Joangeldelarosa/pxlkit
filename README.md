@@ -1,17 +1,17 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit — Open-Source Retro React UI Kit, Pixel Art Icons & 3D Voxel Game Engine" width="640" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit — Retro React UI Kit, Licensed Pixel Art Icons & MIT Voxel Engine" width="640" />
 </p>
 
 <h1 align="center">Pxlkit</h1>
 
 <p align="center">
   <strong>Bring retro aesthetics to the modern web — and build 3D voxel games with React.</strong><br/>
-  Pxlkit is a comprehensive open-source React toolkit featuring 226+ pixel art SVG icons across 10 themed npm packages, 40+ retro UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxels</strong> — an open-source 3D voxel game engine powered by Three.js &amp; React Three Fiber with procedural world generation, 9+ biomes, physics, NPCs, and real-time chunk streaming.
+  Pxlkit is a comprehensive source-available React toolkit featuring 226+ pixel art SVG icons across 10 themed npm packages, 40+ retro UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel game engine powered by Three.js &amp; React Three Fiber with procedural world generation, 9+ biomes, physics, NPCs, and real-time chunk streaming.
 </p>
 
 <p align="center">
   <a href="https://pxlkit.xyz"><img src="https://img.shields.io/badge/docs-pxlkit.xyz-00FF88?style=flat&logo=vercel&logoColor=black" alt="Documentation" /></a>
-  <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Pxlkit%20v1.0-blue.svg" alt="Pxlkit License" /></a>
+  <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-split%20licenses-blue.svg" alt="Pxlkit split licensing" /></a>
   <img src="https://img.shields.io/badge/icons-226%2B-FFD700?style=flat" alt="226+ icons" />
   <img src="https://img.shields.io/badge/components-40%2B-4ECDC4?style=flat" alt="40+ components" />
   <img src="https://img.shields.io/badge/react-%E2%89%A518-61DAFB?logo=react&logoColor=white" alt="React ≥18" />
@@ -42,6 +42,13 @@ pxlkit/
     └── web/            → Next.js 15 showcase & documentation site
 ```
 
+## Licensing Model
+
+- `@pxlkit/core`, `@pxlkit/ui-kit`, and `@pxlkit/voxel` are MIT-licensed code packages.
+- The icon-pack packages and visual assets are source-available under [`LICENSE-ASSETS`](./LICENSE-ASSETS): free with attribution, with paid no-attribution terms in [`COMMERCIAL_TERMS`](./COMMERCIAL_TERMS).
+- The `Pxlkit` name, logos, and brand presentation are covered by [`TRADEMARK_POLICY`](./TRADEMARK_POLICY).
+- Third-party software and hosted fonts are listed in [`THIRD_PARTY_NOTICES`](./THIRD_PARTY_NOTICES).
+
 ## Icon Packs
 
 | Pack             | Package                | Static | Animated |  Total | Description                                |
@@ -54,11 +61,11 @@ pxlkit/
 | **Effects**      | `@pxlkit/effects`      |      0 |       12 | **12** | Explosions, radar ping, flame, shockwave   |
 | **Parallax**     | `@pxlkit/parallax`     |      — |        — | **10** | Multi-layer 3D parallax icons (3–5 layers) |
 
-## @pxlkit/voxels — 3D Voxel Game Engine 🎮
+## @pxlkit/voxel — MIT-Licensed 3D Voxel Game Engine 🎮
 
 > **Status: In active development** — usable now for procedural world exploration, game engine features expanding rapidly.
 
-`@pxlkit/voxels` is an open-source 3D voxel game engine built on **Three.js** and **React Three Fiber**. It's designed for building browser-based voxel games with React — think Minecraft-like worlds running natively in the browser.
+`@pxlkit/voxel` is an MIT-licensed 3D voxel game engine built on **Three.js** and **React Three Fiber**. It's designed for building browser-based voxel games with React — think Minecraft-like worlds running natively in the browser.
 
 ### Features
 
@@ -508,8 +515,13 @@ Contributions are welcome! Whether it's new icons, bug fixes, or documentation i
 
 ## License
 
-[Pxlkit License v1.0](./LICENSE) — Free with attribution, commercial licenses available.
+Pxlkit now uses a split licensing model:
 
-Created by [Joangel De La Rosa](https://github.com/joangeldelarosa)
+- [LICENSE](./LICENSE) — repo-wide licensing overview
+- [LICENSE-CODE](./LICENSE-CODE) — MIT license for code packages like `@pxlkit/core`, `@pxlkit/ui-kit`, and `@pxlkit/voxel`
+- [LICENSE-ASSETS](./LICENSE-ASSETS) — source-available terms for icon packs and visual assets
+- [COMMERCIAL_TERMS](./COMMERCIAL_TERMS) — paid no-attribution terms for icon/assets usage
+- [TRADEMARK_POLICY](./TRADEMARK_POLICY) — rules for the Pxlkit name, logo, and branding
+- [THIRD_PARTY_NOTICES](./THIRD_PARTY_NOTICES) — third-party software and font notices
 
-See [COMMERCIAL_LICENSE.md](./COMMERCIAL_LICENSE.md) for pricing details.
+Created by [Joangel De La Rosa](https://github.com/joangeldelarosa).
