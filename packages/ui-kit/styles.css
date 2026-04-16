@@ -133,10 +133,41 @@
     --retro-shadow-green: rgba(0, 255, 136, 0.3);
     --retro-shadow-green-lg: rgba(0, 255, 136, 0.2);
     --retro-shadow-gold: rgba(255, 215, 0, 0.3);
+
+    /*
+     * Tailwind v4 @theme re-declarations.
+     *
+     * Why: @theme registers --color-retro-* with @property syntax "<color>"
+     * and inherits:true. The var() expression is therefore resolved to a
+     * computed colour value on :root and *that* computed value is what
+     * children inherit — NOT the var() expression.  So when a nested .light
+     * div overrides --retro-bg, the already-computed --color-retro-bg keeps
+     * the :root value.  Re-declaring --color-retro-* here forces the
+     * property to be re-computed on every .dark / .light boundary.
+     */
+    --color-retro-bg: #0A0A0F;
+    --color-retro-surface: #12121A;
+    --color-retro-card: #1A1A2E;
+    --color-retro-text: #E8E6E3;
+    --color-retro-border: #2A2A3E;
+    --color-retro-primary: #818CF8;
+    --color-retro-secondary: #FCD34D;
+    --color-retro-accent: #34D399;
+    --color-retro-muted: #8888AA;
+    --color-retro-green: #00FF88;
+    --color-retro-green-hover: #00CC6A;
+    --color-retro-cyan: #4ECDC4;
+    --color-retro-red: #FF6B6B;
+    --color-retro-gold: #FFD700;
+    --color-retro-purple: #A855F7;
+    --color-retro-pink: #FF77A8;
   }
 
   /* Explicit light theme — used inside nested previews to override
-     inherited dark-mode CSS variables from ancestor .dark elements. */
+     inherited dark-mode CSS variables from ancestor .dark elements.
+     Both --retro-* AND --color-retro-* must be set so that Tailwind
+     utility classes (which read --color-retro-*) resolve correctly
+     even when this .light element is nested inside a .dark ancestor. */
   .light {
     --retro-bg: #F2F0EB;
     --retro-surface: #E6E2DC;
@@ -160,6 +191,24 @@
     --retro-shadow-green: rgba(0, 140, 75, 0.3);
     --retro-shadow-green-lg: rgba(0, 140, 75, 0.2);
     --retro-shadow-gold: rgba(180, 135, 0, 0.3);
+
+    /* Tailwind v4 @theme re-declarations — see .dark comment above. */
+    --color-retro-bg: #F2F0EB;
+    --color-retro-surface: #E6E2DC;
+    --color-retro-card: #DCD8D0;
+    --color-retro-text: #1A1A2E;
+    --color-retro-border: #BEBAA2;
+    --color-retro-primary: #4F46E5;
+    --color-retro-secondary: #FBBF24;
+    --color-retro-accent: #10B981;
+    --color-retro-muted: #646478;
+    --color-retro-green: #008C4B;
+    --color-retro-green-hover: #006E3A;
+    --color-retro-cyan: #24827A;
+    --color-retro-red: #C83741;
+    --color-retro-gold: #B48700;
+    --color-retro-purple: #8237C8;
+    --color-retro-pink: #C84678;
   }
 
   /*
