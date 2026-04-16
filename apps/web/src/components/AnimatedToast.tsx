@@ -276,7 +276,7 @@ export function AnimatedToast({
                   {message && (
                     <motion.p
                       className="font-mono text-xs leading-relaxed opacity-80 mt-1 break-words"
-                      style={{ color: '#e8e6e3' }}
+                      style={{ color: theme.text }}
                       variants={childVariants}
                     >
                       {message}

@@ -427,8 +427,10 @@ const THEME_INIT_SCRIPT = `
     var t = localStorage.getItem('pxlkit-theme');
     if (t === 'light') {
       document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
     } else {
       document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
     }
   } catch(e){}
 })();
