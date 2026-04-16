@@ -39,7 +39,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={handleCopy}
-      className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-[10px] sm:text-xs font-mono border transition-all rounded-sm whitespace-nowrap ${
+      className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-[10px] sm:text-xs font-mono border transition-all rounded-sm whitespace-nowrap ${
         copied
           ? 'bg-retro-green/20 text-retro-green border-retro-green/40'
           : 'bg-retro-surface text-retro-muted border-retro-border hover:text-retro-green hover:border-retro-green/40'
@@ -254,7 +254,7 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
           )}
         </div>
       </div>
-      
+
       <div className="grid grid-cols-3 border-b border-retro-border">
         {(['preview', 'code', 'install'] as const).map((t) => (
           <button
