@@ -35,7 +35,7 @@ function ThemePreviewShell({
   };
 
   return (
-    <div className={dark ? 'dark' : ''}>
+    <div className={dark ? 'dark' : 'light'}>
       <div className="relative bg-retro-bg text-retro-text min-h-screen flex flex-col">
         {children(themeProps)}
       </div>
