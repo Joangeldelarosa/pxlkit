@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'Pxlkit — Open-Source Pixel Art React UI Kit, Icon Library & 3D Voxel Game Engine';
+export const alt = 'Pxlkit — Retro Pixel Art React UI Kit, 226+ SVG Icons & Ready-to-Use Templates';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -88,12 +88,12 @@ export default async function Image() {
               marginBottom: 32,
             }}
           >
-            Pixel Art UI Kit &amp; 3D Voxel Engine
+            Retro React UI Kit, Icons &amp; Templates
           </div>
 
           {/* Feature pills */}
           <div style={{ display: 'flex', gap: 16 }}>
-            {['226+ Icons', '40+ Components', '3D Voxel Engine', 'Procedural Worlds', 'React & SVG'].map(
+            {['226+ Icons', '40+ Components', 'Ready Templates', 'TypeScript-First', 'Tailwind CSS'].map(
               (label) => (
                 <div
                   key={label}
