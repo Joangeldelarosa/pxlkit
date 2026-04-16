@@ -96,7 +96,7 @@ function InstallCmd({ cmd }: { cmd: string }) {
 function SectionThemeWrapper({ children }: { children: React.ReactNode }) {
   const [dark, setDark] = useState(true);
   return (
-    <div className={dark ? 'dark' : ''}>
+    <div className={dark ? 'dark' : 'light'}>
       <div className="bg-retro-bg text-retro-text">
         <div className="flex items-center justify-end gap-2 px-3 py-1.5 border-b border-retro-border/30 bg-retro-surface/20">
           <PixelTooltip content={dark ? 'Switch to light' : 'Switch to dark'} position="bottom">

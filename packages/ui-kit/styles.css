@@ -85,6 +85,28 @@
     --retro-pink: #FF77A8;
   }
 
+  /* Explicit light theme — used inside nested previews to override
+     inherited dark-mode CSS variables from ancestor .dark elements. */
+  .light {
+    --retro-bg: #F2F0EB;
+    --retro-surface: #E6E2DC;
+    --retro-card: #DCD8D0;
+    --retro-text: #1A1A2E;
+    --retro-border: #BEBAA2;
+    --retro-primary: #4F46E5;
+    --retro-secondary: #FBBF24;
+    --retro-accent: #10B981;
+    --retro-muted: #646478;
+    
+    --retro-green: #008C4B;
+    --retro-green-hover: #006E3A;
+    --retro-cyan: #24827A;
+    --retro-red: #C83741;
+    --retro-gold: #B48700;
+    --retro-purple: #8237C8;
+    --retro-pink: #C84678;
+  }
+
   /*
    * Turkish locale support — when `lang="tr"` is set on any ancestor,
    * CSS `text-transform: uppercase` will correctly convert:

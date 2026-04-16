@@ -46,7 +46,7 @@ function PreviewContent() {
 
   /* Section previews: wrap with theme class + floating toggle */
   return (
-    <div className={dark ? 'dark' : ''}>
+    <div className={dark ? 'dark' : 'light'}>
       <div className="min-h-screen bg-retro-bg text-retro-text">
         <div className="sticky top-0 z-50 flex items-center justify-end gap-2 px-4 py-2 bg-retro-bg/80 backdrop-blur-sm border-b border-retro-border/30">
           <PixelTooltip content={dark ? 'Switch to light' : 'Switch to dark'} position="bottom">
