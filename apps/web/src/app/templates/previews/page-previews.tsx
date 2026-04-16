@@ -7,14 +7,12 @@
  * (heroes, headers, footers, features, pricing, testimonials, FAQ, CTAs)
  * so users see exactly how the sections work together in a real page.
  *
- * Every template includes a floating light/dark toggle.
+ * Every template includes a light/dark toggle built into its header.
  */
 
 import { useState, type ReactNode } from 'react';
-import { PxlKitIcon } from '@pxlkit/core';
-import { Star } from '@pxlkit/gamification';
-import { PixelSwitch } from '@pxlkit/ui-kit';
 import { HeaderDropdownPreview, HeaderSimplePreview, HeaderCenteredLogoPreview } from './header-previews';
+import type { ThemeToggleProps } from './header-previews';
 import { HeroCenteredPreview, HeroSplitPreview, HeroParallaxPreview } from './hero-previews';
 import { FeaturesIconGridPreview, FeaturesAlternatingPreview, FeaturesBentoPreview } from './features-previews';
 import { PricingCardsPreview, PricingTablePreview, PricingTogglePreview } from './pricing-previews';
@@ -25,23 +23,21 @@ import { FooterMultiColumnPreview, FooterMinimalPreview, FooterCtaPreview } from
 
 /* ── Shared theme wrapper ────────────────────────────────────────────────── */
 
-function ThemePreviewShell({ children }: { children: ReactNode }) {
+function ThemePreviewShell({
+  children,
+}: {
+  children: (themeProps: ThemeToggleProps) => ReactNode;
+}) {
   const [dark, setDark] = useState(true);
+  const themeProps: ThemeToggleProps = {
+    isDark: dark,
+    onToggleTheme: () => setDark((d) => !d),
+  };
 
   return (
     <div className={dark ? 'dark' : ''}>
       <div className="relative bg-retro-bg text-retro-text min-h-screen flex flex-col">
-        {/* Floating theme toggle */}
-        <div className="sticky top-0 z-50 flex items-center justify-end gap-2 px-4 py-2 bg-retro-bg/80 backdrop-blur-sm border-b border-retro-border/30">
-          <PxlKitIcon icon={Star} size={12} colorful />
-          <PixelSwitch
-            label={dark ? 'Dark' : 'Light'}
-            checked={dark}
-            onChange={setDark}
-            tone="green"
-          />
-        </div>
-        {children}
+        {children(themeProps)}
       </div>
     </div>
   );
@@ -51,14 +47,18 @@ function ThemePreviewShell({ children }: { children: ReactNode }) {
 export function PageSaasPreview() {
   return (
     <ThemePreviewShell>
-      <HeaderDropdownPreview />
-      <HeroCenteredPreview />
-      <FeaturesIconGridPreview />
-      <TestimonialsCardsPreview />
-      <PricingCardsPreview />
-      <FaqAccordionPreview />
-      <CtaBannerPreview />
-      <FooterMultiColumnPreview />
+      {(themeProps) => (
+        <>
+          <HeaderDropdownPreview {...themeProps} />
+          <HeroCenteredPreview />
+          <FeaturesIconGridPreview />
+          <TestimonialsCardsPreview />
+          <PricingCardsPreview />
+          <FaqAccordionPreview />
+          <CtaBannerPreview />
+          <FooterMultiColumnPreview />
+        </>
+      )}
     </ThemePreviewShell>
   );
 }
@@ -67,13 +67,17 @@ export function PageSaasPreview() {
 export function PagePortfolioPreview() {
   return (
     <ThemePreviewShell>
-      <HeaderCenteredLogoPreview />
-      <HeroParallaxPreview />
-      <FeaturesBentoPreview />
-      <TestimonialsLargeQuotePreview />
-      <CtaSplitPreview />
-      <FaqTwoColumnPreview />
-      <FooterCtaPreview />
+      {(themeProps) => (
+        <>
+          <HeaderCenteredLogoPreview {...themeProps} />
+          <HeroParallaxPreview />
+          <FeaturesBentoPreview />
+          <TestimonialsLargeQuotePreview />
+          <CtaSplitPreview />
+          <FaqTwoColumnPreview />
+          <FooterCtaPreview />
+        </>
+      )}
     </ThemePreviewShell>
   );
 }
@@ -82,13 +86,17 @@ export function PagePortfolioPreview() {
 export function PageIndieGamePreview() {
   return (
     <ThemePreviewShell>
-      <HeaderSimplePreview />
-      <HeroSplitPreview />
-      <FeaturesAlternatingPreview />
-      <TestimonialsSliderPreview />
-      <PricingTogglePreview />
-      <CtaCardPreview />
-      <FooterMinimalPreview />
+      {(themeProps) => (
+        <>
+          <HeaderSimplePreview {...themeProps} />
+          <HeroSplitPreview />
+          <FeaturesAlternatingPreview />
+          <TestimonialsSliderPreview />
+          <PricingTogglePreview />
+          <CtaCardPreview />
+          <FooterMinimalPreview />
+        </>
+      )}
     </ThemePreviewShell>
   );
 }
@@ -97,12 +105,16 @@ export function PageIndieGamePreview() {
 export function PageDashboardPreview() {
   return (
     <ThemePreviewShell>
-      <HeaderDropdownPreview />
-      <FeaturesBentoPreview />
-      <PricingTablePreview />
-      <FaqTabbedPreview />
-      <CtaBannerPreview />
-      <FooterMultiColumnPreview />
+      {(themeProps) => (
+        <>
+          <HeaderDropdownPreview {...themeProps} />
+          <FeaturesBentoPreview />
+          <PricingTablePreview />
+          <FaqTabbedPreview />
+          <CtaBannerPreview />
+          <FooterMultiColumnPreview />
+        </>
+      )}
     </ThemePreviewShell>
   );
 }
@@ -111,13 +123,17 @@ export function PageDashboardPreview() {
 export function PageBlogPreview() {
   return (
     <ThemePreviewShell>
-      <HeaderSimplePreview />
-      <HeroCenteredPreview />
-      <FeaturesAlternatingPreview />
-      <TestimonialsCardsPreview />
-      <FaqAccordionPreview />
-      <CtaSplitPreview />
-      <FooterCtaPreview />
+      {(themeProps) => (
+        <>
+          <HeaderSimplePreview {...themeProps} />
+          <HeroCenteredPreview />
+          <FeaturesAlternatingPreview />
+          <TestimonialsCardsPreview />
+          <FaqAccordionPreview />
+          <CtaSplitPreview />
+          <FooterCtaPreview />
+        </>
+      )}
     </ThemePreviewShell>
   );
 }

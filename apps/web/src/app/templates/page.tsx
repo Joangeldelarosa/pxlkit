@@ -3,11 +3,13 @@
 import { useState, useCallback } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Check, Copy, ArrowRight, Grid, ExternalLink } from '@pxlkit/ui';
+import { Sun, Moon } from '@pxlkit/weather';
 import {
   PixelButton,
   PixelBadge,
   PixelFadeIn,
   PixelDivider,
+  PixelTooltip,
 } from '@pxlkit/ui-kit';
 import { TEMPLATE_SECTIONS, FULL_PAGE_TEMPLATES } from './data';
 import { PREVIEW_MAP } from './previews';
@@ -89,6 +91,34 @@ function InstallCmd({ cmd }: { cmd: string }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
+   Section Theme Wrapper — wraps a section preview with dark/light toggle
+   ───────────────────────────────────────────────────────────────────────── */
+function SectionThemeWrapper({ children }: { children: React.ReactNode }) {
+  const [dark, setDark] = useState(true);
+  return (
+    <div className={dark ? 'dark' : ''}>
+      <div className="bg-retro-bg text-retro-text">
+        <div className="flex items-center justify-end gap-2 px-3 py-1.5 border-b border-retro-border/30 bg-retro-surface/20">
+          <PixelTooltip content={dark ? 'Switch to light' : 'Switch to dark'} position="bottom">
+            <button
+              onClick={() => setDark((d) => !d)}
+              className="p-1.5 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
+              aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              <PxlKitIcon icon={dark ? Sun : Moon} size={14} colorful />
+            </button>
+          </PixelTooltip>
+          <span className="font-mono text-[10px] text-retro-muted/60 select-none">
+            {dark ? 'Dark' : 'Light'}
+          </span>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
    Section Variant Card
    ───────────────────────────────────────────────────────────────────────── */
 function VariantCard({ variant }: { variant: TemplateVariant }) {
@@ -140,8 +170,10 @@ function VariantCard({ variant }: { variant: TemplateVariant }) {
       <div className="p-4">
         {tab === 'preview' ? (
           Preview ? (
-            <div className="border border-retro-border rounded-sm overflow-hidden overflow-y-auto bg-retro-bg max-h-[520px]">
-              <Preview />
+            <div className="border border-retro-border rounded-sm overflow-hidden overflow-y-auto max-h-[520px]">
+              <SectionThemeWrapper>
+                <Preview />
+              </SectionThemeWrapper>
             </div>
           ) : (
             <div className="py-10 text-center text-retro-muted font-mono text-xs">
@@ -216,7 +248,7 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
       <div className="p-4">
         {tab === 'preview' ? (
           Preview ? (
-            <div className="border border-retro-border rounded-sm overflow-hidden overflow-y-auto bg-retro-bg max-h-[600px]">
+            <div className="border border-retro-border rounded-sm overflow-hidden overflow-y-auto max-h-[600px]">
               <Preview />
             </div>
           ) : (
