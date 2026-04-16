@@ -1,4 +1,5 @@
 import type { TemplateSection } from '../types';
+import { InfoCircle } from '@pxlkit/feedback';
 
 const INSTALL = 'npm install @pxlkit/ui-kit';
 
@@ -175,7 +176,7 @@ export const faqSection: TemplateSection = {
   id: 'faq',
   name: 'FAQ Sections',
   description: 'Frequently asked questions — accordion, two-column with sidebar, and tabbed.',
-  icon: '❓',
+  icon: InfoCircle,
   variants: [
     {
       id: 'faq-accordion',

@@ -3,7 +3,7 @@
 import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon, parseAnyIconCode, ParallaxPxlKitIcon } from '@pxlkit/core';
 import type { PxlKitData, AnyIcon } from '@pxlkit/core';
 import {
-  Trophy, Lightning, GamificationPack, FireSword,
+  Trophy, Lightning, GamificationPack, FireSword, Fire,
 } from '@pxlkit/gamification';
 import {
   Robot, Palette, Package, ArrowRight, UiPack,
@@ -103,7 +103,7 @@ function HeroSection() {
           >
             <PixelBadge tone="green">MIT Code · Licensed Assets</PixelBadge>
             <PixelBadge tone="cyan">TypeScript + Tailwind</PixelBadge>
-            <PixelBadge tone="gold"><span aria-label="50 percent off launch price">🔥 50% Off Launch</span></PixelBadge>
+            <PixelBadge tone="gold"><span aria-label="50 percent off launch price"><PxlKitIcon icon={Fire} size={12} colorful className="inline-block mr-0.5" /> 50% Off Launch</span></PixelBadge>
           </motion.div>
 
           {/* ── H1 — SEO-rich, benefit-driven ── */}
@@ -1326,7 +1326,7 @@ function PricingPreview() {
           viewport={{ once: true }}
         >
           <div className="inline-flex items-center gap-2 mb-3 sm:mb-4">
-            <PixelBadge tone="red"><span aria-label="50% off launch price">🔥 50% OFF — Launch Price</span></PixelBadge>
+            <PixelBadge tone="red"><span aria-label="50% off launch price"><PxlKitIcon icon={Fire} size={12} colorful className="inline-block mr-0.5" /> 50% OFF — Launch Price</span></PixelBadge>
           </div>
           <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-green mb-2 sm:mb-3">
             PAY ONCE, USE FOREVER

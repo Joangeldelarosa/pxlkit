@@ -1,4 +1,5 @@
 import type { TemplateSection } from '../types';
+import { Sparkles } from '@pxlkit/feedback';
 
 const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/feedback';
 
@@ -250,7 +251,7 @@ export const featuresSection: TemplateSection = {
   id: 'features',
   name: 'Feature Sections',
   description: 'Showcase your product features — icon grid, alternating rows, and bento layout.',
-  icon: '✨',
+  icon: Sparkles,
   variants: [
     {
       id: 'features-icon-grid',

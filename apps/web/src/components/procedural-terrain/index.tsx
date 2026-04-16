@@ -38,7 +38,7 @@ import * as THREE from 'three';
 import Link from 'next/link';
 
 /* ── PxlKit icon imports (for pickup sprites) ── */
-import { Trophy, Star, Coin, Crown, Gem, Shield, Lightning, Key, Sword } from '@pxlkit/gamification';
+import { Trophy, Star, Coin, Crown, Gem, Shield, Lightning, Key, Sword, Dice } from '@pxlkit/gamification';
 import { Heart } from '@pxlkit/social';
 import { Check, Package, SparkleSmall, Robot } from '@pxlkit/ui';
 import { Sun, Moon, Snowflake } from '@pxlkit/weather';
@@ -663,7 +663,7 @@ export default function ProceduralTerrain() {
 
                 {/* Random world */}
                 <PixelButton tone="purple" variant="ghost" onClick={generateNewSeed} className="w-full">
-                  🎲 RANDOM WORLD
+                  <PxlKitIcon icon={Dice} size={14} colorful className="inline-block mr-1" /> RANDOM WORLD
                 </PixelButton>
 
                 {/* Explore button */}

@@ -1,4 +1,5 @@
 import type { TemplateSection } from '../types';
+import { ChatBubble } from '@pxlkit/social';
 
 const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/social @pxlkit/gamification';
 
@@ -221,7 +222,7 @@ export const testimonialsSection: TemplateSection = {
   id: 'testimonials',
   name: 'Testimonials',
   description: 'Social proof sections — grid cards, large featured quote, and paginated slider.',
-  icon: '💬',
+  icon: ChatBubble,
   variants: [
     {
       id: 'testimonials-cards',

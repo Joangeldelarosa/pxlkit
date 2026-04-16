@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
-import { Check, Copy, ArrowRight, Grid, ExternalLink } from '@pxlkit/ui';
+import { Check, Copy, ArrowRight, Grid, ExternalLink, Scroll } from '@pxlkit/ui';
 import { Sun, Moon } from '@pxlkit/weather';
 import {
   PixelButton,
@@ -207,7 +207,7 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
     <div className="border border-retro-border bg-retro-bg rounded-sm overflow-hidden">
       <div className="flex items-center justify-between px-4 py-3 border-b border-retro-border bg-retro-surface/30">
         <div className="flex items-center gap-3">
-          <span className="text-2xl" role="img" aria-hidden>{tpl.icon}</span>
+          <span className="text-2xl leading-none" aria-hidden><PxlKitIcon icon={tpl.icon} size={24} colorful /></span>
           <div>
             <h3 className="font-pixel text-xs text-retro-text leading-relaxed">{tpl.name}</h3>
             <p className="font-mono text-xs text-retro-muted mt-0.5 max-w-md">{tpl.description}</p>
@@ -319,7 +319,7 @@ export default function TemplatesPage() {
                         : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
                     }`}
                   >
-                    <span className="text-base leading-none" role="img" aria-hidden>{section.icon}</span>
+                    <span className="text-base leading-none" aria-hidden><PxlKitIcon icon={section.icon} size={16} colorful /></span>
                     {section.name}
                   </button>
                 ))}
@@ -336,7 +336,7 @@ export default function TemplatesPage() {
                     : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
                 }`}
               >
-                <span className="text-base leading-none" role="img" aria-hidden>📄</span>
+                <span className="text-base leading-none" aria-hidden><PxlKitIcon icon={Scroll} size={16} colorful /></span>
                 Page Templates
                 <span className="ml-auto"><PixelBadge tone="gold">{FULL_PAGE_TEMPLATES.length}</PixelBadge></span>
               </button>
@@ -356,7 +356,7 @@ export default function TemplatesPage() {
                       : 'text-retro-muted border-retro-border hover:text-retro-text hover:bg-retro-surface'
                   }`}
                 >
-                  <span role="img" aria-hidden>{section.icon}</span>
+                  <span aria-hidden><PxlKitIcon icon={section.icon} size={14} colorful /></span>
                   {section.name}
                 </button>
               ))}
@@ -368,7 +368,7 @@ export default function TemplatesPage() {
                     : 'text-retro-muted border-retro-border hover:text-retro-text hover:bg-retro-surface'
                 }`}
               >
-                <span role="img" aria-hidden>📄</span>
+                <span aria-hidden><PxlKitIcon icon={Scroll} size={14} colorful /></span>
                 Full Pages
               </button>
             </div>
@@ -396,7 +396,7 @@ export default function TemplatesPage() {
               <PixelFadeIn key={currentSection.id}>
                 <div className="mb-6">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-3xl" role="img" aria-hidden>{currentSection.icon}</span>
+                    <span aria-hidden><PxlKitIcon icon={currentSection.icon} size={28} colorful /></span>
                     <h2 className="font-pixel text-base text-retro-text leading-loose">
                       {currentSection.name}
                     </h2>

@@ -12,7 +12,9 @@
 
 import { useState, useEffect } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
-import { QuestMap } from '@pxlkit/gamification';
+import type { PxlKitData } from '@pxlkit/core';
+import { QuestMap, Chest } from '@pxlkit/gamification';
+import { Moon, Sunrise, Sun, Sunset } from '@pxlkit/weather';
 import { PixelBadge, PixelSlideIn, PixelFadeIn } from '@pxlkit/ui-kit';
 import type { WorldMode, ChunkVoxelData } from '../types';
 import { VOXEL_SIZE } from '../constants';
@@ -64,12 +66,12 @@ function formatGameTime(hour: number): string {
   return `${h}:${String(m).padStart(2, '0')}`;
 }
 
-function getTimeIcon(hour: number): string {
-  if (hour < 5 || hour >= 21) return '🌙';
-  if (hour < 7) return '🌅';
-  if (hour < 17) return '☀️';
-  if (hour < 19) return '🌇';
-  return '🌙';
+function getTimeIcon(hour: number): PxlKitData {
+  if (hour < 5 || hour >= 21) return Moon;
+  if (hour < 7) return Sunrise;
+  if (hour < 17) return Sun;
+  if (hour < 19) return Sunset;
+  return Moon;
 }
 
 function getTimeLabel(hour: number): string {
@@ -147,7 +149,7 @@ export function GameHUD({
               {getCompassDirection(cameraYaw)}
             </span>
             <div className="w-px h-3 bg-retro-border/20 mx-1" />
-            <span className="font-mono text-[9px] text-retro-muted/40">{getTimeIcon(hour)} {formatGameTime(hour)}</span>
+            <span className="font-mono text-[9px] text-retro-muted/40 inline-flex items-center gap-0.5"><PxlKitIcon icon={getTimeIcon(hour)} size={9} colorful /> {formatGameTime(hour)}</span>
           </div>
         </PixelFadeIn>
       </div>
@@ -179,7 +181,7 @@ export function GameHUD({
         <button onClick={onSave}
           className="pointer-events-auto p-1.5 bg-retro-bg/50 backdrop-blur-sm border border-retro-border/25 rounded-md text-[10px] text-retro-muted/50 hover:text-retro-cyan hover:border-retro-cyan/30 hover:bg-retro-cyan/10 transition-all cursor-pointer"
           title="Save world" style={{ touchAction: 'none' }}>
-          💾
+          <PxlKitIcon icon={Chest} size={12} colorful />
         </button>
 
         {/* Fullscreen map */}
@@ -237,7 +239,7 @@ export function GameHUD({
                   <span className="text-[8px]">{biome}</span>
                 </PixelBadge>
                 <PixelBadge tone="gold">
-                  <span className="text-[8px]">{getTimeIcon(hour)} {getTimeLabel(hour)}</span>
+                  <span className="text-[8px] inline-flex items-center gap-0.5"><PxlKitIcon icon={getTimeIcon(hour)} size={8} colorful /> {getTimeLabel(hour)}</span>
                 </PixelBadge>
               </div>
 

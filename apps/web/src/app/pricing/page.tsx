@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useToast } from '../../components/ToastProvider';
 import { PixelButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
+import { PxlKitIcon } from '@pxlkit/core';
+import { Fire } from '@pxlkit/gamification';
 
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
 const ICON_COUNT_LABEL = '226+';
@@ -238,7 +240,7 @@ function HeroSection() {
 
       <motion.div className="relative z-10" {...fadeInUp}>
         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-retro-red/40 bg-retro-red/10 backdrop-blur-sm text-retro-red font-mono text-xs mb-3 animate-pulse">
-          🔥 50% OFF — Launch Special
+          <PxlKitIcon icon={Fire} size={12} colorful className="inline-block mr-0.5" /> 50% OFF — Launch Special
         </span>
         <br />
         <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-retro-gold/30 bg-retro-bg/80 backdrop-blur-sm text-retro-gold font-mono text-xs mb-6">
