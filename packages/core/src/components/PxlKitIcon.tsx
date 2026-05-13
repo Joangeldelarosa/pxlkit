@@ -3,21 +3,31 @@ import type { IconAppearance, PxlKitProps } from '../types';
 import { gridToPixels } from '../utils/gridToPixels';
 
 /**
- * Renders a pixel art icon as an `<img>` element backed by an inline SVG
- * data URI.
+ * Renders a pixel art icon as an `<img>` element whose `src` is an inline
+ * SVG document encoded as a data URI (MIME `image/svg+xml`).
  *
- * **Why `<img>` instead of inline SVG?** The browser treats `<img>` as a
- * raster source for layout/scaling and honours `image-rendering: pixelated`
- * reliably across Chromium, Firefox and Safari. Inline `<svg>` with
- * `shape-rendering="crispEdges"` and CSS `transform: scale()` does NOT
- * trigger nearest-neighbour scaling consistently, which causes edge columns
- * to silently disappear at sub-integer scales (e.g. `size=14` from a 16
- * native grid → 0.875×, the rightmost pixel column merges below 1 CSS pixel
- * and gets clipped).
+ * **The icon is still SVG end-to-end — no raster anywhere.** The data URI
+ * carries the full `<svg>...<rect>...</svg>` markup; the browser parses
+ * it with its native SVG parser (same as inline `<svg>`), so the artwork
+ * remains vector at every stage (hi-DPI sharp, infinitely zoomable, the
+ * markup can be inspected/exported directly from the `src` attribute).
  *
- * With the `<img>` + pixelated-rendering combo, every source pixel is mapped
- * to one or more output pixels via nearest-neighbour sampling, preserving
- * the full silhouette at any visual size from 8 px to 512 px.
+ * **Why pipe SVG through `<img>` instead of using inline `<svg>`?** Because
+ * CSS `image-rendering: pixelated` (the nearest-neighbour directive that
+ * keeps pixel art crisp at arbitrary sizes) is only honoured reliably for
+ * *image sources* — `<img>`, `<canvas>`, CSS `background-image`. On inline
+ * `<svg>` with `shape-rendering="crispEdges"` + CSS `transform: scale()`,
+ * all three engines (Blink/Gecko/WebKit) do vector scaling with sub-pixel
+ * coverage; at sub-integer scales (e.g. `size=14` rendered from a 16-grid
+ * = 0.875×) the rightmost pixel column collapses below 1 CSS pixel and
+ * silently disappears.
+ *
+ * By embedding the same SVG inside an `<img>`, the browser rasterises the
+ * SVG once at its intrinsic viewBox size (e.g. 16×16) and then scales the
+ * intermediate buffer to the final visual size with nearest-neighbour
+ * sampling, preserving every source pixel from 8 px up to 512 px and
+ * beyond. The source format is unchanged — what changes is where in the
+ * pipeline the rasteriser sits.
  *
  * **Colour modes** (see {@link IconAppearance}):
  * - `appearance="palette"` (default) — original artwork colours.
