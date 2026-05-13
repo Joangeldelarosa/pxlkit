@@ -55,6 +55,7 @@ import {
   PixelMouseParallax,
   UI_KIT_COMPONENTS,
   PxlKitLocaleProvider,
+  PxlKitSurfaceProvider,
   toLocaleUpper,
   TURKISH_CHARACTERS,
 } from '@pxlkit/ui-kit';
@@ -81,6 +82,7 @@ const CATEGORIES = [
     items: [
       { id: 'getting-started', name: 'Getting Started' },
       { id: 'design-tokens', name: 'Design Tokens' },
+      { id: 'surface-system', name: 'Surface System' },
       { id: 'locale-support', name: 'Locale / Turkish' },
     ],
   },
@@ -133,6 +135,7 @@ const CATEGORIES = [
       { id: 'pixel-skeleton', name: 'PixelSkeleton' },
       { id: 'pixel-empty-state', name: 'PixelEmptyState' },
       { id: 'pixel-toast', name: 'PixelToast' },
+      { id: 'use-toast', name: 'useToast()' },
     ],
   },
   {
@@ -654,11 +657,20 @@ import { Search } from '@pxlkit/ui';
 
               <div className="rounded-lg border border-retro-border/30 bg-retro-surface/30 p-4">
                 <h3 className="mb-3 font-mono text-xs font-semibold text-retro-text">Common API Surface</h3>
+                <p className="text-xs text-retro-muted mb-3">
+                  These props are accepted by <strong className="text-retro-text">every</strong> UI-kit
+                  component (where they apply). They&apos;re documented here once and omitted from each
+                  component&apos;s own props table to avoid noise.
+                </p>
                 <PropsTable data={[
-                  { name: 'tone', type: '"green" | "cyan" | "gold" | "red" | "purple" | "neutral"', default: 'varies', description: 'Color scheme — shared across all components' },
+                  { name: 'tone', type: '"green" | "cyan" | "gold" | "red" | "purple" | "pink" | "neutral"', default: 'varies', description: 'Color scheme — shared across all components' },
                   { name: 'size', type: '"sm" | "md" | "lg"', default: '"md"', description: 'Controls height, padding, and font size' },
+                  { name: 'surface', type: '"pixel" | "linear"', default: 'inherits from PxlKitSurfaceProvider, falls back to "pixel"', description: 'Visual aesthetic. Per-component override of the global surface — see Surface System.' },
+                  { name: 'disabled', type: 'boolean', default: 'false', description: 'Standard HTML disabled state — applies to every interactive component (buttons, inputs, switches, sliders, segmented, etc.).' },
                   { name: 'iconLeft / iconRight', type: 'ReactNode', default: '—', description: 'Slot for icons before/after label (see buttons)' },
                   { name: 'label', type: 'string', default: '—', description: 'Accessible label for inputs and controls' },
+                  { name: 'children', type: 'ReactNode', default: '—', description: 'Required for container components (PixelCard, PixelModal, PixelTooltip, animations, etc.). Listed here once; not repeated in each table.' },
+                  { name: 'className', type: 'string', default: '—', description: 'Extra CSS class names merged onto the outer element.' },
                 ]} />
               </div>
             </section>
@@ -709,6 +721,94 @@ import { Search } from '@pxlkit/ui';
                   </div>
                 </div>
               </div>
+            </section>
+
+            {/* ══════════════════ SURFACE SYSTEM ══════════════════ */}
+            <section data-section="surface-system" id="surface-system" className="scroll-mt-20 space-y-4 pt-10">
+              <div className="flex items-center gap-2.5">
+                <h2 className="font-pixel text-xs text-retro-green">SURFACE SYSTEM</h2>
+                <PixelBadge tone="cyan">v1.4.0</PixelBadge>
+              </div>
+              <p className="text-sm text-retro-muted">
+                Every UI-kit component has two visual surfaces: the retro 8-bit{' '}
+                <PixelCodeInline>&quot;pixel&quot;</PixelCodeInline> aesthetic (default — sharp pixel borders,
+                pressed shadows, mono fonts) and a flatter, more modern{' '}
+                <PixelCodeInline>&quot;linear&quot;</PixelCodeInline> aesthetic (subtle 1px borders, rounded corners,
+                sans fonts). You toggle it globally with{' '}
+                <PixelCodeInline>{'<PxlKitSurfaceProvider>'}</PixelCodeInline>, or per-component with the{' '}
+                <PixelCodeInline>surface</PixelCodeInline> prop. Useful for embedding Pxlkit into a non-retro
+                product without rewriting the components.
+              </p>
+
+              <div className="rounded-lg border border-retro-border/30 bg-retro-surface/30 p-4 space-y-4">
+                <h3 className="font-mono text-xs font-semibold text-retro-text">Side-by-side</h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <p className="text-[10px] font-mono text-retro-muted mb-2">surface=&quot;pixel&quot; (default)</p>
+                    <PxlKitSurfaceProvider surface="pixel">
+                      <div className="flex flex-wrap gap-2">
+                        <PixelButton tone="green">Confirm</PixelButton>
+                        <PixelButton tone="purple" variant="ghost">Ghost</PixelButton>
+                        <PixelBadge tone="cyan">v1.4</PixelBadge>
+                      </div>
+                    </PxlKitSurfaceProvider>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-mono text-retro-muted mb-2">surface=&quot;linear&quot;</p>
+                    <PxlKitSurfaceProvider surface="linear">
+                      <div className="flex flex-wrap gap-2">
+                        <PixelButton tone="green">Confirm</PixelButton>
+                        <PixelButton tone="purple" variant="ghost">Ghost</PixelButton>
+                        <PixelBadge tone="cyan">v1.4</PixelBadge>
+                      </div>
+                    </PxlKitSurfaceProvider>
+                  </div>
+                </div>
+              </div>
+
+              {/* Props reference */}
+              <PixelCollapsible label="PxlKitSurfaceProvider — Props reference (2)">
+                <div>
+                  <PropsTable data={[
+                    { name: 'surface', type: '"pixel" | "linear"', default: '"pixel"', description: 'Visual aesthetic applied to every descendant Pxlkit component that does not override it locally.' },
+                    { name: 'children', type: 'ReactNode', default: '—', description: 'Your app or component tree.' },
+                  ]} />
+                </div>
+              </PixelCollapsible>
+
+              {/* Per-component override note */}
+              <PixelAlert
+                title="Every component also accepts `surface` directly"
+                message='Every UI-kit component (PixelButton, PixelInput, PixelCard, …) exposes a surface?: "pixel" | "linear" prop that overrides the nearest provider. Use it when you need a single button in linear mode inside an otherwise pixel-mode page.'
+                tone="cyan"
+              />
+
+              <CodeBlock
+                code={`import { PxlKitSurfaceProvider, PixelButton, PixelCard } from '@pxlkit/ui-kit';
+
+// === GLOBAL toggle: wrap your whole app once ===
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <PxlKitSurfaceProvider surface="linear">
+          {children}
+        </PxlKitSurfaceProvider>
+      </body>
+    </html>
+  );
+}
+
+// === LOCAL override: one component in a different mode ===
+<PxlKitSurfaceProvider surface="pixel">
+  <PixelCard title="Retro card">
+    {/* This one button breaks the pixel surface */}
+    <PixelButton tone="green" surface="linear">Modern button</PixelButton>
+  </PixelCard>
+</PxlKitSurfaceProvider>`}
+                language="tsx"
+                title="Surface — Setup & override"
+              />
             </section>
 
             {/* ══════════════════ LOCALE / TURKISH SUPPORT ══════════════════ */}
@@ -1086,7 +1186,8 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               description={<>Password field with a custom show/hide toggle button. No native browser password reveal UI. Extends the same field shell as <CompLink id="pixel-input">PixelInput</CompLink>.</>}
               props={[
                 { name: 'label', type: 'string', default: '—', description: 'Field label' },
-                { name: 'hint', type: 'string', default: '—', description: 'Helper text' },
+                { name: 'hint', type: 'string', default: '—', description: 'Helper text shown below the field' },
+                { name: 'error', type: 'string', default: '—', description: 'Error message shown below the field. When set, replaces hint and applies the error tone.' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Focus ring color' },
                 { name: 'size', type: 'Size', default: '"md"', description: 'Input height' },
               ]}
@@ -1121,13 +1222,14 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               title="PixelSelect"
               description={<>Fully custom dropdown select — no native {'<select>'} element. Features keyboard navigation (Arrow keys, Enter, Escape), click-outside close, and check mark indicator. For a simpler toggle, see <CompLink id="pixel-segmented">PixelSegmented</CompLink>. For action menus, see <CompLink id="pixel-dropdown">PixelDropdown</CompLink>.</>}
               props={[
-                { name: 'options', type: 'Option[]', default: '—', description: 'Array of { value, label }' },
+                { name: 'options', type: 'Option[]', default: '—', description: 'Array of { value, label, icon? }' },
                 { name: 'value', type: 'string', default: '—', description: 'Controlled value' },
                 { name: 'defaultValue', type: 'string', default: '—', description: 'Uncontrolled initial value' },
-                { name: 'onChange', type: '(v: string) => void', default: '—', description: 'Change handler' },
+                { name: 'onChange', type: '(value: string) => void', default: '—', description: 'Change handler' },
                 { name: 'placeholder', type: 'string', default: '"Select..."', description: 'Placeholder text' },
                 { name: 'label', type: 'string', default: '—', description: 'Field label' },
-                { name: 'size', type: 'Size', default: '"md"', description: 'Input height' },
+                { name: 'hint', type: 'string', default: '—', description: 'Helper text shown below the field' },
+                { name: 'error', type: 'string', default: '—', description: 'Error message; replaces hint and applies the error tone' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Focus ring color' },
               ]}
               code={`<PixelSelect
@@ -1256,10 +1358,11 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               props={[
                 { name: 'label', type: 'string', default: '—', description: 'Display label' },
                 { name: 'value', type: 'number', default: '—', description: 'Current value' },
-                { name: 'onChange', type: '(v: number) => void', default: '—', description: 'Value change handler' },
+                { name: 'onChange', type: '(next: number) => void', default: '—', description: 'Value change handler' },
                 { name: 'min', type: 'number', default: '0', description: 'Minimum value' },
                 { name: 'max', type: 'number', default: '100', description: 'Maximum value' },
                 { name: 'step', type: 'number', default: '1', description: 'Step increment' },
+                { name: 'showMinMax', type: 'boolean', default: 'false', description: 'Render the min and max values beside the track' },
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Track and thumb color' },
               ]}
               code={`<PixelSlider label="Volume" value={vol} onChange={setVol} min={0} max={100} />
@@ -1684,16 +1787,27 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               />
             </DocSection>
 
-            {/* ══════════════════ PIXELTOAST ══════════════════ */}
+            {/* ══════════════════ PIXELTOAST (low-level component) ══════════════════ */}
             <DocSection
               id="pixel-toast"
               title="PixelToast"
-              description={<>Pixel-art toast notifications. The standalone <PixelCodeInline>{'<PixelToast>'}</PixelCodeInline> component ships in <PixelCodeInline>@pxlkit/core</PixelCodeInline>; the recommended consumption is the <PixelCodeInline>{'<ToastProvider>'}</PixelCodeInline> + <PixelCodeInline>useToast()</PixelCodeInline> pattern shown below (this site mounts the provider in <PixelCodeInline>layout.tsx</PixelCodeInline>). Supports tones, positions, custom icons (static or animated), duration, and dismiss controls. The old <PixelCodeInline>/toast</PixelCodeInline> route now redirects here.</>}
+              description={<>The low-level <PixelCodeInline>{'<PixelToast>'}</PixelCodeInline> component shipped from <PixelCodeInline>@pxlkit/core</PixelCodeInline>. It renders one toast at a fixed position; you control visibility and lifecycle. For most apps you&apos;ll want the <PixelCodeInline>useToast()</PixelCodeInline> hook below — it stacks multiple toasts and handles timers for you. The old <PixelCodeInline>/toast</PixelCodeInline> route redirects to this section.</>}
               props={[
-                { name: 'toast(options)', type: '({ title, message?, tone?, icon?, animatedIcon?, duration?, position? }) => string', default: '—', description: 'Generic toast creator' },
-                { name: 'success/error/info/warning', type: '(title, message?, icon?) => string', default: '—', description: 'Tone shortcuts' },
-                { name: 'dismiss(id)', type: '(id: string) => void', default: '—', description: 'Dismiss one toast by id' },
-                { name: 'dismissAll()', type: '() => void', default: '—', description: 'Clear all active toasts' },
+                { name: 'visible', type: 'boolean', default: '—', description: 'Whether the toast is currently visible (required)' },
+                { name: 'title', type: 'string', default: '—', description: 'Heading text (required)' },
+                { name: 'message', type: 'string', default: '—', description: 'Optional body line below the title' },
+                { name: 'icon', type: 'PxlKitData', default: '—', description: 'Pxlkit icon shown on the left' },
+                { name: 'colorfulIcon', type: 'boolean', default: 'true', description: 'Render the icon in palette mode (false → flat accentColor)' },
+                { name: 'iconSize', type: 'number', default: '24', description: 'Icon size in px' },
+                { name: 'bgColor', type: 'string', default: "'#12121a'", description: 'Background colour (hex)' },
+                { name: 'borderColor', type: 'string', default: "'#2a2a3e'", description: 'Border colour (hex)' },
+                { name: 'textColor', type: 'string', default: "'#e8e6e3'", description: 'Body text colour' },
+                { name: 'accentColor', type: 'string', default: "'#00ff88'", description: 'Title + icon tint colour' },
+                { name: 'position', type: "'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'", default: "'top-right'", description: 'Viewport corner to anchor the toast' },
+                { name: 'duration', type: 'number', default: '2200', description: 'Auto-dismiss after N ms (0 disables auto-dismiss)' },
+                { name: 'showClose', type: 'boolean', default: 'true', description: 'Render the X close button' },
+                { name: 'onClose', type: '() => void', default: '—', description: 'Called when duration elapses or the close button is clicked' },
+                { name: 'className', type: 'string', default: '—', description: 'Extra CSS class names on the outer wrapper' },
               ]}
               code={`import { useToast } from '@/components/ToastProvider';
 import { CheckCircle, WarningTriangle } from '@pxlkit/feedback';
@@ -1813,6 +1927,67 @@ function SaveButton() {
                   Detailed integration docs are also available in <a className="text-retro-cyan hover:underline" href="/docs#toast-notifications">/docs#toast-notifications</a>.
                 </p>
               </div>
+            </DocSection>
+
+            {/* ══════════════════ useToast() hook ══════════════════ */}
+            <DocSection
+              id="use-toast"
+              title="useToast()"
+              description={<>Application-level hook that manages a stack of <PixelCodeInline>{'<PixelToast>'}</PixelCodeInline> instances. Mount the matching <PixelCodeInline>{'<ToastProvider>'}</PixelCodeInline> once at the root (this site does it in <PixelCodeInline>layout.tsx</PixelCodeInline>). The hook&apos;s methods auto-handle ids, timers, and unmount — you only worry about the message. Returns the API listed below.</>}
+              props={[
+                { name: 'toast(options)', type: '({ title, message?, tone?, icon?, animatedIcon?, duration?, position? }) => string', default: '—', description: 'Generic creator; returns the new toast id' },
+                { name: 'success / error / info / warning', type: '(title, message?, icon?) => string', default: '—', description: 'Tone shortcuts with sensible default icons' },
+                { name: 'dismiss(id)', type: '(id: string) => void', default: '—', description: 'Dismiss one toast by its id (returned by toast())' },
+                { name: 'dismissAll()', type: '() => void', default: '—', description: 'Clear every active toast' },
+              ]}
+              code={`// 1. Mount the provider once at the root
+import { ToastProvider } from '@/components/ToastProvider';
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <ToastProvider>
+          {children}
+        </ToastProvider>
+      </body>
+    </html>
+  );
+}
+
+// 2. Anywhere inside, call useToast() and use it
+import { useToast } from '@/components/ToastProvider';
+import { CheckCircle, WarningTriangle } from '@pxlkit/feedback';
+import { FireSword } from '@pxlkit/gamification';
+
+function SaveButton() {
+  const { toast, success } = useToast();
+  return (
+    <>
+      <PixelButton onClick={() => success('SAVED', 'Changes synced', CheckCircle)}>
+        Save
+      </PixelButton>
+      <PixelButton
+        onClick={() =>
+          toast({
+            tone: 'warning',
+            title: 'LOW HEALTH',
+            message: 'Use a potion now',
+            position: 'bottom-right',
+            duration: 3500,
+            animatedIcon: FireSword,
+          })
+        }
+      >
+        Show Warning Toast
+      </PixelButton>
+    </>
+  );
+}`}
+            >
+              <p className="text-xs text-retro-muted">
+                Implementation lives at <PixelCodeInline>apps/web/src/components/ToastProvider.tsx</PixelCodeInline> in this repo. Copy that file (or write your own equivalent) into your project to get the multi-toast stack on top of the low-level <PixelCodeInline>{'<PixelToast>'}</PixelCodeInline> primitive documented above.
+              </p>
             </DocSection>
 
             <PixelDivider label="Navigation" tone="purple" spacing="lg" />
@@ -1996,8 +2171,9 @@ function SaveButton() {
               description={<>Action menu dropdown with click-outside close. Ideal for contextual actions and quick navigation. For form selection, see <CompLink id="pixel-select">PixelSelect</CompLink>. For split actions, see <CompLink id="pixel-split-button">PixelSplitButton</CompLink>.</>}
               props={[
                 { name: 'label', type: 'string', default: '—', description: 'Trigger button label' },
-                { name: 'items', type: 'Option[]', default: '—', description: 'Menu items' },
-                { name: 'onSelect', type: '(v: string) => void', default: '—', description: 'Selection handler' },
+                { name: 'items', type: 'Option[]', default: '—', description: 'Menu items: { value, label, icon? }' },
+                { name: 'onSelect', type: '(value: string) => void', default: '—', description: 'Selection handler' },
+                { name: 'icon', type: 'ReactNode', default: '—', description: 'Optional icon shown inside the trigger button' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Trigger button tone' },
               ]}
               code={`<PixelDropdown
@@ -2064,9 +2240,10 @@ function SaveButton() {
               props={[
                 { name: 'label', type: 'string', default: '—', description: 'Center label text' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Label color' },
+                { name: 'spacing', type: '"none" | "sm" | "md" | "lg"', default: '"none"', description: 'Vertical margin around the divider' },
               ]}
               code={`<PixelDivider />
-<PixelDivider label="Section" tone="green" />`}
+<PixelDivider label="Section" tone="green" spacing="lg" />`}
             >
               <div className="space-y-4">
                 <PixelDivider />
