@@ -21,11 +21,11 @@ export const AllFeedback: Story = {
     <div className="space-y-6 max-w-3xl">
       <section className="space-y-3">
         <h3 className="font-pixel text-xs text-retro-green mb-2">PixelAlert — every tone</h3>
-        <PixelAlert tone="green" title="QUEST COMPLETE" message="Boss defeated. +500 XP awarded." icon={<PxlKitIcon icon={CheckCircle} size={16} colorful />} surface={args.surface} />
-        <PixelAlert tone="cyan" title="NEW INFO" message="A merchant has set up camp nearby." icon={<PxlKitIcon icon={InfoCircle} size={16} colorful />} surface={args.surface} />
-        <PixelAlert tone="gold" title="ACHIEVEMENT" message="You earned the Pixel Knight badge." icon={<PxlKitIcon icon={Trophy} size={16} colorful />} surface={args.surface} />
-        <PixelAlert tone="red" title="LOW HEALTH" message="Use a potion before the next encounter." icon={<PxlKitIcon icon={ErrorOctagon} size={16} colorful />} action={<PixelButton size="sm" tone="red" variant="ghost" surface={args.surface}>Use potion</PixelButton>} surface={args.surface} />
-        <PixelAlert tone="purple" title="EXPERIMENTAL" message="Voxel engine is in beta." icon={<PxlKitIcon icon={WarningTriangle} size={16} colorful />} surface={args.surface} />
+        <PixelAlert tone="green" title="QUEST COMPLETE" message="Boss defeated. +500 XP awarded." icon={<PxlKitIcon icon={CheckCircle} size={16} />} surface={args.surface} />
+        <PixelAlert tone="cyan" title="NEW INFO" message="A merchant has set up camp nearby." icon={<PxlKitIcon icon={InfoCircle} size={16} />} surface={args.surface} />
+        <PixelAlert tone="gold" title="ACHIEVEMENT" message="You earned the Pixel Knight badge." icon={<PxlKitIcon icon={Trophy} size={16} />} surface={args.surface} />
+        <PixelAlert tone="red" title="LOW HEALTH" message="Use a potion before the next encounter." icon={<PxlKitIcon icon={ErrorOctagon} size={16} />} action={<PixelButton size="sm" tone="red" variant="ghost" surface={args.surface}>Use potion</PixelButton>} surface={args.surface} />
+        <PixelAlert tone="purple" title="EXPERIMENTAL" message="Voxel engine is in beta." icon={<PxlKitIcon icon={WarningTriangle} size={16} />} surface={args.surface} />
       </section>
       <section className="space-y-3">
         <h3 className="font-pixel text-xs text-retro-green mb-2">PixelProgress — pixel segmented HP-bar</h3>
@@ -47,7 +47,7 @@ export const AllFeedback: Story = {
         <PixelEmptyState
           title="No icons in your inventory"
           description="Open the visual builder or browse one of the 7 packs to start collecting."
-          icon={<AnimatedPxlKitIcon icon={FireSword} size={32} colorful />}
+          icon={<AnimatedPxlKitIcon icon={FireSword} size={32} />}
           action={<PixelButton tone="green" surface={args.surface}>Open builder</PixelButton>}
           surface={args.surface}
         />
@@ -77,7 +77,7 @@ export const PixelAlertStory: Story = {
     message: 'Boss defeated. +500 XP awarded.',
     tone: 'green',
     surface: 'pixel',
-    icon: <PxlKitIcon icon={CheckCircle} size={16} colorful />,
+    icon: <PxlKitIcon icon={CheckCircle} size={16} />,
   },
 };
 
@@ -144,7 +144,7 @@ export const PixelEmptyStateStory: Story = {
     title: 'No icons in your inventory',
     description: 'Open the visual builder or browse one of the 7 packs to start collecting.',
     surface: 'pixel',
-    icon: <AnimatedPxlKitIcon icon={FireSword} size={32} colorful />,
+    icon: <AnimatedPxlKitIcon icon={FireSword} size={32} />,
     action: <PixelButton tone="green">Open builder</PixelButton>,
   },
 };

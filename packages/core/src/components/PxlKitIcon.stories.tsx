@@ -2,6 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { PxlKitIcon } from './PxlKitIcon';
 import type { PxlKitData } from '../types';
 
+/**
+ * PxlKitIcon — Storybook surface.
+ *
+ * Every story uses the canonical v1.3 API: `appearance` + optional `color`.
+ * The legacy `colorful` / `solid` / `tint` props still resolve at runtime
+ * (kept as aliases for v1.2 consumers) but they are NOT exercised here so
+ * Storybook autodocs reflect the current public contract.
+ */
 const demoIcon: PxlKitData = {
   name: 'demo-icon',
   size: 16,
@@ -40,135 +48,137 @@ const meta: Meta<typeof PxlKitIcon> = {
     icon: demoIcon,
     size: 64,
   },
+  argTypes: {
+    appearance: {
+      control: 'radio',
+      options: ['palette', 'tinted', 'solid'],
+      description:
+        'Colour mode. `palette` = original artwork colours (default). `tinted` = palette + colour overlay (preserves luminance). `solid` = every pixel flattened to one colour.',
+    },
+    color: {
+      control: 'color',
+      description: 'Tint hue for `tinted`, flat colour for `solid`. Ignored for `palette`.',
+    },
+    size: {
+      control: { type: 'number', min: 8, max: 256, step: 4 },
+    },
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof PxlKitIcon>;
 
-export const Default: Story = {
-  name: 'Colorful (Default)',
+// ── Appearance modes ────────────────────────────────────────────────────
+
+export const Palette: Story = {
+  name: 'Palette (default)',
   args: {
-    colorful: true,
+    appearance: 'palette',
   },
 };
 
-export const TintRed: Story = {
-  name: 'Tint — red (preserves detail)',
+export const TintedRed: Story = {
+  name: 'Tinted — red',
   args: {
-    colorful: true,
-    tint: '#FF4D4D',
+    appearance: 'tinted',
+    color: '#FF4D4D',
   },
 };
 
-export const TintCyan: Story = {
-  name: 'Tint — cyan',
+export const TintedCyan: Story = {
+  name: 'Tinted — cyan',
   args: {
-    colorful: true,
-    tint: '#24827A',
+    appearance: 'tinted',
+    color: '#24827A',
   },
 };
 
-export const TintPurple: Story = {
-  name: 'Tint — purple',
+export const TintedPurple: Story = {
+  name: 'Tinted — purple',
   args: {
-    colorful: true,
-    tint: '#8237C8',
+    appearance: 'tinted',
+    color: '#8237C8',
   },
 };
 
-export const SolidMonochrome: Story = {
-  name: 'Solid — flattened to currentColor',
+export const Solid: Story = {
+  name: 'Solid — currentColor',
   args: {
-    solid: true,
+    appearance: 'solid',
   },
 };
 
 export const SolidCustomColor: Story = {
-  name: 'Solid — custom color (every pixel one colour)',
+  name: 'Solid — custom colour',
   args: {
-    solid: true,
+    appearance: 'solid',
     color: '#00ff88',
   },
 };
 
-export const TintSideBySide: Story = {
-  name: 'Tint vs Solid — side by side',
-  render: (args) => (
-    <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
+export const AppearanceSideBySide: Story = {
+  name: 'Palette vs Tinted vs Solid',
+  render: () => (
+    <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
       <div style={{ textAlign: 'center' }}>
-        <PxlKitIcon icon={demoIcon} size={64} />
-        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>colorful</p>
+        <PxlKitIcon icon={demoIcon} size={64} appearance="palette" />
+        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>appearance=&quot;palette&quot;</p>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <PxlKitIcon icon={demoIcon} size={64} tint="#FF4D4D" />
-        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>tint="red"</p>
+        <PxlKitIcon icon={demoIcon} size={64} appearance="tinted" color="#FF4D4D" />
+        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>tinted &amp; #FF4D4D</p>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <PxlKitIcon icon={demoIcon} size={64} tint="#24827A" />
-        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>tint="cyan"</p>
+        <PxlKitIcon icon={demoIcon} size={64} appearance="tinted" color="#24827A" />
+        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>tinted &amp; #24827A</p>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <PxlKitIcon icon={demoIcon} size={64} tint="#8237C8" />
-        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>tint="purple"</p>
+        <PxlKitIcon icon={demoIcon} size={64} appearance="tinted" color="#8237C8" />
+        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>tinted &amp; #8237C8</p>
       </div>
       <div style={{ textAlign: 'center', color: '#FF4D4D' }}>
-        <PxlKitIcon icon={demoIcon} size={64} solid />
-        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>solid (flat — lost detail)</p>
+        <PxlKitIcon icon={demoIcon} size={64} appearance="solid" />
+        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>solid (flat)</p>
       </div>
     </div>
   ),
 };
 
+// ── Sizes — verifies nearest-neighbour scaling across the GridSize union ──
+
 export const Size16: Story = {
   name: 'Size 16px',
-  args: {
-    size: 16,
-    colorful: true,
-  },
+  args: { size: 16, appearance: 'palette' },
 };
-
 export const Size32: Story = {
   name: 'Size 32px',
-  args: {
-    size: 32,
-    colorful: true,
-  },
+  args: { size: 32, appearance: 'palette' },
 };
-
 export const Size48: Story = {
   name: 'Size 48px',
-  args: {
-    size: 48,
-    colorful: true,
-  },
+  args: { size: 48, appearance: 'palette' },
 };
-
 export const Size64: Story = {
   name: 'Size 64px',
-  args: {
-    size: 64,
-    colorful: true,
-  },
+  args: { size: 64, appearance: 'palette' },
 };
-
 export const Size128: Story = {
   name: 'Size 128px',
-  args: {
-    size: 128,
-    colorful: true,
-  },
+  args: { size: 128, appearance: 'palette' },
 };
+
+// ── Customisation slots ────────────────────────────────────────────────
 
 export const WithClassName: Story = {
   args: {
-    colorful: true,
+    appearance: 'palette',
     className: 'opacity-50',
   },
 };
 
 export const WithAriaLabel: Story = {
   args: {
-    colorful: true,
+    appearance: 'palette',
     'aria-label': 'Golden trophy icon',
   },
 };

@@ -48,15 +48,15 @@ export const AllDataDisplay: Story = {
   render: (args: any) => (
     <div className="space-y-8 max-w-5xl">
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <PixelStatCard label="Components" value="54" icon={<PxlKitIcon icon={Crown} size={14} colorful />} tone="green" trend="+12 this release" surface={args.surface} />
-        <PixelStatCard label="Icons" value="226+" icon={<PxlKitIcon icon={Trophy} size={14} colorful />} tone="gold" surface={args.surface} />
-        <PixelStatCard label="Templates" value="29" icon={<PxlKitIcon icon={Star} size={14} colorful />} tone="purple" trend="24 sections + 5 pages" surface={args.surface} />
+        <PixelStatCard label="Components" value="54" icon={<PxlKitIcon icon={Crown} size={14} />} tone="green" trend="+12 this release" surface={args.surface} />
+        <PixelStatCard label="Icons" value="226+" icon={<PxlKitIcon icon={Trophy} size={14} />} tone="gold" surface={args.surface} />
+        <PixelStatCard label="Templates" value="29" icon={<PxlKitIcon icon={Star} size={14} />} tone="purple" trend="24 sections + 5 pages" surface={args.surface} />
       </section>
       <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <PixelCard title="Inventory" icon={<AnimatedPxlKitIcon icon={FireSword} size={16} colorful />} surface={args.surface} footer={<PixelTextLink href="#" surface={args.surface}>Read more →</PixelTextLink>}>
+        <PixelCard title="Inventory" icon={<AnimatedPxlKitIcon icon={FireSword} size={16} />} surface={args.surface} footer={<PixelTextLink href="#" surface={args.surface}>Read more →</PixelTextLink>}>
           A container with title, icon, body, and optional footer.
         </PixelCard>
-        <PixelCard title="Tags" icon={<PxlKitIcon icon={Star} size={16} colorful />} surface={args.surface}>
+        <PixelCard title="Tags" icon={<PxlKitIcon icon={Star} size={16} />} surface={args.surface}>
           <div className="flex flex-wrap gap-2">
             <PixelChip label="React" tone="cyan" surface={args.surface} />
             <PixelChip label="TypeScript" tone="purple" surface={args.surface} />
@@ -98,7 +98,7 @@ export const PixelCardStory: Story = {
   args: {
     title: 'Inventory',
     surface: 'pixel',
-    icon: <AnimatedPxlKitIcon icon={FireSword} size={16} colorful />,
+    icon: <AnimatedPxlKitIcon icon={FireSword} size={16} />,
     children: 'A container with title, icon, body, and optional footer.',
   },
 };
@@ -119,7 +119,7 @@ export const PixelStatCardStory: Story = {
     trend: '+12 this release',
     tone: 'green',
     surface: 'pixel',
-    icon: <PxlKitIcon icon={Crown} size={14} colorful />,
+    icon: <PxlKitIcon icon={Crown} size={14} />,
   },
 };
 

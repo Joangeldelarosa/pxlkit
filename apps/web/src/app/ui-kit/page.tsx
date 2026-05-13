@@ -667,8 +667,8 @@ import { Search } from '@pxlkit/ui';
                   { name: 'size', type: '"sm" | "md" | "lg"', default: '"md"', description: 'Controls height, padding, and font size' },
                   { name: 'surface', type: '"pixel" | "linear"', default: 'inherits from PxlKitSurfaceProvider, falls back to "pixel"', description: 'Visual aesthetic. Per-component override of the global surface — see Surface System.' },
                   { name: 'disabled', type: 'boolean', default: 'false', description: 'Standard HTML disabled state — applies to every interactive component (buttons, inputs, switches, sliders, segmented, etc.).' },
-                  { name: 'iconLeft / iconRight', type: 'ReactNode', default: '—', description: 'Slot for icons before/after label (see buttons)' },
-                  { name: 'label', type: 'string', default: '—', description: 'Accessible label for inputs and controls' },
+                  { name: 'iconLeft / iconRight', type: 'ReactNode', default: '—', description: 'Icon slots flanking the label. Accepted by PixelButton; PxlKitButton/PixelSplitButton use the single `icon` slot. Standalone inputs use the `icon` prop instead.' },
+                  { name: 'label', type: 'string', default: '—', description: 'Accessible label for inputs/controls (PixelInput, PixelSelect, PixelCheckbox, PixelSwitch, PixelSlider, PixelRadioGroup, …). Buttons use `children` for their visible text, not `label`.' },
                   { name: 'children', type: 'ReactNode', default: '—', description: 'Required for container components (PixelCard, PixelModal, PixelTooltip, animations, etc.). Listed here once; not repeated in each table.' },
                   { name: 'className', type: 'string', default: '—', description: 'Extra CSS class names merged onto the outer element.' },
                 ]} />
@@ -1278,7 +1278,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               props={[
                 { name: 'label', type: 'string', default: '—', description: 'Checkbox label (required)' },
                 { name: 'checked', type: 'boolean', default: '—', description: 'Controlled checked state' },
-                { name: 'onChange', type: '(v: boolean) => void', default: '—', description: 'Change handler' },
+                { name: 'onChange', type: '(next: boolean) => void', default: '—', description: 'Change handler' },
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Check mark color' },
                 { name: 'disabled', type: 'boolean', default: 'false', description: 'Disable interaction' },
               ]}
@@ -1305,7 +1305,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'label', type: 'string', default: '—', description: 'Group label' },
                 { name: 'value', type: 'string', default: '—', description: 'Current selected value' },
                 { name: 'options', type: 'Option[]', default: '—', description: 'Radio options' },
-                { name: 'onChange', type: '(v: string) => void', default: '—', description: 'Selection handler' },
+                { name: 'onChange', type: '(next: string) => void', default: '—', description: 'Selection handler' },
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Active indicator color' },
               ]}
               code={`<PixelRadioGroup
@@ -1339,7 +1339,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               props={[
                 { name: 'label', type: 'string', default: '—', description: 'Switch label' },
                 { name: 'checked', type: 'boolean', default: '—', description: 'On/off state' },
-                { name: 'onChange', type: '(v: boolean) => void', default: '—', description: 'Toggle handler' },
+                { name: 'onChange', type: '(next: boolean) => void', default: '—', description: 'Toggle handler' },
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Active color' },
               ]}
               code={`<PixelSwitch label="Auto refresh" checked={on} onChange={setOn} />`}
@@ -1385,7 +1385,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'label', type: 'string', default: '—', description: 'Group label' },
                 { name: 'value', type: 'string', default: '—', description: 'Current value' },
                 { name: 'options', type: 'Option[]', default: '—', description: 'Segment options' },
-                { name: 'onChange', type: '(v: string) => void', default: '—', description: 'Selection handler' },
+                { name: 'onChange', type: '(next: string) => void', default: '—', description: 'Selection handler' },
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Active segment color' },
               ]}
               code={`<PixelSegmented
@@ -1476,7 +1476,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               title="PixelTable"
               description={<>Data table with striped rows, hover highlight, and horizontal scroll on small screens. Accepts ReactNode cell values for rich content like <CompLink id="pixel-badge">PixelBadge</CompLink>.</>}
               props={[
-                { name: 'columns', type: 'Array<{ key, header, className? }>', default: '—', description: 'Column definitions' },
+                { name: 'columns', type: 'Array<{ key: string; header: string; className?: string }>', default: '—', description: 'Column definitions; `key` matches row-data keys.' },
                 { name: 'data', type: 'Array<Record<string, ReactNode>>', default: '—', description: 'Row data keyed by column key' },
                 { name: 'striped', type: 'boolean', default: 'true', description: 'Alternating row backgrounds' },
               ]}
@@ -2079,7 +2079,7 @@ function SaveButton() {
               title="PixelBreadcrumb"
               description={<>Navigation breadcrumb with pixel-art chevron separators. Items can be links, buttons, or plain text. Used at the top of this page and in <CompLink id="pixel-modal">modal</CompLink> headers.</>}
               props={[
-                { name: 'items', type: 'Array<{ label, href?, onClick?, active? }>', default: '—', description: 'Breadcrumb items' },
+                { name: 'items', type: 'Array<{ label: string; href?: string; onClick?: () => void; active?: boolean }>', default: '—', description: 'Breadcrumb items. `href` renders an anchor; `onClick` renders a button; both omitted → plain text.' },
               ]}
               code={`<PixelBreadcrumb items={[
   { label: 'Home', href: '/' },
@@ -2101,7 +2101,7 @@ function SaveButton() {
               props={[
                 { name: 'page', type: 'number', default: '—', description: 'Current page' },
                 { name: 'total', type: 'number', default: '—', description: 'Total pages' },
-                { name: 'onChange', type: '(page: number) => void', default: '—', description: 'Page change handler' },
+                { name: 'onChange', type: '(next: number) => void', default: '—', description: 'Page change handler (receives the new page index)' },
               ]}
               code={`<PixelPagination page={page} total={5} onChange={setPage} />`}
             >
@@ -2259,10 +2259,10 @@ function SaveButton() {
             <DocSection
               id="pixel-bare-button"
               title="PixelBareButton"
-              description={<>Unstyled <PixelCodeInline>{'<button>'}</PixelCodeInline> wrapper with <PixelCodeInline>forwardRef</PixelCodeInline> support and <PixelCodeInline>type=&quot;button&quot;</PixelCodeInline> default. Use as the base for custom styled buttons. Accepts all native button attributes.</>}
+              description={<>Unstyled <PixelCodeInline>{'<button>'}</PixelCodeInline> wrapper with <PixelCodeInline>forwardRef</PixelCodeInline> support and <PixelCodeInline>type=&quot;button&quot;</PixelCodeInline> default. Use as the base for custom styled buttons.</>}
               props={[
-                { name: '...props', type: 'ButtonHTMLAttributes', default: '—', description: 'All native <button> attributes' },
-                { name: 'ref', type: 'Ref<HTMLButtonElement>', default: '—', description: 'Forwarded ref' },
+                { name: '(native attrs)', type: 'React.ButtonHTMLAttributes<HTMLButtonElement>', default: '—', description: 'Forwards every native <button> attribute (onClick, disabled, aria-*, data-*, …) onto the underlying element.' },
+                { name: '(ref)', type: 'React.Ref<HTMLButtonElement>', default: '—', description: 'forwardRef passes the ref straight to the native <button>.' },
               ]}
               code={`<PixelBareButton onClick={() => alert('click')} className="px-3 py-1 bg-retro-green/20 rounded">
   Custom Button
@@ -2277,10 +2277,10 @@ function SaveButton() {
             <DocSection
               id="pixel-bare-input"
               title="PixelBareInput"
-              description={<>Unstyled <PixelCodeInline>{'<input>'}</PixelCodeInline> wrapper with <PixelCodeInline>forwardRef</PixelCodeInline> support. Use as the base for custom text fields or form controls. Accepts all native input attributes.</>}
+              description={<>Unstyled <PixelCodeInline>{'<input>'}</PixelCodeInline> wrapper with <PixelCodeInline>forwardRef</PixelCodeInline> support. Use as the base for custom text fields or form controls.</>}
               props={[
-                { name: '...props', type: 'InputHTMLAttributes', default: '—', description: 'All native <input> attributes' },
-                { name: 'ref', type: 'Ref<HTMLInputElement>', default: '—', description: 'Forwarded ref' },
+                { name: '(native attrs)', type: 'React.InputHTMLAttributes<HTMLInputElement>', default: '—', description: 'Forwards every native <input> attribute (type, value, placeholder, onChange, …).' },
+                { name: '(ref)', type: 'React.Ref<HTMLInputElement>', default: '—', description: 'forwardRef passes the ref straight to the native <input>.' },
               ]}
               code={`<PixelBareInput type="text" placeholder="Unstyled input..." className="border px-2 py-1" />`}
             >
@@ -2293,10 +2293,10 @@ function SaveButton() {
             <DocSection
               id="pixel-bare-textarea"
               title="PixelBareTextarea"
-              description={<>Unstyled <PixelCodeInline>{'<textarea>'}</PixelCodeInline> wrapper with <PixelCodeInline>forwardRef</PixelCodeInline> support. Use for custom multi-line inputs. Accepts all native textarea attributes.</>}
+              description={<>Unstyled <PixelCodeInline>{'<textarea>'}</PixelCodeInline> wrapper with <PixelCodeInline>forwardRef</PixelCodeInline> support. Use for custom multi-line inputs.</>}
               props={[
-                { name: '...props', type: 'TextareaHTMLAttributes', default: '—', description: 'All native <textarea> attributes' },
-                { name: 'ref', type: 'Ref<HTMLTextAreaElement>', default: '—', description: 'Forwarded ref' },
+                { name: '(native attrs)', type: 'React.TextareaHTMLAttributes<HTMLTextAreaElement>', default: '—', description: 'Forwards every native <textarea> attribute (rows, cols, value, onChange, …).' },
+                { name: '(ref)', type: 'React.Ref<HTMLTextAreaElement>', default: '—', description: 'forwardRef passes the ref straight to the native <textarea>.' },
               ]}
               code={`<PixelBareTextarea rows={3} placeholder="Unstyled textarea..." className="border px-2 py-1 w-full" />`}
             >

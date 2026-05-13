@@ -13,7 +13,7 @@ import {
 } from './inputs';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Search, Gear } from '@pxlkit/ui';
-import { Mail, Lock } from '@pxlkit/feedback';
+import { Mail } from '@pxlkit/feedback';
 
 const TONES = ['green', 'cyan', 'gold', 'red', 'purple', 'pink', 'neutral'] as const;
 const SIZES = ['sm', 'md', 'lg'] as const;

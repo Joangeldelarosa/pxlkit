@@ -10,9 +10,9 @@ import { Sun } from '@pxlkit/weather';
 const SURFACES = ['pixel', 'linear'] as const;
 
 const TABS: TabItem[] = [
-  { id: 'overview', label: 'Overview', icon: <PxlKitIcon icon={Trophy} size={12} colorful />, content: <p className="text-sm text-retro-muted">Pxlkit ships 54 retro pixel-art React components plus 226+ SVG icons across 7 themed packs.</p> },
-  { id: 'usage', label: 'Usage', icon: <PxlKitIcon icon={Heart} size={12} colorful />, content: <p className="text-sm text-retro-muted">Import any component from <code className="text-retro-cyan">@pxlkit/ui-kit</code> and add the styles.</p> },
-  { id: 'api', label: 'API', icon: <PxlKitIcon icon={Sun} size={12} colorful />, content: <p className="text-sm text-retro-muted">Every component accepts a <code className="text-retro-cyan">surface</code> and <code className="text-retro-cyan">tone</code> prop.</p> },
+  { id: 'overview', label: 'Overview', icon: <PxlKitIcon icon={Trophy} size={12} />, content: <p className="text-sm text-retro-muted">Pxlkit ships 54 retro pixel-art React components plus 226+ SVG icons across 7 themed packs.</p> },
+  { id: 'usage', label: 'Usage', icon: <PxlKitIcon icon={Heart} size={12} />, content: <p className="text-sm text-retro-muted">Import any component from <code className="text-retro-cyan">@pxlkit/ui-kit</code> and add the styles.</p> },
+  { id: 'api', label: 'API', icon: <PxlKitIcon icon={Sun} size={12} />, content: <p className="text-sm text-retro-muted">Every component accepts a <code className="text-retro-cyan">surface</code> and <code className="text-retro-cyan">tone</code> prop.</p> },
   { id: 'changelog', label: 'Changelog', content: <p className="text-sm text-retro-muted">See <code className="text-retro-cyan">CHANGELOG.md</code> for the full history.</p> },
 ];
 
