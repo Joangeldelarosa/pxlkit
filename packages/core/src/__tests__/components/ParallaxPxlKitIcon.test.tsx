@@ -38,12 +38,13 @@ describe('ParallaxPxlKitIcon', () => {
     expect(scene.children.length).toBe(testParallaxIcon.layers.length);
   });
 
-  it('renders SVGs inside layer divs', () => {
+  it('renders one <img> per layer inside the scene', () => {
     const { container } = render(
       <ParallaxPxlKitIcon icon={testParallaxIcon} colorful />
     );
-    const svgs = container.querySelectorAll('svg');
-    expect(svgs.length).toBe(testParallaxIcon.layers.length);
+    // Each layer is a PxlKitIcon which renders as <img src="data:image/svg+xml,..">.
+    const imgs = container.querySelectorAll('img');
+    expect(imgs.length).toBe(testParallaxIcon.layers.length);
   });
 
   it('uses icon name as default aria-label', () => {
@@ -159,9 +160,10 @@ describe('ParallaxPxlKitIcon', () => {
     const { container } = render(
       <ParallaxPxlKitIcon icon={parallaxWithAnimated} colorful />
     );
-    // Should render without errors
-    const svgs = container.querySelectorAll('svg');
-    expect(svgs.length).toBe(2);
+    // Animated layer renders an inner <img> via PxlKitIcon; static layer
+    // also renders an <img>. Two layers → two imgs.
+    const imgs = container.querySelectorAll('img');
+    expect(imgs.length).toBe(2);
   });
 
   it('applies drop-shadow filter on non-back layers when shadow=true', () => {

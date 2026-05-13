@@ -85,8 +85,8 @@ function resolveFrameDuration(
 export function AnimatedPxlKitIcon({
   icon,
   size = 32,
-  colorful = true,
-  color,
+  appearance: appearanceProp,
+  color: colorProp,
   playing: playingProp,
   trigger: triggerProp,
   speed,
@@ -94,7 +94,19 @@ export function AnimatedPxlKitIcon({
   className = '',
   style,
   'aria-label': ariaLabel,
+  // Deprecated legacy props — resolved into `appearance` below.
+  colorful: colorfulProp,
+  solid: solidProp,
+  tint: tintProp,
 }: AnimatedPxlKitProps) {
+  // Resolve effective appearance + colour with backward-compat fallbacks.
+  const appearance =
+    appearanceProp ??
+    (solidProp ? 'solid' :
+     tintProp ? 'tinted' :
+     colorfulProp === false ? 'solid' :
+     'palette');
+  const color = colorProp ?? tintProp;
   const trigger = resolveTrigger(triggerProp, icon.trigger, icon.loop);
   const frameCount = icon.frames.length;
   const effectiveDuration = resolveFrameDuration(icon.frameDuration, speed, fps);
@@ -235,12 +247,28 @@ export function AnimatedPxlKitIcon({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       className={className}
-      style={{ display: 'inline-flex', ...style }}
+      // Wrapper centers the frame icon and stays the exact size of the icon.
+      // - `inline-flex` + `align-items/justify-content center` → frame icon is
+      //   perfectly centered no matter the surrounding context.
+      // - `vertical-align: middle` → no baseline descender gap when mixed with text.
+      // - `flex-shrink: 0` → wrapper never collapses in a cramped flex slot.
+      // - explicit width/height fix the box so all frames render in the same slot.
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        verticalAlign: 'middle',
+        flexShrink: 0,
+        width: size,
+        height: size,
+        lineHeight: 0,
+        ...style,
+      }}
     >
       <PxlKitIcon
         icon={frameIcon}
         size={size}
-        colorful={colorful}
+        appearance={appearance}
         color={color}
         aria-label={ariaLabel || icon.name}
       />

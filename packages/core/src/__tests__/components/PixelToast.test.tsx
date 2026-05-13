@@ -35,8 +35,8 @@ describe('PixelToast', () => {
     const { container } = render(
       <PixelToast visible={true} title="Title" icon={testIcon} />
     );
-    // PxlKitIcon renders an SVG
-    expect(container.querySelector('svg')).not.toBeNull();
+    // PxlKitIcon renders as <img src="data:image/svg+xml,..">.
+    expect(container.querySelector('img')).not.toBeNull();
   });
 
   it('shows close button by default', () => {
