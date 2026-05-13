@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/voxel",
-  "version": "0.1.3",
-  "description": "MIT-licensed 3D voxel game engine for React \u2014 procedural world generation, biome systems, chunk-based terrain streaming, day/night cycles, physics, NPC frameworks, and entity management built on Three.js and React Three Fiber",
+  "version": "0.1.4",
+  "description": "MIT-licensed 3D voxel toolkit for React \u2014 voxel utility primitives (pxlToVoxels, upscaleGrid) plus types. The full procedural-world engine (biomes, chunks, day/night cycles, highways, tunnels) lives in the showcase app at pxlkit.xyz/explore and ships in the v1 package.",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
