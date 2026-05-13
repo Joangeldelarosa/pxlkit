@@ -19,15 +19,15 @@ export const AllParallax: Story = {
         <PixelParallaxGroup className="rounded-md border-2 border-retro-border/40 bg-retro-card/30 h-64 flex items-center justify-center">
           <div className="relative">
             <PixelMouseParallax strength={20}>
-              <ParallaxPxlKitIcon icon={CoolEmoji} size={48} colorful />
+              <ParallaxPxlKitIcon icon={CoolEmoji} size={48} />
             </PixelMouseParallax>
             <div className="h-3" />
             <PixelMouseParallax strength={40}>
-              <ParallaxPxlKitIcon icon={PixelHeart} size={56} colorful />
+              <ParallaxPxlKitIcon icon={PixelHeart} size={56} />
             </PixelMouseParallax>
             <div className="h-3" />
             <PixelMouseParallax strength={60}>
-              <ParallaxPxlKitIcon icon={RetroTV} size={64} colorful />
+              <ParallaxPxlKitIcon icon={RetroTV} size={64} />
             </PixelMouseParallax>
           </div>
         </PixelParallaxGroup>
@@ -36,7 +36,7 @@ export const AllParallax: Story = {
         <h3 className="font-pixel text-xs text-retro-green">PixelParallaxLayer · scroll-driven</h3>
         <div className="rounded-md border-2 border-retro-border/40 bg-retro-card/30 h-80 flex items-center justify-center">
           <PixelParallaxLayer speed={0.4}>
-            <PxlKitIcon icon={Crown} size={64} colorful />
+            <PxlKitIcon icon={Crown} size={64} />
           </PixelParallaxLayer>
         </div>
       </section>
@@ -51,7 +51,7 @@ export const PixelParallaxGroupStory: Story = {
   name: 'PixelParallaxGroup',
   render: (args: any) => (
     <PixelParallaxGroup className="rounded-md border-2 border-retro-border/40 bg-retro-card/30 h-48 flex items-center justify-center" {...args}>
-      <PxlKitIcon icon={Trophy} size={48} colorful />
+      <PxlKitIcon icon={Trophy} size={48} />
     </PixelParallaxGroup>
   ),
   argTypes: {
@@ -68,7 +68,7 @@ export const PixelParallaxLayerStory: Story = {
   render: (args: any) => (
     <div className="rounded-md border-2 border-retro-border/40 bg-retro-card/30 h-96 flex items-center justify-center">
       <PixelParallaxLayer {...args}>
-        <PxlKitIcon icon={Crown} size={48} colorful />
+        <PxlKitIcon icon={Crown} size={48} />
       </PixelParallaxLayer>
     </div>
   ),
@@ -87,7 +87,7 @@ export const PixelMouseParallaxStory: Story = {
   render: (args: any) => (
     <PixelParallaxGroup className="rounded-md border-2 border-retro-border/40 bg-retro-card/30 h-64 flex items-center justify-center">
       <PixelMouseParallax {...args}>
-        <ParallaxPxlKitIcon icon={CoolEmoji} size={56} colorful />
+        <ParallaxPxlKitIcon icon={CoolEmoji} size={56} />
       </PixelMouseParallax>
     </PixelParallaxGroup>
   ),

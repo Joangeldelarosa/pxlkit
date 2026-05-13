@@ -17,7 +17,7 @@ import { Trophy, FireSword, Crown, Star } from '@pxlkit/gamification';
 import { Heart } from '@pxlkit/social';
 
 const TONES = ['green', 'cyan', 'gold', 'red', 'purple', 'pink', 'neutral'] as const;
-const TRIGGERS = ['mount', 'hover', 'click', 'inView'] as const;
+const TRIGGERS = ['mount', 'hover', 'click', 'focus', 'inView'] as const;
 
 const meta: Meta = {
   title: 'UI Kit / Animations',
@@ -31,34 +31,34 @@ export const AllAnimations: Story = {
   render: () => (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 max-w-4xl">
       <Frame label="FadeIn">
-        <PixelFadeIn><PxlKitIcon icon={Trophy} size={32} colorful /></PixelFadeIn>
+        <PixelFadeIn><PxlKitIcon icon={Trophy} size={32} /></PixelFadeIn>
       </Frame>
       <Frame label="SlideIn ↑">
-        <PixelSlideIn from="up"><PxlKitIcon icon={Crown} size={32} colorful /></PixelSlideIn>
+        <PixelSlideIn from="up"><PxlKitIcon icon={Crown} size={32} /></PixelSlideIn>
       </Frame>
       <Frame label="Pulse">
-        <PixelPulse><AnimatedPxlKitIcon icon={FireSword} size={32} colorful /></PixelPulse>
+        <PixelPulse><AnimatedPxlKitIcon icon={FireSword} size={32} /></PixelPulse>
       </Frame>
       <Frame label="Bounce">
-        <PixelBounce><PxlKitIcon icon={Star} size={32} colorful /></PixelBounce>
+        <PixelBounce><PxlKitIcon icon={Star} size={32} /></PixelBounce>
       </Frame>
       <Frame label="Float">
-        <PixelFloat><PxlKitIcon icon={Heart} size={32} colorful /></PixelFloat>
+        <PixelFloat><PxlKitIcon icon={Heart} size={32} /></PixelFloat>
       </Frame>
       <Frame label="Shake (hover)">
-        <PixelShake trigger="hover"><PxlKitIcon icon={Trophy} size={32} colorful /></PixelShake>
+        <PixelShake trigger="hover"><PxlKitIcon icon={Trophy} size={32} /></PixelShake>
       </Frame>
       <Frame label="Rotate">
-        <PixelRotate><PxlKitIcon icon={Star} size={32} colorful /></PixelRotate>
+        <PixelRotate><PxlKitIcon icon={Star} size={32} /></PixelRotate>
       </Frame>
       <Frame label="ZoomIn">
-        <PixelZoomIn><PxlKitIcon icon={Crown} size={32} colorful /></PixelZoomIn>
+        <PixelZoomIn><PxlKitIcon icon={Crown} size={32} /></PixelZoomIn>
       </Frame>
       <Frame label="Flicker">
-        <PixelFlicker><AnimatedPxlKitIcon icon={FireSword} size={32} colorful /></PixelFlicker>
+        <PixelFlicker><AnimatedPxlKitIcon icon={FireSword} size={32} /></PixelFlicker>
       </Frame>
       <Frame label="Glitch (hover)">
-        <PixelGlitch trigger="hover"><PxlKitIcon icon={Trophy} size={32} colorful /></PixelGlitch>
+        <PixelGlitch trigger="hover"><PxlKitIcon icon={Trophy} size={32} /></PixelGlitch>
       </Frame>
       <Frame label="Typewriter">
         <div className="font-pixel text-[10px] text-retro-green">
@@ -78,7 +78,7 @@ function Frame({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-const childArg = <PxlKitIcon icon={Trophy} size={48} colorful />;
+const childArg = <PxlKitIcon icon={Trophy} size={48} />;
 
 const animationBaseArgs = {
   trigger: 'mount' as const,
