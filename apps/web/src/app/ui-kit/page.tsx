@@ -1148,11 +1148,11 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                   onChange={setSelectVal}
                   options={[
                     { value: 'ui', label: 'UI', icon: <PxlKitIcon icon={Grid} size={14} /> },
-                    { value: 'gamification', label: 'Gamification', icon: <PxlKitIcon icon={Trophy} size={14} colorful /> },
-                    { value: 'social', label: 'Social', icon: <PxlKitIcon icon={Heart} size={14} colorful /> },
-                    { value: 'feedback', label: 'Feedback', icon: <PxlKitIcon icon={Bell} size={14} colorful /> },
+                    { value: 'gamification', label: 'Gamification', icon: <PxlKitIcon icon={Trophy} size={14} /> },
+                    { value: 'social', label: 'Social', icon: <PxlKitIcon icon={Heart} size={14} /> },
+                    { value: 'feedback', label: 'Feedback', icon: <PxlKitIcon icon={Bell} size={14} /> },
                     { value: 'effects', label: 'Effects', icon: <PxlKitIcon icon={SparkleSmall} size={14} /> },
-                    { value: 'weather', label: 'Weather', icon: <PxlKitIcon icon={Star} size={14} colorful /> },
+                    { value: 'weather', label: 'Weather', icon: <PxlKitIcon icon={Star} size={14} /> },
                   ]}
                 />
                 <PixelSelect
@@ -1189,7 +1189,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
             >
               <div className="space-y-2">
                 <PixelCheckbox label="Enable icon animations" checked={checked} onChange={setChecked} />
-                <PixelCheckbox label="Use colorful mode" checked={!checked} onChange={(v) => setChecked(!v)} tone="cyan" />
+                <PixelCheckbox label="Use palette colors" checked={!checked} onChange={(v) => setChecked(!v)} tone="cyan" />
                 <PixelCheckbox label="Disabled option" checked={false} onChange={() => {}} disabled />
               </div>
             </DocSection>
@@ -1330,14 +1330,14 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               <div className="grid gap-3 sm:grid-cols-2">
                 <PixelCard
                   title="Gamification Pack"
-                  icon={<PxlKitIcon icon={Trophy} size={16} colorful />}
+                  icon={<PxlKitIcon icon={Trophy} size={16} />}
                   footer={<PixelButton tone="gold" size="sm" iconLeft={<PxlKitIcon icon={Lightning} size={14} />}>Use Pack</PixelButton>}
                 >
                   RPG icons, progress bars, rewards, and game UI elements ready to use.
                 </PixelCard>
                 <PixelCard
                   title="Social Pack"
-                  icon={<PxlKitIcon icon={Heart} size={16} colorful />}
+                  icon={<PxlKitIcon icon={Heart} size={16} />}
                   footer={<PixelButton tone="cyan" size="sm" iconLeft={<PxlKitIcon icon={Message} size={14} />}>Preview</PixelButton>}
                 >
                   Emotions, interactions, and communication elements for modern apps.
@@ -1362,8 +1362,8 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <PixelStatCard label="Total Icons" value="204" icon={<PxlKitIcon icon={Package} size={16} />} tone="green" trend="+12 new" />
                 <PixelStatCard label="Components" value={String(UI_KIT_COMPONENTS.length)} icon={<PxlKitIcon icon={Grid} size={16} />} tone="cyan" trend="100% typed" />
-                <PixelStatCard label="Downloads" value="8.2k" icon={<PxlKitIcon icon={Coin} size={16} colorful />} tone="gold" trend="+24%" />
-                <PixelStatCard label="Stars" value="1.4k" icon={<PxlKitIcon icon={Star} size={16} colorful />} tone="purple" trend="trending" />
+                <PixelStatCard label="Downloads" value="8.2k" icon={<PxlKitIcon icon={Coin} size={16} />} tone="gold" trend="+24%" />
+                <PixelStatCard label="Stars" value="1.4k" icon={<PxlKitIcon icon={Star} size={16} />} tone="purple" trend="trending" />
               </div>
             </DocSection>
 
@@ -2173,7 +2173,7 @@ function SaveButton() {
 
               <CodeBlock code={`// Plays on hover
 <PixelBounce trigger="hover">
-  <PxlKitIcon icon={Star} size={20} colorful />
+  <PxlKitIcon icon={Star} size={20} />
 </PixelBounce>
 
 // Plays once per click
@@ -2202,7 +2202,7 @@ const [active, setActive] = useState(false);
                 <div className="flex flex-col items-center gap-2 rounded-lg border border-retro-border/30 bg-retro-bg/40 p-4">
                   <p className="font-pixel text-[9px] text-retro-muted">HOVER</p>
                   <PixelBounce trigger="hover" height={10}>
-                    <PxlKitIcon icon={Star} size={24} colorful />
+                    <PxlKitIcon icon={Star} size={24} />
                   </PixelBounce>
                 </div>
                 <div className="flex flex-col items-center gap-2 rounded-lg border border-retro-border/30 bg-retro-bg/40 p-4">
@@ -2214,7 +2214,7 @@ const [active, setActive] = useState(false);
                 <div className="flex flex-col items-center gap-2 rounded-lg border border-retro-border/30 bg-retro-bg/40 p-4">
                   <p className="font-pixel text-[9px] text-retro-muted">HOVER</p>
                   <PixelRotate trigger="hover" duration={1200}>
-                    <PxlKitIcon icon={Gear} size={24} colorful />
+                    <PxlKitIcon icon={Gear} size={24} />
                   </PixelRotate>
                 </div>
               </div>
@@ -2326,7 +2326,7 @@ const [active, setActive] = useState(false);
               title="PixelBounce"
               description=<>Applies a pixel-art vertical bounce to any element. Great for icons, badges, and call-to-actions. Control bounce speed with <PixelCodeInline>duration</PixelCodeInline> and stop it with <PixelCodeInline>repeat=1</PixelCodeInline>.</>
               code={`<PixelBounce duration={800}>
-  <PxlKitIcon icon={Trophy} size={24} colorful />
+  <PxlKitIcon icon={Trophy} size={24} />
 </PixelBounce>
 
 // Finite bounce
@@ -2345,13 +2345,13 @@ const [active, setActive] = useState(false);
               {(key) => (
                 <div className="flex flex-wrap items-center gap-4">
                   <PixelBounce key={key} duration={800}>
-                    <PxlKitIcon icon={Trophy} size={24} colorful />
+                    <PxlKitIcon icon={Trophy} size={24} />
                   </PixelBounce>
                   <PixelBounce key={`${key}-b`} duration={600} repeat={3}>
                     <PixelBadge tone="gold">+100 XP</PixelBadge>
                   </PixelBounce>
                   <PixelBounce key={`${key}-c`} duration={1200}>
-                    <PxlKitIcon icon={Crown} size={24} colorful />
+                    <PxlKitIcon icon={Crown} size={24} />
                   </PixelBounce>
                 </div>
               )}
@@ -2363,7 +2363,7 @@ const [active, setActive] = useState(false);
               title="PixelFloat"
               description={<>Creates a smooth hovering motion for icons, badges, and decorative cards. Use it as a soft ambient animation and combine with <CompLink id="pixel-pulse">PixelPulse</CompLink> for status signals.</>}
               code={`<PixelFloat distance={8} duration={2400}>
-  <PxlKitIcon icon={Star} size={20} colorful />
+  <PxlKitIcon icon={Star} size={20} />
 </PixelFloat>`}
               props={[
                 { name: 'duration', type: 'number', default: '2200', description: 'Float cycle duration in ms' },
@@ -2376,9 +2376,9 @@ const [active, setActive] = useState(false);
             >
               {(key) => (
                 <div className="flex flex-wrap items-center gap-4">
-                  <PixelFloat key={key}><PxlKitIcon icon={Star} size={20} colorful /></PixelFloat>
+                  <PixelFloat key={key}><PxlKitIcon icon={Star} size={20} /></PixelFloat>
                   <PixelFloat key={`${key}-b`} distance={10} duration={2800}><PixelBadge tone="cyan">Hover</PixelBadge></PixelFloat>
-                  <PixelFloat key={`${key}-c`} distance={4} duration={1800}><PxlKitIcon icon={Heart} size={20} colorful /></PixelFloat>
+                  <PixelFloat key={`${key}-c`} distance={4} duration={1800}><PxlKitIcon icon={Heart} size={20} /></PixelFloat>
                 </div>
               )}
             </AnimationReplay>
@@ -2403,7 +2403,7 @@ const [active, setActive] = useState(false);
               {(key) => (
                 <div className="flex flex-wrap items-center gap-3">
                   <PixelShake key={key} repeat={2}><PixelBadge tone="red">Invalid</PixelBadge></PixelShake>
-                  <PixelShake key={`${key}-b`} repeat={3} distance={3}><PxlKitIcon icon={WarningTriangle} size={20} colorful /></PixelShake>
+                  <PixelShake key={`${key}-b`} repeat={3} distance={3}><PxlKitIcon icon={WarningTriangle} size={20} /></PixelShake>
                   <PixelShake key={`${key}-c`} duration={650} repeat={2}><PixelBadge tone="gold">Low HP</PixelBadge></PixelShake>
                 </div>
               )}
@@ -2415,7 +2415,7 @@ const [active, setActive] = useState(false);
               title="PixelRotate"
               description={<>Rotates children continuously or in finite loops. Use <PixelCodeInline>direction</PixelCodeInline> to reverse or alternate spin behavior for loading indicators and decorative accents.</>}
               code={`<PixelRotate duration={1800} direction="normal" repeat="infinite">
-  <PxlKitIcon icon={Gear} size={22} colorful />
+  <PxlKitIcon icon={Gear} size={22} />
 </PixelRotate>`}
               props={[
                 { name: 'duration', type: 'number', default: '1800', description: 'One full rotation duration in ms' },
@@ -2428,8 +2428,8 @@ const [active, setActive] = useState(false);
             >
               {(key) => (
                 <div className="flex flex-wrap items-center gap-4">
-                  <PixelRotate key={key}><PxlKitIcon icon={Gear} size={22} colorful /></PixelRotate>
-                  <PixelRotate key={`${key}-b`} direction="reverse" duration={1400}><PxlKitIcon icon={Lightning} size={22} colorful /></PixelRotate>
+                  <PixelRotate key={key}><PxlKitIcon icon={Gear} size={22} /></PixelRotate>
+                  <PixelRotate key={`${key}-b`} direction="reverse" duration={1400}><PxlKitIcon icon={Lightning} size={22} /></PixelRotate>
                   <PixelRotate key={`${key}-c`} repeat={2} direction="alternate"><PixelBadge tone="purple">Sync</PixelBadge></PixelRotate>
                 </div>
               )}
@@ -2488,7 +2488,7 @@ const [active, setActive] = useState(false);
                 <div className="flex flex-wrap items-center gap-4">
                   <PixelFlicker key={key}><p className="font-pixel text-xs text-retro-cyan">SIGNAL LOCKED</p></PixelFlicker>
                   <PixelFlicker key={`${key}-b`} duration={1500}><PixelBadge tone="purple">NEON</PixelBadge></PixelFlicker>
-                  <PixelFlicker key={`${key}-c`} duration={2800}><PxlKitIcon icon={Lightning} size={22} colorful /></PixelFlicker>
+                  <PixelFlicker key={`${key}-c`} duration={2800}><PxlKitIcon icon={Lightning} size={22} /></PixelFlicker>
                 </div>
               )}
             </AnimationReplay>
@@ -2601,7 +2601,7 @@ const [active, setActive] = useState(false);
                   <PixelParallaxLayer speed={0.15} className="absolute inset-0 flex items-center justify-center opacity-20">
                     <div className="grid grid-cols-8 gap-4">
                       {Array.from({ length: 16 }).map((_, i) => (
-                        <PxlKitIcon key={i} icon={Star} size={20} colorful />
+                        <PxlKitIcon key={i} icon={Star} size={20} />
                       ))}
                     </div>
                   </PixelParallaxLayer>
@@ -2654,7 +2654,7 @@ const [active, setActive] = useState(false);
               ]}
               code={`{/* Follows cursor */}
 <PixelMouseParallax strength={15}>
-  <PxlKitIcon icon={Star} size={32} colorful />
+  <PxlKitIcon icon={Star} size={32} />
 </PixelMouseParallax>
 
 {/* Moves away from cursor (depth feel) */}
@@ -2667,19 +2667,19 @@ const [active, setActive] = useState(false);
                 <div className="relative h-48 rounded-lg border border-retro-border/30 bg-retro-bg/50 flex items-center justify-center gap-8">
                   <PixelMouseParallax strength={12}>
                     <div className="text-center">
-                      <PxlKitIcon icon={Trophy} size={36} colorful />
+                      <PxlKitIcon icon={Trophy} size={36} />
                       <p className="font-mono text-[9px] text-retro-muted mt-1">follows (12px)</p>
                     </div>
                   </PixelMouseParallax>
                   <PixelMouseParallax strength={25} invert>
                     <div className="text-center">
-                      <PxlKitIcon icon={Crown} size={36} colorful />
+                      <PxlKitIcon icon={Crown} size={36} />
                       <p className="font-mono text-[9px] text-retro-muted mt-1">inverted (25px)</p>
                     </div>
                   </PixelMouseParallax>
                   <PixelMouseParallax strength={8}>
                     <div className="text-center">
-                      <PxlKitIcon icon={Star} size={36} colorful />
+                      <PxlKitIcon icon={Star} size={36} />
                       <p className="font-mono text-[9px] text-retro-muted mt-1">subtle (8px)</p>
                     </div>
                   </PixelMouseParallax>

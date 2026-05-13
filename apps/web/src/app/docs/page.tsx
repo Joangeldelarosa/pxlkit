@@ -236,41 +236,41 @@ import { Sun } from '@pxlkit/weather';
 function App() {
   return (
     <div>
-      {/* Colorful rendering */}
-      <PxlKitIcon icon={Trophy} size={32} colorful />
+      {/* Palette colors (default) — uses the icon's original palette */}
+      <PxlKitIcon icon={Trophy} size={32} />
 
-      {/* Monochrome (inherits text color) */}
-      <PxlKitIcon icon={CheckCircle} size={32} />
+      {/* Solid mode — every pixel flattened to one color */}
+      <PxlKitIcon icon={CheckCircle} size={32} appearance="solid" color="#00FF88" />
 
-      {/* Custom color */}
-      <PxlKitIcon icon={Heart} size={48} color="#FF0000" />
+      {/* Tinted mode — palette + colour overlay, preserves luminance */}
+      <PxlKitIcon icon={Heart} size={48} appearance="tinted" color="#FF0000" />
     </div>
   );
 }`}</CodeBlock>
             <div className="flex items-end gap-4 p-4 bg-retro-surface rounded-lg border border-retro-border/30 mt-4">
               <div className="text-center">
-                <PxlKitIcon icon={Trophy} size={32} colorful />
+                <PxlKitIcon icon={Trophy} size={32} />
                 <span className="block font-mono text-[9px] text-retro-muted mt-1">gamification</span>
               </div>
               <div className="text-center">
-                <PxlKitIcon icon={CheckCircle} size={32} colorful />
+                <PxlKitIcon icon={CheckCircle} size={32} />
                 <span className="block font-mono text-[9px] text-retro-muted mt-1">feedback</span>
               </div>
               <div className="text-center">
-                <PxlKitIcon icon={Heart} size={32} colorful />
+                <PxlKitIcon icon={Heart} size={32} />
                 <span className="block font-mono text-[9px] text-retro-muted mt-1">social</span>
               </div>
               <div className="text-center">
-                <PxlKitIcon icon={Sun} size={32} colorful />
+                <PxlKitIcon icon={Sun} size={32} />
                 <span className="block font-mono text-[9px] text-retro-muted mt-1">weather</span>
               </div>
-              <div className="text-center text-retro-text">
-                <PxlKitIcon icon={Trophy} size={32} />
-                <span className="block font-mono text-[9px] text-retro-muted mt-1">mono</span>
+              <div className="text-center">
+                <PxlKitIcon icon={Trophy} size={32} appearance="solid" color="#00FF88" />
+                <span className="block font-mono text-[9px] text-retro-muted mt-1">solid</span>
               </div>
               <div className="text-center">
-                <PxlKitIcon icon={Heart} size={48} color="#FF0000" />
-                <span className="block font-mono text-[9px] text-retro-muted mt-1">color prop</span>
+                <PxlKitIcon icon={Heart} size={48} appearance="tinted" color="#FFD700" />
+                <span className="block font-mono text-[9px] text-retro-muted mt-1">tinted</span>
               </div>
             </div>
           </Section>
@@ -288,9 +288,9 @@ function App() {
                   <div key={pack.id} className="p-4 bg-retro-surface rounded-lg border border-retro-border/30 flex items-start gap-3">
                     <div className={accent}>
                       {animated ? (
-                        <AnimatedPxlKitIcon icon={previewIcon} size={32} colorful />
+                        <AnimatedPxlKitIcon icon={previewIcon} size={32} />
                       ) : (
-                        <PxlKitIcon icon={previewIcon} size={32} colorful />
+                        <PxlKitIcon icon={previewIcon} size={32} />
                       )}
                     </div>
                     <div>
@@ -323,12 +323,14 @@ function App() {
               This format is designed to be easy to read, write by hand, and generate with AI.
               Each row is a string of exactly N characters (where N matches the grid size).
             </P>
-            <CodeBlock title="PxlKitData Type">{`interface PxlKitData {
+            <CodeBlock title="PxlKitData Type">{`type GridSize = 8 | 16 | 24 | 32 | 48 | 64;
+
+interface PxlKitData {
   name: string;        // kebab-case identifier
-  size: 8 | 16 | 32;  // grid dimensions (NxN)
+  size: GridSize;      // grid dimensions (NxN)
   category: string;    // pack/category name
   grid: string[];      // N rows of N characters each
-  palette: Record<string, string>;  // char → hex color
+  palette: Record<string, string>;  // char → hex color (#RGB / #RRGGBB / #RRGGBBAA)
   tags: string[];      // searchable tags
   author?: string;     // attribution
 }`}</CodeBlock>
@@ -413,24 +415,70 @@ const solid = encodeHexColor('#FF0000');
           {/* React Component */}
           <Section id="react-component" title="React Component">
             <P>
-              The <Code>{'<PxlKitIcon />'}</Code> component renders pixel art as inline SVG
-              with <Code>shape-rendering: crispEdges</Code> to maintain sharp pixels at any
-              scale. No blurring, no anti-aliasing.
+              The <Code>{'<PxlKitIcon />'}</Code> component renders pixel art as an{' '}
+              <Code>{'<img>'}</Code> element whose <Code>src</Code> is an inline SVG
+              document encoded as a data URI (MIME <Code>image/svg+xml</Code>). The
+              source format stays SVG end-to-end — vector, hi-DPI sharp, exportable —
+              but the wrapping <Code>{'<img>'}</Code> lets us use{' '}
+              <Code>image-rendering: pixelated</Code>, the only browser-honoured
+              directive that guarantees true nearest-neighbour scaling for pixel art
+              at any size from 8 px to 512 px.
             </P>
-            <CodeBlock title="Props">{`interface PxlKitProps {
-  icon: PxlKitData;       // Icon data (required)
-  size?: number;             // Container size in px (default: 32)
-  colorful?: boolean;        // Full color mode (default: false)
-  color?: string;            // Override monochrome color
-  className?: string;        // CSS class names
-  'aria-label'?: string;     // Accessibility label
-  style?: React.CSSProperties;
+            <CodeBlock title="IconAppearance Type">{`type IconAppearance =
+  | 'palette'   // (default) original artwork colours
+  | 'tinted'    // palette + colour overlay (preserves luminance & detail)
+  | 'solid';    // every pixel flattened to a single colour`}</CodeBlock>
+            <CodeBlock title="PxlKitProps">{`interface PxlKitProps {
+  icon: PxlKitData;            // Icon data (required)
+  size?: number;               // Visual size in px (default: 32)
+  appearance?: IconAppearance; // Colour mode (default: 'palette')
+  color?: string;              // Tint hue / flat colour for 'tinted' & 'solid'
+  className?: string;          // CSS class names (applied to the <img>)
+  'aria-label'?: string;       // Accessibility label (becomes <img alt>)
+  style?: React.CSSProperties; // Inline styles (merged onto the <img>)
+
+  /** @deprecated since v1.3 — use \`appearance="palette" | "solid"\` instead. */
+  colorful?: boolean;
+  /** @deprecated since v1.3 — use \`appearance="solid"\` instead. */
+  solid?: boolean;
+  /** @deprecated since v1.3 — use \`appearance="tinted" color="..."\` instead. */
+  tint?: string;
 }`}</CodeBlock>
-            <P>
-              In monochrome mode (default), the icon uses <Code>currentColor</Code>,
-              so it inherits the parent&apos;s text color. Pass <Code>colorful</Code> for full
-              palette rendering.
-            </P>
+            <CodeBlock title="Colour modes in action">{`// Default — original artwork palette
+<PxlKitIcon icon={Trophy} size={32} />
+
+// Tinted — keep the palette luminance, shift the hue
+<PxlKitIcon icon={Trophy} size={32} appearance="tinted" color="#00FF88" />
+
+// Solid — every pixel becomes one colour
+<PxlKitIcon icon={Trophy} size={32} appearance="solid" color="#FF0000" />`}</CodeBlock>
+            <div className="rounded-lg border border-retro-border/30 bg-retro-surface p-4 mt-2">
+              <p className="font-pixel text-[9px] text-retro-gold mb-3">MIGRATION FROM v1.2.x</p>
+              <ul className="space-y-1.5 text-xs font-mono text-retro-muted">
+                <li>
+                  <Code>{'<PxlKitIcon icon={X} colorful />'}</Code> → omit the prop
+                  (<Code>palette</Code> is the default)
+                </li>
+                <li>
+                  <Code>{'<PxlKitIcon icon={X} />'}</Code> (legacy mono){' '}
+                  → <Code>{'<PxlKitIcon icon={X} appearance="solid" />'}</Code>
+                </li>
+                <li>
+                  <Code>{'<PxlKitIcon icon={X} color="#FF0000" />'}</Code>{' '}
+                  → <Code>{'<PxlKitIcon icon={X} appearance="solid" color="#FF0000" />'}</Code>
+                </li>
+                <li>
+                  <Code>{'<PxlKitIcon icon={X} tint="#FF0000" />'}</Code>{' '}
+                  → <Code>{'<PxlKitIcon icon={X} appearance="tinted" color="#FF0000" />'}</Code>
+                </li>
+              </ul>
+              <p className="text-[10px] text-retro-muted/70 mt-3">
+                The deprecated <Code>colorful</Code> / <Code>solid</Code> /{' '}
+                <Code>tint</Code> aliases silently resolve to the new{' '}
+                <Code>appearance</Code> axis at runtime so existing code keeps working.
+                TypeScript marks them as <Code>@deprecated</Code>; plan to migrate before v2.
+              </p>
+            </div>
           </Section>
 
           {/* Animated Icons */}
@@ -462,8 +510,8 @@ type AnimationTrigger = 'loop' | 'once' | 'hover' | 'appear' | 'ping-pong';`}</C
             <CodeBlock title="AnimatedPxlKitIcon Props">{`interface AnimatedPxlKitProps {
   icon: AnimatedPxlKitData;
   size?: number;               // size in px (default: 32)
-  colorful?: boolean;          // full color mode (default: true)
-  color?: string;              // override for monochrome mode
+  appearance?: IconAppearance; // colour mode (default: 'palette')
+  color?: string;              // tint / solid colour
   trigger?: AnimationTrigger;  // override icon.trigger
   speed?: number;              // multiplier: 2 = 2× faster, 0.5 = half (0.1–10)
   fps?: number;                // fixed FPS — takes priority over speed (1–60)
@@ -471,15 +519,25 @@ type AnimationTrigger = 'loop' | 'once' | 'hover' | 'appear' | 'ping-pong';`}</C
   className?: string;
   style?: React.CSSProperties;
   'aria-label'?: string;
+
+  /** @deprecated since v1.3 — use \`appearance\` instead. */
+  colorful?: boolean;
+  /** @deprecated since v1.3 — use \`appearance="solid"\` instead. */
+  solid?: boolean;
+  /** @deprecated since v1.3 — use \`appearance="tinted" color="..."\` instead. */
+  tint?: string;
 }`}</CodeBlock>
             <CodeBlock title="Basic Usage">{`import { AnimatedPxlKitIcon } from '@pxlkit/core';
 import { FireSword } from '@pxlkit/gamification';
 
-// Loop forever (default)
-<AnimatedPxlKitIcon icon={FireSword} size={48} colorful />
+// Loop forever in palette mode (default)
+<AnimatedPxlKitIcon icon={FireSword} size={48} />
 
-// Monochrome loop
-<AnimatedPxlKitIcon icon={FireSword} size={32} color="#00FF88" />`}</CodeBlock>
+// Solid colour loop — flatten every pixel to one colour
+<AnimatedPxlKitIcon icon={FireSword} size={32} appearance="solid" color="#00FF88" />
+
+// Tinted loop — keep luminance, shift hue
+<AnimatedPxlKitIcon icon={FireSword} size={32} appearance="tinted" color="#FF00AA" />`}</CodeBlock>
             <CodeBlock title="Trigger Modes">{`// 'loop'      — plays continuously (default)
 <AnimatedPxlKitIcon icon={FireSword} trigger="loop" />
 
@@ -508,25 +566,27 @@ import { FireSword } from '@pxlkit/gamification';
             <CodeBlock title="Export as Animated SVG">{`import { generateAnimatedSvg } from '@pxlkit/core';
 import { FireSword } from '@pxlkit/gamification';
 
-// Colorful animated SVG with CSS keyframe animation
+// Colorful animated SVG with CSS keyframe animation (default)
 const svg = generateAnimatedSvg(FireSword);
 
 // Monochrome animated SVG
+// (note: generateAnimatedSvg is a utility — its options use the legacy
+//  colorful/monoColor shape; the React component uses the new appearance API)
 const monoSvg = generateAnimatedSvg(FireSword, {
   colorful: false,
   monoColor: '#00FF88',
 });`}</CodeBlock>
             <div className="flex items-end gap-6 p-4 bg-retro-surface rounded-lg border border-retro-gold/30 mt-4">
               <div className="text-center">
-                <AnimatedPxlKitIcon icon={FireSword} size={48} colorful />
+                <AnimatedPxlKitIcon icon={FireSword} size={48} />
                 <p className="font-mono text-[9px] text-retro-muted mt-1">loop</p>
               </div>
               <div className="text-center">
-                <AnimatedPxlKitIcon icon={FireSword} size={48} colorful trigger="hover" />
+                <AnimatedPxlKitIcon icon={FireSword} size={48} trigger="hover" />
                 <p className="font-mono text-[9px] text-retro-muted mt-1">hover</p>
               </div>
               <div className="text-center">
-                <AnimatedPxlKitIcon icon={FireSword} size={48} colorful trigger="ping-pong" />
+                <AnimatedPxlKitIcon icon={FireSword} size={48} trigger="ping-pong" />
                 <p className="font-mono text-[9px] text-retro-muted mt-1">ping-pong</p>
               </div>
               <div className="ml-auto text-right">
@@ -549,16 +609,17 @@ const monoSvg = generateAnimatedSvg(FireSword, {
             <CodeBlock title="Basic Usage">{`import { ParallaxPxlKitIcon } from '@pxlkit/core';
 import { GhostFriend, CoolEmoji } from '@pxlkit/parallax';
 
-// Basic 3D parallax icon
-<ParallaxPxlKitIcon icon={GhostFriend} size={64} colorful />
+// Basic 3D parallax icon (palette is the default — every layer keeps its colours)
+<ParallaxPxlKitIcon icon={GhostFriend} size={64} />
 
-// Large interactive icon with custom strength
+// Large interactive icon with custom strength + a tint applied to every layer
 <ParallaxPxlKitIcon
   icon={CoolEmoji}
   size={128}
   strength={20}
   interactive
-  colorful
+  appearance="tinted"
+  color="#FFD700"
 />`}</CodeBlock>
 
             <P>
@@ -587,10 +648,11 @@ interface ParallaxLayer {
 }`}</CodeBlock>
 
             <CodeBlock title="ParallaxPxlKitIcon Props">{`interface ParallaxPxlKitProps {
-  icon: ParallaxPxlKitData;   // The parallax icon data (required)
+  icon: ParallaxPxlKitData;    // The parallax icon data (required)
   size?: number;               // Container size in px (default: 64)
   strength?: number;           // Mouse reaction intensity (default: 18)
-  colorful?: boolean;          // Full color mode (default: true)
+  appearance?: IconAppearance; // Colour mode applied to every layer (default: 'palette')
+  color?: string;              // Tint / solid colour applied to every layer
   smoothing?: number;          // Lerp factor 0–1 (default: 0.06)
   perspective?: number;        // CSS perspective in px (default: max(200, size×2.5))
   layerGap?: number;           // Z spacing between layers (default: max(12, size×0.2))
@@ -600,6 +662,13 @@ interface ParallaxLayer {
   className?: string;
   style?: React.CSSProperties;
   'aria-label'?: string;
+
+  /** @deprecated since v1.3 — use \`appearance\` instead. */
+  colorful?: boolean;
+  /** @deprecated since v1.3 — use \`appearance="solid"\` instead. */
+  solid?: boolean;
+  /** @deprecated since v1.3 — use \`appearance="tinted" color="..."\` instead. */
+  tint?: string;
 }`}</CodeBlock>
 
             <P>
@@ -645,11 +714,11 @@ import {
 
             <div className="flex flex-wrap items-end gap-6 p-4 bg-retro-surface rounded-lg border border-retro-gold/30 mt-4">
               <div className="text-center">
-                <ParallaxPxlKitIcon icon={GhostFriend} size={72} strength={16} interactive colorful />
+                <ParallaxPxlKitIcon icon={GhostFriend} size={72} strength={16} interactive />
                 <p className="font-mono text-[9px] text-retro-muted mt-2">GhostFriend</p>
               </div>
               <div className="text-center">
-                <ParallaxPxlKitIcon icon={CoolEmoji} size={72} strength={16} interactive colorful />
+                <ParallaxPxlKitIcon icon={CoolEmoji} size={72} strength={16} interactive />
                 <p className="font-mono text-[9px] text-retro-muted mt-2">CoolEmoji</p>
               </div>
               <div className="ml-auto text-right">
