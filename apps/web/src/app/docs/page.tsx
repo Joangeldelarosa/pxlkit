@@ -490,7 +490,7 @@ const solid = encodeHexColor('#FF0000');
             </P>
             <CodeBlock title="AnimatedPxlKitData Type">{`interface AnimatedPxlKitData {
   name: string;
-  size: 8 | 16 | 32;
+  size: GridSize;                      // 8 | 16 | 24 | 32 | 48 | 64
   category: string;
   palette: Record<string, string>;    // shared base palette across all frames
   frames: AnimationFrame[];            // array of frames (in display order)
@@ -743,11 +743,23 @@ import {
           {/* Toast Notifications */}
           <Section id="toast-notifications" title="Toast Notifications">
             <P>
-              Toast notifications are now documented as part of the UI Kit in
-              {' '}<PixelTextLink href="/ui-kit#pixel-toast">/ui-kit#pixel-toast</PixelTextLink>.
-              The system is powered by <Code>{'<ToastProvider />'}</Code> + <Code>useToast()</Code>,
-              and supports tones, positions, durations, and animated icons.
+              Toast notifications come in two layers — both documented in the UI Kit:
             </P>
+            <ul className="space-y-2 text-sm text-retro-muted ml-4 list-disc list-outside mb-3">
+              <li>
+                <PixelTextLink href="/ui-kit#pixel-toast">/ui-kit#pixel-toast</PixelTextLink>{' '}
+                — the low-level <Code>{'<PixelToast>'}</Code> component shipped from{' '}
+                <Code>@pxlkit/core</Code>: 15 props for visibility, title/message, icon,
+                position, duration, colours, close button.
+              </li>
+              <li>
+                <PixelTextLink href="/ui-kit#use-toast">/ui-kit#use-toast</PixelTextLink>{' '}
+                — the <Code>{'<ToastProvider>'}</Code> + <Code>useToast()</Code> hook pattern
+                that stacks multiple toasts, handles timers, and exposes{' '}
+                <Code>success</Code> / <Code>error</Code> / <Code>info</Code> / <Code>warning</Code>{' '}
+                shortcuts. Use this in app code.
+              </li>
+            </ul>
             <CodeBlock title="Quick Usage">{`import { useToast } from '@/components/ToastProvider';
 import { PixelButton } from '@pxlkit/ui-kit';
 import { CheckCircle } from '@pxlkit/feedback';
@@ -804,16 +816,46 @@ const fileSvg = gridToSvg(Trophy, {
   mode: 'colorful',
   xmlDeclaration: true,
 });`}</CodeBlock>
-            <CodeBlock title="Other Utilities">{`import {
-  gridToPixels,    // grid+palette → [{x, y, color}]
-  pixelsToGrid,    // [{x, y, color}] → grid+palette
-  pixelsToSvg,     // pixel array → SVG string
-  svgToDataUri,    // SVG string → data:image/svg+xml URI
-  svgToBase64,     // SVG string → base64 data URI
-  validateIconData, // validate PxlKitData
-  generateIconCode, // PxlKitData → TypeScript code
-  parseIconCode,    // code string → PxlKitData
+            <CodeBlock title="Pixel ↔ grid ↔ SVG conversion">{`import {
+  gridToPixels,     // PxlKitData            → Array<{ x, y, color, opacity? }>
+  pixelsToGrid,     // pixels + size + palette → { grid, palette }
+  pixelsToSvg,      // pixels + size + SvgOptions → SVG string
+  svgToDataUri,     // SVG string → "data:image/svg+xml,..."
+  svgToBase64,      // SVG string → "data:image/svg+xml;base64,..."
 } from '@pxlkit/core';`}</CodeBlock>
+            <CodeBlock title="Validation & parsing">{`import {
+  validateIconData,  // (icon) => string[]   — array of error messages (empty = valid)
+  isValidIconData,   // (icon) => boolean    — shorthand
+  parseIconCode,     // (code: string) => PxlKitData | null    — strict
+  parseAnyIconCode,  // (code: string) => AnyIcon | null       — handles Pxl / Animated / Parallax
+  generateIconCode,  // (icon) => string     — PxlKitData → TS source
+  isAnimatedIcon,    // (icon) => icon is AnimatedPxlKitData   — type guard
+  isParallaxIcon,    // (icon) => icon is ParallaxPxlKitData   — type guard
+} from '@pxlkit/core';`}</CodeBlock>
+            <CodeBlock title="Animated SVG export">{`import {
+  generateAnimatedSvg,    // (icon, { colorful?, monoColor?, pixelSize?, xmlDeclaration? }) => string
+  animatedToFrameIcons,   // (icon) => Array<{ icon: PxlKitData; duration: number }>
+} from '@pxlkit/core';
+
+// Drive your own raf/canvas loop from animatedToFrameIcons():
+const frames = animatedToFrameIcons(FireSword);
+frames.forEach(({ icon, duration }) => {
+  // icon is a static PxlKitData snapshot of the frame
+  // duration is the ms to display it before advancing
+});`}</CodeBlock>
+            <CodeBlock title="Colour utilities">{`import {
+  parseHexColor,            // ('#RRGGBBAA') => { color: string; opacity: number }
+  encodeHexColor,           // (hex, opacity?) => string                — inverse of parseHexColor
+  adjustBrightness,         // (hex, amount: -1..1) => string           — lighten/darken
+  hexToRgb,                 // ('#RRGGBB') => { r, g, b }
+  rgbToHex,                 // (r, g, b) => '#RRGGBB'
+  getPerceivedBrightness,   // ('#RRGGBB') => number (0..255 luma)      — useful for picking dark/light text
+  RETRO_PALETTES,           // Record<name, string[]>                   — the curated retro palettes used across the site
+} from '@pxlkit/core';
+
+// Pick a readable text colour automatically:
+const luma = getPerceivedBrightness(bgHex);
+const textColor = luma > 140 ? '#000' : '#fff';`}</CodeBlock>
           </Section>
 
           {/* AI Generation */}
