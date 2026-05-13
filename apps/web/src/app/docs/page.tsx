@@ -24,10 +24,13 @@ const ALL_PACKS: { pack: IconPack; previewIcon: AnyIcon; accent: string }[] = [
   { pack: EffectsPack,      previewIcon: EffectsPack.icons[0], accent: 'text-retro-purple' },
 ];
 
-const TOTAL_ICONS = ALL_PACKS.reduce((n, p) => n + p.pack.icons.length, 0);
+/* Parallax pack is a flat ParallaxPxlKitData[] (different shape than IconPack),
+ * but it counts toward the total and appears in the install command. */
+const TOTAL_ICONS = ALL_PACKS.reduce((n, p) => n + p.pack.icons.length, 0) + ParallaxPack.length;
+const TOTAL_PACKS = ALL_PACKS.length + 1; // +1 for parallax
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
 
-const ALL_PACK_IDS = ALL_PACKS.map((p) => p.pack.id);
+const ALL_PACK_IDS = [...ALL_PACKS.map((p) => p.pack.id), 'parallax'];
 const INSTALL_CMD = `npm install @pxlkit/core ${ALL_PACK_IDS.map((id) => `@pxlkit/${id}`).join(' ')}`;
 
 const sections = [
@@ -75,7 +78,7 @@ function DocsSidebarContent({
       })}
       <div className="border-t border-retro-border/30 pt-3 mt-3 px-3">
         <p className="font-mono text-[10px] text-retro-muted/50">
-          {sections.length} sections · {TOTAL_ICONS} icons · {ALL_PACKS.length} packs
+          {sections.length} sections · {TOTAL_ICONS} icons · {TOTAL_PACKS} packs
         </p>
       </div>
     </nav>
@@ -211,7 +214,7 @@ export default function DocsPage() {
               Everything you need to use Pxlkit — MIT React UI code + source-available icon packs
             </p>
             <p className="font-mono text-[10px] text-retro-muted/50 mt-2">
-              {UI_COMPONENTS_COUNT} components · PixelToast guide · {TOTAL_ICONS} icons across {ALL_PACKS.length} packs · 3D Parallax
+              {UI_COMPONENTS_COUNT} components · PixelToast guide · {TOTAL_ICONS} icons across {TOTAL_PACKS} packs · 3D Parallax
             </p>
           </div>
 
@@ -220,7 +223,7 @@ export default function DocsPage() {
             <P>
               Pxlkit combines MIT-licensed React UI code with source-available pixel art icon packs.
               It ships with {UI_COMPONENTS_COUNT} production-ready components and {TOTAL_ICONS}+ hand-crafted SVG icons
-              across {ALL_PACKS.length} thematic packs. Each icon pack is a separate npm package under
+              across {TOTAL_PACKS} thematic packs. Each icon pack is a separate npm package under
               the <Code>@pxlkit</Code> scope.
             </P>
             <CodeBlock title="Install">{INSTALL_CMD}</CodeBlock>
@@ -275,8 +278,8 @@ function App() {
           {/* Available Packs */}
           <Section id="available-packs" title="Available Packs">
             <P>
-              Pxlkit ships with {ALL_PACKS.length} icon packs. Each pack can contain
-              both static and animated icons. Install only the ones you need &mdash; they&apos;re fully tree-shakeable.
+              Pxlkit ships with {TOTAL_PACKS} icon packs ({ALL_PACKS.length} standard 16×16 packs plus the 3D parallax pack documented below).
+              Each standard pack can contain both static and animated icons. Install only the ones you need &mdash; they&apos;re fully tree-shakeable.
             </P>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {ALL_PACKS.map(({ pack, previewIcon, accent }) => {
@@ -778,7 +781,7 @@ Rules:
 Create a [YOUR DESCRIPTION] icon.`}</CodeBlock>
             <P>
               After the AI generates the code, you can paste it into the
-              {' '}<a href="/builder" className="text-retro-cyan hover:underline">Builder</a>{' '}
+              {' '}<PixelTextLink href="/builder">Builder</PixelTextLink>{' '}
               to preview it, or use <Code>parseIconCode()</Code> programmatically:
             </P>
             <CodeBlock title="Parse AI Output">{`import { parseIconCode, validateIconData } from '@pxlkit/core';

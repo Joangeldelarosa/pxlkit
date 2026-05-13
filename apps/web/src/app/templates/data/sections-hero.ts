@@ -57,7 +57,7 @@ export function HeroCentered() {
           </PixelBounce>
           <span>226+ icons</span>
           <span className="text-retro-border">|</span>
-          <span>10 packages</span>
+          <span>7 themed packs</span>
           <span className="text-retro-border">|</span>
           <span>MIT licensed</span>
         </div>

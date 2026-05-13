@@ -1688,7 +1688,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
             <DocSection
               id="pixel-toast"
               title="PixelToast"
-              description={<>Toast notifications are part of the UI Kit via <PixelCodeInline>ToastProvider</PixelCodeInline> + <PixelCodeInline>useToast()</PixelCodeInline>. Supports tones, positions, custom icons (static or animated), duration, and dismiss controls. The old <PixelCodeInline>/toast</PixelCodeInline> route now redirects here.</>}
+              description={<>Pixel-art toast notifications. The standalone <PixelCodeInline>{'<PixelToast>'}</PixelCodeInline> component ships in <PixelCodeInline>@pxlkit/core</PixelCodeInline>; the recommended consumption is the <PixelCodeInline>{'<ToastProvider>'}</PixelCodeInline> + <PixelCodeInline>useToast()</PixelCodeInline> pattern shown below (this site mounts the provider in <PixelCodeInline>layout.tsx</PixelCodeInline>). Supports tones, positions, custom icons (static or animated), duration, and dismiss controls. The old <PixelCodeInline>/toast</PixelCodeInline> route now redirects here.</>}
               props={[
                 { name: 'toast(options)', type: '({ title, message?, tone?, icon?, animatedIcon?, duration?, position? }) => string', default: '—', description: 'Generic toast creator' },
                 { name: 'success/error/info/warning', type: '(title, message?, icon?) => string', default: '—', description: 'Tone shortcuts' },

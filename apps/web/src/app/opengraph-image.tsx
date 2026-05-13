@@ -93,7 +93,7 @@ export default async function Image() {
 
           {/* Feature pills */}
           <div style={{ display: 'flex', gap: 16 }}>
-            {['226+ Icons', '40+ Components', 'Ready Templates', 'TypeScript-First', 'Tailwind CSS'].map(
+            {['226+ Icons', '54 Components', 'Ready Templates', 'TypeScript-First', 'Tailwind CSS'].map(
               (label) => (
                 <div
                   key={label}

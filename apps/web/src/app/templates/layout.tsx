@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Ready-to-Use Retro Templates & Sections — Copy-Paste React Components | Pxlkit',
   description:
-    'Copy-paste retro React templates: hero sections, pricing tables, CTAs, testimonials, headers & full pages. Pixel-art styled, Tailwind CSS powered.',
+    'Copy-paste retro React templates: 24 section variants across 8 categories (hero, header, footer, CTA, pricing, testimonials, FAQ, features) plus 5 full page layouts. Pixel-art styled, Tailwind CSS powered.',
   keywords: [
     'react templates',
     'react page templates',

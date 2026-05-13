@@ -10,7 +10,7 @@ const SITE_NAME = 'Pxlkit';
 const SITE_URL = 'https://pxlkit.xyz';
 const SITE_TAGLINE = 'Retro React UI Kit — Pixel-Art Components, Ready-Made Templates & 226+ SVG Icons';
 const SITE_DESCRIPTION =
-  '40+ retro pixel-art React components, 226+ SVG icons, ready-to-use landing page templates & sections. TypeScript-first, Tailwind CSS, tree-shakeable. Open-source UI kit.';
+  '54 retro pixel-art React components, 226+ SVG icons across 7 themed packs, 24 section variants & 5 full-page templates. TypeScript-first, Tailwind CSS, tree-shakeable. Open-source UI kit.';
 
 export const viewport: Viewport = {
   themeColor: [
@@ -260,7 +260,7 @@ const JSON_LD = {
       applicationSubCategory: 'React Component Library',
       operatingSystem: 'Web',
       description:
-        'Open-source retro React UI kit with 40+ pixel-art components, 226+ SVG icons, and ready-to-use landing page templates including hero sections, pricing tables, testimonials, CTAs, FAQs, and 5 full page templates. TypeScript-first, Tailwind CSS-powered, tree-shakeable.',
+        'Open-source retro React UI kit with 54 pixel-art components, 226+ SVG icons across 7 themed packs, 24 section variants and 5 full-page templates (hero, pricing, testimonials, CTA, FAQ, features, header, footer). TypeScript-first, Tailwind CSS-powered, tree-shakeable.',
       url: SITE_URL,
       author: { '@id': `${SITE_URL}/#organization` },
       license: 'https://github.com/Joangeldelarosa/pxlkit/blob/main/LICENSE',
@@ -291,9 +291,9 @@ const JSON_LD = {
       programmingLanguage: ['TypeScript', 'React', 'JavaScript'],
       downloadUrl: 'https://www.npmjs.com/package/@pxlkit/core',
       featureList: [
-        '40+ retro pixel-art UI components',
+        '54 retro pixel-art UI components',
         '226+ hand-crafted SVG icons across 7 packs',
-        'Ready-to-use hero, pricing, CTA, testimonial, FAQ & feature sections',
+        '24 section variants — hero, pricing, CTA, testimonial, FAQ, features, header & footer (3 designs each)',
         '5 complete page templates',
         'Visual pixel icon builder',
         'AI icon generation via LLM prompts',
@@ -311,7 +311,7 @@ const JSON_LD = {
       '@id': `${SITE_URL}/#voxel-engine`,
       name: '@pxlkit/voxel',
       description:
-        'Coming soon — MIT-licensed 3D voxel game engine built with Three.js and React Three Fiber. Features procedural world generation with biomes, chunk-based terrain, and day/night cycles.',
+        'MIT-licensed 3D voxel toolkit built with Three.js and React Three Fiber. v0.1.x ships voxel utility primitives (pxlToVoxels, upscaleGrid); the procedural world engine — biomes, chunk-based terrain, day/night cycles — is live in the /explore showcase and being prepared for the v1 package.',
       url: `${SITE_URL}/explore`,
       codeRepository: 'https://github.com/Joangeldelarosa/pxlkit',
       programmingLanguage: ['TypeScript', 'React', 'GLSL'],
@@ -331,7 +331,7 @@ const JSON_LD = {
           position: 1,
           name: '@pxlkit/ui-kit',
           url: 'https://www.npmjs.com/package/@pxlkit/ui-kit',
-          description: '40+ retro pixel-art React UI components — buttons, inputs, modals, tables, selects, and more',
+          description: '54 retro pixel-art React UI components — buttons, inputs, modals, tables, selects, animations, parallax, locale support, and more',
         },
         {
           '@type': 'ListItem',
@@ -415,7 +415,7 @@ const JSON_LD = {
           name: 'What React components does Pxlkit include?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Pxlkit includes 40+ retro pixel-art React components: buttons, inputs, cards, modals, tables, selects, badges, tooltips, toast notifications, and more. All are TypeScript-first, Tailwind CSS-powered, and tree-shakeable.',
+            text: 'Pxlkit ships 54 retro pixel-art React components: buttons, inputs, cards, modals, tables, selects, badges, tooltips, toast notifications, animation primitives, parallax wrappers, and a locale provider. All are TypeScript-first, Tailwind CSS-powered, and tree-shakeable.',
           },
         },
         {
@@ -423,7 +423,7 @@ const JSON_LD = {
           name: 'What ready-to-use templates and sections are available?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Pxlkit provides ready-to-use template sections including hero sections, headers, footers, CTAs, pricing tables, testimonials, FAQ sections, and feature showcases. It also includes 5 complete page templates you can drop into any React or Next.js project.',
+            text: 'Pxlkit provides 24 ready-to-use section variants across 8 categories (hero, header, footer, CTA, pricing, testimonials, FAQ, features) — 3 designs per category. Plus 5 complete page templates (SaaS landing, portfolio, indie game, admin dashboard, blog) that drop into any React or Next.js project.',
           },
         },
         {

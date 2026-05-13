@@ -69,9 +69,24 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/explore" className="text-retro-muted hover:text-retro-green transition-colors">
+                  Explore <span className="text-[10px] opacity-70">🚧</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/docs" className="text-retro-muted hover:text-retro-green transition-colors">
                   Documentation
                 </Link>
+              </li>
+              <li>
+                <a
+                  href="https://storybook.pxlkit.xyz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-retro-muted hover:text-retro-green transition-colors inline-flex items-center gap-1"
+                >
+                  Storybook <span className="text-[10px] opacity-70">↗</span>
+                </a>
               </li>
               <li>
                 <Link href="/pricing" className="text-retro-muted hover:text-retro-green transition-colors">

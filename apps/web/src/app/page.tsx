@@ -26,13 +26,15 @@ import { useToast } from '../components/ToastProvider';
 import type { ToastTone } from '../components/ToastProvider';
 import { CoolEmoji } from '../data/cool-emoji';
 import {
+  PixelAccordion,
   PixelBadge,
   PixelButton,
   PixelCard,
   PixelCodeInline,
-  PixelTextarea,
-  PixelParallaxLayer,
   PixelMouseParallax,
+  PixelParallaxLayer,
+  PixelSegmented,
+  PixelTextarea,
   UI_KIT_COMPONENTS,
 } from '@pxlkit/ui-kit';
 
@@ -246,7 +248,7 @@ function TrustBar() {
           {[
             { value: `${UI_COMPONENTS_COUNT}+`, label: 'UI Components' },
             { value: `${TOTAL_ICON_COUNT}+`, label: 'Pixel Icons' },
-            { value: '29', label: 'Template Sections' },
+            { value: '24', label: 'Section Variants' },
             { value: '5', label: 'Page Templates' },
             { value: '100%', label: 'TypeScript' },
           ].map((stat) => (
@@ -303,7 +305,7 @@ function TemplatesShowcase() {
             TEMPLATES &amp; SECTIONS — SHIP IN MINUTES
           </h2>
           <p className="text-retro-muted max-w-2xl mx-auto text-xs sm:text-sm leading-relaxed px-2">
-            29 ready-to-use section templates across 8 categories, plus 5 complete page layouts.
+            24 section variants across 8 categories, plus 5 complete page layouts — 29 ready-to-use templates in total.
             Every template is built with Pxlkit components, fully responsive, and supports{' '}
             <span className="text-retro-green font-bold">dark and light mode</span> out of the box.
             Copy the code, drop it in your project, customize, and ship.
@@ -1178,28 +1180,18 @@ Create an animated [DESCRIBE YOUR ICON HERE] icon.`;
             ask ChatGPT, Claude, or any LLM — paste the result and see your icon instantly.
             Then polish it in the visual builder.
           </p>
-          {/* Mode toggle */}
-          <div className="inline-flex gap-1 mt-4 p-1 bg-retro-bg rounded-lg border border-retro-border/30">
-            <button
-              onClick={() => setMode('static')}
-              className={`px-4 py-1.5 text-xs font-mono rounded transition-all ${
-                mode === 'static'
-                  ? 'bg-retro-green/20 text-retro-green border border-retro-green/40'
-                  : 'text-retro-muted hover:text-retro-text border border-transparent'
-              }`}
-            >
-              Static Icon
-            </button>
-            <button
-              onClick={() => setMode('animated')}
-              className={`px-4 py-1.5 text-xs font-mono rounded transition-all ${
-                mode === 'animated'
-                  ? 'bg-retro-purple/20 text-retro-purple border border-retro-purple/40'
-                  : 'text-retro-muted hover:text-retro-text border border-transparent'
-              }`}
-            >
-              Animated Icon
-            </button>
+          {/* Mode toggle — ui-kit PixelSegmented */}
+          <div className="mt-4 inline-flex justify-center">
+            <PixelSegmented
+              label=""
+              value={mode}
+              onChange={(v) => setMode(v as 'static' | 'animated')}
+              tone={mode === 'animated' ? 'purple' : 'green'}
+              options={[
+                { value: 'static', label: 'Static Icon' },
+                { value: 'animated', label: 'Animated Icon' },
+              ]}
+            />
           </div>
         </motion.div>
 
@@ -1398,8 +1390,6 @@ function PricingPreview() {
 
 /* ──────────────────── FAQ ──────────────────── */
 function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
   const faqs = [
     {
       q: 'Is Pxlkit really free?',
@@ -1407,7 +1397,7 @@ function FAQSection() {
     },
     {
       q: 'What templates and sections are included?',
-      a: 'Pxlkit includes 29 section templates across 8 categories: hero sections, headers, footers, CTAs, pricing tables, testimonials, FAQ sections, and feature grids — each with 3 design variants. Plus 5 complete page templates: SaaS landing, portfolio, indie game, admin dashboard, and blog.',
+      a: 'Pxlkit ships 8 section categories — hero, header, footer, CTA, pricing, testimonials, FAQ, and features — with 3 design variants each (24 section variants total). Plus 5 complete page templates: SaaS landing, portfolio, indie game, admin dashboard, and blog. 29 ready-to-use templates altogether.',
     },
     {
       q: 'What React components does the UI kit include?',
@@ -1452,36 +1442,18 @@ function FAQSection() {
           </p>
         </motion.div>
 
-        <div className="space-y-2">
-          {faqs.map((faq, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-            >
-              <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full text-left px-4 sm:px-5 py-3 sm:py-4 rounded-lg border border-retro-border/30 bg-retro-bg/60 hover:bg-retro-surface/50 transition-colors group"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <h3 className="font-mono text-xs sm:text-sm text-retro-text group-hover:text-retro-green transition-colors">
-                    {faq.q}
-                  </h3>
-                  <span className={`font-pixel text-retro-muted text-xs shrink-0 transition-transform ${openIndex === i ? 'rotate-45' : ''}`}>
-                    +
-                  </span>
-                </div>
-                {openIndex === i && (
-                  <p className="mt-2 sm:mt-3 text-retro-muted text-xs sm:text-sm leading-relaxed pr-6">
-                    {faq.a}
-                  </p>
-                )}
-              </button>
-            </motion.div>
-          ))}
-        </div>
+        {/* FAQ — ui-kit PixelAccordion */}
+        <PixelAccordion
+          items={faqs.map((faq, i) => ({
+            id: `faq-${i}`,
+            title: faq.q,
+            content: (
+              <p className="text-retro-muted text-xs sm:text-sm leading-relaxed">
+                {faq.a}
+              </p>
+            ),
+          }))}
+        />
       </div>
     </section>
   );

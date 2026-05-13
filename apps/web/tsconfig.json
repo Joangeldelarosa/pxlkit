@@ -11,7 +11,9 @@
       "@pxlkit/weather": ["../../packages/weather/src"],
       "@pxlkit/effects": ["../../packages/effects/src"],
       "@pxlkit/ui": ["../../packages/ui/src"],
-      "@pxlkit/voxel": ["../../packages/voxel/src"]
+      "@pxlkit/ui-kit": ["../../packages/ui-kit/src"],
+      "@pxlkit/voxel": ["../../packages/voxel/src"],
+      "@pxlkit/parallax": ["../../packages/parallax/src"]
     },
     "module": "ESNext",
     "moduleResolution": "bundler",

@@ -64,7 +64,7 @@ const CARDS_PLANS: Plan[] = [
     popular: true,
     features: [
       { label: '226+ icons across all packs', tooltip: 'Full access to every icon in every pack' },
-      { label: 'All 10 packages included', tooltip: 'Every current and future icon package' },
+      { label: 'All 7 icon packs included', tooltip: 'Every current and future icon pack' },
       { label: 'Email &amp; priority support', tooltip: 'Direct email line with faster response times', html: true },
       { label: 'Commercial use license', tooltip: 'Ship in client and commercial projects' },
       { label: 'Lifetime updates', tooltip: 'Every new icon and update, forever' },
@@ -81,7 +81,7 @@ const CARDS_PLANS: Plan[] = [
     icon: Crown,
     features: [
       { label: '226+ icons across all packs', tooltip: 'Full library access for your entire team' },
-      { label: 'All 10 packages included', tooltip: 'Every current and future icon package' },
+      { label: 'All 7 icon packs included', tooltip: 'Every current and future icon pack' },
       { label: 'Dedicated Slack channel', tooltip: 'Private Slack channel with direct team support' },
       { label: 'Multi-seat team license', tooltip: 'Cover up to 25 developers under one license' },
       { label: 'Lifetime updates', tooltip: 'Every new icon and update, forever' },
@@ -389,7 +389,7 @@ const TOGGLE_PLANS: TogglePlan[] = [
     popular: true,
     features: [
       '226+ icons, all packs',
-      'All 10 packages included',
+      'All 7 icon packs included',
       'Priority email support',
       'Commercial license',
       'Lifetime updates',
