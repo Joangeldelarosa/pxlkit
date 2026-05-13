@@ -54,7 +54,7 @@ export function HeroCenteredPreview() {
           </PixelGlitch>
         </h1>
         <p className="text-retro-muted font-mono text-sm sm:text-base max-w-lg mx-auto mb-8 leading-relaxed">
-          Production-ready pixel-art React components with 250+ colorful
+          Production-ready pixel-art React components with 226+ colorful
           icons, rich animations, and a full design system. Ship fast. Look
           legendary.
         </p>
@@ -87,17 +87,17 @@ export function HeroCenteredPreview() {
             <PixelBounce>
               <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful />
             </PixelBounce>
-            <PixelTooltip content="Across 10 themed icon packs" position="top">
+            <PixelTooltip content="Across 7 themed icon packs" position="top">
               <span className="inline-flex items-center gap-1.5">
                 <PxlKitIcon icon={Package} size={14} colorful />
-                250+ icons
+                226+ icons
               </span>
             </PixelTooltip>
             <span className="text-retro-border">|</span>
-            <PixelTooltip content="Buttons, cards, modals, and more" position="top">
+            <PixelTooltip content="Buttons, cards, modals, animations, and more" position="top">
               <span className="inline-flex items-center gap-1.5">
                 <PxlKitIcon icon={Grid} size={14} colorful />
-                40+ components
+                54 components
               </span>
             </PixelTooltip>
             <span className="text-retro-border">|</span>

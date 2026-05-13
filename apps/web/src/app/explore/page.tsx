@@ -30,19 +30,14 @@ const ProceduralTerrain = dynamic(() => import('../../components/procedural-terr
 
 /**
  * Explore page — immersive full-screen mode.
- * Hides the footer and background grid to maximize the 3D viewport.
+ * Footer is hidden via ConditionalShell's NO_FOOTER_ROUTES set.
+ * Background grid is hidden here so the 3D viewport reads on a clean canvas.
  */
 export default function ExplorePage() {
-  // Hide footer and background grid for immersive experience
   useEffect(() => {
-    const footer = document.querySelector('footer');
     const gridBg = document.querySelector('[data-pxlkit="grid-bg"]') as HTMLElement | null;
-
-    if (footer) footer.style.display = 'none';
     if (gridBg) gridBg.style.display = 'none';
-
     return () => {
-      if (footer) footer.style.display = '';
       if (gridBg) gridBg.style.display = '';
     };
   }, []);

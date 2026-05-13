@@ -5,14 +5,18 @@ import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useTheme } from './ThemeProvider';
 
-const NAV_ITEMS: { href: string; label: string; badge?: string }[] = [
+const NAV_ITEMS: { href: string; label: string; badge?: string; external?: boolean }[] = [
   { href: '/', label: 'Home' },
   { href: '/icons', label: 'Icons' },
   { href: '/builder', label: 'Builder' },
   { href: '/ui-kit', label: 'UI Kit' },
   { href: '/templates', label: 'Templates' },
-  { href: '/explore', label: 'Worlds', badge: '🚧' },
+  { href: '/explore', label: 'Explore', badge: '🚧' },
   { href: '/docs', label: 'Docs' },
+  // Storybook lives on a separate Vercel deploy — see STORYBOOK_DEPLOY.md.
+  // Falls back to a placeholder until the subdomain is wired up; the badge
+  // signals the entry is external.
+  { href: 'https://storybook.pxlkit.xyz', label: 'Storybook', badge: '↗', external: true },
   { href: '/pricing', label: 'Pricing' },
 ];
 
@@ -120,20 +124,34 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-1">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`px-4 py-2 text-sm font-mono transition-all rounded relative ${
-                  isActive
-                    ? 'text-retro-green bg-retro-green/10'
-                    : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
-                }`}
-              >
+            const className = `px-4 py-2 text-sm font-mono transition-all rounded relative ${
+              isActive
+                ? 'text-retro-green bg-retro-green/10'
+                : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
+            }`;
+            const content = (
+              <>
                 {item.label}
                 {item.badge && (
-                  <span className="ml-1 text-[10px]" title="Coming Soon">{item.badge}</span>
+                  <span className="ml-1 text-[10px]" title={item.external ? 'Opens in new tab' : 'Coming Soon'}>
+                    {item.badge}
+                  </span>
                 )}
+              </>
+            );
+            return item.external ? (
+              <a
+                key={item.href}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={className}
+              >
+                {content}
+              </a>
+            ) : (
+              <Link key={item.href} href={item.href} className={className}>
+                {content}
               </Link>
             );
           })}
@@ -220,21 +238,35 @@ export function Navbar() {
           <div className="px-4 py-3 space-y-1">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`block px-4 py-2.5 text-sm font-mono rounded transition-all ${
-                    isActive
-                      ? 'text-retro-green bg-retro-green/10'
-                      : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
-                  }`}
-                >
+              const className = `block px-4 py-2.5 text-sm font-mono rounded transition-all ${
+                isActive
+                  ? 'text-retro-green bg-retro-green/10'
+                  : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
+              }`;
+              const content = (
+                <>
                   {item.label}
                   {item.badge && (
-                    <span className="ml-1 text-[10px]" title="Coming Soon">{item.badge}</span>
+                    <span className="ml-1 text-[10px]" title={item.external ? 'Opens in new tab' : 'Coming Soon'}>
+                      {item.badge}
+                    </span>
                   )}
+                </>
+              );
+              return item.external ? (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                  className={className}
+                >
+                  {content}
+                </a>
+              ) : (
+                <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)} className={className}>
+                  {content}
                 </Link>
               );
             })}

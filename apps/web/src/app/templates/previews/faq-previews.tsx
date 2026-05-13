@@ -25,7 +25,7 @@ const ACCORDION_ITEMS = [
     tone: 'green' as const,
     category: 'Overview',
     q: 'What is Pxlkit?',
-    a: 'A complete pixel-art component library for React. It includes 50+ UI components, 226+ handcrafted SVG icons across 10 packages, rich animations, a 3D voxel engine, and full TypeScript support.',
+    a: 'A complete pixel-art component library for React. It includes 54 UI components, 226+ handcrafted SVG icons across 7 themed packs, rich animations, a 3D voxel engine, and full TypeScript support.',
   },
   {
     icon: Shield,

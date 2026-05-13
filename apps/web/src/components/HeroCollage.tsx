@@ -9,8 +9,9 @@ import { SocialPack } from '@pxlkit/social';
 import { WeatherPack } from '@pxlkit/weather';
 import { EffectsPack } from '@pxlkit/effects';
 import { UiPack } from '@pxlkit/ui';
+import { ParallaxPack } from '@pxlkit/parallax';
 
-/* ── Gather ALL icons ── */
+/* ── Floating-render set (excludes parallax — different shape, rendered elsewhere) ── */
 const ALL_ICONS: AnyIcon[] = [
   ...GamificationPack.icons,
   ...FeedbackPack.icons,
@@ -20,7 +21,7 @@ const ALL_ICONS: AnyIcon[] = [
   ...EffectsPack.icons,
 ];
 
-const TOTAL_ICON_COUNT = ALL_ICONS.length;
+const TOTAL_ICON_COUNT = ALL_ICONS.length + ParallaxPack.length;
 
 /* ── Types ── */
 interface FloatingIcon {

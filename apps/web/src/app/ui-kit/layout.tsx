@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '40+ Retro Pixel Art React Components — UI Kit with Live Demos | Pxlkit',
+  title: '54 Retro Pixel Art React Components — UI Kit with Live Demos | Pxlkit',
   description:
-    'Production-ready retro React UI kit: 40+ pixel-art components — buttons, forms, modals, tables & more. TypeScript, Tailwind CSS. MIT-licensed.',
+    'Production-ready retro React UI kit: 54 pixel-art components — buttons, forms, modals, tables, animations, parallax & more. TypeScript, Tailwind CSS. MIT-licensed.',
   keywords: [
     'react ui kit',
     'react component library',
@@ -76,15 +76,15 @@ export const metadata: Metadata = {
     'pxlkit components',
   ],
   openGraph: {
-    title: '40+ Retro Pixel Art React Components — UI Kit with Live Demos | Pxlkit',
+    title: '54 Retro Pixel Art React Components — UI Kit with Live Demos | Pxlkit',
     description:
-      '40+ hand-crafted retro React components: buttons, forms, modals, tables, toast notifications, and more. TypeScript-first, Tailwind-powered, zero native UI. MIT-licensed and free to use.',
+      '54 hand-crafted retro React components: buttons, forms, modals, tables, toast notifications, animations, parallax, locale support, and more. TypeScript-first, Tailwind-powered, zero native UI. MIT-licensed and free to use.',
     url: 'https://pxlkit.xyz/ui-kit',
   },
   twitter: {
-    title: '40+ Retro Pixel Art React Components — UI Kit with Live Demos | Pxlkit',
+    title: '54 Retro Pixel Art React Components — UI Kit with Live Demos | Pxlkit',
     description:
-      'Production-ready retro pixel-art React UI kit: 40+ components with live demos. TypeScript, Tailwind CSS, tree-shakeable. MIT-licensed.',
+      'Production-ready retro pixel-art React UI kit: 54 components with live demos. TypeScript, Tailwind CSS, tree-shakeable. MIT-licensed.',
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/ui-kit',

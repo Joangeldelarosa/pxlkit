@@ -26,7 +26,7 @@ const GRID_FEATURES = [
     icon: Trophy,
     iconPack: 'Gamification Pack',
     title: 'Pixel Icons',
-    desc: '226+ handcrafted pixel-art icons spanning 10 themed packs — retro charm, modern quality.',
+    desc: '226+ handcrafted pixel-art icons spanning 7 themed packs — retro charm, modern quality.',
     detail: 'Each icon is hand-drawn on a pixel grid and exported as optimized SVG. Available in colorful, monochrome, and animated variants across UI, gamification, social, weather, and more.',
     border: 'border-retro-gold/30 bg-retro-gold/5',
   },
@@ -51,7 +51,7 @@ const GRID_FEATURES = [
     iconPack: 'UI Pack',
     title: 'Modular Packs',
     desc: 'Install only what you need — UI, gamification, social, weather, and more.',
-    detail: 'Ten themed icon packs can be installed independently. Mix and match packs without bloating your bundle. Each pack has its own NPM package.',
+    detail: 'Seven themed icon packs can be installed independently. Mix and match packs without bloating your bundle. Each pack has its own NPM package.',
     border: 'border-retro-purple/30 bg-retro-purple/5',
   },
   {
@@ -77,7 +77,7 @@ const ALT_FEATURES = [
     icon: Crown,
     accentIcon: SparkleStar,
     title: 'Premium Icon Library',
-    desc: '226+ pixel-perfect icons across 10 themed packs. Every icon available in colorful, monochrome, and animated variants.',
+    desc: '226+ pixel-perfect icons across 7 themed packs. Every icon available in colorful, monochrome, and animated variants.',
     stat: { label: 'Icons', value: '226+' },
     tone: 'gold' as const,
     border: 'border-retro-gold/30 bg-retro-gold/5',
@@ -306,7 +306,7 @@ export function FeaturesBentoPreview() {
                 Pixel Icon Library
               </h3>
               <p className="font-mono text-sm text-retro-muted leading-relaxed">
-                226+ handcrafted pixel icons across 10 themed packs. Available in colorful,
+                226+ handcrafted pixel icons across 7 themed packs. Available in colorful,
                 monochrome, and animated variants — all SVG, all tree-shakeable.
               </p>
             </div>
