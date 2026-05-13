@@ -6,14 +6,14 @@
 
 <p align="center">
   <strong>Bring retro aesthetics to the modern web — and build 3D voxel games with React.</strong><br/>
-  Pxlkit is a comprehensive source-available React toolkit featuring 226+ pixel art SVG icons across 10 themed npm packages, 40+ retro UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel game engine powered by Three.js &amp; React Three Fiber with procedural world generation, 9+ biomes, physics, NPCs, and real-time chunk streaming.
+  Pxlkit is a comprehensive source-available React toolkit featuring 226+ pixel art SVG icons across 7 themed packs (10 npm packages total including the code packages), 54 retro UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel toolkit on Three.js &amp; React Three Fiber. The showcase app at <a href="https://pxlkit.xyz/explore">pxlkit.xyz/explore</a> ships procedural world generation, biomes, day/night cycles, and chunk-based terrain streaming.
 </p>
 
 <p align="center">
   <a href="https://pxlkit.xyz"><img src="https://img.shields.io/badge/docs-pxlkit.xyz-00FF88?style=flat&logo=vercel&logoColor=black" alt="Documentation" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-split%20licenses-blue.svg" alt="Pxlkit split licensing" /></a>
   <img src="https://img.shields.io/badge/icons-226%2B-FFD700?style=flat" alt="226+ icons" />
-  <img src="https://img.shields.io/badge/components-40%2B-4ECDC4?style=flat" alt="40+ components" />
+  <img src="https://img.shields.io/badge/components-54-4ECDC4?style=flat" alt="54 components" />
   <img src="https://img.shields.io/badge/react-%E2%89%A518-61DAFB?logo=react&logoColor=white" alt="React ≥18" />
   <img src="https://img.shields.io/badge/typescript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict" />
   <img src="https://img.shields.io/badge/voxel%20engine-Three.js%20%2B%20R3F-black?logo=threedotjs&logoColor=white" alt="Voxel Engine: Three.js + React Three Fiber" />
@@ -23,13 +23,13 @@
 
 ## Overview
 
-**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into themed packs, a retro React UI kit with **40+ components**, a core rendering engine, a **3D voxel game engine** with procedural world generation, and a Next.js showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. You can browse and visually edit all icons at the [official website](https://pxlkit.xyz).
+**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into 7 themed packs, a retro React UI kit with **54 components**, a core rendering engine, a **3D voxel toolkit** (with a procedural world engine running live at `/explore`), and a Next.js 15 showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. Browse and visually edit them at the [official website](https://pxlkit.xyz).
 
 ```
 pxlkit/
 ├── packages/
 │   ├── core/           → Types, React components, SVG utilities
-│   ├── ui-kit/         → 40+ retro pixel art React UI components
+│   ├── ui-kit/         → 54 retro pixel art React UI components
 │   ├── gamification/   → 51 icons — RPG, achievements, rewards
 │   ├── feedback/       → 33 icons — alerts, status, notifications
 │   ├── social/         → 43 icons — community, emojis, messaging
@@ -61,37 +61,40 @@ pxlkit/
 | **Effects**      | `@pxlkit/effects`      |      0 |       12 | **12** | Explosions, radar ping, flame, shockwave   |
 | **Parallax**     | `@pxlkit/parallax`     |      — |        — | **10** | Multi-layer 3D parallax icons (3–5 layers) |
 
-## @pxlkit/voxel — MIT-Licensed 3D Voxel Game Engine 🎮
+## @pxlkit/voxel — MIT-Licensed 3D Voxel Toolkit 🎮
 
-> **Status: In active development** — usable now for procedural world exploration, game engine features expanding rapidly.
+> **Status: v0.1.x — early preview.** The published npm package today exposes voxel utility primitives. The full procedural-world engine lives in this repo's showcase app and is being prepared for the v1 release.
 
-`@pxlkit/voxel` is an MIT-licensed 3D voxel game engine built on **Three.js** and **React Three Fiber**. It's designed for building browser-based voxel games with React — think Minecraft-like worlds running natively in the browser.
+`@pxlkit/voxel` is an MIT-licensed 3D voxel toolkit built on **Three.js** and **React Three Fiber**. The current package ships:
 
-### Features
+- **`pxlToVoxels(icon, options)`** — convert any `PxlKitData` 16×16 icon into an array of `Voxel { x, y, z, color }`, with optional `scale` and `extrudeDepth` for thickness.
+- **`upscaleGrid(grid, factor)`** — upscale a pixel grid before voxelization for higher-resolution voxel models.
+- **Types** — `Voxel`, `VoxelData`, `VoxelConvertOptions`.
+- **`VoxelBomb`** — sample voxel icon for testing renderers.
 
-- 🌍 **Procedural World Generation** — Infinite, deterministic worlds using seeded Perlin noise and fractal Brownian motion (FBM)
-- 🏔️ **9+ Biomes** — Plains, desert, tundra, forest, mountains, ocean, city, swamp, village — each with unique terrain, vegetation, and structures
-- 🏗️ **Chunk-Based Streaming** — 16×16 chunks load dynamically around the camera with frustum culling
-- 🌅 **Day/Night Cycle** — 12-keyframe sun/moon/sky interpolation with animated window lights
-- 🏙️ **Procedural Cities** — 20+ building types, 5 zoning types, multi-lot buildings, major avenues
-- 🚣 **Dynamic Entities** — Boats on water, sky birds, ground critters, ambient weather particles
-- 🎮 **Fly Camera** — Pointer-lock fly camera with configurable speed and controls
-- 📦 **Tree-Shakeable** — Import only what you need
-- 🔧 **TypeScript-First** — Full type safety with strict mode
-- ⚡ **React-Native Integration** — Built for React Three Fiber, works anywhere R3F works
+### Live preview engine — `/explore`
 
-### Live Demo
+The procedural city engine you can fly through at **[pxlkit.xyz/explore](https://pxlkit.xyz/explore)** lives in [`apps/web/src/components/procedural-terrain/`](./apps/web/src/components/procedural-terrain/). It uses the published `@pxlkit/voxel` primitives plus app-local R3F code:
 
-Explore procedural voxel worlds live at **[pxlkit.xyz/explore](https://pxlkit.xyz/explore)** — fly through infinite terrain with dynamic biomes, day/night cycles, and real-time chunk generation.
+- 🌍 Procedural world generation — seeded Perlin / fractal Brownian motion
+- 🏔️ Continent + biome system — plains, desert, tundra, forest, mountains, ocean, city, swamp, village (with continent-level elevation modifiers)
+- 🏗️ Chunk-based streaming — 16×16 chunks load dynamically with frustum culling and fog-color fade-in
+- 🌅 Day/night cycle — 12-keyframe sun/moon/sky interpolation with animated window lights at night
+- 🏙️ Procedural cities — 20+ building types, 5 zoning types, multi-lot buildings, avenues, inter-biome highways with tunnels and bridges
+- 🚣 Dynamic entities — boats on water, sky birds, ground critters, ambient weather particles
+- 🎮 Fly camera — pointer-lock controls with configurable speed
+- 🗺️ Game HUD — minimap, fullscreen map, compass, FPS counter, settings panel (built with `@pxlkit/ui-kit`)
+- ⚡ Built for `@react-three/fiber` 9.x + `@react-three/drei` 10.x
 
-### Roadmap
+### Roadmap (toward v1 — when the showcase engine gets packaged)
 
-- Physics engine integration (collision detection, rigid bodies)
-- NPC system with behavior trees and pathfinding
-- Inventory and item management
-- Multiplayer support via WebSockets
-- Sound engine with spatial audio
-- Modular entity-component system
+- Promote chunk / biome / city modules into `packages/voxel/src/` so consumers can `npm install @pxlkit/voxel` and get the full engine.
+- Physics engine integration (collision detection, rigid bodies).
+- NPC system with behavior trees and pathfinding.
+- Inventory and item management.
+- Multiplayer support via WebSockets.
+- Sound engine with spatial audio.
+- Modular entity-component system.
 
 ## Quick Start
 
@@ -119,15 +122,17 @@ npm install @pxlkit/core @pxlkit/parallax
 import { PxlKitIcon } from '@pxlkit/core';
 import { Trophy } from '@pxlkit/gamification';
 
-// Monochrome — inherits text color
+// Default — original artwork palette
 <PxlKitIcon icon={Trophy} size={32} />
 
-// Full color — renders with original palette
-<PxlKitIcon icon={Trophy} size={48} colorful />
+// Tinted — preserves detail (highlights/shadows) while shifting hue
+<PxlKitIcon icon={Trophy} size={32} appearance="tinted" color="#FF4D4D" />
 
-// Custom monochrome color
-<PxlKitIcon icon={Trophy} size={32} color="#E74C3C" />
+// Solid — flatten every pixel to one colour
+<PxlKitIcon icon={Trophy} size={32} appearance="solid" color="#FFFFFF" />
 ```
+
+Icons are rendered as `<img>` elements backed by an inline SVG data URI with `image-rendering: pixelated` — every source pixel is preserved at every visual size, no edge dropouts at non-integer scales.
 
 ### Animated Icons
 
@@ -135,14 +140,17 @@ import { Trophy } from '@pxlkit/gamification';
 import { AnimatedPxlKitIcon } from '@pxlkit/core';
 import { FireSword } from '@pxlkit/gamification';
 
-// Auto-playing loop
-<AnimatedPxlKitIcon icon={FireSword} size={48} colorful />
+// Auto-playing loop (default — full palette)
+<AnimatedPxlKitIcon icon={FireSword} size={48} />
 
 // Play on hover only
-<AnimatedPxlKitIcon icon={FireSword} size={48} colorful trigger="hover" />
+<AnimatedPxlKitIcon icon={FireSword} size={48} trigger="hover" />
 
 // Half speed
-<AnimatedPxlKitIcon icon={FireSword} size={48} colorful speed={0.5} />
+<AnimatedPxlKitIcon icon={FireSword} size={48} speed={0.5} />
+
+// Tinted to match a UI tone, detail intact
+<AnimatedPxlKitIcon icon={FireSword} size={48} appearance="tinted" color="#8237C8" />
 ```
 
 ### Parallax 3D Icons
@@ -152,7 +160,7 @@ import { ParallaxPxlKitIcon } from '@pxlkit/core';
 import { CoolEmoji } from '@pxlkit/parallax';
 
 // Interactive parallax — layers move with mouse
-<ParallaxPxlKitIcon icon={CoolEmoji} size={64} colorful />
+<ParallaxPxlKitIcon icon={CoolEmoji} size={64} />
 
 // Custom depth strength and perspective
 <ParallaxPxlKitIcon icon={CoolEmoji} size={96} strength={24} perspective={300} />
@@ -187,9 +195,9 @@ import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from "@pxlkit/core";
 {
   GamificationPack.icons.map((icon) =>
     isAnimatedIcon(icon) ? (
-      <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} colorful />
+      <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} />
     ) : (
-      <PxlKitIcon key={icon.name} icon={icon} size={32} colorful />
+      <PxlKitIcon key={icon.name} icon={icon} size={32} />
     ),
   );
 }
@@ -382,6 +390,36 @@ node validate-icons.js
 
 Checks grid dimensions (16×16), palette usage, and detects unused/missing palette keys.
 
+## Storybook
+
+Every component in `@pxlkit/core` and `@pxlkit/ui-kit` has a live Storybook entry — 99+ stories total, organised by category, with Controls panels to manipulate every prop live (tone, size, surface, appearance, tint colour, disabled state, animation timing, etc.).
+
+**Live**: [storybook.pxlkit.xyz](https://storybook.pxlkit.xyz)
+
+**Local**:
+
+```bash
+npm run storybook       # dev mode on http://localhost:6006
+npm run build-storybook # static build → ./storybook-static/
+```
+
+Sidebar categories:
+
+- **Foundations / Surface** — `pixel` vs `linear` aesthetic split-screen
+- **Core / PxlKitIcon** — colour modes (`palette`, `tinted`, `solid`) + size grid
+- **Core / AnimatedPxlKitIcon** — every trigger (`loop`, `hover`, `once`, `appear`, `ping-pong`)
+- **Core / PixelToast** — every position + tone
+- **UI Kit / Actions** — `PixelButton`, `PxlKitButton`, `PixelSplitButton`
+- **UI Kit / Inputs** — the 9 form controls
+- **UI Kit / Feedback** — Alert (with HP-bar progress), Empty State, Skeleton
+- **UI Kit / Overlay** — Modal (window-style title bar in pixel surface), Tooltip, Dropdown
+- **UI Kit / Layout** — Section, Divider with ornaments
+- **UI Kit / Navigation** — Tabs, Accordion, Breadcrumb, Pagination
+- **UI Kit / Animations** — 11 motion primitives applied to real `@pxlkit/gamification` icons
+- **UI Kit / Parallax** — Mouse + scroll parallax wrappers
+- **UI Kit / Data Display** — 14 components from Cards to ColorSwatches
+- **UI Kit / Locale** — `PxlKitLocaleProvider` Turkish vs English side-by-side
+
 ## Tech Stack
 
 | Layer          | Technology                                                   |
@@ -399,8 +437,8 @@ Checks grid dimensions (16×16), palette usage, and detects unused/missing palet
 | Package                | npm                                                                                                                        | Description                                     |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | `@pxlkit/core`         | [![npm](https://img.shields.io/npm/v/@pxlkit/core?color=blue)](https://www.npmjs.com/package/@pxlkit/core)                 | Types, components, SVG engine                   |
-| `@pxlkit/ui-kit`       | [![npm](https://img.shields.io/npm/v/@pxlkit/ui-kit?color=blue)](https://www.npmjs.com/package/@pxlkit/ui-kit)             | 40+ retro pixel art React UI components         |
-| `@pxlkit/voxel`        | [![npm](https://img.shields.io/npm/v/@pxlkit/voxel?color=blue)](https://www.npmjs.com/package/@pxlkit/voxel)               | 3D voxel game engine, procedural worlds         |
+| `@pxlkit/ui-kit`       | [![npm](https://img.shields.io/npm/v/@pxlkit/ui-kit?color=blue)](https://www.npmjs.com/package/@pxlkit/ui-kit)             | 54 retro pixel art React UI components          |
+| `@pxlkit/voxel`        | [![npm](https://img.shields.io/npm/v/@pxlkit/voxel?color=blue)](https://www.npmjs.com/package/@pxlkit/voxel)               | 3D voxel utility primitives (engine in /explore)|
 | `@pxlkit/gamification` | [![npm](https://img.shields.io/npm/v/@pxlkit/gamification?color=blue)](https://www.npmjs.com/package/@pxlkit/gamification) | RPG, achievements, rewards                      |
 | `@pxlkit/feedback`     | [![npm](https://img.shields.io/npm/v/@pxlkit/feedback?color=blue)](https://www.npmjs.com/package/@pxlkit/feedback)         | Alerts, status, notifications                   |
 | `@pxlkit/social`       | [![npm](https://img.shields.io/npm/v/@pxlkit/social?color=blue)](https://www.npmjs.com/package/@pxlkit/social)             | Community, emojis, messaging                    |
