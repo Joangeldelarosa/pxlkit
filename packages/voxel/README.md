@@ -28,6 +28,10 @@
 
 > ⚠️ **Early preview** — This package is in active development (v0.x). The API may change in future releases.
 
+## Live procedural-world engine
+
+The chunk-streaming city engine you can fly through at **[pxlkit.xyz/explore](https://pxlkit.xyz/explore)** is *not* part of the published v0.1.x package — it lives in [`apps/web/src/components/procedural-terrain/`](https://github.com/joangeldelarosa/pxlkit/tree/main/apps/web/src/components/procedural-terrain) and ships with biomes, continents, day/night cycles, highways, tunnels and a Game HUD built on `@pxlkit/ui-kit`. The plan for v1 is to promote those modules into this package so consumers can `npm install @pxlkit/voxel` and get the full engine.
+
 ## Installation
 
 ```bash
