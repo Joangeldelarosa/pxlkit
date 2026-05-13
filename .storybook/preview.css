@@ -1,0 +1,26 @@
+/* Storybook-only globals — load fonts + apply dark theme by default. */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* Make stories use the dark retro theme by default (matches site default).
+ * Toggle via the Storybook backgrounds addon to test light. */
+html.dark,
+html[data-theme="dark"],
+:root {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  background-color: var(--color-retro-bg, #0A0A0F);
+  color: var(--color-retro-text, #E0E0EA);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Stories live in a centered viewport — give them breathing room */
+.sb-show-main {
+  padding: 24px;
+}
+
+* {
+  image-rendering: pixelated;
+}
