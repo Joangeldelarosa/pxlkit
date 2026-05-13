@@ -53,13 +53,35 @@ function occupancySignature(rows) {
   return rows.join('').split('').map((c) => (c === '.' ? '0' : '1')).join('');
 }
 
+/**
+ * Jaccard similarity over the set of lit pixels.
+ *
+ * The previous Hamming-based metric (matches / 256) was biased toward
+ * silhouettes with very few lit pixels — two icons with 3 lit pixels each
+ * would score ≥0.97 just because the 250 empty `.` positions agreed,
+ * regardless of whether the lit positions overlapped at all. That caused
+ * ~60 false-positive NEAR_DUPLICATE warnings for animated/parallax icons
+ * whose first frame is intentionally sparse (intro frame, back layer).
+ *
+ * Jaccard ignores positions where *both* signatures are empty:
+ *   similarity = |A ∩ B| / |A ∪ B|
+ * which scores genuine silhouette overlap and stays close to 0 for two
+ * icons whose lit pixels live in different regions of the canvas.
+ *
+ * Edge case: two fully empty signatures → |A ∪ B| = 0 → return 1, since
+ * they are trivially identical. (In practice all icons have lit pixels.)
+ */
 function similarity(sigA, sigB) {
   if (sigA.length !== sigB.length) return 0;
-  let same = 0;
+  let intersection = 0;
+  let union = 0;
   for (let i = 0; i < sigA.length; i += 1) {
-    if (sigA[i] === sigB[i]) same += 1;
+    const aLit = sigA[i] === '1';
+    const bLit = sigB[i] === '1';
+    if (aLit && bLit) intersection += 1;
+    if (aLit || bLit) union += 1;
   }
-  return same / sigA.length;
+  return union === 0 ? 1 : intersection / union;
 }
 
 const iconFiles = readIconFiles();
