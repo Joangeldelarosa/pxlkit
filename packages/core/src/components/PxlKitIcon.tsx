@@ -107,8 +107,29 @@ export function PxlKitIcon({
     const tintActive = appearance === 'tinted';
     const tintColor = color || '#FFFFFF';
 
+    // Tint pipeline (when appearance === 'tinted'):
+    //
+    //   1. feFlood produces a solid-colour rectangle of `tintColor`.
+    //   2. feComposite operator="in" crops that flood to the source's
+    //      alpha — yielding a flat-tinted silhouette ("tinted").
+    //   3. feBlend mode="color" composites the flat-tinted layer (as the
+    //      *top* layer) over the original SourceGraphic (as the *bottom*
+    //      layer). SVG compositing for mode="color" defines the result as:
+    //
+    //          result.hue + result.saturation = top.HSL
+    //          result.luminosity             = bottom.HSL
+    //
+    //      So putting the flat tint on top means every pixel adopts the
+    //      tint's hue+saturation, while the per-pixel luminance variation
+    //      from the original artwork is preserved. That's the "colored
+    //      lighting" effect — pixel-art shading intact, palette hue shifted.
+    //
+    //      Earlier revisions had `in` and `in2` swapped, which produced the
+    //      opposite (uniform luminance from the flat tint, original hues
+    //      retained from the source). That looked broken — barely tinted
+    //      and lost shading detail. Fixed in v1.3.2.
     const filterDef = tintActive
-      ? `<defs><filter id="pxk-tint"><feFlood flood-color="${tintColor}" flood-opacity="1" result="flood"/><feComposite in="flood" in2="SourceGraphic" operator="in" result="tinted"/><feBlend in="SourceGraphic" in2="tinted" mode="color"/></filter></defs>`
+      ? `<defs><filter id="pxk-tint"><feFlood flood-color="${tintColor}" flood-opacity="1" result="flood"/><feComposite in="flood" in2="SourceGraphic" operator="in" result="tinted"/><feBlend in="tinted" in2="SourceGraphic" mode="color"/></filter></defs>`
       : '';
 
     const bodyOpen = tintActive ? '<g filter="url(#pxk-tint)">' : '';
