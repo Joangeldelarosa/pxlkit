@@ -94,8 +94,13 @@ export const FeedbackPack: IconPack = {
     ChatDots,
     Mail,
     Send,
+    Link,
+    Unlink,
+    Lock,
+    Unlock,
     ShieldCheck,
     ShieldAlert,
+    Clock,
     Sparkles,
     Megaphone,
     // Animated
