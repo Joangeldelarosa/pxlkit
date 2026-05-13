@@ -1,12 +1,12 @@
 {
   "name": "pxlkit-monorepo",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
-  "description": "Source-available retro React toolkit \u2014 MIT-licensed UI and voxel engine packages, 226+ pixel art SVG icons under a commercial-friendly asset license, 40+ UI components, 3D parallax effects, animated icons, visual builder, toast notifications, and procedural voxel worlds powered by Three.js & React Three Fiber",
+  "description": "Source-available retro React toolkit — MIT-licensed UI and voxel engine packages, 226+ pixel art SVG icons under a commercial-friendly asset license, 40+ UI components, 3D parallax effects, animated icons, visual builder, toast notifications, and procedural voxel worlds powered by Three.js & React Three Fiber",
   "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "homepage": "https://pxlkit.xyz",
   "license": "SEE LICENSE IN LICENSE",
@@ -46,6 +46,7 @@
     "@storybook/addon-essentials": "^8.6.18",
     "@storybook/addon-interactions": "^8.6.18",
     "@storybook/react-vite": "^8.6.18",
+    "@tailwindcss/vite": "^4.3.0",
     "storybook": "^8.6.18",
     "turbo": "^2.4.0",
     "typescript": "^5.7.0"
