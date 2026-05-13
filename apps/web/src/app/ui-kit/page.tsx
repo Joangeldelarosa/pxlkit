@@ -75,6 +75,48 @@ import { useToast, type ToastPosition, type ToastTone } from '../../components/T
 type PropDef = { name: string; type: string; default: string; description: string };
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
 
+/* Cross-cutting props that almost every component accepts. Defined once
+   and spread into each DocSection's `props` array so every table is a
+   self-contained reference (matching what Storybook autodocs surface for
+   the same component). */
+const PROP_SURFACE: PropDef = {
+  name: 'surface',
+  type: '"pixel" | "linear"',
+  default: 'inherits from PxlKitSurfaceProvider, else "pixel"',
+  description: 'Per-component override of the global surface aesthetic. See Surface System.',
+};
+const PROP_DISABLED: PropDef = {
+  name: 'disabled',
+  type: 'boolean',
+  default: 'false',
+  description: 'Standard HTML disabled state. Greys out the control and blocks pointer / keyboard interaction.',
+};
+const PROP_CLASSNAME: PropDef = {
+  name: 'className',
+  type: 'string',
+  default: '—',
+  description: 'Extra CSS class names merged onto the outermost element.',
+};
+const PROP_CHILDREN_REQUIRED: PropDef = {
+  name: 'children',
+  type: 'ReactNode',
+  default: '—',
+  description: 'Required — the content rendered inside the component.',
+};
+const PROP_STYLE: PropDef = {
+  name: 'style',
+  type: 'CSSProperties',
+  default: '—',
+  description: 'Inline styles forwarded to the outer element.',
+};
+
+// Bundles for the most common component shapes. Use these in `props=[...specific, ...COMMON_X]`.
+const COMMON_INTERACTIVE: PropDef[] = [PROP_SURFACE, PROP_DISABLED, PROP_CLASSNAME];
+const COMMON_DISPLAY: PropDef[] = [PROP_SURFACE, PROP_CLASSNAME];
+const COMMON_CONTAINER: PropDef[] = [PROP_SURFACE, PROP_CLASSNAME, PROP_CHILDREN_REQUIRED];
+const COMMON_ANIMATION: PropDef[] = [PROP_CLASSNAME, PROP_CHILDREN_REQUIRED];
+const COMMON_PARALLAX: PropDef[] = [PROP_CLASSNAME, PROP_STYLE, PROP_CHILDREN_REQUIRED];
+
 const CATEGORIES = [
   {
     id: 'overview',
@@ -659,8 +701,9 @@ import { Search } from '@pxlkit/ui';
                 <h3 className="mb-3 font-mono text-xs font-semibold text-retro-text">Common API Surface</h3>
                 <p className="text-xs text-retro-muted mb-3">
                   These props are accepted by <strong className="text-retro-text">every</strong> UI-kit
-                  component (where they apply). They&apos;re documented here once and omitted from each
-                  component&apos;s own props table to avoid noise.
+                  component where applicable. Each component&apos;s individual props table below also
+                  lists them inline — so each table is a complete, self-contained reference. This
+                  shared block remains as a quick overview.
                 </p>
                 <PropsTable data={[
                   { name: 'tone', type: '"green" | "cyan" | "gold" | "red" | "purple" | "pink" | "neutral"', default: 'varies', description: 'Color scheme — shared across all components' },
@@ -1034,6 +1077,9 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'iconLeft', type: 'ReactNode', default: '—', description: 'Icon before label' },
                 { name: 'iconRight', type: 'ReactNode', default: '—', description: 'Icon after label' },
                 { name: 'loading', type: 'boolean', default: 'false', description: 'Shows spinner, disables button' },
+                { name: 'children', type: 'ReactNode', default: '—', description: 'Button label text or any inline content' },
+                ...COMMON_INTERACTIVE,
+                { name: '(native attrs)', type: 'React.ButtonHTMLAttributes<HTMLButtonElement>', default: '—', description: 'Forwards every native <button> attribute (onClick, type, aria-*, …).' },
               ]}
               code={`<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} />}>
   Primary Action
@@ -1085,10 +1131,11 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               title="PxlKitButton"
               description={<>Square icon-only button with accessible label via aria-label and title. Ideal for toolbar actions. For labeled buttons, see <CompLink id="pixel-button">PixelButton</CompLink>.</>}
               props={[
-                { name: 'label', type: 'string', default: '—', description: 'Accessible label (required)' },
+                { name: 'label', type: 'string', default: '—', description: 'Accessible label (required, becomes aria-label + title)' },
                 { name: 'icon', type: 'ReactNode', default: '—', description: 'Icon element (required)' },
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Color variant' },
                 { name: 'size', type: 'Size', default: '"md"', description: 'Button size' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PxlKitButton label="Edit" icon={<PxlKitIcon icon={Edit} size={16} />} tone="cyan" />
 <PxlKitButton label="Copy" icon={<PxlKitIcon icon={Copy} size={16} />} tone="green" />`}
@@ -1115,6 +1162,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"purple"', description: 'Color variant' },
                 { name: 'onPrimary', type: '() => void', default: '—', description: 'Primary action handler' },
                 { name: 'onSelect', type: '(value: string) => void', default: '—', description: 'Dropdown selection handler' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelSplitButton
   label="Deploy"
@@ -1154,6 +1202,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'icon', type: 'ReactNode', default: '—', description: 'Icon in left slot' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Focus ring color' },
                 { name: 'size', type: 'Size', default: '"md"', description: 'Input height' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelInput
   label="Search"
@@ -1190,6 +1239,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'error', type: 'string', default: '—', description: 'Error message shown below the field. When set, replaces hint and applies the error tone.' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Focus ring color' },
                 { name: 'size', type: 'Size', default: '"md"', description: 'Input height' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelPasswordInput label="Password" placeholder="Enter your password" />`}
             >
@@ -1208,6 +1258,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'hint', type: 'string', default: '—', description: 'Helper text' },
                 { name: 'error', type: 'string', default: '—', description: 'Error message' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Focus ring color' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelTextarea label="Bio" placeholder="Tell us about yourself..." />`}
             >
@@ -1231,6 +1282,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'hint', type: 'string', default: '—', description: 'Helper text shown below the field' },
                 { name: 'error', type: 'string', default: '—', description: 'Error message; replaces hint and applies the error tone' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Focus ring color' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelSelect
   label="Icon Pack"
@@ -1281,6 +1333,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'onChange', type: '(next: boolean) => void', default: '—', description: 'Change handler' },
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Check mark color' },
                 { name: 'disabled', type: 'boolean', default: 'false', description: 'Disable interaction' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelCheckbox
   label="Enable animations"
@@ -1307,6 +1360,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'options', type: 'Option[]', default: '—', description: 'Radio options' },
                 { name: 'onChange', type: '(next: string) => void', default: '—', description: 'Selection handler' },
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Active indicator color' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelRadioGroup
   label="Framework"
@@ -1341,6 +1395,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'checked', type: 'boolean', default: '—', description: 'On/off state' },
                 { name: 'onChange', type: '(next: boolean) => void', default: '—', description: 'Toggle handler' },
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Active color' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelSwitch label="Auto refresh" checked={on} onChange={setOn} />`}
             >
@@ -1364,6 +1419,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'step', type: 'number', default: '1', description: 'Step increment' },
                 { name: 'showMinMax', type: 'boolean', default: 'false', description: 'Render the min and max values beside the track' },
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Track and thumb color' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelSlider label="Volume" value={vol} onChange={setVol} min={0} max={100} />
 <PixelSlider label="Opacity" value={opacity} onChange={setOpacity} tone="gold" />`}
@@ -1387,6 +1443,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'options', type: 'Option[]', default: '—', description: 'Segment options' },
                 { name: 'onChange', type: '(next: string) => void', default: '—', description: 'Selection handler' },
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Active segment color' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelSegmented
   label="Density"
@@ -1421,6 +1478,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'title', type: 'string', default: '—', description: 'Card heading' },
                 { name: 'icon', type: 'ReactNode', default: '—', description: 'Header icon' },
                 { name: 'footer', type: 'ReactNode', default: '—', description: 'Footer section' },
+                ...COMMON_CONTAINER,
               ]}
               code={`<PixelCard
   title="Gamification"
@@ -1459,6 +1517,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'icon', type: 'ReactNode', default: '—', description: 'Stat icon' },
                 { name: 'tone', type: 'Tone', default: '"gold"', description: 'Card accent color' },
                 { name: 'trend', type: 'string', default: '—', description: 'Trend text' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelStatCard label="Downloads" value="12.4k" tone="green" trend="+15% this week" />`}
             >
@@ -1479,6 +1538,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'columns', type: 'Array<{ key: string; header: string; className?: string }>', default: '—', description: 'Column definitions; `key` matches row-data keys.' },
                 { name: 'data', type: 'Array<Record<string, ReactNode>>', default: '—', description: 'Row data keyed by column key' },
                 { name: 'striped', type: 'boolean', default: 'true', description: 'Alternating row backgrounds' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelTable
   columns={[
@@ -1518,6 +1578,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'src', type: 'string', default: '—', description: 'Image URL' },
                 { name: 'size', type: 'Size', default: '"md"', description: 'Avatar size' },
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Border/background tone' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelAvatar name="Joangel De La Rosa" tone="green" />
 <PixelAvatar name="AI Bot" tone="purple" size="lg" />`}
@@ -1539,6 +1600,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               props={[
                 { name: 'children', type: 'ReactNode', default: '—', description: 'Badge content' },
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Color variant' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelBadge tone="green">Stable</PixelBadge>
 <PixelBadge tone="gold">Beta</PixelBadge>
@@ -1563,6 +1625,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'label', type: 'string', default: '—', description: 'Chip text content' },
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Color variant' },
                 { name: 'onRemove', type: '() => void', default: '—', description: 'Shows remove button when provided' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelChip label="react" tone="cyan" />
 <PixelChip label="removable" tone="gold" onRemove={() => {}} />`}
@@ -1586,6 +1649,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'href', type: 'string', default: '—', description: 'URL (renders <a>); omit for <button>' },
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Text color variant' },
                 { name: 'className', type: 'string', default: '—', description: 'Additional CSS classes' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelTextLink href="/docs" tone="cyan">Documentation</PixelTextLink>
 <PixelTextLink tone="gold" onClick={() => alert('clicked')}>Action Link</PixelTextLink>`}
@@ -1607,6 +1671,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               props={[
                 { name: 'children', type: 'ReactNode', default: '—', description: 'Code text' },
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Color variant' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelCodeInline tone="cyan">useState</PixelCodeInline>
 <PixelCodeInline tone="purple">PxlKitIcon</PixelCodeInline>`}
@@ -1628,6 +1693,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               description={<>Keyboard shortcut indicator rendered as a styled key cap. Combine multiple instances for multi-key shortcuts. Pairs well with <CompLink id="pixel-tooltip">PixelTooltip</CompLink> for shortcut hints.</>}
               props={[
                 { name: 'children', type: 'ReactNode', default: '—', description: 'Key label' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelKbd>Ctrl</PixelKbd> + <PixelKbd>K</PixelKbd>
 <PixelKbd>⌘</PixelKbd> + <PixelKbd>Shift</PixelKbd> + <PixelKbd>P</PixelKbd>`}
@@ -1653,6 +1719,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
               props={[
                 { name: 'name', type: 'string', default: '—', description: 'Display name of the color' },
                 { name: 'cssVar', type: 'string', default: '—', description: 'CSS custom property name' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelColorSwatch name="Green" cssVar="--retro-green" />
 <PixelColorSwatch name="Cyan" cssVar="--retro-cyan" />`}
@@ -1679,6 +1746,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"red"', description: 'Severity color' },
                 { name: 'icon', type: 'ReactNode', default: '—', description: 'Leading icon' },
                 { name: 'action', type: 'ReactNode', default: '—', description: 'Action slot (button)' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelAlert
   tone="green"
@@ -1727,6 +1795,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Bar color' },
                 { name: 'label', type: 'string', default: '—', description: 'Label text' },
                 { name: 'showValue', type: 'boolean', default: 'true', description: 'Show percentage' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelProgress value={72} tone="green" label="Upload Progress" />`}
             >
@@ -1747,6 +1816,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'width', type: 'string', default: '—', description: 'CSS width' },
                 { name: 'height', type: 'string', default: '"1rem"', description: 'CSS height' },
                 { name: 'rounded', type: 'boolean', default: 'false', description: 'Pill shape' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelSkeleton width="200px" height="1rem" />
 <PixelSkeleton width="40px" height="40px" rounded />`}
@@ -1771,6 +1841,7 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
                 { name: 'description', type: 'string', default: '—', description: 'Body text' },
                 { name: 'icon', type: 'ReactNode', default: '—', description: 'Decorative icon' },
                 { name: 'action', type: 'ReactNode', default: '—', description: 'Action button' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelEmptyState
   title="No results"
@@ -2000,6 +2071,7 @@ function SaveButton() {
               props={[
                 { name: 'items', type: 'TabItem[]', default: '—', description: '{ id, label, icon?, content }' },
                 { name: 'defaultTab', type: 'string', default: 'first', description: 'Initially active tab ID' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelTabs items={[
   { id: 'overview', label: 'Overview', content: '...' },
@@ -2024,6 +2096,7 @@ function SaveButton() {
               props={[
                 { name: 'items', type: 'AccordionItem[]', default: '—', description: '{ id, title, content }' },
                 { name: 'allowMultiple', type: 'boolean', default: 'false', description: 'Allow multiple open panels' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelAccordion items={[
   { id: '1', title: 'How to use icons', content: '...' },
@@ -2048,6 +2121,7 @@ function SaveButton() {
                 { name: 'label', type: 'string', default: '—', description: 'Toggle button label' },
                 { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Start expanded' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Button tone' },
+                ...COMMON_CONTAINER,
               ]}
               code={`<PixelCollapsible label="Show details">
   <p>Hidden content revealed on toggle.</p>
@@ -2080,6 +2154,7 @@ function SaveButton() {
               description={<>Navigation breadcrumb with pixel-art chevron separators. Items can be links, buttons, or plain text. Used at the top of this page and in <CompLink id="pixel-modal">modal</CompLink> headers.</>}
               props={[
                 { name: 'items', type: 'Array<{ label: string; href?: string; onClick?: () => void; active?: boolean }>', default: '—', description: 'Breadcrumb items. `href` renders an anchor; `onClick` renders a button; both omitted → plain text.' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelBreadcrumb items={[
   { label: 'Home', href: '/' },
@@ -2102,6 +2177,7 @@ function SaveButton() {
                 { name: 'page', type: 'number', default: '—', description: 'Current page' },
                 { name: 'total', type: 'number', default: '—', description: 'Total pages' },
                 { name: 'onChange', type: '(next: number) => void', default: '—', description: 'Page change handler (receives the new page index)' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelPagination page={page} total={5} onChange={setPage} />`}
             >
@@ -2120,6 +2196,7 @@ function SaveButton() {
                 { name: 'title', type: 'string', default: '—', description: 'Modal heading' },
                 { name: 'onClose', type: '() => void', default: '—', description: 'Close handler' },
                 { name: 'size', type: '"sm" | "md" | "lg"', default: '"md"', description: 'Max width' },
+                ...COMMON_CONTAINER,
               ]}
               code={`const [open, setOpen] = useState(false);
 
@@ -2143,6 +2220,7 @@ function SaveButton() {
               props={[
                 { name: 'content', type: 'string', default: '—', description: 'Tooltip text' },
                 { name: 'position', type: '"top" | "bottom" | "left" | "right"', default: '"top"', description: 'Tooltip placement' },
+                ...COMMON_CONTAINER,
               ]}
               code={`<PixelTooltip content="Edit this item" position="top">
   <PxlKitButton label="Edit" icon={<PxlKitIcon icon={Edit} size={16} />} />
@@ -2175,6 +2253,7 @@ function SaveButton() {
                 { name: 'onSelect', type: '(value: string) => void', default: '—', description: 'Selection handler' },
                 { name: 'icon', type: 'ReactNode', default: '—', description: 'Optional icon shown inside the trigger button' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Trigger button tone' },
+                ...COMMON_INTERACTIVE,
               ]}
               code={`<PixelDropdown
   label="Actions"
@@ -2219,6 +2298,7 @@ function SaveButton() {
               props={[
                 { name: 'title', type: 'string', default: '—', description: 'Section heading' },
                 { name: 'subtitle', type: 'string', default: '—', description: 'Description text' },
+                ...COMMON_CONTAINER,
               ]}
               code={`<PixelSection title="Actions" subtitle="Interactive button components.">
   {children}
@@ -2241,6 +2321,7 @@ function SaveButton() {
                 { name: 'label', type: 'string', default: '—', description: 'Center label text' },
                 { name: 'tone', type: 'Tone', default: '"neutral"', description: 'Label color' },
                 { name: 'spacing', type: '"none" | "sm" | "md" | "lg"', default: '"none"', description: 'Vertical margin around the divider' },
+                ...COMMON_DISPLAY,
               ]}
               code={`<PixelDivider />
 <PixelDivider label="Section" tone="green" spacing="lg" />`}
@@ -2421,6 +2502,7 @@ const [active, setActive] = useState(false);
                 { name: 'className', type: 'string', default: '—', description: 'Extra class names on wrapper div' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when animation cycle finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {(key) => (
@@ -2459,6 +2541,7 @@ const [active, setActive] = useState(false);
                 { name: 'fillMode', type: '"none" | "forwards" | "backwards" | "both"', default: '"both"', description: 'How styles apply before/after animation' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when animation cycle finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {(key) => (
@@ -2486,6 +2569,7 @@ const [active, setActive] = useState(false);
                 { name: 'easing', type: 'string', default: '"ease-in-out"', description: 'CSS easing function' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when animation cycle finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {() => (
@@ -2517,6 +2601,7 @@ const [active, setActive] = useState(false);
                 { name: 'easing', type: 'string', default: '"ease"', description: 'CSS easing function' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when animation cycle finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {(key) => (
@@ -2549,6 +2634,7 @@ const [active, setActive] = useState(false);
                 { name: 'easing', type: 'string', default: '"ease-in-out"', description: 'CSS easing function' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when animation cycle finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {(key) => (
@@ -2575,6 +2661,7 @@ const [active, setActive] = useState(false);
                 { name: 'easing', type: 'string', default: '"linear"', description: 'CSS easing function' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when animation cycle finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {(key) => (
@@ -2601,6 +2688,7 @@ const [active, setActive] = useState(false);
                 { name: 'easing', type: 'string', default: '"linear"', description: 'CSS easing function' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when animation cycle finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {(key) => (
@@ -2629,6 +2717,7 @@ const [active, setActive] = useState(false);
                 { name: 'fillMode', type: '"none" | "forwards" | "backwards" | "both"', default: '"both"', description: 'How styles apply before/after animation' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when animation cycle finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {(key) => (
@@ -2659,6 +2748,7 @@ const [active, setActive] = useState(false);
                 { name: 'repeat', type: 'number | "infinite"', default: '"infinite"', description: 'Loop count for the effect' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when animation cycle finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {(key) => (
@@ -2685,6 +2775,7 @@ const [active, setActive] = useState(false);
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Text color tone' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when typing finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {(key) => (
@@ -2715,6 +2806,7 @@ const [active, setActive] = useState(false);
                 { name: 'intensity', type: 'number', default: '4', description: 'Horizontal channel-split offset in px' },
                 { name: 'trigger', type: 'AnimationTrigger', default: '"mount"', description: '"mount" | "hover" | "click" | "focus" | "inView" | boolean' },
                 { name: 'onComplete', type: '() => void', default: '—', description: 'Fires when animation cycle finishes' },
+                ...COMMON_ANIMATION,
               ]}
             >
               {() => (
@@ -2759,6 +2851,7 @@ const [active, setActive] = useState(false);
                 { name: 'axis', type: '"x" | "y" | "both"', default: '"y"', description: 'Which axis to translate on.' },
                 { name: 'className', type: 'string', default: '—', description: 'Extra class names on wrapper div.' },
                 { name: 'style', type: 'CSSProperties', default: '—', description: 'Inline styles on wrapper div.' },
+                ...COMMON_PARALLAX,
               ]}
               code={`<PixelParallaxGroup className="h-[400px]">
   {/* Slow background layer */}
@@ -2798,6 +2891,7 @@ const [active, setActive] = useState(false);
                 { name: 'as', type: '"div" | "section" | "header" | "main"', default: '"div"', description: 'HTML tag to render.' },
                 { name: 'className', type: 'string', default: '—', description: 'Extra class names.' },
                 { name: 'style', type: 'CSSProperties', default: '—', description: 'Inline styles.' },
+                ...COMMON_PARALLAX,
               ]}
               code={`<PixelParallaxGroup as="section" className="h-[600px] bg-retro-bg">
   <PixelParallaxLayer speed={0.2}>
@@ -2828,6 +2922,7 @@ const [active, setActive] = useState(false);
                 { name: 'invert', type: 'boolean', default: 'false', description: 'If true, moves away from cursor instead of towards.' },
                 { name: 'className', type: 'string', default: '—', description: 'Extra class names.' },
                 { name: 'style', type: 'CSSProperties', default: '—', description: 'Inline styles.' },
+                ...COMMON_PARALLAX,
               ]}
               code={`{/* Follows cursor */}
 <PixelMouseParallax strength={15}>
