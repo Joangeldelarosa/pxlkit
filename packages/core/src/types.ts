@@ -139,23 +139,61 @@ export interface SvgOptions {
 }
 
 /**
- * Props for the PxlKitIcon React component
+ * Colour-mode for a pixel-art icon.
+ *
+ * - `'palette'` (default) — render the icon's original artwork colours as-is.
+ *   Use this whenever you want the design to read exactly as the artist drew it.
+ * - `'tinted'` — keep the full palette but overlay a colour tint via an SVG
+ *   `feFlood` + `feBlend mode="color"` filter. Highlights, shadows and detail
+ *   are preserved while hue shifts toward `color`. Recommended when you want
+ *   an icon to match a UI tone WITHOUT collapsing its silhouette to a blob.
+ * - `'solid'` — flatten every non-transparent pixel to `color` (falls back to
+ *   `currentColor`). Use only for chrome glyphs that should match adjacent text.
+ */
+export type IconAppearance = 'palette' | 'tinted' | 'solid';
+
+/**
+ * Props for the `PxlKitIcon` React component.
+ *
+ * The colour-mode contract is **one prop**: {@link IconAppearance}. The legacy
+ * `colorful` / `solid` / `tint` booleans were removed in v1.3 because they
+ * encoded the same axis three different ways.
+ *
+ * Migration (v1.2.x → v1.3.x):
+ * - `<PxlKitIcon icon={X} colorful />`            → omit the prop (palette is the default)
+ * - `<PxlKitIcon icon={X} />` (legacy mono)       → `<PxlKitIcon icon={X} appearance="solid" />`
+ * - `<PxlKitIcon icon={X} color="#FF0000" />`     → `<PxlKitIcon icon={X} appearance="solid" color="#FF0000" />`
+ * - `<PxlKitIcon icon={X} tint="#FF0000" />`      → `<PxlKitIcon icon={X} appearance="tinted" color="#FF0000" />`
  */
 export interface PxlKitProps {
-  /** The icon data to render */
+  /** The icon data to render. */
   icon: PxlKitData;
-  /** Container size in px (default: 32) */
+  /** Container size in px (default: 32). The SVG always renders at the icon's
+   *  native pixel grid and is then sized to this value by the wrapper so
+   *  sub-pixel rect dropouts can't happen at non-integer scales. */
   size?: number;
-  /** Render in full color (default: false, uses currentColor) */
-  colorful?: boolean;
-  /** Override color for monochrome mode */
+  /**
+   * Colour mode (default: `'palette'`). See {@link IconAppearance}.
+   */
+  appearance?: IconAppearance;
+  /**
+   * Tint hue (for `appearance="tinted"`) or flat colour (for `appearance="solid"`).
+   * Falls back to `currentColor` so the icon picks up the surrounding text colour
+   * when none is provided. Ignored when `appearance="palette"`.
+   */
   color?: string;
-  /** Additional CSS class names */
+  /** Additional CSS class names. */
   className?: string;
-  /** Accessible label */
+  /** Accessible label. */
   'aria-label'?: string;
-  /** Inline styles */
+  /** Inline styles applied to the icon wrapper. */
   style?: React.CSSProperties;
+  /** @deprecated since v1.3 — use `appearance="palette" | "solid"` instead. */
+  colorful?: boolean;
+  /** @deprecated since v1.3 — use `appearance="solid"` instead. */
+  solid?: boolean;
+  /** @deprecated since v1.3 — use `appearance="tinted" color="..."` instead. */
+  tint?: string;
 }
 
 // ─── Animation Types ───────────────────────
@@ -235,17 +273,24 @@ export interface AnimatedPxlKitData {
 }
 
 /**
- * Props for the AnimatedPxlKitIcon React component.
+ * Props for the `AnimatedPxlKitIcon` React component.
+ * Shares the `appearance` + `color` contract with {@link PxlKitProps}.
  */
 export interface AnimatedPxlKitProps {
-  /** The animated icon data */
+  /** The animated icon data. */
   icon: AnimatedPxlKitData;
-  /** Container size in px (default: 32) */
+  /** Container size in px (default: 32). */
   size?: number;
-  /** Render in full color (default: true for animated) */
-  colorful?: boolean;
-  /** Override color for monochrome mode */
+  /** Colour mode (default: `'palette'`). See {@link IconAppearance}. */
+  appearance?: IconAppearance;
+  /** Tint hue / flat colour. Falls back to `currentColor`. */
   color?: string;
+  /** @deprecated since v1.3 — use `appearance` instead. */
+  colorful?: boolean;
+  /** @deprecated since v1.3 — use `appearance="solid"` instead. */
+  solid?: boolean;
+  /** @deprecated since v1.3 — use `appearance="tinted" color="..."` instead. */
+  tint?: string;
   /**
    * Whether the animation is playing (default: true).
    * When using trigger-based control, prefer omitting this and let
@@ -351,8 +396,16 @@ export interface ParallaxPxlKitProps {
    * Higher = more dramatic 3D tilt. (default: 18)
    */
   strength?: number;
-  /** Renders layers in full color (default: true) */
+  /** Colour mode applied to every layer (default: `'palette'`). See {@link IconAppearance}. */
+  appearance?: IconAppearance;
+  /** Tint hue / flat colour. Falls back to `currentColor`. */
+  color?: string;
+  /** @deprecated since v1.3 — use `appearance` instead. */
   colorful?: boolean;
+  /** @deprecated since v1.3 — use `appearance="solid"` instead. */
+  solid?: boolean;
+  /** @deprecated since v1.3 — use `appearance="tinted" color="..."` instead. */
+  tint?: string;
   /** Smooth lerp factor 0–1 (default: 0.06) */
   smoothing?: number;
   /**

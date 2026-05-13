@@ -46,23 +46,77 @@ export default meta;
 type Story = StoryObj<typeof PxlKitIcon>;
 
 export const Default: Story = {
-  name: 'Monochrome (Default)',
-  args: {
-    colorful: false,
-  },
-};
-
-export const Colorful: Story = {
+  name: 'Colorful (Default)',
   args: {
     colorful: true,
   },
 };
 
-export const CustomColor: Story = {
+export const TintRed: Story = {
+  name: 'Tint — red (preserves detail)',
   args: {
-    colorful: false,
+    colorful: true,
+    tint: '#FF4D4D',
+  },
+};
+
+export const TintCyan: Story = {
+  name: 'Tint — cyan',
+  args: {
+    colorful: true,
+    tint: '#24827A',
+  },
+};
+
+export const TintPurple: Story = {
+  name: 'Tint — purple',
+  args: {
+    colorful: true,
+    tint: '#8237C8',
+  },
+};
+
+export const SolidMonochrome: Story = {
+  name: 'Solid — flattened to currentColor',
+  args: {
+    solid: true,
+  },
+};
+
+export const SolidCustomColor: Story = {
+  name: 'Solid — custom color (every pixel one colour)',
+  args: {
+    solid: true,
     color: '#00ff88',
   },
+};
+
+export const TintSideBySide: Story = {
+  name: 'Tint vs Solid — side by side',
+  render: (args) => (
+    <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ textAlign: 'center' }}>
+        <PxlKitIcon icon={demoIcon} size={64} />
+        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>colorful</p>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <PxlKitIcon icon={demoIcon} size={64} tint="#FF4D4D" />
+        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>tint="red"</p>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <PxlKitIcon icon={demoIcon} size={64} tint="#24827A" />
+        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>tint="cyan"</p>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <PxlKitIcon icon={demoIcon} size={64} tint="#8237C8" />
+        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>tint="purple"</p>
+      </div>
+      <div style={{ textAlign: 'center', color: '#FF4D4D' }}>
+        <PxlKitIcon icon={demoIcon} size={64} solid />
+        <p style={{ fontFamily: 'monospace', fontSize: 10, marginTop: 8 }}>solid (flat — lost detail)</p>
+      </div>
+    </div>
+  ),
 };
 
 export const Size16: Story = {

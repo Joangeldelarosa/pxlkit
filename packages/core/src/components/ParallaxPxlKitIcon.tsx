@@ -82,7 +82,8 @@ export function ParallaxPxlKitIcon({
   icon,
   size = 64,
   strength = 18,
-  colorful = true,
+  appearance: appearanceProp,
+  color: colorProp,
   smoothing = 0.06,
   perspective: perspectiveProp,
   layerGap: layerGapProp,
@@ -92,7 +93,19 @@ export function ParallaxPxlKitIcon({
   className = '',
   style,
   'aria-label': ariaLabel,
+  // Deprecated legacy props — resolved into `appearance` below.
+  colorful: colorfulProp,
+  solid: solidProp,
+  tint: tintProp,
 }: ParallaxPxlKitProps) {
+  // Resolve effective appearance + colour with backward-compat fallbacks.
+  const appearance =
+    appearanceProp ??
+    (solidProp ? 'solid' :
+     tintProp ? 'tinted' :
+     colorfulProp === false ? 'solid' :
+     'palette');
+  const color = colorProp ?? tintProp;
   // Derive sensible defaults — dramatic 3D
   const perspective = perspectiveProp ?? Math.max(200, size * 2.5);
   const layerGap = layerGapProp ?? Math.max(12, size * 0.2);
@@ -279,10 +292,22 @@ export function ParallaxPxlKitIcon({
       ref={containerRef}
       className={className}
       onClick={interactive ? handleClick : undefined}
+      // - `position: relative` anchors the absolute particle canvas (was missing,
+      //   making particles position relative to the closest positioned ancestor).
+      // - `overflow: visible` lets 3D layers extrude past the bounding box without
+      //   being clipped (parallax depth + drop-shadow halo).
+      // - `vertical-align: middle` + `line-height: 0` eliminate the inline baseline
+      //   gap and prevent text-row misalignment.
+      // - `flex-shrink: 0` keeps the icon at its declared size inside flex layouts.
       style={{
         display: 'inline-flex',
+        position: 'relative',
+        overflow: 'visible',
         alignItems: 'center',
         justifyContent: 'center',
+        verticalAlign: 'middle',
+        flexShrink: 0,
+        lineHeight: 0,
         width: size,
         height: size,
         perspective: perspective,
@@ -337,13 +362,15 @@ export function ParallaxPxlKitIcon({
                 <AnimatedPxlKitIcon
                   icon={layer.icon}
                   size={size}
-                  colorful={colorful}
+                  appearance={appearance}
+                  color={color}
                 />
               ) : (
                 <PxlKitIcon
                   icon={layer.icon}
                   size={size}
-                  colorful={colorful}
+                  appearance={appearance}
+                  color={color}
                 />
               )}
             </div>

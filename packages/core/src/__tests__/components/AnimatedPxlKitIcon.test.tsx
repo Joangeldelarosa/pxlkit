@@ -4,6 +4,33 @@ import { AnimatedPxlKitIcon } from '../../components/AnimatedPxlKitIcon';
 import { testAnimatedIcon } from '../fixtures';
 import type { AnimatedPxlKitData } from '../../types';
 
+/**
+ * AnimatedPxlKitIcon wraps PxlKitIcon (which renders as `<img>`-with-data-URI
+ * for nearest-neighbour scaling). So the wrapper div is the outer DOM and the
+ * frame artwork lives inside the inner `<img src="data:image/svg+xml,..">`.
+ * Helpers below decode the SVG out of the data URI when we need to assert on
+ * frame contents (rects, palette, etc.).
+ */
+
+function getInnerImg(container: HTMLElement): HTMLImageElement {
+  const img = container.querySelector('img');
+  expect(img).not.toBeNull();
+  return img as HTMLImageElement;
+}
+
+function decodeSvgFromImg(img: HTMLImageElement): string {
+  const src = img.getAttribute('src') || '';
+  expect(src).toMatch(/^data:image\/svg\+xml,/);
+  return decodeURIComponent(src.replace(/^data:image\/svg\+xml,/, ''));
+}
+
+function countRectsInImg(img: HTMLImageElement): number {
+  const svgMarkup = decodeSvgFromImg(img);
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = svgMarkup;
+  return wrapper.querySelectorAll('rect').length;
+}
+
 describe('AnimatedPxlKitIcon', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -13,11 +40,11 @@ describe('AnimatedPxlKitIcon', () => {
     vi.useRealTimers();
   });
 
-  it('renders an SVG element', () => {
+  it('renders an <img> element for the frame', () => {
     const { container } = render(
       <AnimatedPxlKitIcon icon={testAnimatedIcon} />
     );
-    expect(container.querySelector('svg')).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
   });
 
   it('renders a wrapper div with inline-flex', () => {
@@ -45,35 +72,33 @@ describe('AnimatedPxlKitIcon', () => {
     expect(wrapper.style.opacity).toBe('0.5');
   });
 
-  it('uses icon name as default aria-label', () => {
+  it('uses icon name as default alt text on the inner img', () => {
     render(<AnimatedPxlKitIcon icon={testAnimatedIcon} />);
-    expect(screen.getByLabelText(testAnimatedIcon.name)).toBeTruthy();
+    expect(screen.getByAltText(testAnimatedIcon.name)).toBeTruthy();
   });
 
-  it('custom aria-label overrides default', () => {
+  it('custom aria-label overrides default alt', () => {
     render(
       <AnimatedPxlKitIcon icon={testAnimatedIcon} aria-label="My Animation" />
     );
-    expect(screen.getByLabelText('My Animation')).toBeTruthy();
+    expect(screen.getByAltText('My Animation')).toBeTruthy();
   });
 
   it('cycles frames over time in loop mode', () => {
     const { container } = render(
       <AnimatedPxlKitIcon icon={testAnimatedIcon} />
     );
-    const getRectsCount = () => container.querySelectorAll('rect').length;
-    const initialCount = getRectsCount();
+    const img = getInnerImg(container);
+    const initialSrc = img.getAttribute('src');
 
     // Advance past one frame duration
     act(() => {
       vi.advanceTimersByTime(testAnimatedIcon.frameDuration + 50);
     });
 
-    // The DOM should have updated (frames have different grids)
-    const newCount = getRectsCount();
-    // We just need to confirm it rendered without crashing;
-    // the frame should have changed
-    expect(newCount).toBeGreaterThanOrEqual(0);
+    // The data URI should have updated as we moved to a different frame.
+    const newSrc = getInnerImg(container).getAttribute('src');
+    expect(newSrc).not.toBe(initialSrc);
   });
 
   it('does not animate when playing is false', () => {
@@ -81,7 +106,7 @@ describe('AnimatedPxlKitIcon', () => {
       <AnimatedPxlKitIcon icon={testAnimatedIcon} playing={false} />
     );
 
-    // Get initial SVG content
+    // Get initial DOM
     const initialHTML = container.innerHTML;
 
     act(() => {
@@ -110,7 +135,7 @@ describe('AnimatedPxlKitIcon', () => {
     });
 
     // Should still render without crashing
-    expect(container.querySelector('svg')).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
   });
 
   it('respects trigger="hover" — only animates on hover', () => {
@@ -140,7 +165,7 @@ describe('AnimatedPxlKitIcon', () => {
       fireEvent.mouseLeave(wrapper);
     });
 
-    expect(container.querySelector('svg')).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
   });
 
   it('respects trigger="ping-pong"', () => {
@@ -155,7 +180,7 @@ describe('AnimatedPxlKitIcon', () => {
       );
     });
 
-    expect(container.querySelector('svg')).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
   });
 
   it('speed prop affects frame duration', () => {
@@ -167,7 +192,7 @@ describe('AnimatedPxlKitIcon', () => {
       vi.advanceTimersByTime(testAnimatedIcon.frameDuration);
     });
 
-    expect(container.querySelector('svg')).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
   });
 
   it('fps prop overrides frame duration', () => {
@@ -179,7 +204,7 @@ describe('AnimatedPxlKitIcon', () => {
       vi.advanceTimersByTime(200);
     });
 
-    expect(container.querySelector('svg')).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
   });
 
   it('resets frame index when icon changes', () => {
@@ -200,7 +225,7 @@ describe('AnimatedPxlKitIcon', () => {
     // Switch icons
     rerender(<AnimatedPxlKitIcon icon={secondIcon} />);
 
-    expect(container.querySelector('svg')).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
   });
 
   it('does not animate single-frame icon', () => {
@@ -236,16 +261,18 @@ describe('AnimatedPxlKitIcon', () => {
       <AnimatedPxlKitIcon icon={iconWithFramePalette} colorful />
     );
 
-    expect(container.querySelector('svg')).not.toBeNull();
+    // We at least know rects render — frame palette merging is exercised
+    // when computing the encoded SVG for the active frame.
+    expect(countRectsInImg(getInnerImg(container))).toBeGreaterThan(0);
   });
 
   it('passes size prop to inner PxlKitIcon', () => {
     const { container } = render(
       <AnimatedPxlKitIcon icon={testAnimatedIcon} size={64} />
     );
-    const svg = container.querySelector('svg');
-    expect(svg?.getAttribute('width')).toBe('64');
-    expect(svg?.getAttribute('height')).toBe('64');
+    const img = getInnerImg(container);
+    expect(img.getAttribute('width')).toBe('64');
+    expect(img.getAttribute('height')).toBe('64');
   });
 
   it('passes colorful=false and color prop to PxlKitIcon', () => {
@@ -256,10 +283,11 @@ describe('AnimatedPxlKitIcon', () => {
         color="#FF5500"
       />
     );
-    const rects = container.querySelectorAll('rect');
-    if (rects.length > 0) {
-      expect(rects[0].getAttribute('fill')).toBe('#FF5500');
-    }
+    const img = getInnerImg(container);
+    const svgMarkup = decodeSvgFromImg(img);
+    // Every rect should be flattened to the solid color.
+    expect(svgMarkup).toContain('fill="#FF5500"');
+    expect(svgMarkup).not.toMatch(/fill="(?!#FF5500)#[0-9A-Fa-f]{6}"/);
   });
 
   it('resolves trigger from icon.trigger when prop is not set', () => {
@@ -278,7 +306,7 @@ describe('AnimatedPxlKitIcon', () => {
       );
     });
 
-    expect(container.querySelector('svg')).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
   });
 
   it('falls back to loop:true → "loop" trigger', () => {
@@ -296,6 +324,6 @@ describe('AnimatedPxlKitIcon', () => {
       vi.advanceTimersByTime(loopIcon.frameDuration * loopIcon.frames.length * 3);
     });
 
-    expect(container.querySelector('svg')).not.toBeNull();
+    expect(container.querySelector('img')).not.toBeNull();
   });
 });
