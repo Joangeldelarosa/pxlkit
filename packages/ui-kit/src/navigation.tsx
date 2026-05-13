@@ -1,18 +1,31 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Tone, Size, Option, TabItem, AccordionItem, cn, useClickOutside,
-  toneMap, sizeClass, focusRing, inputBase,
-  ChevronDownIcon, CheckIcon, CloseIcon, FieldShell
+  Surface, TabItem, AccordionItem, cn,
+  toneMap, focusRing, surfaceClasses, useEffectiveSurface,
+  ChevronDownIcon,
 } from './common';
 
+/* ──────────────────────────────────────────────────────────────────────────
+   PixelTabs — tabbed panel. Pixel surface uses file-folder tabs.
+   ────────────────────────────────────────────────────────────────────────── */
 
-
-export function PixelTabs({ items, defaultTab }: { items: TabItem[]; defaultTab?: string }) {
+export function PixelTabs({
+  items,
+  defaultTab,
+  surface: surfaceProp,
+}: {
+  items: TabItem[];
+  defaultTab?: string;
+  surface?: Surface;
+}) {
+  const surface = useEffectiveSurface(surfaceProp);
+  const s = surfaceClasses(surface);
   const [active, setActive] = useState(defaultTab ?? items[0]?.id);
   const current = items.find((i) => i.id === active) ?? items[0];
+  const tabRadius = surface === 'pixel' ? 'rounded-t-[3px]' : 'rounded-t-md';
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-1 border-b border-retro-border/40 pb-px" role="tablist">
+      <div className="flex flex-wrap gap-1 border-b-2 border-retro-border/40 pb-px" role="tablist">
         {items.map((item) => (
           <button
             key={item.id}
@@ -20,7 +33,9 @@ export function PixelTabs({ items, defaultTab }: { items: TabItem[]; defaultTab?
             role="tab"
             aria-selected={active === item.id}
             className={cn(
-              'flex items-center gap-1.5 rounded-t-md border border-b-0 px-3 py-2 text-xs font-mono transition-colors outline-none -mb-px',
+              'flex items-center gap-1.5 px-3 py-2 text-xs outline-none -mb-px transition-colors',
+              s.font, tabRadius,
+              s.border, 'border-b-0',
               focusRing,
               active === item.id
                 ? 'border-retro-border/40 bg-retro-bg text-retro-green'
@@ -33,22 +48,35 @@ export function PixelTabs({ items, defaultTab }: { items: TabItem[]; defaultTab?
           </button>
         ))}
       </div>
-      <div role="tabpanel" className="rounded-md border border-retro-border/40 bg-retro-bg/50 p-3 text-sm text-retro-muted">
+      <div role="tabpanel" className={cn('bg-retro-bg/50 p-3 text-sm text-retro-muted', s.border, s.radius, 'border-retro-border/40')}>
         {current?.content}
       </div>
     </div>
   );
 }
 
-export function PixelAccordion({ items, allowMultiple = false }: { items: AccordionItem[]; allowMultiple?: boolean }) {
+/* ──────────────────────────────────────────────────────────────────────────
+   PixelAccordion — list of expandable items.
+   ────────────────────────────────────────────────────────────────────────── */
+
+export function PixelAccordion({
+  items,
+  allowMultiple = false,
+  surface: surfaceProp,
+}: {
+  items: AccordionItem[];
+  allowMultiple?: boolean;
+  surface?: Surface;
+}) {
+  const surface = useEffectiveSurface(surfaceProp);
+  const s = surfaceClasses(surface);
   const [openIds, setOpenIds] = useState<Set<string>>(new Set(items[0] ? [items[0].id] : []));
 
   const toggle = (id: string) => {
     setOpenIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
+      if (next.has(id)) next.delete(id);
+      else {
         if (!allowMultiple) next.clear();
         next.add(id);
       }
@@ -61,11 +89,11 @@ export function PixelAccordion({ items, allowMultiple = false }: { items: Accord
       {items.map((item) => {
         const isOpen = openIds.has(item.id);
         return (
-          <div key={item.id} className="rounded-md border border-retro-border/40 bg-retro-surface/40">
+          <div key={item.id} className={cn('bg-retro-surface/40', s.border, s.radius, 'border-retro-border/40')}>
             <button
               type="button"
               aria-expanded={isOpen}
-              className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm font-mono text-retro-text outline-none"
+              className={cn('flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-retro-text outline-none', s.font)}
               onClick={() => toggle(item.id)}
             >
               <span>{item.title}</span>
@@ -83,23 +111,35 @@ export function PixelAccordion({ items, allowMultiple = false }: { items: Accord
   );
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   PixelBreadcrumb — trail with pixel chevron separators.
+   ────────────────────────────────────────────────────────────────────────── */
+
 export function PixelBreadcrumb({
   items,
+  surface: surfaceProp,
 }: {
   items: Array<{ label: string; href?: string; onClick?: () => void; active?: boolean }>;
+  surface?: Surface;
 }) {
+  const surface = useEffectiveSurface(surfaceProp);
+  const s = surfaceClasses(surface);
   return (
-    <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 font-mono text-xs">
+    <nav aria-label="Breadcrumb" className={cn('flex items-center gap-1.5 text-xs', s.font)}>
       {items.map((item, idx) => (
         <React.Fragment key={idx}>
           {idx > 0 && (
-            <svg viewBox="0 0 8 8" className="h-2 w-2 shrink-0 text-retro-border" shapeRendering="crispEdges" fill="currentColor">
-              <rect x="2" y="1" width="1" height="1" />
-              <rect x="3" y="2" width="1" height="1" />
-              <rect x="4" y="3" width="2" height="1" />
-              <rect x="3" y="5" width="1" height="1" />
-              <rect x="2" y="6" width="1" height="1" />
-            </svg>
+            surface === 'pixel' ? (
+              <svg viewBox="0 0 8 8" className="h-2 w-2 shrink-0 text-retro-border" shapeRendering="crispEdges" fill="currentColor" preserveAspectRatio="xMidYMid meet" style={{ display: 'inline-block', verticalAlign: 'middle', overflow: 'visible' }}>
+                <rect x="2" y="1" width="1" height="1" />
+                <rect x="3" y="2" width="1" height="1" />
+                <rect x="4" y="3" width="2" height="1" />
+                <rect x="3" y="5" width="1" height="1" />
+                <rect x="2" y="6" width="1" height="1" />
+              </svg>
+            ) : (
+              <span aria-hidden className="text-retro-border">/</span>
+            )
           )}
           {item.active ? (
             <span className="text-retro-text font-medium">{item.label}</span>
@@ -120,16 +160,25 @@ export function PixelBreadcrumb({
   );
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+   PixelPagination — chunky page-number buttons.
+   ────────────────────────────────────────────────────────────────────────── */
+
 export function PixelPagination({
   page,
   total,
   onChange,
+  surface: surfaceProp,
 }: {
   page: number;
   total: number;
   onChange: (next: number) => void;
+  surface?: Surface;
 }) {
+  const surface = useEffectiveSurface(surfaceProp);
+  const s = surfaceClasses(surface);
   const pages = Array.from({ length: total }, (_, idx) => idx + 1);
+  const baseBtn = cn('h-8 text-xs transition-colors', s.font, s.border, s.radius);
   return (
     <nav aria-label="Pagination" className="inline-flex items-center gap-1">
       <button
@@ -137,7 +186,7 @@ export function PixelPagination({
         disabled={page <= 1}
         onClick={() => onChange(Math.max(1, page - 1))}
         className={cn(
-          'inline-flex h-8 items-center rounded-md border px-2.5 text-xs font-mono transition-colors',
+          baseBtn, 'inline-flex items-center px-2.5',
           page <= 1 ? 'opacity-50 cursor-not-allowed border-retro-border text-retro-muted' : 'border-retro-border text-retro-muted hover:bg-retro-surface hover:text-retro-text',
         )}
       >
@@ -149,7 +198,7 @@ export function PixelPagination({
           type="button"
           aria-current={p === page ? 'page' : undefined}
           className={cn(
-            'h-8 w-8 rounded-md border text-xs font-mono transition-colors',
+            baseBtn, 'w-8',
             p === page
               ? 'border-retro-green/50 bg-retro-green/10 text-retro-green'
               : 'border-retro-border text-retro-muted hover:bg-retro-surface hover:text-retro-text',
@@ -164,7 +213,7 @@ export function PixelPagination({
         disabled={page >= total}
         onClick={() => onChange(Math.min(total, page + 1))}
         className={cn(
-          'inline-flex h-8 items-center rounded-md border px-2.5 text-xs font-mono transition-colors',
+          baseBtn, 'inline-flex items-center px-2.5',
           page >= total ? 'opacity-50 cursor-not-allowed border-retro-border text-retro-muted' : 'border-retro-border text-retro-muted hover:bg-retro-surface hover:text-retro-text',
         )}
       >
@@ -173,4 +222,3 @@ export function PixelPagination({
     </nav>
   );
 }
-

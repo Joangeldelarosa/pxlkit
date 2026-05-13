@@ -128,8 +128,9 @@ describe('PixelDivider with Turkish locale', () => {
     expect(span).not.toBeNull();
     // The span should have the CSS 'uppercase' class (Tailwind)
     expect(span!.className).toContain('uppercase');
-    // Text content is the raw label — CSS handles visual uppercasing
-    expect(span!.textContent).toBe('bilgi');
+    // Pixel surface wraps the label with ◆ ornaments — assert the raw label
+    // is contained rather than checking strict equality.
+    expect(span!.textContent).toContain('bilgi');
   });
 
   it('inherits lang="tr" from the provider wrapper div', () => {
@@ -143,7 +144,8 @@ describe('PixelDivider with Turkish locale', () => {
     expect(langDiv).not.toBeNull();
     const span = langDiv!.querySelector('span');
     expect(span).not.toBeNull();
-    expect(span!.textContent).toBe('işlem');
+    // Pixel surface decorates the label with ◆ ornaments — contain, not equal.
+    expect(span!.textContent).toContain('işlem');
   });
 
   it('renders without label (just an hr)', () => {
