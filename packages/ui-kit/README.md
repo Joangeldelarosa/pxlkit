@@ -6,13 +6,13 @@
 
 <p align="center">
   <strong>Retro pixel art UI kit and React components for Pxlkit.</strong><br/>
-  40+ styled React components with pixel art aesthetics — buttons, inputs, modals, toasts, animations, parallax effects, and full locale support.
+  54 styled React components with pixel art aesthetics — buttons, inputs, modals, toasts, animations, parallax effects, and full locale support.
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@pxlkit/ui-kit"><img src="https://img.shields.io/npm/v/@pxlkit/ui-kit?color=blue" alt="npm version" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE-CODE"><img src="https://img.shields.io/badge/license-MIT-22c55e.svg" alt="MIT License" /></a>
-  <img src="https://img.shields.io/badge/components-40%2B-FFD700?style=flat" alt="40+ components" />
+  <img src="https://img.shields.io/badge/components-54-FFD700?style=flat" alt="54 components" />
   <img src="https://img.shields.io/badge/react-%E2%89%A518-61DAFB?logo=react&logoColor=white" alt="React ≥18" />
 </p>
 
@@ -20,7 +20,7 @@
 
 ## Overview
 
-`@pxlkit/ui-kit` is a comprehensive React component library in the [Pxlkit](https://pxlkit.xyz) ecosystem, providing **40+ retro pixel art styled components** for building modern web applications with a nostalgic aesthetic. Every component follows a consistent pixel art design language with customizable color tones.
+`@pxlkit/ui-kit` is a comprehensive React component library in the [Pxlkit](https://pxlkit.xyz) ecosystem, providing **54 retro pixel art styled components** for building modern web applications with a nostalgic aesthetic. Every component follows a consistent pixel art design language with customizable color tones.
 
 ## Installation
 
@@ -53,6 +53,33 @@ function App() {
   );
 }
 ```
+
+## Surface system — pixel ↔ linear
+
+Every visible component accepts a `surface?: 'pixel' | 'linear'` prop that switches the aesthetic:
+
+- **`pixel`** *(default)* — chunky 2px borders, sharp staircase pixel corners (via clip-path), offset block shadow with no blur, mono/pixel typography. The signature retro identity.
+- **`linear`** — soft 1px borders, gentle rounded corners, blurred drop shadows, sans typography. Same API, modern aesthetic.
+
+Switch one component:
+
+```tsx
+<PixelButton surface="linear">Looks modern</PixelButton>
+```
+
+Switch a whole subtree via provider:
+
+```tsx
+import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+<PxlKitSurfaceProvider surface="linear">
+  {/* every nested Pxlkit component inherits surface="linear" */}
+</PxlKitSurfaceProvider>
+```
+
+## Tone system
+
+Components accept `tone?: 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'`. Tones map to design-token colours that respect the active theme (light/dark) and the `--retro-*` CSS variables — override any variable on `:root` or `.dark` to reskin every component.
 
 ## Components
 
@@ -166,17 +193,16 @@ function App() {
 | `PXLKIT_FONTS` | Font configuration for Press Start 2P, Inter, JetBrains Mono |
 | `TURKISH_CHARACTERS` | Turkish character mapping reference |
 
-## Color Tones
+## Storybook
 
-All components support a `tone` prop for consistent color theming:
+Every one of the 54 components is individually documented at **[storybook.pxlkit.xyz](https://storybook.pxlkit.xyz)** under the `UI Kit / *` sidebar. Each story has a Controls panel for live prop manipulation:
 
-```tsx
-<PixelButton tone="green">Success</PixelButton>
-<PixelButton tone="red">Danger</PixelButton>
-<PixelButton tone="cyan">Info</PixelButton>
-<PixelButton tone="yellow">Warning</PixelButton>
-<PixelButton tone="neutral">Default</PixelButton>
-```
+- Surface toggle (pixel ↔ linear) on every component
+- Tone selector (7 tones)
+- Size selector (sm / md / lg)
+- Disabled / loading / variant states
+- Real animated `@pxlkit` icons in slots
+- Side-by-side surface comparison: `Foundations / Surface / Side By Side`
 
 ## Turkish Locale Support
 

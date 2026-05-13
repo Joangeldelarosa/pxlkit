@@ -47,15 +47,28 @@ npm install @pxlkit/core
 import { PxlKitIcon } from '@pxlkit/core';
 import { Trophy } from '@pxlkit/gamification';
 
-// Monochrome — inherits text color
+// Default — original artwork palette
 <PxlKitIcon icon={Trophy} size={32} />
 
-// Full color — renders with original palette
-<PxlKitIcon icon={Trophy} size={48} colorful />
+// Tinted — preserves detail (highlights/shadows) while shifting hue
+<PxlKitIcon icon={Trophy} size={32} appearance="tinted" color="#FF4D4D" />
 
-// Custom monochrome color
-<PxlKitIcon icon={Trophy} size={32} color="#E74C3C" />
+// Solid — flatten every pixel to one colour
+<PxlKitIcon icon={Trophy} size={32} appearance="solid" color="#FFFFFF" />
 ```
+
+Icons render as `<img>` elements backed by inline SVG data URIs with `image-rendering: pixelated` — every source pixel is preserved at every visual size, no edge dropouts at non-integer scales (e.g. `size={14}` from a 16-grid icon renders pixel-perfect).
+
+### Colour mode contract
+
+| `appearance` | When to use | Result |
+| --- | --- | --- |
+| `"palette"` *(default)* | Decorative icons that should read as drawn | Full original palette |
+| `"tinted"` + `color` | Match a UI tone without losing detail | Palette tinted via SVG `feBlend mode="color"` — preserves luminance |
+| `"solid"` + `color` | Chrome glyphs that need flat fill | Every non-transparent pixel = `color` |
+| `"solid"` *(no color)* | (legacy) inheriting text colour | `#FFFFFF` fallback — pass an explicit `color` for solid mode inside `<img>` since `currentColor` isn't honoured in isolated img contexts |
+
+> **Migration from v1.2.x**: the boolean `colorful`, `solid`, and `tint` props are accepted as `@deprecated` aliases that map to the new `appearance`. Existing code keeps working; new code should use `appearance` + `color`.
 
 ### Animated Icons
 
@@ -63,14 +76,14 @@ import { Trophy } from '@pxlkit/gamification';
 import { AnimatedPxlKitIcon } from '@pxlkit/core';
 import { FireSword } from '@pxlkit/gamification';
 
-// Auto-playing loop
-<AnimatedPxlKitIcon icon={FireSword} size={48} colorful />
+// Auto-playing loop (default — full palette)
+<AnimatedPxlKitIcon icon={FireSword} size={48} />
 
 // Play on hover only
-<AnimatedPxlKitIcon icon={FireSword} size={48} colorful trigger="hover" />
+<AnimatedPxlKitIcon icon={FireSword} size={48} trigger="hover" />
 
-// Half speed
-<AnimatedPxlKitIcon icon={FireSword} size={48} colorful speed={0.5} />
+// Half speed + tinted to match a tone
+<AnimatedPxlKitIcon icon={FireSword} size={48} speed={0.5} appearance="tinted" color="#8237C8" />
 ```
 
 ### Parallax 3D Icons
@@ -80,7 +93,7 @@ import { ParallaxPxlKitIcon } from '@pxlkit/core';
 import { CoolEmoji } from '@pxlkit/parallax';
 
 // Interactive parallax — layers move with mouse
-<ParallaxPxlKitIcon icon={CoolEmoji} size={64} colorful />
+<ParallaxPxlKitIcon icon={CoolEmoji} size={64} />
 
 // Custom depth strength and perspective
 <ParallaxPxlKitIcon icon={CoolEmoji} size={96} strength={24} perspective={300} />
@@ -102,6 +115,10 @@ import { CheckCircle } from '@pxlkit/feedback';
   duration={3000}
 />
 ```
+
+## Storybook
+
+Explore every component and prop live: **[storybook.pxlkit.xyz](https://storybook.pxlkit.xyz)** — the `Core/` section has stories for `PxlKitIcon`, `AnimatedPxlKitIcon` (all 5 triggers), and `PixelToast` (every tone + position). The `Core / PxlKitIcon / Tint vs Solid — side by side` story is the clearest demo of how tinting preserves detail vs flattening to one colour.
 
 ## React Components
 
@@ -212,7 +229,7 @@ export const Trophy: PxlKitData = {
 | [`@pxlkit/ui`](https://www.npmjs.com/package/@pxlkit/ui) | 41 icons — interface controls, navigation |
 | [`@pxlkit/effects`](https://www.npmjs.com/package/@pxlkit/effects) | 12 animated VFX icons |
 | [`@pxlkit/parallax`](https://www.npmjs.com/package/@pxlkit/parallax) | 10 multi-layer 3D parallax icons |
-| [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | 40+ retro React UI components |
+| [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | 54 retro React UI components |
 
 ## Documentation
 
