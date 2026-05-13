@@ -231,11 +231,112 @@
  * Retro pixel-art utility classes for borders, shadows, and FX.
  * ──────────────────────────────────────────────────────────── */
 @layer utilities {
+  /*
+   * Pixel-art staircase corners — the signature look.
+   * Each corner is a single-step cut so the silhouette reads as a chunky
+   * octagonal pixel shape instead of a smooth curve. Use `filter: drop-shadow`
+   * (via .pxl-shadow) instead of box-shadow so the offset shadow follows the
+   * staircase silhouette rather than the original square.
+   */
+  .pxl-corner-sm {
+    /* 2px corner cut — buttons, inputs, chips, badges */
+    clip-path: polygon(
+      2px 0,
+      calc(100% - 2px) 0,
+      calc(100% - 2px) 2px,
+      100% 2px,
+      100% calc(100% - 2px),
+      calc(100% - 2px) calc(100% - 2px),
+      calc(100% - 2px) 100%,
+      2px 100%,
+      2px calc(100% - 2px),
+      0 calc(100% - 2px),
+      0 2px,
+      2px 2px
+    );
+  }
+  .pxl-corner-md {
+    /* 4px corner cut — cards, alerts, sections */
+    clip-path: polygon(
+      4px 0,
+      calc(100% - 4px) 0,
+      calc(100% - 4px) 2px,
+      calc(100% - 2px) 2px,
+      calc(100% - 2px) 4px,
+      100% 4px,
+      100% calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 2px),
+      calc(100% - 4px) 100%,
+      4px 100%,
+      4px calc(100% - 2px),
+      2px calc(100% - 2px),
+      2px calc(100% - 4px),
+      0 calc(100% - 4px),
+      0 4px,
+      2px 4px,
+      2px 2px,
+      4px 2px
+    );
+  }
+  .pxl-corner-lg {
+    /* 6px two-step corner — modals, panels */
+    clip-path: polygon(
+      6px 0,
+      calc(100% - 6px) 0,
+      calc(100% - 6px) 2px,
+      calc(100% - 4px) 2px,
+      calc(100% - 4px) 4px,
+      calc(100% - 2px) 4px,
+      calc(100% - 2px) 6px,
+      100% 6px,
+      100% calc(100% - 6px),
+      calc(100% - 2px) calc(100% - 6px),
+      calc(100% - 2px) calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 4px) calc(100% - 2px),
+      calc(100% - 6px) calc(100% - 2px),
+      calc(100% - 6px) 100%,
+      6px 100%,
+      6px calc(100% - 2px),
+      4px calc(100% - 2px),
+      4px calc(100% - 4px),
+      2px calc(100% - 4px),
+      2px calc(100% - 6px),
+      0 calc(100% - 6px),
+      0 6px,
+      2px 6px,
+      2px 4px,
+      4px 4px,
+      4px 2px,
+      6px 2px
+    );
+  }
+
+  /*
+   * Pixel-art offset shadows — drop-shadow follows clip-path silhouette,
+   * so the shadow itself is also staircased. This is the secret to the
+   * iconic Game-Boy / Windows-95 chunky button look.
+   */
+  .pxl-shadow {
+    filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 0.25));
+  }
+  .pxl-shadow-hover:hover {
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.25));
+    transform: translate(1px, 1px);
+  }
+  .pxl-shadow-active:active {
+    filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.25));
+    transform: translate(2px, 2px);
+  }
+
+  /* Legacy compat (kept for any old consumers) */
   .pixel-corners {
     clip-path: polygon(
-      4px 0, calc(100% - 4px) 0, 
-      100% 4px, 100% calc(100% - 4px), 
-      calc(100% - 4px) 100%, 4px 100%, 
+      4px 0, calc(100% - 4px) 0,
+      100% 4px, 100% calc(100% - 4px),
+      calc(100% - 4px) 100%, 4px 100%,
       0 calc(100% - 4px), 0 4px
     );
   }
