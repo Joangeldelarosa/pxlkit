@@ -23,3 +23,12 @@ playwright-report/
 playwright/.cache/
 # Local tooling
 .claude/
+.agents/
+# Internal planning / working docs (not part of the public package)
+docs/superpowers/
+CLAUDE.md
+AUDIT.md
+AUDIT-COHERENCE.md
+AUDIT-FOLLOWUP.md
+AUDIT-STORYBOOK.md
+STORYBOOK_DEPLOY.md
