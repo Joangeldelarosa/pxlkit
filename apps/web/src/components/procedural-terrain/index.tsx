@@ -75,6 +75,17 @@ import { SettingsPanel } from './ui/SettingsPanel';
 import { GameHUD } from './ui/GameHUD';
 import { FullscreenMap } from './ui/FullscreenMap';
 
+/* ── Debug subsystem (Phase 2) ── */
+import {
+  DebugController,
+  DebugScene,
+  CameraBridge,
+  parseDebugUrlParams,
+  findTeleportTarget,
+} from './debug';
+import type { CameraBridgeApi, OverlayKind } from './debug';
+import type { TerrainSamplerInputs } from './utils/terrain-sampler';
+
 /* ═══════════════════════════════════════════════════════════════
  *  Initialize Pickup Icons
  * ═══════════════════════════════════════════════════════════════ */
@@ -409,11 +420,13 @@ function ChunkManagerWithCounter({ seed, config, onChunkCount, chunkCacheRef }: 
  * ═══════════════════════════════════════════════════════════════ */
 
 export default function ProceduralTerrain() {
-  /* ── Restore from URL query params first, then localStorage, then defaults ── */
-  const urlScene = useMemo(() => {
+  /* ── Parse URL params (extended for debug mode) once on mount ── */
+  const urlParams = useMemo(() => {
     if (typeof window === 'undefined') return null;
-    return decodeSceneFromURL();
+    return parseDebugUrlParams();
   }, []);
+  const urlScene = urlParams?.scene ?? null;
+
   const savedWorld = useMemo(() => {
     if (urlScene) return null; // URL takes precedence
     if (typeof window === 'undefined') return null;
@@ -428,8 +441,22 @@ export default function ProceduralTerrain() {
   const initPos = urlScene?.pos ?? savedWorld?.pos ?? undefined;
   const initRot = urlScene?.rot ?? savedWorld?.rot ?? undefined;
 
+  /* ── Debug mode: enabled via ?debug=1 OR non-production builds ── */
+  const debugEnabled = (urlParams?.debug ?? false)
+    || (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production');
+
   const [seed, setSeed] = useState(initSeed);
-  const [config, setConfig] = useState<WorldConfig>(savedConfig ?? DEFAULT_CONFIG);
+  const [config, setConfig] = useState<WorldConfig>(() => {
+    const base = savedConfig ?? DEFAULT_CONFIG;
+    if (!urlParams) return base;
+    // Apply URL overrides on top of saved/defaults
+    return {
+      ...base,
+      ...(urlParams.worldMode ? { worldMode: urlParams.worldMode } : {}),
+      ...(urlParams.renderDistance != null ? { renderDistance: urlParams.renderDistance } : {}),
+      ...(urlParams.boatDensity != null ? { boatDensity: urlParams.boatDensity } : {}),
+    };
+  });
   const [isLocked, setIsLocked] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
@@ -472,6 +499,73 @@ export default function ProceduralTerrain() {
     biome: createNoise2D(seed + 2), temp: createNoise2D(seed + 3),
     continent: createNoise2D(seed + 7),
   }), [seed]);
+
+  /* ── Terrain sampler for debug subsystem (Phase 2) ──
+   *  Pure-noise queries for biome/height/water at any (wx, wz). The
+   *  sampler is rebuilt whenever seed or relevant config knobs change
+   *  so debug queries always reflect the live world. */
+  const debugSampler = useMemo<TerrainSamplerInputs>(() => ({
+    heightN: createNoise2D(seed),
+    detailN: createNoise2D(seed + 1),
+    biomeN: noises.biome,
+    tempN: noises.temp,
+    regionN: createNoise2D(seed + 6),
+    continentN: noises.continent,
+    cfg: config,
+  }), [seed, config, noises.biome, noises.temp, noises.continent]);
+
+  /* ── Debug overlay state (mirrored from DebugController) ── */
+  const [debugOverlays, setDebugOverlays] = useState<Record<OverlayKind, boolean>>({
+    grid: false, biome: false, highway: false, tunnel: false,
+    bridge: false, water: false, boats: false,
+  });
+
+  /* ── Camera bridge (filled by <CameraBridge> inside Canvas) ── */
+  const cameraApiRef = useRef<CameraBridgeApi | null>(null);
+  const getCameraSnapshot = useCallback(() => {
+    const api = cameraApiRef.current;
+    if (api) return api.getCamera();
+    return {
+      position: [0, 12, 20] as [number, number, number],
+      rotation: [0, 0, 0] as [number, number, number],
+    };
+  }, []);
+  const teleportCamera = useCallback((wx: number, worldY: number, wz: number) => {
+    cameraApiRef.current?.teleport(wx, worldY, wz);
+  }, []);
+
+  /* ── Auto-teleport from ?teleport=X URL param ── */
+  const teleportApplied = useRef(false);
+  useEffect(() => {
+    if (teleportApplied.current) return;
+    if (!urlParams?.teleport || !cameraApiRef.current) return;
+    const camWx = getCameraSnapshot().position[0] / VOXEL_SIZE;
+    const camWz = getCameraSnapshot().position[2] / VOXEL_SIZE;
+    const result = findTeleportTarget(debugSampler, camWx, camWz, urlParams.teleport);
+    if (result) {
+      teleportCamera(result.wx * VOXEL_SIZE, result.worldY, result.wz * VOXEL_SIZE);
+      teleportApplied.current = true;
+    }
+  // Re-attempts each frame until cameraApiRef is filled.
+  // We poll via short interval rather than tying to a frame loop here.
+  });
+
+  useEffect(() => {
+    if (!urlParams?.teleport) return;
+    const id = setInterval(() => {
+      if (teleportApplied.current) { clearInterval(id); return; }
+      if (!cameraApiRef.current) return;
+      const camWx = getCameraSnapshot().position[0] / VOXEL_SIZE;
+      const camWz = getCameraSnapshot().position[2] / VOXEL_SIZE;
+      const result = findTeleportTarget(debugSampler, camWx, camWz, urlParams.teleport!);
+      if (result) {
+        teleportCamera(result.wx * VOXEL_SIZE, result.worldY, result.wz * VOXEL_SIZE);
+        teleportApplied.current = true;
+        clearInterval(id);
+      }
+    }, 100);
+    return () => clearInterval(id);
+  }, [urlParams?.teleport, debugSampler, getCameraSnapshot, teleportCamera]);
 
   useEffect(() => { speedRef.current = config.flySpeed; }, [config.flySpeed]);
 
@@ -823,9 +917,70 @@ export default function ProceduralTerrain() {
           <GroundCritters biome={currentBiome} npcDensity={config.npcDensity} npcDistance={config.npcDistance} npcScale={config.npcScale} npcMaxPerChunk={config.npcMaxPerChunk} chunkCacheRef={chunkCacheRef} />
           <NightWindowLights chunkCacheRef={chunkCacheRef} windowLitProbability={config.windowLitProbability} lightDistance={Math.min(config.lightDistance, config.renderDistance)} lightFadeStart={config.lightFadeStart} lampBrightness={config.lampBrightness} lampColorTemp={config.lampColorTemp} />
           <WaterBoats chunkCacheRef={chunkCacheRef} boatDensity={config.boatDensity} boatDistance={Math.min(config.boatDistance, config.renderDistance)} />
+          {debugEnabled && <CameraBridge apiRef={cameraApiRef} />}
+          {debugEnabled && (
+            <DebugSceneWithCache
+              chunkCacheRef={chunkCacheRef}
+              overlays={debugOverlays}
+            />
+          )}
           </TimeContext.Provider>
         </Canvas>
       </div>
+
+      {/* ── Debug controller (DOM panel) — mounted only when debug mode active ── */}
+      {debugEnabled && (
+        <DebugController
+          enabled={debugEnabled}
+          initialOverlays={urlParams?.overlays ?? []}
+          chunkCacheRef={chunkCacheRef}
+          seed={seed}
+          setSeed={setSeed}
+          getCamera={getCameraSnapshot}
+          teleport={teleportCamera}
+          config={config}
+          setConfig={setConfig}
+          sampler={debugSampler}
+          isLocked={isLocked}
+          onOverlaysChange={setDebugOverlays}
+          dismissWelcome={() => {
+            setShowControls(false);
+            setShowSettings(false);
+            setIsLocked(true);
+          }}
+        />
+      )}
     </div>
   );
+}
+
+/* ── Helper: passes a live Map snapshot to DebugScene every frame ──
+ *  ChunkCache is a ref, so we read its current value via useFrame
+ *  rather than holding stale state. */
+function DebugSceneWithCache({
+  chunkCacheRef,
+  overlays,
+}: {
+  chunkCacheRef: React.RefObject<Map<string, ChunkVoxelData>>;
+  overlays: Record<OverlayKind, boolean>;
+}) {
+  const [snapshot, setSnapshot] = useState<Map<string, ChunkVoxelData>>(new Map());
+  const anyOn = Object.values(overlays).some(Boolean);
+
+  // Refresh snapshot 4× per second when overlays are on
+  useEffect(() => {
+    if (!anyOn) {
+      if (snapshot.size > 0) setSnapshot(new Map());
+      return;
+    }
+    const id = setInterval(() => {
+      const cache = chunkCacheRef.current;
+      if (cache) setSnapshot(new Map(cache));
+    }, 250);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [anyOn]);
+
+  if (!anyOn) return null;
+  return <DebugScene chunks={snapshot} overlays={overlays} />;
 }

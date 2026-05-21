@@ -19,6 +19,7 @@ import * as THREE from 'three';
 import type { ChunkVoxelData } from '../types';
 import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
 import { getPickupIcons } from '../generation/chunk';
+import { getWedgeGeometry, WEDGE_META_VALUES } from './wedge-geometry';
 
 /* ── Shared geometry (reused across all chunks) ── */
 const sharedGeo = new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE);
@@ -68,6 +69,12 @@ export function ChunkMesh({
   const waterRef = useRef<THREE.InstancedMesh>(null);
   const miniRef  = useRef<THREE.InstancedMesh>(null);
   const paintRef = useRef<THREE.InstancedMesh>(null);
+  /* 4 wedge layers (one per descent direction +X / -X / +Z / -Z) so
+     per-instance work is just position + colour. */
+  const wedgeXPosRef = useRef<THREE.InstancedMesh>(null);
+  const wedgeXNegRef = useRef<THREE.InstancedMesh>(null);
+  const wedgeZPosRef = useRef<THREE.InstancedMesh>(null);
+  const wedgeZNegRef = useRef<THREE.InstancedMesh>(null);
   const groupRef = useRef<THREE.Group>(null);
 
   /* Per-chunk materials — cloned from templates, disposed on unmount.
@@ -142,6 +149,36 @@ export function ChunkMesh({
       }
       miniMesh.instanceMatrix.needsUpdate = true;
       if (miniMesh.instanceColor) miniMesh.instanceColor.needsUpdate = true;
+    }
+
+    /* Slope ramp wedges (Phase 4.1) — partition by meta into 4 layers */
+    if (data.rampCount > 0) {
+      const counts = { [+1]: 0, [-1]: 0, [+2]: 0, [-2]: 0 } as Record<number, number>;
+      const refs: Record<number, React.RefObject<THREE.InstancedMesh | null>> = {
+        [+1]: wedgeXPosRef, [-1]: wedgeXNegRef,
+        [+2]: wedgeZPosRef, [-2]: wedgeZNegRef,
+      };
+      for (let i = 0; i < data.rampCount; i++) {
+        const meta = data.rampMeta[i];
+        const mesh = refs[meta]?.current;
+        if (!mesh) continue;
+        const slot = counts[meta]++;
+        const i3 = i * 3;
+        tmpM.identity();
+        tmpM.elements[12] = data.rampPositions[i3];
+        tmpM.elements[13] = data.rampPositions[i3 + 1];
+        tmpM.elements[14] = data.rampPositions[i3 + 2];
+        mesh.setMatrixAt(slot, tmpM);
+        tmpC.setRGB(data.rampColors[i3], data.rampColors[i3 + 1], data.rampColors[i3 + 2]);
+        mesh.setColorAt(slot, tmpC);
+      }
+      for (const meta of WEDGE_META_VALUES) {
+        const mesh = refs[meta]?.current;
+        if (!mesh) continue;
+        mesh.count = counts[meta];
+        mesh.instanceMatrix.needsUpdate = true;
+        if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      }
     }
 
     /* Road paint decals */
@@ -220,6 +257,18 @@ export function ChunkMesh({
       {data.waterCount > 0 && <instancedMesh ref={waterRef} args={[sharedWaterGeo, mats.water, data.waterCount]} frustumCulled={false} />}
       {data.miniVoxelCount > 0 && <instancedMesh ref={miniRef} args={[miniGeo, mats.mini, data.miniVoxelCount]} frustumCulled={false} />}
       {data.paintCount > 0 && <instancedMesh ref={paintRef} args={[paintGeo, mats.paint, data.paintCount]} frustumCulled={false} />}
+      {/* Slope ramp wedges — 4 directional layers. We allocate the max
+          possible count for each layer (data.rampCount) so the buffer
+          can hold any partition; the actual `.count` is set during
+          useLayoutEffect to the per-direction tally. */}
+      {data.rampCount > 0 && (
+        <>
+          <instancedMesh ref={wedgeXPosRef} args={[getWedgeGeometry(+1), mats.solid, data.rampCount]} frustumCulled={false} />
+          <instancedMesh ref={wedgeXNegRef} args={[getWedgeGeometry(-1), mats.solid, data.rampCount]} frustumCulled={false} />
+          <instancedMesh ref={wedgeZPosRef} args={[getWedgeGeometry(+2), mats.solid, data.rampCount]} frustumCulled={false} />
+          <instancedMesh ref={wedgeZNegRef} args={[getWedgeGeometry(-2), mats.solid, data.rampCount]} frustumCulled={false} />
+        </>
+      )}
     </group>
   );
 }

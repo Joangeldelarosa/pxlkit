@@ -300,6 +300,43 @@ export interface ChunkVoxelData {
   paintScales: Float32Array;
   /** Number of road paint instances */
   paintCount: number;
+  /* ── Slope ramps (Phase 4.1) ──
+   *  When adjacent road/terrain cells differ by 1 voxel in height we
+   *  render a tilted plane bridging the gap instead of leaving a
+   *  visible stair-step. Each ramp instance is encoded as: anchor
+   *  position (centre of ramp in world units), top-surface RGB, and
+   *  a packed axis/direction metadata byte.
+   *
+   *  Meta encoding (one signed byte per ramp):
+   *     +1 = descent along +X
+   *     -1 = descent along -X
+   *     +2 = descent along +Z
+   *     -2 = descent along -Z
+   */
+  /**
+   *  RAMPS are triangular-prism wedges that REPLACE the top voxel of
+   *  a road/sidewalk/highway cell on a 1-voxel slope. Each instance is
+   *  centred at the cell's footprint with Y = topVoxelY (the centre of
+   *  the cube it replaces) and the wedge geometry has the descent
+   *  built in via per-direction baked rotation.
+   *
+   *  Meta byte sign packs the direction:
+   *    +1 / -1 = descent along ±X
+   *    +2 / -2 = descent along ±Z
+   *  We render with 4 separate InstancedMesh layers (one per direction)
+   *  to keep per-instance work to position + color only.
+   *
+   *  Materials eligible for ramps (Phase 4.1 conservative scope):
+   *    - Highway road surface (inter-biome highways: rural/standard/autopista)
+   *    - City road / sidewalk
+   *    - Tunnel interior road
+   *  NOT eligible: terrain tops, mountain rock, water, buildings,
+   *  bridges, structures.
+   */
+  rampPositions: Float32Array;
+  rampColors: Float32Array;
+  rampMeta: Int8Array;
+  rampCount: number;
   chunkX: number;
   chunkZ: number;
   /** Dominant biome type name for this chunk (used by minimap) */

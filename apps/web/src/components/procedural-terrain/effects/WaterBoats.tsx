@@ -265,16 +265,19 @@ export function WaterBoats({
     if (boatDensity > 0 && t - lastSpawnCheck.current > SPAWN_CHECK_INTERVAL && boats.length < maxBoats) {
       lastSpawnCheck.current = t;
 
-      // Try random positions around camera to find deep water
+      // Try random positions around camera to find deep water.
+      // NOTE: `dist` is already in world units — `spawnRadius` contains
+      // CHUNK_SIZE × VOXEL_SIZE. Multiplying by VOXEL_SIZE again would
+      // collapse spawns to half-radius (the long-standing bug).
       for (let attempt = 0; attempt < 12; attempt++) {
         const angle = pseudoRand(t * 100 + attempt, camX * 0.1) * Math.PI * 2;
         const dist = spawnRadius * 0.4 + pseudoRand(t * 50 + attempt, camZ * 0.1) * spawnRadius * 0.6;
-        const sx = camX + Math.cos(angle) * dist * VOXEL_SIZE;
-        const sz = camZ + Math.sin(angle) * dist * VOXEL_SIZE;
+        const sx = camX + Math.cos(angle) * dist;
+        const sz = camZ + Math.sin(angle) * dist;
 
         const spawnInfo = sampleWaterInfo(cache, sx, sz);
         if (spawnInfo.depth >= MIN_WATER_DEPTH) {
-          // Also check surrounding area for navigability
+          // Also check surrounding area for navigability (3 voxels ahead)
           const aheadInfo = sampleWaterInfo(cache, sx + Math.cos(angle) * 3 * VOXEL_SIZE, sz + Math.sin(angle) * 3 * VOXEL_SIZE);
           if (aheadInfo.depth >= MIN_WATER_DEPTH) {
             boats.push({

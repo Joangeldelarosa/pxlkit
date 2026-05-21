@@ -17,3 +17,9 @@ Thumbs.db
 yarn-error.log
 coverage/
 storybook-static/
+# Test artifacts
+test-results/
+playwright-report/
+playwright/.cache/
+# Local tooling
+.claude/

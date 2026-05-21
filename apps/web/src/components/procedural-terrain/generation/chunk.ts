@@ -17,6 +17,12 @@ import { mulberry32, fbm } from '../utils/noise';
 import { varyColor, hashCoord } from '../utils/color';
 import { getBiome, getVariedBiome, getContinent, getContinentElevation } from '../utils/biomes';
 import { classifyCityCell, getBuildingType, getBuildingHeight, getSectorLampColors, getInterHighwayInfo, getHighwayFurniture, TUNNEL_HEIGHT } from '../city/layout';
+import type { TerrainSamplerInputs } from '../utils/terrain-sampler';
+import { isTunnelAt, allowsTunnelInBiome, TUNNEL_TRIGGER_DELTA, computeRoadLevelAt } from '../utils/highway-geom';
+import { emitRampsForChunk } from './ramps';
+import { detectBridgeSpans, shouldPlacePillar, findSpanAt } from './bridges';
+import type { BridgeSpan } from './bridges';
+import { emitCascades } from './cascades';
 import { generateBuildingColumn } from '../city/buildings';
 import type { PxlKitData } from '@pxlkit/core';
 
@@ -106,8 +112,38 @@ export function generateChunkData(
   const paintColA = new Float32Array(maxPaint * 3);
   const paintScaleA = new Float32Array(maxPaint * 2); // [scaleX, scaleZ] per instance
   let paintC = 0;
+  /* ── Slope ramp buffers (Phase 4.1) ──
+     One ramp per road cell at most → CHUNK_SIZE² is the upper bound.
+     Tracks the road surface Y per cell (+1 border to enable cross-chunk
+     ramp detection) and the road's TOP-FACE colour. */
+  const maxRamps = CHUNK_SIZE * CHUNK_SIZE;
+  const rampPosA = new Float32Array(maxRamps * 3);
+  const rampColA = new Float32Array(maxRamps * 3);
+  const rampMetaA = new Int8Array(maxRamps);
+  const roadHeightMap = new Int32Array((CHUNK_SIZE + 2) * (CHUNK_SIZE + 2)).fill(-1);
+  const roadColorMap = new Float32Array(CHUNK_SIZE * CHUNK_SIZE * 3);
+  /** 1 if this cell's top voxel should NOT be emitted (replaced by wedge) */
+  const skipTopMap = new Uint8Array(CHUNK_SIZE * CHUNK_SIZE);
+
+  /** Mark a cell as carrying a road surface at the given top Y with the given colour. */
+  function markRoad(lx: number, lz: number, topY: number, r: number, g: number, b: number) {
+    const idxExt = (lx + 1) * (CHUNK_SIZE + 2) + (lz + 1);
+    roadHeightMap[idxExt] = topY;
+    const c3 = (lx * CHUNK_SIZE + lz) * 3;
+    roadColorMap[c3] = r;
+    roadColorMap[c3 + 1] = g;
+    roadColorMap[c3 + 2] = b;
+  }
 
   const bX = cx * CHUNK_SIZE, bZ = cz * CHUNK_SIZE;
+
+  /* ── Terrain sampler (cross-chunk-stable point queries) ──
+   *  Bundle the noise functions + cfg so utilities outside this scope can
+   *  reproduce the EXACT same biome/height/water values for any (wx, wz)
+   *  without needing the chunk's hMap. See utils/terrain-sampler.ts. */
+  const sampler: TerrainSamplerInputs = {
+    heightN, detailN, biomeN, tempN, regionN, continentN, cfg,
+  };
 
   /* ── Finite world edge taper ── */
   const isFinite = cfg.worldMode === 'finite';
@@ -295,25 +331,21 @@ export function generateChunkData(
 
       hwInfoMap[localIdx] = hwInfo;
 
-      // Compute the highway surface level.
-      // The key challenge is cross-chunk continuity: each chunk only has
-      // terrain heights for its own cells (+1 border). To get a smooth,
-      // globally-consistent road grade we use a TWO-STEP approach:
-      //
-      // 1) LOCAL MINIMUM: sample nearby terrain heights within the chunk
-      //    to approximate the local valley/floor level.
-      // 2) GLOBAL NOISE FLOOR: also sample the raw terrain noise at extended
-      //    positions OUTSIDE the chunk (using the same deterministic noise
-      //    functions). This gives us a chunk-boundary-independent estimate.
-      //
-      // The final road level is the max of (waterLevel+2, blended estimate).
+      // ── Phase 4.7: Cross-chunk-stable road level ──
+      // Use the deterministic noise-only sampler from highway-geom.ts
+      // so adjacent chunks computing the same (wx, wz) get IDENTICAL
+      // results. The legacy chunk-local sampling stays as a fallback
+      // for cells where the deterministic version returns -1 (should
+      // not happen on real highway cells but guards against edge cases).
       const c = variedConfigs[localIdx] || BIOMES[biome];
       const waterLevel = c.waterLevel;
 
-      let roadLevel = h;
+      let roadLevel = computeRoadLevelAt(sampler, wx, wz, hwInfo);
       let maxWL = waterLevel;
 
-      if (biome !== 'mountains') {
+      if (roadLevel < 0 && biome !== 'mountains') {
+        // Fallback to legacy local sampling — keeps backwards-compat
+        roadLevel = h;
         // ── Step 1: Local terrain sampling (within chunk border) ──
         const sampleRange = Math.min(6, CHUNK_SIZE - 1);
         let localMinH = h;
@@ -365,8 +397,14 @@ export function generateChunkData(
       }
       roadLevel = Math.max(maxWL + 2, roadLevel);
 
-      // Tunnel detection: if terrain is significantly higher than road level
-      const isTunnel = biome === 'mountains' && h > roadLevel + TUNNEL_HEIGHT + 2;
+      // Tunnel detection: terrain visibly clips through the road surface.
+      // Broadened beyond the original "mountains only" rule: tall forest/plains/
+      // highland-tundra hills now tunnel instead of leaving a half-carved trench.
+      // The exact (biome, continent) → allows-tunnel matrix lives in
+      // utils/highway-geom.ts so debug tools and tests share the rule.
+      const contTypeForTunnel = continentN ? getContinent(continentN, wx, wz) : null;
+      const allowsTunnel = allowsTunnelInBiome(biome, contTypeForTunnel);
+      const isTunnel = allowsTunnel && h > roadLevel + TUNNEL_HEIGHT + TUNNEL_TRIGGER_DELTA;
 
       if (isTunnel) {
         // For tunnels, set road level to a reasonable grade
@@ -415,6 +453,87 @@ export function generateChunkData(
             hMap[nHmIdx] = maxH;
           }
         }
+      }
+    }
+  }
+
+  /* ── Build roadHeightMap for slope-ramp detection (Phase 4.1) ──
+   *  Only inter-biome highway cells that are flat road surface (NOT
+   *  barriers, medians, intersections, shoulders, tunnels) qualify
+   *  as ramp candidates. Stored in the +1-border roadHeightMap.
+   *
+   *  Border cells (lx ∈ {-1, CHUNK_SIZE} or lz ∈ {-1, CHUNK_SIZE})
+   *  are populated via the cross-chunk-stable sampler so adjacent
+   *  chunks agree on wedge placement. */
+  const gW2 = CHUNK_SIZE + 2;
+  for (let lx = -1; lx <= CHUNK_SIZE; lx++) {
+    for (let lz = -1; lz <= CHUNK_SIZE; lz++) {
+      const wxr = bX + lx, wzr = bZ + lz;
+      const idxExt = (lx + 1) * gW2 + (lz + 1);
+
+      if (lx >= 0 && lx < CHUNK_SIZE && lz >= 0 && lz < CHUNK_SIZE) {
+        // In-chunk: read from highway pre-pass results
+        const inIdx = lx * CHUNK_SIZE + lz;
+        const rd = hwLevelMap[inIdx];
+        if (rd < 0) continue;
+        if (hwTunnelMap[inIdx]) continue; // tunnels keep their own slope
+        const hi = hwInfoMap[inIdx];
+        if (!hi || hi.isBarrier || hi.isMedian || hi.isIntersection || hi.isShoulder) continue;
+        roadHeightMap[idxExt] = rd;
+      } else {
+        // Border: compute deterministically via sampler so adjacent
+        // chunks reach the same conclusion at shared edges.
+        const hi = getInterHighwayInfo(wxr, wzr);
+        if (!hi || hi.isBarrier || hi.isMedian || hi.isIntersection || hi.isShoulder) continue;
+        if (isTunnelAt(sampler, wxr, wzr, hi)) continue;
+        const onRoad = (Math.abs(hi.distFromCenterX) <= hi.hwHalfWX && hi.onX)
+                    || (Math.abs(hi.distFromCenterZ) <= hi.hwHalfWZ && hi.onZ);
+        if (!onRoad) continue;
+        const rd = computeRoadLevelAt(sampler, wxr, wzr, hi);
+        if (rd < 0) continue;
+        roadHeightMap[idxExt] = rd;
+      }
+    }
+  }
+
+  /* ── Detect over-water bridge spans (Phase 4.6) ──
+   *  Run on the in-chunk highway info map so endpoint pillars can be
+   *  anchored later in the emit loop. waterLevelMap is filled below
+   *  per-cell during the main loop, but for span detection we use
+   *  the variedConfigs water levels we already computed. */
+  const tmpWaterLevelMap = new Int32Array(CHUNK_SIZE * CHUNK_SIZE);
+  for (let lx = 0; lx < CHUNK_SIZE; lx++) {
+    for (let lz = 0; lz < CHUNK_SIZE; lz++) {
+      const cfg2 = variedConfigs[lx * CHUNK_SIZE + lz];
+      tmpWaterLevelMap[lx * CHUNK_SIZE + lz] = cfg2 ? cfg2.waterLevel : 5;
+    }
+  }
+  const bridgeSpans: BridgeSpan[] = detectBridgeSpans({
+    bX, bZ, hMap,
+    waterLevelMap: tmpWaterLevelMap,
+    hwInfoMap,
+  });
+
+  /* ── Wedge detection pass — fills skipTopMap for cells that will
+   *  emit a wedge instance instead of a flat top voxel.
+   *  Rural highways have no pure-asphalt cells (half-width 3 is all
+   *  barrier + median) so they never produce wedges. Standard and
+   *  autopista classes have 4 asphalt cells per row that can ramp. */
+  for (let lx = 0; lx < CHUNK_SIZE; lx++) {
+    for (let lz = 0; lz < CHUNK_SIZE; lz++) {
+      const idxExt = (lx + 1) * gW2 + (lz + 1);
+      const myH = roadHeightMap[idxExt];
+      if (myH < 0) continue;
+      const nXp = roadHeightMap[(lx + 2) * gW2 + (lz + 1)];
+      const nXn = roadHeightMap[(lx + 0) * gW2 + (lz + 1)];
+      const nZp = roadHeightMap[(lx + 1) * gW2 + (lz + 2)];
+      const nZn = roadHeightMap[(lx + 1) * gW2 + (lz + 0)];
+      const dXp = (nXp >= 0 && myH - nXp === 1) ? 1 : 0;
+      const dXn = (nXn >= 0 && myH - nXn === 1) ? 1 : 0;
+      const dZp = (nZp >= 0 && myH - nZp === 1) ? 1 : 0;
+      const dZn = (nZn >= 0 && myH - nZn === 1) ? 1 : 0;
+      if (dXp + dXn + dZp + dZn >= 1) {
+        skipTopMap[lx * CHUNK_SIZE + lz] = 1;
       }
     }
   }
@@ -544,7 +663,20 @@ export function generateChunkData(
           // Any biome at extreme heights gets snow
           baseCol = '#eef2ff';
         } else if (isTop) {
-          baseCol = c.colors.top;
+          /* Phase 4.2 — coast/sand band. Cells whose top is at or just
+             below the water line, in coast-eligible biomes, get sand
+             instead of the biome's normal top colour. This eliminates
+             the abrupt biome→water colour cut. */
+          const isCoastBiome = biome === 'plains' || biome === 'forest';
+          const isDesertBeach = biome === 'desert';
+          const wlBand = wl - 1;          // sand starts 1 voxel under water
+          const sandBand = isCoastBiome && (y >= wlBand && y <= wl + 1);
+          const desertSand = isDesertBeach && y <= wl + 3;
+          if (sandBand || desertSand) {
+            baseCol = '#e6d09c'; // warm beach sand
+          } else {
+            baseCol = c.colors.top;
+          }
         } else if (y >= h - 3) {
           baseCol = c.colors.mid;
         } else if (y >= h - 8) {
@@ -561,11 +693,18 @@ export function generateChunkData(
 
       /* ── 2. WATER — flat surface plane for seamless cross-chunk rendering ── */
       /* Skip water rendering under highway cells — the highway surface replaces it.
-       * When highway is over water we render bridge supports instead (section 3b). */
+       * When highway is over water we render bridge supports instead (section 3b).
+       *
+       * IMPORTANT: do NOT trackH the water level. `solidHeightMap` must reflect
+       * the topmost SOLID voxel only. WaterBoats and FlyCamera rely on this
+       * invariant to detect water vs land. Treating water as solid here was
+       * the long-standing reason boats never spawned (sampleWaterInfo always
+       * returned depth=0). The seabed height stays in solidHeightMap (set
+       * by the terrain trackH a few lines above), so `solidH < wl` correctly
+       * identifies water cells. */
       if (h < wl && !isOnInterHW) {
         pushW((bX + lx) * VOXEL_SIZE, wl * VOXEL_SIZE + VOXEL_SIZE * 0.5, (bZ + lz) * VOXEL_SIZE,
           varyColor(c.colors.water, wx, wl, wz, 4, 0.06, 0.06));
-        trackH(lx, lz, wl);
       }
 
       /* ══════════════════ 3. CITY BIOME ══════════════════ */
@@ -1174,9 +1313,15 @@ export function generateChunkData(
         if (onActualRoad) {
           // ── Highway asphalt surface ──
           const isMedian2 = hi.isMedian;
-          // At intersections, barriers from one highway should NOT block the other;
-          // disable barrier rendering at intersection cells to keep cross traffic clear
-          const isBarrier2 = hi.isBarrier && !hi.isIntersection;
+          // At intersections, barriers from one highway should NOT block the
+          // other — but we shouldn't drop barriers on the entire intersection
+          // region either (that leaves the approach lanes barrier-less,
+          // visually breaking lane continuity). Only the central 3×3 core
+          // is barrier-free; barriers on approach edges are preserved.
+          const inIntersectionCore = hi.isIntersection
+            && Math.abs(hi.distFromCenterX) <= 1
+            && Math.abs(hi.distFromCenterZ) <= 1;
+          const isBarrier2 = hi.isBarrier && !inIntersectionCore;
 
           // Road color varies by class
           let roadColor: string;
@@ -1194,10 +1339,24 @@ export function generateChunkData(
               : '#333333';                                    // standard dark asphalt
           }
 
-          push((bX + lx) * VOXEL_SIZE, roadY * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
-            varyColor(roadColor, wx, roadY, wz, 2, 0.02, 0.03));
-          groundHeightMap[lIdx] = roadY;
-          trackH(lx, lz, roadY);
+          /* Slope ramp recording — track the plain asphalt colour for
+             this cell. If skipTopMap says this cell is a wedge, suppress
+             the flat-top voxel emission so the wedge replaces it. */
+          const variedRoadColor = varyColor(roadColor, wx, roadY, wz, 2, 0.02, 0.03);
+          if (!isMedian2 && !isBarrier2 && !hi.isIntersection) {
+            const baseRoadColor = hwClass === 'rural' ? '#444444' : hwClass === 'autopista' ? '#2a2a2a' : '#333333';
+            _tc.set(baseRoadColor);
+            markRoad(lx, lz, roadY, _tc.r, _tc.g, _tc.b);
+          }
+          if (skipTopMap[lIdx]) {
+            // Wedge will cover this; still register the height for collision
+            groundHeightMap[lIdx] = roadY;
+            trackH(lx, lz, roadY);
+          } else {
+            push((bX + lx) * VOXEL_SIZE, roadY * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE, variedRoadColor);
+            groundHeightMap[lIdx] = roadY;
+            trackH(lx, lz, roadY);
+          }
 
           // ── Fill terrain gap (embankment) with retaining wall detail ──
           if (!isTunnel && !isOverWater && h < roadY) {
@@ -1231,17 +1390,39 @@ export function generateChunkData(
               }
             }
 
-            // Bridge support pillars — wider and more frequent than before
-            const pillarSpacing = hwClass === 'autopista' ? 8 : hwClass === 'standard' ? 10 : 14;
-            const onPillarX = hi.onX && ((wx % pillarSpacing + pillarSpacing) % pillarSpacing === 0);
-            const onPillarZ = hi.onZ && ((wz % pillarSpacing + pillarSpacing) % pillarSpacing === 0);
-            // Pillars on barrier AND median positions for structural realism
-            const isPillarPos = isBarrier2 || (isMedian2 && (onPillarX || onPillarZ));
-            if (isPillarPos && (onPillarX || onPillarZ)) {
+            /* ── Bridge support pillars (Phase 4.6) ──
+             *  Anchored to the BridgeSpan endpoints + midpoints rather
+             *  than a global world-coord modulo. Pillar bottom uses
+             *  raw terrain height (`h`) so the column reaches the
+             *  seabed, not the water surface. */
+            const span = findSpanAt(bridgeSpans, wx, wz, hi.onX, hi.onZ);
+            const placePillarHere = !!span && shouldPlacePillar(wx, wz, span);
+            const onBarrierForPillar = isBarrier2;
+            const onMedianCenterForPillar = isMedian2;
+            if (placePillarHere && (onBarrierForPillar || onMedianCenterForPillar)) {
               const pillarBottom = Math.max(0, h);
               for (let py = pillarBottom; py < roadY - 2; py++) {
                 push((bX + lx) * VOXEL_SIZE, py * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                   varyColor('#999999', wx, py, wz, 2, 0.02, 0.04));
+              }
+            }
+
+            /* ── Truss railings for long autopista bridges ──
+             *  When the span is > 24 voxels AND class is autopista, add
+             *  diagonal mini-voxel struts every 3 voxels on the barrier
+             *  position. Provides visual heft for long highway crossings. */
+            if (span && span.length > 24 && hwClass === 'autopista' && isBarrier2) {
+              const alongAxisPos = span.axis === 'x' ? wx : wz;
+              const alongStart = span.axis === 'x' ? span.startWX : span.startWZ;
+              const sinceStart = alongAxisPos - alongStart;
+              if (sinceStart % 3 === 0) {
+                const railPxT = (bX + lx) * VOXEL_SIZE;
+                const railPzT = (bZ + lz) * VOXEL_SIZE;
+                const trussBaseY = roadY * VOXEL_SIZE + VOXEL_SIZE * 0.6;
+                // Vertical truss riser — 10 mini-voxels tall
+                for (let ty = 0; ty < 10; ty++) {
+                  pushMini(railPxT, trussBaseY + ty * MVS, railPzT, '#bbbbbb');
+                }
               }
             }
 
@@ -1415,36 +1596,29 @@ export function generateChunkData(
           if (isTunnel) {
             const tunnelCeil = roadY + TUNNEL_HEIGHT;
 
-            // Detect tunnel portal zone: check if nearby cells along highway
-            // are NOT tunnels — that means we're at the entrance.
-            // Also compute portal depth (distance from tunnel mouth)
+            // Detect tunnel portal zone via cross-chunk-stable sampling.
+            // Previously this read hwTunnelMap which only covers the current
+            // chunk — portal arches truncated at chunk borders. Now we use
+            // isTunnelAt() from utils/highway-geom.ts which gives the same
+            // answer regardless of which chunk asks. Adjacent chunks now
+            // agree on portal location → seamless arch across borders.
             let isPortalZone = false;
             let portalDepth = 0; // 0 = deep inside tunnel, small = near mouth
             const portalCheckRange = 6;
             for (let ps = 1; ps <= portalCheckRange; ps++) {
-              // Check positions along the highway direction
-              const checkWx = wx + (hi.onX ? ps : 0);
-              const checkWz = wz + (hi.onZ ? ps : 0);
-              const checkLx = checkWx - bX;
-              const checkLz = checkWz - bZ;
-              if (checkLx >= 0 && checkLx < CHUNK_SIZE && checkLz >= 0 && checkLz < CHUNK_SIZE) {
-                if (hwTunnelMap[checkLx * CHUNK_SIZE + checkLz] === 0) {
-                  isPortalZone = true;
-                  portalDepth = ps;
-                  break;
-                }
+              const checkWxPos = wx + (hi.onX ? ps : 0);
+              const checkWzPos = wz + (hi.onZ ? ps : 0);
+              if (!isTunnelAt(sampler, checkWxPos, checkWzPos)) {
+                isPortalZone = true;
+                portalDepth = ps;
+                break;
               }
-              // Also check negative direction
-              const checkWx2 = wx - (hi.onX ? ps : 0);
-              const checkWz2 = wz - (hi.onZ ? ps : 0);
-              const checkLx2 = checkWx2 - bX;
-              const checkLz2 = checkWz2 - bZ;
-              if (checkLx2 >= 0 && checkLx2 < CHUNK_SIZE && checkLz2 >= 0 && checkLz2 < CHUNK_SIZE) {
-                if (hwTunnelMap[checkLx2 * CHUNK_SIZE + checkLz2] === 0) {
-                  isPortalZone = true;
-                  portalDepth = ps;
-                  break;
-                }
+              const checkWxNeg = wx - (hi.onX ? ps : 0);
+              const checkWzNeg = wz - (hi.onZ ? ps : 0);
+              if (!isTunnelAt(sampler, checkWxNeg, checkWzNeg)) {
+                isPortalZone = true;
+                portalDepth = ps;
+                break;
               }
             }
 
@@ -1463,19 +1637,33 @@ export function generateChunkData(
               // Deeper voxels near portal get progressively taller — forms the
               // characteristic trumpet-shaped tunnel mouth with retaining walls
               if (isPortalZone) {
-                // Arch height tapers: closest to entrance (depth=1) gets tallest arch,
-                // further from entrance (depth=portalCheckRange) is flush with ceiling
-                const archExtra = Math.max(0, 3 - Math.floor(portalDepth * 0.5));
+                /* ── Phase 4.5: semicircular portal arch ──
+                 *  Arch radius scales with highway half-width so each
+                 *  class (rural=3, standard=5, autopista=7) gets a
+                 *  proportional opening. The height at each barrier
+                 *  column follows sqrt(r² − x²) so the silhouette is
+                 *  a true semicircle (stair-stepped by voxel grid).
+                 *  Tapers to 0 as portalDepth grows so the arch fades
+                 *  inward instead of leaving a sharp wall. */
+                const archRadius = effectiveHW + 1;
+                const xFromCenter = hi.onX ? hi.distFromCenterX : hi.distFromCenterZ;
+                const arg = archRadius * archRadius - xFromCenter * xFromCenter;
+                let archShape = arg > 0 ? Math.sqrt(arg) : 0;
+                /* Diminish over depth: full at depth=1, zero at depth=portalCheckRange */
+                const depthFade = Math.max(0, 1 - (portalDepth - 1) / (portalCheckRange - 1));
+                const archExtra = Math.max(0, Math.floor(archShape * depthFade));
                 for (let ay = 1; ay <= archExtra; ay++) {
                   push((bX + lx) * VOXEL_SIZE, (tunnelCeil + ay) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                     varyColor('#887766', wx, tunnelCeil + ay, wz, 2, 0.02, 0.04));
                 }
-                // Portal face keystone detail at depth 1-2
-                if (portalDepth <= 2) {
+                /* Keystone — slightly darker capstone at the highest point of the arch */
+                if (portalDepth <= 2 && archExtra > 0 && Math.abs(xFromCenter) <= 1) {
                   push((bX + lx) * VOXEL_SIZE, (tunnelCeil + archExtra + 1) * VOXEL_SIZE, (bZ + lz) * VOXEL_SIZE,
                     varyColor('#776655', wx, tunnelCeil + archExtra + 1, wz, 2, 0.02, 0.04));
+                  trackH(lx, lz, tunnelCeil + archExtra + 1);
+                } else if (archExtra > 0) {
+                  trackH(lx, lz, tunnelCeil + archExtra);
                 }
-                trackH(lx, lz, tunnelCeil + archExtra + (portalDepth <= 2 ? 1 : 0));
               }
             }
 
@@ -1807,6 +1995,45 @@ export function generateChunkData(
   const domBiome = BIOME_TYPES[domBiomeIdx] ?? 'plains';
   const avgH = heightSum / (CHUNK_SIZE * CHUNK_SIZE);
 
+  /* ── Emit cascade waterfalls (Phase 4.4) ──
+   *  Drops between adjacent water bodies of ≥ 2 voxels get a vertical
+   *  water column instead of a hard step. Reads waterLevelMap and a
+   *  +1 border of biome water levels. */
+  const borderWaterLevel = new Int32Array((CHUNK_SIZE + 2) * (CHUNK_SIZE + 2));
+  for (let lx = -1; lx <= CHUNK_SIZE; lx++) {
+    for (let lz = -1; lz <= CHUNK_SIZE; lz++) {
+      const wxr = bX + lx, wzr = bZ + lz;
+      const idxExt2 = (lx + 1) * (CHUNK_SIZE + 2) + (lz + 1);
+      if (lx >= 0 && lx < CHUNK_SIZE && lz >= 0 && lz < CHUNK_SIZE) {
+        borderWaterLevel[idxExt2] = waterLevelMap[lx * CHUNK_SIZE + lz];
+      } else {
+        // Compute via sampler so adjacent chunks agree on cascades
+        const biomeAt = getBiome(biomeN, tempN, wxr, wzr, cfg.cityFrequency, continentN);
+        const cb = getVariedBiome(BIOMES[biomeAt], wxr, wzr, regionN, cfg.biomeVariation, cfg.terrainRoughness, continentN);
+        borderWaterLevel[idxExt2] = cb.waterLevel;
+      }
+    }
+  }
+  emitCascades({
+    bX, bZ, hMap,
+    waterLevelMap,
+    borderWaterLevel,
+    pushW,
+  });
+
+  /* ── Emit slope-ramp wedges (Phase 4.1) ──
+   *  Reads roadHeightMap + roadColorMap and outputs ramp instances
+   *  to rampPosA/rampColA/rampMetaA. */
+  const rampC = emitRampsForChunk({
+    rampPositions: rampPosA,
+    rampColors: rampColA,
+    rampMeta: rampMetaA,
+    count: 0,
+    bX, bZ,
+    roadHeightMap, roadColorMap,
+    gW: CHUNK_SIZE + 2,
+  });
+
   return {
     positions: posA.subarray(0, sc * 3), colors: colA.subarray(0, sc * 3), count: sc,
     waterPositions: wPosA.subarray(0, wc * 3), waterColors: wColA.subarray(0, wc * 3), waterCount: wc,
@@ -1820,6 +2047,10 @@ export function generateChunkData(
     paintColors: paintColA.subarray(0, paintC * 3),
     paintScales: paintScaleA.subarray(0, paintC * 2),
     paintCount: paintC,
+    rampPositions: rampPosA.subarray(0, rampC * 3),
+    rampColors: rampColA.subarray(0, rampC * 3),
+    rampMeta: rampMetaA.subarray(0, rampC),
+    rampCount: rampC,
     chunkX: cx, chunkZ: cz,
     biome: domBiome,
     avgHeight: avgH,
