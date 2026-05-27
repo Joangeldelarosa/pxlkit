@@ -436,23 +436,26 @@ export const Megaphone = createIcon(
   'megaphone',
   { R: '#FF6B6B', D: '#B23A3A', C: '#FFFFFF' },
   ['megaphone', 'announce', 'broadcast', 'notice', 'toast', 'ui'],
-  ({ set }) => {
-    // flared horn opening to the right + BOLD concentric sound waves — the
-    // strong "broadcasting" arcs are what disambiguate it from a generic blob
+  ({ set, fillRect }) => {
+    // a cone tipped on its side: wide mouth on the LEFT, tapering to a point on
+    // the right, with a straight grip HANDLE hanging from the body + sound
+    // lines off the wide mouth.
     const cone: Record<number, [number, number]> = {
-      4: [10, 12], 5: [7, 12], 6: [3, 12], 7: [2, 12], 8: [2, 12], 9: [3, 12], 10: [7, 12], 11: [10, 12],
+      2: [2, 4], 3: [2, 6], 4: [2, 8], 5: [2, 9], 6: [2, 11], 7: [2, 12], 8: [2, 12], 9: [2, 11], 10: [2, 9], 11: [2, 8], 12: [2, 6], 13: [2, 4],
     };
     for (const key of Object.keys(cone)) {
       const y = Number(key);
       const [l, r] = cone[y];
       for (let x = l; x <= r; x += 1) set(x, y, 'R');
-      set(r, y, 'D'); // dark mouth rim
     }
-    // a bold ")" sound arc off the mouth (separated from the cone)
-    set(14, 6, 'C');
-    set(15, 7, 'C');
-    set(15, 8, 'C');
-    set(14, 9, 'C');
+    // dark rim down the wide mouth (left edge)
+    for (let y = 2; y <= 13; y += 1) set(2, y, 'D');
+    // straight grip handle hanging from the underside of the cone
+    fillRect(6, 13, 2, 3, 'D');
+    // sound lines off the wide mouth (left)
+    set(0, 5, 'C');
+    set(0, 8, 'C');
+    set(0, 10, 'C');
   }
 );
 
