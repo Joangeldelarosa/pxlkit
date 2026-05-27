@@ -1,16 +1,9 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 🎀 Ribbon — 16×16 pixel art award ribbon
- *
- * A vertical medal ribbon with a circular award medallion at the bottom.
- *
- * Palette:
- *   R = Red ribbon  (#E74C3C)
- *   D = Dark red    (#A93226)
- *   G = Gold medal  (#FFD700)
- *   B = Dark gold   (#B8860B)
- *   W = White shine (#FFFFFF)
+ * 🎖️ Ribbon — award ribbon: a gold medallion with two forked red ribbon
+ * tails hanging below. Centered and symmetric; reads as a prize/award rather
+ * than a generic red blob.
  */
 export const Ribbon: PxlKitData = {
   name: 'ribbon',
@@ -18,28 +11,26 @@ export const Ribbon: PxlKitData = {
   category: 'feedback',
   grid: [
     '................',
-    '......RRRR......',
-    '.....RRDDRR.....',
-    '.....RR..RR.....',
-    '....RR....RR....',
-    '....RD....DR....',
-    '.....RR..RR.....',
+    '......GGGG......',
+    '....GGGGGGGG....',
+    '...GGGGGGGGGG...',
+    '...GGGWWWWGGG...',
+    '...GGGWWWWGGG...',
+    '...GGGGGGGGGG...',
+    '....GGGGGGGG....',
     '.....RRRRRR.....',
-    '......RRRR......',
-    '.....GGGGGG.....',
-    '....GGWWWWGG....',
-    '....GGWBBWGG....',
-    '....GGWWWWGG....',
-    '.....GGGGGG.....',
+    '....RRR..RRR....',
+    '....RR....RR....',
+    '....RR....RR....',
+    '...RR......RR...',
+    '...R........R...',
     '................',
     '................',
   ],
   palette: {
-    R: '#E74C3C',
-    D: '#A93226',
     G: '#FFD700',
-    B: '#B8860B',
     W: '#FFFFFF',
+    R: '#E03131',
   },
   tags: ['ribbon', 'award', 'prize', 'first-place', 'winner', 'feedback'],
   author: 'pxlkit',

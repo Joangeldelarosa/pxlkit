@@ -22,7 +22,7 @@ function inBounds(x: number, y: number): boolean {
   return x >= 0 && x < SIZE && y >= 0 && y < SIZE;
 }
 
-function createIcon(
+export function createIcon(
   name: string,
   palette: Record<string, string>,
   tags: string[],
@@ -115,6 +115,47 @@ function createIcon(
   };
 }
 
+// ─── Shared shield silhouette (unifies the shield-* family) ───
+const SHIELD_ROWS = [
+  '................',
+  '................',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '....SSSSSSSS....',
+  '....SSSSSSSS....',
+  '.....SSSSSS.....',
+  '......SSSS......',
+  '.......SS.......',
+  '................',
+  '................',
+];
+
+const SHIELD_RIM: ReadonlyArray<readonly [number, number]> = [
+  [4, 9], [11, 9], [4, 10], [11, 10], [5, 11], [10, 11], [6, 12], [9, 12], [7, 13], [8, 13],
+];
+
+/**
+ * Stamp the shared filled-shield silhouette (`fill`) with a darker beveled
+ * lower rim (`rim`). Every shield-* icon uses this so the family is coherent.
+ */
+export function paintShield(
+  set: (x: number, y: number, char: string) => void,
+  fill: string,
+  rim: string
+) {
+  for (let y = 0; y < SIZE; y += 1) {
+    for (let x = 0; x < SIZE; x += 1) {
+      if (SHIELD_ROWS[y][x] === 'S') set(x, y, fill);
+    }
+  }
+  for (const [x, y] of SHIELD_RIM) set(x, y, rim);
+}
+
 export const CheckCircle = createIcon(
   'check-circle',
   { O: '#00CC66', C: '#FFFFFF' },
@@ -165,17 +206,19 @@ export const ErrorOctagon = createIcon(
   'error-octagon',
   { R: '#E03131', C: '#FFFFFF' },
   ['error', 'stop', 'danger', 'critical', 'toast', 'status'],
-  ({ line, fillRect }) => {
-    line(5, 2, 10, 2, 'R');
-    line(3, 4, 3, 11, 'R');
-    line(12, 4, 12, 11, 'R');
-    line(5, 13, 10, 13, 'R');
-    line(4, 3, 3, 4, 'R');
-    line(11, 3, 12, 4, 'R');
-    line(3, 11, 4, 12, 'R');
-    line(12, 11, 11, 12, 'R');
-    fillRect(7, 5, 2, 5, 'C');
-    fillRect(7, 11, 2, 2, 'C');
+  ({ set, fillRect }) => {
+    // filled octagon (stop sign) — chamfered square, symmetric
+    const span: Record<number, [number, number]> = {
+      2: [5, 10], 3: [4, 11], 4: [3, 12], 5: [2, 13], 6: [2, 13], 7: [2, 13],
+      8: [2, 13], 9: [2, 13], 10: [2, 13], 11: [3, 12], 12: [4, 11], 13: [5, 10],
+    };
+    for (let y = 2; y <= 13; y += 1) {
+      const [l, r] = span[y];
+      for (let x = l; x <= r; x += 1) set(x, y, 'R');
+    }
+    // white "!" knockout
+    fillRect(7, 5, 2, 4, 'C');
+    fillRect(7, 10, 2, 1, 'C');
   }
 );
 
@@ -195,12 +238,15 @@ export const Bell = createIcon(
 
 export const NotificationDot = createIcon(
   'notification-dot',
-  { B: '#29ADFF', R: '#FF3B30', C: '#FFFFFF' },
+  { B: '#29ADFF', D: '#1C6FA8', R: '#FF3B30', C: '#FFFFFF' },
   ['notification', 'badge', 'dot', 'unread', 'indicator', 'toast'],
-  ({ rect, fillCircle }) => {
-    rect(2, 3, 12, 10, 'B');
-    fillCircle(11, 4, 2, 'R');
-    fillCircle(11, 4, 1, 'C');
+  ({ fillRect, rect, fillCircle }) => {
+    // app tile (filled, rounded-ish) with a darker rim
+    fillRect(2, 5, 9, 9, 'B');
+    rect(2, 5, 9, 9, 'D');
+    // unread badge: white-bordered red dot, top-right corner
+    fillCircle(12, 4, 3, 'C');
+    fillCircle(12, 4, 2, 'R');
   }
 );
 
@@ -313,31 +359,23 @@ export const Unlock = createIcon(
 
 export const ShieldCheck = createIcon(
   'shield-check',
-  { B: '#4ECDC4', D: '#2B6B67', C: '#FFFFFF' },
+  { S: '#00CC66', D: '#008844', C: '#FFFFFF' },
   ['shield', 'check', 'safe', 'trusted', 'toast', 'security'],
-  ({ line }) => {
-    line(4, 3, 11, 3, 'B');
-    line(4, 3, 4, 10, 'B');
-    line(11, 3, 11, 10, 'B');
-    line(4, 10, 8, 13, 'D');
-    line(11, 10, 8, 13, 'D');
-    line(6, 8, 8, 10, 'C');
-    line(8, 10, 10, 6, 'C');
+  ({ set, line }) => {
+    paintShield(set, 'S', 'D');
+    line(5, 8, 7, 10, 'C');
+    line(7, 10, 11, 5, 'C');
   }
 );
 
 export const ShieldAlert = createIcon(
   'shield-alert',
-  { B: '#FFB020', D: '#8A5A00', C: '#FFFFFF' },
+  { S: '#FFB020', D: '#8A5A00', C: '#FFFFFF' },
   ['shield', 'alert', 'warning', 'security', 'toast', 'risk'],
-  ({ line, fillRect, set }) => {
-    line(4, 3, 11, 3, 'B');
-    line(4, 3, 4, 10, 'B');
-    line(11, 3, 11, 10, 'B');
-    line(4, 10, 8, 13, 'D');
-    line(11, 10, 8, 13, 'D');
-    fillRect(7, 6, 2, 4, 'C');
-    set(8, 11, 'C');
+  ({ set, fillRect }) => {
+    paintShield(set, 'S', 'D');
+    fillRect(7, 5, 2, 4, 'C');
+    fillRect(7, 10, 2, 1, 'C');
   }
 );
 

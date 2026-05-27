@@ -1,44 +1,18 @@
-import type { PxlKitData } from '@pxlkit/core';
+import { createIcon, paintShield } from '../icons';
 
 /**
- * 🛡️! ShieldExclamation — 16×16 pixel art shield with exclamation
- *
- * An orange shield with a white ! — security warning or policy issue.
- *
- * Palette:
- *   O = Orange      (#E67E22)
- *   D = Dark orange (#CA6F1E)
- *   W = White mark  (#FFFFFF)
- *   L = Light tint  (#F0A04B)
+ * 🛡️! ShieldExclamation — filled shield with a white ! (critical security
+ * issue). Shares the unified shield silhouette with
+ * shield-check / shield-alert / shield-cross; orange marks higher severity
+ * than the amber shield-alert.
  */
-export const ShieldExclamation: PxlKitData = {
-  name: 'shield-exclamation',
-  size: 16,
-  category: 'feedback',
-  grid: [
-    '................',
-    '....OOOOOOOO....',
-    '...OOOOOOOOOOO..',
-    '..OOOOLOOOOLOO..',
-    '..OOOOWOOOOOO...',
-    '..OOOOWOOOOOO...',
-    '..OOOOWOOOOOO...',
-    '..OOOOWOOOOO....',
-    '..OOOOO.OOOO....',
-    '..OOOOWOOOO.....',
-    '..OOOOWOOO......',
-    '...OOOOOOO......',
-    '....OOOOOOO.....',
-    '.....OOOOOO.....',
-    '......OOOO......',
-    '.......OO.......',
-  ],
-  palette: {
-    O: '#E67E22',
-    D: '#CA6F1E',
-    W: '#FFFFFF',
-    L: '#F0A04B',
-  },
-  tags: ['shield', 'exclamation', 'warning', 'alert', 'security', 'feedback'],
-  author: 'pxlkit',
-};
+export const ShieldExclamation = createIcon(
+  'shield-exclamation',
+  { S: '#E8590C', D: '#9A3412', C: '#FFFFFF' },
+  ['shield', 'exclamation', 'warning', 'alert', 'critical', 'security', 'feedback'],
+  ({ set, fillRect }) => {
+    paintShield(set, 'S', 'D');
+    fillRect(7, 5, 2, 4, 'C');
+    fillRect(7, 10, 2, 1, 'C');
+  }
+);

@@ -1,44 +1,17 @@
-import type { PxlKitData } from '@pxlkit/core';
+import { createIcon, paintShield } from '../icons';
 
 /**
- * 🛡️✕ ShieldCross — 16×16 pixel art shield with an X
- *
- * A red shield with a white × mark — access denied, blocked, or failed protection.
- *
- * Palette:
- *   R = Red shield  (#E74C3C)
- *   D = Dark red    (#A93226)
- *   W = White X     (#FFFFFF)
- *   S = Shield edge (#C0392B)
+ * 🛡️✕ ShieldCross — filled shield with a white ✕ (access denied / blocked /
+ * failed protection). Shares the unified shield silhouette with
+ * shield-check / shield-alert / shield-exclamation.
  */
-export const ShieldCross: PxlKitData = {
-  name: 'shield-cross',
-  size: 16,
-  category: 'feedback',
-  grid: [
-    '................',
-    '....RRRRRRR.....',
-    '...RRRRRRRRRR...',
-    '..RRRSWWWWSRRRR.',
-    '..RRSWWRSWWSRRR.',
-    '..RRWWWWWWWWRRR.',
-    '..RRWWRWRWWRRR..',
-    '..RRSWWWWWSRRR..',
-    '..RRSWWSWWSRRR..',
-    '..RRRSWWWSRRRR..',
-    '...RRRRRRRRRR...',
-    '....RRRRRRRRR...',
-    '.....RRRRRRR....',
-    '......RRRRR.....',
-    '.......RRR......',
-    '........R.......',
-  ],
-  palette: {
-    R: '#E74C3C',
-    D: '#A93226',
-    W: '#FFFFFF',
-    S: '#C0392B',
-  },
-  tags: ['shield', 'cross', 'block', 'deny', 'fail', 'security', 'feedback'],
-  author: 'pxlkit',
-};
+export const ShieldCross = createIcon(
+  'shield-cross',
+  { S: '#E03131', D: '#9B1C1C', C: '#FFFFFF' },
+  ['shield', 'cross', 'block', 'deny', 'fail', 'security', 'feedback'],
+  ({ set, line }) => {
+    paintShield(set, 'S', 'D');
+    line(5, 5, 10, 10, 'C');
+    line(10, 5, 5, 10, 'C');
+  }
+);
