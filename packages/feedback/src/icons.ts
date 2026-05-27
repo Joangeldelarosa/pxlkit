@@ -312,15 +312,19 @@ export const Mail = createIcon(
 
 export const Send = createIcon(
   'send',
-  { B: '#29ADFF', C: '#FFFFFF' },
+  { B: '#29ADFF', D: '#1C6FB8' },
   ['send', 'paper-plane', 'message', 'forward', 'toast', 'ui'],
-  ({ line, fillRect, set }) => {
-    line(2, 8, 13, 2, 'B');
-    line(2, 8, 13, 13, 'B');
-    line(13, 2, 10, 8, 'B');
-    line(13, 13, 10, 8, 'B');
-    fillRect(6, 7, 5, 2, 'C');
-    set(11, 8, 'B');
+  ({ set }) => {
+    // FILLED paper plane pointing right (V-notch tail), two-tone fold so it
+    // survives at 16px — an outline plane collapses to mush at native size.
+    const span: Record<number, [number, number]> = {
+      3: [3, 4], 4: [3, 5], 5: [4, 7], 6: [5, 10], 7: [6, 12], 8: [7, 14],
+      9: [6, 12], 10: [5, 10], 11: [4, 7], 12: [3, 5], 13: [3, 4],
+    };
+    for (let y = 3; y <= 13; y += 1) {
+      const [l, r] = span[y];
+      for (let x = l; x <= r; x += 1) set(x, y, y <= 8 ? 'B' : 'D');
+    }
   }
 );
 
@@ -433,22 +437,22 @@ export const Megaphone = createIcon(
   { R: '#FF6B6B', D: '#B23A3A', C: '#FFFFFF' },
   ['megaphone', 'announce', 'broadcast', 'notice', 'toast', 'ui'],
   ({ set }) => {
-    // symmetric horn opening to the right, mouthpiece nub at the left tip,
-    // dark mouth rim, white sound waves off the opening
+    // flared horn opening to the right + BOLD concentric sound waves — the
+    // strong "broadcasting" arcs are what disambiguate it from a generic blob
     const cone: Record<number, [number, number]> = {
-      4: [8, 12], 5: [6, 12], 6: [4, 12], 7: [3, 12], 8: [3, 12], 9: [4, 12], 10: [6, 12], 11: [8, 12],
+      4: [10, 12], 5: [7, 12], 6: [3, 12], 7: [2, 12], 8: [2, 12], 9: [3, 12], 10: [7, 12], 11: [10, 12],
     };
-    for (let y = 4; y <= 11; y += 1) {
+    for (const key of Object.keys(cone)) {
+      const y = Number(key);
       const [l, r] = cone[y];
       for (let x = l; x <= r; x += 1) set(x, y, 'R');
-      set(r, y, 'D'); // mouth rim
+      set(r, y, 'D'); // dark mouth rim
     }
-    set(2, 7, 'D');
-    set(2, 8, 'D'); // mouthpiece
+    // a bold ")" sound arc off the mouth (separated from the cone)
     set(14, 6, 'C');
-    set(15, 5, 'C');
+    set(15, 7, 'C');
+    set(15, 8, 'C');
     set(14, 9, 'C');
-    set(15, 10, 'C'); // sound waves
   }
 );
 
