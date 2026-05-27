@@ -21,12 +21,17 @@ storybook-static/
 test-results/
 playwright-report/
 playwright/.cache/
+.artifacts/
 # Local tooling
 .claude/
 .agents/
+.planning/
+.gsd/
 # Internal planning / working docs (not part of the public package)
 docs/superpowers/
 CLAUDE.md
+AGENTS.md
+GEMINI.md
 AUDIT.md
 AUDIT-COHERENCE.md
 AUDIT-FOLLOWUP.md
