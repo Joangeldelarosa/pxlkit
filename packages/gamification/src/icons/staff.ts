@@ -1,15 +1,13 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 🔮 Staff — 16×16 pixel art wizard staff
+ * 🔮 Staff — a wizard staff: a glowing crystal orb on top of a long, thin
+ * wooden shaft. The old one had a wide pedestal base that read as a chalice.
  *
- * A tall wooden staff with a glowing crystal orb at the top.
- *
- * Palette:
  *   C = Crystal blue (#4FC3F7)
- *   W = White shine  (#FFFFFF)
- *   B = Brown wood   (#6B4226)
- *   D = Dark wood    (#3E2010)
+ *   W = White shine (#FFFFFF)
+ *   B = Brown wood (#6B4226)
+ *   D = Dark wood (#3E2010)
  */
 export const Staff: PxlKitData = {
   name: 'staff',
@@ -17,20 +15,20 @@ export const Staff: PxlKitData = {
   category: 'gamification',
   grid: [
     '................',
-    '.....CCCCC......',
-    '....CCWCCCC.....',
-    '....CCWCCCC.....',
-    '.....CCCCC......',
-    '......BBB.......',
-    '......BBB.......',
+    '......CCCC......',
+    '.....CCCCCC.....',
+    '.....CWWCCC.....',
+    '.....CCCCCC.....',
+    '......CCCC......',
     '.......BB.......',
     '.......BB.......',
     '.......BB.......',
     '.......BB.......',
-    '......BBB.......',
-    '.....BBBBB......',
-    '....BBBBBBB.....',
-    '.....DDDDD......',
+    '.......BB.......',
+    '.......BB.......',
+    '.......BB.......',
+    '.......BB.......',
+    '......DDDD......',
     '................',
   ],
   palette: {
