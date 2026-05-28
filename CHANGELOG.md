@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [core 1.3.3 / feedback 1.2.5 / gamification 1.2.4] - 2026-05-27 — Icon refinement pass + core type export
+
+A visual-quality pass on two icon packs, driven by a new internal
+`/dev/inspector` tool (multi-resolution + pixel-grid overlay, animation
+frame-stepper) and verified on checker / dark / light backgrounds and at 16px.
+
+### Added — `@pxlkit/core` v1.3.3
+
+- Re-export the public `IconAppearance` type (`'palette' | 'tinted' | 'solid'`) from the package entry. It already lived in the type definitions but was never exported, so consumers couldn't import it to type the `appearance` prop. Additive, non-breaking.
+
+### Changed — `@pxlkit/feedback` v1.2.5
+
+- Unified the `shield-*` family (shield-check / -alert / -cross / -exclamation) to one filled, high-contrast silhouette with white knockout glyphs and semantic colours.
+- Redesigned for legibility, symmetry and contrast: `double-check`, `caution`, `error-octagon`, `notification-dot`, `typing-dots`, `ribbon`, `badge`, `megaphone`, `warning-triangle`, `bell`, `message-square`, `chat-dots`, `mail`, `sparkles`.
+
+### Changed — `@pxlkit/gamification` v1.2.4
+
+- Redesigned for legibility, symmetry and contrast: `star`, `bow`, `boots`, `quest-compass`, `sparkle-star`, `floating-skull` (light-bg contrast), `arrow`, `heart-pulse`, `lightning`, `level-up`, `axe`, `dagger`, `health-potion`, `dice`, `staff`, `armor`, `helmet`, `loot-chest`.
+- Icon counts unchanged (33 feedback, 51 gamification) — these are redesigns, not additions.
+
+### Fixed — pack metadata coherence
+
+- Synced every pack's `IconPack.version` to its package.json version (was stale at `0.1.0`) so the icon gallery shows the correct version per pack. `@pxlkit/feedback` → `1.2.5`, `@pxlkit/gamification` → `1.2.4`, and `social`/`weather`/`effects` → `1.2.3`, `ui` → `1.2.4` (display-only sync, no version bump for those four).
+- **`@pxlkit/web`** — dependency ranges bumped: `@pxlkit/feedback ^1.2.5`, `@pxlkit/gamification ^1.2.4`.
+
 ## [Release prep] - 2026-05-12 — README sweep + Storybook deploy + ui-kit consumer migration
 
 - **`@pxlkit/web` v1.1.0** — bumped to reflect API-consumer migration:

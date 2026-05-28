@@ -130,6 +130,6 @@ export const GamificationPack: IconPack = {
     // New animated
     GlowingSword, FloatingGem, HeartPulse, CoinFlip, FloatingSkull, CardDraw,
   ],
-  version: '0.1.0',
+  version: '1.2.4',
   author: 'pxlkit',
 };

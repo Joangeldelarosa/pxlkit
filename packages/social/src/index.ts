@@ -137,6 +137,6 @@ export const SocialPack: IconPack = {
     // New animated
     WinkingFace, LaughingFace, FloatingHearts, BouncingMessage, RingingPhone,
   ],
-  version: '0.1.0',
+  version: '1.2.3',
   author: 'pxlkit',
 };

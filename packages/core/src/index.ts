@@ -7,6 +7,7 @@ export type {
   PxlKitData,
   AnyIcon,
   IconPack,
+  IconAppearance,
   SvgOptions,
   PxlKitProps,
   PixelToastProps,
