@@ -21,31 +21,50 @@
 import { chromium } from 'playwright';
 import path from 'node:path';
 
-const BASE_URL = process.env.PXLKIT_OG_URL ?? 'http://localhost:3333/og';
+const BASE_URL = process.env.PXLKIT_OG_URL ?? 'http://localhost:3333';
 
-const TARGETS: { name: string; width: number; height: number; out: string }[] = [
-  { name: 'og-image',    width: 1280, height: 640,  out: 'public/og-image.png' },
-  { name: 'og-twitter',  width: 1200, height: 630,  out: 'public/og-twitter.png' },
-  { name: 'readme-hero', width: 1920, height: 1080, out: 'public/readme-hero.png' },
+type Target = {
+  name: string;
+  width: number;
+  height: number;
+  out: string;
+  /** Path appended to BASE_URL — defaults to /og (the curated brand frame). */
+  path?: string;
+  /** Selector that must be attached before screenshot. */
+  waitFor?: string;
+};
+
+const TARGETS: Target[] = [
+  // OG / Twitter / README hero — curated full-bleed brand frame
+  { name: 'og-image',    width: 1280, height: 640,  out: 'public/og-image.png',    waitFor: '[data-testid="og-frame"]' },
+  { name: 'og-twitter',  width: 1200, height: 630,  out: 'public/og-twitter.png',  waitFor: '[data-testid="og-frame"]' },
+  { name: 'readme-hero', width: 1920, height: 1080, out: 'public/readme-hero.png', waitFor: '[data-testid="og-frame"]' },
+  // App icons rendered from the /og/icon route (square, dark BG, glow + BrandIcon)
+  { name: 'icon-192',          width: 192, height: 192, out: 'public/icon-192.png',          path: '/og/icon?s=192', waitFor: '[data-testid="og-icon"]' },
+  { name: 'icon-512',          width: 512, height: 512, out: 'public/icon-512.png',          path: '/og/icon?s=512', waitFor: '[data-testid="og-icon"]' },
+  { name: 'apple-touch-icon',  width: 180, height: 180, out: 'public/apple-touch-icon.png',  path: '/og/icon?s=180', waitFor: '[data-testid="og-icon"]' },
 ];
 
 async function main() {
   const browser = await chromium.launch();
   try {
     for (const t of TARGETS) {
+      const url = BASE_URL.replace(/\/$/, '') + (t.path ?? '/og');
       const ctx = await browser.newContext({
         viewport: { width: t.width, height: t.height },
         deviceScaleFactor: 2,
       });
       const page = await ctx.newPage();
-      console.log(`→ ${t.name} (${t.width}×${t.height}) loading…`);
-      await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-      // /og is the curated full-bleed frame (no chrome). Wait for it.
-      await page.waitForSelector('[data-testid="og-frame"]', { state: 'attached', timeout: 15_000 });
-      // Wait for icon field to hydrate so the frozen field is in place.
-      await page.waitForSelector('[data-fi-id]', { state: 'attached', timeout: 10_000 });
-      // Settle layout / font load.
-      await page.waitForTimeout(1000);
+      console.log(`→ ${t.name} (${t.width}×${t.height}) ${url}`);
+      await page.goto(url, { waitUntil: 'networkidle' });
+      if (t.waitFor) {
+        await page.waitForSelector(t.waitFor, { state: 'attached', timeout: 15_000 });
+      }
+      // For /og, also wait for the frozen icon field to hydrate.
+      if ((t.path ?? '/og') === '/og') {
+        await page.waitForSelector('[data-fi-id]', { state: 'attached', timeout: 10_000 });
+      }
+      await page.waitForTimeout(700);
       const outAbs = path.resolve(process.cwd(), t.out);
       await page.screenshot({ path: outAbs, fullPage: false, type: 'png' });
       console.log(`✓ ${t.name} → ${outAbs}`);
