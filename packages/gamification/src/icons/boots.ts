@@ -1,14 +1,13 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 👢 Boots — 16×16 pixel art pair of leather boots
+ * 👢 Boots — a single leather boot in side view (L-shape): a tall shaft with
+ * the foot extending to the right and a dark sole. The old version was two
+ * front-view columns that read as a "U".
  *
- * Two brown leather boots seen from the front.
- *
- * Palette:
  *   B = Brown leather (#8B4513)
- *   D = Dark shadow   (#4A2208)
  *   L = Light tone    (#A0552A)
+ *   D = Dark sole     (#4A2208)
  */
 export const Boots: PxlKitData = {
   name: 'boots',
@@ -17,16 +16,16 @@ export const Boots: PxlKitData = {
   grid: [
     '................',
     '................',
-    '..BBB......BBB..',
-    '..BBB......BBB..',
-    '..BBB......BBB..',
-    '..BBB......BBB..',
-    '..BBB......BBB..',
-    '..BBBB....BBBB..',
-    '..DBBBBB.DBBBBB.',
-    '..DBBBBBBDBBBBB.',
-    '..DBBBBBBBBBBBD.',
-    '..DDDDDDDDDDDDD.',
+    '.....BBBB.......',
+    '.....LBBB.......',
+    '.....LBBB.......',
+    '.....LBBB.......',
+    '.....LBBB.......',
+    '.....LBBB.......',
+    '.....LBBBB......',
+    '.....LBBBBBB....',
+    '.....LBBBBBBBB..',
+    '....DDDDDDDDDD..',
     '................',
     '................',
     '................',
@@ -34,8 +33,8 @@ export const Boots: PxlKitData = {
   ],
   palette: {
     B: '#8B4513',
-    D: '#4A2208',
     L: '#A05028',
+    D: '#4A2208',
   },
   tags: ['boots', 'shoes', 'leather', 'speed', 'equipment', 'rpg'],
   author: 'pxlkit',
