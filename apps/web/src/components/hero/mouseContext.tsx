@@ -55,7 +55,7 @@ export function MouseProvider({ children }: { children: ReactNode }) {
 
   return (
     <MouseContext.Provider value={{ mouseRef, active, containerRef }}>
-      <div ref={containerRef} className="contents">
+      <div ref={containerRef} className="relative">
         {children}
       </div>
     </MouseContext.Provider>

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { MouseProvider } from './mouseContext';
 import { HeroBackground } from './HeroBackground';
+import { IconField } from './IconField';
 
 /**
  * Cinematic homepage hero — replaces the previous text-block hero.
@@ -18,6 +19,7 @@ export function HeroCinematic() {
         style={{ minHeight: '90vh' }}
       >
         <HeroBackground />
+        <IconField />
 
         {/* Content layer */}
         <div
