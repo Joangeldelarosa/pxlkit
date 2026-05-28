@@ -1,10 +1,14 @@
 'use client';
 
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { MouseProvider } from './mouseContext';
 import { HeroBackground } from './HeroBackground';
 import { IconField } from './IconField';
 import { VoxelText } from './VoxelText';
+import { useReducedMotion } from './useReducedMotion';
+
+const DustParticles = dynamic(() => import('./DustParticles'), { ssr: false });
 
 /**
  * Cinematic homepage hero — replaces the previous text-block hero.
@@ -12,6 +16,7 @@ import { VoxelText } from './VoxelText';
  * will mount the IconField, VoxelText and DustParticles layers.
  */
 export function HeroCinematic() {
+  const reduced = useReducedMotion();
   return (
     <MouseProvider>
       <section
@@ -20,6 +25,7 @@ export function HeroCinematic() {
         style={{ minHeight: '90vh' }}
       >
         <HeroBackground />
+        {!reduced && <DustParticles />}
         <IconField />
 
         {/* Content layer */}
