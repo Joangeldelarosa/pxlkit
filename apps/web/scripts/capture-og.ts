@@ -21,7 +21,7 @@
 import { chromium } from 'playwright';
 import path from 'node:path';
 
-const BASE_URL = process.env.PXLKIT_OG_URL ?? 'http://localhost:3333/';
+const BASE_URL = process.env.PXLKIT_OG_URL ?? 'http://localhost:3333/og';
 
 const TARGETS: { name: string; width: number; height: number; out: string }[] = [
   { name: 'og-image',    width: 1280, height: 640,  out: 'public/og-image.png' },
@@ -40,12 +40,12 @@ async function main() {
       const page = await ctx.newPage();
       console.log(`→ ${t.name} (${t.width}×${t.height}) loading…`);
       await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-      // Wait for IconField to hydrate
-      await page.waitForSelector('[data-fi-id]', { state: 'attached', timeout: 15_000 });
-      // Wait for VoxelText headline
-      await page.waitForSelector('[data-testid="hero-headline"]', { state: 'attached', timeout: 5_000 });
-      // Allow animations to settle and dust to spin up
-      await page.waitForTimeout(1500);
+      // /og is the curated full-bleed frame (no chrome). Wait for it.
+      await page.waitForSelector('[data-testid="og-frame"]', { state: 'attached', timeout: 15_000 });
+      // Wait for icon field to hydrate so the frozen field is in place.
+      await page.waitForSelector('[data-fi-id]', { state: 'attached', timeout: 10_000 });
+      // Settle layout / font load.
+      await page.waitForTimeout(1000);
       const outAbs = path.resolve(process.cwd(), t.out);
       await page.screenshot({ path: outAbs, fullPage: false, type: 'png' });
       console.log(`✓ ${t.name} → ${outAbs}`);
