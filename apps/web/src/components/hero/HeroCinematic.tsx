@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { MouseProvider } from './mouseContext';
 import { HeroBackground } from './HeroBackground';
 import { IconField } from './IconField';
+import { VoxelText } from './VoxelText';
 
 /**
  * Cinematic homepage hero — replaces the previous text-block hero.
@@ -26,12 +27,7 @@ export function HeroCinematic() {
           className="relative z-10 flex flex-col items-center justify-center px-4 sm:px-6 py-16 md:py-24 gap-8"
           style={{ minHeight: '90vh' }}
         >
-          <h1
-            data-testid="hero-headline"
-            className="font-pixel text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-retro-green text-glow leading-none tracking-wide"
-          >
-            PXLKIT
-          </h1>
+          <VoxelText>PXLKIT</VoxelText>
 
           <p className="font-mono text-sm sm:text-base text-retro-muted max-w-xl text-center">
             Retro pixel-art React UI kit · 226+ icons · 54 components · MIT code,
