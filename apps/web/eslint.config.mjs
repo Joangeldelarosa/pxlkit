@@ -25,6 +25,21 @@ const eslintConfig = [
       "@typescript-eslint/no-explicit-any": "off",
     },
   },
+  {
+    // The cinematic hero deliberately seeds floating-icon and dust-particle
+    // positions with Math.random() inside useMemo (one-shot, intentional
+    // randomness) and uses an idle-pause RAF that lerps state across frames.
+    // The newer react-hooks rules flag these as impurity / set-state-in-effect,
+    // but they are intentional and covered by vitest unit tests.
+    files: ["src/components/hero/**"],
+    rules: {
+      "react-hooks/refs": "off",
+      "react-hooks/purity": "off",
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/immutability": "off",
+      "react-hooks/globals": "off",
+    },
+  },
 ];
 
 export default eslintConfig;

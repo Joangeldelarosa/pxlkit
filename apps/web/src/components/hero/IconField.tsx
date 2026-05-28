@@ -10,6 +10,7 @@ import {
 } from '@pxlkit/core';
 import { useMouse } from './mouseContext';
 import { ALL_ICONS, shuffle } from './iconPool';
+import { useReducedMotion } from './useReducedMotion';
 
 export type Layer = {
   z: number;
@@ -159,6 +160,8 @@ export function IconField({
   freeze?: boolean;
 }) {
   const { mouseRef, active, containerRef } = useMouse();
+  const reduced = useReducedMotion();
+  const effectiveFreeze = freeze || reduced;
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
   const iconsRef = useRef<FloatingIcon[]>([]);
   const rafRef = useRef<number>(0);
@@ -189,7 +192,7 @@ export function IconField({
 
   // Physics loop
   useEffect(() => {
-    if (!size || freeze) return;
+    if (!size || effectiveFreeze) return;
     let cancelled = false;
 
     const loop = () => {
@@ -274,7 +277,7 @@ export function IconField({
       cancelled = true;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [size, active, mouseRef, freeze]);
+  }, [size, active, mouseRef, effectiveFreeze]);
 
   if (!size) return null;
 
