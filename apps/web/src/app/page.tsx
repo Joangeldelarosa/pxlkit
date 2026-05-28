@@ -22,7 +22,7 @@ import { motion } from 'framer-motion';
 import { useState, useCallback, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { TOTAL_ICON_COUNT } from '../components/HeroCollage';
-import { HeroCinematic } from '../components/hero';
+import { HeroCinematic, StatCardStrip } from '../components/hero';
 import { useToast } from '../components/ToastProvider';
 import type { ToastTone } from '../components/ToastProvider';
 import { CoolEmoji } from '../data/cool-emoji';
@@ -64,7 +64,7 @@ export default function HomePage() {
   return (
     <div className="relative overflow-x-hidden w-full max-w-[100vw]">
       <HeroCinematic />
-      <TrustBar />
+      <StatCardStrip />
       <TemplatesShowcase />
       <FeaturesSection />
       <HowItWorks />

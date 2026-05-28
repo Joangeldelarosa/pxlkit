@@ -1,2 +1,2 @@
 export { HeroCinematic } from './HeroCinematic';
-// StatCardStrip exported in wave 6
+export { StatCardStrip } from './StatCardStrip';
