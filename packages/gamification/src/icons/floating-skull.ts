@@ -11,10 +11,10 @@ export const FloatingSkull: AnimatedPxlKitData = {
   size: 16,
   category: 'gamification',
   palette: {
-    W: '#EEEEEE', // skull white
-    D: '#888888', // shadow dark
+    W: '#C4CAD8', // pale ghost (was #EEEEEE — invisible on a light background)
+    D: '#6E7486', // shadow (darker for definition)
     K: '#1A1A2E', // eye socket black
-    T: '#DDDDFF', // ghostly tint
+    T: '#AFAFD8', // ghostly wisp tint
   },
   frames: [
     {
