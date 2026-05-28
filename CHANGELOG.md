@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [social 1.2.4] - 2026-05-27 — Social pack refinement pass
+
+A visual-quality pass on the `@pxlkit/social` pack using the
+`/dev/inspector` tool (multi-resolution + pixel-grid overlay) and verified
+on checker / dark / light backgrounds and at 16px native size.
+
+### Changed — `@pxlkit/social` v1.2.4
+
+- Redesigned for legibility, family coherence and metaphor correctness:
+  - `thumbs-up` / `thumbs-down` — replaced the abstract gold hook with a
+    clearer fist + vertical thumb silhouette and orange cuff.
+  - `at-sign` — replaced the concentric-target look with an open-ring +
+    inner `a`-curl + tail extending bottom-right.
+  - `star-face` — rebuilt on the shared face silhouette so it reads as a
+    face with two distinct star eyes (not a starburst).
+  - `surprise` — wide 2×2 black eyes + clean round O mouth (removed the
+    forehead highlight that made the face read as an `8`).
+  - `angry` — simplified to a clean V-brow + recessed eyes + grimace
+    mouth on the shared face silhouette in red flush.
+  - `block-user` — promoted to the shared blue person silhouette of
+    `add-user` / `remove-user` with a clearer red badge containing a
+    diagonal white slash, so the family is visually consistent.
+
 ## [core 1.3.3 / feedback 1.2.5 / gamification 1.2.4] - 2026-05-27 — Icon refinement pass + core type export
 
 A visual-quality pass on two icon packs, driven by a new internal

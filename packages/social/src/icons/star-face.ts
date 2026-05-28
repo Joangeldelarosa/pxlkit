@@ -4,13 +4,15 @@ import type { PxlKitData } from '@pxlkit/core';
  * 🌟 StarFace — 16×16 pixel art star-eyed face emoji
  *
  * Yellow face with star-shaped pupils and beaming smile — awestruck, fans.
+ * Uses the same yellow face silhouette as `smile` so the face family stays
+ * coherent; the eyes are 3×3 plus-shaped orange stars centered on cols 5 and 10
+ * (mirror-symmetric about col 7.5).
  *
  * Palette:
  *   Y = Yellow      (#FFD700)
  *   S = Star orange (#FF9500)
- *   K = Black       (#1A1A1A)
+ *   K = Mouth black (#1A1A1A)
  *   O = Outline     (#CC9900)
- *   W = White       (#FFFFFF)
  */
 export const StarFace: PxlKitData = {
   name: 'star-face',
@@ -18,19 +20,19 @@ export const StarFace: PxlKitData = {
   category: 'social',
   grid: [
     '................',
-    '.....O..O.......',
-    '....OOYYOO......',
-    '..OOYYYYYYOO....',
-    '..OYYYSYYSYYO...',
-    '.OOYYSSYSSYYOO..',
-    '.OYSSSSYSSSSYO..',
-    '.OYYSYSYYSYSYO..',
-    '.OYYSSYSSYSSYO..',
-    '.OYYYSYYSYYYO...',
-    '..OYYYYYYYYYO...',
-    '..OOYYKKKYYOO...',
+    '.....OOOOOO.....',
+    '...OOYYYYYYOO...',
+    '..OOYYYYYYYYOO..',
+    '..OYYSYYYYSYYO..',
+    '.OOYSSSYYSSSYOO.',
+    '.OYYYSYYYYSYYYO.',
+    '.OYYKYYYYYYKYYO.',
+    '.OYYYKYYYYKYYYO.',
+    '.OYYYYKKKKYYYYO.',
+    '..OYYYYYYYYYYO..',
+    '..OOYYYYYYYYOO..',
     '...OOOOOOOOOO...',
-    '......OO........',
+    '................',
     '................',
     '................',
   ],
@@ -39,7 +41,6 @@ export const StarFace: PxlKitData = {
     S: '#FF9500',
     K: '#1A1A1A',
     O: '#CC9900',
-    W: '#FFFFFF',
   },
   tags: ['star', 'eyes', 'amazed', 'fan', 'starstruck', 'emoji', 'social'],
   author: 'pxlkit',

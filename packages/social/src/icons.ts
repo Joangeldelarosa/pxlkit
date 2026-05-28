@@ -138,44 +138,59 @@ export const HeartBroken = createIcon(
   }
 );
 
-export const ThumbsUp = createIcon(
-  'thumbs-up',
-  { S: '#FBBF24', D: '#D69E2E', B: '#F97316' },
-  ['thumbs-up', 'like', 'approve', 'positive', 'social'],
-  ({ fillRect, rect, line, set }) => {
-    // thumb
-    fillRect(5, 3, 3, 5, 'S');
-    line(6, 2, 9, 2, 'S');
-    set(10, 3, 'S');
-    // hand
-    fillRect(3, 8, 9, 5, 'S');
-    rect(3, 8, 9, 5, 'D');
-    // finger lines
-    line(4, 10, 10, 10, 'D');
-    line(4, 12, 10, 12, 'D');
-    // cuff
-    fillRect(3, 13, 3, 2, 'B');
-  }
-);
+export const ThumbsUp: PxlKitData = {
+  name: 'thumbs-up',
+  size: 16,
+  category: 'social',
+  grid: [
+    '................',
+    '....SSS.........',
+    '....SDS.........',
+    '....SDS.........',
+    '....SDS.........',
+    '..SSSSSSSSSS....',
+    '..SSSSSSSSSS....',
+    '..SDDDDDDDDS....',
+    '..SSSSSSSSSS....',
+    '..SDDDDDDDDS....',
+    '..SSSSSSSSSS....',
+    '..SSSSSSSSSS....',
+    '..BBBBBBBBBB....',
+    '..BBBBBBBBBB....',
+    '................',
+    '................',
+  ],
+  palette: { S: '#FBBF24', D: '#D69E2E', B: '#F97316' },
+  tags: ['thumbs-up', 'like', 'approve', 'positive', 'social'],
+  author: 'pxlkit',
+};
 
-export const ThumbsDown = createIcon(
-  'thumbs-down',
-  { S: '#FBBF24', D: '#D69E2E', B: '#F97316' },
-  ['thumbs-down', 'dislike', 'reject', 'negative', 'social'],
-  ({ fillRect, rect, line, set }) => {
-    // inverted hand
-    fillRect(4, 3, 9, 5, 'S');
-    rect(4, 3, 9, 5, 'D');
-    line(5, 5, 11, 5, 'D');
-    line(5, 7, 11, 7, 'D');
-    // thumb going down
-    fillRect(8, 8, 3, 5, 'S');
-    line(7, 13, 10, 13, 'S');
-    set(6, 12, 'S');
-    // cuff
-    fillRect(10, 1, 3, 2, 'B');
-  }
-);
+export const ThumbsDown: PxlKitData = {
+  name: 'thumbs-down',
+  size: 16,
+  category: 'social',
+  grid: [
+    '................',
+    '................',
+    '..BBBBBBBBBB....',
+    '..BBBBBBBBBB....',
+    '..SSSSSSSSSS....',
+    '..SSSSSSSSSS....',
+    '..SDDDDDDDDS....',
+    '..SSSSSSSSSS....',
+    '..SDDDDDDDDS....',
+    '..SSSSSSSSSS....',
+    '..SSSSSSSSSS....',
+    '....SDS.........',
+    '....SDS.........',
+    '....SDS.........',
+    '....SSS.........',
+    '................',
+  ],
+  palette: { S: '#FBBF24', D: '#D69E2E', B: '#F97316' },
+  tags: ['thumbs-down', 'dislike', 'reject', 'negative', 'social'],
+  author: 'pxlkit',
+};
 
 export const User = createIcon(
   'user',
@@ -294,18 +309,32 @@ export const EyeOff = createIcon(
   }
 );
 
-export const AtSign = createIcon(
-  'at-sign',
-  { B: '#06B6D4', D: '#0891B2' },
-  ['at', 'email', 'mention', 'address', 'social'],
-  ({ ring, fillCircle, line }) => {
-    ring(7.5, 7.5, 6, 'B');
-    ring(7.5, 7.5, 3, 'D', 0.8);
-    fillCircle(7.5, 7.5, 1.5, 'B');
-    line(10, 6, 10, 10, 'D');
-    line(10, 10, 12, 10, 'D');
-  }
-);
+export const AtSign: PxlKitData = {
+  name: 'at-sign',
+  size: 16,
+  category: 'social',
+  grid: [
+    '................',
+    '...BBBBBBBB.....',
+    '..B........B....',
+    '..B.DDDDDD.B....',
+    '..B.D....D.B....',
+    '..B.D.DD.D.B....',
+    '..B.D.DD.D.B....',
+    '..B.D....D.B....',
+    '..B.DDDDDD.BB...',
+    '..B.........BB..',
+    '...B.......BBB..',
+    '....BBBBBBB.....',
+    '................',
+    '................',
+    '................',
+    '................',
+  ],
+  palette: { B: '#06B6D4', D: '#0891B2' },
+  tags: ['at', 'email', 'mention', 'address', 'social'],
+  author: 'pxlkit',
+};
 
 export const Hashtag = createIcon(
   'hashtag',

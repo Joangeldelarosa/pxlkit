@@ -3,13 +3,14 @@ import type { PxlKitData } from '@pxlkit/core';
 /**
  * 😠 Angry — 16×16 pixel art angry face emoji
  *
- * Red-flushed face with furrowed brow and grimace — anger, frustration.
+ * Red-flushed face with V-shaped lowered brow and a grimace mouth — anger,
+ * frustration. Uses the same face silhouette as the rest of the face family
+ * but in red flush + dark-red outline (D) so anger reads via colour + brow.
  *
  * Palette:
  *   R = Red flush   (#FF6B6B)
- *   O = Orange mix  (#FF8C42)
- *   K = Black       (#1A1A1A)
- *   D = Dark brow   (#993300)
+ *   K = Brow/eyes/mouth (#1A1A1A)
+ *   D = Dark outline    (#993300)
  */
 export const Angry: PxlKitData = {
   name: 'angry',
@@ -17,16 +18,16 @@ export const Angry: PxlKitData = {
   category: 'social',
   grid: [
     '................',
-    '....DDDDDDDD....',
+    '.....DDDDDD.....',
     '...DDRRRRRRDD...',
     '..DDRRRRRRRRDD..',
-    '..DRKKRRRRKKRD..',
-    '.DDRRDKKKKDRRDD.',
-    '.DRRRRKRRKRRRD..',
-    '.DRRRRRRRRRRRD..',
-    '.DRRRRKKKKRRRD..',
-    '.DRRRKKDDKKRRD..',
-    '..DRRDKRRKDRD...',
+    '..DRRKKRRKKRRD..',
+    '.DRRRRKKKKRRRRD.',
+    '.DRRRRKRRKRRRRD.',
+    '.DRRRRRRRRRRRRD.',
+    '.DRRRKKKKKKRRRD.',
+    '.DRRKRRRRRRKRRD.',
+    '..DRRRRRRRRRRD..',
     '..DDRRRRRRRRDD..',
     '...DDDDDDDDDD...',
     '................',
@@ -35,7 +36,6 @@ export const Angry: PxlKitData = {
   ],
   palette: {
     R: '#FF6B6B',
-    O: '#FF8C42',
     K: '#1A1A1A',
     D: '#993300',
   },
