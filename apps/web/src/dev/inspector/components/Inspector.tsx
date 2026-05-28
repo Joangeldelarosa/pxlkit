@@ -22,6 +22,7 @@ export function Inspector({ initialState }: InspectorProps) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- flag client mount so Playwright can wait on [data-ready="true"]
     setReady(true);
   }, []);
 
