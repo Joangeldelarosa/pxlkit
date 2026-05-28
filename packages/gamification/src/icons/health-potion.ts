@@ -1,16 +1,14 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * ❤️‍🩹 HealthPotion — 16×16 pixel art red health potion
+ * ❤️‍🩹 HealthPotion — a rounded red bottle with a cork and a white "+" health
+ * cross on the body (the old one promised a plus label but never drew it, so it
+ * was just a generic red blob).
  *
- * A rounded red glass bottle with a cork stopper and a plus sign label.
- *
- * Palette:
  *   K = Cork brown (#654321)
  *   R = Red liquid (#FF4040)
- *   L = Light shine (#FF9090)
  *   D = Dark glass (#B01010)
- *   W = White shine (#FFFFFF)
+ *   W = White cross / shine (#FFFFFF)
  */
 export const HealthPotion: PxlKitData = {
   name: 'health-potion',
@@ -18,18 +16,18 @@ export const HealthPotion: PxlKitData = {
   category: 'gamification',
   grid: [
     '................',
-    '........K.......',
-    '.......KKK......',
-    '......KKKKK.....',
-    '......RRRRR.....',
-    '.....RRWRRRR....',
-    '.....RRRRRRRR...',
-    '.....RRRRRRRR...',
-    '.....DRRRRRRD...',
-    '.....DRRWRRRD...',
-    '......DRRRD.....',
-    '......DRRRD.....',
-    '.......DDD......',
+    '.......KK.......',
+    '.......KK.......',
+    '......DRRD......',
+    '.....DRRRRD.....',
+    '....DRRRRRRD....',
+    '....RRRWWRRR....',
+    '....RWWWWWWR....',
+    '....RWWWWWWR....',
+    '....RRRWWRRR....',
+    '....DRRRRRRD....',
+    '.....DRRRRD.....',
+    '......DRRD......',
     '................',
     '................',
     '................',
@@ -37,7 +35,6 @@ export const HealthPotion: PxlKitData = {
   palette: {
     K: '#654321',
     R: '#FF4040',
-    L: '#FF9090',
     D: '#B01010',
     W: '#FFFFFF',
   },
