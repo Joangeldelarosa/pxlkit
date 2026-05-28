@@ -3,13 +3,14 @@ import type { PxlKitData } from '@pxlkit/core';
 /**
  * 🚫 BlockUser — 16×16 pixel art block user
  *
- * A person silhouette overlaid with a red circle-slash — block or ban.
+ * Blue person silhouette (matching add-user / remove-user for family coherence)
+ * with a small red 3×3 badge containing a white diagonal slash — block or ban.
  *
  * Palette:
- *   H = Head grey   (#8899AA)
- *   B = Body grey   (#778899)
- *   R = Red circle  (#E74C3C)
- *   D = Dark red    (#C0392B)
+ *   H = Head blue   (#5B9BD5)
+ *   B = Body blue   (#4A7EBF)
+ *   R = Red badge   (#E74C3C)
+ *   W = White slash (#FFFFFF)
  */
 export const BlockUser: PxlKitData = {
   name: 'block-user',
@@ -17,27 +18,27 @@ export const BlockUser: PxlKitData = {
   category: 'social',
   grid: [
     '................',
-    '....HHH.........', 
-    '...HHHHH........',
-    '....HHH.........',
-    '...BBBBB........',
-    '..BBBBBBB.......',
-    '...BBBBB........',
-    '...BBBBB........',
-    '..BBBBBBB..RRRRR',
-    '..BBBBBBB.RRDRRR',
-    '..BBBBBBB.RRRDRR',
-    '..BBBBBBB..RDDDD',
-    '..BBBBBBB....RR.',
-    '..BBBBBBBBB.....',
+    '.....HHH........',
+    '....HHHHH.......',
+    '.....HHH........',
+    '....BBBBB.......',
+    '...BBBBBBB......',
+    '....BBBBB.......',
+    '....BBBBB.......',
+    '...BBBBBBB......',
+    '...BBBBBBB...RRW',
+    '...BBBBBBB...RWR',
+    '...BBBBBBB...WRR',
+    '...BBBBBBB......',
+    '...BBBBBBBBB....',
     '................',
     '................',
   ],
   palette: {
-    H: '#8899AA',
-    B: '#778899',
+    H: '#5B9BD5',
+    B: '#4A7EBF',
     R: '#E74C3C',
-    D: '#C0392B',
+    W: '#FFFFFF',
   },
   tags: ['block', 'ban', 'restrict', 'user', 'social'],
   author: 'pxlkit',
