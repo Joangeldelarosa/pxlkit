@@ -1,16 +1,9 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 🏅 Badge — 16×16 pixel art achievement badge
- *
- * A round badge with a star center — for achievements and certifications.
- *
- * Palette:
- *   G = Gold outer ring (#FFD700)
- *   D = Dark gold       (#B8860B)
- *   B = Blue center     (#3498DB)
- *   W = White star      (#FFFFFF)
- *   S = Star shadow     (#AED6F1)
+ * 🏅 Badge — round achievement badge: gold ring, blue field, a centered white
+ * 5-point star, and a small gold ribbon nub below. Star is symmetric about the
+ * vertical axis (the old one was a left-shifted bar).
  */
 export const Badge: PxlKitData = {
   name: 'badge',
@@ -18,20 +11,20 @@ export const Badge: PxlKitData = {
   category: 'feedback',
   grid: [
     '................',
-    '.....GGGGG......',
-    '...GGBBBBBGG....',
-    '..GBBBBBBBBBG...',
-    '.GBBBBWBBBBBBG..',
-    '.GBBWWWWWBBBBBG.',
-    '.GBBBBBBBBBBBG..',
-    '.GBBBWWWWWBBBG..',
-    '.GBBBBBBBBBBBG..',
-    '.GBBBBWBBBBBBG..',
-    '..GBBBBBBBBBG...',
-    '...GGBBBBBGG....',
-    '.....GDDGG......',
-    '.....G..G.......',
-    '.....GGGG.......',
+    '.....GGGGGG.....',
+    '...GGGGGGGGGG...',
+    '..GGBBBBBBBBGG..',
+    '..GBBBBWWBBBBG..',
+    '.GBBBBBWWBBBBBG.',
+    '.GBBWWWWWWWWBBG.',
+    '.GBBBWWWWWWBBBG.',
+    '..GBBWWBBWWBBG..',
+    '..GGBBBBBBBBGG..',
+    '...GGGGGGGGGG...',
+    '.....GGGGGG.....',
+    '......GDDG......',
+    '......G..G......',
+    '......GGGG......',
     '................',
   ],
   palette: {
@@ -39,7 +32,6 @@ export const Badge: PxlKitData = {
     D: '#B8860B',
     B: '#3498DB',
     W: '#FFFFFF',
-    S: '#AED6F1',
   },
   tags: ['badge', 'achievement', 'award', 'certified', 'medal', 'feedback'],
   author: 'pxlkit',

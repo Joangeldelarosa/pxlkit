@@ -1,17 +1,15 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 📦 LootChest — 16×16 pixel art open treasure chest
+ * 📦 LootChest — an OPEN treasure chest: the lid is raised (dark underside
+ * showing) with gold spilling out the top over a wooden box. The old one read
+ * as a closed chest with a gold band.
  *
- * An open wooden chest overflowing with gold, with a raised lid.
- * Distinct from the closed Chest icon (lid is raised, contents visible).
- *
- * Palette:
- *   B = Brown wood  (#8B4513)
- *   D = Dark wood   (#5C2E00)
- *   G = Gold trim   (#FFD700)
- *   Y = Gold loot   (#FFF176)
- *   K = Keyhole     (#1A0A00)
+ *   B = Brown wood (#8B4513)
+ *   G = Gold trim (#FFD700)
+ *   Y = Gold loot (#FFF176)
+ *   D = Dark lid underside (#5C2E00)
+ *   K = Keyhole (#1A0A00)
  */
 export const LootChest: PxlKitData = {
   name: 'loot-chest',
@@ -19,17 +17,17 @@ export const LootChest: PxlKitData = {
   category: 'gamification',
   grid: [
     '................',
-    '................',
-    '...GGGGGGGGG....',
-    '..GBBBBBBBBGG...',
-    '..GBBGYYYYBGG...',
-    '..GGGGGGGGGG....',
-    '..GBBBBBBBBBG...',
-    '..GBBBGKGBBBBG..',
-    '..GBBBBBBBBBBG..',
-    '..GBBBBBBBBBBG..',
-    '..GGGGGGGGGGGG..',
-    '...BBBBBBBBBB...',
+    '...GGGGGGGGGG...',
+    '...GDDDDDDDDG...',
+    '...GG.YYYY.GG...',
+    '....YYYYYYYY....',
+    '...YYYYYYYYYY...',
+    '...GGGGGGGGGG...',
+    '...GBBBKKBBBG...',
+    '...GBBBBBBBBG...',
+    '...GBBBBBBBBG...',
+    '...GGGGGGGGGG...',
+    '....BBBBBBBB....',
     '................',
     '................',
     '................',
@@ -37,9 +35,9 @@ export const LootChest: PxlKitData = {
   ],
   palette: {
     B: '#8B4513',
-    D: '#5C2E00',
     G: '#FFD700',
     Y: '#FFF176',
+    D: '#5C2E00',
     K: '#1A0A00',
   },
   tags: ['loot', 'chest', 'treasure', 'reward', 'open', 'rpg'],

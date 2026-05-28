@@ -1,11 +1,10 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 🏹 Bow — 16×16 pixel art bow (weapon)
+ * 🏹 Bow — a recurve bow: curved wooden limb ("(" shape) on the left with a
+ * straight taut string (the chord) on the right. The old version was a full
+ * circle with a bar through it (read as an eye/round shield).
  *
- * A wooden recurve bow with taut string.
- *
- * Palette:
  *   B = Brown wood (#7B5E3A)
  *   S = String     (#D0C890)
  */
@@ -15,20 +14,20 @@ export const Bow: PxlKitData = {
   category: 'gamification',
   grid: [
     '................',
-    '..BBBBBBBBB.....',
-    '.B.........B....',
-    'B...........B...',
-    'B.....S.....B...',
-    'B.....S.....B...',
-    'B.....S.....B...',
-    'B.....S.....B...',
-    'B.....S.....B...',
-    'B.....S.....B...',
-    'B.....S.....B...',
-    'B...........B...',
-    '.B.........B....',
-    '..BBBBBBBBB.....',
-    '................',
+    '.........B......',
+    '.......BBS......',
+    '......BB.S......',
+    '.....BB..S......',
+    '....BB...S......',
+    '....B....S......',
+    '...B.....S......',
+    '...B.....S......',
+    '....B....S......',
+    '....BB...S......',
+    '.....BB..S......',
+    '......BB.S......',
+    '.......BBS......',
+    '.........B......',
     '................',
   ],
   palette: {

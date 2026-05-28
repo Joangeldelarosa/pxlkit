@@ -1,15 +1,13 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * ⚠️🚧 Caution — 16×16 pixel art caution/hazard stripes
+ * ⚠️🚧 Caution — a centered, symmetric hazard triangle filled with bold
+ * yellow/black diagonal stripes inside an orange border. Stronger than a plain
+ * warning — physical danger / critical state.
  *
- * Yellow and black diagonal hazard stripes inside a warning border.
- * Stronger than a regular warning — physical danger or critical state.
- *
- * Palette:
- *   Y = Yellow stripes (#FFD700)
- *   B = Black stripes  (#1A1A1A)
- *   O = Orange border  (#E67E22)
+ *   O = Orange border (#E67E22)
+ *   Y = Yellow stripe (#FFD700)
+ *   B = Black stripe   (#1A1A1A)
  */
 export const Caution: PxlKitData = {
   name: 'caution',
@@ -17,26 +15,26 @@ export const Caution: PxlKitData = {
   category: 'feedback',
   grid: [
     '................',
-    '.......OO.......',
-    '......OOOO......',
-    '.....OOBBOO.....',
-    '....OOBYYBO.....',
-    '....OBYYYYBO....',
-    '...OBBYYBBYBO...',
-    '...OBYYYYBYBO...',
-    '..OBBYYBBYYBO...',
-    '..OBYYYYBYYBOO..',
-    '.OBBYYBBYYBBOO..',
-    '.OBBBBBBBBBBOOO.',
-    'OOOOOOOOOOOOOOOO',
     '................',
+    '.......OO.......',
+    '......OBBO......',
+    '......OBYO......',
+    '.....OBYYYO.....',
+    '.....OYYYBO.....',
+    '....OYYYBBBO....',
+    '....OYYBBBYO....',
+    '...OYYBBBYYYO...',
+    '...OYBBBYYYBO...',
+    '..OYBBBYYYBBBO..',
+    '..OBBBYYYBBBYO..',
+    '.OOOOOOOOOOOOOO.',
     '................',
     '................',
   ],
   palette: {
+    O: '#E67E22',
     Y: '#FFD700',
     B: '#1A1A1A',
-    O: '#E67E22',
   },
   tags: ['caution', 'hazard', 'danger', 'warning', 'stripe', 'feedback'],
   author: 'pxlkit',

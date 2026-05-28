@@ -1,15 +1,13 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 🪓 Axe — 16×16 pixel art battle axe
+ * 🪓 Axe — a battle axe: a crescent silver blade (cutting edge to the left)
+ * attached along a vertical brown handle. The old one had an ambiguous head
+ * plus a stray gold "guard" that read as a branch.
  *
- * A wide-bladed battle axe with brown handle and gold guard.
- *
- * Palette:
  *   S = Silver blade (#C0C0C0)
- *   D = Dark blade   (#808080)
- *   W = Blade shine  (#FFFFFF)
- *   G = Gold guard   (#FFD700)
+ *   D = Dark blade (#808080)
+ *   W = Cutting-edge shine (#FFFFFF)
  *   B = Brown handle (#8B4513)
  */
 export const Axe: PxlKitData = {
@@ -18,27 +16,26 @@ export const Axe: PxlKitData = {
   category: 'gamification',
   grid: [
     '................',
-    '........SSSSSS..',
-    '.......SSSSSSS..',
-    '......SDDSSSSS..',
-    '.....SDDDSSSS...',
-    '....SDDDDSSS....',
-    '...GGGGGB.......',
-    '....G...B.......',
-    '.....G..B.......',
-    '......GBBB......',
-    '.......BBB......',
+    '...SSSSSBB......',
+    '..SSSSSSBB......',
+    '.SSSSSSSBB......',
+    'WSSSSSSDBB......',
+    '.SSSSSSSBB......',
+    '..SSSSSSBB......',
+    '...SSSSSBB......',
     '........BB......',
-    '........DB......',
-    '.........D......',
-    '................',
+    '........BB......',
+    '........BB......',
+    '........BB......',
+    '........BB......',
+    '........BB......',
+    '........BB......',
     '................',
   ],
   palette: {
     S: '#C0C0C0',
     D: '#808080',
     W: '#FFFFFF',
-    G: '#FFD700',
     B: '#8B4513',
   },
   tags: ['axe', 'weapon', 'battle', 'hack', 'warrior', 'rpg'],

@@ -1,15 +1,13 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 🛡️✕ ShieldCross — 16×16 pixel art shield with an X
+ * 🛡️✕ ShieldCross — filled red shield with a white ✕ (access denied / blocked /
+ * failed protection). Shares the shield silhouette of shield-check / -alert /
+ * -exclamation.
  *
- * A red shield with a white × mark — access denied, blocked, or failed protection.
- *
- * Palette:
- *   R = Red shield  (#E74C3C)
- *   D = Dark red    (#A93226)
- *   W = White X     (#FFFFFF)
- *   S = Shield edge (#C0392B)
+ *   S = Shield fill (#E03131)
+ *   D = Dark rim (#9B1C1C)
+ *   C = White mark (#FFFFFF)
  */
 export const ShieldCross: PxlKitData = {
   name: 'shield-cross',
@@ -17,27 +15,26 @@ export const ShieldCross: PxlKitData = {
   category: 'feedback',
   grid: [
     '................',
-    '....RRRRRRR.....',
-    '...RRRRRRRRRR...',
-    '..RRRSWWWWSRRRR.',
-    '..RRSWWRSWWSRRR.',
-    '..RRWWWWWWWWRRR.',
-    '..RRWWRWRWWRRR..',
-    '..RRSWWWWWSRRR..',
-    '..RRSWWSWWSRRR..',
-    '..RRRSWWWSRRRR..',
-    '...RRRRRRRRRR...',
-    '....RRRRRRRRR...',
-    '.....RRRRRRR....',
-    '......RRRRR.....',
-    '.......RRR......',
-    '........R.......',
+    '................',
+    '...SSSSSSSSSS...',
+    '...SSSSSSSSSS...',
+    '...SSSSSSSSSS...',
+    '...SSCSSSSCSS...',
+    '...SSSCSSCSSS...',
+    '...SSSSCCSSSS...',
+    '...SSSSCCSSSS...',
+    '....DSCSSCSD....',
+    '....DCSSSSCD....',
+    '.....DSSSSD.....',
+    '......DSSD......',
+    '.......DD.......',
+    '................',
+    '................',
   ],
   palette: {
-    R: '#E74C3C',
-    D: '#A93226',
-    W: '#FFFFFF',
-    S: '#C0392B',
+    S: '#E03131',
+    D: '#9B1C1C',
+    C: '#FFFFFF',
   },
   tags: ['shield', 'cross', 'block', 'deny', 'fail', 'security', 'feedback'],
   author: 'pxlkit',

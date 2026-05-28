@@ -1,46 +1,38 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 🎀 Ribbon — 16×16 pixel art award ribbon
- *
- * A vertical medal ribbon with a circular award medallion at the bottom.
- *
- * Palette:
- *   R = Red ribbon  (#E74C3C)
- *   D = Dark red    (#A93226)
- *   G = Gold medal  (#FFD700)
- *   B = Dark gold   (#B8860B)
- *   W = White shine (#FFFFFF)
+ * 🥇 Ribbon — an award medal hanging from a folded ribbon. The ribbon meets at
+ * a point at the TOP (a hook/fold) and opens into two bands that attach to the
+ * gold disc below, which carries a white star. Ribbon-on-top inverts the
+ * composition so it can't read as a character (the disc-over-tails failure).
  */
 export const Ribbon: PxlKitData = {
   name: 'ribbon',
   size: 16,
   category: 'feedback',
   grid: [
-    '................',
+    '.......RR.......',
     '......RRRR......',
-    '.....RRDDRR.....',
+    '......R..R......',
     '.....RR..RR.....',
     '....RR....RR....',
-    '....RD....DR....',
-    '.....RR..RR.....',
-    '.....RRRRRR.....',
-    '......RRRR......',
-    '.....GGGGGG.....',
-    '....GGWWWWGG....',
-    '....GGWBBWGG....',
-    '....GGWWWWGG....',
-    '.....GGGGGG.....',
+    '...GGGGGGGGGG...',
+    '..GGGGGGGGGGGG..',
+    '..GGGGGGGGGGGG..',
+    '..GGGGGWWGGGGG..',
+    '..GGGGWWWWGGGG..',
+    '..GGGGGWWGGGGG..',
+    '..GGGGGGGGGGGG..',
+    '...GGGGGGGGGG...',
+    '....GGGGGGGG....',
     '................',
     '................',
   ],
   palette: {
-    R: '#E74C3C',
-    D: '#A93226',
     G: '#FFD700',
-    B: '#B8860B',
     W: '#FFFFFF',
+    R: '#E03131',
   },
-  tags: ['ribbon', 'award', 'prize', 'first-place', 'winner', 'feedback'],
+  tags: ['ribbon', 'award', 'prize', 'first-place', 'winner', 'medal', 'feedback'],
   author: 'pxlkit',
 };

@@ -109,6 +109,6 @@ export const FeedbackPack: IconPack = {
     DoubleCheck, Badge, Ribbon, FeedbackTarget, TargetHit,
     Bug, BugFixed, Caution, ShieldCross, ShieldExclamation,
   ],
-  version: '0.1.0',
+  version: '1.2.5',
   author: 'pxlkit',
 };

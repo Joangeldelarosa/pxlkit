@@ -1,15 +1,13 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 🛡️! ShieldExclamation — 16×16 pixel art shield with exclamation
+ * 🛡️! ShieldExclamation — filled orange shield with a white ! (critical
+ * security issue). Shares the shield silhouette of shield-check / -alert /
+ * -cross; orange marks higher severity than the amber shield-alert.
  *
- * An orange shield with a white ! — security warning or policy issue.
- *
- * Palette:
- *   O = Orange      (#E67E22)
- *   D = Dark orange (#CA6F1E)
- *   W = White mark  (#FFFFFF)
- *   L = Light tint  (#F0A04B)
+ *   S = Shield fill (#E8590C)
+ *   D = Dark rim (#9A3412)
+ *   C = White mark (#FFFFFF)
  */
 export const ShieldExclamation: PxlKitData = {
   name: 'shield-exclamation',
@@ -17,28 +15,27 @@ export const ShieldExclamation: PxlKitData = {
   category: 'feedback',
   grid: [
     '................',
-    '....OOOOOOOO....',
-    '...OOOOOOOOOOO..',
-    '..OOOOLOOOOLOO..',
-    '..OOOOWOOOOOO...',
-    '..OOOOWOOOOOO...',
-    '..OOOOWOOOOOO...',
-    '..OOOOWOOOOO....',
-    '..OOOOO.OOOO....',
-    '..OOOOWOOOO.....',
-    '..OOOOWOOO......',
-    '...OOOOOOO......',
-    '....OOOOOOO.....',
-    '.....OOOOOO.....',
-    '......OOOO......',
-    '.......OO.......',
+    '................',
+    '...SSSSSSSSSS...',
+    '...SSSSSSSSSS...',
+    '...SSSSSSSSSS...',
+    '...SSSSCCSSSS...',
+    '...SSSSCCSSSS...',
+    '...SSSSCCSSSS...',
+    '...SSSSCCSSSS...',
+    '....DSSSSSSD....',
+    '....DSSCCSSD....',
+    '.....DSSSSD.....',
+    '......DSSD......',
+    '.......DD.......',
+    '................',
+    '................',
   ],
   palette: {
-    O: '#E67E22',
-    D: '#CA6F1E',
-    W: '#FFFFFF',
-    L: '#F0A04B',
+    S: '#E8590C',
+    D: '#9A3412',
+    C: '#FFFFFF',
   },
-  tags: ['shield', 'exclamation', 'warning', 'alert', 'security', 'feedback'],
+  tags: ['shield', 'exclamation', 'warning', 'alert', 'critical', 'security', 'feedback'],
   author: 'pxlkit',
 };

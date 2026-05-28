@@ -22,7 +22,7 @@ function inBounds(x: number, y: number): boolean {
   return x >= 0 && x < SIZE && y >= 0 && y < SIZE;
 }
 
-function createIcon(
+export function createIcon(
   name: string,
   palette: Record<string, string>,
   tags: string[],
@@ -115,6 +115,47 @@ function createIcon(
   };
 }
 
+// ─── Shared shield silhouette (unifies the shield-* family) ───
+const SHIELD_ROWS = [
+  '................',
+  '................',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '...SSSSSSSSSS...',
+  '....SSSSSSSS....',
+  '....SSSSSSSS....',
+  '.....SSSSSS.....',
+  '......SSSS......',
+  '.......SS.......',
+  '................',
+  '................',
+];
+
+const SHIELD_RIM: ReadonlyArray<readonly [number, number]> = [
+  [4, 9], [11, 9], [4, 10], [11, 10], [5, 11], [10, 11], [6, 12], [9, 12], [7, 13], [8, 13],
+];
+
+/**
+ * Stamp the shared filled-shield silhouette (`fill`) with a darker beveled
+ * lower rim (`rim`). Every shield-* icon uses this so the family is coherent.
+ */
+export function paintShield(
+  set: (x: number, y: number, char: string) => void,
+  fill: string,
+  rim: string
+) {
+  for (let y = 0; y < SIZE; y += 1) {
+    for (let x = 0; x < SIZE; x += 1) {
+      if (SHIELD_ROWS[y][x] === 'S') set(x, y, fill);
+    }
+  }
+  for (const [x, y] of SHIELD_RIM) set(x, y, rim);
+}
+
 export const CheckCircle = createIcon(
   'check-circle',
   { O: '#00CC66', C: '#FFFFFF' },
@@ -148,16 +189,26 @@ export const InfoCircle = createIcon(
   }
 );
 
+const TRIANGLE_SPAN: Record<number, [number, number]> = {
+  2: [7, 8], 3: [6, 9], 4: [6, 9], 5: [5, 10], 6: [5, 10], 7: [4, 11],
+  8: [4, 11], 9: [3, 12], 10: [3, 12], 11: [2, 13], 12: [2, 13], 13: [1, 14],
+};
+
 export const WarningTriangle = createIcon(
   'warning-triangle',
   { Y: '#FFB020', D: '#8A5A00', C: '#FFFFFF' },
   ['warning', 'alert', 'caution', 'risk', 'toast', 'status'],
-  ({ line, fillRect, set }) => {
-    line(8, 2, 2, 13, 'Y');
-    line(8, 2, 13, 13, 'Y');
-    line(2, 13, 13, 13, 'D');
+  ({ set, fillRect }) => {
+    // filled, centered, symmetric triangle with a dark border
+    for (let y = 2; y <= 13; y += 1) {
+      const [l, r] = TRIANGLE_SPAN[y];
+      for (let x = l; x <= r; x += 1) {
+        set(x, y, x === l || x === r || y === 13 ? 'D' : 'Y');
+      }
+    }
+    // white "!" knockout
     fillRect(7, 6, 2, 4, 'C');
-    set(8, 11, 'C');
+    fillRect(7, 11, 2, 1, 'C');
   }
 );
 
@@ -165,42 +216,53 @@ export const ErrorOctagon = createIcon(
   'error-octagon',
   { R: '#E03131', C: '#FFFFFF' },
   ['error', 'stop', 'danger', 'critical', 'toast', 'status'],
-  ({ line, fillRect }) => {
-    line(5, 2, 10, 2, 'R');
-    line(3, 4, 3, 11, 'R');
-    line(12, 4, 12, 11, 'R');
-    line(5, 13, 10, 13, 'R');
-    line(4, 3, 3, 4, 'R');
-    line(11, 3, 12, 4, 'R');
-    line(3, 11, 4, 12, 'R');
-    line(12, 11, 11, 12, 'R');
-    fillRect(7, 5, 2, 5, 'C');
-    fillRect(7, 11, 2, 2, 'C');
+  ({ set, fillRect }) => {
+    // filled octagon (stop sign) — chamfered square, symmetric
+    const span: Record<number, [number, number]> = {
+      2: [5, 10], 3: [4, 11], 4: [3, 12], 5: [2, 13], 6: [2, 13], 7: [2, 13],
+      8: [2, 13], 9: [2, 13], 10: [2, 13], 11: [3, 12], 12: [4, 11], 13: [5, 10],
+    };
+    for (let y = 2; y <= 13; y += 1) {
+      const [l, r] = span[y];
+      for (let x = l; x <= r; x += 1) set(x, y, 'R');
+    }
+    // white "!" knockout
+    fillRect(7, 5, 2, 4, 'C');
+    fillRect(7, 10, 2, 1, 'C');
   }
 );
 
 export const Bell = createIcon(
   'bell',
-  { O: '#FFD700', D: '#B8860B', C: '#FFFFFF' },
+  { O: '#FFD700', D: '#B8860B' },
   ['bell', 'notification', 'alert', 'ring', 'toast', 'status'],
-  ({ rect, fillRect, ring, set }) => {
-    ring(7.5, 7, 4.5, 'O', 1.1);
-    fillRect(4, 6, 8, 5, 'O');
-    rect(4, 6, 8, 5, 'D');
-    fillRect(6, 12, 4, 1, 'D');
-    set(7, 13, 'C');
-    set(8, 13, 'C');
+  ({ set }) => {
+    // rounded dome with a top knob, near-vertical sides, flared rim + clapper
+    const dome: Record<number, [number, number]> = {
+      2: [7, 8], 3: [6, 9], 4: [5, 10], 5: [5, 10], 6: [4, 11], 7: [4, 11], 8: [4, 11], 9: [4, 11], 10: [3, 12],
+    };
+    for (let y = 2; y <= 10; y += 1) {
+      const [l, r] = dome[y];
+      for (let x = l; x <= r; x += 1) set(x, y, 'O');
+    }
+    for (let x = 2; x <= 13; x += 1) set(x, 11, 'O'); // flared rim
+    for (let x = 3; x <= 12; x += 1) set(x, 12, 'D'); // rim shadow
+    set(7, 13, 'D');
+    set(8, 13, 'D'); // clapper
   }
 );
 
 export const NotificationDot = createIcon(
   'notification-dot',
-  { B: '#29ADFF', R: '#FF3B30', C: '#FFFFFF' },
+  { B: '#29ADFF', D: '#1C6FA8', R: '#FF3B30', C: '#FFFFFF' },
   ['notification', 'badge', 'dot', 'unread', 'indicator', 'toast'],
-  ({ rect, fillCircle }) => {
-    rect(2, 3, 12, 10, 'B');
-    fillCircle(11, 4, 2, 'R');
-    fillCircle(11, 4, 1, 'C');
+  ({ fillRect, rect, fillCircle }) => {
+    // app tile (filled, rounded-ish) with a darker rim
+    fillRect(2, 5, 9, 9, 'B');
+    rect(2, 5, 9, 9, 'D');
+    // unread badge: white-bordered red dot, top-right corner
+    fillCircle(12, 4, 3, 'C');
+    fillCircle(12, 4, 2, 'R');
   }
 );
 
@@ -208,12 +270,14 @@ export const MessageSquare = createIcon(
   'message-square',
   { B: '#29ADFF', C: '#FFFFFF' },
   ['message', 'chat', 'comment', 'support', 'toast', 'ui'],
-  ({ rect, line }) => {
-    rect(2, 3, 12, 9, 'B');
-    line(6, 11, 4, 14, 'B');
-    line(6, 11, 8, 14, 'B');
-    line(4, 6, 11, 6, 'C');
-    line(4, 8, 10, 8, 'C');
+  ({ fillRect, set }) => {
+    // filled bubble + tail + two white text lines
+    fillRect(2, 3, 12, 8, 'B');
+    set(4, 11, 'B');
+    set(5, 11, 'B');
+    set(4, 12, 'B');
+    fillRect(4, 5, 8, 1, 'C');
+    fillRect(4, 7, 6, 1, 'C');
   }
 );
 
@@ -221,13 +285,15 @@ export const ChatDots = createIcon(
   'chat-dots',
   { P: '#8B5CF6', C: '#FFFFFF' },
   ['chat', 'typing', 'conversation', 'message', 'toast', 'ui'],
-  ({ rect, set }) => {
-    rect(2, 4, 12, 8, 'P');
-    set(5, 8, 'C');
-    set(8, 8, 'C');
-    set(11, 8, 'C');
+  ({ fillRect, set }) => {
+    // filled bubble + tail + three centered dots
+    fillRect(2, 3, 12, 8, 'P');
+    set(4, 11, 'P');
+    set(5, 11, 'P');
     set(4, 12, 'P');
-    set(3, 13, 'P');
+    fillRect(4, 6, 2, 2, 'C');
+    fillRect(7, 6, 2, 2, 'C');
+    fillRect(10, 6, 2, 2, 'C');
   }
 );
 
@@ -235,27 +301,30 @@ export const Mail = createIcon(
   'mail',
   { B: '#4ECDC4', C: '#FFFFFF', D: '#2C7A7B' },
   ['mail', 'email', 'inbox', 'message', 'toast', 'ui'],
-  ({ rect, line, fillRect }) => {
-    rect(2, 4, 12, 8, 'B');
-    line(2, 4, 8, 9, 'D');
-    line(13, 4, 8, 9, 'D');
-    line(2, 11, 7, 7, 'C');
-    line(13, 11, 8, 7, 'C');
-    fillRect(7, 7, 2, 2, 'C');
+  ({ fillRect, rect, line }) => {
+    // filled envelope + dark border + white flap V
+    fillRect(2, 4, 12, 9, 'B');
+    rect(2, 4, 12, 9, 'D');
+    line(3, 5, 8, 9, 'C');
+    line(12, 5, 8, 9, 'C');
   }
 );
 
 export const Send = createIcon(
   'send',
-  { B: '#29ADFF', C: '#FFFFFF' },
+  { B: '#29ADFF', D: '#1C6FB8' },
   ['send', 'paper-plane', 'message', 'forward', 'toast', 'ui'],
-  ({ line, fillRect, set }) => {
-    line(2, 8, 13, 2, 'B');
-    line(2, 8, 13, 13, 'B');
-    line(13, 2, 10, 8, 'B');
-    line(13, 13, 10, 8, 'B');
-    fillRect(6, 7, 5, 2, 'C');
-    set(11, 8, 'B');
+  ({ set }) => {
+    // FILLED paper plane pointing right (V-notch tail), two-tone fold so it
+    // survives at 16px — an outline plane collapses to mush at native size.
+    const span: Record<number, [number, number]> = {
+      3: [3, 4], 4: [3, 5], 5: [4, 7], 6: [5, 10], 7: [6, 12], 8: [7, 14],
+      9: [6, 12], 10: [5, 10], 11: [4, 7], 12: [3, 5], 13: [3, 4],
+    };
+    for (let y = 3; y <= 13; y += 1) {
+      const [l, r] = span[y];
+      for (let x = l; x <= r; x += 1) set(x, y, y <= 8 ? 'B' : 'D');
+    }
   }
 );
 
@@ -313,31 +382,23 @@ export const Unlock = createIcon(
 
 export const ShieldCheck = createIcon(
   'shield-check',
-  { B: '#4ECDC4', D: '#2B6B67', C: '#FFFFFF' },
+  { S: '#00CC66', D: '#008844', C: '#FFFFFF' },
   ['shield', 'check', 'safe', 'trusted', 'toast', 'security'],
-  ({ line }) => {
-    line(4, 3, 11, 3, 'B');
-    line(4, 3, 4, 10, 'B');
-    line(11, 3, 11, 10, 'B');
-    line(4, 10, 8, 13, 'D');
-    line(11, 10, 8, 13, 'D');
-    line(6, 8, 8, 10, 'C');
-    line(8, 10, 10, 6, 'C');
+  ({ set, line }) => {
+    paintShield(set, 'S', 'D');
+    line(5, 8, 7, 10, 'C');
+    line(7, 10, 11, 5, 'C');
   }
 );
 
 export const ShieldAlert = createIcon(
   'shield-alert',
-  { B: '#FFB020', D: '#8A5A00', C: '#FFFFFF' },
+  { S: '#FFB020', D: '#8A5A00', C: '#FFFFFF' },
   ['shield', 'alert', 'warning', 'security', 'toast', 'risk'],
-  ({ line, fillRect, set }) => {
-    line(4, 3, 11, 3, 'B');
-    line(4, 3, 4, 10, 'B');
-    line(11, 3, 11, 10, 'B');
-    line(4, 10, 8, 13, 'D');
-    line(11, 10, 8, 13, 'D');
-    fillRect(7, 6, 2, 4, 'C');
-    set(8, 11, 'C');
+  ({ set, fillRect }) => {
+    paintShield(set, 'S', 'D');
+    fillRect(7, 5, 2, 4, 'C');
+    fillRect(7, 10, 2, 1, 'C');
   }
 );
 
@@ -357,15 +418,17 @@ export const Sparkles = createIcon(
   'sparkles',
   { Y: '#FFE066', C: '#FFFFFF' },
   ['sparkles', 'shine', 'magic', 'highlight', 'toast', 'ui'],
-  ({ line, set }) => {
-    line(8, 2, 8, 6, 'Y');
-    line(6, 4, 10, 4, 'Y');
-    line(8, 10, 8, 14, 'Y');
-    line(6, 12, 10, 12, 'Y');
-    set(3, 6, 'C');
-    set(12, 7, 'C');
-    set(4, 11, 'C');
-    set(13, 3, 'C');
+  ({ set, fillRect }) => {
+    // one big diamond sparkle (centered) + two small accent sparkles
+    const diamond: Record<number, [number, number]> = {
+      3: [7, 8], 4: [6, 9], 5: [5, 10], 6: [4, 11], 7: [5, 10], 8: [6, 9], 9: [7, 8],
+    };
+    for (let y = 3; y <= 9; y += 1) {
+      const [l, r] = diamond[y];
+      for (let x = l; x <= r; x += 1) set(x, y, 'Y');
+    }
+    fillRect(12, 3, 2, 2, 'C');
+    fillRect(3, 11, 2, 2, 'C');
   }
 );
 
@@ -373,15 +436,26 @@ export const Megaphone = createIcon(
   'megaphone',
   { R: '#FF6B6B', D: '#B23A3A', C: '#FFFFFF' },
   ['megaphone', 'announce', 'broadcast', 'notice', 'toast', 'ui'],
-  ({ line, fillRect, set }) => {
-    line(4, 8, 11, 5, 'R');
-    line(4, 9, 11, 11, 'R');
-    line(11, 5, 13, 5, 'D');
-    line(11, 11, 13, 11, 'D');
-    line(13, 5, 13, 11, 'D');
-    fillRect(3, 8, 2, 2, 'R');
-    line(5, 10, 6, 13, 'D');
-    line(7, 9, 8, 13, 'C');
+  ({ set, fillRect }) => {
+    // a cone tipped on its side: wide mouth on the LEFT, tapering to a point on
+    // the right, with a straight grip HANDLE hanging from the body + sound
+    // lines off the wide mouth.
+    const cone: Record<number, [number, number]> = {
+      2: [2, 4], 3: [2, 6], 4: [2, 8], 5: [2, 9], 6: [2, 11], 7: [2, 12], 8: [2, 12], 9: [2, 11], 10: [2, 9], 11: [2, 8], 12: [2, 6], 13: [2, 4],
+    };
+    for (const key of Object.keys(cone)) {
+      const y = Number(key);
+      const [l, r] = cone[y];
+      for (let x = l; x <= r; x += 1) set(x, y, 'R');
+    }
+    // dark rim down the wide mouth (left edge)
+    for (let y = 2; y <= 13; y += 1) set(2, y, 'D');
+    // straight grip handle hanging from the underside of the cone
+    fillRect(6, 13, 2, 3, 'D');
+    // sound lines off the wide mouth (left)
+    set(0, 5, 'C');
+    set(0, 8, 'C');
+    set(0, 10, 'C');
   }
 );
 

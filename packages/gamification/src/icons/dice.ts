@@ -1,15 +1,14 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 🎲 Dice — 16×16 pixel art six-sided die
+ * 🎲 Dice — a six-sided die showing the "3" face (three clean diagonal pips),
+ * a dark rounded border and a bottom shadow edge. The face is a light grey
+ * (not pure white) so the die still reads on a light background.
  *
- * A classic d6 dice showing a three pip face — chance, RNG, luck, games.
- *
- * Palette:
- *   W = White face (#FFFFFF)
- *   D = Dark edge  (#444466)
- *   S = Shadow     (#888899)
- *   P = Pip black  (#1A1A2E)
+ *   F = Light face (#E8E8F0)
+ *   D = Dark border (#3A3A55)
+ *   S = Bottom shadow (#9090A8)
+ *   P = Pip (#1A1A2E)
  */
 export const Dice: PxlKitData = {
   name: 'dice',
@@ -17,26 +16,26 @@ export const Dice: PxlKitData = {
   category: 'gamification',
   grid: [
     '................',
-    '...DDDDDDDDD....',
-    '..DWWWWWWWWSD...',
-    '..DWWWWWWWWSD...',
-    '..DWWPDWWWWSD...',
-    '..DWWPWWWWWSD...',
-    '..DWWWWWWWWSD...',
-    '..DWWWWWPWWSD...',
-    '..DWWWWWPWWSD...',
-    '..DWWWWWWWWSD...',
-    '..DWWPWWWWWSD...',
-    '..DWWPDWWWWSD...',
-    '..DWWWWWWWWSD...',
+    '...DDDDDDDDDD...',
+    '..DFFFFFFFFFFD..',
+    '..DFPPFFFFFFFD..',
+    '..DFPPFFFFFFFD..',
+    '..DFFFFFFFFFFD..',
+    '..DFFFFPPFFFFD..',
+    '..DFFFFPPFFFFD..',
+    '..DFFFFFFFFFFD..',
+    '..DFFFFFFFPPFD..',
+    '..DFFFFFFFPPFD..',
+    '..DFFFFFFFFFFD..',
     '..DSSSSSSSSSSD..',
-    '...DDDDDDDDD....',
+    '...DDDDDDDDDD...',
+    '................',
     '................',
   ],
   palette: {
-    W: '#FFFFFF',
-    D: '#444466',
-    S: '#888899',
+    F: '#E8E8F0',
+    D: '#3A3A55',
+    S: '#9090A8',
     P: '#1A1A2E',
   },
   tags: ['dice', 'd6', 'random', 'chance', 'luck', 'rng', 'board-game'],

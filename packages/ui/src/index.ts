@@ -107,6 +107,6 @@ export const UiPack: IconPack = {
     // New animated
     LoadingSpinner, PulsingDot, BouncingArrow, ShakingBell, SpinningGear,
   ],
-  version: '0.1.0',
+  version: '1.2.4',
   author: 'pxlkit',
 };

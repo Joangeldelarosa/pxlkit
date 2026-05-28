@@ -1,16 +1,15 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * 🏹 Arrow — 16×16 pixel art arrow icon
+ * 🏹 Arrow — a clean arrow pointing right: a small green chevron of fletching
+ * at the tail, a thin brown shaft, and a prominent steel arrowhead (►) with a
+ * white tip glint. The old version had an oversized green fletching blob and a
+ * weak tip, so it read as a fish.
  *
- * A pointed arrow for direction, quests, and ranged attacks.
- *
- * Palette:
- *   S = Steel tip (#C0C0C0)
- *   D = Dark steel (#708090)
+ *   S = Steel head (#C0C0C0)
  *   B = Brown shaft (#8B4513)
- *   L = Light brown (#CD853F)
- *   G = Green feather (#228B22)
+ *   G = Green fletching (#228B22)
+ *   W = Tip glint (#FFFFFF)
  */
 export const Arrow: PxlKitData = {
   name: 'arrow',
@@ -20,26 +19,25 @@ export const Arrow: PxlKitData = {
     '................',
     '................',
     '................',
-    '..GG............',
-    '.GGGG...........',
-    '..GGLBBBBB......',
-    '...GLLBBBBBSS...',
-    '....LLLLBBBBSSSW',
-    '....LLLLBBBBSSSW',
-    '...GLLBBBBBSS...',
-    '..GGLBBBBB......',
-    '.GGGG...........',
-    '..GG............',
+    '................',
+    '..........S.....',
+    '.GG.......SS....',
+    '..GG......SSS...',
+    '...GBBBBBBSSSSW.',
+    '...GBBBBBBSSSSW.',
+    '..GG......SSS...',
+    '.GG.......SS....',
+    '..........S.....',
+    '................',
     '................',
     '................',
     '................',
   ],
   palette: {
-    'S': '#C0C0C0',
-    'B': '#8B4513',
-    'L': '#CD853F',
-    'G': '#228B22',
-    'W': '#FFFFFF',
+    S: '#C0C0C0',
+    B: '#8B4513',
+    G: '#228B22',
+    W: '#FFFFFF',
   },
   tags: ['arrow', 'projectile', 'direction', 'quest', 'ranged', 'bow'],
   author: 'pxlkit',

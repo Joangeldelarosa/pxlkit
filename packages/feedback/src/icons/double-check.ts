@@ -1,13 +1,12 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * ✅✅ DoubleCheck — 16×16 pixel art double checkmark
+ * ✅✅ DoubleCheck — two overlapping checkmarks ("read" / "confirmed"). The back
+ * tick is dark green and the front tick is bright green, separated by a gap so
+ * the pair reads as TWO checks rather than one fused blob.
  *
- * Two overlapping green checkmarks — "read" or "confirmed" status.
- *
- * Palette:
- *   G = Green check (#00CC66)
- *   D = Dark green  (#008844)
+ *   G = Bright green front tick (#00CC66)
+ *   D = Dark green back tick (#008844)
  */
 export const DoubleCheck: PxlKitData = {
   name: 'double-check',
@@ -16,17 +15,17 @@ export const DoubleCheck: PxlKitData = {
   grid: [
     '................',
     '................',
-    '................',
-    '.....G.....G....',
-    '....GG....GG....',
-    '...GGG...GGG....',
-    'G.GGGG.GGGGG....',
-    'GGGGGGGGGGGG....',
-    '.GGGGG.GGGGG....',
-    '..GGG...GGGG....',
-    '...G.....GGG....',
+    '.....D.....G....',
+    '....DD....GG....',
+    '...DDD...GGG....',
+    'D.DDDD.GGGGG....',
+    'DDDDDD.GGGGG....',
+    '.DDDDD.GGGGG....',
+    '..DDD...GGGG....',
+    '...D.....GGG....',
     '.........GG.....',
     '..........G.....',
+    '................',
     '................',
     '................',
     '................',

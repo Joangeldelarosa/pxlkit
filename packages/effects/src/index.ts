@@ -50,6 +50,6 @@ export const EffectsPack: IconPack = {
     NeonStrobe,
     PortalSpin,
   ],
-  version: '0.1.0',
+  version: '1.2.3',
   author: 'pxlkit',
 };

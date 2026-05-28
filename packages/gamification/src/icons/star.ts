@@ -1,11 +1,10 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * ⭐ Star — 16×16 pixel art star icon
+ * ⭐ Star — a clean 5-pointed star, mirror-symmetric about the vertical centre
+ * line (every row mirrors col i ↔ col 15-i). The old one had an off-centre
+ * apex and unmatched arms/legs.
  *
- * A clean symmetric 5-pointed star for ratings and achievements.
- *
- * Palette:
  *   G = Gold (#FFD700)
  *   D = Dark gold edge (#B8860B)
  *   W = White shine (#FFFFFF)
@@ -15,27 +14,27 @@ export const Star: PxlKitData = {
   size: 16,
   category: 'gamification',
   grid: [
-    '........W.......',
-    '.......GGG......',
-    '.......GGG......',
-    '......GGGGG.....',
-    'GGGGGGGGGGGGGG..',
-    '.GGGGGGGGGGGG...',
-    '..WGGGGGGGGG....',
-    '...GGGG.GGGG....',
-    '..GGGG...GGGG...',
-    '.DGGG.....DGD...',
-    '.DGG.......DD...',
-    '..DD............',
+    '.......GG.......',
+    '.......WW.......',
+    '......GGGG......',
+    '......GGGG......',
+    'GGGGGGGGGGGGGGGG',
+    '.GGGGGGGGGGGGGG.',
+    '..GGGGGGGGGGGG..',
+    '...GGGGGGGGGG...',
+    '...GGGGGGGGGG...',
+    '..GGGGG..GGGGG..',
+    '..GGG......GGG..',
+    '.DGG........GGD.',
     '................',
     '................',
     '................',
     '................',
   ],
   palette: {
-    'G': '#FFD700',
-    'D': '#B8860B',
-    'W': '#FFFFFF',
+    G: '#FFD700',
+    D: '#B8860B',
+    W: '#FFFFFF',
   },
   tags: ['star', 'rating', 'favorite', 'bookmark', 'reward', 'achievement'],
   author: 'pxlkit',

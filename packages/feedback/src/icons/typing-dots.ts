@@ -1,98 +1,100 @@
 import type { AnimatedPxlKitData } from '@pxlkit/core';
 
+/**
+ * 💬… TypingDots — a filled chat bubble with a tail and three animated dots.
+ * Filled (not outlined) so it reads on dark AND light; one dot lights up per
+ * frame, then all dim (pause).
+ *
+ *   B = bubble fill (#475569)
+ *   W = active dot  (#FFFFFF)
+ *   G = dim dot     (#94A3B8)
+ */
 export const TypingDots: AnimatedPxlKitData = {
   name: 'typing-dots',
   size: 16,
   category: 'feedback',
   palette: {
-    B: '#64748B', // bubble
-    D: '#475569', // bubble dark
-    T: '#94A3B8', // tail
-    W: '#FFFFFF', // dot active
-    G: '#CBD5E1', // dot dim
-    A: '#E2E8F0', // dot bright
+    B: '#475569',
+    W: '#FFFFFF',
+    G: '#94A3B8',
   },
   frames: [
     {
-      // Dot 1 active
       grid: [
         '................',
         '................',
+        '...BBBBBBBBBB...',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBWWBGGBGGBB..',
+        '..BBWWBGGBGGBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '...BBBBBBBBBB...',
+        '...BBB..........',
+        '..BB............',
         '................',
-        '..BBBBBBBBBB....',
-        '..BDDDDDDDDDBB..',
-        '..BD.........DB.',
-        '..BD.A..G..G.DB.',
-        '..BD.W..G..G.DB.',
-        '..BD.A..G..G.DB.',
-        '..BD.........DB.',
-        '..BDDDDDDDDDBB..',
-        '..BBBBBBBBBB....',
-        '....TT..........',
-        '.....T..........',
         '................',
         '................',
       ],
     },
     {
-      // Dot 2 active
       grid: [
         '................',
         '................',
+        '...BBBBBBBBBB...',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBGGBWWBGGBB..',
+        '..BBGGBWWBGGBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '...BBBBBBBBBB...',
+        '...BBB..........',
+        '..BB............',
         '................',
-        '..BBBBBBBBBB....',
-        '..BDDDDDDDDDBB..',
-        '..BD.........DB.',
-        '..BD.G..A..G.DB.',
-        '..BD.G..W..G.DB.',
-        '..BD.G..A..G.DB.',
-        '..BD.........DB.',
-        '..BDDDDDDDDDBB..',
-        '..BBBBBBBBBB....',
-        '....TT..........',
-        '.....T..........',
         '................',
         '................',
       ],
     },
     {
-      // Dot 3 active
       grid: [
         '................',
         '................',
+        '...BBBBBBBBBB...',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBGGBGGBWWBB..',
+        '..BBGGBGGBWWBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '...BBBBBBBBBB...',
+        '...BBB..........',
+        '..BB............',
         '................',
-        '..BBBBBBBBBB....',
-        '..BDDDDDDDDDBB..',
-        '..BD.........DB.',
-        '..BD.G..G..A.DB.',
-        '..BD.G..G..W.DB.',
-        '..BD.G..G..A.DB.',
-        '..BD.........DB.',
-        '..BDDDDDDDDDBB..',
-        '..BBBBBBBBBB....',
-        '....TT..........',
-        '.....T..........',
         '................',
         '................',
       ],
     },
     {
-      // All dim (pause)
       grid: [
         '................',
         '................',
+        '...BBBBBBBBBB...',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBGGBGGBGGBB..',
+        '..BBGGBGGBGGBB..',
+        '..BBBBBBBBBBBB..',
+        '..BBBBBBBBBBBB..',
+        '...BBBBBBBBBB...',
+        '...BBB..........',
+        '..BB............',
         '................',
-        '..BBBBBBBBBB....',
-        '..BDDDDDDDDDBB..',
-        '..BD.........DB.',
-        '..BD.G..G..G.DB.',
-        '..BD.G..G..G.DB.',
-        '..BD.G..G..G.DB.',
-        '..BD.........DB.',
-        '..BDDDDDDDDDBB..',
-        '..BBBBBBBBBB....',
-        '....TT..........',
-        '.....T..........',
         '................',
         '................',
       ],
