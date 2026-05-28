@@ -85,7 +85,13 @@ for (const p of PARTICLES) {
   );
 }
 
+// Dark background with rounded corners — matches the icon-192 / icon-512
+// PNG canvas style so tab favicon, PWA icon and apple-touch-icon all read
+// as the SAME mark.
+const bg = `  <rect width="${VIEW}" height="${VIEW}" rx="6" fill="#0A0A0F"/>`;
+
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VIEW} ${VIEW}" shape-rendering="crispEdges">
+${bg}
 ${rects.join('\n')}
 </svg>
 `;
