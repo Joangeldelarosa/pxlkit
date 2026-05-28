@@ -9,6 +9,8 @@
 @layer base {
   :root {
     --grid-line: rgba(0, 0, 0, 0.06);
+    /* Darker shade of retro-green for voxel-text 3D depth (used in apps/web/src/components/hero/VoxelText.tsx). */
+    --color-retro-green-dark: #2a8f5f;
   }
 
   .dark {

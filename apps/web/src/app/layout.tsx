@@ -148,12 +148,21 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: `${SITE_NAME} — ${SITE_TAGLINE}`,
     description: SITE_DESCRIPTION,
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1280,
+        height: 640,
+        alt: `${SITE_NAME} — ${SITE_TAGLINE}`,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: `${SITE_NAME} — ${SITE_TAGLINE}`,
     description: SITE_DESCRIPTION,
     creator: '@joangeldelarosa',
+    images: ['/og-twitter.png'],
   },
   alternates: {
     canonical: SITE_URL,

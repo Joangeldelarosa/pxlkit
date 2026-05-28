@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit — Retro React UI Kit, Licensed Pixel Art Icons & MIT Voxel Engine" width="640" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/readme-hero.png" alt="Pxlkit — Retro React UI Kit, Licensed Pixel Art Icons & MIT Voxel Engine" width="900" />
 </p>
 
 <h1 align="center">Pxlkit</h1>

@@ -13,7 +13,8 @@
     "test:visual:headed": "playwright test --headed",
     "test:visual:ui": "playwright test --ui",
     "test:visual:update": "playwright test --update-snapshots",
-    "capture:pack": "tsx scripts/capture-pack.ts"
+    "capture:pack": "tsx scripts/capture-pack.ts",
+    "og:capture": "tsx scripts/capture-og.ts"
   },
   "dependencies": {
     "@paypal/react-paypal-js": "^9.0.1",
