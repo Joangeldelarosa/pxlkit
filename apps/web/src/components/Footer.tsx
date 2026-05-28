@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Heart } from '@pxlkit/social';
-import { PixelBrandMark } from './PixelLogo';
+import { BrandMark } from './Logo';
 
 export function Footer() {
   return (
@@ -13,7 +13,7 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <Link href="/" className="mb-4 inline-block">
-              <PixelBrandMark size={24} />
+              <BrandMark size={26} />
             </Link>
             <p className="text-retro-muted text-sm font-mono max-w-sm">
               The retro React toolkit with MIT code packages and licensed icon assets.

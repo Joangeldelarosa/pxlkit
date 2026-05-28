@@ -46,6 +46,12 @@ type FloatingIcon = {
   diesAt: number | null;
   spring: number;
   damping: number;
+  /** Direction icon flies as the user scrolls past the hero (radians, 0..2π). */
+  explodeAngle: number;
+  /** Distance multiplier for scroll-explosion (1.0 = near, 2.5 = far). */
+  explodeMagnitude: number;
+  /** Scale-on-scroll factor (negative = shrink, positive = zoom in). */
+  explodeZoomFactor: number;
 };
 
 const SIZES_FAR = [22, 26, 30];
@@ -88,6 +94,9 @@ function buildIcons(density: number, width: number, height: number): FloatingIco
         diesAt: null,
         spring: 0.02,
         damping: 0.92,
+        explodeAngle: Math.random() * Math.PI * 2,
+        explodeMagnitude: 1 + Math.random() * 1.5,
+        explodeZoomFactor: -0.5 + Math.random() * 3.5,
       });
       id += 1;
     }
@@ -153,7 +162,7 @@ export function respawnTick(
 }
 
 export function IconField({
-  density = 60,
+  density = 48,
   freeze = false,
 }: {
   density?: number;
@@ -168,6 +177,14 @@ export function IconField({
   const idleSinceRef = useRef<number>(Date.now());
   const rootElRef = useRef<HTMLDivElement | null>(null);
   const spawnStateRef = useRef<{ lastSpawnAt: number }>({ lastSpawnAt: Date.now() });
+  /** Scroll-explosion progress, 0 = hero in view, 1+ = scrolled past. */
+  const scrollProgressRef = useRef<number>(0);
+  /** Ref-stored loop kick — scroll listener uses this to wake a paused RAF. */
+  const wakeRef = useRef<() => void>(() => {});
+  /** Cached element lists and id→icon map — rebuilt only when icons change. */
+  const iconElsRef = useRef<HTMLElement[]>([]);
+  const layerElsRef = useRef<HTMLElement[]>([]);
+  const iconByIdRef = useRef<Map<number, FloatingIcon>>(new Map());
 
   // Measure scope (the MouseProvider wrapper, which wraps the <section>)
   useEffect(() => {
@@ -188,6 +205,17 @@ export function IconField({
 
   useEffect(() => {
     iconsRef.current = [...initialIcons];
+    // Rebuild lookup map (id is stable per FloatingIcon instance).
+    iconByIdRef.current = new Map(iconsRef.current.map((ic) => [ic.id, ic]));
+    // Cache DOM element lists — they only change when initialIcons rebuilds.
+    if (rootElRef.current) {
+      iconElsRef.current = Array.from(
+        rootElRef.current.querySelectorAll<HTMLElement>('[data-fi-id]'),
+      );
+      layerElsRef.current = Array.from(
+        rootElRef.current.querySelectorAll<HTMLElement>('[data-layer]'),
+      );
+    }
   }, [initialIcons]);
 
   // Physics loop
@@ -231,37 +259,56 @@ export function IconField({
         if (Math.abs(ic.vx) > 0.05 || Math.abs(ic.vy) > 0.05) anyMoving = true;
       }
 
-      if (active || anyMoving) idleSinceRef.current = now;
+      const sp = scrollProgressRef.current;
+      if (active || anyMoving || sp > 0.001) idleSinceRef.current = now;
 
-      // Spawn-trickle + fade-in/out + respawn
-      spawnTick(arr, spawnStateRef.current, now);
-      respawnTick(arr, w, h, now);
+      // Spawn-trickle + fade-in/out + respawn (skip while scrolled past
+      // the hero — no point re-seeding icons the user can't see)
+      if (sp < 0.5) {
+        spawnTick(arr, spawnStateRef.current, now);
+        respawnTick(arr, w, h, now);
+      }
 
-      // Apply DOM transforms directly (avoid per-frame React renders)
-      const root = rootElRef.current;
-      if (root) {
-        // Per-layer parallax wrapper transforms
-        const layerEls = root.querySelectorAll<HTMLDivElement>('[data-layer]');
-        layerEls.forEach((el) => {
-          const li = Number(el.dataset.layer);
-          const layer = LAYERS[li];
-          if (!layer) return;
-          const px = mouseRef.current.x * layer.parallaxFactor;
-          const py = mouseRef.current.y * layer.parallaxFactor;
-          el.style.transform = `translate3d(${px}px, ${py}px, ${layer.z}px)`;
-        });
-        // Per-icon position / rotation / opacity
-        const els = root.querySelectorAll<HTMLDivElement>('[data-fi-id]');
-        els.forEach((el) => {
-          const id = Number(el.dataset.fiId);
-          const ic = arr.find((i) => i.id === id);
-          if (!ic) return;
-          el.style.left = `${ic.x - ic.size / 2}px`;
-          el.style.top = `${ic.y - ic.size / 2}px`;
-          const layer = LAYERS[ic.layerIdx];
-          el.style.transform = `scale(${layer.scale}) rotate(${ic.rotation}deg)`;
-          el.style.opacity = String(ic.opacity);
-        });
+      // Per-layer parallax wrapper transforms (cached list — no DOM queries per frame)
+      const layerEls = layerElsRef.current;
+      for (let li = 0; li < layerEls.length; li++) {
+        const el = layerEls[li];
+        const layer = LAYERS[li];
+        if (!layer) continue;
+        const px = mouseRef.current.x * layer.parallaxFactor;
+        const py = mouseRef.current.y * layer.parallaxFactor;
+        el.style.transform = `translate3d(${px}px, ${py}px, ${layer.z}px)`;
+      }
+
+      // Per-icon position / rotation / opacity — adds scroll-explosion
+      // displacement, zoom and fade-out on top of physics state.
+      const EXPLODE_DIST = 900; // px at sp=1
+      const iconEls = iconElsRef.current;
+      const iconById = iconByIdRef.current;
+      for (let i = 0; i < iconEls.length; i++) {
+        const el = iconEls[i];
+        const id = Number(el.dataset.fiId);
+        const ic = iconById.get(id);
+        if (!ic) continue;
+
+        let drawX = ic.x;
+        let drawY = ic.y;
+        const layer = LAYERS[ic.layerIdx];
+        let scale = layer.scale;
+        let opacity = ic.opacity;
+
+        if (sp > 0) {
+          drawX += Math.cos(ic.explodeAngle) * ic.explodeMagnitude * EXPLODE_DIST * sp;
+          drawY += Math.sin(ic.explodeAngle) * ic.explodeMagnitude * EXPLODE_DIST * sp;
+          scale = scale * Math.max(0.05, 1 + ic.explodeZoomFactor * sp);
+          opacity = opacity * Math.max(0, 1 - sp * 1.1);
+        }
+
+        const style = el.style;
+        style.left = `${drawX - ic.size / 2}px`;
+        style.top = `${drawY - ic.size / 2}px`;
+        style.transform = `scale(${scale}) rotate(${ic.rotation}deg)`;
+        style.opacity = `${opacity}`;
       }
 
       if (now - idleSinceRef.current < RAF_IDLE_TIMEOUT) {
@@ -271,13 +318,39 @@ export function IconField({
       }
     };
 
+    // expose a wake-up the scroll listener can call when RAF is paused
+    wakeRef.current = () => {
+      if (cancelled || rafRef.current) return;
+      idleSinceRef.current = Date.now();
+      rafRef.current = requestAnimationFrame(loop);
+    };
+
     idleSinceRef.current = Date.now();
     rafRef.current = requestAnimationFrame(loop);
     return () => {
       cancelled = true;
+      wakeRef.current = () => {};
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [size, active, mouseRef, effectiveFreeze]);
+
+  // Scroll listener — updates scrollProgressRef and wakes the RAF if paused.
+  // Passive listener so it never blocks scrolling.
+  useEffect(() => {
+    if (effectiveFreeze) {
+      scrollProgressRef.current = 0;
+      return;
+    }
+    const compute = () => {
+      const heroH = window.innerHeight * 0.9; // matches min-h-[90vh]
+      const p = Math.min(1.5, Math.max(0, window.scrollY / heroH));
+      scrollProgressRef.current = p;
+      if (p > 0.001) wakeRef.current();
+    };
+    compute();
+    window.addEventListener('scroll', compute, { passive: true });
+    return () => window.removeEventListener('scroll', compute);
+  }, [effectiveFreeze]);
 
   if (!size) return null;
 

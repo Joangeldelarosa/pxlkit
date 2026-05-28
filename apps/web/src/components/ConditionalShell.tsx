@@ -10,10 +10,11 @@ import { Footer } from './Footer';
  *
  * - `/templates/preview` → blank canvas for iframe-embedded template previews.
  * - `/dev/*` → internal, unpublished dev tools (icon inspector). No chrome at all.
+ * - `/og/*` → curated full-bleed frames used by the OG / README screenshot pipeline.
  * - `/explore` → full-screen 3D voxel viewport; keeps Navbar but hides Footer.
  */
 const NO_CHROME_ROUTES = new Set(['/templates/preview']);
-const NO_CHROME_PREFIXES = ['/dev'];
+const NO_CHROME_PREFIXES = ['/dev', '/og'];
 const NO_FOOTER_ROUTES = new Set(['/explore']);
 
 export function ConditionalShell({ children }: { children: React.ReactNode }) {

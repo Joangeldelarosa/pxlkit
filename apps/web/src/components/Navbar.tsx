@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useTheme } from './ThemeProvider';
+import { BrandMark } from './Logo';
 
 const NAV_ITEMS: { href: string; label: string; badge?: string; external?: boolean }[] = [
   { href: '/', label: 'Home' },
@@ -91,33 +92,11 @@ export function Navbar() {
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 sm:gap-3 group"
+          className="flex items-center group"
           onClick={() => setMenuOpen(false)}
+          aria-label="Pxlkit home"
         >
-          {/* Tiny pixel art logo — matches favicon "P" */}
-          <div className="w-7 h-7 sm:w-8 sm:h-8 relative">
-            <svg viewBox="0 0 32 32" className="w-full h-full" shapeRendering="crispEdges">
-              <rect width="32" height="32" fill="var(--retro-bg)" rx="4" />
-              <rect x="4" y="2" width="24" height="2" fill="var(--retro-green)" />
-              <rect x="2" y="4" width="2" height="24" fill="var(--retro-green)" />
-              <rect x="28" y="4" width="2" height="24" fill="var(--retro-cyan)" />
-              <rect x="4" y="28" width="24" height="2" fill="var(--retro-cyan)" />
-              <rect x="4" y="4" width="2" height="2" fill="var(--retro-green)" />
-              <rect x="26" y="4" width="2" height="2" fill="var(--retro-cyan)" />
-              <rect x="4" y="26" width="2" height="2" fill="var(--retro-cyan)" />
-              <rect x="26" y="26" width="2" height="2" fill="var(--retro-cyan)" />
-              <rect x="8" y="8" width="2" height="14" fill="var(--retro-gold)" />
-              <rect x="10" y="8" width="8" height="2" fill="var(--retro-gold)" />
-              <rect x="18" y="10" width="2" height="6" fill="var(--retro-gold)" />
-              <rect x="10" y="14" width="8" height="2" fill="var(--retro-gold)" />
-              <rect x="22" y="20" width="2" height="2" fill="var(--retro-red)" />
-              <rect x="24" y="18" width="2" height="2" fill="var(--retro-red)" />
-              <rect x="22" y="22" width="4" height="2" fill="var(--retro-red)" />
-            </svg>
-          </div>
-          <span className="font-pixel text-[10px] sm:text-xs text-retro-green group-hover:text-glow transition-all">
-            PXLKIT
-          </span>
+          <BrandMark size={26} className="group-hover:opacity-95 transition-opacity" />
         </Link>
 
         {/* Desktop nav links + actions */}
