@@ -1158,7 +1158,8 @@ function PricingPreview() {
               <motion.div
                 key={plan.name}
                 variants={fadeInUp}
-                className={`relative rounded-xl border ${tc.border} ${tc.bg} p-5 transition-all hover:scale-[1.02] ${
+                whileHover={{ scale: 1.02, transition: { type: 'spring', stiffness: 320, damping: 24 } }}
+                className={`relative rounded-xl border ${tc.border} ${tc.bg} p-5 transition-colors ${
                   plan.popular ? 'ring-1 ring-retro-gold/30' : ''
                 }`}
               >
