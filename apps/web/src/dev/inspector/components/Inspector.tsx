@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { isAnimatedIcon } from '@pxlkit/core';
 import { findIcon, getPackById } from '../lib/registry';
 import { serializeInspectorParams } from '../lib/params';
 import { modeOf, type InspectorState } from '../lib/types';
@@ -33,6 +34,7 @@ export function Inspector({ initialState }: InspectorProps) {
   const packIcons = pack?.icons.map((i) => i.name) ?? [];
   const mode = modeOf(state);
   const selected = state.icon ? findIcon(state.pack, state.icon) ?? null : null;
+  const animatedFrameCount = selected && isAnimatedIcon(selected) ? selected.frames.length : 0;
 
   return (
     <main
@@ -56,7 +58,12 @@ export function Inspector({ initialState }: InspectorProps) {
         </span>
       </header>
 
-      <InspectorControls state={state} packIcons={packIcons} onChange={apply} />
+      <InspectorControls
+        state={state}
+        packIcons={packIcons}
+        animatedFrameCount={animatedFrameCount}
+        onChange={apply}
+      />
 
       <section data-testid="inspector-stage" style={{ flex: 1, padding: 24, overflow: 'auto' }}>
         {mode === 'single' ? (
@@ -69,6 +76,8 @@ export function Inspector({ initialState }: InspectorProps) {
               bg={state.bg}
               appearance={state.appearance}
               color={state.color}
+              playing={state.playing}
+              frame={state.frame}
             />
           ) : (
             <p data-testid="icon-missing" style={{ fontFamily: 'monospace', color: '#e57373' }}>

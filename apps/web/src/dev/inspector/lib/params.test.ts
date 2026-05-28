@@ -15,7 +15,17 @@ describe('parseInspectorParams', () => {
     expect(s.color).toBeNull();
     expect(s.cell).toBe(64);
     expect(s.view).toBe('grid');
+    expect(s.playing).toBe(true);
+    expect(s.frame).toBe(0);
     expect(s.grid).toBe(false); // collection mode → overlay off by default
+  });
+
+  it('parses playing + frame for animated icons', () => {
+    expect(parse('playing=0').playing).toBe(false);
+    expect(parse('playing=1').playing).toBe(true);
+    expect(parse('frame=3').frame).toBe(3);
+    expect(parse('frame=-2').frame).toBe(0); // clamped
+    expect(parse('frame=999').frame).toBe(63); // clamped to FRAME_MAX
   });
 
   it('parses the collection view and falls back on junk', () => {

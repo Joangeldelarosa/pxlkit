@@ -26,6 +26,10 @@ export interface InspectorState {
   cell: number;
   /** Collection layout (applies only when no single icon is selected). */
   view: CollectionView;
+  /** Animated icons play (true) or freeze on `frame` (false). */
+  playing: boolean;
+  /** Frame index shown when an animated icon is paused. */
+  frame: number;
 }
 
 export const PACK_IDS = [
@@ -45,6 +49,9 @@ export const DEFAULT_SIZES = [16, 24, 32, 48, 64, 128, 256];
 export const DEFAULT_GRID_COLOR = '#00E5A0';
 export const DEFAULT_CELL = 64;
 export const DEFAULT_VIEW: CollectionView = 'grid';
+export const DEFAULT_PLAYING = true;
+export const DEFAULT_FRAME = 0;
+export const FRAME_MAX = 63;
 export const SIZE_MIN = 1;
 export const SIZE_MAX = 512;
 export const CELL_MIN = 8;

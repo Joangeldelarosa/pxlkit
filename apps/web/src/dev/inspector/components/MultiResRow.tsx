@@ -10,10 +10,22 @@ export interface MultiResRowProps {
   bg: Background;
   appearance: IconAppearance;
   color?: string | null;
+  playing?: boolean;
+  frame?: number;
 }
 
 /** One icon rendered side-by-side at every requested size. */
-export function MultiResRow({ icon, sizes, grid, gridColor, bg, appearance, color }: MultiResRowProps) {
+export function MultiResRow({
+  icon,
+  sizes,
+  grid,
+  gridColor,
+  bg,
+  appearance,
+  color,
+  playing,
+  frame,
+}: MultiResRowProps) {
   return (
     <div
       data-testid="multi-res-row"
@@ -29,6 +41,8 @@ export function MultiResRow({ icon, sizes, grid, gridColor, bg, appearance, colo
           bg={bg}
           appearance={appearance}
           color={color}
+          playing={playing}
+          frame={frame}
         />
       ))}
     </div>

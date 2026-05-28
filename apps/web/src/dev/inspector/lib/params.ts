@@ -5,9 +5,12 @@ import {
   CELL_MAX,
   CELL_MIN,
   DEFAULT_CELL,
+  DEFAULT_FRAME,
   DEFAULT_GRID_COLOR,
+  DEFAULT_PLAYING,
   DEFAULT_SIZES,
   DEFAULT_VIEW,
+  FRAME_MAX,
   PACK_IDS,
   SIZE_MAX,
   SIZE_MIN,
@@ -40,6 +43,8 @@ export function parseInspectorParams(sp: URLSearchParams): InspectorState {
   const gridRaw = sp.get('grid');
   const grid = gridRaw === null ? icon != null : gridRaw === '1' || gridRaw === 'true';
   const cellRaw = parseInt(sp.get('cell') ?? '', 10);
+  const playingRaw = sp.get('playing');
+  const frameRaw = parseInt(sp.get('frame') ?? '', 10);
 
   return {
     pack: oneOf(sp.get('pack'), PACK_IDS, 'gamification'),
@@ -52,6 +57,8 @@ export function parseInspectorParams(sp: URLSearchParams): InspectorState {
     color: isHex(sp.get('color')) ? (sp.get('color') as string) : null,
     cell: Number.isFinite(cellRaw) ? clamp(cellRaw, CELL_MIN, CELL_MAX) : DEFAULT_CELL,
     view: oneOf<CollectionView>(sp.get('view'), VIEWS, DEFAULT_VIEW),
+    playing: playingRaw === null ? DEFAULT_PLAYING : playingRaw === '1' || playingRaw === 'true',
+    frame: Number.isFinite(frameRaw) ? clamp(frameRaw, 0, FRAME_MAX) : DEFAULT_FRAME,
   };
 }
 
@@ -67,5 +74,7 @@ export function serializeInspectorParams(state: InspectorState): string {
   if (state.color) sp.set('color', state.color);
   sp.set('cell', String(state.cell));
   sp.set('view', state.view);
+  sp.set('playing', state.playing ? '1' : '0');
+  sp.set('frame', String(state.frame));
   return sp.toString();
 }

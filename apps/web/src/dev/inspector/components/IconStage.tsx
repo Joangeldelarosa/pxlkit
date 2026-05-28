@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/core';
-import type { AnyIcon, IconAppearance } from '@pxlkit/core';
+import type { AnyIcon, AnimatedPxlKitData, IconAppearance, PxlKitData } from '@pxlkit/core';
 import { GridOverlay } from './GridOverlay';
 import type { Background } from '../lib/types';
 
@@ -25,13 +25,32 @@ export interface IconStageProps {
   appearance: IconAppearance;
   color?: string | null;
   showLabel?: boolean;
+  /** For animated icons: play the loop (true) or freeze on `frame` (false). */
+  playing?: boolean;
+  /** Frame index to freeze on when `playing` is false. */
+  frame?: number;
 }
 
 const fmtScale = (scale: number): string => `${Math.round(scale * 100) / 100}×`;
 
+/** Build a static PxlKitData for one frame of an animated icon. */
+function frameToData(icon: AnimatedPxlKitData, frame: number): PxlKitData {
+  const i = Math.max(0, Math.min(frame, icon.frames.length - 1));
+  const f = icon.frames[i];
+  return {
+    name: icon.name,
+    size: icon.size,
+    category: icon.category,
+    grid: f.grid,
+    palette: f.palette ? { ...icon.palette, ...f.palette } : icon.palette,
+    tags: icon.tags,
+  };
+}
+
 /**
  * One icon rendered at one size, on a chosen background, with an optional
- * pixel-grid overlay and a "{size}px · {scale}×" label.
+ * pixel-grid overlay and a label. Animated icons either loop (`playing`) or
+ * freeze on a chosen `frame` so a single frame can be inspected/captured.
  */
 export function IconStage({
   icon,
@@ -42,8 +61,12 @@ export function IconStage({
   appearance,
   color,
   showLabel = true,
+  playing = true,
+  frame = 0,
 }: IconStageProps) {
   const scale = icon.size ? size / icon.size : 1;
+  const animated = isAnimatedIcon(icon);
+  const frameCount = animated ? icon.frames.length : 1;
 
   return (
     <figure
@@ -63,15 +86,24 @@ export function IconStage({
           ...BG_STYLE[bg],
         }}
       >
-        {isAnimatedIcon(icon) ? (
-          <AnimatedPxlKitIcon
-            icon={icon}
-            size={size}
-            appearance={appearance}
-            color={color ?? undefined}
-            playing={false}
-            aria-label={icon.name}
-          />
+        {animated ? (
+          playing ? (
+            <AnimatedPxlKitIcon
+              icon={icon}
+              size={size}
+              appearance={appearance}
+              color={color ?? undefined}
+              aria-label={icon.name}
+            />
+          ) : (
+            <PxlKitIcon
+              icon={frameToData(icon, frame)}
+              size={size}
+              appearance={appearance}
+              color={color ?? undefined}
+              aria-label={icon.name}
+            />
+          )
         ) : (
           <PxlKitIcon
             icon={icon}
@@ -86,6 +118,7 @@ export function IconStage({
       {showLabel && (
         <figcaption style={{ fontSize: 11, fontFamily: 'monospace', color: '#9aa3ad', whiteSpace: 'nowrap' }}>
           {size}px · {fmtScale(scale)}
+          {animated && !playing ? ` · f${Math.min(frame, frameCount - 1) + 1}/${frameCount}` : ''}
         </figcaption>
       )}
     </figure>

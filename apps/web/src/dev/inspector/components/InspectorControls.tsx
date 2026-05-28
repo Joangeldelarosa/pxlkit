@@ -14,6 +14,8 @@ const SIZE_CHOICES = [8, 16, 24, 32, 48, 64, 128, 256];
 export interface InspectorControlsProps {
   state: InspectorState;
   packIcons: string[];
+  /** Frame count of the selected icon if animated (0 = static / no selection). */
+  animatedFrameCount?: number;
   onChange: (next: InspectorState) => void;
 }
 
@@ -37,8 +39,15 @@ const labelStyle: React.CSSProperties = {
   color: '#8893a0',
 };
 
-export function InspectorControls({ state, packIcons, onChange }: InspectorControlsProps) {
+export function InspectorControls({
+  state,
+  packIcons,
+  animatedFrameCount = 0,
+  onChange,
+}: InspectorControlsProps) {
   const update = (patch: Partial<InspectorState>) => onChange({ ...state, ...patch });
+  const btn: React.CSSProperties = { ...ctrl, cursor: 'pointer', padding: '4px 8px' };
+  const frameIdx = Math.min(state.frame, Math.max(0, animatedFrameCount - 1));
 
   const toggleSize = (size: number) => {
     const has = state.sizes.includes(size);
@@ -196,6 +205,48 @@ export function InspectorControls({ state, packIcons, onChange }: InspectorContr
           style={{ ...ctrl, width: 72 }}
         />
       </label>
+
+      {animatedFrameCount > 1 && state.icon && (
+        <div style={labelStyle}>
+          Animation
+          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+            <button
+              type="button"
+              data-testid="ctrl-play"
+              onClick={() => update({ playing: !state.playing })}
+              style={btn}
+            >
+              {state.playing ? '⏸ pause' : '▶ play'}
+            </button>
+            {!state.playing && (
+              <>
+                <button
+                  type="button"
+                  data-testid="frame-prev"
+                  onClick={() => update({ frame: Math.max(0, frameIdx - 1) })}
+                  style={btn}
+                >
+                  ◀
+                </button>
+                <span
+                  data-testid="frame-indicator"
+                  style={{ fontFamily: 'monospace', fontSize: 12, color: '#e6e6ea', minWidth: 44, textAlign: 'center' }}
+                >
+                  {frameIdx + 1}/{animatedFrameCount}
+                </span>
+                <button
+                  type="button"
+                  data-testid="frame-next"
+                  onClick={() => update({ frame: Math.min(animatedFrameCount - 1, frameIdx + 1) })}
+                  style={btn}
+                >
+                  ▶
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
