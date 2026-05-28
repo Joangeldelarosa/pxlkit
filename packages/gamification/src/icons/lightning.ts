@@ -1,14 +1,12 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * ⚡ Lightning — 16×16 pixel art lightning bolt icon
+ * ⚡ Lightning — a clean zigzag bolt: top segment slants down-left to a wide
+ * flash, jogs, then the bottom segment continues down-left to a point. The old
+ * one had a blobby diamond head that read as a fat "S".
  *
- * A bright electric bolt for power-ups and speed boosts.
- *
- * Palette:
  *   Y = Yellow (#FFD700)
- *   L = Light yellow (#FFF44F)
- *   W = White (#FFFFFF)
+ *   W = White hot edge (#FFFFFF)
  *   D = Dark yellow (#B8860B)
  */
 export const Lightning: PxlKitData = {
@@ -17,26 +15,26 @@ export const Lightning: PxlKitData = {
   category: 'gamification',
   grid: [
     '................',
-    '......WW........',
-    '.....WYYW.......',
-    '....WYYYYW......',
-    '...WYYYYD.......',
-    '....YYYD........',
+    '.........WYY....',
+    '........WYY.....',
+    '.......WYY......',
+    '......WYYY......',
+    '.....WYYYYY.....',
+    '....WYYYYYD.....',
+    '........YYD.....',
+    '.......YYD......',
+    '......YYD.......',
+    '.....YYD........',
     '....YYD.........',
     '...YYD..........',
-    '..YYYYYYYY......',
-    '.....WYYYYYY....',
-    '.......YYYYD....',
-    '......YYYD......',
-    '.....YYYD.......',
-    '....YYYD........',
-    '....YYD.........',
-    '.....D..........',
+    '...YD...........',
+    '................',
+    '................',
   ],
   palette: {
-    'Y': '#FFD700',
-    'W': '#FFFFFF',
-    'D': '#B8860B',
+    Y: '#FFD700',
+    W: '#FFFFFF',
+    D: '#B8860B',
   },
   tags: ['lightning', 'bolt', 'power', 'energy', 'speed', 'electric'],
   author: 'pxlkit',
