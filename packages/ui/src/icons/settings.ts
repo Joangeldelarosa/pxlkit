@@ -1,15 +1,15 @@
 import type { PxlKitData } from '@pxlkit/core';
 
 /**
- * ⚙️ Settings — 16×16 pixel art settings / wrench icon
+ * ⚙️ Settings — 16×16 pixel art settings / preferences icon
  *
- * A horizontal three-bar settings slider — preferences, config, options.
+ * Three horizontal slider bars with white knobs at different positions —
+ * the universal "preferences / adjust / filter" pattern used on mobile and
+ * desktop. Knobs sit left / middle / right so the icon reads as adjustment
+ * even at 16 px.
  *
- * Palette:
- *   B = Bar blue  (#5B9BD5)
- *   D = Dark bar  (#2E6DA4)
- *   C = Circle    (#FFFFFF)
- *   O = Outline   (#334455)
+ *   B = Bar blue (#5B9BD5)
+ *   W = Knob     (#FFFFFF)
  */
 export const Settings: PxlKitData = {
   name: 'settings',
@@ -18,26 +18,24 @@ export const Settings: PxlKitData = {
   grid: [
     '................',
     '................',
-    '.OOO......OOOO..',
-    '.OBBO..CC.OBBO..',
-    '.OOO......OOOO..',
     '................',
-    '..OOOO......OOO.',
-    '..OBBO.CC...OBO.',
-    '..OOOO......OOO.',
+    '.WWWBBBBBBBBBBB.',
+    '.WWWBBBBBBBBBBB.',
     '................',
-    '.OOOO.....OOOO..',
-    '.OBO..CC..OBBO..',
-    '.OOOO.....OOOO..',
+    '................',
+    '.BBBBBWWWBBBBBB.',
+    '.BBBBBWWWBBBBBB.',
+    '................',
+    '................',
+    '.BBBBBBBBBBBWWW.',
+    '.BBBBBBBBBBBWWW.',
     '................',
     '................',
     '................',
   ],
   palette: {
     B: '#5B9BD5',
-    D: '#2E6DA4',
-    C: '#FFFFFF',
-    O: '#334455',
+    W: '#FFFFFF',
   },
   tags: ['settings', 'sliders', 'preferences', 'adjust', 'filter', 'ui'],
   author: 'pxlkit',
