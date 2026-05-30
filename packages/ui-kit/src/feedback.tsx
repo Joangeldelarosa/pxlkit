@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import {
   Tone, Surface, cn,
   toneMap, surfaceClasses, useEffectiveSurface,
@@ -9,26 +9,31 @@ import {
    Pixel surface adds a left accent stripe (RPG status-bar pattern).
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelAlert({
-  title,
-  message,
-  tone = 'red',
-  icon,
-  action,
-  surface: surfaceProp,
-}: {
+/** Public prop bag for {@link PixelAlert}. */
+export interface PixelAlertProps {
   title: string;
   message: string;
   tone?: Tone;
   icon?: React.ReactNode;
   action?: React.ReactNode;
   surface?: Surface;
-}) {
+  /** Optional `aria-live` override. Status banners ("info") should usually use `"polite"`. */
+  live?: 'polite' | 'assertive' | 'off';
+}
+
+export const PixelAlert = forwardRef<HTMLDivElement, PixelAlertProps>(function PixelAlert(
+  { title, message, tone = 'red', icon, action, surface: surfaceProp, live },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
+  // Critical tones get assertive announcements by default; neutral tones go polite.
+  const ariaLive = live ?? (tone === 'red' || tone === 'gold' ? 'assertive' : 'polite');
   return (
     <div
+      ref={ref}
       role="alert"
+      aria-live={ariaLive}
       className={cn(
         'relative p-3',
         s.border, s.radiusLg,
@@ -50,45 +55,48 @@ export function PixelAlert({
       </div>
     </div>
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelProgress — Pixel surface renders 10 segmented HP-bar blocks;
    linear surface renders a smooth filled bar.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelProgress({
-  value,
-  tone = 'green',
-  label,
-  showValue = true,
-  surface: surfaceProp,
-}: {
+/** Public prop bag for {@link PixelProgress}. */
+export interface PixelProgressProps {
   value: number;
   tone?: Tone;
   label?: string;
   showValue?: boolean;
   surface?: Surface;
-}) {
+  /** When `true`, switches to indeterminate animation (visual only — ARIA still reports value). */
+  indeterminate?: boolean;
+}
+
+export const PixelProgress = forwardRef<HTMLDivElement, PixelProgressProps>(function PixelProgress(
+  { value, tone = 'green', label, showValue = true, surface: surfaceProp, indeterminate = false },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const safe = Math.max(0, Math.min(100, value));
 
   return (
-    <div className="space-y-1.5">
+    <div ref={ref} className="space-y-1.5">
       {(label || showValue) && (
         <div className={cn('flex items-center justify-between text-xs text-retro-muted', s.font)}>
           {label && <span>{label}</span>}
-          {showValue && <span className={toneMap[tone].text}>{safe}%</span>}
+          {showValue && !indeterminate && <span className={toneMap[tone].text}>{safe}%</span>}
         </div>
       )}
       {surface === 'pixel' ? (
         <div
           role="progressbar"
-          aria-valuenow={safe}
+          aria-valuenow={indeterminate ? undefined : safe}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={label}
+          aria-busy={indeterminate || undefined}
           className={cn('flex gap-0.5 p-0.5', s.border, s.radius, 'border-retro-border/60 bg-retro-surface/60')}
         >
           {Array.from({ length: 10 }).map((_, i) => {
@@ -99,7 +107,13 @@ export function PixelProgress({
                 key={i}
                 className={cn(
                   'h-2 flex-1 rounded-[1px] transition-all duration-150',
-                  filled ? toneMap[tone].fill : partial ? cn(toneMap[tone].fill, 'opacity-50') : 'bg-retro-bg/40',
+                  indeterminate
+                    ? cn(toneMap[tone].fill, 'opacity-70 animate-pulse')
+                    : filled
+                      ? toneMap[tone].fill
+                      : partial
+                        ? cn(toneMap[tone].fill, 'opacity-50')
+                        : 'bg-retro-bg/40',
                 )}
               />
             );
@@ -108,77 +122,85 @@ export function PixelProgress({
       ) : (
         <div
           role="progressbar"
-          aria-valuenow={safe}
+          aria-valuenow={indeterminate ? undefined : safe}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={label}
+          aria-busy={indeterminate || undefined}
           className="h-2.5 overflow-hidden rounded-full border border-retro-border bg-retro-surface/80"
         >
           <div
-            className={cn('h-full rounded-full transition-all duration-500', toneMap[tone].bg)}
-            style={{ width: `${safe}%` }}
+            className={cn(
+              'h-full rounded-full transition-all duration-500',
+              toneMap[tone].bg,
+              indeterminate && 'animate-pulse',
+            )}
+            style={{ width: indeterminate ? '100%' : `${safe}%` }}
           />
         </div>
       )}
     </div>
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelSkeleton — loading placeholder. Pixel surface uses sharp corners.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelSkeleton({
-  width,
-  height = '1rem',
-  rounded = false,
-  className,
-  surface: surfaceProp,
-}: {
+/** Public prop bag for {@link PixelSkeleton}. */
+export interface PixelSkeletonProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'role' | 'aria-label'> {
   width?: string;
   height?: string;
   rounded?: boolean;
-  className?: string;
   surface?: Surface;
-}) {
+  /** Accessible label override; falls back to `"Loading"`. */
+  ariaLabel?: string;
+}
+
+export const PixelSkeleton = forwardRef<HTMLDivElement, PixelSkeletonProps>(function PixelSkeleton(
+  { width, height = '1rem', rounded = false, className, surface: surfaceProp, ariaLabel = 'Loading', style, ...rest },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const roundClass = rounded ? (surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full') : s.radius;
   return (
     <div
+      ref={ref}
       role="status"
-      aria-label="Loading"
+      aria-label={ariaLabel}
       className={cn('animate-pulse bg-retro-surface/80', roundClass, className)}
-      style={{ width, height }}
+      style={{ width, height, ...style }}
+      {...rest}
     />
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelEmptyState — empty/no-results placeholder.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelEmptyState({
-  title,
-  description,
-  action,
-  icon,
-  surface: surfaceProp,
-}: {
+/** Public prop bag for {@link PixelEmptyState}. */
+export interface PixelEmptyStateProps {
   title: string;
   description: string;
   action?: React.ReactNode;
   icon?: React.ReactNode;
   surface?: Surface;
-}) {
+}
+
+export const PixelEmptyState = forwardRef<HTMLDivElement, PixelEmptyStateProps>(function PixelEmptyState(
+  { title, description, action, icon, surface: surfaceProp },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   return (
-    <div className={cn('border-dashed border-retro-border/60 bg-retro-surface/20 p-8 text-center', s.border, s.radiusLg)}>
-      {icon && <div className="mb-3 flex items-center justify-center text-retro-cyan">{icon}</div>}
+    <div ref={ref} className={cn('border-dashed border-retro-border/60 bg-retro-surface/20 p-8 text-center', s.border, s.radiusLg)}>
+      {icon && <div className="mb-3 flex items-center justify-center text-retro-cyan" aria-hidden>{icon}</div>}
       <h4 className={cn('text-sm font-semibold text-retro-text', s.font)}>{title}</h4>
       <p className="mx-auto mt-2 max-w-sm text-sm text-retro-muted">{description}</p>
       {action && <div className="mt-5">{action}</div>}
     </div>
   );
-}
+});

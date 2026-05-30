@@ -36,6 +36,8 @@ export const UI_KIT_COMPONENTS = [
   'PixelModal',
   'PixelTooltip',
   'PixelDropdown',
+  'PixelToast',
+  'PxlKitToastProvider',
   'PixelDivider',
   'PixelSection',
   'PixelFadeIn',

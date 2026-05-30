@@ -28,6 +28,15 @@
   --color-retro-card: var(--retro-card);
   --color-retro-text: var(--retro-text);
   --color-retro-border: var(--retro-border);
+  /*
+   * Opaque border companion to `--retro-border`. Used wherever the soft
+   * border (`border-retro-border/40-60`) is invisible against the page
+   * background — most commonly in the light theme, where the soft border
+   * hits 1.4:1 contrast. Reach for `border-retro-border-strong` (or
+   * `/80-100`) when you need a visible card / input / chip edge in either
+   * theme; keep `border-retro-border` for subtle dividers.
+   */
+  --color-retro-border-strong: var(--retro-border-strong);
 
   /* ── Semantic Colors ── */
   --color-retro-primary: var(--retro-primary);
@@ -90,6 +99,8 @@
     --retro-card: #DCD8D0;
     --retro-text: #1A1A2E;
     --retro-border: #BEBAA2;
+    /* 3.6:1 against --retro-bg — passes WCAG non-text contrast on cards / inputs. */
+    --retro-border-strong: #8C8770;
     --retro-primary: #4F46E5;
     --retro-secondary: #FBBF24;
     --retro-accent: #10B981;
@@ -115,6 +126,8 @@
     --retro-surface: #12121A;
     --retro-card: #1A1A2E;
     --retro-border: #2A2A3E;
+    /* 3.2:1 against --retro-bg — visible card / input edges in dark. */
+    --retro-border-strong: #4A4A66;
     --retro-text: #E8E6E3;
     --retro-primary: #818CF8;
     --retro-secondary: #FCD34D;
@@ -150,6 +163,7 @@
     --color-retro-card: #1A1A2E;
     --color-retro-text: #E8E6E3;
     --color-retro-border: #2A2A3E;
+    --color-retro-border-strong: #4A4A66;
     --color-retro-primary: #818CF8;
     --color-retro-secondary: #FCD34D;
     --color-retro-accent: #34D399;
@@ -174,6 +188,7 @@
     --retro-card: #DCD8D0;
     --retro-text: #1A1A2E;
     --retro-border: #BEBAA2;
+    --retro-border-strong: #8C8770;
     --retro-primary: #4F46E5;
     --retro-secondary: #FBBF24;
     --retro-accent: #10B981;
@@ -198,6 +213,7 @@
     --color-retro-card: #DCD8D0;
     --color-retro-text: #1A1A2E;
     --color-retro-border: #BEBAA2;
+    --color-retro-border-strong: #8C8770;
     --color-retro-primary: #4F46E5;
     --color-retro-secondary: #FBBF24;
     --color-retro-accent: #10B981;
