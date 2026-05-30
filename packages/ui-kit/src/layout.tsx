@@ -1,32 +1,72 @@
 import React from 'react';
 import { Tone, Surface, cn, toneMap, surfaceClasses, useEffectiveSurface } from './common';
 import { usePxlKitLocale } from './locale';
+import { PixelCenter } from './layout/PixelCenter';
+import {
+  sectionRhythm,
+  pageGutter,
+  type ContainerWidth,
+  type PageGutter,
+  type SectionRhythmKey,
+} from './tokens';
 
 /* ──────────────────────────────────────────────────────────────────────────
-   PixelSection — bordered section with title row and optional subtitle.
+   PixelSection — bordered section with optional title row and subtitle.
    ────────────────────────────────────────────────────────────────────────── */
+
+export interface PixelSectionProps {
+  title?: string;
+  subtitle?: string;
+  children: React.ReactNode;
+  surface?: Surface;
+  container?: ContainerWidth | false;
+  verticalPadding?: SectionRhythmKey;
+  horizontalGutter?: PageGutter;
+}
 
 export function PixelSection({
   title,
   subtitle,
   children,
   surface: surfaceProp,
-}: {
-  title: string;
-  subtitle?: string;
-  children: React.ReactNode;
-  surface?: Surface;
-}) {
+  container = '5xl',
+  verticalPadding = 'xl',
+  horizontalGutter = 'lg',
+}: PixelSectionProps) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const { upper } = usePxlKitLocale();
-  return (
-    <section className={cn('bg-retro-card/40 p-4 sm:p-6', s.border, s.radiusLg, 'border-retro-border/40')}>
-      <div className="mb-4">
-        <h3 className={cn('text-xs text-retro-green', surface === 'pixel' ? 'font-pixel' : 'font-semibold text-sm')}>{upper(title)}</h3>
-        {subtitle && <p className={cn('mt-2 text-sm text-retro-muted', s.font)}>{subtitle}</p>}
-      </div>
+
+  const inner = (
+    <>
+      {title && (
+        <div className="mb-4">
+          <h3 className={cn('text-xs text-retro-green', surface === 'pixel' ? 'font-pixel' : 'font-semibold text-sm')}>{upper(title)}</h3>
+          {subtitle && <p className={cn('mt-2 text-sm text-retro-muted', s.font)}>{subtitle}</p>}
+        </div>
+      )}
       {children}
+    </>
+  );
+
+  return (
+    <section
+      className={cn(
+        'bg-retro-card/40 p-4 sm:p-6',
+        s.border,
+        s.radiusLg,
+        'border-retro-border/40',
+        sectionRhythm[verticalPadding],
+        !container && pageGutter[horizontalGutter],
+      )}
+    >
+      {container ? (
+        <PixelCenter maxWidth={container} gutter={horizontalGutter} surface={surface}>
+          {inner}
+        </PixelCenter>
+      ) : (
+        inner
+      )}
     </section>
   );
 }
@@ -59,14 +99,19 @@ export function PixelDivider({
     return <hr className={cn(rule, 'border-retro-border/40', spacingClass, className)} />;
   }
   return (
-    <div className={cn('flex items-center gap-3', spacingClass, className)}>
-      <hr className={cn(rule, 'flex-1 border-retro-border/40')} />
+    <div
+      role="separator"
+      aria-orientation="horizontal"
+      aria-label={label}
+      className={cn('flex items-center gap-3', spacingClass, className)}
+    >
+      <hr aria-hidden="true" className={cn(rule, 'flex-1 border-retro-border/40')} />
       <span className={cn('text-[10px] uppercase tracking-wider inline-flex items-center gap-1.5', surface === 'pixel' ? 'font-pixel' : s.fontDisplay, toneMap[tone].text)}>
         {surface === 'pixel' && <span aria-hidden className="opacity-60">◆</span>}
         {label}
         {surface === 'pixel' && <span aria-hidden className="opacity-60">◆</span>}
       </span>
-      <hr className={cn(rule, 'flex-1 border-retro-border/40')} />
+      <hr aria-hidden="true" className={cn(rule, 'flex-1 border-retro-border/40')} />
     </div>
   );
 }

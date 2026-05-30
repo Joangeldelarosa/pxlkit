@@ -56,4 +56,13 @@ export const UI_KIT_COMPONENTS = [
   'PixelMouseParallax',
   'PxlKitLocaleProvider',
   'PxlKitSurfaceProvider',
+  'PixelBox',
+  'PixelStack',
+  'PixelCluster',
+  'PixelGrid',
+  'PixelEqualHeightGrid',
+  'PixelCenter',
+  'PixelContainer',
+  'PixelTwoColumn',
+  'PixelSectionHeader',
 ] as const;
