@@ -1,27 +1,16 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useRef, useState } from 'react';
 import {
   Tone, Size, Surface, Option, cn, useClickOutside,
-  toneMap, focusRing, inputBase, surfaceClasses, useEffectiveSurface,
+  toneMap, focusRing, inputBase, sizeHeight, surfaceClasses, useEffectiveSurface,
   ChevronDownIcon, CheckIcon, FieldShell,
 } from './common';
-
-const sizeHeight = (size: Size) => (size === 'sm' ? 'h-8 text-xs' : size === 'lg' ? 'h-12 text-sm' : 'h-10 text-sm');
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelInput — single-line text input with label/hint/error, icon slot.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelInput({
-  label,
-  hint,
-  error,
-  tone = 'neutral',
-  size = 'md',
-  surface: surfaceProp,
-  icon,
-  className,
-  ...props
-}: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
+/** Public prop bag for {@link PixelInput}. */
+export interface PixelInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string;
   hint?: string;
   error?: string;
@@ -29,7 +18,12 @@ export function PixelInput({
   size?: Size;
   surface?: Surface;
   icon?: React.ReactNode;
-}) {
+}
+
+export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function PixelInput(
+  { label, hint, error, tone = 'neutral', size = 'md', surface: surfaceProp, icon, className, ...rest },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   return (
@@ -37,40 +31,50 @@ export function PixelInput({
       <span className="relative block">
         {icon && <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-retro-muted shrink-0">{icon}</span>}
         <input
+          ref={ref}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error || hint ? `${rest.id ?? 'pxl-input'}-msg` : undefined}
           className={cn(
             inputBase, s.font, s.border, s.radius, s.transition,
-            sizeHeight(size), focusRing, toneMap[tone].ring,
-            error ? 'border-retro-red/60' : 'border-retro-border',
+            sizeHeight[size], focusRing, toneMap[tone].ring,
+            error ? 'border-retro-red/60' : 'border-retro-border-strong',
             icon ? 'pl-10 pr-3' : 'px-3',
             className,
           )}
-          {...props}
+          {...rest}
         />
       </span>
     </FieldShell>
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelPasswordInput — password field with show/hide toggle.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelPasswordInput({
-  label,
-  hint,
-  error,
-  tone = 'neutral',
-  size = 'md',
-  surface: surfaceProp,
-  ...props
-}: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> & {
+/** Public prop bag for {@link PixelPasswordInput}. */
+export interface PixelPasswordInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
   label?: string;
   hint?: string;
   error?: string;
   tone?: Tone;
   size?: Size;
   surface?: Surface;
-}) {
+  /** Text for the visibility toggle, in `[showLabel, hideLabel]` form. */
+  toggleLabels?: [string, string];
+}
+
+export const PixelPasswordInput = forwardRef<HTMLInputElement, PixelPasswordInputProps>(function PixelPasswordInput(
+  {
+    label, hint, error,
+    tone = 'neutral', size = 'md',
+    surface: surfaceProp,
+    toggleLabels = ['Show', 'Hide'],
+    className,
+    ...rest
+  },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const [visible, setVisible] = useState(false);
@@ -78,88 +82,80 @@ export function PixelPasswordInput({
     <FieldShell label={label} hint={hint} error={error} surface={surface}>
       <span className="relative block">
         <input
+          ref={ref}
           type={visible ? 'text' : 'password'}
+          aria-invalid={error ? true : undefined}
           className={cn(
             inputBase, s.font, s.border, s.radius, s.transition,
-            sizeHeight(size), focusRing, toneMap[tone].ring,
-            error ? 'border-retro-red/60' : 'border-retro-border',
+            sizeHeight[size], focusRing, toneMap[tone].ring,
+            error ? 'border-retro-red/60' : 'border-retro-border-strong',
             'px-3 pr-16',
+            className,
           )}
-          {...props}
+          {...rest}
         />
         <button
           type="button"
           tabIndex={-1}
-          aria-label={visible ? 'Hide password' : 'Show password'}
+          aria-label={visible ? toggleLabels[1] : toggleLabels[0]}
+          aria-pressed={visible}
           className={cn(
-            'absolute right-1.5 top-1/2 -translate-y-1/2 border border-retro-border/40 bg-retro-surface/60 px-2 py-0.5 text-[10px] uppercase text-retro-muted transition-colors hover:text-retro-text disabled:opacity-50 disabled:cursor-not-allowed',
+            'absolute right-1.5 top-1/2 -translate-y-1/2 border border-retro-border-strong bg-retro-surface/60 px-2 py-0.5 text-[10px] uppercase text-retro-muted transition-colors hover:text-retro-text disabled:opacity-50 disabled:cursor-not-allowed',
             s.font, s.radius,
           )}
-          disabled={props.disabled}
+          disabled={rest.disabled}
           onClick={() => setVisible((v) => !v)}
         >
-          {visible ? 'Hide' : 'Show'}
+          {visible ? toggleLabels[1] : toggleLabels[0]}
         </button>
       </span>
     </FieldShell>
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelTextarea — multi-line text input.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelTextarea({
-  label,
-  hint,
-  error,
-  tone = 'neutral',
-  surface: surfaceProp,
-  className,
-  ...props
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+/** Public prop bag for {@link PixelTextarea}. */
+export interface PixelTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   hint?: string;
   error?: string;
   tone?: Tone;
   surface?: Surface;
-}) {
+}
+
+export const PixelTextarea = forwardRef<HTMLTextAreaElement, PixelTextareaProps>(function PixelTextarea(
+  { label, hint, error, tone = 'neutral', surface: surfaceProp, className, ...rest },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   return (
     <FieldShell label={label} hint={hint} error={error} surface={surface}>
       <textarea
+        ref={ref}
+        aria-invalid={error ? true : undefined}
         className={cn(
           inputBase, s.font, s.border, s.radius, s.transition,
           focusRing, toneMap[tone].ring,
-          'min-h-24 border-retro-border px-3 py-2 text-sm',
-          error && 'border-retro-red/60',
+          'min-h-24 px-3 py-2 text-sm',
+          error ? 'border-retro-red/60' : 'border-retro-border-strong',
           className,
         )}
-        {...props}
+        {...rest}
       />
     </FieldShell>
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelSelect — fully custom dropdown with keyboard nav. No native <select>.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelSelect({
-  label,
-  options,
-  value: controlledValue,
-  defaultValue,
-  onChange,
-  placeholder = 'Select...',
-  hint,
-  error,
-  disabled = false,
-  tone = 'neutral',
-  size = 'md',
-  surface: surfaceProp,
-}: {
+/** Public prop bag for {@link PixelSelect}. */
+export interface PixelSelectProps {
   label?: string;
   options: Option[];
   value?: string;
@@ -172,7 +168,30 @@ export function PixelSelect({
   tone?: Tone;
   size?: Size;
   surface?: Surface;
-}) {
+  /** Sets `name` on the hidden serialization input so the value participates in native `<form>` submissions. */
+  name?: string;
+  required?: boolean;
+  id?: string;
+  'aria-describedby'?: string;
+}
+
+export const PixelSelect = forwardRef<HTMLButtonElement, PixelSelectProps>(function PixelSelect(
+  {
+    label, options,
+    value: controlledValue,
+    defaultValue,
+    onChange,
+    placeholder = 'Select...',
+    hint, error,
+    disabled = false,
+    tone = 'neutral',
+    size = 'md',
+    surface: surfaceProp,
+    name, required, id,
+    'aria-describedby': ariaDescribedBy,
+  },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const isControlled = controlledValue !== undefined;
@@ -193,6 +212,7 @@ export function PixelSelect({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') { setOpen(false); return; }
+    if (e.key === 'Tab') { setOpen(false); return; /* allow default Tab */ }
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       if (open && highlighted >= 0) { handleSelect(options[highlighted].value); }
@@ -208,23 +228,39 @@ export function PixelSelect({
       e.preventDefault();
       setHighlighted((p) => Math.max(p - 1, 0));
     }
+    if (e.key === 'Home') {
+      e.preventDefault();
+      if (!open) setOpen(true);
+      setHighlighted(0);
+    }
+    if (e.key === 'End') {
+      e.preventDefault();
+      if (!open) setOpen(true);
+      setHighlighted(options.length - 1);
+    }
   };
 
   return (
     <FieldShell label={label} hint={hint} error={error} surface={surface}>
       <div ref={containerRef} className="relative">
+        {name && <input type="hidden" name={name} value={value} required={required} />}
         <button
+          ref={ref}
+          id={id}
           type="button"
           role="combobox"
           aria-expanded={open}
           aria-haspopup="listbox"
           aria-disabled={disabled}
+          aria-required={required || undefined}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={ariaDescribedBy}
           disabled={disabled}
           className={cn(
-            'flex w-full items-center justify-between bg-retro-bg/70 px-3 outline-none',
+            'flex w-full items-center justify-between bg-retro-surface/40 px-3 outline-none',
             s.font, s.border, s.radius, s.transition,
-            sizeHeight(size), focusRing, toneMap[tone].ring,
-            error ? 'border-retro-red/60' : 'border-retro-border',
+            sizeHeight[size], focusRing, toneMap[tone].ring,
+            error ? 'border-retro-red/60' : 'border-retro-border-strong',
             disabled && 'opacity-50 cursor-not-allowed',
           )}
           onClick={() => !disabled && setOpen(!open)}
@@ -237,7 +273,7 @@ export function PixelSelect({
           <ChevronDownIcon className={cn('ml-2 flex-shrink-0 text-retro-muted transition-transform', open && 'rotate-180')} />
         </button>
         {open && (
-          <div role="listbox" className={cn('absolute left-0 top-full z-40 mt-1 w-full bg-retro-bg p-1 shadow-xl', s.border, s.radiusLg, 'border-retro-border')}>
+          <div role="listbox" className={cn('absolute left-0 top-full z-40 mt-1 w-full bg-retro-bg p-1 shadow-xl', s.border, s.radiusLg, 'border-retro-border-strong')}>
             {options.map((opt, idx) => (
               <button
                 key={opt.value}
@@ -266,72 +302,82 @@ export function PixelSelect({
       </div>
     </FieldShell>
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelCheckbox — chunky pixel check mark.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelCheckbox({
-  label,
-  checked,
-  onChange,
-  disabled = false,
-  tone = 'green',
-  surface: surfaceProp,
-}: {
+/** Public prop bag for {@link PixelCheckbox}. */
+export interface PixelCheckboxProps {
   label: string;
   checked: boolean;
   onChange: (next: boolean) => void;
   disabled?: boolean;
   tone?: Tone;
   surface?: Surface;
-}) {
+  /** Form-serialization name. Hidden mirror input sends `'on'` / `''`. */
+  name?: string;
+  /** HTML form value when checked. Defaults to `'on'`. */
+  value?: string;
+  required?: boolean;
+  id?: string;
+}
+
+export const PixelCheckbox = forwardRef<HTMLButtonElement, PixelCheckboxProps>(function PixelCheckbox(
+  {
+    label, checked, onChange,
+    disabled = false,
+    tone = 'green',
+    surface: surfaceProp,
+    name, value = 'on', required, id,
+  },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   return (
-    <button
-      type="button"
-      role="checkbox"
-      aria-checked={checked}
-      aria-disabled={disabled}
-      disabled={disabled}
-      onClick={() => onChange(!checked)}
-      className={cn(
-        'group flex items-center gap-2.5 text-sm outline-none',
-        s.font,
-        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
-      )}
-    >
-      <span
+    <>
+      {name && checked && <input type="hidden" name={name} value={value} required={required} />}
+      <button
+        ref={ref}
+        id={id}
+        type="button"
+        role="checkbox"
+        aria-checked={checked}
+        aria-disabled={disabled}
+        aria-required={required || undefined}
+        disabled={disabled}
+        onClick={() => onChange(!checked)}
         className={cn(
-          'flex h-[18px] w-[18px] shrink-0 items-center justify-center transition-all',
-          s.border, s.radius,
-          checked ? cn(toneMap[tone].border, toneMap[tone].bg) : 'border-retro-border bg-retro-bg',
-          !disabled && 'group-hover:border-retro-muted',
-          'group-focus-visible:ring-2 group-focus-visible:ring-retro-green/40 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-retro-bg',
+          'group flex items-center gap-2.5 text-sm outline-none',
+          s.font,
+          disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
         )}
       >
-        {checked && <CheckIcon className={toneMap[tone].text} />}
-      </span>
-      <span className="text-retro-text select-none">{label}</span>
-    </button>
+        <span
+          className={cn(
+            'flex h-[18px] w-[18px] shrink-0 items-center justify-center transition-all',
+            s.border, s.radius,
+            checked ? cn(toneMap[tone].border, toneMap[tone].bg) : 'border-retro-border-strong bg-retro-bg',
+            !disabled && 'group-hover:border-retro-muted',
+            'group-focus-visible:ring-2 group-focus-visible:ring-retro-green/40 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-retro-bg',
+          )}
+        >
+          {checked && <CheckIcon className={toneMap[tone].text} />}
+        </span>
+        <span className="text-retro-text select-none">{label}</span>
+      </button>
+    </>
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelRadioGroup — grouped radios with pixel dot indicator.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelRadioGroup({
-  label,
-  value,
-  options,
-  onChange,
-  disabled = false,
-  tone = 'cyan',
-  surface: surfaceProp,
-}: {
+/** Public prop bag for {@link PixelRadioGroup}. */
+export interface PixelRadioGroupProps {
   label: string;
   value: string;
   options: Option[];
@@ -339,11 +385,26 @@ export function PixelRadioGroup({
   disabled?: boolean;
   tone?: Tone;
   surface?: Surface;
-}) {
+  /** Form-serialization name. */
+  name?: string;
+  required?: boolean;
+}
+
+export const PixelRadioGroup = forwardRef<HTMLFieldSetElement, PixelRadioGroupProps>(function PixelRadioGroup(
+  {
+    label, value, options, onChange,
+    disabled = false,
+    tone = 'cyan',
+    surface: surfaceProp,
+    name, required,
+  },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   return (
-    <fieldset className="space-y-2" role="radiogroup" aria-disabled={disabled} disabled={disabled}>
+    <fieldset ref={ref} className="space-y-2" role="radiogroup" aria-disabled={disabled} aria-required={required || undefined}>
+      {name && <input type="hidden" name={name} value={value} required={required} />}
       <legend className={cn('mb-1.5 text-xs text-retro-muted', s.font)}>{label}</legend>
       {options.map((opt) => {
         const isActive = value === opt.value;
@@ -354,6 +415,9 @@ export function PixelRadioGroup({
             role="radio"
             aria-checked={isActive}
             aria-disabled={disabled}
+            // Fix: <fieldset disabled> only cascades to native form controls;
+            // <button> children need an explicit `disabled` to be functionally
+            // unavailable (not just visually dim).
             disabled={disabled}
             onClick={() => !disabled && onChange(opt.value)}
             className={cn(
@@ -367,7 +431,7 @@ export function PixelRadioGroup({
                 'flex h-[18px] w-[18px] shrink-0 items-center justify-center transition-all',
                 s.border,
                 surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full',
-                isActive ? cn(toneMap[tone].border, toneMap[tone].bg) : 'border-retro-border bg-retro-bg',
+                isActive ? cn(toneMap[tone].border, toneMap[tone].bg) : 'border-retro-border-strong bg-retro-bg',
                 !disabled && 'group-hover:border-retro-muted',
               )}
             >
@@ -387,80 +451,87 @@ export function PixelRadioGroup({
       })}
     </fieldset>
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelSwitch — toggle switch with disabled + surface.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelSwitch({
-  label,
-  checked,
-  onChange,
-  disabled = false,
-  tone = 'green',
-  surface: surfaceProp,
-}: {
+/** Public prop bag for {@link PixelSwitch}. */
+export interface PixelSwitchProps {
   label: string;
   checked: boolean;
   onChange: (next: boolean) => void;
   disabled?: boolean;
   tone?: Tone;
   surface?: Surface;
-}) {
+  /** Form-serialization name. Hidden mirror sends `'on'` / `''`. */
+  name?: string;
+  /** HTML form value when checked. Defaults to `'on'`. */
+  value?: string;
+  required?: boolean;
+  id?: string;
+}
+
+export const PixelSwitch = forwardRef<HTMLButtonElement, PixelSwitchProps>(function PixelSwitch(
+  {
+    label, checked, onChange,
+    disabled = false,
+    tone = 'green',
+    surface: surfaceProp,
+    name, value = 'on', required, id,
+  },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-disabled={disabled}
-      disabled={disabled}
-      onClick={() => !disabled && onChange(!checked)}
-      className={cn(
-        'group inline-flex items-center gap-3 text-sm text-retro-text outline-none',
-        s.font, focusRing, toneMap[tone].ring,
-        disabled && 'opacity-50 cursor-not-allowed',
-      )}
-    >
-      <span
+    <>
+      {name && checked && <input type="hidden" name={name} value={value} required={required} />}
+      <button
+        ref={ref}
+        id={id}
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-disabled={disabled}
+        aria-required={required || undefined}
+        disabled={disabled}
+        onClick={() => !disabled && onChange(!checked)}
         className={cn(
-          'relative inline-flex h-6 w-11 shrink-0 items-center transition-colors',
-          s.border,
-          surface === 'pixel' ? 'rounded-[3px]' : 'rounded-full',
-          checked ? cn(toneMap[tone].border, toneMap[tone].bg) : 'border-retro-border bg-retro-surface',
+          'group inline-flex items-center gap-3 text-sm text-retro-text outline-none',
+          s.font, focusRing, toneMap[tone].ring,
+          disabled && 'opacity-50 cursor-not-allowed',
         )}
       >
         <span
           className={cn(
-            'absolute left-0.5 h-4 w-4 transition-transform',
-            surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full',
-            checked ? cn('translate-x-5', toneMap[tone].fill) : 'translate-x-0 bg-retro-muted',
+            'relative inline-flex h-6 w-11 shrink-0 items-center transition-colors',
+            s.border,
+            surface === 'pixel' ? 'rounded-[3px]' : 'rounded-full',
+            checked ? cn(toneMap[tone].border, toneMap[tone].bg) : 'border-retro-border-strong bg-retro-surface',
           )}
-        />
-      </span>
-      <span className="select-none">{label}</span>
-    </button>
+        >
+          <span
+            className={cn(
+              'absolute left-0.5 h-4 w-4 transition-transform',
+              surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full',
+              checked ? cn('translate-x-5', toneMap[tone].fill) : 'translate-x-0 bg-retro-muted',
+            )}
+          />
+        </span>
+        <span className="select-none">{label}</span>
+      </button>
+    </>
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelSlider — custom range slider with keyboard + pointer support.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelSlider({
-  label,
-  min = 0,
-  max = 100,
-  step = 1,
-  value,
-  onChange,
-  disabled = false,
-  tone = 'cyan',
-  showMinMax = false,
-  surface: surfaceProp,
-}: {
+/** Public prop bag for {@link PixelSlider}. */
+export interface PixelSliderProps {
   label: string;
   min?: number;
   max?: number;
@@ -471,7 +542,24 @@ export function PixelSlider({
   tone?: Tone;
   showMinMax?: boolean;
   surface?: Surface;
-}) {
+  name?: string;
+  required?: boolean;
+  id?: string;
+}
+
+export const PixelSlider = forwardRef<HTMLDivElement, PixelSliderProps>(function PixelSlider(
+  {
+    label,
+    min = 0, max = 100, step = 1,
+    value, onChange,
+    disabled = false,
+    tone = 'cyan',
+    showMinMax = false,
+    surface: surfaceProp,
+    name, required, id,
+  },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -520,6 +608,10 @@ export function PixelSlider({
       let next = value;
       if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = Math.min(max, value + step);
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = Math.max(min, value - step);
+      else if (e.key === 'Home') next = min;
+      else if (e.key === 'End') next = max;
+      else if (e.key === 'PageUp') next = Math.min(max, value + step * 10);
+      else if (e.key === 'PageDown') next = Math.max(min, value - step * 10);
       else return;
       e.preventDefault();
       onChange(next);
@@ -528,13 +620,15 @@ export function PixelSlider({
   );
 
   return (
-    <div className={cn('space-y-2', disabled && 'opacity-50')}>
+    <div ref={ref} className={cn('space-y-2', disabled && 'opacity-50')}>
+      {name && <input type="hidden" name={name} value={value} required={required} />}
       <div className={cn('flex items-center justify-between text-xs text-retro-muted', s.font)}>
         <span>{label}</span>
         <span className={toneMap[tone].text}>{value}</span>
       </div>
       <div
         ref={trackRef}
+        id={id}
         role="slider"
         tabIndex={disabled ? -1 : 0}
         aria-valuemin={min}
@@ -542,8 +636,9 @@ export function PixelSlider({
         aria-valuenow={value}
         aria-label={label}
         aria-disabled={disabled}
+        aria-required={required || undefined}
         className={cn(
-          'group relative h-2.5 outline-none touch-none border border-retro-border/60 bg-retro-surface/50',
+          'group relative h-2.5 outline-none touch-none border border-retro-border-strong bg-retro-surface/50',
           surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full',
           disabled ? 'cursor-not-allowed' : 'cursor-pointer',
           focusRing, toneMap[tone].ring,
@@ -579,21 +674,14 @@ export function PixelSlider({
       )}
     </div>
   );
-}
+});
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelSegmented — segmented control for toggling between options.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelSegmented({
-  label,
-  value,
-  options,
-  onChange,
-  disabled = false,
-  tone = 'green',
-  surface: surfaceProp,
-}: {
+/** Public prop bag for {@link PixelSegmented}. */
+export interface PixelSegmentedProps {
   label: string;
   value: string;
   options: Option[];
@@ -601,13 +689,28 @@ export function PixelSegmented({
   disabled?: boolean;
   tone?: Tone;
   surface?: Surface;
-}) {
+  /** Form-serialization name. */
+  name?: string;
+  required?: boolean;
+}
+
+export const PixelSegmented = forwardRef<HTMLDivElement, PixelSegmentedProps>(function PixelSegmented(
+  {
+    label, value, options, onChange,
+    disabled = false,
+    tone = 'green',
+    surface: surfaceProp,
+    name, required,
+  },
+  ref,
+) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   return (
-    <div className={cn('space-y-1.5', disabled && 'opacity-50 cursor-not-allowed')}>
+    <div ref={ref} className={cn('space-y-1.5', disabled && 'opacity-50 cursor-not-allowed')}>
+      {name && <input type="hidden" name={name} value={value} required={required} />}
       <p className={cn('text-xs text-retro-muted', s.font)}>{label}</p>
-      <div className={cn('inline-flex bg-retro-surface/50 p-0.5', s.border, s.radius, 'border-retro-border/50')}>
+      <div className={cn('inline-flex bg-retro-surface/50 p-0.5', s.border, s.radius, 'border-retro-border-strong/60')}>
         {options.map((opt) => {
           const isActive = value === opt.value;
           return (
@@ -635,4 +738,4 @@ export function PixelSegmented({
       </div>
     </div>
   );
-}
+});
