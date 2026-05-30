@@ -32,101 +32,112 @@ import {
   PixelCodeInline,
   PixelGlitch,
   PixelChip,
+  PixelContainer,
+  PixelStack,
+  PixelCluster,
+  PixelTwoColumn,
+  PixelHeroMedia,
 } from '@pxlkit/ui-kit';
 
 /* ── Hero Centered ──────────────────────────────────────────────────────── */
 export function HeroCenteredPreview() {
   return (
-    <section className="flex flex-col items-center justify-center text-center px-6 py-20 sm:py-28 bg-retro-bg min-h-[480px]">
-      <PixelFadeIn>
-        <PixelBadge tone="green">
-          <span className="inline-flex items-center gap-1">
-            <PxlKitIcon icon={Verified} size={12} colorful />
-            Now open source
-          </span>
-        </PixelBadge>
-      </PixelFadeIn>
-
-      <PixelFadeIn delay={120}>
-        <h1 className="font-pixel text-2xl sm:text-4xl text-retro-text leading-loose mt-6 mb-3">
-          <PixelGlitch trigger="hover" intensity={3} duration={800}>
-            <PixelTypewriter text="Build retro UIs" speed={55} />
-          </PixelGlitch>
-        </h1>
-        <p className="text-retro-muted font-mono text-sm sm:text-base max-w-lg mx-auto mb-8 leading-relaxed">
-          Production-ready pixel-art React components with 226+ colorful
-          icons, rich animations, and a full design system. Ship fast. Look
-          legendary.
-        </p>
-      </PixelFadeIn>
-
-      <PixelFadeIn delay={240}>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <PixelButton
-            tone="green"
-            size="lg"
-            iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
-          >
-            Get Started
-          </PixelButton>
-          <PixelButton tone="neutral" size="lg" variant="ghost">
-            Browse Docs
-          </PixelButton>
-        </div>
-      </PixelFadeIn>
-
-      <PixelFadeIn delay={300}>
-        <div className="mt-6 inline-flex items-center gap-2 rounded-lg border border-retro-border bg-retro-surface/40 px-4 py-2 font-mono text-sm">
-          <PixelCodeInline tone="green">npm install @pxlkit/core</PixelCodeInline>
-        </div>
-      </PixelFadeIn>
-
-      <PixelFadeIn delay={360}>
-        <PixelMouseParallax strength={15}>
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-retro-muted font-mono text-sm">
-            <PixelBounce>
-              <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful />
-            </PixelBounce>
-            <PixelTooltip content="Across 7 themed icon packs" position="top">
-              <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={Package} size={14} colorful />
-                226+ icons
+    <section className="bg-retro-bg min-h-[480px] flex items-center">
+      <PixelContainer maxWidth="xl" padding="xl">
+        <PixelStack gap={6} align="center" className="text-center">
+          <PixelFadeIn>
+            <PixelBadge tone="green">
+              <span className="inline-flex items-center gap-1">
+                <PxlKitIcon icon={Verified} size={12} colorful />
+                Now open source
               </span>
-            </PixelTooltip>
-            <span className="text-retro-border">|</span>
-            <PixelTooltip content="Buttons, cards, modals, animations, and more" position="top">
-              <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={Grid} size={14} colorful />
-                54 components
-              </span>
-            </PixelTooltip>
-            <span className="text-retro-border">|</span>
-            <PixelTooltip content="Free for personal and commercial use" position="top">
-              <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={ShieldCheck} size={14} colorful />
-                MIT licensed
-              </span>
-            </PixelTooltip>
-          </div>
-        </PixelMouseParallax>
-      </PixelFadeIn>
+            </PixelBadge>
+          </PixelFadeIn>
 
-      <PixelFadeIn delay={480}>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-retro-muted font-mono text-xs">
-          <span className="inline-flex items-center gap-1">
-            <PxlKitIcon icon={CheckCircle} size={12} colorful />
-            TypeScript-first
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <PxlKitIcon icon={CheckCircle} size={12} colorful />
-            Tree-shakeable
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <PxlKitIcon icon={CheckCircle} size={12} colorful />
-            SSR ready
-          </span>
-        </div>
-      </PixelFadeIn>
+          <PixelFadeIn delay={120}>
+            <PixelStack gap={3} align="center" className="text-center">
+              <h1 className="font-pixel text-2xl sm:text-4xl text-retro-text leading-loose">
+                <PixelGlitch trigger="hover" intensity={3} duration={800}>
+                  <PixelTypewriter text="Build retro UIs" speed={55} />
+                </PixelGlitch>
+              </h1>
+              <p className="text-retro-muted font-mono text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
+                Production-ready pixel-art React components with 226+ colorful
+                icons, rich animations, and a full design system. Ship fast. Look
+                legendary.
+              </p>
+            </PixelStack>
+          </PixelFadeIn>
+
+          <PixelFadeIn delay={240}>
+            <PixelCluster gap={3} justify="center">
+              <PixelButton
+                tone="green"
+                size="lg"
+                iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+              >
+                Get Started
+              </PixelButton>
+              <PixelButton tone="neutral" size="lg" variant="ghost">
+                Browse Docs
+              </PixelButton>
+            </PixelCluster>
+          </PixelFadeIn>
+
+          <PixelFadeIn delay={300}>
+            <div className="inline-flex items-center gap-2 rounded-lg border border-retro-border bg-retro-surface/40 px-4 py-2 font-mono text-sm">
+              <PixelCodeInline tone="green">npm install @pxlkit/core</PixelCodeInline>
+            </div>
+          </PixelFadeIn>
+
+          <PixelFadeIn delay={360}>
+            <PixelMouseParallax strength={15}>
+              <PixelCluster gap={6} justify="center" className="text-retro-muted font-mono text-sm">
+                <PixelBounce>
+                  <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful />
+                </PixelBounce>
+                <PixelTooltip content="Across 7 themed icon packs" position="top">
+                  <span className="inline-flex items-center gap-1.5">
+                    <PxlKitIcon icon={Package} size={14} colorful />
+                    226+ icons
+                  </span>
+                </PixelTooltip>
+                <span className="text-retro-border">|</span>
+                <PixelTooltip content="Buttons, cards, modals, animations, and more" position="top">
+                  <span className="inline-flex items-center gap-1.5">
+                    <PxlKitIcon icon={Grid} size={14} colorful />
+                    54 components
+                  </span>
+                </PixelTooltip>
+                <span className="text-retro-border">|</span>
+                <PixelTooltip content="Free for personal and commercial use" position="top">
+                  <span className="inline-flex items-center gap-1.5">
+                    <PxlKitIcon icon={ShieldCheck} size={14} colorful />
+                    MIT licensed
+                  </span>
+                </PixelTooltip>
+              </PixelCluster>
+            </PixelMouseParallax>
+          </PixelFadeIn>
+
+          <PixelFadeIn delay={480}>
+            <PixelCluster gap={4} justify="center" className="text-retro-muted font-mono text-xs">
+              <span className="inline-flex items-center gap-1">
+                <PxlKitIcon icon={CheckCircle} size={12} colorful />
+                TypeScript-first
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <PxlKitIcon icon={CheckCircle} size={12} colorful />
+                Tree-shakeable
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <PxlKitIcon icon={CheckCircle} size={12} colorful />
+                SSR ready
+              </span>
+            </PixelCluster>
+          </PixelFadeIn>
+        </PixelStack>
+      </PixelContainer>
     </section>
   );
 }
@@ -139,88 +150,104 @@ const splitShowcaseIcons = [
 ] as const;
 
 export function HeroSplitPreview() {
+  const left = (
+    <PixelSlideIn from="left">
+      <PixelStack gap={4} align="start">
+        <PixelBadge tone="cyan">
+          <span className="inline-flex items-center gap-1">
+            <PxlKitIcon icon={Lightning} size={12} colorful />
+            v2.0 release
+          </span>
+        </PixelBadge>
+
+        <PixelStack gap={3} align="start">
+          <h1 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose">
+            Gamify your <span className="text-retro-cyan">Interface</span>
+          </h1>
+          <p className="text-retro-muted font-mono text-sm sm:text-base max-w-md leading-relaxed">
+            Animated gamification icons, community-ready social components,
+            and pixel-perfect feedback indicators — all built for the retro
+            web.
+          </p>
+        </PixelStack>
+
+        <PixelCluster gap={2} justify="start">
+          <PixelChip label="React" tone="cyan" />
+          <PixelChip label="TypeScript" tone="purple" />
+          <PixelChip label="Tailwind" tone="green" />
+        </PixelCluster>
+
+        <PixelCluster gap={4} justify="start" className="text-retro-muted font-mono text-xs">
+          <span className="inline-flex items-center gap-1.5">
+            <PxlKitIcon icon={Trophy} size={14} colorful />
+            6 icon packs
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <PxlKitIcon icon={Globe} size={14} colorful />
+            i18n ready
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <PxlKitIcon icon={Shield} size={14} colorful />
+            Fully typed
+          </span>
+        </PixelCluster>
+
+        <PixelPulse>
+          <PixelBadge tone="gold">
+            <span className="inline-flex items-center gap-1">
+              <PxlKitIcon icon={Star} size={12} colorful />
+              2.4k stars
+            </span>
+          </PixelBadge>
+        </PixelPulse>
+
+        <PixelCluster gap={3} justify="start">
+          <PixelButton
+            tone="cyan"
+            size="lg"
+            iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+          >
+            Get Started
+          </PixelButton>
+          <PixelButton tone="neutral" size="lg" variant="ghost">
+            View Docs
+          </PixelButton>
+        </PixelCluster>
+      </PixelStack>
+    </PixelSlideIn>
+  );
+
+  const right = (
+    <PixelSlideIn from="right">
+      <PixelHeroMedia ratio="1/1" anchor="baseline-headline">
+        <PixelCluster gap={8} justify="center" className="h-full">
+          {splitShowcaseIcons.map(({ icon, size, label }, i) => (
+            <PixelTooltip key={i} content={label} position="top">
+              <PixelFloat
+                duration={2200 + i * 400}
+                distance={8 + i * 2}
+              >
+                <AnimatedPxlKitIcon icon={icon} size={size} colorful />
+              </PixelFloat>
+            </PixelTooltip>
+          ))}
+        </PixelCluster>
+      </PixelHeroMedia>
+    </PixelSlideIn>
+  );
+
   return (
     <section className="bg-retro-bg min-h-[480px] flex items-center">
-      <div className="w-full max-w-5xl mx-auto px-6 py-20 sm:py-28 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-        <PixelSlideIn from="left">
-          <div>
-            <PixelBadge tone="cyan">
-              <span className="inline-flex items-center gap-1">
-                <PxlKitIcon icon={Lightning} size={12} colorful />
-                v2.0 release
-              </span>
-            </PixelBadge>
-            <h1 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mt-5 mb-4">
-              Gamify your <span className="text-retro-cyan">Interface</span>
-            </h1>
-            <p className="text-retro-muted font-mono text-sm sm:text-base mb-4 max-w-md leading-relaxed">
-              Animated gamification icons, community-ready social components,
-              and pixel-perfect feedback indicators — all built for the retro
-              web.
-            </p>
-
-            <div className="flex flex-wrap gap-2 mb-5">
-              <PixelChip label="React" tone="cyan" />
-              <PixelChip label="TypeScript" tone="purple" />
-              <PixelChip label="Tailwind" tone="green" />
-            </div>
-
-            <div className="flex flex-wrap gap-4 mb-5 text-retro-muted font-mono text-xs">
-              <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={Trophy} size={14} colorful />
-                6 icon packs
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={Globe} size={14} colorful />
-                i18n ready
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={Shield} size={14} colorful />
-                Fully typed
-              </span>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 mb-7">
-              <PixelPulse>
-                <PixelBadge tone="gold">
-                  <span className="inline-flex items-center gap-1">
-                    <PxlKitIcon icon={Star} size={12} colorful />
-                    2.4k stars
-                  </span>
-                </PixelBadge>
-              </PixelPulse>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <PixelButton
-                tone="cyan"
-                size="lg"
-                iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
-              >
-                Get Started
-              </PixelButton>
-              <PixelButton tone="neutral" size="lg" variant="ghost">
-                View Docs
-              </PixelButton>
-            </div>
-          </div>
-        </PixelSlideIn>
-
-        <PixelSlideIn from="right">
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            {splitShowcaseIcons.map(({ icon, size, label }, i) => (
-              <PixelTooltip key={i} content={label} position="top">
-                <PixelFloat
-                  duration={2200 + i * 400}
-                  distance={8 + i * 2}
-                >
-                  <AnimatedPxlKitIcon icon={icon} size={size} colorful />
-                </PixelFloat>
-              </PixelTooltip>
-            ))}
-          </div>
-        </PixelSlideIn>
-      </div>
+      <PixelContainer maxWidth="xl" padding="xl">
+        <PixelTwoColumn
+          ratio="50/50"
+          gap={10}
+          stackBelow="md"
+          align="center"
+          left={left}
+          right={right}
+        />
+      </PixelContainer>
     </section>
   );
 }

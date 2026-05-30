@@ -2,19 +2,22 @@
 
 import { useState } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
-import { Check, ArrowRight } from '@pxlkit/ui';
+import { ArrowRight } from '@pxlkit/ui';
 import { Trophy, Crown, Coin, Lightning, Gem } from '@pxlkit/gamification';
-import { CheckCircle, ShieldCheck, Sparkles } from '@pxlkit/feedback';
+import { CheckCircle, ShieldCheck } from '@pxlkit/feedback';
 import {
   PixelButton,
   PixelBadge,
   PixelFadeIn,
   PixelSlideIn,
-  PixelDivider,
   PixelSwitch,
   PixelTooltip,
   PixelTextLink,
   PixelBounce,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelEqualHeightGrid,
+  PixelPricingCard,
 } from '@pxlkit/ui-kit';
 
 type PlanTone = 'neutral' | 'green' | 'cyan';
@@ -22,7 +25,6 @@ type PlanTone = 'neutral' | 'green' | 'cyan';
 interface PlanFeature {
   label: string;
   tooltip: string;
-  html?: boolean;
 }
 
 interface Plan {
@@ -65,7 +67,7 @@ const CARDS_PLANS: Plan[] = [
     features: [
       { label: '226+ icons across all packs', tooltip: 'Full access to every icon in every pack' },
       { label: 'All 7 icon packs included', tooltip: 'Every current and future icon pack' },
-      { label: 'Email &amp; priority support', tooltip: 'Direct email line with faster response times', html: true },
+      { label: 'Email & priority support', tooltip: 'Direct email line with faster response times' },
       { label: 'Commercial use license', tooltip: 'Ship in client and commercial projects' },
       { label: 'Lifetime updates', tooltip: 'Every new icon and update, forever' },
       { label: 'Early access to new icons', tooltip: 'Preview and use icons before public release' },
@@ -91,126 +93,60 @@ const CARDS_PLANS: Plan[] = [
   },
 ];
 
-const TONE_STYLES: Record<PlanTone, { border: string; bg: string; glow: string }> = {
-  neutral: {
-    border: 'border-retro-border',
-    bg: 'bg-retro-surface/30',
-    glow: '',
-  },
-  green: {
-    border: 'border-retro-green/50',
-    bg: 'bg-retro-green/5',
-    glow: 'shadow-[0_0_30px_-5px] shadow-retro-green/20 ring-1 ring-retro-green/20',
-  },
-  cyan: {
-    border: 'border-retro-cyan/40',
-    bg: 'bg-retro-cyan/5',
-    glow: '',
-  },
-};
-
 /* ── Pricing Cards ──────────────────────────────────────────────────────── */
 export function PricingCardsPreview() {
   return (
-    <section className="py-20 sm:py-28 px-6 bg-retro-bg">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <PixelFadeIn>
-            <PixelBadge tone="green">
-              <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={Sparkles} size={12} colorful />
-                New plans available
-              </span>
-            </PixelBadge>
-          </PixelFadeIn>
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mt-4 mb-3">
-            Simple, transparent pricing
-          </h2>
-          <p className="text-retro-muted font-mono text-sm sm:text-base max-w-lg mx-auto">
-            Pick the plan that fits your project. Upgrade or downgrade anytime &mdash; no lock-in.
-          </p>
-        </div>
+    <PixelContainer as="section" maxWidth="xl" padding="xl" className="bg-retro-bg">
+      <PixelSectionHeader
+        align="center"
+        size="md"
+        spacing="normal"
+        title="Simple, transparent pricing"
+        description="Pick the plan that fits your project. Upgrade or downgrade anytime — no lock-in."
+        eyebrow="New plans available"
+      />
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
+      <div className="mt-16">
+        <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={6}>
           {CARDS_PLANS.map((plan, idx) => (
             <PixelFadeIn key={plan.name}>
               <PixelSlideIn from={idx === 0 ? 'left' : idx === 2 ? 'right' : 'left'}>
-                <div
-                  className={`rounded-xl border p-8 flex flex-col h-full relative hover:scale-[1.02] transition-transform ${TONE_STYLES[plan.tone].border} ${TONE_STYLES[plan.tone].bg} ${plan.popular ? TONE_STYLES[plan.tone].glow : ''}`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <PixelBadge tone="green">
-                        <span className="inline-flex items-center gap-1">
-                          <PxlKitIcon icon={Lightning} size={12} colorful />
-                          Most Popular
-                        </span>
-                      </PixelBadge>
-                    </div>
-                  )}
-
-                  {/* Icon + name */}
-                  <div className="text-center mb-6 pt-2">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-lg border border-retro-border/50 bg-retro-surface/40 mb-4">
-                      <PxlKitIcon icon={plan.icon} size={32} colorful />
-                    </div>
-                    <h3 className="font-pixel text-lg text-retro-text mb-1">{plan.name}</h3>
-                    <p className="font-mono text-xs text-retro-muted">{plan.description}</p>
-                  </div>
-
-                  <PixelDivider tone="neutral" />
-
-                  {/* Price */}
-                  <div className="flex items-baseline justify-center gap-1 my-6">
-                    <span className="font-pixel text-4xl text-retro-text">{plan.price}</span>
-                    <span className="font-mono text-sm text-retro-muted">{plan.period}</span>
-                  </div>
-
-                  {/* Features */}
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {plan.features.map((f) => (
-                      <li key={f.label} className="font-mono text-sm text-retro-muted flex items-start gap-2.5">
-                        <PxlKitIcon icon={CheckCircle} size={14} colorful className="flex-shrink-0 mt-0.5" />
-                        <PixelTooltip content={f.tooltip} position="top">
-                          {f.html ? (
-                            <span dangerouslySetInnerHTML={{ __html: f.label }} />
-                          ) : (
-                            <span>{f.label}</span>
-                          )}
-                        </PixelTooltip>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* CTA */}
-                  <PixelButton
-                    tone={plan.tone}
-                    size="md"
-                    className="w-full justify-center"
-                    iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
-                  >
-                    {plan.cta}
-                  </PixelButton>
-                </div>
+                <PixelPricingCard
+                  tone={plan.tone}
+                  highlight={plan.popular}
+                  popular={plan.popular ? { label: 'MOST POPULAR', tone: 'gold' } : undefined}
+                  icon={<PxlKitIcon icon={plan.icon} size={32} colorful />}
+                  name={plan.name}
+                  description={plan.description}
+                  price={{ amount: plan.price, period: plan.period }}
+                  features={plan.features.map((f) => ({ label: f.label, tooltip: f.tooltip }))}
+                  cta={
+                    <PixelButton
+                      tone={plan.tone}
+                      size="md"
+                      className="w-full justify-center"
+                      iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                    >
+                      {plan.cta}
+                    </PixelButton>
+                  }
+                />
               </PixelSlideIn>
             </PixelFadeIn>
           ))}
-        </div>
+        </PixelEqualHeightGrid>
+      </div>
 
-        {/* Guarantee */}
-        <div className="text-center mt-10 space-y-3">
-          <p className="inline-flex items-center gap-2 font-mono text-xs text-retro-muted">
-            <PxlKitIcon icon={ShieldCheck} size={14} colorful />
-            30-day money-back guarantee &middot; Cancel anytime
-          </p>
-          <div>
-            <PixelTextLink href="#" tone="green">Compare plans in detail</PixelTextLink>
-          </div>
+      <div className="text-center mt-10 space-y-3">
+        <p className="inline-flex items-center gap-2 font-mono text-xs text-retro-muted">
+          <PxlKitIcon icon={ShieldCheck} size={14} colorful />
+          30-day money-back guarantee · Cancel anytime
+        </p>
+        <div>
+          <PixelTextLink href="#" tone="green">Compare plans in detail</PixelTextLink>
         </div>
       </div>
-    </section>
+    </PixelContainer>
   );
 }
 
@@ -264,19 +200,16 @@ function TableCell({ value }: { value: CellValue }) {
 
 export function PricingTablePreview() {
   return (
-    <section className="py-20 sm:py-28 px-6 bg-retro-bg">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-14">
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-3">
-            Compare plans
-          </h2>
-          <p className="text-retro-muted font-mono text-sm sm:text-base">
-            See what&apos;s included in each tier at a glance.
-          </p>
-        </div>
+    <PixelContainer as="section" maxWidth="md" padding="xl" className="bg-retro-bg">
+      <PixelSectionHeader
+        align="center"
+        size="md"
+        spacing="normal"
+        title="Compare plans"
+        description="See what's included in each tier at a glance."
+      />
 
-        {/* Table */}
+      <div className="mt-14">
         <PixelFadeIn>
           <div className="rounded-xl border border-retro-border overflow-hidden">
             <table className="w-full font-mono text-sm">
@@ -347,7 +280,7 @@ export function PricingTablePreview() {
           </div>
         </PixelFadeIn>
       </div>
-    </section>
+    </PixelContainer>
   );
 }
 
@@ -407,7 +340,7 @@ const TOGGLE_PLANS: TogglePlan[] = [
       'Unlimited team seats',
       'Dedicated Slack channel',
       'Custom icon requests',
-      'SLA &amp; invoicing',
+      'SLA & invoicing',
     ],
   },
 ];
@@ -416,105 +349,60 @@ export function PricingTogglePreview() {
   const [isYearly, setIsYearly] = useState(false);
 
   return (
-    <section className="py-20 sm:py-28 px-6 bg-retro-bg">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-5">
-            Choose your plan
-          </h2>
+    <PixelContainer as="section" maxWidth="xl" padding="xl" className="bg-retro-bg">
+      <div className="text-center mb-12">
+        <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-5">
+          Choose your plan
+        </h2>
 
-          {/* Toggle */}
-          <div className="inline-flex items-center gap-3 bg-retro-surface/40 border border-retro-border rounded-lg px-5 py-3">
-            <span
-              className={`font-mono text-sm font-semibold transition-colors ${!isYearly ? 'text-retro-green' : 'text-retro-muted'}`}
-            >
-              Monthly
-            </span>
-            <PixelSwitch
-              label=""
-              checked={isYearly}
-              onChange={setIsYearly}
-              tone="green"
-            />
-            <span
-              className={`font-mono text-sm font-semibold transition-colors ${isYearly ? 'text-retro-green' : 'text-retro-muted'}`}
-            >
-              Yearly
-            </span>
-            <PixelBounce trigger={isYearly}>
-              <PixelBadge tone="gold">
-                <span className="inline-flex items-center gap-1">
-                  <PxlKitIcon icon={Lightning} size={10} colorful />
-                  Save 20%
-                </span>
-              </PixelBadge>
-            </PixelBounce>
-          </div>
+        <div className="inline-flex items-center gap-3 bg-retro-surface/40 border border-retro-border rounded-lg px-5 py-3">
+          <span
+            className={`font-mono text-sm font-semibold transition-colors ${!isYearly ? 'text-retro-green' : 'text-retro-muted'}`}
+          >
+            Monthly
+          </span>
+          <PixelSwitch
+            label=""
+            checked={isYearly}
+            onChange={setIsYearly}
+            tone="green"
+          />
+          <span
+            className={`font-mono text-sm font-semibold transition-colors ${isYearly ? 'text-retro-green' : 'text-retro-muted'}`}
+          >
+            Yearly
+          </span>
+          <PixelBounce trigger={isYearly}>
+            <PixelBadge tone="gold">
+              <span className="inline-flex items-center gap-1">
+                <PxlKitIcon icon={Lightning} size={10} colorful />
+                Save 20%
+              </span>
+            </PixelBadge>
+          </PixelBounce>
         </div>
+      </div>
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-8">
-          {TOGGLE_PLANS.map((plan) => {
-            const price = isYearly ? plan.yearly : plan.monthly;
-            const perMonth = isYearly ? Math.round(plan.yearly / 12) : plan.monthly;
-            const savings = isYearly ? plan.monthly * 12 - plan.yearly : 0;
+      <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={6}>
+        {TOGGLE_PLANS.map((plan) => {
+          const price = isYearly ? plan.yearly : plan.monthly;
+          const perMonth = isYearly ? Math.round(plan.yearly / 12) : plan.monthly;
+          const savings = isYearly ? plan.monthly * 12 - plan.yearly : 0;
+          const displayAmount = isYearly ? `$${price}` : `$${perMonth}`;
+          const displayPeriod = isYearly ? '/yr' : '/mo';
 
-            return (
-              <PixelFadeIn key={plan.name}>
-                <div
-                  className={`rounded-xl border p-8 flex flex-col h-full relative transition-all ${TONE_STYLES[plan.tone].border} ${TONE_STYLES[plan.tone].bg} ${plan.popular ? TONE_STYLES[plan.tone].glow : ''}`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <PixelBadge tone="green">
-                        <span className="inline-flex items-center gap-1">
-                          <PxlKitIcon icon={Lightning} size={12} colorful />
-                          Best Value
-                        </span>
-                      </PixelBadge>
-                    </div>
-                  )}
-
-                  <div className="text-center mb-4 pt-2">
-                    <PixelTooltip content={`${plan.name} plan`} position="top">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg border border-retro-border/50 bg-retro-surface/40 mb-3">
-                        <PxlKitIcon icon={plan.icon} size={28} colorful />
-                      </div>
-                    </PixelTooltip>
-                    <h3 className="font-pixel text-lg text-retro-text mb-1">{plan.name}</h3>
-                    <p className="font-mono text-xs text-retro-muted">{plan.description}</p>
-                  </div>
-
-                  <div className="text-center my-5">
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="font-pixel text-4xl text-retro-text">
-                        ${isYearly ? price : perMonth}
-                      </span>
-                      <span className="font-mono text-sm text-retro-muted">
-                        {isYearly ? '/yr' : '/mo'}
-                      </span>
-                    </div>
-                    {isYearly && (
-                      <PixelFadeIn>
-                        <p className="font-mono text-xs text-retro-green mt-1">
-                          ${perMonth}/mo &middot; You save ${savings}/yr
-                        </p>
-                      </PixelFadeIn>
-                    )}
-                  </div>
-
-                  <PixelDivider tone="neutral" />
-
-                  <ul className="space-y-3 my-6 flex-1">
-                    {plan.features.map((f) => (
-                      <li key={f} className="font-mono text-sm text-retro-muted flex items-start gap-2.5">
-                        <PxlKitIcon icon={Check} size={12} className="text-retro-green flex-shrink-0 mt-0.5" />
-                        <span dangerouslySetInnerHTML={{ __html: f }} />
-                      </li>
-                    ))}
-                  </ul>
-
+          return (
+            <PixelFadeIn key={plan.name}>
+              <PixelPricingCard
+                tone={plan.tone}
+                highlight={plan.popular}
+                popular={plan.popular ? { label: 'BEST VALUE', tone: 'gold' } : undefined}
+                icon={<PxlKitIcon icon={plan.icon} size={28} colorful />}
+                name={plan.name}
+                description={plan.description}
+                price={{ amount: displayAmount, period: displayPeriod }}
+                features={plan.features.map((f) => ({ label: f.replace(/&amp;/g, '&') }))}
+                cta={
                   <PixelButton
                     tone={plan.tone}
                     size="md"
@@ -523,20 +411,26 @@ export function PricingTogglePreview() {
                   >
                     Select {plan.name}
                   </PixelButton>
-                </div>
-              </PixelFadeIn>
-            );
-          })}
-        </div>
+                }
+                footer={
+                  isYearly ? (
+                    <span className="font-mono text-xs text-retro-green">
+                      ${perMonth}/mo · You save ${savings}/yr
+                    </span>
+                  ) : undefined
+                }
+              />
+            </PixelFadeIn>
+          );
+        })}
+      </PixelEqualHeightGrid>
 
-        {/* Guarantee */}
-        <div className="text-center mt-10">
-          <p className="inline-flex items-center gap-2 font-mono text-xs text-retro-muted">
-            <PxlKitIcon icon={ShieldCheck} size={14} colorful />
-            30-day money-back guarantee &middot; No questions asked
-          </p>
-        </div>
+      <div className="text-center mt-10">
+        <p className="inline-flex items-center gap-2 font-mono text-xs text-retro-muted">
+          <PxlKitIcon icon={ShieldCheck} size={14} colorful />
+          30-day money-back guarantee · No questions asked
+        </p>
       </div>
-    </section>
+    </PixelContainer>
   );
 }

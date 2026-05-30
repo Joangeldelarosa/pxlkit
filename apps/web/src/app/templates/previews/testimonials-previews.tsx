@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
-import { Star, SparkleStar, Crown } from '@pxlkit/gamification';
+import { SparkleStar, Crown } from '@pxlkit/gamification';
 import { Verified } from '@pxlkit/social';
 import { Sparkles } from '@pxlkit/feedback';
 import {
@@ -12,9 +12,13 @@ import {
   PixelButton,
   PixelFadeIn,
   PixelFloat,
-  PixelTooltip,
   PixelTextLink,
   PixelPulse,
+  PixelTestimonialCard,
+  PixelStarRating,
+  PixelEqualHeightGrid,
+  PixelContainer,
+  PixelSectionHeader,
 } from '@pxlkit/ui-kit';
 
 /* ── Shared data ────────────────────────────────────────────────────────── */
@@ -52,70 +56,48 @@ const TESTIMONIALS = [
   },
 ];
 
-function Stars({ count = 5 }: { count?: number }) {
-  return (
-    <div className="flex gap-1">
-      {Array.from({ length: count }).map((_, i) => (
-        <PxlKitIcon key={i} icon={Star} size={14} colorful />
-      ))}
-    </div>
-  );
-}
-
 /* ── Testimonials Cards ─────────────────────────────────────────────────── */
 export function TestimonialsCardsPreview() {
   return (
-    <section className="py-20 sm:py-28 px-6 bg-retro-bg">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-14">
+    <PixelContainer as="section" maxWidth="lg" className="bg-retro-bg">
+      <PixelSectionHeader
+        align="center"
+        eyebrow="Testimonials"
+        title="Loved by developers"
+        description="Don't take our word for it — here's what our community has to say."
+        actions={
           <PixelBadge tone="gold">
             <PxlKitIcon icon={Crown} size={12} colorful />
             <span className="ml-1.5">Testimonials</span>
           </PixelBadge>
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-3 mt-4">
-            Loved by developers
-          </h2>
-          <p className="text-retro-muted font-mono text-sm sm:text-base max-w-lg mx-auto">
-            Don&apos;t take our word for it — here&apos;s what our community has to say.
-          </p>
-        </div>
+        }
+      />
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((t, i) => (
-            <PixelFadeIn key={t.name} delay={i * 100}>
-              <div
-                className={`rounded-xl border ${t.border} ${t.bg} p-6 flex flex-col h-full transition-all hover:shadow-lg hover:-translate-y-1`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <Stars />
-                  <PixelTooltip content="Verified customer" position="top">
-                    <PxlKitIcon icon={Verified} size={16} colorful />
-                  </PixelTooltip>
+      <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={6} className="mt-14">
+        {TESTIMONIALS.map((t, i) => (
+          <PixelFadeIn key={t.name} delay={i * 100} className="h-full">
+            <PixelTestimonialCard
+              quote={t.quote}
+              name={t.name}
+              role={t.role}
+              company={t.company}
+              tone={t.tone}
+              stars={5}
+              avatar={{ name: t.name, tone: t.tone }}
+              className={`h-full ${t.border} ${t.bg} transition-all hover:shadow-lg hover:-translate-y-1`}
+              actions={
+                <div className="flex items-center justify-between gap-2">
+                  <PixelTextLink href="#" tone="green">
+                    Read full review
+                  </PixelTextLink>
+                  <PxlKitIcon icon={Verified} size={16} colorful />
                 </div>
-
-                <p className="font-mono text-sm text-retro-muted leading-relaxed flex-1 italic mb-4">
-                  &quot;{t.quote}&quot;
-                </p>
-
-                <div className="mb-4">
-                  <PixelTextLink href="#" tone="green">Read full review</PixelTextLink>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <PixelAvatar name={t.name} size="md" tone={t.tone} />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-pixel text-xs text-retro-text">{t.name}</p>
-                    <p className="font-mono text-xs text-retro-muted truncate">
-                      {t.role} · {t.company}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </PixelFadeIn>
-          ))}
-        </div>
-      </div>
-    </section>
+              }
+            />
+          </PixelFadeIn>
+        ))}
+      </PixelEqualHeightGrid>
+    </PixelContainer>
   );
 }
 
@@ -147,7 +129,7 @@ export function TestimonialsLargeQuotePreview() {
 
         <div className="flex justify-center">
           <PixelPulse trigger="hover">
-            <Stars />
+            <PixelStarRating value={5} size="sm" tone="gold" />
           </PixelPulse>
         </div>
 
@@ -222,20 +204,18 @@ export function TestimonialsSliderPreview() {
   return (
     <section className="py-20 sm:py-28 px-6 bg-retro-bg">
       <div className="max-w-xl mx-auto">
-        <div className="text-center mb-10">
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose">
-            What devs say
-          </h2>
-          <p className="text-retro-muted font-mono text-sm mt-2">
-            Hear from developers who ship with PxlKit every day.
-          </p>
-        </div>
+        <PixelSectionHeader
+          align="center"
+          title="What devs say"
+          description="Hear from developers who ship with PxlKit every day."
+          className="mb-10"
+        />
 
         <div
           className={`rounded-xl border ${current.border} ${current.bg} p-8 text-center transition-colors`}
         >
           <div className="flex justify-center mb-5">
-            <Stars />
+            <PixelStarRating value={5} size="sm" tone="gold" />
           </div>
           <p className="font-mono text-sm sm:text-base text-retro-muted leading-relaxed mb-6 italic max-w-md mx-auto">
             &quot;{current.quote}&quot;

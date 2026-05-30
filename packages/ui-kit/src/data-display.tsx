@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 import {
   Tone, Size, Surface, cn,
   toneMap, surfaceClasses, useEffectiveSurface,
@@ -6,42 +6,293 @@ import {
 } from './common';
 import { PixelButton } from './actions';
 import { usePxlKitLocale } from './locale';
+import { tone as toneTokens, ToneKey } from './tokens';
+import { PixelRibbon } from './cards/PixelRibbon';
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelCard — container with title, icon, body, optional footer.
    Pixel surface uses thick border + offset shadow as signature.
+
+   Upgraded (Ola 2) additively: optional tone tint, hover-interactive lift,
+   media slot, badge ribbon, description with line-clamp, polymorphic <a>
+   render via href, and a padding scale. Existing call sites continue to
+   work unchanged.
    ────────────────────────────────────────────────────────────────────────── */
 
-export function PixelCard({
-  title,
-  icon,
-  children,
-  footer,
-  surface: surfaceProp,
-}: {
+const paddingMap = {
+  none: 'p-0',
+  sm: 'p-2',
+  md: 'p-3',
+  lg: 'p-6',
+} as const;
+
+const lineClampMap = {
+  2: 'line-clamp-2 min-h-[2em]',
+  3: 'line-clamp-3 min-h-[3em]',
+  4: 'line-clamp-4 min-h-[4em]',
+} as const;
+
+export interface PixelCardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
   title: string;
   icon?: React.ReactNode;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   footer?: React.ReactNode;
   surface?: Surface;
-}) {
-  const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
+  /** Optional tone tint applied to border + soft background. */
+  tone?: ToneKey;
+  /**
+   * When true, adds a hover lift + focus ring. If no `href` is set, an
+   * `onClick` is REQUIRED — the card renders with `role="button"` +
+   * `tabIndex={0}` + Enter/Space activation for keyboard parity.
+   */
+  interactive?: boolean;
+  /** Top media slot rendered above the header. Clipped by overflow:hidden. */
+  media?: React.ReactNode;
+  /** Corner ribbon badge — renders {@link PixelRibbon}. */
+  badge?: { label: string; tone?: ToneKey };
+  /** Muted paragraph rendered under the title. */
+  description?: string;
+  /** Apply `line-clamp-N` + `min-h-[N em]` to the description. */
+  descriptionLines?: 2 | 3 | 4;
+  /**
+   * When provided, the root renders as `<a href>` instead of `<article>`.
+   *
+   * ⚠️ Nesting interactive children (PixelButton, PixelTextLink, etc.) inside
+   * `footer` / `media` / `children` is invalid HTML in href mode — screen
+   * readers cannot navigate nested interactives inside an anchor. Render
+   * those outside the card when you need an actionable area.
+   */
+  href?: string;
+  /** Anchor target — only meaningful when `href` is set. */
+  target?: React.AnchorHTMLAttributes<HTMLAnchorElement>['target'];
+  /** Anchor rel — only meaningful when `href` is set. */
+  rel?: React.AnchorHTMLAttributes<HTMLAnchorElement>['rel'];
+  /** Padding scale; default keeps the legacy `p-4` rhythm. */
+  padding?: 'none' | 'sm' | 'md' | 'lg';
+}
+
+type CardRoot = HTMLAnchorElement | HTMLElement;
+
+function CardHeader({ children, className, ...rest }: React.HTMLAttributes<HTMLElement>) {
   return (
-    <article className={cn('bg-retro-surface/60 p-4 transition-colors', s.border, s.radiusLg, 'border-retro-border/40 hover:border-retro-border/60')}>
-      <header className="mb-3 flex items-center gap-2 border-b border-retro-border/30 pb-3">
-        {icon && <span className="inline-flex items-center justify-center shrink-0">{icon}</span>}
-        <h4 className={cn('text-sm font-semibold text-retro-text', s.font)}>{title}</h4>
-      </header>
-      <div className="text-sm text-retro-muted">{children}</div>
-      {footer && <footer className="mt-4 border-t border-retro-border/30 pt-3">{footer}</footer>}
-    </article>
+    <header
+      className={cn('mb-3 flex items-center gap-2 border-b border-retro-border/30 pb-3', className)}
+      {...rest}
+    >
+      {children}
+    </header>
   );
 }
+CardHeader.displayName = 'PixelCard.Header';
+
+function CardBody({ children, className, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={cn('flex-1 text-sm text-retro-muted', className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+CardBody.displayName = 'PixelCard.Body';
+
+function CardFooter({ children, className, ...rest }: React.HTMLAttributes<HTMLElement>) {
+  return (
+    <footer
+      className={cn('mt-auto border-t border-retro-border/30 pt-3', className)}
+      {...rest}
+    >
+      {children}
+    </footer>
+  );
+}
+CardFooter.displayName = 'PixelCard.Footer';
+
+function childrenContainCardHeader(children: React.ReactNode): boolean {
+  let found = false;
+  React.Children.forEach(children, (child) => {
+    if (found) return;
+    if (React.isValidElement(child)) {
+      const c = child.type as { displayName?: string } | string;
+      if (typeof c !== 'string' && c?.displayName === 'PixelCard.Header') {
+        found = true;
+      }
+    }
+  });
+  return found;
+}
+
+const PixelCardImpl = forwardRef<CardRoot, PixelCardProps>(function PixelCard(
+  {
+    title,
+    icon,
+    children,
+    footer,
+    surface: surfaceProp,
+    tone,
+    interactive,
+    media,
+    badge,
+    description,
+    descriptionLines,
+    href,
+    target,
+    rel,
+    padding,
+    onClick,
+    onKeyDown,
+    className,
+    ...rest
+  },
+  ref,
+) {
+  const surface = useEffectiveSurface(surfaceProp);
+  const s = surfaceClasses(surface);
+  const t = tone ? toneTokens[tone] : null;
+  const padCls = padding ? paddingMap[padding] : 'p-4';
+  const hasMedia = !!media;
+  const hasBadge = !!badge;
+  const hasExplicitHeader = childrenContainCardHeader(children);
+
+  const rootCls = cn(
+    'relative flex flex-col bg-retro-surface/60 transition-all',
+    s.border,
+    s.radiusLg,
+    t ? t.border : 'border-retro-border/40 hover:border-retro-border/60',
+    t ? t.soft : null,
+    (hasMedia || hasBadge) && 'overflow-hidden',
+    interactive && 'cursor-pointer hover:-translate-y-[2px] hover:shadow-lg',
+    (interactive || href) && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
+    href && 'no-underline text-inherit',
+    !hasMedia && padCls,
+    className,
+  );
+
+  const handleKeyDown: React.KeyboardEventHandler<HTMLElement> = (e) => {
+    onKeyDown?.(e);
+    if (e.defaultPrevented) return;
+    if (!interactive || href) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick?.(e as unknown as React.MouseEvent<HTMLElement>);
+    }
+  };
+
+  const inner = (
+    <>
+      {hasMedia && <div className="-m-0 overflow-hidden">{media}</div>}
+      {hasBadge && (
+        <PixelRibbon
+          position="top-right"
+          tone={badge!.tone ?? 'gold'}
+          surface={surface}
+        >
+          {badge!.label}
+        </PixelRibbon>
+      )}
+      <div className={cn(hasMedia && padCls, 'flex flex-1 flex-col')}>
+        {!hasExplicitHeader && (
+          <header className={cn('flex items-center gap-2 border-b border-retro-border/30 pb-3', description ? 'mb-2' : 'mb-3')}>
+            {icon && <span className="inline-flex items-center justify-center shrink-0">{icon}</span>}
+            <h4 className={cn('text-sm font-semibold text-retro-text', s.font)}>{title}</h4>
+          </header>
+        )}
+        {description && (
+          <p
+            className={cn(
+              'mb-3 text-sm text-retro-muted',
+              descriptionLines ? lineClampMap[descriptionLines] : null,
+            )}
+          >
+            {description}
+          </p>
+        )}
+        {children !== undefined && children !== null && (
+          <div className="text-sm text-retro-muted">{children}</div>
+        )}
+        {footer && (
+          <footer className="mt-4 border-t border-retro-border/30 pt-3">{footer}</footer>
+        )}
+      </div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a
+        ref={ref as React.Ref<HTMLAnchorElement>}
+        href={href}
+        target={target}
+        rel={rel}
+        className={rootCls}
+        onClick={onClick as React.MouseEventHandler<HTMLAnchorElement> | undefined}
+        {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+      >
+        {inner}
+      </a>
+    );
+  }
+
+  if (interactive) {
+    return (
+      <article
+        ref={ref as React.Ref<HTMLElement>}
+        className={rootCls}
+        role="button"
+        tabIndex={0}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        {...rest}
+      >
+        {inner}
+      </article>
+    );
+  }
+
+  return (
+    <article
+      ref={ref as React.Ref<HTMLElement>}
+      className={rootCls}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      {...rest}
+    >
+      {inner}
+    </article>
+  );
+});
+
+PixelCardImpl.displayName = 'PixelCard';
+
+export const PixelCard = PixelCardImpl as typeof PixelCardImpl & {
+  Header: typeof CardHeader;
+  Body: typeof CardBody;
+  Footer: typeof CardFooter;
+};
+
+PixelCard.Header = CardHeader;
+PixelCard.Body = CardBody;
+PixelCard.Footer = CardFooter;
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelStatCard — compact metric card.
+
+   Upgraded (Ola 2) additively: optional `size` (sm/md/lg) scales padding +
+   font sizes; optional `iconPosition` (left/right/top/bottom-left) controls
+   where the icon renders. Defaults preserve the legacy layout.
    ────────────────────────────────────────────────────────────────────────── */
+
+export type PixelStatCardSize = 'sm' | 'md' | 'lg';
+export type PixelStatCardIconPosition = 'left' | 'right' | 'top' | 'bottom-left';
+
+export interface PixelStatCardProps {
+  label: string;
+  value: string;
+  icon?: React.ReactNode;
+  tone?: Tone;
+  trend?: string;
+  surface?: Surface;
+  size?: PixelStatCardSize;
+  iconPosition?: PixelStatCardIconPosition;
+}
 
 export function PixelStatCard({
   label,
@@ -50,24 +301,81 @@ export function PixelStatCard({
   tone = 'gold',
   trend,
   surface: surfaceProp,
-}: {
-  label: string;
-  value: string;
-  icon?: React.ReactNode;
-  tone?: Tone;
-  trend?: string;
-  surface?: Surface;
-}) {
+  size = 'md',
+  iconPosition = 'top',
+}: PixelStatCardProps) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
-  return (
-    <div className={cn('p-4', s.border, s.radiusLg, toneMap[tone].border, toneMap[tone].soft)}>
-      <div className="mb-3 flex items-center justify-between">
-        <p className={cn('text-xs text-retro-muted', s.font)}>{label}</p>
-        {icon && <span className={cn('inline-flex items-center justify-center shrink-0 text-sm', toneMap[tone].text)}>{icon}</span>}
+
+  const padding = size === 'sm' ? 'p-3' : size === 'lg' ? 'p-6' : 'p-4';
+  const labelSize = size === 'sm' ? 'text-[10px]' : size === 'lg' ? 'text-sm' : 'text-xs';
+  const valueSize =
+    surface === 'pixel'
+      ? (size === 'sm' ? 'text-xs font-pixel' : size === 'lg' ? 'text-lg font-pixel' : 'text-sm font-pixel')
+      : (size === 'sm' ? 'text-sm font-semibold' : size === 'lg' ? 'text-2xl font-semibold' : 'text-base font-semibold');
+  const trendSize = size === 'sm' ? 'text-[10px]' : size === 'lg' ? 'text-sm' : 'text-xs';
+  const iconBoxSize = size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-lg' : 'text-sm';
+  const valueGap = size === 'sm' ? 'mt-1.5' : size === 'lg' ? 'mt-3' : 'mt-2';
+  const trendGap = size === 'sm' ? 'mt-1.5' : size === 'lg' ? 'mt-3' : 'mt-2';
+
+  const labelEl = <p className={cn(labelSize, 'text-retro-muted', s.font)}>{label}</p>;
+  const valueEl = <p className={cn('text-retro-text', valueSize)}>{value}</p>;
+  const iconEl = icon ? (
+    <span className={cn('inline-flex items-center justify-center shrink-0', iconBoxSize, toneMap[tone].text)}>{icon}</span>
+  ) : null;
+  const trendEl = trend ? <p className={cn(trendGap, trendSize, 'text-retro-muted', s.font)}>{trend}</p> : null;
+
+  const baseClass = cn(padding, s.border, s.radiusLg, toneMap[tone].border, toneMap[tone].soft);
+
+  if (iconPosition === 'right') {
+    return (
+      <div className={cn(baseClass, 'grid grid-cols-[1fr_auto] items-center gap-3')}>
+        <div>
+          {labelEl}
+          <div className={valueGap}>{valueEl}</div>
+          {trendEl}
+        </div>
+        {iconEl}
       </div>
-      <p className={cn('text-sm text-retro-text', surface === 'pixel' ? 'font-pixel' : 'font-semibold text-base')}>{value}</p>
-      {trend && <p className={cn('mt-2 text-xs text-retro-muted', s.font)}>{trend}</p>}
+    );
+  }
+
+  if (iconPosition === 'left') {
+    return (
+      <div className={cn(baseClass, 'flex items-center gap-3')}>
+        {iconEl}
+        <div className="flex-1">
+          {labelEl}
+          <div className={valueGap}>{valueEl}</div>
+          {trendEl}
+        </div>
+      </div>
+    );
+  }
+
+  if (iconPosition === 'bottom-left') {
+    return (
+      <div className={cn(baseClass, 'relative')}>
+        <div className="mb-3 flex items-center justify-between">{labelEl}</div>
+        {valueEl}
+        {trendEl}
+        {iconEl && (
+          <span className={cn('absolute bottom-0 left-0 inline-flex items-center justify-center', padding, iconBoxSize, toneMap[tone].text)}>
+            {icon}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={baseClass}>
+      <div className="mb-3 flex items-center justify-between">
+        {labelEl}
+        {iconEl}
+      </div>
+      {valueEl}
+      {trendEl}
     </div>
   );
 }
@@ -246,6 +554,8 @@ export function PixelTextLink({
   const s = surfaceClasses(surface);
   const cls = cn(
     'underline underline-offset-2 decoration-current/40 transition-colors cursor-pointer',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
+    toneMap[tone].ring,
     s.font,
     toneMap[tone].text,
     tone === 'cyan' && 'hover:text-retro-green',
