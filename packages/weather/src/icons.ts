@@ -232,28 +232,36 @@ export const Thunder = createIcon(
   }
 );
 
-export const Wind = createIcon(
-  'wind',
-  { B: '#93C5FD', D: '#60A5FA', C: '#BFDBFE' },
-  ['wind', 'windy', 'breeze', 'air', 'weather'],
-  ({ line, set }) => {
-    // three curved wind lines
-    line(2, 4, 10, 4, 'B');
-    line(10, 4, 12, 3, 'B');
-    set(12, 2, 'B');
-
-    line(3, 7, 11, 7, 'D');
-    line(11, 7, 13, 8, 'D');
-    set(13, 9, 'D');
-
-    line(2, 10, 9, 10, 'C');
-    line(9, 10, 11, 9, 'C');
-    set(11, 8, 'C');
-
-    line(4, 13, 8, 13, 'B');
-    line(8, 13, 10, 12, 'B');
-  }
-);
+export const Wind: PxlKitData = {
+  name: 'wind',
+  size: 16,
+  category: 'weather',
+  grid: [
+    '................',
+    '................',
+    '............BB..',
+    '.BBBBBBBBBBBB.B.',
+    '.............BB.',
+    '............BB..',
+    '................',
+    '.....DDDDDDDDDD.',
+    '............DD..',
+    '...........DD...',
+    '................',
+    '..CCCCCCCCCCC...',
+    '.............C..',
+    '............C...',
+    '................',
+    '................',
+  ],
+  palette: {
+    B: '#93C5FD',
+    D: '#60A5FA',
+    C: '#BFDBFE',
+  },
+  tags: ['wind', 'windy', 'breeze', 'air', 'weather'],
+  author: 'pxlkit',
+};
 
 export const Thermometer = createIcon(
   'thermometer',
@@ -466,27 +474,37 @@ export const Hail = createIcon(
   }
 );
 
-export const Compass = createIcon(
-  'compass',
-  { B: '#6B7280', R: '#EF4444', W: '#FFFFFF', D: '#374151', G: '#22C55E' },
-  ['compass', 'direction', 'navigation', 'north', 'weather'],
-  ({ ring, fillCircle, line, set }) => {
-    ring(7.5, 7.5, 6, 'B');
-    ring(7.5, 7.5, 6.5, 'D', 0.4);
-    fillCircle(7.5, 7.5, 1, 'D');
-    // north pointer (red)
-    line(8, 2, 8, 7, 'R');
-    line(7, 3, 8, 2, 'R');
-    line(9, 3, 8, 2, 'R');
-    // south pointer (white)
-    line(8, 8, 8, 13, 'W');
-    // east/west marks
-    set(2, 8, 'G');
-    set(13, 8, 'G');
-    // cardinal dots
-    set(8, 1, 'R');
-  }
-);
+export const Compass: PxlKitData = {
+  name: 'compass',
+  size: 16,
+  category: 'weather',
+  grid: [
+    '................',
+    '......BBBB......',
+    '....BB....BB....',
+    '...B........B...',
+    '..B....R.....B..',
+    '..B...RRR....B..',
+    '.B...RRRRR....B.',
+    '.B....RRR.....B.',
+    '.B....DDD.....B.',
+    '.B....WWW.....B.',
+    '.B...WWWWW....B.',
+    '..B...WWW....B..',
+    '..B....W.....B..',
+    '...B........B...',
+    '....BB....BB....',
+    '......BBBB......',
+  ],
+  palette: {
+    B: '#6B7280',
+    R: '#EF4444',
+    W: '#FFFFFF',
+    D: '#374151',
+  },
+  tags: ['compass', 'direction', 'navigation', 'north', 'weather'],
+  author: 'pxlkit',
+};
 
 export const WeatherIcons: PxlKitData[] = [
   Sun,

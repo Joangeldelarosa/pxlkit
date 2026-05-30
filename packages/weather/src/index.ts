@@ -106,6 +106,6 @@ export const WeatherPack: IconPack = {
     // New animated
     SpinningTornado, DriftingFog, FallingSnow, LightningStrike, PulsingSun, WindGust,
   ],
-  version: '1.2.3',
+  version: '1.2.4',
   author: 'pxlkit',
 };

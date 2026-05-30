@@ -27,7 +27,7 @@
     "@pxlkit/ui": "^1.2.5",
     "@pxlkit/ui-kit": "^1.4.2",
     "@pxlkit/voxel": "^0.1.4",
-    "@pxlkit/weather": "^1.2.3",
+    "@pxlkit/weather": "^1.2.4",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@tailwindcss/postcss": "^4.2.1",
