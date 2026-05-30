@@ -1,5 +1,38 @@
 # @pxlkit/ui-kit — Changelog
 
+## 1.8.0 — 2026-05-30 (Ola 3 — Overlay + Form Workhorses)
+
+### Added — Overlay foundation
+- **PixelPortal** — SSR-safe createPortal wrapper, custom container support.
+- **PixelPopover** — Floating-UI positioned popover (foundation for DatePicker / Combobox / HoverCard) with side+align, sideOffset, closeOnEscape/Outside, surface-aware corners and arrow.
+
+### Added — Overlays
+- **PixelDrawer** — Edge-attached slide-in panel with focus trap, scroll lock, header/body/footer slots, dismissOnOverlay.
+- **PixelCommand** — Cmd+K palette with fuzzy filter + grouped items + arrow-key navigation + Enter to select + Escape to close.
+- **PixelAlertDialog** — Confirm-destructive dialog with role=alertdialog, focus pinned to Cancel, optional async onAction.
+- **PixelSheet** — Mobile bottom-sheet preset over PixelDrawer with drag handle.
+
+### Added — Form workhorses
+- **PixelCombobox** — Searchable single-select with grouped options + ArrowDown/Up/Home/End/Enter/Space keyboard nav + aria-activedescendant.
+- **PixelMultiSelect** — Tag-style multi value picker with chip remove (keyboard-reachable), max cap, clearable.
+- **PixelDatePicker** — Date input + calendar popover with min/max + disabledDates + presets row.
+- **PixelNumberInput** — Steppers + clamp behaviors (strict/blur/none) + precision + thousandsSeparator + prefix/suffix + hideControls.
+- **PixelOTPInput** — N-cell auto-advance with paste support + onComplete + mask + type=numeric|alphanumeric.
+- **PixelFileUpload** — Dropzone with previews + maxSize/maxFiles + onReject with reasons + renderItem override.
+- **PixelForm** — react-hook-form wrapper with Root/Field/Item/Label/Control/Description/Message + auto-wired aria-describedby and aria-invalid.
+
+### Changed
+- **PixelModal** — Now portaled (escapes transformed ancestors) + real focus trap (WCAG 2.1.2) + refcounted scroll lock (iOS-safe) + new optional footer/description slots + sizes xl/full + asyncClose pending UX.
+- **PixelTooltip** — Migrated to @floating-ui/react-dom (flip + shift + autoUpdate) + portal + controlled open/defaultOpen + trigger=hover/click/focus + content:ReactNode (legacy label still accepted) + delay { open, close }.
+- **PixelInput** — New optional prefix, suffix, addonLeft/Right, clearable+onClear, showCount, loading.
+- **PixelTextarea** — autosize (auto-grow with content) + minRows/maxRows + showCount.
+
+### Deps
+- Added: @floating-ui/react-dom@^2.1.8, react-hook-form@^7.76.1.
+
+### Fixed
+- Adversarial review (3 lenses) caught and fixed: PixelCombobox a11y blocker (keyboard nav + chip remove keyboard reachability), 25 majors across overlay/form correctness + a11y + API-DX.
+
 ## 1.7.0 — 2026-05-30 (Ola 2 — Hero + Cards + Featured Ribbon)
 
 ### Added
