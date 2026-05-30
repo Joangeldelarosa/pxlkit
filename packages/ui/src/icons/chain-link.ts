@@ -3,12 +3,12 @@ import type { PxlKitData } from '@pxlkit/core';
 /**
  * 🔗 ChainLink — 16×16 pixel art chain link / hyperlink
  *
- * Two interlocked oval rings — link, hyperlink, URL, chain.
+ * Two interlocked ring halves drawn on a diagonal — the universal
+ * hyperlink / chain icon. Each half-ring leans into the other so the
+ * silhouette reads as a connected pair at 16 px instead of a blob.
  *
- * Palette:
  *   B = Blue link  (#5B9BD5)
  *   D = Dark edge  (#2E6DA4)
- *   O = Outline    (#334455)
  */
 export const ChainLink: PxlKitData = {
   name: 'chain-link',
@@ -16,26 +16,25 @@ export const ChainLink: PxlKitData = {
   category: 'ui',
   grid: [
     '................',
-    '........OOOOO...',
-    '.......ODBBBDO..',
-    '......ODBBBBDO..',
-    '.....OOBBBBBOO..',
-    '....ODBBBBBDO...',
-    '...ODBBBO.DO....',
-    '...OBBBBBBDO....',
-    '..ODBBBBBBDO....',
-    '..OOBBBBBOOO....',
-    '...ODBBBBBDO....',
-    '....ODBBBBDO....',
-    '.....OOOOO......',
-    '................',
+    '...BBBB.........',
+    '..BDDDDB........',
+    '.BD....DB.......',
+    '.BD....DBBBB....',
+    '..BD..DBDDDDB...',
+    '...BBBB.....DB..',
+    '............DB..',
+    '..BD........DB..',
+    '..BDDDB.....DB..',
+    '.BD....DB..DB...',
+    '.BD....DBBBB....',
+    '..BD..DB........',
+    '...BBBB.........',
     '................',
     '................',
   ],
   palette: {
     B: '#5B9BD5',
     D: '#2E6DA4',
-    O: '#334455',
   },
   tags: ['link', 'chain', 'url', 'hyperlink', 'connect', 'ui'],
   author: 'pxlkit',

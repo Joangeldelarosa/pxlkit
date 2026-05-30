@@ -3,11 +3,13 @@ import type { PxlKitData } from '@pxlkit/core';
 /**
  * 🔓 LockOpen — 16×16 pixel art open padlock
  *
- * A padlock with the shackle raised — unlocked, accessible, open access.
+ * The shackle is fully lifted off the body — left arm broken, right arm
+ * still attached to the body via a hinge, and a visible gap separates the
+ * shackle from the body. This is the lifted/unlatched signal that makes
+ * the unlock state immediately distinct from the closed `lock` icon at
+ * 16 px.
  *
- * Palette:
  *   G = Gold lock  (#FFB400)
- *   D = Dark edge  (#CC8800)
  *   O = Outline    (#334455)
  *   K = Keyhole    (#334455)
  */
@@ -18,24 +20,23 @@ export const LockOpen: PxlKitData = {
   grid: [
     '................',
     '....OOOOO.......',
-    '....OGGGO.......',
-    '....OGGGO.......',
-    '....OGGO........',
-    '....OGG.........',
-    'OOOOOGGOOOOOO...',
-    'OGGGGGGGGGGGO...',
-    'OGGGGKGGGGGGO...',
-    'OGGGKKKGGGGGO...',
-    'OGGGGKGGGGGGO...',
-    'OGGGGGGGGGGGO...',
-    'OOOOOOOOOOOOO...',
-    '................',
+    '...OGGGOO.......',
+    '..OGG..GO.......',
+    '..OG....O.......',
+    '..OG............',
+    '..OG............',
+    '..OG..OOOOOOOOOO',
+    '..OG.OGGGGGGGGO.',
+    '.....OGGGKGGGGO.',
+    '.....OGGKKKGGGO.',
+    '.....OGGGKGGGGO.',
+    '.....OGGGGGGGGO.',
+    '.....OOOOOOOOOO.',
     '................',
     '................',
   ],
   palette: {
     G: '#FFB400',
-    D: '#CC8800',
     O: '#334455',
     K: '#334455',
   },

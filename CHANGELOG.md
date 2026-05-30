@@ -5,26 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [weather 1.2.4] - 2026-05-28 — Weather pack refinement pass
+## [ui 1.2.5] - 2026-05-28 — UI pack refinement pass
 
-A visual-quality pass on the `@pxlkit/weather` pack using the
-`/dev/inspector` tool (multi-resolution + pixel-grid overlay) and verified
-on dark + light backgrounds and at 16 px native size.
+A visual-quality pass on the `@pxlkit/ui` pack using the `/dev/inspector`
+tool (multi-resolution + pixel-grid overlay) and verified on dark + light
+backgrounds and at 16 px native size.
 
-### Changed — `@pxlkit/weather` v1.2.4
+### Changed — `@pxlkit/ui` v1.2.5
 
 - Redesigned for legibility, family coherence and metaphor correctness:
-  - `crescent-moon` — replaced the full-disc gold blob with an actual
-    waxing crescent C-shape that matches the icon name at 16 px.
-  - `clear-night` — replaced the full-disc moon with a small crescent
-    plus three scattered white stars so the icon clearly reads as a
-    calm clear night, distinct from `full-moon`.
-  - `compass` — converted the 1-pixel-wide thin needle to a thick red
-    north arrow + white south arrow inside a clean ring with a dark
-    centre pivot; the icon no longer reads as a gear at 16 px.
-  - `wind` — three swoosh lines, each ending in a curved tail/hook,
-    distinct from `fog`'s flat horizontal lines (fog stays straight,
-    wind clearly curls).
+  - `settings` — replaced the noisy 3-row half-slider blob with three full
+    horizontal slider bars and white knobs at left / centre / right
+    positions, the universal "adjust / preferences" pattern.
+  - `dots-menu` — replaced the three large grey boxes with three actual
+    round dots (4×4 rounded squares) stacked vertically — the kebab menu
+    now reads as kebab and not as media controls.
+  - `history` — replaced the blue-tail clock blob with a clean
+    counter-clockwise circular arrow with a distinct bottom-left
+    arrowhead, distinct from both `clock` and `undo`.
+  - `eraser` — replaced the slanted pencil-eraser hybrid with a clean
+    two-tone block (pink top, grey body, dark outline).
+  - `paint-bucket` — replaced the downward-teardrop pin with a real
+    trapezoidal bucket, curved handle, and teal paint splash spilling out.
+  - `chain-link` — redrew the swirly blob as two interlocked diagonal
+    half-rings so the silhouette reads as a connected pair at 16 px.
+  - `copy` — added a clearly-offset back page so the icon reads as
+    "duplicate" instead of a single document.
+  - `edit` — added a blue underline at the bottom so the pencil now reads
+    as "edit / write" and differs from the plain `pencil` icon.
+  - `gear` — redrew as an 8-tooth cog with a clear centre hole, dropping
+    the scattered white pixels that read as snowflake-noise.
+  - `lock-open` — lifted the shackle clear off the body with a visible
+    gap so the unlock state is unambiguously distinct from the closed
+    `lock` icon.
 
 ## [social 1.2.4] - 2026-05-27 — Social pack refinement pass
 
