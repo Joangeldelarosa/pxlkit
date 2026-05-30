@@ -3,11 +3,11 @@ import type { PxlKitData } from '@pxlkit/core';
 /**
  * ⋮ DotsMenu — 16×16 pixel art vertical three-dot menu
  *
- * Three vertical dots — overflow menu, more options, kebab menu.
+ * Three vertical round dots (kebab menu) — overflow menu, more options.
+ * Each dot is a 4×4 rounded square at cols 6–9, stacked at rows 1–4,
+ * 6–9 and 11–14 so the silhouette reads clean at 16 px.
  *
- * Palette:
- *   D = Dot grey  (#667788)
- *   O = Outline   (#334455)
+ *   D = Dot grey (#667788)
  */
 export const DotsMenu: PxlKitData = {
   name: 'dots-menu',
@@ -15,25 +15,24 @@ export const DotsMenu: PxlKitData = {
   category: 'ui',
   grid: [
     '................',
+    '.......DD.......',
+    '......DDDD......',
+    '......DDDD......',
+    '.......DD.......',
     '................',
-    '.....OOOOO......',
-    '.....ODDDO......',
-    '.....ODDDO......',
-    '.....OOOOO......',
+    '.......DD.......',
+    '......DDDD......',
+    '......DDDD......',
+    '.......DD.......',
     '................',
-    '.....OOOOO......',
-    '.....ODDDO......',
-    '.....ODDDO......',
-    '.....OOOOO......',
+    '.......DD.......',
+    '......DDDD......',
+    '......DDDD......',
+    '.......DD.......',
     '................',
-    '.....OOOOO......',
-    '.....ODDDO......',
-    '.....ODDDO......',
-    '.....OOOOO......',
   ],
   palette: {
     D: '#667788',
-    O: '#334455',
   },
   tags: ['more', 'options', 'overflow', 'kebab', 'dots', 'menu', 'ui'],
   author: 'pxlkit',

@@ -3,7 +3,14 @@ import type { PxlKitData } from '@pxlkit/core';
 /**
  * 🧹 Eraser — 16×16 pixel art eraser icon
  *
- * A rectangular eraser for removing/clearing.
+ * Classic two-tone block eraser sitting upright: pink top half + grey
+ * bottom half + dark outline. Cleaner silhouette than the previous tilted
+ * pencil-eraser hybrid, and clearly reads as the universal eraser block at
+ * 16 px.
+ *
+ *   P = Pink top   (#FF8FAB)
+ *   G = Grey body  (#BFBFBF)
+ *   O = Outline    (#333333)
  */
 export const Eraser: PxlKitData = {
   name: 'eraser',
@@ -12,25 +19,26 @@ export const Eraser: PxlKitData = {
   grid: [
     '................',
     '................',
-    '........GGGGGG..',
-    '.......GPPPPGG..',
-    '......GPPPPGG...',
-    '.....GPPPPGG....',
-    '....GPPPPGG.....',
-    '...GPPPPGG......',
-    '..GPPPPGG.......',
-    '..GWWWGG........',
-    '..GWWWG.........',
-    '..GWWGG.........',
-    '..GWGG..........',
-    '..GGG...........',
-    '...G............',
+    '................',
+    '...OOOOOOOOOO...',
+    '..OPPPPPPPPPPO..',
+    '..OPPPPPPPPPPO..',
+    '..OPPPPPPPPPPO..',
+    '..OOOOOOOOOOOO..',
+    '..OGGGGGGGGGGO..',
+    '..OGGGGGGGGGGO..',
+    '..OGGGGGGGGGGO..',
+    '..OGGGGGGGGGGO..',
+    '...OOOOOOOOOO...',
+    '................',
+    '................',
     '................',
   ],
   palette: {
-    G: '#555555',
     P: '#FF8FAB',
-    W: '#FFFFFF',
+    G: '#BFBFBF',
+    O: '#333333',
   },
   tags: ['eraser', 'delete', 'remove', 'clear', 'tool'],
+  author: 'pxlkit',
 };
