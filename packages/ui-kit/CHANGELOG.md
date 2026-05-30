@@ -1,5 +1,46 @@
 # @pxlkit/ui-kit — Changelog
 
+## 1.9.0 — 2026-05-30 (Ola 4a — Kit Depth: DataTable + 18 components + 7 upgrades)
+
+### Added — Data viz + tables
+- **PixelDataTable** — TanStack-powered table with sort, selection, pagination, column visibility, density, sticky header, loading skeleton, empty state.
+- **PixelCarousel** — Embla-powered carousel with arrows, dots, vertical orientation.
+- **PixelTimeline** — Vertical event timeline with bullets + connector lines.
+- **PixelStatGroup** — Grouped stat cards container.
+- **PixelAvatarGroup** — Stacked overlapping avatars with +N tile.
+- **PixelBadgeGroup** / **PixelChipGroup** — Badge overflow popover + multi-toggle chip rows.
+- **PixelSparkline** / **PixelBarChart** / **PixelAreaChart** — SVG chart primitives.
+
+### Added — Navigation
+- **PixelStepper** — Multi-step indicator with orientation + step click.
+- **PixelMenubar** — Horizontal app menubar with submenus + shortcuts.
+- **PixelNavigationMenu** — Mega-menu primitive.
+- **PixelSidebar** — Collapsible app-shell nav with sections + badges.
+
+### Added — Layout + feedback
+- **PixelScrollArea** — Surface-aware scrollbar styling.
+- **PixelSpinner** — Inline animated spinner (respects useReducedMotion).
+
+### Added — Forms
+- **PixelInputGroup** — Joined-shell input + button + select.
+- **PixelToggleGroup** + **PixelToggle** — Multi-toggle button rows.
+- **PixelDateRangePicker** — Two-month range picker with presets.
+- **PixelCalendarGrid** — Standalone month grid.
+- **PixelColorInput** — Color value input with swatch popover.
+
+### Changed (backwards-compatible)
+- **PixelTable**: columns/data API + sort + selection + sticky + density + loading + emptyState.
+- **PixelTabs**: orientation (vertical), keepMounted, scrollable, activationMode, compositional Tabs.List/Trigger/Panel.
+- **PixelToast** / **useToast**: toast.promise(), toast.success/error/info/warning/loading, toast.update(), Sonner-style stacked-offset + expand-on-hover, animatedIcon support.
+- **PixelDropdown**: extended Option (kind=separator/header/submenu/checkbox/radio, shortcut), compositional API, typeahead.
+- **PixelBadge** + **PixelChip**: variant (solid/soft/outline/ghost), size, iconLeft, onClick; PixelChip deletable + onDelete.
+- **PixelAvatar**: status indicator dot, sizes xs/xl, shape, colorSeed (deterministic fallback), loading=lazy.
+- **PixelButton**: 4 variants (solid/soft/outline/ghost), asChild, fullWidth, loading width-pinning.
+- **PixelSlider**: range mode (dual thumb), marks, showTooltip, ticks.
+
+### Deps
+- Added: @tanstack/react-table, embla-carousel-react.
+
 ## 1.8.0 — 2026-05-30 (Ola 3 — Overlay + Form Workhorses)
 
 ### Added — Overlay foundation
