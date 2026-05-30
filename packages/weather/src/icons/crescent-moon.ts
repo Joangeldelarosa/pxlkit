@@ -3,9 +3,11 @@ import type { PxlKitData } from '@pxlkit/core';
 /**
  * 🌙 CrescentMoon — 16×16 pixel art crescent moon
  *
- * A classic golden crescent moon facing right — night, sleep, nocturnal.
+ * Classic waxing crescent moon: the horns open to the right, with a darker
+ * edge on the outside (gives volume) and a softer highlight on the inner
+ * curve. The previous design rendered as a full disc which did not match
+ * the icon name at 16 px.
  *
- * Palette:
  *   Y = Moon gold  (#F0C040)
  *   D = Dark edge  (#C89020)
  *   L = Light glow (#F8E080)
@@ -16,20 +18,20 @@ export const CrescentMoon: PxlKitData = {
   category: 'weather',
   grid: [
     '................',
-    '........DYYY....',
-    '......DYYYYY....',
-    '.....DYYYYYYY...',
-    '....DYYYYLYYYY..',
-    '....DYYYYYLYY...',
-    '....DYYYYYLYY...',
-    '....DYYYYYLYYY..',
-    '....DYYYYLLYYYY.',
-    '....DYYYYYYYYY..',
-    '.....DYYYYYYYY..',
-    '......DYYYYY....',
-    '........DYYY....',
-    '................',
-    '................',
+    '.....DDDD.......',
+    '...DDYYYYDD.....',
+    '..DYYYYYYYYD....',
+    '..DYY....YYD....',
+    '.DYYY......D....',
+    '.DYYL...........',
+    '.DYYL...........',
+    '.DYYL...........',
+    '.DYYL...........',
+    '.DYYY......D....',
+    '..DYY....YYD....',
+    '..DYYYYYYYYD....',
+    '...DDYYYYDD.....',
+    '.....DDDD.......',
     '................',
   ],
   palette: {
