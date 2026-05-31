@@ -18,6 +18,11 @@ export interface PixelSidebarItemProps {
 }
 
 export interface PixelSidebarSectionProps {
+  /** Canonical section label. */
+  label?: string;
+  /**
+   * @deprecated Use `label` instead. Retained as alias for one minor.
+   */
   title?: string;
   items: PixelSidebarItemProps[];
 }
@@ -216,16 +221,18 @@ export const PixelSidebar = forwardRef<HTMLElement, PixelSidebarProps>(function 
       )}
 
       <div className="flex-1 overflow-y-auto py-2">
-        {sections.map((section, idx) => (
-          <div key={section.title ?? `section-${idx}`} className={cn(idx > 0 && 'mt-3')}>
-            {section.title && !collapsed && (
+        {sections.map((section, idx) => {
+          const sectionLabel = section.label ?? section.title;
+          return (
+          <div key={sectionLabel ?? `section-${idx}`} className={cn(idx > 0 && 'mt-3')}>
+            {sectionLabel && !collapsed && (
               <h3
                 className={cn(
                   'px-3 pb-1 text-[10px] uppercase tracking-wider text-retro-muted',
                   s.fontDisplay,
                 )}
               >
-                {section.title}
+                {sectionLabel}
               </h3>
             )}
             <ul role="list" className="space-y-0.5 px-1">
@@ -240,7 +247,8 @@ export const PixelSidebar = forwardRef<HTMLElement, PixelSidebarProps>(function 
               ))}
             </ul>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {footer && (

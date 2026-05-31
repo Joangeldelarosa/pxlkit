@@ -8,6 +8,7 @@ import {
   useEffectiveSurface,
   toneMap,
 } from '../common';
+import { useControllableState } from '../hooks/useControllableState';
 
 /* ──────────────────────────────────────────────────────────────────────────
    Date helpers — pure, no deps. (Mirror PixelDatePicker semantics.)
@@ -81,6 +82,7 @@ function buildMonthGrid(year: number, month: number): DayCell[] {
 
 export interface PixelCalendarGridProps {
   value?: Date | null;
+  defaultValue?: Date | null;
   onChange?: (date: Date) => void;
   minDate?: Date;
   maxDate?: Date;
@@ -97,7 +99,8 @@ export interface PixelCalendarGridProps {
 export const PixelCalendarGrid = forwardRef<HTMLDivElement, PixelCalendarGridProps>(
   function PixelCalendarGrid(
     {
-      value,
+      value: valueProp,
+      defaultValue,
       onChange,
       minDate,
       maxDate,
@@ -113,6 +116,11 @@ export const PixelCalendarGrid = forwardRef<HTMLDivElement, PixelCalendarGridPro
   ) {
     const surface = useEffectiveSurface(surfaceProp);
     const s = surfaceClasses(surface);
+    const [value, setValue] = useControllableState<Date | null | undefined>({
+      value: valueProp,
+      defaultValue: defaultValue ?? null,
+      onChange: onChange ? ((next) => { if (next) onChange(next); }) : undefined,
+    });
 
     // Uncontrolled fallback for month when `month` not provided.
     const initial = month ?? value ?? new Date();
@@ -217,7 +225,7 @@ export const PixelCalendarGrid = forwardRef<HTMLDivElement, PixelCalendarGridPro
 
     const pickDate = (d: Date) => {
       if (isDisabled(d)) return;
-      onChange?.(startOfDay(d));
+      setValue(startOfDay(d));
     };
 
     // Range preview math.

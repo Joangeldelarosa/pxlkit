@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Tone, Surface, cn,
-  useEffectiveSurface,
+  surfaceClasses, useEffectiveSurface,
   ChevronDownIcon,
 } from '../common';
 import { PixelButton } from '../actions';
@@ -31,9 +31,10 @@ export function PixelCollapsible({
   surface: surfaceProp,
 }: PixelCollapsibleProps) {
   const surface = useEffectiveSurface(surfaceProp);
+  const s = surfaceClasses(surface);
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div>
+    <div className={cn(s.border, s.radius)}>
       <PixelButton
         type="button"
         size="sm"

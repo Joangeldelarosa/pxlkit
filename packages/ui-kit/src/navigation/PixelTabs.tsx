@@ -7,7 +7,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Surface, TabItem, cn, useEffectiveSurface } from '../common';
+import { Surface, TabItem, cn, surfaceClasses, useEffectiveSurface } from '../common';
+import { useControllableState } from '../hooks/useControllableState';
 import {
   PixelTabsContext,
   PixelTabsContextValue,
@@ -27,9 +28,13 @@ import { PixelTabsPanel } from './PixelTabsPanel';
 export interface PixelTabsProps {
   /** Sugar API. When omitted, use <PixelTabs.List>/<PixelTabs.Trigger>/<PixelTabs.Panel>. */
   items?: TabItem[];
-  /** Uncontrolled initial active tab id. Ignored when `value` is set. */
+  /** Uncontrolled initial active tab id. Canonical name; aliases `defaultTab`. */
+  defaultValue?: string;
+  /**
+   * @deprecated Use `defaultValue` instead. Retained as alias for one minor.
+   */
   defaultTab?: string;
-  /** Controlled active tab id. When set, `defaultTab` is ignored. */
+  /** Controlled active tab id. When set, `defaultValue` is ignored. */
   value?: string;
   /** Fires whenever the active tab changes (controlled or uncontrolled). */
   onChange?: (id: string) => void;
@@ -52,6 +57,7 @@ export interface PixelTabsProps {
 function PixelTabsRoot(
   {
     items,
+    defaultValue,
     defaultTab,
     value,
     onChange,
@@ -66,12 +72,18 @@ function PixelTabsRoot(
   ref: React.Ref<HTMLDivElement>,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const isControlled = value !== undefined;
+  const s = surfaceClasses(surface);
   const sugar = items && items.length > 0;
-  const [internal, setInternal] = useState<string | undefined>(
-    defaultTab ?? items?.[0]?.id,
-  );
-  const active = isControlled ? value : internal;
+  const seedDefault = defaultValue ?? defaultTab ?? items?.[0]?.id;
+  const [active, setActive] = useControllableState<string | undefined>({
+    value,
+    defaultValue: seedDefault,
+    onChange: onChange ? ((next) => { if (next !== undefined) onChange(next); }) : undefined,
+  });
+  // Track sync changes for auto-seed compat below
+  const isControlled = value !== undefined;
+  const internal = isControlled ? undefined : active;
+  const setInternal = (id: string) => setActive(id);
   const baseId = useId();
 
   const triggerRefs = useRef<Map<string, HTMLButtonElement | null>>(new Map());
@@ -79,10 +91,9 @@ function PixelTabsRoot(
 
   const select = useCallback(
     (id: string) => {
-      if (!isControlled) setInternal(id);
-      onChange?.(id);
+      setActive(id);
     },
-    [isControlled, onChange],
+    [setActive],
   );
 
   const registerTrigger = useCallback((id: string, el: HTMLButtonElement | null) => {
@@ -168,6 +179,7 @@ function PixelTabsRoot(
         ref={ref}
         className={cn(
           orientation === 'horizontal' ? 'space-y-3' : 'flex gap-3',
+          s.border, s.radius,
         )}
         data-orientation={orientation}
       >

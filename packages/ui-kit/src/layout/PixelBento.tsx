@@ -55,6 +55,11 @@ PixelBento.displayName = 'PixelBento';
 
 export interface PixelBentoCellProps extends React.HTMLAttributes<HTMLDivElement> {
   span?: BentoSpan;
+  /** Canonical structural variant. */
+  variant?: BentoKind;
+  /**
+   * @deprecated Use `variant` instead. Retained as alias for one minor.
+   */
   kind?: BentoKind;
   tone?: ToneKey;
   surface?: Surface;
@@ -63,7 +68,8 @@ export interface PixelBentoCellProps extends React.HTMLAttributes<HTMLDivElement
 export const PixelBentoCell = forwardRef<HTMLDivElement, PixelBentoCellProps>(function PixelBentoCell(
   {
     span = '1x1',
-    kind = 'feature',
+    variant,
+    kind,
     tone = 'neutral',
     surface: surfaceProp,
     className,
@@ -76,15 +82,16 @@ export const PixelBentoCell = forwardRef<HTMLDivElement, PixelBentoCellProps>(fu
   const s = surfaceClasses(surface);
   const t = toneTokens[tone];
   const Comp = 'div' as 'div';
+  const resolvedVariant: BentoKind = variant ?? kind ?? 'feature';
 
   return (
     <Comp
       ref={ref}
-      data-kind={kind}
+      data-kind={resolvedVariant}
       data-span={span}
       className={cn(
         spanMap[span],
-        kindLayoutMap[kind],
+        kindLayoutMap[resolvedVariant],
         s.border,
         s.radiusLg,
         t.border,

@@ -7,15 +7,18 @@ import {
   Tone, Surface, cn,
   toneMap, focusRing, surfaceClasses, useEffectiveSurface,
 } from '../common';
+import { useControllableState } from '../hooks/useControllableState';
 
 /** Public prop bag for {@link PixelSwitch}. */
 export interface PixelSwitchProps {
   /** Label rendered next to the switch. */
   label: string;
   /** Controlled checked state. */
-  checked: boolean;
+  checked?: boolean;
+  /** Uncontrolled initial checked state. */
+  defaultChecked?: boolean;
   /** Fires with the next checked value when clicked. */
-  onChange: (next: boolean) => void;
+  onChange?: (next: boolean) => void;
   /** Disables interaction + grays out the control. */
   disabled?: boolean;
   /** Visual tone for the "on" state. Default: `'green'`. */
@@ -34,7 +37,7 @@ export interface PixelSwitchProps {
 
 export const PixelSwitch = forwardRef<HTMLButtonElement, PixelSwitchProps>(function PixelSwitch(
   {
-    label, checked, onChange,
+    label, checked, defaultChecked, onChange,
     disabled = false,
     tone = 'green',
     surface: surfaceProp,
@@ -44,19 +47,25 @@ export const PixelSwitch = forwardRef<HTMLButtonElement, PixelSwitchProps>(funct
 ) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
+  const [internalChecked, setInternalChecked] = useControllableState<boolean>({
+    value: checked,
+    defaultValue: defaultChecked ?? false,
+    onChange,
+  });
+  const isChecked = internalChecked ?? false;
   return (
     <>
-      {name && checked && <input type="hidden" name={name} value={value} required={required} />}
+      {name && isChecked && <input type="hidden" name={name} value={value} required={required} />}
       <button
         ref={ref}
         id={id}
         type="button"
         role="switch"
-        aria-checked={checked}
+        aria-checked={isChecked}
         aria-disabled={disabled}
         aria-required={required || undefined}
         disabled={disabled}
-        onClick={() => !disabled && onChange(!checked)}
+        onClick={() => !disabled && setInternalChecked(!isChecked)}
         className={cn(
           'group inline-flex items-center gap-3 text-sm text-retro-text outline-none',
           s.font, focusRing, toneMap[tone].ring,
@@ -68,14 +77,14 @@ export const PixelSwitch = forwardRef<HTMLButtonElement, PixelSwitchProps>(funct
             'relative inline-flex h-6 w-11 shrink-0 items-center transition-colors',
             s.border,
             surface === 'pixel' ? 'rounded-[3px]' : 'rounded-full',
-            checked ? cn(toneMap[tone].border, toneMap[tone].bg) : 'border-retro-border-strong bg-retro-surface',
+            isChecked ? cn(toneMap[tone].border, toneMap[tone].bg) : 'border-retro-border-strong bg-retro-surface',
           )}
         >
           <span
             className={cn(
               'absolute left-0.5 h-4 w-4 transition-transform',
               surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full',
-              checked ? cn('translate-x-5', toneMap[tone].fill) : 'translate-x-0 bg-retro-muted',
+              isChecked ? cn('translate-x-5', toneMap[tone].fill) : 'translate-x-0 bg-retro-muted',
             )}
           />
         </span>
