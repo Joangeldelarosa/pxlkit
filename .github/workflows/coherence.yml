@@ -1,3 +1,5 @@
+# Strict mode: audit must pass on every PR.
+# SSOT data layer is the source of truth — drift fails CI.
 name: Coherence Audit
 
 on:
@@ -32,7 +34,6 @@ jobs:
       - name: Run coherence audit (JSON mode)
         id: audit
         run: npm run audit:coherence:json --workspace=@pxlkit/ui-kit -- > coherence-report.json
-        continue-on-error: true
 
       - name: Render coherence report (Markdown)
         if: always()

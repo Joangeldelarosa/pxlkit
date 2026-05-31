@@ -1,5 +1,10 @@
 # @pxlkit/ui-kit — Changelog
 
+## Unreleased — Ola 4c.3 (Lock-in)
+
+### CI
+- Coherence audit now hard-required on every PR (was soft-mode since Ola 4c.1)
+
 ## Unreleased — Ola 4d (Bulk File Refactor)
 
 ### Refactored
