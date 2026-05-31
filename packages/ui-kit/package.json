@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/ui-kit",
   "version": "1.5.0",
-  "description": "Retro pixel art UI kit — 56 production-ready React components with switchable surface aesthetic (pixel/linear), TypeScript, Tailwind CSS design tokens, dark mode, and accessible buttons, forms, modals, tables, cards, toasts, animations, parallax, and locale support",
+  "description": "Retro pixel art UI kit — 57 production-ready React components with switchable surface aesthetic (pixel/linear), TypeScript, Tailwind CSS design tokens, dark mode, and accessible buttons, forms, modals, tables, cards, toasts, animations, parallax, and locale support",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
