@@ -1,5 +1,13 @@
 # @pxlkit/ui-kit — Changelog
 
+## Unreleased — Ola 4d (Bulk File Refactor)
+
+### Refactored
+- Split 9 legacy bulk files into one-file-per-component folder pattern: actions/, data-display/, inputs/, navigation/, overlay/, feedback/, animations/, parallax/, layout/
+- Zero public API change (folder + index.ts agglomerator pattern via Node module resolution)
+- Zero visual change (impl bytes identical, just relocated)
+- _internal/ folders for shared helpers (private)
+
 ## Unreleased — Ola 4c.2 Partial (SSOT Migration)
 
 ### Tooling

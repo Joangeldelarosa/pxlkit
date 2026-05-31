@@ -1,0 +1,88 @@
+'use client';
+
+import React, { forwardRef, useEffect, useState } from 'react';
+import { cn, Tone, toneMap } from '../common';
+import type { AnimationTrigger } from './types';
+import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
+
+/* ─────────────────────────────────────────────────────────────────────────
+   PixelTypewriter — types out a string one character at a time with a
+   blinking caret while writing.
+   ───────────────────────────────────────────────────────────────────────── */
+
+export interface PixelTypewriterProps {
+  /** Text to type out. */
+  text: string;
+  /** Milliseconds between each character. Default `60`. */
+  speed?: number;
+  /** Delay before typing starts, in milliseconds. Default `0`. */
+  delay?: number;
+  /** Show a blinking caret while writing. Default `true`. */
+  cursor?: boolean;
+  /** Tone token applied to the text color. Default `'green'`. */
+  tone?: Tone;
+  /** When the animation should play. Default `'mount'`. */
+  trigger?: AnimationTrigger;
+  /** Fires once the full string is rendered. */
+  onComplete?: () => void;
+  /** Extra class names applied to the wrapping `<span>`. */
+  className?: string;
+}
+
+export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>(function PixelTypewriter(
+  {
+    text,
+    speed = 60,
+    delay = 0,
+    cursor = true,
+    tone = 'green',
+    trigger = 'mount',
+    onComplete,
+    className,
+  },
+  forwardedRef,
+) {
+  const { ref, active, handlers, endAnimation } = useAnimationTrigger(trigger, onComplete);
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!active) {
+      setDisplayed('');
+      setDone(false);
+      return;
+    }
+    setDisplayed('');
+    setDone(false);
+    let i = 0;
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    const timeoutId = setTimeout(() => {
+      intervalId = setInterval(() => {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) {
+          clearInterval(intervalId);
+          setDone(true);
+          endAnimation();
+        }
+      }, speed);
+    }, delay);
+    return () => {
+      clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [active, text, speed, delay, endAnimation]);
+
+  return (
+    <span
+      ref={mergeRefs(ref as unknown as React.Ref<HTMLSpanElement>, forwardedRef)}
+      {...(handlers as React.DOMAttributes<HTMLSpanElement>)}
+      className={cn('font-mono', toneMap[tone].text, className)}
+    >
+      {displayed}
+      {cursor && !done && active && <span className="animate-pulse">▌</span>}
+    </span>
+  );
+});
+
+PixelTypewriter.displayName = 'PixelTypewriter';
