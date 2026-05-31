@@ -15,6 +15,13 @@
 - Regenerated downstream artifacts via pnpm docs:build.
 - Audit gate score: 15/30 passing.
 
+#### Round 2 — Gate calibration
+- Calibrated coverage-components gate to follow `export * from './X'` re-export chains (eliminated 50+ false positives).
+- Added name filter to theme-surface-coherence to skip non-component exports (Context/Provider/Icon/CONSTANTS).
+- Ran pnpm docs:build for real — regenerated READMEs, closing consistency-readme + dead-links + coverage-readmes.
+- Fixed build regressions introduced by the prior auto-fix wave (specific reverts on conflicting prop additions).
+- CI workflow: added `--silent` flag to `audit:coherence:json` to prevent npm banner pollution.
+
 ## Unreleased — Ola 4c.3 (Lock-in)
 
 ### CI
