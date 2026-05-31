@@ -67,6 +67,81 @@ import { CodeBlock } from '../../components/CodeBlock';
 import { useToast, type ToastPosition, type ToastTone } from '../../components/ToastProvider';
 import { WhatsNewStrip, type WhatsNewItem } from '../../components/whats-new-strip';
 
+/* ── Live demos imported from package SSOT .examples.tsx files.
+   Each export is the `Default` example function authored alongside the component.
+   When the kit ships a new example, this list grows; when one is removed the
+   build fails loudly here instead of silently rendering a placeholder. ── */
+// Actions
+// (none — actions placeholders all have hand-written sections above)
+
+// Inputs / Forms
+import { Default as PixelInputGroupDefault } from '@pxlkit/ui-kit/forms/PixelInputGroup.examples';
+import { Default as PixelToggleGroupDefault } from '@pxlkit/ui-kit/forms/PixelToggleGroup.examples';
+import { Default as PixelToggleDefault } from '@pxlkit/ui-kit/forms/PixelToggle.examples';
+import { Default as PixelDateRangePickerDefault } from '@pxlkit/ui-kit/forms/PixelDateRangePicker.examples';
+import { Default as PixelCalendarGridDefault } from '@pxlkit/ui-kit/forms/PixelCalendarGrid.examples';
+import { Default as PixelColorInputDefault } from '@pxlkit/ui-kit/forms/PixelColorInput.examples';
+import { Default as PixelComboboxDefault } from '@pxlkit/ui-kit/forms/PixelCombobox.examples';
+import { Default as PixelMultiSelectDefault } from '@pxlkit/ui-kit/forms/PixelMultiSelect.examples';
+import { Default as PixelNumberInputDefault } from '@pxlkit/ui-kit/forms/PixelNumberInput.examples';
+import { Default as PixelOTPInputDefault } from '@pxlkit/ui-kit/forms/PixelOTPInput.examples';
+import { Default as PixelFileUploadDefault } from '@pxlkit/ui-kit/forms/PixelFileUpload.examples';
+import { Default as PixelFormDefault } from '@pxlkit/ui-kit/forms/PixelForm.examples';
+import { Default as PixelDatePickerDefault } from '@pxlkit/ui-kit/forms/PixelDatePicker.examples';
+
+// Data Display (richer data widgets)
+import { Default as PixelDataTableDefault } from '@pxlkit/ui-kit/data/PixelDataTable.examples';
+import { Default as PixelCarouselDefault } from '@pxlkit/ui-kit/data/PixelCarousel.examples';
+import { Default as PixelTimelineDefault } from '@pxlkit/ui-kit/data/PixelTimeline.examples';
+import { Default as PixelStatGroupDefault } from '@pxlkit/ui-kit/data/PixelStatGroup.examples';
+import { Default as PixelAvatarGroupDefault } from '@pxlkit/ui-kit/data/PixelAvatarGroup.examples';
+import { Default as PixelBadgeGroupDefault } from '@pxlkit/ui-kit/data/PixelBadgeGroup.examples';
+import { Default as PixelChipGroupDefault } from '@pxlkit/ui-kit/data/PixelChipGroup.examples';
+import { Default as PixelSparklineDefault } from '@pxlkit/ui-kit/data/PixelSparkline.examples';
+import { Default as PixelBarChartDefault } from '@pxlkit/ui-kit/data/PixelBarChart.examples';
+import { Default as PixelAreaChartDefault } from '@pxlkit/ui-kit/data/PixelAreaChart.examples';
+
+// Hero & Cards
+import { Default as PixelHeroSectionDefault } from '@pxlkit/ui-kit/hero/PixelHeroSection.examples';
+import { Default as PixelHeroMediaDefault } from '@pxlkit/ui-kit/hero/PixelHeroMedia.examples';
+import { Default as PixelFeatureCardDefault } from '@pxlkit/ui-kit/cards/PixelFeatureCard.examples';
+import { Default as PixelPricingCardDefault } from '@pxlkit/ui-kit/cards/PixelPricingCard.examples';
+import { Default as PixelTestimonialCardDefault } from '@pxlkit/ui-kit/cards/PixelTestimonialCard.examples';
+import { Default as PixelRibbonDefault } from '@pxlkit/ui-kit/cards/PixelRibbon.examples';
+import { Default as PixelStarRatingDefault } from '@pxlkit/ui-kit/cards/PixelStarRating.examples';
+import { Default as PixelIconFrameDefault } from '@pxlkit/ui-kit/cards/PixelIconFrame.examples';
+
+// Feedback
+import { Default as PixelSpinnerDefault } from '@pxlkit/ui-kit/feedback/PixelSpinner.examples';
+
+// Navigation
+import { Default as PixelStepperDefault } from '@pxlkit/ui-kit/navigation/PixelStepper.examples';
+import { Default as PixelMenubarDefault } from '@pxlkit/ui-kit/navigation/PixelMenubar.examples';
+import { Default as PixelNavigationMenuDefault } from '@pxlkit/ui-kit/navigation/PixelNavigationMenu.examples';
+import { Default as PixelSidebarDefault } from '@pxlkit/ui-kit/navigation/PixelSidebar.examples';
+
+// Overlay
+import { Default as PixelDrawerDefault } from '@pxlkit/ui-kit/overlays/PixelDrawer.examples';
+import { Default as PixelCommandDefault } from '@pxlkit/ui-kit/overlays/PixelCommand.examples';
+import { Default as PixelAlertDialogDefault } from '@pxlkit/ui-kit/overlays/PixelAlertDialog.examples';
+import { Default as PixelSheetDefault } from '@pxlkit/ui-kit/overlays/PixelSheet.examples';
+import { Default as PixelPortalDefault } from '@pxlkit/ui-kit/overlay-foundation/PixelPortal.examples';
+import { Default as PixelPopoverDefault } from '@pxlkit/ui-kit/overlay-foundation/PixelPopover.examples';
+
+// Layout
+import { Default as PixelBentoDefault } from '@pxlkit/ui-kit/layout/PixelBento.examples';
+import { Default as PixelBentoCellDefault } from '@pxlkit/ui-kit/layout/PixelBentoCell.examples';
+import { Default as PixelScrollAreaDefault } from '@pxlkit/ui-kit/layout/PixelScrollArea.examples';
+import { Default as PixelBoxDefault } from '@pxlkit/ui-kit/layout/PixelBox.examples';
+import { Default as PixelStackDefault } from '@pxlkit/ui-kit/layout/PixelStack.examples';
+import { Default as PixelClusterDefault } from '@pxlkit/ui-kit/layout/PixelCluster.examples';
+import { Default as PixelGridDefault } from '@pxlkit/ui-kit/layout/PixelGrid.examples';
+import { Default as PixelEqualHeightGridDefault } from '@pxlkit/ui-kit/layout/PixelEqualHeightGrid.examples';
+import { Default as PixelCenterDefault } from '@pxlkit/ui-kit/layout/PixelCenter.examples';
+import { Default as PixelContainerDefault } from '@pxlkit/ui-kit/layout/PixelContainer.examples';
+import { Default as PixelTwoColumnDefault } from '@pxlkit/ui-kit/layout/PixelTwoColumn.examples';
+import { Default as PixelSectionHeaderDefault } from '@pxlkit/ui-kit/layout/PixelSectionHeader.examples';
+
 /* ── Heavy demo block — Parallax (scroll + mouse listeners, GPU transforms).
    Code-split via next/dynamic + ssr:false so the JS only loads when this
    below-the-fold section actually mounts on the client. ── */
@@ -370,6 +445,82 @@ const PLACEHOLDER_COMPONENTS: { name: string; slug: string }[] = (() => {
   }
   return out;
 })();
+
+/* PascalCase name → real Default example component imported above. Each entry
+   renders a working live demo in the placeholder DocSection block (no more
+   "demo lands later" copy). Add a new SSOT example file to the kit and a new
+   line here — keep it explicit so missing imports are a compile error.
+
+   Keys MUST match the registry's PascalCase names (used by PLACEHOLDER_COMPONENTS). */
+const LIVE_DEMOS: Record<string, React.ComponentType> = {
+  // Inputs / Forms
+  PixelInputGroup: PixelInputGroupDefault,
+  PixelToggleGroup: PixelToggleGroupDefault,
+  PixelToggle: PixelToggleDefault,
+  PixelDateRangePicker: PixelDateRangePickerDefault,
+  PixelCalendarGrid: PixelCalendarGridDefault,
+  PixelColorInput: PixelColorInputDefault,
+  PixelCombobox: PixelComboboxDefault,
+  PixelMultiSelect: PixelMultiSelectDefault,
+  PixelNumberInput: PixelNumberInputDefault,
+  PixelOTPInput: PixelOTPInputDefault,
+  PixelFileUpload: PixelFileUploadDefault,
+  PixelForm: PixelFormDefault,
+  PixelDatePicker: PixelDatePickerDefault,
+
+  // Data Display
+  PixelDataTable: PixelDataTableDefault,
+  PixelCarousel: PixelCarouselDefault,
+  PixelTimeline: PixelTimelineDefault,
+  PixelStatGroup: PixelStatGroupDefault,
+  PixelAvatarGroup: PixelAvatarGroupDefault,
+  PixelBadgeGroup: PixelBadgeGroupDefault,
+  PixelChipGroup: PixelChipGroupDefault,
+  PixelSparkline: PixelSparklineDefault,
+  PixelBarChart: PixelBarChartDefault,
+  PixelAreaChart: PixelAreaChartDefault,
+
+  // Hero & Cards
+  PixelHeroSection: PixelHeroSectionDefault,
+  PixelHeroMedia: PixelHeroMediaDefault,
+  PixelFeatureCard: PixelFeatureCardDefault,
+  PixelPricingCard: PixelPricingCardDefault,
+  PixelTestimonialCard: PixelTestimonialCardDefault,
+  PixelRibbon: PixelRibbonDefault,
+  PixelStarRating: PixelStarRatingDefault,
+  PixelIconFrame: PixelIconFrameDefault,
+
+  // Feedback
+  PixelSpinner: PixelSpinnerDefault,
+
+  // Navigation
+  PixelStepper: PixelStepperDefault,
+  PixelMenubar: PixelMenubarDefault,
+  PixelNavigationMenu: PixelNavigationMenuDefault,
+  PixelSidebar: PixelSidebarDefault,
+
+  // Overlay
+  PixelDrawer: PixelDrawerDefault,
+  PixelCommand: PixelCommandDefault,
+  PixelAlertDialog: PixelAlertDialogDefault,
+  PixelSheet: PixelSheetDefault,
+  PixelPortal: PixelPortalDefault,
+  PixelPopover: PixelPopoverDefault,
+
+  // Layout
+  PixelBento: PixelBentoDefault,
+  PixelBentoCell: PixelBentoCellDefault,
+  PixelScrollArea: PixelScrollAreaDefault,
+  PixelBox: PixelBoxDefault,
+  PixelStack: PixelStackDefault,
+  PixelCluster: PixelClusterDefault,
+  PixelGrid: PixelGridDefault,
+  PixelEqualHeightGrid: PixelEqualHeightGridDefault,
+  PixelCenter: PixelCenterDefault,
+  PixelContainer: PixelContainerDefault,
+  PixelTwoColumn: PixelTwoColumnDefault,
+  PixelSectionHeader: PixelSectionHeaderDefault,
+};
 
 /* Items shipped in Ola 4a (v2.0.0). DocSection anchors land in a follow-up wave —
    until then each link lands on the changelog v1.9 entry so the click is never a no-op. */
@@ -3008,38 +3159,47 @@ const [active, setActive] = useState(false);
             <ParallaxDemos />
 
             {/* ============================================================
-                v2.0.0 placeholders — full doc bodies + live demos land in a follow-up wave (Ola 6).
-                Each section is reachable via sidebar; clicking an item scrolls here so the link is never dead.
-                List is DERIVED from CATEGORIES (kills drift) — when a real DocSection lands above,
-                its slug drops out of PLACEHOLDER_COMPONENTS automatically.
+                v2.0.0 live demos — each placeholder slug now renders the real Default
+                example imported from packages/ui-kit/src/<category>/<Component>.examples.tsx.
+                If a component has no examples file (rare — most ship one in SSOT),
+                LIVE_DEMOS won't have an entry and we fall back to a minimal placeholder.
                 ============================================================ */}
             {PLACEHOLDER_COMPONENTS.length > 0 && (
               <section className="pt-10">
                 <PixelDivider label="More Components" tone="cyan" spacing="lg" />
                 <p className="mt-4 text-xs text-retro-muted max-w-2xl">
-                  These components ship in the package today. Full live demos and prop tables land in
-                  upcoming docs waves — each anchor below is the slug the sidebar links to.
+                  Real live demos for every component that ships in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>.
+                  Each preview is the <PixelCodeInline>Default</PixelCodeInline> example function authored
+                  alongside the component in <PixelCodeInline>&lt;Component&gt;.examples.tsx</PixelCodeInline>{' '}
+                  (single source of truth).
                 </p>
                 <div className="mt-5 space-y-2">
-                  {PLACEHOLDER_COMPONENTS.map((c) => (
-                    <DocSection
-                      key={c.slug}
-                      id={c.slug}
-                      title={c.name}
-                      description={
-                        <>
-                          Shipped in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>. Full docs and
-                          live demos coming soon — see the{' '}
-                          <PixelTextLink href="/changelog#v200">v2.0.0 changelog</PixelTextLink> for current usage.
-                        </>
-                      }
-                      code={`import { ${c.name} } from '@pxlkit/ui-kit';`}
-                    >
-                      <p className="text-retro-muted text-sm">
-                        Live demo lands in a follow-up docs wave. Import path and basic usage are shown below.
-                      </p>
-                    </DocSection>
-                  ))}
+                  {PLACEHOLDER_COMPONENTS.map((c) => {
+                    const Demo = LIVE_DEMOS[c.name];
+                    return (
+                      <DocSection
+                        key={c.slug}
+                        id={c.slug}
+                        title={c.name}
+                        description={
+                          <>
+                            Shipped in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>. See the{' '}
+                            <PixelTextLink href="/changelog#v200">v2.0.0 changelog</PixelTextLink> for full release notes.
+                          </>
+                        }
+                        code={`import { ${c.name} } from '@pxlkit/ui-kit';`}
+                      >
+                        {Demo ? (
+                          <Demo />
+                        ) : (
+                          <p className="text-retro-muted text-sm">
+                            Live demo for <PixelCodeInline>{c.name}</PixelCodeInline> lands in a follow-up
+                            docs wave. Import path and basic usage are shown below.
+                          </p>
+                        )}
+                      </DocSection>
+                    );
+                  })}
                 </div>
               </section>
             )}
