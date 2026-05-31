@@ -296,7 +296,7 @@ const JSON_LD = {
           description: 'Unlimited projects, all future packs, priority support',
         },
       ],
-      softwareVersion: '1.2.2',
+      softwareVersion: '2.0.0',
       programmingLanguage: ['TypeScript', 'React', 'JavaScript'],
       downloadUrl: 'https://www.npmjs.com/package/@pxlkit/core',
       featureList: [

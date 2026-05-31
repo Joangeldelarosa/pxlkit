@@ -676,8 +676,8 @@ export default function UIKitPage() {
             {/* ══════════════════ WHAT'S NEW STRIP ══════════════════ */}
             <div className="mb-6">
               <WhatsNewStrip
-                version="1.9.0"
-                date="2026-05-30"
+                version="2.0.0"
+                date="2026-05-31"
                 items={WHATS_NEW_V190_ITEMS}
               />
             </div>

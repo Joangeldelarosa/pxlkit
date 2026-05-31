@@ -36,6 +36,39 @@ interface Release {
 
 const RELEASES: Release[] = [
   {
+    version: '2.0.0',
+    date: '2026-05-31',
+    title: 'Master Overhaul — Ola 4d split + SSOT migration + 30 audit gates',
+    prUrl: 'https://github.com/pxlkit/pxlkit/pull/50',
+    prLabel: 'View PR #50 on GitHub',
+    changes: [
+      {
+        category: 'Added',
+        title: 'Manifest SSOT — single source of truth for every component',
+        detail:
+          'Component metadata (props, examples, stability, since) lives in one manifest per component; docs + JSDoc + examples regenerate from it. Kills doc drift.',
+      },
+      {
+        category: 'Added',
+        title: '30 coherence gates — monorepo audit pipeline',
+        detail:
+          'Source, docs, tests, deps, build, and process gates run in CI to catch incoherence before merge.',
+      },
+      {
+        category: 'Changed',
+        title: 'Ola 4d split — layout primitives no longer paint chrome',
+        detail:
+          'PixelCenter and PixelTwoColumn return to being pure layout/grid primitives. Surface chrome (border/radius) is opt-in via wrapping PixelSurface or surface variants on container components.',
+      },
+      {
+        category: 'Changed',
+        title: 'Landing rebuilt on the new SSOT — version stamps wired to package',
+        detail:
+          'Hero, WhatsNewStrip, StatsStrip, dashboard ribbon, and JSON-LD now follow the manifest contract.',
+      },
+    ],
+  },
+  {
     version: '1.9.0',
     date: '2026-05-30',
     title: 'Ola 4a — Kit Depth: DataTable + 18 new + 7 upgrades',
