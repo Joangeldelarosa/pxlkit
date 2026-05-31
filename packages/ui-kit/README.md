@@ -6,15 +6,23 @@
 
 <p align="center">
   <strong>Retro pixel art UI kit and React components for Pxlkit.</strong><br/>
-  54 styled React components with pixel art aesthetics — buttons, inputs, modals, toasts, animations, parallax effects, and full locale support.
+  111 styled React components with pixel art aesthetics — buttons, inputs, modals, toasts, animations, parallax effects, and full locale support.
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@pxlkit/ui-kit"><img src="https://img.shields.io/npm/v/@pxlkit/ui-kit?color=blue" alt="npm version" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE-CODE"><img src="https://img.shields.io/badge/license-MIT-22c55e.svg" alt="MIT License" /></a>
-  <img src="https://img.shields.io/badge/components-54-FFD700?style=flat" alt="54 components" />
+  <img src="https://img.shields.io/badge/components-111-FFD700?style=flat" alt="111 components" />
   <img src="https://img.shields.io/badge/react-%E2%89%A518-61DAFB?logo=react&logoColor=white" alt="React ≥18" />
 </p>
+
+> ### 🚀 v2.0 — *Ship a retro-future product without rolling your own design system.*
+>
+> **111 components · 95%+ test coverage · WCAG 2.1 AA · 30 audit gates · switchable `pixel ↔ linear` surface**
+>
+> - 📦 **[Release notes →](../../docs/launch/RELEASE-NOTES-V2.0.md)**
+> - 🔁 **[Migrating from v1? →](../../docs/migration/V1-TO-V2.md)** (TL;DR: it's `npm install @pxlkit/ui-kit@2` and you're done)
+> - 📰 **[Press kit →](../../docs/launch/V2-PRESS-KIT.md)**
 
 ---
 

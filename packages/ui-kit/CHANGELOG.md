@@ -1,5 +1,14 @@
 # @pxlkit/ui-kit — Changelog
 
+## 2.0.0 — 2026-05-31 (Ola 5 — Launch Ceremony)
+
+### Released
+- Master Overhaul complete: 111+ components across all categories.
+- Olas 1-4 + 4c.x rolled into single v2.0.0 release tag.
+- See docs/launch/RELEASE-NOTES-V2.0.md for the full launch story.
+- Migration guide at docs/migration/V1-TO-V2.md.
+- Press kit at docs/launch/V2-PRESS-KIT.md.
+
 ## Unreleased — Ola 4c.3 (Lock-in)
 
 ### CI
