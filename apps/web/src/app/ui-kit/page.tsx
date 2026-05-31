@@ -921,7 +921,7 @@ export default function UIKitPage() {
       </div>
 
       {/* ════════════════ MAIN LAYOUT ════════════════ */}
-      <div className="relative">
+      <div className="relative overflow-x-clip">
         {/* ────────────────── Desktop sidebar (fixed) ────────────────── */}
         <aside className="hidden lg:block fixed top-16 left-0 bottom-0 w-64 z-30 border-r border-retro-border/40 bg-retro-bg/95 backdrop-blur-sm">
           <div className="h-full overflow-y-auto overscroll-contain p-5 pb-16 scrollbar-thin">

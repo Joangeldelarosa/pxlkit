@@ -100,7 +100,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop nav links + actions */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden lg:flex items-center gap-1">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             const className = `px-4 py-2 text-sm font-mono transition-all rounded relative ${
@@ -166,7 +166,7 @@ export function Navbar() {
         </div>
 
         {/* Mobile: theme toggle + hamburger */}
-        <div className="flex md:hidden items-center gap-1">
+        <div className="flex lg:hidden items-center gap-1">
           <button
             type="button"
             onClick={toggleTheme}
@@ -213,7 +213,7 @@ export function Navbar() {
 
       {/* Mobile menu dropdown */}
       {menuOpen && (
-        <div className="md:hidden border-t border-retro-border/50 bg-retro-bg/95 backdrop-blur-md animate-in slide-in-from-top duration-200">
+        <div className="lg:hidden border-t border-retro-border/50 bg-retro-bg/95 backdrop-blur-md animate-in slide-in-from-top duration-200">
           <div className="px-4 py-3 space-y-1">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;

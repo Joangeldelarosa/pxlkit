@@ -68,7 +68,7 @@ export function WhatsNewStrip({
         </PixelCluster>
 
         <div
-          className="-mx-1 overflow-x-auto scrollbar-thin"
+          className="-mx-1 overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           data-testid="whats-new-track"
         >
           <ul className="flex min-w-max items-stretch gap-2 px-1 py-1">
