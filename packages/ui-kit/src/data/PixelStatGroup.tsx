@@ -20,6 +20,8 @@ export interface PixelStatGroupProps extends React.HTMLAttributes<HTMLDivElement
   columns?: number;
   tone?: ToneKey;
   surface?: Surface;
+  /** Render with surface-aware border + radius chrome. Defaults to true — group needs visible chrome. */
+  bordered?: boolean;
   /** Accessible name for the group landmark. Without it, role=group is dropped. */
   'aria-label'?: string;
   'aria-labelledby'?: string;
@@ -32,6 +34,7 @@ export const PixelStatGroup = forwardRef<HTMLDivElement, PixelStatGroupProps>(fu
     columns = 3,
     tone = 'neutral',
     surface: surfaceProp,
+    bordered = true,
     className,
     children,
     ...rest
@@ -57,10 +60,10 @@ export const PixelStatGroup = forwardRef<HTMLDivElement, PixelStatGroupProps>(fu
       role={hasName ? 'group' : undefined}
       className={cn(
         layoutClass,
-        s.border,
-        s.radiusLg,
-        t.border,
-        'bg-retro-surface/40',
+        bordered && s.border,
+        bordered && s.radiusLg,
+        bordered && t.border,
+        bordered && 'bg-retro-surface/40',
         className,
       )}
       {...rest}

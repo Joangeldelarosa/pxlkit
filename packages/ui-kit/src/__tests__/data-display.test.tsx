@@ -570,11 +570,35 @@ describe('PixelTable — sortable header', () => {
     expect(ths[2].getAttribute('aria-sort')).toBeNull();
   });
 
-  it('does not render a sort button when onSortChange is missing', () => {
+  it('uncontrolled: renders a sort button when column.sortable is true even without onSortChange', () => {
     const cols = [{ key: 'name', header: 'Name', sortable: true }];
     const rows = [{ name: 'a' }];
     const { container } = render(<PixelTable columns={cols} data={rows} />);
-    expect(container.querySelectorAll('th button').length).toBe(0);
+    expect(container.querySelectorAll('th button').length).toBe(1);
+  });
+
+  it('uncontrolled: clicking sort header reorders rows by the sorted column', () => {
+    const cols = [
+      { key: 'name', header: 'Name', sortable: true },
+      { key: 'age', header: 'Age', sortable: true },
+    ];
+    const rows = [
+      { id: 'a', name: 'Charlie', age: 30 },
+      { id: 'b', name: 'Alice', age: 25 },
+      { id: 'c', name: 'Bob', age: 28 },
+    ];
+    const { container } = render(<PixelTable columns={cols} data={rows} />);
+    const nameBtn = container.querySelectorAll('th button')[0] as HTMLButtonElement;
+    fireEvent.click(nameBtn);
+    const bodyRows = container.querySelectorAll('tbody tr');
+    expect(bodyRows[0].textContent).toContain('Alice');
+    expect(bodyRows[1].textContent).toContain('Bob');
+    expect(bodyRows[2].textContent).toContain('Charlie');
+    // aria-sort reflects the internal state
+    const nameTh = container.querySelectorAll('th')[0];
+    expect(nameTh.getAttribute('aria-sort')).toBe('ascending');
+    fireEvent.click(nameBtn);
+    expect(nameTh.getAttribute('aria-sort')).toBe('descending');
   });
 });
 

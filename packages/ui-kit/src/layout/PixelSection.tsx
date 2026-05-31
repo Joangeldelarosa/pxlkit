@@ -30,6 +30,8 @@ export interface PixelSectionProps {
   verticalPadding?: SectionRhythmKey;
   /** Horizontal gutter token (used only when `container` is `false`). */
   horizontalGutter?: PageGutter;
+  /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
+  bordered?: boolean;
 }
 
 export const PixelSection = forwardRef<HTMLElement, PixelSectionProps>(function PixelSection(
@@ -41,6 +43,7 @@ export const PixelSection = forwardRef<HTMLElement, PixelSectionProps>(function 
     container = '5xl',
     verticalPadding = 'xl',
     horizontalGutter = 'lg',
+    bordered = false,
   },
   ref,
 ) {
@@ -64,10 +67,11 @@ export const PixelSection = forwardRef<HTMLElement, PixelSectionProps>(function 
     <section
       ref={ref}
       className={cn(
-        'bg-retro-card/40 p-4 sm:p-6',
-        s.border,
-        s.radiusLg,
-        'border-retro-border/40',
+        'p-4 sm:p-6',
+        bordered && 'bg-retro-card/40',
+        bordered && s.border,
+        bordered && s.radiusLg,
+        bordered && 'border-retro-border/40',
         sectionRhythm[verticalPadding],
         !container && pageGutter[horizontalGutter],
       )}

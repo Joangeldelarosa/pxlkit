@@ -75,7 +75,7 @@ export function DocSection({
         <div className="mt-2 text-sm text-retro-muted max-w-2xl">{description}</div>
       </div>
 
-      <div className="rounded-lg border border-retro-border/40 bg-retro-surface/20 p-4 sm:p-6">
+      <div className="rounded-lg bg-retro-surface/10 p-4 sm:p-6">
         {children}
       </div>
 

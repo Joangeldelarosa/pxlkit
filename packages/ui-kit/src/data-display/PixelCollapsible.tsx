@@ -21,6 +21,8 @@ export interface PixelCollapsibleProps {
   tone?: Tone;
   /** Visual surface override. */
   surface?: Surface;
+  /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
+  bordered?: boolean;
 }
 
 export function PixelCollapsible({
@@ -29,12 +31,13 @@ export function PixelCollapsible({
   defaultOpen = false,
   tone = 'neutral',
   surface: surfaceProp,
+  bordered = false,
 }: PixelCollapsibleProps) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className={cn(s.border, s.radius)}>
+    <div className={cn(bordered && s.border, bordered && s.radius)}>
       <PixelButton
         type="button"
         size="sm"

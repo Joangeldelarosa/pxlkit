@@ -63,6 +63,8 @@ export interface PixelBentoCellProps extends React.HTMLAttributes<HTMLDivElement
   kind?: BentoKind;
   tone?: ToneKey;
   surface?: Surface;
+  /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
+  bordered?: boolean;
 }
 
 export const PixelBentoCell = forwardRef<HTMLDivElement, PixelBentoCellProps>(function PixelBentoCell(
@@ -74,6 +76,7 @@ export const PixelBentoCell = forwardRef<HTMLDivElement, PixelBentoCellProps>(fu
     surface: surfaceProp,
     className,
     children,
+    bordered = false,
     ...rest
   },
   ref,
@@ -92,11 +95,11 @@ export const PixelBentoCell = forwardRef<HTMLDivElement, PixelBentoCellProps>(fu
       className={cn(
         spanMap[span],
         kindLayoutMap[resolvedVariant],
-        s.border,
-        s.radiusLg,
-        t.border,
-        t.bg,
-        t.text,
+        bordered && s.border,
+        bordered && s.radiusLg,
+        bordered && t.border,
+        bordered && t.bg,
+        bordered && t.text,
         s.transition,
         className,
       )}

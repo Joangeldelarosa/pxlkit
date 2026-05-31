@@ -110,6 +110,8 @@ export interface PixelSparklineProps extends React.SVGAttributes<SVGSVGElement> 
   size?: ChartSize;
   showArea?: boolean;
   surface?: Surface;
+  /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
+  bordered?: boolean;
 }
 
 export const PixelSparkline = forwardRef<SVGSVGElement, PixelSparklineProps>(function PixelSparkline(
@@ -119,6 +121,7 @@ export const PixelSparkline = forwardRef<SVGSVGElement, PixelSparklineProps>(fun
     size = 'md',
     showArea = false,
     surface: surfaceProp,
+    bordered = false,
     className,
     'aria-label': ariaLabel,
     ...rest
@@ -150,7 +153,7 @@ export const PixelSparkline = forwardRef<SVGSVGElement, PixelSparklineProps>(fun
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
       shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible', s.border, s.radius, className)}
+      className={cn('overflow-visible', bordered && s.border, bordered && s.radius, className)}
       {...rest}
     >
       {showArea && areaPoints && (
@@ -186,6 +189,8 @@ export interface PixelBarChartProps extends React.SVGAttributes<SVGSVGElement> {
   orientation?: 'vertical' | 'horizontal';
   showValues?: boolean;
   surface?: Surface;
+  /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
+  bordered?: boolean;
 }
 
 export const PixelBarChart = forwardRef<SVGSVGElement, PixelBarChartProps>(function PixelBarChart(
@@ -196,6 +201,7 @@ export const PixelBarChart = forwardRef<SVGSVGElement, PixelBarChartProps>(funct
     orientation = 'vertical',
     showValues = false,
     surface: surfaceProp,
+    bordered = false,
     className,
     'aria-label': ariaLabel,
     ...rest
@@ -245,7 +251,7 @@ export const PixelBarChart = forwardRef<SVGSVGElement, PixelBarChartProps>(funct
       height={height}
       viewBox={`0 0 ${width} ${height}`}
       shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible', s.border, s.radius, className)}
+      className={cn('overflow-visible', bordered && s.border, bordered && s.radius, className)}
       {...rest}
     >
       {bars.map((b, i) => (
@@ -291,6 +297,8 @@ export interface PixelAreaChartProps extends React.SVGAttributes<SVGSVGElement> 
   size?: ChartSize;
   smooth?: boolean;
   surface?: Surface;
+  /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
+  bordered?: boolean;
 }
 
 export const PixelAreaChart = forwardRef<SVGSVGElement, PixelAreaChartProps>(function PixelAreaChart(
@@ -300,6 +308,7 @@ export const PixelAreaChart = forwardRef<SVGSVGElement, PixelAreaChartProps>(fun
     size = 'md',
     smooth = false,
     surface: surfaceProp,
+    bordered = false,
     className,
     'aria-label': ariaLabel,
     ...rest
@@ -336,7 +345,7 @@ export const PixelAreaChart = forwardRef<SVGSVGElement, PixelAreaChartProps>(fun
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
       shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible', s.border, s.radius, className)}
+      className={cn('overflow-visible', bordered && s.border, bordered && s.radius, className)}
       data-tone-glow={t.glow}
       data-smooth={smooth || undefined}
       {...rest}

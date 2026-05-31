@@ -12,10 +12,12 @@ export interface PixelTabsPanelProps extends Omit<React.HTMLAttributes<HTMLDivEl
   value: string;
   /** Override the root's keepMounted setting for this panel. */
   keepMounted?: boolean;
+  /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
+  bordered?: boolean;
 }
 
 export const PixelTabsPanel = forwardRef<HTMLDivElement, PixelTabsPanelProps>(
-  function PixelTabsPanel({ value, keepMounted, className, children, ...rest }, ref) {
+  function PixelTabsPanel({ value, keepMounted, bordered = false, className, children, ...rest }, ref) {
     const ctx = useTabsContext('PixelTabs.Panel');
     const s = surfaceClasses(ctx.surface);
     const selected = ctx.active === value;
@@ -33,8 +35,11 @@ export const PixelTabsPanel = forwardRef<HTMLDivElement, PixelTabsPanelProps>(
         data-state={selected ? 'active' : 'inactive'}
         tabIndex={0}
         className={cn(
-          'bg-retro-bg/50 p-3 text-sm text-retro-muted outline-none',
-          s.border, s.radius, 'border-retro-border/40',
+          'p-3 text-sm text-retro-muted outline-none',
+          bordered && 'bg-retro-bg/50',
+          bordered && s.border,
+          bordered && s.radius,
+          bordered && 'border-retro-border/40',
           focusRing, 'focus-visible:ring-retro-cyan/30',
           className,
         )}

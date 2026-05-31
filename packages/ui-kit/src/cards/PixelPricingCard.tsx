@@ -23,6 +23,8 @@ export interface PixelPricingCardProps extends React.HTMLAttributes<HTMLElement>
   highlight?: boolean;
   footer?: React.ReactNode;
   surface?: Surface;
+  /** Render with surface-aware border + radius chrome. Defaults to true — a pricing card needs visible chrome. */
+  bordered?: boolean;
 }
 
 export const PixelPricingCard = forwardRef<HTMLElement, PixelPricingCardProps>(
@@ -39,6 +41,7 @@ export const PixelPricingCard = forwardRef<HTMLElement, PixelPricingCardProps>(
       highlight = false,
       footer,
       surface: surfaceProp,
+      bordered = true,
       className,
       ...rest
     },
@@ -56,10 +59,10 @@ export const PixelPricingCard = forwardRef<HTMLElement, PixelPricingCardProps>(
         ref={ref as React.Ref<HTMLElement>}
         className={cn(
           'relative flex flex-col p-5',
-          s.border,
-          s.radiusLg,
-          highlight ? t.border : 'border-retro-border',
-          highlight ? t.soft : 'bg-retro-surface/40',
+          bordered && s.border,
+          bordered && s.radiusLg,
+          bordered && (highlight ? t.border : 'border-retro-border'),
+          bordered && (highlight ? t.soft : 'bg-retro-surface/40'),
           highlight && t.glow,
           className,
         )}

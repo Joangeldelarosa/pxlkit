@@ -624,7 +624,7 @@ function DocSection({
       </div>
 
       {/* Live preview */}
-      <div className="rounded-lg border border-retro-border/40 bg-retro-surface/20 p-4 sm:p-6">
+      <div className="rounded-lg bg-retro-surface/10 p-4 sm:p-6">
         {children}
       </div>
 
@@ -674,7 +674,7 @@ function AnimationReplay({
       </div>
 
       {/* Live preview */}
-      <div className="rounded-lg border border-retro-border/40 bg-retro-surface/20 p-4 sm:p-6">
+      <div className="rounded-lg bg-retro-surface/10 p-4 sm:p-6">
         <div className="mb-3 flex justify-end">
           <PixelButton
             onClick={() => setTick((n) => n + 1)}
@@ -2716,7 +2716,7 @@ function SaveButton() {
                 </p>
               </div>
 
-              <div className="rounded-lg border border-retro-border/40 bg-retro-surface/20 p-4 sm:p-6">
+              <div className="rounded-lg bg-retro-surface/10 p-4 sm:p-6">
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   <div className="space-y-1">
                     <PixelBadge tone="green">mount</PixelBadge>

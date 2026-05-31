@@ -75,6 +75,8 @@ export interface PixelTableProps<Row = Record<string, React.ReactNode>> {
   onRowClick?: (row: Row, idx: number) => void;
   /** Cell padding scale. Defaults to `'normal'`. */
   density?: PixelTableDensity;
+  /** Render with surface-aware border + radius chrome. Defaults to true — tables need visible chrome. */
+  bordered?: boolean;
 }
 
 const tableCellPad: Record<PixelTableDensity, string> = {
@@ -127,12 +129,24 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
   emptyState,
   onRowClick,
   density = 'normal',
+  bordered = true,
 }: PixelTableProps<Row>) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const padCls = tableCellPad[density];
   const hasSelection = selection !== undefined;
-  const selectedSet = React.useMemo(() => new Set(selectedIds ?? []), [selectedIds]);
+  // Internal selection fallback for uncontrolled mode.
+  const [internalSelected, setInternalSelected] = React.useState<string[]>([]);
+  const effectiveSelectedIds = selectedIds ?? internalSelected;
+  const selectedSet = React.useMemo(() => new Set(effectiveSelectedIds), [effectiveSelectedIds]);
+  // Internal sort fallback. Active iff a sortable column exists. Headers always
+  // render a button when col.sortable is true (no more onSortChange gate).
+  const [internalSort, setInternalSort] = React.useState<PixelTableSortState | undefined>(undefined);
+  const effectiveSort = sort ?? internalSort;
+  const commitSelection = (next: string[]) => {
+    if (selectedIds === undefined) setInternalSelected(next);
+    onSelectionChange?.(next);
+  };
 
   const resolveRowId = React.useCallback(
     (row: Row, idx: number): string => {
@@ -146,9 +160,31 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
 
   const totalColCount = columns.length + (hasSelection ? 1 : 0);
 
+  // Apply sort to rows when a sortable column is active. We sort by the raw
+  // row[key] value (numbers compare numerically, otherwise localeCompare).
+  // Original order preserved when no sort is active.
+  const sortedData = React.useMemo(() => {
+    if (!effectiveSort) return data;
+    const col = columns.find((c) => c.key === effectiveSort.key);
+    if (!col || !col.sortable) return data;
+    const indexed = data.map((row, idx) => ({ row, idx }));
+    indexed.sort((a, b) => {
+      const av = (a.row as unknown as Record<string, unknown>)[effectiveSort.key];
+      const bv = (b.row as unknown as Record<string, unknown>)[effectiveSort.key];
+      let cmp = 0;
+      if (av == null && bv == null) cmp = 0;
+      else if (av == null) cmp = -1;
+      else if (bv == null) cmp = 1;
+      else if (typeof av === 'number' && typeof bv === 'number') cmp = av - bv;
+      else cmp = String(av).localeCompare(String(bv), undefined, { numeric: true });
+      return effectiveSort.dir === 'asc' ? cmp : -cmp;
+    });
+    return indexed.map((i) => i.row);
+  }, [data, columns, effectiveSort]);
+
   const allRowIds = React.useMemo(
-    () => data.map((row, idx) => resolveRowId(row, idx)),
-    [data, resolveRowId],
+    () => sortedData.map((row, idx) => resolveRowId(row, idx)),
+    [sortedData, resolveRowId],
   );
   const allSelected = hasSelection && allRowIds.length > 0 && allRowIds.every((id) => selectedSet.has(id));
   const someSelected = hasSelection && !allSelected && allRowIds.some((id) => selectedSet.has(id));
@@ -162,31 +198,28 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
 
   const toggleAll = () => {
     if (!hasSelection || selection !== 'multi') return;
-    if (allSelected) {
-      onSelectionChange?.([]);
-    } else {
-      onSelectionChange?.(allRowIds);
-    }
+    commitSelection(allSelected ? [] : allRowIds);
   };
 
   const toggleOne = (id: string) => {
     if (!hasSelection) return;
     if (selection === 'single') {
-      const next = selectedSet.has(id) ? [] : [id];
-      onSelectionChange?.(next);
+      commitSelection(selectedSet.has(id) ? [] : [id]);
       return;
     }
     const next = new Set(selectedSet);
     if (next.has(id)) next.delete(id);
     else next.add(id);
-    onSelectionChange?.(Array.from(next));
+    commitSelection(Array.from(next));
   };
 
   const handleSortClick = (col: PixelTableColumn<Row>) => {
-    if (!col.sortable || !onSortChange) return;
-    const isActive = sort?.key === col.key;
-    const nextDir: PixelTableSortDir = isActive && sort?.dir === 'asc' ? 'desc' : 'asc';
-    onSortChange({ key: col.key, dir: nextDir });
+    if (!col.sortable) return;
+    const isActive = effectiveSort?.key === col.key;
+    const nextDir: PixelTableSortDir = isActive && effectiveSort?.dir === 'asc' ? 'desc' : 'asc';
+    const next: PixelTableSortState = { key: col.key, dir: nextDir };
+    if (sort === undefined) setInternalSort(next);
+    onSortChange?.(next);
   };
 
   const stickyFirstHeadCls = stickyFirstColumn ? 'sticky left-0 z-20 bg-retro-surface/80 backdrop-blur-sm' : '';
@@ -199,7 +232,7 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
   };
 
   return (
-    <div className={cn('overflow-x-auto', s.border, s.radius, 'border-retro-border')}>
+    <div className={cn('overflow-x-auto', bordered && s.border, bordered && s.radius, bordered && 'border-retro-border')}>
       <table className={cn('w-full text-left text-sm', s.font)}>
         <thead
           className={cn(
@@ -227,9 +260,9 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
               </th>
             )}
             {columns.map((col, colIdx) => {
-              const isSorted = sort?.key === col.key;
+              const isSorted = effectiveSort?.key === col.key;
               const ariaSort: React.AriaAttributes['aria-sort'] = col.sortable
-                ? (isSorted ? (sort!.dir === 'asc' ? 'ascending' : 'descending') : 'none')
+                ? (isSorted ? (effectiveSort!.dir === 'asc' ? 'ascending' : 'descending') : 'none')
                 : undefined;
               const headerStyle: React.CSSProperties | undefined = col.width != null
                 ? { width: typeof col.width === 'number' ? `${col.width}px` : col.width }
@@ -249,7 +282,7 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
                     col.className,
                   )}
                 >
-                  {col.sortable && onSortChange ? (
+                  {col.sortable ? (
                     <button
                       type="button"
                       onClick={() => handleSortClick(col)}
@@ -260,7 +293,7 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
                       )}
                     >
                       <span>{col.header}</span>
-                      <PixelTableSortIcons dir={isSorted ? sort!.dir : null} />
+                      <PixelTableSortIcons dir={isSorted ? effectiveSort!.dir : null} />
                     </button>
                   ) : (
                     col.header
@@ -295,14 +328,14 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
                 ))}
               </tr>
             ))
-          ) : data.length === 0 ? (
+          ) : sortedData.length === 0 ? (
             <tr>
               <td colSpan={totalColCount} className={cn('text-center text-retro-muted', padCls)}>
                 {emptyState ?? <span>No data.</span>}
               </td>
             </tr>
           ) : (
-            data.map((row, idx) => {
+            sortedData.map((row, idx) => {
               const rowId = resolveRowId(row, idx);
               const isSelected = hasSelection && selectedSet.has(rowId);
               return (

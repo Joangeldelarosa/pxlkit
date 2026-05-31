@@ -34,10 +34,10 @@ describe('PixelBento', () => {
     expect(el.getAttribute('data-kind')).toBe('stat');
   });
 
-  it('PixelBentoCell tone="purple" applies purple border', () => {
+  it('PixelBentoCell tone="purple" bordered applies purple border', () => {
     const { getByTestId } = render(
       <PixelBento>
-        <PixelBentoCell data-testid="cell" tone="purple" />
+        <PixelBentoCell data-testid="cell" tone="purple" bordered />
       </PixelBento>,
     );
     const el = getByTestId('cell');

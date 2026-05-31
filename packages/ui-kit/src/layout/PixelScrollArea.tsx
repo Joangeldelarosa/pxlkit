@@ -16,6 +16,8 @@ export interface PixelScrollAreaProps extends Omit<React.HTMLAttributes<HTMLDivE
   offsetScrollbars?: boolean;
   scrollbarSize?: number;
   surface?: Surface;
+  /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
+  bordered?: boolean;
   /**
    * Accessible name for the scrollable region. Required for keyboard users to
    * understand what they've landed on. Provide either `aria-label` or
@@ -49,6 +51,7 @@ export const PixelScrollArea = forwardRef<HTMLDivElement, PixelScrollAreaProps>(
     offsetScrollbars = false,
     scrollbarSize,
     surface: surfaceProp,
+    bordered = false,
     className,
     children,
     style,
@@ -101,7 +104,8 @@ export const PixelScrollArea = forwardRef<HTMLDivElement, PixelScrollAreaProps>(
       className={cn(
         'relative outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40',
         typeClass[resolvedVariant],
-        s.border, s.radius,
+        bordered && s.border,
+        bordered && s.radius,
         s.font,
         surface === 'pixel' ? 'pxl-scroll-pixel' : 'pxl-scroll-linear',
         className,

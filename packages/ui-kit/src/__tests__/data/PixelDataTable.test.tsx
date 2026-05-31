@@ -49,6 +49,38 @@ describe('PixelDataTable', () => {
     expect(next[0]).toEqual({ id: 'name', desc: false });
   });
 
+  it('uncontrolled: clicking sortable header reorders rows without any state props', () => {
+    // Use the Name column (string) — TanStack sorts strings ascending by default.
+    const { getByRole, getAllByRole } = render(
+      <PixelDataTable data={people} columns={columns} />,
+    );
+    // Original: Ada, Linus, Grace. Asc by name → Ada, Grace, Linus.
+    const nameSort = getByRole('button', { name: /sort by name/i });
+    fireEvent.click(nameSort);
+    const rows = getAllByRole('row');
+    expect(rows[1].textContent).toContain('Ada');
+    expect(rows[2].textContent).toContain('Grace');
+    expect(rows[3].textContent).toContain('Linus');
+    // Click again to flip → Linus, Grace, Ada
+    fireEvent.click(nameSort);
+    const rows2 = getAllByRole('row');
+    expect(rows2[1].textContent).toContain('Linus');
+    expect(rows2[2].textContent).toContain('Grace');
+    expect(rows2[3].textContent).toContain('Ada');
+  });
+
+  it('uncontrolled: header has aria-sort that reflects internal sort state', () => {
+    const { getByRole } = render(
+      <PixelDataTable data={people} columns={columns} />,
+    );
+    const nameTh = getByRole('columnheader', { name: /name/i });
+    expect(nameTh.getAttribute('aria-sort')).toBe('none');
+    fireEvent.click(getByRole('button', { name: /sort by name/i }));
+    expect(nameTh.getAttribute('aria-sort')).toBe('ascending');
+    fireEvent.click(getByRole('button', { name: /sort by name/i }));
+    expect(nameTh.getAttribute('aria-sort')).toBe('descending');
+  });
+
   it('loading=true renders skeleton rows', () => {
     const { container, queryByText } = render(
       <PixelDataTable data={people} columns={columns} loading />,

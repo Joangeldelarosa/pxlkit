@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useMemo } from 'react';
+import React, { forwardRef, useMemo, useState } from 'react';
 import {
   type ColumnDef,
   type SortingState,
@@ -65,6 +65,8 @@ export interface PixelDataTableProps<TData, TValue = unknown> {
   onRowClick?: (row: TData) => void;
   surface?: Surface;
   className?: string;
+  /** Render with surface-aware border + radius chrome. Defaults to true — data table needs visible chrome. */
+  bordered?: boolean;
 }
 
 const cellPad: Record<PixelDataTableDensity, string> = {
@@ -123,6 +125,7 @@ function PixelDataTableInner<TData, TValue = unknown>(
     onRowClick,
     surface: surfaceProp,
     className,
+    bordered = true,
   }: PixelDataTableProps<TData, TValue>,
   ref: React.Ref<HTMLDivElement>,
 ) {
@@ -162,38 +165,58 @@ function PixelDataTableInner<TData, TValue = unknown>(
     return [selectionCol, ...columns];
   }, [columns, hasRowSelection]);
 
+  // Internal state fallbacks when consumer omits the matching on*Change.
+  // Mirrors useControllableState pattern: controlled prop overrides internal.
+  const [internalSorting, setInternalSorting] = useState<SortingState>([]);
+  const [internalFiltering, setInternalFiltering] = useState<ColumnFiltersState>([]);
+  const [internalPagination, setInternalPagination] = useState<PaginationState>(
+    pagination ?? { pageIndex: 0, pageSize: 10 },
+  );
+  const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({});
+  const [internalVisibility, setInternalVisibility] = useState<VisibilityState>({});
+
   // Adapter callbacks: TanStack uses Updater<T>; consumers want plain values.
-  const sortingState: SortingState = (sorting as SortingState | undefined) ?? [];
+  const sortingState: SortingState = (sorting as SortingState | undefined) ?? internalSorting;
   const filteringState: ColumnFiltersState = useMemo(() => {
-    if (!filtering) return [];
+    if (!filtering) return internalFiltering;
     return Object.entries(filtering).map(([id, value]) => ({ id, value }));
-  }, [filtering]);
-  const paginationState: PaginationState = pagination ?? { pageIndex: 0, pageSize: 10 };
-  const rowSelectionState: RowSelectionState = rowSelection ?? {};
-  const visibilityState: VisibilityState = columnVisibility ?? {};
+  }, [filtering, internalFiltering]);
+  const paginationState: PaginationState = pagination ?? internalPagination;
+  const rowSelectionState: RowSelectionState = rowSelection ?? internalRowSelection;
+  const visibilityState: VisibilityState = columnVisibility ?? internalVisibility;
 
   const handleSorting: OnChangeFn<SortingState> = (updater) => {
     const next = resolveUpdater(updater, sortingState);
+    if (sorting === undefined) setInternalSorting(next);
     onSortingChange?.(next.map((sv) => ({ id: sv.id, desc: sv.desc })));
   };
   const handleFilters: OnChangeFn<ColumnFiltersState> = (updater) => {
     const next = resolveUpdater(updater, filteringState);
+    if (filtering === undefined) setInternalFiltering(next);
     const dict: Record<string, string> = {};
     for (const f of next) dict[f.id] = String(f.value ?? '');
     onFilteringChange?.(dict);
   };
   const handlePagination: OnChangeFn<PaginationState> = (updater) => {
     const next = resolveUpdater(updater, paginationState);
+    if (pagination === undefined) setInternalPagination(next);
     onPaginationChange?.({ pageIndex: next.pageIndex, pageSize: next.pageSize });
   };
   const handleRowSelection: OnChangeFn<RowSelectionState> = (updater) => {
     const next = resolveUpdater(updater, rowSelectionState);
+    if (rowSelection === undefined) setInternalRowSelection(next);
     onRowSelectionChange?.(next);
   };
   const handleVisibility: OnChangeFn<VisibilityState> = (updater) => {
     const next = resolveUpdater(updater, visibilityState);
+    if (columnVisibility === undefined) setInternalVisibility(next);
     onColumnVisibilityChange?.(next);
   };
+
+  // Enable pagination when EITHER controlled prop OR internal pagination should be used.
+  // Default: pagination on if data > pageSize (matches user expectation of an interactive
+  // table). To stay backwards-compatible we only enable when consumer opts in OR provides data.
+  const paginationEnabled = pagination !== undefined;
 
   const table = useReactTable<TData>({
     data,
@@ -201,21 +224,21 @@ function PixelDataTableInner<TData, TValue = unknown>(
     state: {
       sorting: sortingState,
       columnFilters: filteringState,
-      pagination: pagination ? paginationState : undefined,
+      pagination: paginationEnabled ? paginationState : undefined,
       rowSelection: rowSelectionState,
       columnVisibility: visibilityState,
     },
     getRowId: getRowId ? (row, idx) => getRowId(row, idx) : undefined,
     enableRowSelection: hasRowSelection,
-    onSortingChange: onSortingChange ? handleSorting : undefined,
-    onColumnFiltersChange: onFilteringChange ? handleFilters : undefined,
-    onPaginationChange: onPaginationChange ? handlePagination : undefined,
-    onRowSelectionChange: onRowSelectionChange ? handleRowSelection : undefined,
-    onColumnVisibilityChange: onColumnVisibilityChange ? handleVisibility : undefined,
+    onSortingChange: handleSorting,
+    onColumnFiltersChange: handleFilters,
+    onPaginationChange: handlePagination,
+    onRowSelectionChange: handleRowSelection,
+    onColumnVisibilityChange: handleVisibility,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: pagination ? getPaginationRowModel() : undefined,
+    getPaginationRowModel: paginationEnabled ? getPaginationRowModel() : undefined,
     manualPagination: false,
   });
 
@@ -229,8 +252,9 @@ function PixelDataTableInner<TData, TValue = unknown>(
       ref={ref}
       className={cn(
         'overflow-x-auto',
-        s.border, s.radius,
-        'border-retro-border',
+        bordered && s.border,
+        bordered && s.radius,
+        bordered && 'border-retro-border',
         className,
       )}
     >
@@ -352,7 +376,7 @@ function PixelDataTableInner<TData, TValue = unknown>(
         </tbody>
       </table>
 
-      {pagination && (
+      {paginationEnabled && (
         <PixelDataTablePagination
           surface={surface}
           pageIndex={paginationState.pageIndex}

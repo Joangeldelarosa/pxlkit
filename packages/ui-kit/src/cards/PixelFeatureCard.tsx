@@ -53,6 +53,8 @@ export interface PixelFeatureCardProps extends React.HTMLAttributes<HTMLElement>
   onClick?: React.MouseEventHandler<HTMLElement>;
   orientation?: Orientation;
   surface?: Surface;
+  /** Render with surface-aware border + radius chrome. Defaults to true — a feature card needs visible chrome. */
+  bordered?: boolean;
 }
 
 export const PixelFeatureCard = forwardRef<HTMLElement, PixelFeatureCardProps>(
@@ -76,6 +78,7 @@ export const PixelFeatureCard = forwardRef<HTMLElement, PixelFeatureCardProps>(
       onClick,
       orientation = 'vertical',
       surface: surfaceProp,
+      bordered = true,
       className,
       children,
       ...rest
@@ -102,10 +105,10 @@ export const PixelFeatureCard = forwardRef<HTMLElement, PixelFeatureCardProps>(
     const root = cn(
       'relative p-5',
       isHorizontal ? 'grid grid-cols-[auto_1fr] gap-4 items-start' : 'flex flex-col',
-      s.border,
-      s.radiusLg,
+      bordered && s.border,
+      bordered && s.radiusLg,
       s.transition,
-      'border-retro-border bg-retro-surface/40',
+      bordered && 'border-retro-border bg-retro-surface/40',
       isInteractive && 'cursor-pointer hover:-translate-y-[2px]',
       isInteractive && s.shadowHover,
       isInteractive && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',

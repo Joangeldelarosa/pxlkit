@@ -71,6 +71,8 @@ export interface PixelCardProps extends Omit<React.HTMLAttributes<HTMLElement>, 
   rel?: React.AnchorHTMLAttributes<HTMLAnchorElement>['rel'];
   /** Padding scale; default keeps the legacy `p-4` rhythm. */
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  /** Render with surface-aware border + radius chrome. Defaults to true — a card should look like a card. */
+  bordered?: boolean;
 }
 
 type CardRoot = HTMLAnchorElement | HTMLElement;
@@ -139,6 +141,7 @@ const PixelCardImpl = forwardRef<CardRoot, PixelCardProps>(function PixelCard(
     target,
     rel,
     padding,
+    bordered = true,
     onClick,
     onKeyDown,
     className,
@@ -155,11 +158,12 @@ const PixelCardImpl = forwardRef<CardRoot, PixelCardProps>(function PixelCard(
   const hasExplicitHeader = childrenContainCardHeader(children);
 
   const rootCls = cn(
-    'relative flex flex-col bg-retro-surface/60 transition-all',
-    s.border,
-    s.radiusLg,
-    t ? t.border : 'border-retro-border/40 hover:border-retro-border/60',
-    t ? t.soft : null,
+    'relative flex flex-col transition-all',
+    bordered && 'bg-retro-surface/60',
+    bordered && s.border,
+    bordered && s.radiusLg,
+    bordered && (t ? t.border : 'border-retro-border/40 hover:border-retro-border/60'),
+    bordered && (t ? t.soft : null),
     (hasMedia || hasBadge) && 'overflow-hidden',
     interactive && 'cursor-pointer hover:-translate-y-[2px] hover:shadow-lg',
     (interactive || href) && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',

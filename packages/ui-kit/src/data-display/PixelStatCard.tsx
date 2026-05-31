@@ -32,6 +32,8 @@ export interface PixelStatCardProps {
   size?: PixelStatCardSize;
   /** Icon placement relative to label/value. Defaults to `'top'`. */
   iconPosition?: PixelStatCardIconPosition;
+  /** Render with surface-aware border + radius chrome. Defaults to true — a stat card needs visible chrome. */
+  bordered?: boolean;
 }
 
 export function PixelStatCard({
@@ -43,6 +45,7 @@ export function PixelStatCard({
   surface: surfaceProp,
   size = 'md',
   iconPosition = 'top',
+  bordered = true,
 }: PixelStatCardProps) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
@@ -65,7 +68,13 @@ export function PixelStatCard({
   ) : null;
   const trendEl = trend ? <p className={cn(trendGap, trendSize, 'text-retro-muted', s.font)}>{trend}</p> : null;
 
-  const baseClass = cn(padding, s.border, s.radiusLg, toneMap[tone].border, toneMap[tone].soft);
+  const baseClass = cn(
+    padding,
+    bordered && s.border,
+    bordered && s.radiusLg,
+    bordered && toneMap[tone].border,
+    bordered && toneMap[tone].soft,
+  );
 
   if (iconPosition === 'right') {
     return (
