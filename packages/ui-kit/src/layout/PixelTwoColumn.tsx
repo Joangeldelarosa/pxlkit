@@ -61,6 +61,7 @@ export interface PixelTwoColumnProps extends React.HTMLAttributes<HTMLDivElement
   left: React.ReactNode;
   right: React.ReactNode;
   surface?: Surface;
+  as?: keyof React.JSX.IntrinsicElements;
 }
 
 export const PixelTwoColumn = forwardRef<HTMLDivElement, PixelTwoColumnProps>(function PixelTwoColumn(
@@ -74,6 +75,7 @@ export const PixelTwoColumn = forwardRef<HTMLDivElement, PixelTwoColumnProps>(fu
     right,
     surface: surfaceProp,
     className,
+    as,
     ...rest
   },
   ref,
@@ -85,8 +87,10 @@ export const PixelTwoColumn = forwardRef<HTMLDivElement, PixelTwoColumnProps>(fu
     ? stackedColsAt[stackBelow][ratio]
     : ratioClassMap[ratio];
 
+  const Comp = (as ?? 'div') as 'div';
+
   return (
-    <div
+    <Comp
       ref={ref}
       className={cn(
         'grid',
@@ -94,6 +98,7 @@ export const PixelTwoColumn = forwardRef<HTMLDivElement, PixelTwoColumnProps>(fu
         stackedTemplate,
         stackGap[gap],
         align && alignMap[align],
+        s.border, s.radius,
         s.transition,
         className,
       )}
@@ -101,7 +106,7 @@ export const PixelTwoColumn = forwardRef<HTMLDivElement, PixelTwoColumnProps>(fu
     >
       <div className={cn(reverse && 'order-2')}>{left}</div>
       <div className={cn(reverse && 'order-1')}>{right}</div>
-    </div>
+    </Comp>
   );
 });
 

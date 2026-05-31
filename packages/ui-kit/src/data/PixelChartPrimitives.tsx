@@ -1,7 +1,7 @@
 'use client';
 
 import React, { forwardRef, useMemo } from 'react';
-import { cn, Surface, useEffectiveSurface } from '../common';
+import { cn, Surface, surfaceClasses, useEffectiveSurface } from '../common';
 import { tone as toneTokens, ToneKey } from '../tokens';
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -126,6 +126,7 @@ export const PixelSparkline = forwardRef<SVGSVGElement, PixelSparklineProps>(fun
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
+  const s = surfaceClasses(surface);
   const { width, height } = sizeMap[size];
   const padX = 2;
   const padY = 4;
@@ -149,7 +150,7 @@ export const PixelSparkline = forwardRef<SVGSVGElement, PixelSparklineProps>(fun
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
       shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible', className)}
+      className={cn('overflow-visible', s.border, s.radius, className)}
       {...rest}
     >
       {showArea && areaPoints && (
@@ -202,6 +203,7 @@ export const PixelBarChart = forwardRef<SVGSVGElement, PixelBarChartProps>(funct
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
+  const s = surfaceClasses(surface);
   const { width, height } = barSizeMap[size];
 
   const ys = data.map(d => d.y);
@@ -243,7 +245,7 @@ export const PixelBarChart = forwardRef<SVGSVGElement, PixelBarChartProps>(funct
       height={height}
       viewBox={`0 0 ${width} ${height}`}
       shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible', className)}
+      className={cn('overflow-visible', s.border, s.radius, className)}
       {...rest}
     >
       {bars.map((b, i) => (
@@ -305,6 +307,7 @@ export const PixelAreaChart = forwardRef<SVGSVGElement, PixelAreaChartProps>(fun
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
+  const s = surfaceClasses(surface);
   const { width, height } = sizeMap[size];
   const padX = 2;
   const padY = 4;
@@ -333,7 +336,7 @@ export const PixelAreaChart = forwardRef<SVGSVGElement, PixelAreaChartProps>(fun
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
       shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible', className)}
+      className={cn('overflow-visible', s.border, s.radius, className)}
       data-tone-glow={t.glow}
       data-smooth={smooth || undefined}
       {...rest}

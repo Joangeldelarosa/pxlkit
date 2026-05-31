@@ -11,8 +11,12 @@ import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
    ───────────────────────────────────────────────────────────────────────── */
 
 export interface PixelTypewriterProps {
-  /** Text to type out. */
-  text: string;
+  /** Label (text) to type out. Canonical prop. */
+  label?: string;
+  /**
+   * @deprecated Use `label` instead. Retained as alias for one minor.
+   */
+  text?: string;
   /** Milliseconds between each character. Default `60`. */
   speed?: number;
   /** Delay before typing starts, in milliseconds. Default `0`. */
@@ -31,6 +35,7 @@ export interface PixelTypewriterProps {
 
 export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>(function PixelTypewriter(
   {
+    label,
     text,
     speed = 60,
     delay = 0,
@@ -42,6 +47,7 @@ export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>
   },
   forwardedRef,
 ) {
+  const resolvedText = label ?? text ?? '';
   const { ref, active, handlers, endAnimation } = useAnimationTrigger(trigger, onComplete);
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
@@ -59,8 +65,8 @@ export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>
     const timeoutId = setTimeout(() => {
       intervalId = setInterval(() => {
         i++;
-        setDisplayed(text.slice(0, i));
-        if (i >= text.length) {
+        setDisplayed(resolvedText.slice(0, i));
+        if (i >= resolvedText.length) {
           clearInterval(intervalId);
           setDone(true);
           endAnimation();
@@ -71,7 +77,7 @@ export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>
       clearTimeout(timeoutId);
       if (intervalId) clearInterval(intervalId);
     };
-  }, [active, text, speed, delay, endAnimation]);
+  }, [active, resolvedText, speed, delay, endAnimation]);
 
   return (
     <span

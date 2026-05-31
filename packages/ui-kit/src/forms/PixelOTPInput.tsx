@@ -28,6 +28,11 @@ export interface PixelOTPInputProps {
   onChange?: (next: string) => void;
   onComplete?: (full: string) => void;
   mask?: boolean;
+  /** Canonical structural variant. */
+  variant?: 'numeric' | 'alphanumeric';
+  /**
+   * @deprecated Use `variant` instead. Retained as alias for one minor.
+   */
   type?: 'numeric' | 'alphanumeric';
   autoFocus?: boolean;
   separator?: React.ReactNode;
@@ -57,7 +62,8 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
       onChange,
       onComplete,
       mask = false,
-      type = 'numeric',
+      variant,
+      type,
       autoFocus = false,
       separator,
       size = 'md',
@@ -69,6 +75,7 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
   ) {
     const surface = useEffectiveSurface(surfaceProp);
     const s = surfaceClasses(surface);
+    const resolvedVariant: 'numeric' | 'alphanumeric' = variant ?? type ?? 'numeric';
 
     const [val, setVal] = useControllableState<string>({
       value,
@@ -134,7 +141,7 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
       (index: number, raw: string) => {
         // Take just the last entered char (handles fast typing where the
         // previous value is still present when the new key lands).
-        const cleaned = sanitize(raw, type);
+        const cleaned = sanitize(raw, resolvedVariant);
         if (!cleaned) {
           // Reject — clear cell visually by writing the prior value back.
           setCharAt(index, '');
@@ -148,7 +155,7 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
         // onComplete handled by effect once `val` is committed.
         void joined;
       },
-      [type, setCharAt, length, focusCell],
+      [resolvedVariant, setCharAt, length, focusCell],
     );
 
     const handleKeyDown = useCallback(
@@ -189,7 +196,7 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
       (index: number, e: React.ClipboardEvent<HTMLInputElement>) => {
         e.preventDefault();
         const data = e.clipboardData?.getData?.('text') ?? '';
-        const cleaned = sanitize(data, type);
+        const cleaned = sanitize(data, resolvedVariant);
         if (!cleaned) return;
 
         const next = chars.slice();
@@ -205,7 +212,7 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
         // Defer focus until React has flushed the value into the cells.
         requestAnimationFrame(() => focusCell(focusIndex));
       },
-      [chars, setVal, type, length, focusCell],
+      [chars, setVal, resolvedVariant, length, focusCell],
     );
 
     const handleFocus = useCallback(
@@ -220,8 +227,8 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
       [],
     );
 
-    const inputMode = type === 'numeric' ? 'numeric' : 'text';
-    const pattern = type === 'numeric' ? '[0-9]*' : '[0-9a-zA-Z]*';
+    const inputMode = resolvedVariant === 'numeric' ? 'numeric' : 'text';
+    const pattern = resolvedVariant === 'numeric' ? '[0-9]*' : '[0-9a-zA-Z]*';
 
     return (
       <div

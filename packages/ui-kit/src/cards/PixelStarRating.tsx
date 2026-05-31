@@ -7,6 +7,7 @@ import {
   surfaceClasses,
   useEffectiveSurface,
 } from '../common';
+import { useControllableState } from '../hooks/useControllableState';
 
 type StarSize = 'sm' | 'md' | 'lg';
 type StarTone = 'gold' | 'green';
@@ -23,8 +24,11 @@ const toneFill: Record<StarTone, string> = {
 };
 
 export interface PixelStarRatingProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
-  value: number;
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
+  /** Controlled rating value (0..max). */
+  value?: number;
+  /** Uncontrolled initial rating value (0..max). */
+  defaultValue?: number;
   max?: number;
   size?: StarSize;
   tone?: StarTone;
@@ -87,6 +91,7 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
   function PixelStarRating(
     {
       value,
+      defaultValue,
       max = 5,
       size = 'md',
       tone = 'gold',
@@ -101,7 +106,12 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
   ) {
     const surface = useEffectiveSurface(surfaceProp);
     const s = surfaceClasses(surface);
-    const safe = Math.max(0, Math.min(max, Math.round(value)));
+    const [internalValue, setInternalValue] = useControllableState<number>({
+      value,
+      defaultValue: defaultValue ?? 0,
+      onChange,
+    });
+    const safe = Math.max(0, Math.min(max, Math.round(internalValue ?? 0)));
     const dim = sizeMap[size];
     const fillClass = toneFill[tone];
     const outlineClass = 'text-retro-border';
@@ -119,7 +129,7 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
             data-pxl-star={status}
             aria-label={`Rate ${i + 1} of ${max}`}
             aria-pressed={filled}
-            onClick={() => onChange?.(i + 1)}
+            onClick={() => setInternalValue(i + 1)}
             className={cn(
               'cursor-pointer inline-flex items-center justify-center bg-transparent border-0 p-0',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
@@ -150,7 +160,7 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
         aria-label={
           interactive ? `Rating, ${safe} of ${max}` : `${safe} out of ${max}`
         }
-        className={cn('inline-flex items-center gap-1', s.font, className)}
+        className={cn('inline-flex items-center gap-1', s.border, s.radius, s.font, className)}
         {...rest}
       >
         <span className="inline-flex items-center gap-0.5">{stars}</span>
