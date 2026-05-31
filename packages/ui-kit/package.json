@@ -31,7 +31,11 @@
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "docs:build": "tsx ../../scripts/build-docs/orchestrate.ts",
+    "docs:scan": "tsx ../../scripts/build-docs/scan-manifests.ts",
+    "audit:coherence": "tsx ../../scripts/audit-coherence/run.ts",
+    "audit:coherence:json": "tsx ../../scripts/audit-coherence/run.ts --json"
   },
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0",
@@ -48,6 +52,7 @@
     "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
+    "@microsoft/tsdoc": "^0.16.0",
     "@pxlkit/effects": "*",
     "@pxlkit/feedback": "*",
     "@pxlkit/gamification": "*",
@@ -55,13 +60,23 @@
     "@pxlkit/weather": "*",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
+    "@types/fs-extra": "^11.0.4",
+    "@types/js-yaml": "^4.0.9",
     "@types/react": "^18.2.0 || ^19.0.0",
     "@types/react-dom": "^18.2.0 || ^19.0.0",
     "@vitest/coverage-v8": "^4.1.2",
+    "change-case": "^5.4.4",
+    "fast-glob": "^3.3.3",
+    "fs-extra": "^11.3.5",
+    "js-yaml": "^4.1.1",
     "jsdom": "^29.0.2",
+    "magic-string": "^0.30.21",
+    "picocolors": "^1.1.1",
+    "react-docgen-typescript": "^2.4.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.2",
+    "zod": "^4.4.3"
   },
   "keywords": [
     "pixel-art",

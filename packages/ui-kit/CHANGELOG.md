@@ -1,5 +1,14 @@
 # @pxlkit/ui-kit — Changelog
 
+## Unreleased — Ola 4c.1 (Tooling)
+
+### Tooling
+- SSOT infrastructure: 12 generators + 30 audit gates (covering theme tokens, prop inheritance, controlled/uncontrolled, forwardRef, a11y, bundle size, related graph).
+- 6 Claude Code skills (project: add-component, deprecate-component; general: ssot-component-library, monorepo-coherence-audit, design-system-governance, ai-doc-regeneration).
+- 11 governance docs (3 ADRs + API_STABILITY + VERSIONING + DEPRECATION_POLICY + BREAKING_CHANGE_CHECKLIST + COHERENCE_PHILOSOPHY + CONTRIBUTING + 5 runbooks).
+- CI workflows for coherence audit + weekly drift detection + deprecation review.
+- Initial audit run: see coherence-report.md.
+
 ## 1.9.0 — 2026-05-30 (Ola 4a — Kit Depth: DataTable + 18 components + 7 upgrades)
 
 ### Added — Data viz + tables

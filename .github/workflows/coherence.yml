@@ -1,0 +1,55 @@
+name: Coherence Audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  audit:
+    name: Run 30 coherence gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all packages
+        run: npm run build
+
+      - name: Run coherence audit (JSON mode)
+        id: audit
+        run: npm run audit:coherence:json --workspace=@pxlkit/ui-kit -- > coherence-report.json
+        continue-on-error: true
+
+      - name: Render coherence report (Markdown)
+        if: always()
+        run: npm run audit:coherence --workspace=@pxlkit/ui-kit || true
+
+      - name: Upload coherence report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coherence-report
+          path: |
+            coherence-report.md
+            coherence-report.json
+          retention-days: 30
+
+      - name: Fail if audit reported blockers
+        if: steps.audit.outcome == 'failure'
+        run: |
+          echo "::error::Coherence audit failed. Review the artifacts."
+          exit 1

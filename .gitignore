@@ -37,3 +37,8 @@ AUDIT-COHERENCE.md
 AUDIT-FOLLOWUP.md
 AUDIT-STORYBOOK.md
 STORYBOOK_DEPLOY.md
+# SSOT coherence audit outputs
+/coherence-report.md
+/coherence-report.json
+/docs/coherence-snapshots/*.png
+!/docs/coherence-snapshots/.gitkeep
