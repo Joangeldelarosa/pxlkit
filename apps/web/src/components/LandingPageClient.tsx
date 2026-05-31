@@ -22,7 +22,7 @@ import { motion } from 'framer-motion';
 import { useState, useCallback, Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { TOTAL_ICON_COUNT } from './HeroCollage';
-import { HeroCollage } from './HeroCollage';
+import { HeroCinematic, StatCardStrip } from './hero';
 import { useToast } from './ToastProvider';
 import type { ToastTone } from './ToastProvider';
 import { WhatsNewStrip, type WhatsNewItem } from './whats-new-strip';
@@ -38,7 +38,6 @@ import {
   PixelEqualHeightGrid,
   PixelFeatureCard,
   PixelGrid,
-  PixelHeroSection,
   PixelMouseParallax,
   PixelParallaxLayer,
   PixelSectionHeader,
@@ -85,7 +84,8 @@ const WHATS_NEW_ITEMS: WhatsNewItem[] = [
 export function LandingPageClient() {
   return (
     <div className="relative overflow-x-hidden w-full max-w-[100vw]">
-      <LandingHero />
+      <HeroCinematic />
+      <StatCardStrip />
       <WhatsNewStrip
         version="2.0.0"
         date="2026-05-31"
@@ -106,64 +106,6 @@ export function LandingPageClient() {
       <VoxelComingSoon />
       <LandingCta />
     </div>
-  );
-}
-
-/* ──────────────────── HERO (split, Ola 2 PixelHeroSection) ──────────────────── */
-function LandingHero() {
-  const router = useRouter();
-
-  return (
-    <PixelHeroSection
-      variant="centered"
-      density="comfortable"
-      minHeight="lg"
-      tone="green"
-      eyebrow="Pixel-Art UI Kit v2.0.0"
-      headline="Ship a retro-future product without designing one from scratch."
-      subline="One contract for surface, tone, and density. One prop to flip pixel ↔ linear. Accessibility on every interactive, batteries from DataTable to OTPInput — so you skip the plumbing and ship the idea."
-      primaryCta={
-        <PixelButton
-          tone="green"
-          size="md"
-          iconRight={<PxlKitIcon icon={ArrowRight} size={14} className="inline-block" />}
-          onClick={() => router.push('/ui-kit')}
-        >
-          Browse components
-        </PixelButton>
-      }
-      secondaryCta={
-        <PixelButton
-          tone="neutral"
-          size="md"
-          variant="ghost"
-          onClick={() =>
-            window.open('https://github.com/joangeldelarosa/pxlkit', '_blank', 'noopener,noreferrer')
-          }
-        >
-          View on GitHub
-        </PixelButton>
-      }
-      install={
-        <div className="rounded-lg border border-retro-border bg-retro-bg/70 px-3 py-2 font-mono text-[11px] sm:text-xs text-retro-muted inline-block">
-          <span className="text-retro-green mr-2">$</span>
-          npm i @pxlkit/core @pxlkit/ui-kit
-        </div>
-      }
-      meta={
-        <div className="flex flex-wrap gap-2">
-          <PixelBadge tone="green">MIT</PixelBadge>
-          <PixelBadge tone="cyan">TypeScript</PixelBadge>
-          <PixelBadge tone="gold">Tailwind v4</PixelBadge>
-          <PixelBadge tone="purple">React 19</PixelBadge>
-        </div>
-      }
-      media={
-        <div className="relative w-full">
-          <HeroCollage />
-        </div>
-      }
-    />
   );
 }
 
@@ -729,7 +671,7 @@ function IconShowcase() {
 const TOAST_DEMOS: { tone: ToastTone; title: string; message: string; icon: PxlKitData; color: string }[] = [
   { tone: 'success', title: 'SAVED',      message: 'Your changes have been saved',         icon: CheckCircle,      color: '#00ff88' },
   { tone: 'error',   title: 'ERROR',       message: 'Could not connect to server',          icon: XCircle,          color: '#ff6b6b' },
-  { tone: 'info',    title: 'NEW UPDATE',  message: 'Pxlkit v1.9 is now available',         icon: InfoCircle,       color: '#4ecdc4' },
+  { tone: 'info',    title: 'NEW UPDATE',  message: 'Pxlkit v2.0 is now available',         icon: InfoCircle,       color: '#4ecdc4' },
   { tone: 'warning', title: 'LOW STORAGE', message: 'Only 12MB remaining — clean up soon', icon: WarningTriangle,  color: '#ffa300' },
 ];
 
