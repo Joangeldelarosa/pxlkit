@@ -18,10 +18,15 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./styles.css": "./styles.css"
+    "./styles.css": "./styles.css",
+    "./examples/*": {
+      "types": "./src/*.examples.tsx",
+      "import": "./src/*.examples.tsx"
+    }
   },
   "files": [
     "dist",
+    "src",
     "styles.css"
   ],
   "scripts": {
