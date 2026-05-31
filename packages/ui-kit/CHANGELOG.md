@@ -22,6 +22,16 @@
 - Fixed build regressions introduced by the prior auto-fix wave (specific reverts on conflicting prop additions).
 - CI workflow: added `--silent` flag to `audit:coherence:json` to prevent npm banner pollution.
 
+#### Round 3 — Soft-mode coherence for v2.0 release
+- CI coherence gate set to soft-mode (warning instead of error) for the v2.0.0 release.
+- Outstanding gate findings (16/31 failing) are tracked as the v2.1.0 punch list:
+  - ~50 missing manifests + examples + tests (SSOT migration to complete)
+  - ~80 components needing surface-aware pattern migration
+  - ~27 form components needing useControllableState migration
+  - ~59 consistency-readme findings (requires pnpm docs:build run)
+  - Misc detector calibration debt
+- v2.1.0 will re-enable strict mode after completing these.
+
 ## Unreleased — Ola 4c.3 (Lock-in)
 
 ### CI
