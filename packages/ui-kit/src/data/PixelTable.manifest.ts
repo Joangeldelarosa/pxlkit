@@ -1,0 +1,65 @@
+import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
+import {
+  Default,
+  Striped,
+  PixelSurface,
+  LinearSurface,
+  Sortable,
+  SingleSelection,
+  MultiSelection,
+  CompactDensity,
+  ComfortableDensity,
+  Loading,
+  Empty,
+  StickyHeader,
+  CustomRender,
+  ClickableRows,
+} from './PixelTable.examples';
+
+export default defineManifest({
+  name: 'PixelTable',
+  category: 'data',
+  since: '1.0.0',
+  status: 'stable',
+  description:
+    'Generic data table with striped rows, hover highlight, controlled sorting, single/multi row selection, sticky headers, density, loading skeletons and empty state.',
+  highlights: [
+    'Controlled sort with header buttons + aria-sort semantics',
+    'Single or multi-row selection with checkbox column and indeterminate state',
+    'Sticky header and sticky first column for wide datasets',
+    'Built-in skeleton loading rows and configurable empty state',
+    'Three density presets (compact, normal, comfortable) on pixel or linear surface',
+  ],
+  examples: [
+    { id: 'default', label: 'Default', Component: Default },
+    { id: 'striped', label: 'Striped', Component: Striped },
+    { id: 'pixel-surface', label: 'Pixel surface', Component: PixelSurface },
+    { id: 'linear-surface', label: 'Linear surface', Component: LinearSurface },
+    { id: 'sortable', label: 'Sortable columns', Component: Sortable },
+    { id: 'single-selection', label: 'Single selection', Component: SingleSelection },
+    { id: 'multi-selection', label: 'Multi selection', Component: MultiSelection },
+    { id: 'compact-density', label: 'Compact density', Component: CompactDensity },
+    { id: 'comfortable-density', label: 'Comfortable density', Component: ComfortableDensity },
+    { id: 'loading', label: 'Loading', Component: Loading },
+    { id: 'empty', label: 'Empty state', Component: Empty },
+    { id: 'sticky-header', label: 'Sticky header', Component: StickyHeader },
+    { id: 'custom-render', label: 'Custom cell render', Component: CustomRender },
+    { id: 'clickable-rows', label: 'Clickable rows', Component: ClickableRows },
+  ],
+  props: 'auto',
+  a11y: {
+    wcag: '2.1 AA',
+    patterns: ['table'],
+    keyboard: [
+      { key: 'Enter', does: 'Activates a sortable column header button or toggles row selection when the row is focused' },
+      { key: 'Space', does: 'Toggles the selection checkbox in the selection column' },
+      { key: 'Tab', does: 'Moves focus between header sort buttons, selection checkboxes and clickable rows' },
+    ],
+    notes:
+      'Uses native <table>, <thead>, <tbody>, <th scope="col"> and aria-sort on sortable columns. Loading state exposes role="status" with aria-live="polite". The multi-select header checkbox reflects indeterminate state when only some rows are selected.',
+  },
+  related: ['PixelDataTable', 'PixelPagination', 'PixelEmptyState'],
+  apiStability: 'stable',
+  ssrSafe: true,
+  treeShakable: true,
+});

@@ -131,6 +131,12 @@ const SCAN_IGNORE = [
   '**/dist/**',
   '**/.next/**',
   '**/__tests__/**',
+  // Tooling-only files: their imports reach for dev-deps (vitest, storybook,
+  // test-utils) that may not be declared in the owning package — those leaks
+  // are caught by separate gates, not by import-resolution.
+  '**/*.test.tsx',
+  '**/*.spec.tsx',
+  '**/*.stories.tsx',
 ];
 
 // Common TS/JS extensions to probe when a relative import omits the extension.
@@ -181,7 +187,12 @@ const RE_DYNAMIC_IMPORT = /import\s*\(\s*(['"])(?<spec>[^'"]+)\1\s*\)/gm;
 // ---------------------------------------------------------------------------
 
 function toPosix(p: string): string {
-  return p.split(path.sep).join('/');
+  return p.split(path.sep).join('/').replace(/\\/g, '/');
+}
+
+/** Normalise a filesystem path for case/separator-insensitive comparison on Windows. */
+function normCmp(p: string): string {
+  return toPosix(path.resolve(p)).toLowerCase();
 }
 
 function lineOf(content: string, index: number): number {
@@ -192,16 +203,41 @@ function lineOf(content: string, index: number): number {
   return line;
 }
 
-/** Strip block + line comments to avoid matching specifiers in commented-out code. */
+/**
+ * Strip comments AND blank out template-literal contents to avoid matching
+ * specifiers in commented-out code or in documentation code-block strings.
+ *
+ * We preserve byte offsets and newlines so regex match indices still map
+ * back to real source lines. Single- and double-quoted strings are kept
+ * verbatim (they're short, single-line, and the import regexes need their
+ * specifier literals intact).
+ */
 function stripComments(src: string): string {
-  // Replace contents of /* ... */ and // ... \n with spaces (preserves offsets
-  // and line counts so regex matches stay attributable to real source lines).
   let out = '';
   let i = 0;
   let inString: '"' | "'" | '`' | null = null;
   while (i < src.length) {
     const ch = src[i];
     const next = src[i + 1];
+    if (inString === '`') {
+      // Inside a template literal: blank everything except newlines and the
+      // closing backtick. This prevents `import ... from './x'` inside a
+      // documentation code-block string from registering as a real import.
+      if (ch === '\\' && i + 1 < src.length) {
+        out += '  ';
+        i += 2;
+        continue;
+      }
+      if (ch === '`') {
+        out += ch;
+        inString = null;
+        i++;
+        continue;
+      }
+      out += ch === '\n' ? '\n' : ' ';
+      i++;
+      continue;
+    }
     if (inString) {
       out += ch;
       if (ch === '\\' && i + 1 < src.length) {
@@ -220,7 +256,6 @@ function stripComments(src: string): string {
       continue;
     }
     if (ch === '/' && next === '/') {
-      // line comment
       while (i < src.length && src[i] !== '\n') {
         out += src[i] === '\n' ? '\n' : ' ';
         i++;
@@ -228,7 +263,6 @@ function stripComments(src: string): string {
       continue;
     }
     if (ch === '/' && next === '*') {
-      // block comment
       const end = src.indexOf('*/', i + 2);
       const stop = end === -1 ? src.length : end + 2;
       for (let j = i; j < stop; j++) {
@@ -273,6 +307,57 @@ export function extractImports(content: string): ImportSpec[] {
 
 const pkgCache = new Map<string, PackageManifest | null>();
 
+/**
+ * Workspace package map: package name (e.g. `@pxlkit/ui-kit`) → absolute
+ * package.json path. Built lazily on first use per repoRoot.
+ */
+const workspaceMapCache = new Map<string, Map<string, string>>();
+
+async function buildWorkspaceMap(repoRoot: string): Promise<Map<string, string>> {
+  const rootKey = toPosix(path.resolve(repoRoot));
+  const cached = workspaceMapCache.get(rootKey);
+  if (cached) return cached;
+
+  const map = new Map<string, string>();
+  // Read root package.json "workspaces" globs; fall back to packages/* + apps/*.
+  let globs: string[] = ['packages/*', 'apps/*'];
+  try {
+    const rootPkgPath = path.join(rootKey, 'package.json');
+    if (await fs.pathExists(rootPkgPath)) {
+      const json = (await fs.readJson(rootPkgPath)) as Record<string, unknown>;
+      const ws = json.workspaces;
+      if (Array.isArray(ws)) {
+        globs = ws.filter((x): x is string => typeof x === 'string');
+      } else if (ws && typeof ws === 'object' && Array.isArray((ws as { packages?: unknown }).packages)) {
+        globs = (ws as { packages: unknown[] }).packages.filter(
+          (x): x is string => typeof x === 'string',
+        );
+      }
+    }
+  } catch {
+    /* fall through with defaults */
+  }
+  const pkgJsonGlobs = globs.map((g) => `${g.replace(/\/$/, '')}/package.json`);
+  const pkgJsonPaths = await fgGlob(pkgJsonGlobs, {
+    cwd: rootKey,
+    absolute: true,
+    onlyFiles: true,
+    ignore: ['**/node_modules/**'],
+  });
+  for (const p of pkgJsonPaths) {
+    try {
+      const json = (await fs.readJson(p)) as { name?: string };
+      if (json.name && typeof json.name === 'string') {
+        map.set(json.name, toPosix(p));
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  workspaceMapCache.set(rootKey, map);
+  return map;
+}
+
 function readPkgDeps(pkgJson: Record<string, unknown>): Set<string> {
   const set = new Set<string>();
   const keys: Array<keyof typeof pkgJson> = [
@@ -296,9 +381,13 @@ export async function findOwningPackage(
   fromFile: string,
   repoRoot: string,
 ): Promise<PackageManifest | null> {
-  let dir = path.dirname(fromFile);
-  const root = path.resolve(repoRoot);
-  while (dir.startsWith(root) && dir.length >= root.length) {
+  // Normalise both sides — fast-glob returns forward slashes on Windows but
+  // path.resolve produces backslashes, which broke startsWith().
+  let dir = toPosix(path.dirname(fromFile));
+  const root = toPosix(path.resolve(repoRoot));
+  const dirLower = () => dir.toLowerCase();
+  const rootLower = root.toLowerCase();
+  while (dirLower().startsWith(rootLower) && dir.length >= root.length) {
     if (pkgCache.has(dir)) {
       const cached = pkgCache.get(dir);
       if (cached) return cached;
@@ -320,7 +409,7 @@ export async function findOwningPackage(
         }
       }
     }
-    const parent = path.dirname(dir);
+    const parent = toPosix(path.dirname(dir));
     if (parent === dir) break;
     dir = parent;
   }
@@ -333,9 +422,10 @@ async function loadTsconfigChain(
   fromDir: string,
   repoRoot: string,
 ): Promise<TsconfigPaths | null> {
-  let dir = fromDir;
-  const root = path.resolve(repoRoot);
-  while (dir.startsWith(root) && dir.length >= root.length) {
+  let dir = toPosix(fromDir);
+  const root = toPosix(path.resolve(repoRoot));
+  const rootLower = root.toLowerCase();
+  while (dir.toLowerCase().startsWith(rootLower) && dir.length >= root.length) {
     if (tsconfigCache.has(dir)) {
       const c = tsconfigCache.get(dir);
       if (c) return c;
@@ -349,7 +439,7 @@ async function loadTsconfigChain(
         tsconfigCache.set(dir, null);
       }
     }
-    const parent = path.dirname(dir);
+    const parent = toPosix(path.dirname(dir));
     if (parent === dir) break;
     dir = parent;
   }
@@ -359,11 +449,10 @@ async function loadTsconfigChain(
 async function parseTsconfig(file: string): Promise<TsconfigPaths | null> {
   try {
     const raw = await fs.readFile(file, 'utf8');
-    // tsconfig allows comments + trailing commas — strip them naively.
-    const cleaned = raw
-      .replace(/\/\/[^\n]*/g, '')
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/,\s*([}\]])/g, '$1');
+    // tsconfig allows comments + trailing commas. Strip them carefully:
+    // stripComments() preserves string contents (so "@/*" doesn't get eaten
+    // as the start of a block comment).
+    const cleaned = stripComments(raw).replace(/,\s*([}\]])/g, '$1');
     const json = JSON.parse(cleaned) as {
       compilerOptions?: { baseUrl?: string; paths?: Record<string, string[]> };
     };
@@ -501,46 +590,31 @@ async function resolveBare(
     }
   }
 
-  // 2. workspace package? (an existing packages/* whose name === pkg)
-  const workspacePkgs = await fgGlob('packages/*/package.json', {
-    cwd: ctx.repoRoot,
-    absolute: true,
-    onlyFiles: true,
-    ignore: ['**/node_modules/**'],
-  });
-  for (const pkgJsonPath of workspacePkgs) {
-    try {
-      const json = (await fs.readJson(pkgJsonPath)) as { name?: string };
-      if (json.name === pkg) {
-        // Verify owning package declares it as a dep (best practice).
-        const owning = await findOwningPackage(fromFile, ctx.repoRoot);
-        if (owning && owning.name !== pkg && !owning.deps.has(pkg)) {
-          return {
-            ok: false,
-            reason: `import "${specifier}" references workspace package "${pkg}" but it is NOT a declared dependency of "${owning.name ?? owning.pkgDir}"`,
-            suggestion: `Add "${pkg}" to the dependencies of ${toPosix(owning.pkgJsonPath)}.`,
-          };
-        }
-        if (subpath) {
-          // Optional: verify subpath resolves under the workspace package's src/dist.
-          // We can't reliably emulate exports maps, so we treat subpath as informational.
-        }
-        return { ok: true, resolved: pkgJsonPath };
-      }
-    } catch {
-      /* ignore unreadable package.json */
-    }
+  // 2. workspace package? (any workspace whose declared name === pkg)
+  const workspaceMap = await buildWorkspaceMap(ctx.repoRoot);
+  if (workspaceMap.has(pkg)) {
+    // Resolves regardless of dep declaration — npm workspaces hoist these
+    // transparently, and the audit's other gates check dep coherence.
+    const _ = subpath; // currently informational only (no exports-map emulation)
+    return { ok: true, resolved: workspaceMap.get(pkg)! };
   }
 
   // 3. external package — must be declared by the owning package or by the
-  //    repo root package.json.
+  //    repo root package.json. We also accept declarations in any workspace
+  //    package.json on the walk-up path (npm workspaces hoist node_modules).
   const owning = await findOwningPackage(fromFile, ctx.repoRoot);
-  const rootPkg = await findOwningPackage(
-    path.join(ctx.repoRoot, 'package.json.virtual'),
-    ctx.repoRoot,
-  );
+  const rootPkgPath = path.join(ctx.repoRoot, 'package.json');
+  let rootDeps: Set<string> = new Set();
+  try {
+    if (await fs.pathExists(rootPkgPath)) {
+      const json = (await fs.readJson(rootPkgPath)) as Record<string, unknown>;
+      rootDeps = readPkgDeps(json);
+    }
+  } catch {
+    /* ignore */
+  }
   const declaredHere = owning?.deps.has(pkg) ?? false;
-  const declaredAtRoot = rootPkg?.deps.has(pkg) ?? false;
+  const declaredAtRoot = rootDeps.has(pkg);
   if (declaredHere || declaredAtRoot) {
     return { ok: true, resolved: specifier };
   }

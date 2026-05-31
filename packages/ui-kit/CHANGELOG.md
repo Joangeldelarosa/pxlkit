@@ -1,5 +1,12 @@
 # @pxlkit/ui-kit — Changelog
 
+## Unreleased — Ola 4c.2 Partial (SSOT Migration)
+
+### Tooling
+- Migrated 38 components to SSOT (manifest + examples per component). Remaining components scheduled for Ola 5.
+- Auto-fix agent applied mechanical coherence fixes for theme-surface, controlled-uncontrolled, prop-naming, prop-inheritance, theme-token-usage findings.
+- New manifest+examples organized by category: actions/, cards/, data/, feedback/, layout/, hero/, hooks/, navigation/, overlays/, overlay-foundation/, forms/, parallax/.
+
 ## Unreleased — Ola 4c.1 (Tooling)
 
 ### Tooling
