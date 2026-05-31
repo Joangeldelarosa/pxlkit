@@ -406,7 +406,7 @@ function HeroSection() {
           <span className="h-2 w-2 rounded-full bg-retro-red/70" />
           <span className="h-2 w-2 rounded-full bg-retro-gold/70" />
           <span className="h-2 w-2 rounded-full bg-retro-green/70" />
-          <span className="ml-2 font-mono text-[10px] text-retro-muted">
+          <span className="ml-2 font-mono text-[11px] text-retro-muted tracking-wide">
             codex / src / editor.tsx
           </span>
         </div>
@@ -428,7 +428,7 @@ function HeroSection() {
 
         <div className="absolute bottom-5 right-5 flex flex-col items-end gap-3">
           <PixelFloat duration={2800} distance={6}>
-            <span className="inline-flex items-center gap-1.5 rounded-md border border-retro-cyan/40 bg-retro-cyan/10 px-2 py-1 font-mono text-[10px] text-retro-cyan">
+            <span className="inline-flex items-center gap-1.5 rounded-md border border-retro-cyan/40 bg-retro-cyan/10 px-2 py-1 font-mono text-[11px] text-retro-cyan tracking-wide">
               <AnimatedPxlKitIcon icon={SparkleStar} size={12} colorful />
               AI suggested
             </span>

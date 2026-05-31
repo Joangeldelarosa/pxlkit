@@ -127,7 +127,7 @@ export function Example() {
 <PixelButton size="lg">Large</PixelButton>`,
     preview: (
       <div className="flex flex-wrap items-center gap-2">
-        <button type="button" className="px-3 py-1 text-[10px] font-semibold bg-retro-surface/60 text-retro-text border border-retro-border">
+        <button type="button" className="px-3 py-1 text-[11px] font-semibold bg-retro-surface/60 text-retro-text border border-retro-border tracking-wide">
           Small
         </button>
         <button type="button" className="px-4 py-2 text-xs font-semibold bg-retro-surface/60 text-retro-text border border-retro-border">
@@ -199,7 +199,7 @@ function OnThisPageRail() {
     <aside aria-labelledby="on-this-page-title" className="hidden xl:block sticky top-16 self-start pl-4">
       <h2
         id="on-this-page-title"
-        className="text-[10px] uppercase tracking-[0.18em] text-retro-muted mb-3 font-normal"
+        className="text-[11px] uppercase tracking-[0.18em] text-retro-fg mb-3 font-semibold"
       >
         On this page
       </h2>

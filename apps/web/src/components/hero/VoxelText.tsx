@@ -51,7 +51,7 @@ export function VoxelText({ children }: { children: ReactNode }) {
   return (
     <h1
       data-testid="hero-headline"
-      className="font-pixel text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-retro-green leading-none tracking-wider select-none"
+      className="font-pixel text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-retro-green leading-none tracking-wider select-none whitespace-nowrap"
       style={{ perspective: '1000px' }}
     >
       <span

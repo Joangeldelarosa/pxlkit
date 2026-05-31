@@ -16,9 +16,9 @@ import { variantClasses, PixelBadgeVariant } from './_internal/variantClasses';
 export type { PixelBadgeVariant } from './_internal/variantClasses';
 
 const badgeSizeCls: Record<Size, string> = {
-  sm: 'px-2 py-0.5 text-[10px] gap-1',
-  md: 'px-2.5 py-1 text-[11px] gap-1.5',
-  lg: 'px-3 py-1.5 text-xs gap-1.5',
+  sm: 'px-2 py-0.5 text-[11px] gap-1 tracking-wide',
+  md: 'px-2.5 py-1 text-xs gap-1.5 tracking-wide',
+  lg: 'px-3 py-1.5 text-sm gap-1.5 tracking-wide',
 };
 
 export interface PixelBadgeProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onClick'> {

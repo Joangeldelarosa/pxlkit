@@ -80,7 +80,7 @@ describe('PixelBadge — size', () => {
     const span = container.querySelector('span') as HTMLElement;
     expect(span.className).toContain('px-2.5');
     expect(span.className).toContain('py-1');
-    expect(span.className).toContain('text-[11px]');
+    expect(span.className).toContain('text-xs');
   });
 
   it('size="sm" applies tighter padding + smaller text', () => {
@@ -88,7 +88,7 @@ describe('PixelBadge — size', () => {
     const span = container.querySelector('span') as HTMLElement;
     expect(span.className).toContain('px-2');
     expect(span.className).toContain('py-0.5');
-    expect(span.className).toContain('text-[10px]');
+    expect(span.className).toContain('text-[11px]');
   });
 
   it('size="lg" applies bigger padding + larger text', () => {
@@ -96,7 +96,7 @@ describe('PixelBadge — size', () => {
     const span = container.querySelector('span') as HTMLElement;
     expect(span.className).toContain('px-3');
     expect(span.className).toContain('py-1.5');
-    expect(span.className).toContain('text-xs');
+    expect(span.className).toContain('text-sm');
   });
 });
 
@@ -233,7 +233,7 @@ describe('PixelChip — size', () => {
     const root = container.firstElementChild as HTMLElement;
     expect(root.className).toContain('px-2');
     expect(root.className).toContain('py-0.5');
-    expect(root.className).toContain('text-[10px]');
+    expect(root.className).toContain('text-[11px]');
   });
 
   it('size="lg" applies bigger padding + larger text', () => {

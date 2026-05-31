@@ -1201,7 +1201,7 @@ function LandingCta() {
         />
 
         <div className="mt-6 sm:mt-8 flex flex-col items-center gap-5">
-          <div className="rounded-lg border border-retro-border bg-retro-bg/80 px-4 py-2 font-mono text-[11px] sm:text-xs text-retro-muted">
+          <div className="max-w-full rounded-lg border border-retro-border bg-retro-bg/80 px-4 py-2 font-mono text-[11px] sm:text-xs text-retro-muted break-words">
             <span className="text-retro-green mr-2">$</span>
             npm i @pxlkit/core @pxlkit/ui-kit
           </div>

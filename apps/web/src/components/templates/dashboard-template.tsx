@@ -414,7 +414,7 @@ function DashboardInner() {
               }
               footer={
                 !sidebarCollapsed ? (
-                  <div className="text-[10px] font-mono text-retro-muted/70 px-1">
+                  <div className="text-[11px] font-mono text-retro-muted px-1 tracking-wide">
                     v2.0.0 · build 4a
                   </div>
                 ) : null
@@ -604,7 +604,7 @@ function DashboardInner() {
                             aria-label="Daily revenue area chart"
                           />
                         </div>
-                        <div className="flex flex-wrap gap-2 text-[10px] font-mono text-retro-muted">
+                        <div className="flex flex-wrap gap-2 text-[11px] font-mono text-retro-muted tracking-wide">
                           {REVENUE_SERIES.slice(-7).map((p, i) => (
                             <span key={`${p.x}-${i}`} className="px-2 py-1 border border-retro-border/40 rounded-sm">
                               {p.x}: ${p.y.toLocaleString()}

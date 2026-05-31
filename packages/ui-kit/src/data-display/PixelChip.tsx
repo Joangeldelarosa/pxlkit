@@ -15,9 +15,9 @@ import { variantClasses, PixelBadgeVariant } from './_internal/variantClasses';
    ───────────────────────────────────────────────────────────────────────── */
 
 const chipSizeCls: Record<Size, string> = {
-  sm: 'px-2 py-0.5 text-[10px] gap-1',
-  md: 'px-2.5 py-1 text-xs gap-1.5',
-  lg: 'px-3 py-1.5 text-sm gap-2',
+  sm: 'px-2 py-0.5 text-[11px] gap-1 tracking-wide',
+  md: 'px-2.5 py-1 text-xs gap-1.5 tracking-wide',
+  lg: 'px-3 py-1.5 text-sm gap-2 tracking-wide',
 };
 
 export interface PixelChipProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onClick'> {

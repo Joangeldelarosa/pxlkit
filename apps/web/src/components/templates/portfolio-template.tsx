@@ -187,7 +187,7 @@ export default function PixelPortfolioTemplate() {
                         <h3 className="font-pixel text-sm text-retro-text leading-snug">
                           {cs.title}
                         </h3>
-                        <span className="font-mono text-[10px] text-retro-muted">{cs.year}</span>
+                        <span className="font-mono text-[11px] text-retro-muted tracking-wide">{cs.year}</span>
                       </div>
                       <p className="font-mono text-xs text-retro-muted leading-relaxed">
                         {cs.summary}
