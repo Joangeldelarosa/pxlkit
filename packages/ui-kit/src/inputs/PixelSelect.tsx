@@ -8,6 +8,7 @@ import {
   toneMap, focusRing, sizeHeight, surfaceClasses, useEffectiveSurface,
   ChevronDownIcon, CheckIcon, FieldShell,
 } from '../common';
+import { useControllableState } from '../hooks/useControllableState';
 
 /** Public prop bag for {@link PixelSelect}. */
 export interface PixelSelectProps {
@@ -64,9 +65,11 @@ export const PixelSelect = forwardRef<HTMLButtonElement, PixelSelectProps>(funct
 ) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
-  const isControlled = controlledValue !== undefined;
-  const [internalValue, setInternalValue] = useState(defaultValue ?? '');
-  const value = isControlled ? controlledValue : internalValue;
+  const [value, setValue] = useControllableState<string>({
+    value: controlledValue,
+    defaultValue: defaultValue ?? '',
+    onChange,
+  });
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -75,8 +78,7 @@ export const PixelSelect = forwardRef<HTMLButtonElement, PixelSelectProps>(funct
   useClickOutside(containerRef, () => setOpen(false));
 
   const handleSelect = (v: string) => {
-    if (!isControlled) setInternalValue(v);
-    onChange?.(v);
+    setValue(v);
     setOpen(false);
   };
 

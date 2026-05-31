@@ -11,9 +11,13 @@ import {
 
 /** Public prop bag for {@link PixelAlert}. */
 export interface PixelAlertProps {
-  /** Short title shown in tone color. */
-  title: string;
-  /** Body message under the title. */
+  /** Short label shown in tone color (canonical name for the title). */
+  label?: string;
+  /**
+   * @deprecated Use `label` instead. Retained as alias for one minor.
+   */
+  title?: string;
+  /** Body message under the label. */
   message: string;
   /** Tone determines border, fill, text colors. Defaults to `'red'`. */
   tone?: Tone;
@@ -28,9 +32,10 @@ export interface PixelAlertProps {
 }
 
 export const PixelAlert = forwardRef<HTMLDivElement, PixelAlertProps>(function PixelAlert(
-  { title, message, tone = 'red', icon, action, surface: surfaceProp, live },
+  { label, title, message, tone = 'red', icon, action, surface: surfaceProp, live },
   ref,
 ) {
+  const resolvedLabel = label ?? title ?? '';
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   // Critical tones get assertive announcements by default; neutral tones go polite.
@@ -54,7 +59,7 @@ export const PixelAlert = forwardRef<HTMLDivElement, PixelAlertProps>(function P
       <div className="flex items-start gap-2.5">
         {icon && <span className={cn('mt-0.5 shrink-0 inline-flex items-center justify-center', toneMap[tone].text)}>{icon}</span>}
         <div className="flex-1">
-          <p className={cn('text-xs font-semibold', s.font, toneMap[tone].text)}>{title}</p>
+          <p className={cn('text-xs font-semibold', s.font, toneMap[tone].text)}>{resolvedLabel}</p>
           <p className="mt-1 text-sm text-retro-muted">{message}</p>
           {action && <div className="mt-3">{action}</div>}
         </div>

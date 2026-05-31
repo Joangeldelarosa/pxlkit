@@ -108,7 +108,7 @@ export const PixelSheet = forwardRef<HTMLDivElement, PixelSheetProps>(function P
         <div
           aria-hidden="true"
           onClick={() => onOpenChange(false)}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="absolute inset-0 bg-retro-text/60 backdrop-blur-sm"
         />
         {/* panel */}
         <div

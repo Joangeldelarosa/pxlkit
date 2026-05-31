@@ -226,7 +226,7 @@ export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
           aria-hidden={false}
         >
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-retro-text/60 backdrop-blur-sm"
             onClick={() => onOpenChange(false)}
             aria-hidden="true"
           />

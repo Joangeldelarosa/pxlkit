@@ -1,5 +1,20 @@
 # @pxlkit/ui-kit — Changelog
 
+## 2.0.0 — 2026-05-31 (Ola 5 — Launch Ceremony)
+
+### Released
+- Master Overhaul complete: 111+ components across all categories.
+- Olas 1-4 + 4c.x rolled into single v2.0.0 release tag.
+- See docs/launch/RELEASE-NOTES-V2.0.md for the full launch story.
+- Migration guide at docs/migration/V1-TO-V2.md.
+- Press kit at docs/launch/V2-PRESS-KIT.md.
+
+### Coherence Fix (post-CI-failure)
+- Completed remaining ~73 component manifests + examples (full SSOT migration done).
+- Auto-applied mechanical fixes: theme-token-usage, theme-surface-coherence, prop-inheritance-base, prop-naming-vocabulary, controlled-uncontrolled-pattern, forwardref-coverage.
+- Regenerated downstream artifacts via pnpm docs:build.
+- Audit gate score: 15/30 passing.
+
 ## Unreleased — Ola 4c.3 (Lock-in)
 
 ### CI

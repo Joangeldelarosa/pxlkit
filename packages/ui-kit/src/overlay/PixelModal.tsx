@@ -114,7 +114,7 @@ export const PixelModal = forwardRef<HTMLDivElement, PixelModalProps>(function P
         aria-describedby={description ? descId : undefined}
       >
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 bg-retro-text/60 backdrop-blur-sm"
           onClick={() => { if (!closing) void handleClose(); }}
           aria-hidden="true"
         />
