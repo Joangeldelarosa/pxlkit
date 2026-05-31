@@ -8,7 +8,7 @@ import { useCountUp } from './useCountUp';
 type Tone = 'gold' | 'green' | 'purple';
 
 const STATS: { label: string; to: number; tone: Tone; suffix: string }[] = [
-  { label: 'Components', to: 54, tone: 'gold', suffix: '+' },
+  { label: 'Components', to: 111, tone: 'gold', suffix: '+' },
   { label: 'Icons', to: 226, tone: 'green', suffix: '+' },
   { label: 'Themed packs', to: 7, tone: 'purple', suffix: '' },
 ];

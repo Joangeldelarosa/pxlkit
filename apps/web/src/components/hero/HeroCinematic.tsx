@@ -40,6 +40,7 @@ export function HeroCinematic() {
         >
           {/* Status badges */}
           <div className="flex flex-wrap justify-center gap-2">
+            <PixelBadge tone="purple">PIXEL-ART UI KIT v2.0.0</PixelBadge>
             <PixelBadge tone="green">MIT Code · Licensed Assets</PixelBadge>
             <PixelBadge tone="cyan">TypeScript + Tailwind</PixelBadge>
             <PixelBadge tone="gold">
@@ -57,7 +58,7 @@ export function HeroCinematic() {
 
           {/* Compact stats line */}
           <p className="font-mono text-xs sm:text-sm text-retro-muted max-w-xl text-center px-2">
-            Retro pixel-art React UI kit · 226+ icons · 54 components · MIT code,
+            Retro pixel-art React UI kit · 226+ icons · 111+ components · MIT code,
             source-available art.
           </p>
 

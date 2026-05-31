@@ -4,7 +4,7 @@ import { PixelChangelogTemplate } from '@/components/templates/changelog-templat
 export const metadata: Metadata = {
   title: 'Pxlkit Changelog — Filter by Version & Category',
   description:
-    'Browse every Pxlkit release. Filter by version and Added/Changed/Fixed/Deps, jump straight to the GitHub PR. Latest: v1.9 — Kit Depth.',
+    'Browse every Pxlkit release. Filter by version and Added/Changed/Fixed/Deps, jump straight to the GitHub PR. Latest: v2.0 — Master Overhaul.',
   keywords: [
     'pxlkit changelog',
     'pxlkit releases',
