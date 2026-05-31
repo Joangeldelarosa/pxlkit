@@ -60,15 +60,26 @@ export const metadata: Metadata = {
     'pxlkit upgrade',
   ],
   openGraph: {
+    type: 'website',
     title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses | Pxlkit',
     description:
       'MIT-licensed React UI kit (free forever). Icon packs free with attribution. Indie $9.50 / Team $24.50 for no-attribution commercial use. One-time payment, lifetime updates.',
     url: 'https://pxlkit.xyz/pricing',
+    images: [
+      {
+        url: '/og/pricing.png',
+        width: 1280,
+        height: 640,
+        alt: 'Pxlkit pricing — Free MIT code, indie & team licenses for commercial use',
+      },
+    ],
   },
   twitter: {
+    card: 'summary_large_image',
     title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses | Pxlkit',
     description:
       'MIT code is free forever. Icon packs free with attribution. Indie ($9.50) / Team ($24.50) for commercial use. One-time payment.',
+    images: ['/og/pricing.png'],
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/pricing',

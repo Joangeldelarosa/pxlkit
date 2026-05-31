@@ -17,17 +17,17 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/'],
+        disallow: ['/api/', '/dev/'],
       },
       {
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/api/'],
+        disallow: ['/api/', '/dev/'],
       },
       {
         userAgent: 'Bingbot',
         allow: '/',
-        disallow: ['/api/'],
+        disallow: ['/api/', '/dev/'],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

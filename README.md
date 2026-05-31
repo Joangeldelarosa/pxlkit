@@ -6,14 +6,14 @@
 
 <p align="center">
   <strong>Bring retro aesthetics to the modern web — and build 3D voxel games with React.</strong><br/>
-  Pxlkit is a comprehensive source-available React toolkit featuring 226+ pixel art SVG icons across 7 themed packs (10 npm packages total including the code packages), 54 retro UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel toolkit on Three.js &amp; React Three Fiber. The showcase app at <a href="https://pxlkit.xyz/explore">pxlkit.xyz/explore</a> ships procedural world generation, biomes, day/night cycles, and chunk-based terrain streaming.
+  Pxlkit is a comprehensive source-available React toolkit featuring 226+ pixel art SVG icons across 7 themed packs (10 npm packages total including the code packages), 57 retro UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel toolkit on Three.js &amp; React Three Fiber. The showcase app at <a href="https://pxlkit.xyz/explore">pxlkit.xyz/explore</a> ships procedural world generation, biomes, day/night cycles, and chunk-based terrain streaming.
 </p>
 
 <p align="center">
   <a href="https://pxlkit.xyz"><img src="https://img.shields.io/badge/docs-pxlkit.xyz-00FF88?style=flat&logo=vercel&logoColor=black" alt="Documentation" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-split%20licenses-blue.svg" alt="Pxlkit split licensing" /></a>
   <img src="https://img.shields.io/badge/icons-226%2B-FFD700?style=flat" alt="226+ icons" />
-  <img src="https://img.shields.io/badge/components-54-4ECDC4?style=flat" alt="54 components" />
+  <img src="https://img.shields.io/badge/components-57-4ECDC4?style=flat" alt="57 components" />
   <img src="https://img.shields.io/badge/react-%E2%89%A518-61DAFB?logo=react&logoColor=white" alt="React ≥18" />
   <img src="https://img.shields.io/badge/typescript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict" />
   <img src="https://img.shields.io/badge/voxel%20engine-Three.js%20%2B%20R3F-black?logo=threedotjs&logoColor=white" alt="Voxel Engine: Three.js + React Three Fiber" />
@@ -23,13 +23,13 @@
 
 ## Overview
 
-**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into 7 themed packs, a retro React UI kit with **54 components**, a core rendering engine, a **3D voxel toolkit** (with a procedural world engine running live at `/explore`), and a Next.js 15 showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. Browse and visually edit them at the [official website](https://pxlkit.xyz).
+**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into 7 themed packs, a retro React UI kit with **57 components**, a core rendering engine, a **3D voxel toolkit** (with a procedural world engine running live at `/explore`), and a Next.js 15 showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. Browse and visually edit them at the [official website](https://pxlkit.xyz).
 
 ```
 pxlkit/
 ├── packages/
 │   ├── core/           → Types, React components, SVG utilities
-│   ├── ui-kit/         → 54 retro pixel art React UI components
+│   ├── ui-kit/         → 57 retro pixel art React UI components
 │   ├── gamification/   → 51 icons — RPG, achievements, rewards
 │   ├── feedback/       → 33 icons — alerts, status, notifications
 │   ├── social/         → 43 icons — community, emojis, messaging
@@ -41,6 +41,18 @@ pxlkit/
 └── apps/
     └── web/            → Next.js 15 showcase & documentation site
 ```
+
+## Recently Shipped
+
+| Version | Highlights |
+| --- | --- |
+| **`@pxlkit/ui-kit` v1.5.0** | `forwardRef` wired across every interactive primitive, full a11y pass (ARIA + focus rings + keyboard handlers), and `PixelToast` + `PxlKitToastProvider` shipped inside the kit. |
+| **`@pxlkit/ui` v1.2.5** | UI-pack refinement pass — 10 icons redrawn for legibility (settings, dots-menu, history, eraser, paint-bucket, chain-link, copy, edit, gear, lock-open). |
+| **`@pxlkit/social` v1.2.4** | Social-pack refinement pass — thumbs, at-sign, star-face, surprise, angry, and more rebuilt for face-family coherence. |
+| **`@pxlkit/weather` v1.2.4** | Weather-pack refinement pass — 4 icons redrawn for clarity at 16 px. |
+| **`@pxlkit/ui-kit` v1.4.0** | Switchable surface aesthetic (pixel ↔ linear) on every component via `PxlKitSurfaceProvider`. |
+
+See [`CHANGELOG.md`](./CHANGELOG.md) for the full release history.
 
 ## Licensing Model
 
@@ -392,7 +404,7 @@ Checks grid dimensions (16×16), palette usage, and detects unused/missing palet
 
 ## Storybook
 
-Every component in `@pxlkit/core` and `@pxlkit/ui-kit` has a live Storybook entry — 99+ stories total, organised by category, with Controls panels to manipulate every prop live (tone, size, surface, appearance, tint colour, disabled state, animation timing, etc.).
+Every component in `@pxlkit/core` and `@pxlkit/ui-kit` has a live Storybook entry — 100+ stories total, organised by category, with Controls panels to manipulate every prop live (tone, size, surface, appearance, tint colour, disabled state, animation timing, etc.).
 
 **Live**: [storybook.pxlkit.xyz](https://storybook.pxlkit.xyz)
 
@@ -437,7 +449,7 @@ Sidebar categories:
 | Package                | npm                                                                                                                        | Description                                     |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | `@pxlkit/core`         | [![npm](https://img.shields.io/npm/v/@pxlkit/core?color=blue)](https://www.npmjs.com/package/@pxlkit/core)                 | Types, components, SVG engine                   |
-| `@pxlkit/ui-kit`       | [![npm](https://img.shields.io/npm/v/@pxlkit/ui-kit?color=blue)](https://www.npmjs.com/package/@pxlkit/ui-kit)             | 54 retro pixel art React UI components          |
+| `@pxlkit/ui-kit`       | [![npm](https://img.shields.io/npm/v/@pxlkit/ui-kit?color=blue)](https://www.npmjs.com/package/@pxlkit/ui-kit)             | 57 retro pixel art React UI components          |
 | `@pxlkit/voxel`        | [![npm](https://img.shields.io/npm/v/@pxlkit/voxel?color=blue)](https://www.npmjs.com/package/@pxlkit/voxel)               | 3D voxel utility primitives (engine in /explore)|
 | `@pxlkit/gamification` | [![npm](https://img.shields.io/npm/v/@pxlkit/gamification?color=blue)](https://www.npmjs.com/package/@pxlkit/gamification) | RPG, achievements, rewards                      |
 | `@pxlkit/feedback`     | [![npm](https://img.shields.io/npm/v/@pxlkit/feedback?color=blue)](https://www.npmjs.com/package/@pxlkit/feedback)         | Alerts, status, notifications                   |
