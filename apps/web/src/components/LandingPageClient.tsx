@@ -119,7 +119,7 @@ function LandingHero() {
       density="comfortable"
       minHeight="lg"
       tone="green"
-      eyebrow="Pixel-Art UI Kit v1.9.0"
+      eyebrow="Pixel-Art UI Kit v2.0.0"
       headline="Ship a retro-future product without designing one from scratch."
       subline="One contract for surface, tone, and density. One prop to flip pixel ↔ linear. Accessibility on every interactive, batteries from DataTable to OTPInput — so you skip the plumbing and ship the idea."
       primaryCta={
@@ -403,7 +403,7 @@ function StatsStrip() {
         layout="grid"
         columns={4}
         tone="cyan"
-        aria-label="Pxlkit v1.9.0 by the numbers"
+        aria-label="Pxlkit v2.0.0 by the numbers"
       >
         {stats.map((s) => (
           <div

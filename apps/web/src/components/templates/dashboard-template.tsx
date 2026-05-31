@@ -395,7 +395,7 @@ function DashboardInner() {
       <div className="relative min-h-screen bg-retro-bg text-retro-text">
         {/* Top ribbon — page-level "NEW" marker */}
         <PixelRibbon position="top-right" tone="cyan" offset="md">
-          NEW · @pxlkit/ui-kit v1.9.0
+          NEW · @pxlkit/ui-kit v2.0.0
         </PixelRibbon>
 
         <div className="flex min-h-screen">
@@ -415,7 +415,7 @@ function DashboardInner() {
               footer={
                 !sidebarCollapsed ? (
                   <div className="text-[10px] font-mono text-retro-muted/70 px-1">
-                    v1.9.0 · build 4a
+                    v2.0.0 · build 4a
                   </div>
                 ) : null
               }

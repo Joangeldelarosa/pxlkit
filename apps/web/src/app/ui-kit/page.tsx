@@ -131,139 +131,249 @@ const COMMON_CONTAINER: PropDef[] = [PROP_SURFACE, PROP_CLASSNAME, PROP_CHILDREN
 const COMMON_ANIMATION: PropDef[] = [PROP_CLASSNAME, PROP_CHILDREN_REQUIRED];
 const COMMON_PARALLAX: PropDef[] = [PROP_CLASSNAME, PROP_STYLE, PROP_CHILDREN_REQUIRED];
 
-const CATEGORIES = [
-  {
-    id: 'overview',
-    label: 'Overview',
-    items: [
-      { id: 'getting-started', name: 'Getting Started' },
-      { id: 'design-tokens', name: 'Design Tokens' },
-      { id: 'surface-system', name: 'Surface System' },
-      { id: 'locale-support', name: 'Locale / Turkish' },
-    ],
-  },
-  {
-    id: 'actions',
-    label: 'Actions',
-    items: [
-      { id: 'pixel-button', name: 'PixelButton' },
-      { id: 'pxlkit-button', name: 'PxlKitButton' },
-      { id: 'pixel-split-button', name: 'PixelSplitButton' },
-    ],
-  },
-  {
-    id: 'inputs',
-    label: 'Inputs',
-    items: [
-      { id: 'pixel-input', name: 'PixelInput' },
-      { id: 'pixel-password-input', name: 'PixelPasswordInput' },
-      { id: 'pixel-textarea', name: 'PixelTextarea' },
-      { id: 'pixel-select', name: 'PixelSelect' },
-      { id: 'pixel-checkbox', name: 'PixelCheckbox' },
-      { id: 'pixel-radio-group', name: 'PixelRadioGroup' },
-      { id: 'pixel-switch', name: 'PixelSwitch' },
-      { id: 'pixel-slider', name: 'PixelSlider' },
-      { id: 'pixel-segmented', name: 'PixelSegmented' },
-    ],
-  },
-  {
-    id: 'data-display',
-    label: 'Data Display',
-    items: [
-      { id: 'pixel-card', name: 'PixelCard' },
-      { id: 'pixel-stat-card', name: 'PixelStatCard' },
-      { id: 'pixel-table', name: 'PixelTable' },
-      { id: 'pixel-avatar', name: 'PixelAvatar' },
-      { id: 'pixel-badge', name: 'PixelBadge' },
-      { id: 'pixel-chip', name: 'PixelChip' },
-      { id: 'pixel-text-link', name: 'PixelTextLink' },
-      { id: 'pixel-code-inline', name: 'PixelCodeInline' },
-      { id: 'pixel-kbd', name: 'PixelKbd' },
-      { id: 'pixel-color-swatch', name: 'PixelColorSwatch' },
-    ],
-  },
-  {
-    id: 'feedback',
-    label: 'Feedback',
-    items: [
-      { id: 'pixel-alert', name: 'PixelAlert' },
-      { id: 'pixel-progress', name: 'PixelProgress' },
-      { id: 'pixel-skeleton', name: 'PixelSkeleton' },
-      { id: 'pixel-empty-state', name: 'PixelEmptyState' },
-      { id: 'pixel-toast', name: 'PixelToast' },
-      { id: 'use-toast', name: 'useToast()' },
-    ],
-  },
-  {
-    id: 'navigation',
-    label: 'Navigation',
-    items: [
-      { id: 'pixel-tabs', name: 'PixelTabs' },
-      { id: 'pixel-accordion', name: 'PixelAccordion' },
-      { id: 'pixel-collapsible', name: 'PixelCollapsible' },
-      { id: 'pixel-breadcrumb', name: 'PixelBreadcrumb' },
-      { id: 'pixel-pagination', name: 'PixelPagination' },
-    ],
-  },
-  {
-    id: 'overlay',
-    label: 'Overlay',
-    items: [
-      { id: 'pixel-modal', name: 'PixelModal' },
-      { id: 'pixel-tooltip', name: 'PixelTooltip' },
-      { id: 'pixel-dropdown', name: 'PixelDropdown' },
-    ],
-  },
-  {
-    id: 'layout',
-    label: 'Layout',
-    items: [
-      { id: 'pixel-section', name: 'PixelSection' },
-      { id: 'pixel-divider', name: 'PixelDivider' },
-    ],
-  },
-  {
-    id: 'primitives',
-    label: 'Primitives',
-    items: [
-      { id: 'pixel-bare-button', name: 'PixelBareButton' },
-      { id: 'pixel-bare-input', name: 'PixelBareInput' },
-      { id: 'pixel-bare-textarea', name: 'PixelBareTextarea' },
-    ],
-  },
-  {
-    id: 'animations',
-    label: 'Animations',
-    items: [
-      { id: 'pixel-fade-in', name: 'PixelFadeIn' },
-      { id: 'pixel-slide-in', name: 'PixelSlideIn' },
-      { id: 'pixel-pulse', name: 'PixelPulse' },
-      { id: 'pixel-bounce', name: 'PixelBounce' },
-      { id: 'pixel-float', name: 'PixelFloat' },
-      { id: 'pixel-shake', name: 'PixelShake' },
-      { id: 'pixel-rotate', name: 'PixelRotate' },
-      { id: 'pixel-zoom-in', name: 'PixelZoomIn' },
-      { id: 'pixel-flicker', name: 'PixelFlicker' },
-      { id: 'pixel-typewriter', name: 'PixelTypewriter' },
-      { id: 'pixel-glitch', name: 'PixelGlitch' },
-    ],
-  },
-  {
-    id: 'parallax',
-    label: 'Parallax',
-    items: [
-      { id: 'pixel-parallax-layer', name: 'PixelParallaxLayer' },
-      { id: 'pixel-parallax-group', name: 'PixelParallaxGroup' },
-      { id: 'pixel-mouse-parallax', name: 'PixelMouseParallax' },
-    ],
-  },
+/* ── Sidebar categories are DERIVED from UI_KIT_COMPONENTS to kill drift.
+   Add a component to the registry and it shows up in the sidebar automatically.
+   Conceptual items (Getting Started / Design Tokens / etc.) live in OVERVIEW_ITEMS
+   below — they don't map 1:1 to a component, so they stay hardcoded.
+   PixelToast/useToast() live in FEEDBACK_EXTRA_ITEMS for the same reason. ── */
+
+const COMPONENT_CATEGORY_MAP: Record<string, string> = {
+  // Actions
+  PixelButton: 'actions',
+  PixelIconButton: 'actions',
+  PxlKitButton: 'actions',
+  PixelSplitButton: 'actions',
+
+  // Inputs
+  PixelInput: 'inputs',
+  PixelPasswordInput: 'inputs',
+  PixelTextarea: 'inputs',
+  PixelSelect: 'inputs',
+  PixelCheckbox: 'inputs',
+  PixelRadioGroup: 'inputs',
+  PixelSwitch: 'inputs',
+  PixelSlider: 'inputs',
+  PixelSegmented: 'inputs',
+  PixelCombobox: 'inputs',
+  PixelMultiSelect: 'inputs',
+  PixelDatePicker: 'inputs',
+  PixelDateRangePicker: 'inputs',
+  PixelCalendarGrid: 'inputs',
+  PixelNumberInput: 'inputs',
+  PixelOTPInput: 'inputs',
+  PixelFileUpload: 'inputs',
+  PixelColorInput: 'inputs',
+  PixelInputGroup: 'inputs',
+  PixelToggleGroup: 'inputs',
+  PixelToggle: 'inputs',
+  PixelForm: 'inputs',
+
+  // Data Display
+  PixelCard: 'data-display',
+  PixelStatCard: 'data-display',
+  PixelStatGroup: 'data-display',
+  PixelTable: 'data-display',
+  PixelDataTable: 'data-display',
+  PixelAvatar: 'data-display',
+  PixelAvatarGroup: 'data-display',
+  PixelBadge: 'data-display',
+  PixelBadgeGroup: 'data-display',
+  PixelChip: 'data-display',
+  PixelChipGroup: 'data-display',
+  PixelTextLink: 'data-display',
+  PixelCollapsible: 'data-display',
+  PixelTimeline: 'data-display',
+  PixelCarousel: 'data-display',
+  PixelSparkline: 'data-display',
+  PixelBarChart: 'data-display',
+  PixelAreaChart: 'data-display',
+  PixelRibbon: 'data-display',
+  PixelStarRating: 'data-display',
+  PixelIconFrame: 'data-display',
+
+  // Hero & Cards
+  PixelHeroSection: 'hero',
+  PixelHeroMedia: 'hero',
+  PixelFeatureCard: 'hero',
+  PixelPricingCard: 'hero',
+  PixelTestimonialCard: 'hero',
+
+  // Feedback
+  PixelAlert: 'feedback',
+  PixelProgress: 'feedback',
+  PixelSkeleton: 'feedback',
+  PixelEmptyState: 'feedback',
+  PixelSpinner: 'feedback',
+  PixelToast: 'feedback',
+  PxlKitToastProvider: '__skip',
+
+  // Navigation
+  PixelTabs: 'navigation',
+  PixelAccordion: 'navigation',
+  PixelBreadcrumb: 'navigation',
+  PixelPagination: 'navigation',
+  PixelStepper: 'navigation',
+  PixelMenubar: 'navigation',
+  PixelNavigationMenu: 'navigation',
+  PixelSidebar: 'navigation',
+
+  // Overlay
+  PixelModal: 'overlay',
+  PixelTooltip: 'overlay',
+  PixelDropdown: 'overlay',
+  PixelDrawer: 'overlay',
+  PixelCommand: 'overlay',
+  PixelAlertDialog: 'overlay',
+  PixelSheet: 'overlay',
+  PixelPortal: 'overlay',
+  PixelPopover: 'overlay',
+
+  // Layout
+  PixelDivider: 'layout',
+  PixelSection: 'layout',
+  PixelBox: 'layout',
+  PixelStack: 'layout',
+  PixelCluster: 'layout',
+  PixelGrid: 'layout',
+  PixelEqualHeightGrid: 'layout',
+  PixelCenter: 'layout',
+  PixelContainer: 'layout',
+  PixelTwoColumn: 'layout',
+  PixelSectionHeader: 'layout',
+  PixelBento: 'layout',
+  PixelBentoCell: 'layout',
+  PixelScrollArea: 'layout',
+
+  // Primitives
+  PixelBareButton: 'primitives',
+  PixelBareInput: 'primitives',
+  PixelBareTextarea: 'primitives',
+  PixelCodeInline: 'primitives',
+  PixelKbd: 'primitives',
+  PixelColorSwatch: 'primitives',
+
+  // Animations
+  PixelFadeIn: 'animations',
+  PixelSlideIn: 'animations',
+  PixelPulse: 'animations',
+  PixelBounce: 'animations',
+  PixelTypewriter: 'animations',
+  PixelGlitch: 'animations',
+  PixelFloat: 'animations',
+  PixelShake: 'animations',
+  PixelRotate: 'animations',
+  PixelZoomIn: 'animations',
+  PixelFlicker: 'animations',
+
+  // Parallax
+  PixelParallaxLayer: 'parallax',
+  PixelParallaxGroup: 'parallax',
+  PixelMouseParallax: 'parallax',
+
+  // Providers are infra, not docs — skip from the visible list
+  PxlKitLocaleProvider: '__skip',
+  PxlKitSurfaceProvider: '__skip',
+};
+
+const CATEGORY_META: Array<{ id: string; label: string }> = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'actions', label: 'Actions' },
+  { id: 'inputs', label: 'Inputs' },
+  { id: 'data-display', label: 'Data Display' },
+  { id: 'hero', label: 'Hero & Cards' },
+  { id: 'feedback', label: 'Feedback' },
+  { id: 'navigation', label: 'Navigation' },
+  { id: 'overlay', label: 'Overlay' },
+  { id: 'layout', label: 'Layout' },
+  { id: 'primitives', label: 'Primitives' },
+  { id: 'animations', label: 'Animations' },
+  { id: 'parallax', label: 'Parallax' },
 ];
+
+const OVERVIEW_ITEMS: { id: string; name: string }[] = [
+  { id: 'getting-started', name: 'Getting Started' },
+  { id: 'design-tokens', name: 'Design Tokens' },
+  { id: 'surface-system', name: 'Surface System' },
+  { id: 'locale-support', name: 'Locale / Turkish' },
+];
+
+const FEEDBACK_EXTRA_ITEMS: { id: string; name: string }[] = [
+  { id: 'use-toast', name: 'useToast()' },
+];
+
+/* PascalCase → kebab-case slug, preserving the existing scheme:
+   PixelButton → pixel-button, PxlKitButton → pxlkit-button, PixelOTPInput → pixel-otp-input.
+   PxlKit is treated as a single token to match existing hand-written anchors. */
+function toSlug(name: string): string {
+  return name
+    .replace(/^PxlKit/, 'Pxlkit')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .replace(/([a-z\d])([A-Z])/g, '$1-$2')
+    .toLowerCase();
+}
+
+const CATEGORIES = (() => {
+  const buckets: Record<string, { id: string; label: string; items: { id: string; name: string }[] }> = {};
+  for (const meta of CATEGORY_META) {
+    buckets[meta.id] = { id: meta.id, label: meta.label, items: [] };
+  }
+  // Overview is conceptual, not registry-driven
+  buckets['overview'].items.push(...OVERVIEW_ITEMS);
+
+  for (const componentName of UI_KIT_COMPONENTS) {
+    const catId = COMPONENT_CATEGORY_MAP[componentName] ?? 'data-display';
+    if (catId === '__skip') continue;
+    if (!buckets[catId]) continue;
+    buckets[catId].items.push({ id: toSlug(componentName), name: componentName });
+  }
+
+  // Tail-add non-component feedback items
+  buckets['feedback'].items.push(...FEEDBACK_EXTRA_ITEMS);
+
+  return CATEGORY_META.map((meta) => buckets[meta.id]).filter((cat) => cat.items.length > 0);
+})();
 
 const ALL_SECTION_IDS = CATEGORIES.flatMap((c) => c.items.map((i) => i.id));
 
-/* Items shipped in Ola 4a (v1.9.0). DocSection anchors land in a follow-up wave —
+/* Components present in the registry that don't yet have a hand-written DocSection.
+   Each gets a minimal placeholder so sidebar anchors always land somewhere instead
+   of jumping to the top of the page. As real DocSections land in follow-up waves,
+   their slugs drop out of this list (existing anchors take precedence by definition). */
+const PLACEHOLDER_COMPONENTS: { name: string; slug: string }[] = (() => {
+  const rendered = new Set<string>([
+    // Conceptual overview sections
+    'getting-started', 'design-tokens', 'surface-system', 'locale-support',
+    // Hand-written DocSections
+    'pixel-button', 'pxlkit-button', 'pixel-split-button',
+    'pixel-input', 'pixel-password-input', 'pixel-textarea', 'pixel-select',
+    'pixel-checkbox', 'pixel-radio-group', 'pixel-switch', 'pixel-slider', 'pixel-segmented',
+    'pixel-card', 'pixel-stat-card', 'pixel-table', 'pixel-avatar', 'pixel-badge', 'pixel-chip',
+    'pixel-text-link', 'pixel-collapsible',
+    'pixel-code-inline', 'pixel-kbd', 'pixel-color-swatch',
+    'pixel-bare-button', 'pixel-bare-input', 'pixel-bare-textarea',
+    'pixel-alert', 'pixel-progress', 'pixel-skeleton', 'pixel-empty-state', 'pixel-toast',
+    'pixel-tabs', 'pixel-accordion', 'pixel-breadcrumb', 'pixel-pagination',
+    'pixel-modal', 'pixel-tooltip', 'pixel-dropdown',
+    'pixel-section', 'pixel-divider',
+    'pixel-fade-in', 'pixel-slide-in', 'pixel-pulse', 'pixel-bounce', 'pixel-typewriter', 'pixel-glitch',
+    'pixel-float', 'pixel-shake', 'pixel-rotate', 'pixel-zoom-in', 'pixel-flicker',
+    // Parallax has its own dynamic-imported block with anchors
+    'pixel-parallax-layer', 'pixel-parallax-group', 'pixel-mouse-parallax',
+    // Non-component sidebar entries
+    'use-toast',
+  ]);
+  const out: { name: string; slug: string }[] = [];
+  for (const cat of CATEGORIES) {
+    for (const item of cat.items) {
+      if (!rendered.has(item.id)) out.push({ name: item.name, slug: item.id });
+    }
+  }
+  return out;
+})();
+
+/* Items shipped in Ola 4a (v2.0.0). DocSection anchors land in a follow-up wave —
    until then each link lands on the changelog v1.9 entry so the click is never a no-op. */
-const WHATS_NEW_V190_ITEMS: WhatsNewItem[] = [
+const WHATS_NEW_V200_ITEMS: WhatsNewItem[] = [
   { name: 'PixelDataTable', category: 'data', href: '/changelog#v190-pixel-data-table', isNew: true },
   { name: 'PixelStepper', category: 'navigation', href: '/changelog#v190-pixel-stepper', isNew: true },
   { name: 'PixelSpinner', category: 'feedback', href: '/changelog#v190-pixel-spinner', isNew: true },
@@ -676,9 +786,9 @@ export default function UIKitPage() {
             {/* ══════════════════ WHAT'S NEW STRIP ══════════════════ */}
             <div className="mb-6">
               <WhatsNewStrip
-                version="1.9.0"
-                date="2026-05-30"
-                items={WHATS_NEW_V190_ITEMS}
+                version="2.0.0"
+                date="2026-05-31"
+                items={WHATS_NEW_V200_ITEMS}
               />
             </div>
 
@@ -2896,6 +3006,43 @@ const [active, setActive] = useState(false);
 
             {/* Heavy demo block — dynamic-imported with PixelSkeleton fallback */}
             <ParallaxDemos />
+
+            {/* ============================================================
+                v2.0.0 placeholders — full doc bodies + live demos land in a follow-up wave (Ola 6).
+                Each section is reachable via sidebar; clicking an item scrolls here so the link is never dead.
+                List is DERIVED from CATEGORIES (kills drift) — when a real DocSection lands above,
+                its slug drops out of PLACEHOLDER_COMPONENTS automatically.
+                ============================================================ */}
+            {PLACEHOLDER_COMPONENTS.length > 0 && (
+              <section className="pt-10">
+                <PixelDivider label="More Components" tone="cyan" spacing="lg" />
+                <p className="mt-4 text-xs text-retro-muted max-w-2xl">
+                  These components ship in the package today. Full live demos and prop tables land in
+                  upcoming docs waves — each anchor below is the slug the sidebar links to.
+                </p>
+                <div className="mt-5 space-y-2">
+                  {PLACEHOLDER_COMPONENTS.map((c) => (
+                    <DocSection
+                      key={c.slug}
+                      id={c.slug}
+                      title={c.name}
+                      description={
+                        <>
+                          Shipped in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>. Full docs and
+                          live demos coming soon — see the{' '}
+                          <PixelTextLink href="/changelog#v200">v2.0.0 changelog</PixelTextLink> for current usage.
+                        </>
+                      }
+                      code={`import { ${c.name} } from '@pxlkit/ui-kit';`}
+                    >
+                      <p className="text-retro-muted text-sm">
+                        Live demo lands in a follow-up docs wave. Import path and basic usage are shown below.
+                      </p>
+                    </DocSection>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* ══════════════════ COMPONENT INVENTORY ══════════════════ */}
             <section className="pt-10">

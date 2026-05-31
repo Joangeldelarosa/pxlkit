@@ -10,22 +10,22 @@ const items: WhatsNewItem[] = [
 
 describe('WhatsNewStrip', () => {
   it('renders version + date + every item', () => {
-    render(<WhatsNewStrip version="1.9.0" date="2026-05-30" items={items} />);
+    render(<WhatsNewStrip version="2.0.0" date="2026-05-31" items={items} />);
 
-    expect(screen.getByText('v1.9.0')).toBeInTheDocument();
-    expect(screen.getByText('2026-05-30')).toBeInTheDocument();
+    expect(screen.getByText('v2.0.0')).toBeInTheDocument();
+    expect(screen.getByText('2026-05-31')).toBeInTheDocument();
     expect(screen.getByText('PixelDataTable')).toBeInTheDocument();
     expect(screen.getByText('PixelStepper')).toBeInTheDocument();
     expect(screen.getByText('PixelColorInput')).toBeInTheDocument();
   });
 
   it('renders an explicit landmark with aria-label', () => {
-    render(<WhatsNewStrip version="1.9.0" date="2026-05-30" items={items} />);
-    expect(screen.getByLabelText("What's new in v1.9.0")).toBeInTheDocument();
+    render(<WhatsNewStrip version="2.0.0" date="2026-05-31" items={items} />);
+    expect(screen.getByLabelText("What's new in v2.0.0")).toBeInTheDocument();
   });
 
   it('marks NEW items with a "New" pill', () => {
-    render(<WhatsNewStrip version="1.9.0" date="2026-05-30" items={items} />);
+    render(<WhatsNewStrip version="2.0.0" date="2026-05-31" items={items} />);
     const pills = screen.getAllByText('New');
     expect(pills.length).toBe(items.length);
   });
@@ -43,13 +43,13 @@ describe('WhatsNewStrip', () => {
   });
 
   it('links each item to its anchor href', () => {
-    render(<WhatsNewStrip version="1.9.0" date="2026-05-30" items={items} />);
+    render(<WhatsNewStrip version="2.0.0" date="2026-05-31" items={items} />);
     const link = screen.getByRole('link', { name: /PixelDataTable/i });
     expect(link.getAttribute('href')).toBe('#pixel-data-table');
   });
 
   it('links the changelog CTA to /templates/changelog by default', () => {
-    render(<WhatsNewStrip version="1.9.0" date="2026-05-30" items={items} />);
+    render(<WhatsNewStrip version="2.0.0" date="2026-05-31" items={items} />);
     const cta = screen.getByRole('link', { name: /See full changelog/i });
     expect(cta.getAttribute('href')).toBe('/templates/changelog');
   });
@@ -68,7 +68,7 @@ describe('WhatsNewStrip', () => {
   });
 
   it('renders category badges', () => {
-    render(<WhatsNewStrip version="1.9.0" date="2026-05-30" items={items} />);
+    render(<WhatsNewStrip version="2.0.0" date="2026-05-31" items={items} />);
     expect(screen.getByText('data')).toBeInTheDocument();
     expect(screen.getByText('navigation')).toBeInTheDocument();
     expect(screen.getByText('forms')).toBeInTheDocument();
