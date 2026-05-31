@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import {
   PixelAccordion,
@@ -50,9 +51,6 @@ import {
   PixelTypewriter,
   PixelZoomIn,
   PixelFlicker,
-  PixelParallaxLayer,
-  PixelParallaxGroup,
-  PixelMouseParallax,
   UI_KIT_COMPONENTS,
   PxlKitLocaleProvider,
   PxlKitSurfaceProvider,
@@ -67,6 +65,22 @@ import { Bell, CheckCircle, WarningTriangle, InfoCircle } from '@pxlkit/feedback
 import { Heart, Message } from '@pxlkit/social';
 import { CodeBlock } from '../../components/CodeBlock';
 import { useToast, type ToastPosition, type ToastTone } from '../../components/ToastProvider';
+import { WhatsNewStrip, type WhatsNewItem } from '../../components/whats-new-strip';
+
+/* ── Heavy demo block — Parallax (scroll + mouse listeners, GPU transforms).
+   Code-split via next/dynamic + ssr:false so the JS only loads when this
+   below-the-fold section actually mounts on the client. ── */
+const ParallaxDemos = dynamic(() => import('./_parallax-demos'), {
+  ssr: false,
+  loading: () => (
+    <div className="space-y-4 pt-10">
+      <PixelSkeleton width="100%" height="2rem" />
+      <PixelSkeleton width="100%" height="12rem" />
+      <PixelSkeleton width="100%" height="10rem" />
+      <PixelSkeleton width="100%" height="12rem" />
+    </div>
+  ),
+});
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    TYPES & DATA
@@ -246,6 +260,29 @@ const CATEGORIES = [
 ];
 
 const ALL_SECTION_IDS = CATEGORIES.flatMap((c) => c.items.map((i) => i.id));
+
+/* Items shipped in Ola 4a (v1.9.0). DocSection anchors land in a follow-up wave —
+   until then each link lands on the changelog v1.9 entry so the click is never a no-op. */
+const WHATS_NEW_V190_ITEMS: WhatsNewItem[] = [
+  { name: 'PixelDataTable', category: 'data', href: '/changelog#v190-pixel-data-table', isNew: true },
+  { name: 'PixelStepper', category: 'navigation', href: '/changelog#v190-pixel-stepper', isNew: true },
+  { name: 'PixelSpinner', category: 'feedback', href: '/changelog#v190-pixel-spinner', isNew: true },
+  { name: 'PixelScrollArea', category: 'layout', href: '/changelog#v190-pixel-scroll-area', isNew: true },
+  { name: 'PixelMenubar', category: 'navigation', href: '/changelog#v190-pixel-menubar', isNew: true },
+  { name: 'PixelNavigationMenu', category: 'navigation', href: '/changelog#v190-pixel-navigation-menu', isNew: true },
+  { name: 'PixelSidebar', category: 'navigation', href: '/changelog#v190-pixel-sidebar', isNew: true },
+  { name: 'PixelCarousel', category: 'data', href: '/changelog#v190-pixel-carousel', isNew: true },
+  { name: 'PixelTimeline', category: 'data', href: '/changelog#v190-pixel-timeline', isNew: true },
+  { name: 'PixelStatGroup', category: 'data', href: '/changelog#v190-pixel-stat-group', isNew: true },
+  { name: 'PixelAvatarGroup', category: 'data', href: '/changelog#v190-pixel-avatar-group', isNew: true },
+  { name: 'PixelBadgeGroup', category: 'data', href: '/changelog#v190-pixel-badge-group', isNew: true },
+  { name: 'PixelInputGroup', category: 'forms', href: '/changelog#v190-pixel-input-group', isNew: true },
+  { name: 'PixelToggleGroup', category: 'forms', href: '/changelog#v190-pixel-toggle-group', isNew: true },
+  { name: 'PixelDateRangePicker', category: 'forms', href: '/changelog#v190-pixel-date-range-picker', isNew: true },
+  { name: 'PixelCalendarGrid', category: 'forms', href: '/changelog#v190-pixel-calendar-grid', isNew: true },
+  { name: 'PixelColorInput', category: 'forms', href: '/changelog#v190-pixel-color-input', isNew: true },
+  { name: 'PixelChartPrimitives', category: 'data', href: '/changelog#v190-pixel-chart-primitives', isNew: true },
+];
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    INTERNAL: Cross-link helper
@@ -636,21 +673,35 @@ export default function UIKitPage() {
         <main className="min-h-screen lg:ml-64">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10 py-8 pb-24">
 
+            {/* ══════════════════ WHAT'S NEW STRIP ══════════════════ */}
+            <div className="mb-6">
+              <WhatsNewStrip
+                version="1.9.0"
+                date="2026-05-30"
+                items={WHATS_NEW_V190_ITEMS}
+              />
+            </div>
+
             {/* ══════════════════ HERO ══════════════════ */}
             <header>
               <PixelBreadcrumb items={[{ label: 'Home', href: '/' }, { label: 'UI Kit', active: true }]} />
               <h1 className="mt-4 font-pixel text-base text-retro-green sm:text-lg leading-relaxed">PXLKIT UI KIT</h1>
               <p className="mt-3 max-w-2xl text-sm text-retro-muted leading-relaxed">
-                A full-featured, fully custom React component library built with TypeScript, Tailwind CSS, and Pxlkit pixel-art icons.
-                Every element is hand-crafted without native browser UI components — designed for retro-futuristic interfaces that work
-                flawlessly across all devices. Use the sidebar to navigate all {UI_COMPONENTS_COUNT} components and PixelToast docs.
+                A React component kit built on three promises.{' '}
+                <strong className="text-retro-cyan">Surface system</strong> — flip every component between an 8-bit
+                pixel aesthetic and a flat linear one with a single prop, same API either way.{' '}
+                <strong className="text-retro-green">Accessibility-first</strong> — WAI-ARIA roles, keyboard navigation,
+                focus rings, and reduced-motion fallbacks ship on every interactive, not bolted on later.{' '}
+                <strong className="text-retro-gold">Batteries-included</strong> — DataTable, Stepper, Sidebar, Timeline,
+                Calendar, Charts, OTPInput and {UI_COMPONENTS_COUNT - 8}+ more are already in the box. Use the sidebar
+                to browse all {UI_COMPONENTS_COUNT} components and the PixelToast guide.
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
                 <PixelBadge tone="green">{UI_COMPONENTS_COUNT} components</PixelBadge>
-                <PixelBadge tone="cyan">icon-ready</PixelBadge>
+                <PixelBadge tone="cyan">pixel ↔ linear surface</PixelBadge>
                 <PixelBadge tone="gold">typescript-first</PixelBadge>
-                <PixelBadge tone="purple">a11y baseline</PixelBadge>
-                <PixelBadge tone="red">zero dependencies</PixelBadge>
+                <PixelBadge tone="purple">WAI-ARIA baseline</PixelBadge>
+                <PixelBadge tone="red">zero runtime deps</PixelBadge>
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <PixelStatCard label="Components" value={String(UI_COMPONENTS_COUNT)} icon={<PxlKitIcon icon={Grid} size={16} />} tone="green" />
@@ -666,9 +717,13 @@ export default function UIKitPage() {
             <section data-section="getting-started" id="getting-started" className="scroll-mt-20 space-y-4">
               <h2 className="font-pixel text-xs text-retro-green">GETTING STARTED</h2>
               <p className="text-sm text-retro-muted">
-                Import components from the UI Kit module and pair them with any icon from the Pxlkit icon packs.
-                All components share a common API surface with <CompLink id="design-tokens"><PixelCodeInline>tone</PixelCodeInline></CompLink>, <PixelCodeInline>size</PixelCodeInline>,
-                and icon props for consistent theming. See <CompLink id="pixel-button">PixelButton</CompLink>, <CompLink id="pixel-input">PixelInput</CompLink>, and <CompLink id="pixel-select">PixelSelect</CompLink> for examples.
+                Three steps and you&apos;re rendering. Install <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>, import
+                its stylesheet alongside Tailwind, and pull components from the same package. Every primitive accepts the
+                shared <CompLink id="design-tokens"><PixelCodeInline>tone</PixelCodeInline></CompLink>,{' '}
+                <PixelCodeInline>size</PixelCodeInline>, and <PixelCodeInline>surface</PixelCodeInline> contract — so
+                what you learn on <CompLink id="pixel-button">PixelButton</CompLink> applies to{' '}
+                <CompLink id="pixel-input">PixelInput</CompLink>,{' '}
+                <CompLink id="pixel-select">PixelSelect</CompLink>, and the other {UI_COMPONENTS_COUNT - 3}.
               </p>
               <CodeBlock
                 code={`// 1. Setup your Tailwind CSS file (e.g., index.css)
@@ -2839,125 +2894,8 @@ const [active, setActive] = useState(false);
               )}
             </AnimationReplay>
 
-            <PixelDivider label="Parallax" tone="gold" spacing="lg" />
-
-            {/* ══════════════════ PIXELPARALLAXLAYER ══════════════════ */}
-            <DocSection
-              id="pixel-parallax-layer"
-              title="PixelParallaxLayer"
-              description={<>Scroll-based parallax layer. Translates children along Y (or X) proportionally to scroll position. Use <PixelCodeInline>speed</PixelCodeInline> to control the multiplier — 0 = static, 0.5 = half speed (far background), negative = reverse direction. GPU-composited via <PixelCodeInline>translate3d</PixelCodeInline>. Wrap inside <CompLink id="pixel-parallax-group">PixelParallaxGroup</CompLink> for clipped layouts.</>}
-              props={[
-                { name: 'speed', type: 'number', default: '0.5', description: 'Parallax multiplier. 0 = no movement, 1 = full scroll speed, negative = reverse.' },
-                { name: 'axis', type: '"x" | "y" | "both"', default: '"y"', description: 'Which axis to translate on.' },
-                { name: 'className', type: 'string', default: '—', description: 'Extra class names on wrapper div.' },
-                { name: 'style', type: 'CSSProperties', default: '—', description: 'Inline styles on wrapper div.' },
-                ...COMMON_PARALLAX,
-              ]}
-              code={`<PixelParallaxGroup className="h-[400px]">
-  {/* Slow background layer */}
-  <PixelParallaxLayer speed={0.3} className="absolute inset-0">
-    <img src="/bg-stars.png" className="w-full h-full object-cover" />
-  </PixelParallaxLayer>
-
-  {/* Foreground content */}
-  <PixelParallaxLayer speed={-0.1}>
-    <PixelCard title="Floating Card">I move slightly opposite to scroll</PixelCard>
-  </PixelParallaxLayer>
-</PixelParallaxGroup>`}
-            >
-              <div className="space-y-3">
-                <p className="text-sm text-retro-muted">Scroll the page to see the parallax effect on these layers:</p>
-                <div className="relative h-48 rounded-lg overflow-hidden border border-retro-border/30 bg-retro-bg/50">
-                  <PixelParallaxLayer speed={0.15} className="absolute inset-0 flex items-center justify-center opacity-20">
-                    <div className="grid grid-cols-8 gap-4">
-                      {Array.from({ length: 16 }).map((_, i) => (
-                        <PxlKitIcon key={i} icon={Star} size={20} />
-                      ))}
-                    </div>
-                  </PixelParallaxLayer>
-                  <PixelParallaxLayer speed={-0.08} className="absolute inset-0 flex items-center justify-center">
-                    <PixelBadge tone="gold">speed: -0.08 (floats up)</PixelBadge>
-                  </PixelParallaxLayer>
-                </div>
-              </div>
-            </DocSection>
-
-            {/* ══════════════════ PIXELPARALLAXGROUP ══════════════════ */}
-            <DocSection
-              id="pixel-parallax-group"
-              title="PixelParallaxGroup"
-              description={<>Container that establishes a clipped viewport area for parallax layers. Applies <PixelCodeInline>overflow: hidden</PixelCodeInline> and <PixelCodeInline>position: relative</PixelCodeInline> automatically. Wrap <CompLink id="pixel-parallax-layer">PixelParallaxLayer</CompLink> and <CompLink id="pixel-mouse-parallax">PixelMouseParallax</CompLink> elements inside.</>}
-              props={[
-                { name: 'as', type: '"div" | "section" | "header" | "main"', default: '"div"', description: 'HTML tag to render.' },
-                { name: 'className', type: 'string', default: '—', description: 'Extra class names.' },
-                { name: 'style', type: 'CSSProperties', default: '—', description: 'Inline styles.' },
-                ...COMMON_PARALLAX,
-              ]}
-              code={`<PixelParallaxGroup as="section" className="h-[600px] bg-retro-bg">
-  <PixelParallaxLayer speed={0.2}>
-    {/* Background */}
-  </PixelParallaxLayer>
-  <PixelMouseParallax strength={15}>
-    {/* Foreground that follows cursor */}
-  </PixelMouseParallax>
-</PixelParallaxGroup>`}
-            >
-              <PixelParallaxGroup className="h-40 rounded-lg border border-retro-border/30 bg-retro-bg/50">
-                <PixelParallaxLayer speed={0.12} className="absolute inset-0 flex items-center justify-center opacity-15">
-                  <div className="font-pixel text-[80px] text-retro-green/20 select-none">BG</div>
-                </PixelParallaxLayer>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <PixelBadge tone="green">Clipped parallax group</PixelBadge>
-                </div>
-              </PixelParallaxGroup>
-            </DocSection>
-
-            {/* ══════════════════ PIXELMOUSEPARALLAX ══════════════════ */}
-            <DocSection
-              id="pixel-mouse-parallax"
-              title="PixelMouseParallax"
-              description={<>Cursor-tracking parallax. Translates children based on mouse position relative to the nearest parent container. Use <PixelCodeInline>strength</PixelCodeInline> to control max travel distance in px. Set <PixelCodeInline>invert</PixelCodeInline> to move away from cursor. Perfect for floating elements, hero backgrounds, and interactive depth effects.</>}
-              props={[
-                { name: 'strength', type: 'number', default: '20', description: 'Max travel distance in px.' },
-                { name: 'invert', type: 'boolean', default: 'false', description: 'If true, moves away from cursor instead of towards.' },
-                { name: 'className', type: 'string', default: '—', description: 'Extra class names.' },
-                { name: 'style', type: 'CSSProperties', default: '—', description: 'Inline styles.' },
-                ...COMMON_PARALLAX,
-              ]}
-              code={`{/* Follows cursor */}
-<PixelMouseParallax strength={15}>
-  <PxlKitIcon icon={Star} size={32} />
-</PixelMouseParallax>
-
-{/* Moves away from cursor (depth feel) */}
-<PixelMouseParallax strength={25} invert>
-  <PixelBadge tone="cyan">Background layer</PixelBadge>
-</PixelMouseParallax>`}
-            >
-              <div className="space-y-3">
-                <p className="text-sm text-retro-muted">Move your mouse over this area:</p>
-                <div className="relative h-48 rounded-lg border border-retro-border/30 bg-retro-bg/50 flex items-center justify-center gap-8">
-                  <PixelMouseParallax strength={12}>
-                    <div className="text-center">
-                      <PxlKitIcon icon={Trophy} size={36} />
-                      <p className="font-mono text-[9px] text-retro-muted mt-1">follows (12px)</p>
-                    </div>
-                  </PixelMouseParallax>
-                  <PixelMouseParallax strength={25} invert>
-                    <div className="text-center">
-                      <PxlKitIcon icon={Crown} size={36} />
-                      <p className="font-mono text-[9px] text-retro-muted mt-1">inverted (25px)</p>
-                    </div>
-                  </PixelMouseParallax>
-                  <PixelMouseParallax strength={8}>
-                    <div className="text-center">
-                      <PxlKitIcon icon={Star} size={36} />
-                      <p className="font-mono text-[9px] text-retro-muted mt-1">subtle (8px)</p>
-                    </div>
-                  </PixelMouseParallax>
-                </div>
-              </div>
-            </DocSection>
+            {/* Heavy demo block — dynamic-imported with PixelSkeleton fallback */}
+            <ParallaxDemos />
 
             {/* ══════════════════ COMPONENT INVENTORY ══════════════════ */}
             <section className="pt-10">

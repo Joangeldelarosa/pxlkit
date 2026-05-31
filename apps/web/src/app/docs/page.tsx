@@ -211,23 +211,48 @@ export default function DocsPage() {
           <div className="text-center pt-8 mb-4">
             <h1 className="font-pixel text-xl text-retro-cyan mb-3">DOCUMENTATION</h1>
             <p className="text-retro-muted font-mono text-sm">
-              Everything you need to use Pxlkit — MIT React UI code + source-available icon packs
+              Three steps to your first rendered component. Then dig into icons, animation, and the rest of the kit.
             </p>
             <p className="font-mono text-[10px] text-retro-muted/50 mt-2">
-              {UI_COMPONENTS_COUNT} components · PixelToast guide · {TOTAL_ICONS} icons across {TOTAL_PACKS} packs · 3D Parallax
+              Install · Wrap with provider · Use components
             </p>
           </div>
 
           {/* Getting Started */}
           <Section id="getting-started" title="Getting Started">
             <P>
-              Pxlkit combines MIT-licensed React UI code with source-available pixel art icon packs.
-              It ships with {UI_COMPONENTS_COUNT} production-ready components and {TOTAL_ICONS}+ hand-crafted SVG icons
-              across {TOTAL_PACKS} thematic packs. Each icon pack is a separate npm package under
-              the <Code>@pxlkit</Code> scope.
+              <strong className="text-retro-green">Step 1 — Install.</strong> One command pulls{' '}
+              <Code>@pxlkit/core</Code> and whichever icon packs you actually need. Pure SVG, no font loading,
+              tree-shakeable — every pack is its own npm module under the <Code>@pxlkit</Code> scope.
             </P>
-            <CodeBlock title="Install">{INSTALL_CMD}</CodeBlock>
-            <CodeBlock title="Basic Usage">{`import { PxlKitIcon } from '@pxlkit/core';
+            <CodeBlock title="npm install @pxlkit/core + icon packs">{INSTALL_CMD}</CodeBlock>
+            <P>
+              <strong className="text-retro-green">Step 2 — Wrap with the provider</strong>{' '}
+              (only needed for the UI Kit). Mount <Code>{'<PxlKitSurfaceProvider>'}</Code> once at the root of your
+              app to set the default surface — &quot;pixel&quot; for the retro 8-bit aesthetic, &quot;linear&quot; for
+              a flat modern one. Every UI Kit component reads from it, and any component can override locally with
+              its own <Code>surface</Code> prop.
+            </P>
+            <CodeBlock title="app/layout.tsx — wrap once at the root">{`import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+import '@pxlkit/ui-kit/styles.css';
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <PxlKitSurfaceProvider surface="pixel">
+          {children}
+        </PxlKitSurfaceProvider>
+      </body>
+    </html>
+  );
+}`}</CodeBlock>
+            <P>
+              <strong className="text-retro-green">Step 3 — Use components.</strong> Import any icon and any UI Kit
+              primitive and render. Icons accept <Code>palette</Code> (default), <Code>tinted</Code>, and{' '}
+              <Code>solid</Code> appearance modes — same prop, three looks.
+            </P>
+            <CodeBlock title="Render an icon">{`import { PxlKitIcon } from '@pxlkit/core';
 import { Trophy } from '@pxlkit/gamification';
 import { CheckCircle } from '@pxlkit/feedback';
 import { Heart } from '@pxlkit/social';
