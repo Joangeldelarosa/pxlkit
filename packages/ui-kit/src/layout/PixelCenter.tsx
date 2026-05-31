@@ -10,9 +10,14 @@ const textMap = {
   right: 'text-right',
 } as const;
 
-export interface PixelCenterProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface PixelCenterProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'align'> {
   maxWidth?: ContainerWidth;
   gutter?: PageGutter;
+  /** Text alignment of the centered content (canonical). */
+  align?: 'left' | 'center' | 'right';
+  /**
+   * @deprecated Use `align` instead. Retained as alias for one minor.
+   */
   text?: 'left' | 'center' | 'right';
   inline?: boolean;
   as?: keyof React.JSX.IntrinsicElements;
@@ -23,6 +28,7 @@ export const PixelCenter = forwardRef<HTMLDivElement, PixelCenterProps>(function
   {
     maxWidth = '5xl',
     gutter = 'lg',
+    align,
     text,
     inline = false,
     as,
@@ -36,6 +42,7 @@ export const PixelCenter = forwardRef<HTMLDivElement, PixelCenterProps>(function
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const Comp = (as ?? 'div') as 'div';
+  const resolvedAlign = align ?? text;
 
   return (
     <Comp
@@ -45,7 +52,8 @@ export const PixelCenter = forwardRef<HTMLDivElement, PixelCenterProps>(function
         'mx-auto',
         containerWidth[maxWidth],
         pageGutter[gutter],
-        text && textMap[text],
+        resolvedAlign && textMap[resolvedAlign],
+        s.border, s.radius,
         s.transition,
         className,
       )}

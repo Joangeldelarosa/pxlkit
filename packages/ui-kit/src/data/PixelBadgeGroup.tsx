@@ -16,6 +16,7 @@ import {
   useEffectiveSurface,
 } from '../common';
 import { PixelPopover } from '../overlay-foundation/PixelPopover';
+import { useControllableState } from '../hooks/useControllableState';
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelBadgeGroup — inline row of badges with +N overflow popover.
@@ -128,8 +129,11 @@ interface ChipChildProps {
 }
 
 export interface PixelChipGroupProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
+  /** Controlled selection. */
   value?: string[];
+  /** Uncontrolled initial selection. */
+  defaultValue?: string[];
   onChange?: (next: string[]) => void;
   multiple?: boolean;
   surface?: Surface;
@@ -142,7 +146,8 @@ export interface PixelChipGroupProps
 export const PixelChipGroup = forwardRef<HTMLDivElement, PixelChipGroupProps>(
   function PixelChipGroup(
     {
-      value = [],
+      value: valueProp,
+      defaultValue,
       onChange,
       multiple = false,
       surface: surfaceProp,
@@ -154,18 +159,24 @@ export const PixelChipGroup = forwardRef<HTMLDivElement, PixelChipGroupProps>(
   ) {
     const surface = useEffectiveSurface(surfaceProp);
     const s = surfaceClasses(surface);
+    const [value, setValue] = useControllableState<string[]>({
+      value: valueProp,
+      defaultValue: defaultValue ?? [],
+      onChange,
+    });
 
     const toggle = (chipValue: string) => {
-      const isSelected = value.includes(chipValue);
+      const current = value ?? [];
+      const isSelected = current.includes(chipValue);
       let next: string[];
       if (multiple) {
         next = isSelected
-          ? value.filter((v) => v !== chipValue)
-          : [...value, chipValue];
+          ? current.filter((v) => v !== chipValue)
+          : [...current, chipValue];
       } else {
         next = isSelected ? [] : [chipValue];
       }
-      onChange?.(next);
+      setValue(next);
     };
 
     const items = Children.toArray(children).filter(isValidElement);
@@ -186,7 +197,7 @@ export const PixelChipGroup = forwardRef<HTMLDivElement, PixelChipGroupProps>(
       if (el) btnRefs.current.set(val, el);
       else btnRefs.current.delete(val);
     }, []);
-    const selectedRadio = !multiple ? (value[0] ?? null) : null;
+    const selectedRadio = !multiple ? ((value ?? [])[0] ?? null) : null;
     const focusableRadio = selectedRadio ?? radioValues[0] ?? null;
 
     const moveRadio = useCallback(
@@ -232,7 +243,7 @@ export const PixelChipGroup = forwardRef<HTMLDivElement, PixelChipGroupProps>(
               </React.Fragment>
             );
           }
-          const selected = value.includes(chipValue);
+          const selected = (value ?? []).includes(chipValue);
           const handleClick = () => toggle(chipValue);
           const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
             if (e.key === 'Enter' || e.key === ' ') {

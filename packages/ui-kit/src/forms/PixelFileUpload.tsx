@@ -19,6 +19,7 @@ export type PixelFileRejection = { file: File; reasons: string[] };
 /** Public prop bag for {@link PixelFileUpload}. */
 export interface PixelFileUploadProps {
   value?: File[];
+  defaultValue?: File[];
   onChange?: (files: File[]) => void;
   accept?: string;
   multiple?: boolean;
@@ -78,6 +79,7 @@ function matchesAccept(file: File, accept?: string): boolean {
 export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(function PixelFileUpload(
   {
     value,
+    defaultValue,
     onChange,
     accept,
     multiple = false,
@@ -105,7 +107,7 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
 
   const [files, setFiles] = useControllableState<File[]>({
     value,
-    defaultValue: [],
+    defaultValue: defaultValue ?? [],
     onChange,
   });
 

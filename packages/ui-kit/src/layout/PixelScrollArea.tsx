@@ -5,8 +5,13 @@ import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
 
 type ScrollType = 'auto' | 'always' | 'scroll' | 'hover';
 
-export interface PixelScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface PixelScrollAreaProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'type'> {
   maxHeight?: string | number;
+  /** Canonical structural variant (scrollbar visibility mode). */
+  variant?: ScrollType;
+  /**
+   * @deprecated Use `variant` instead. Retained as alias for one minor.
+   */
   type?: ScrollType;
   offsetScrollbars?: boolean;
   scrollbarSize?: number;
@@ -39,7 +44,8 @@ const typeClass: Record<ScrollType, string> = {
 export const PixelScrollArea = forwardRef<HTMLDivElement, PixelScrollAreaProps>(function PixelScrollArea(
   {
     maxHeight,
-    type = 'auto',
+    variant,
+    type,
     offsetScrollbars = false,
     scrollbarSize,
     surface: surfaceProp,
@@ -52,6 +58,7 @@ export const PixelScrollArea = forwardRef<HTMLDivElement, PixelScrollAreaProps>(
 ) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
+  const resolvedVariant: ScrollType = variant ?? type ?? 'auto';
 
   const inlineStyle: React.CSSProperties = {
     ...style,
@@ -87,13 +94,14 @@ export const PixelScrollArea = forwardRef<HTMLDivElement, PixelScrollAreaProps>(
   return (
     <div
       ref={ref}
-      data-scrollbar={type}
+      data-scrollbar={resolvedVariant}
       data-surface={surface}
       role={explicitRole ?? 'region'}
       tabIndex={explicitTabIndex ?? 0}
       className={cn(
         'relative outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40',
-        typeClass[type],
+        typeClass[resolvedVariant],
+        s.border, s.radius,
         s.font,
         surface === 'pixel' ? 'pxl-scroll-pixel' : 'pxl-scroll-linear',
         className,
