@@ -79,7 +79,7 @@ const PLANS: Plan[] = [
     name: 'Community',
     price: 'Free',
     priceSuffix: 'forever',
-    description: 'MIT code packages stay free. Use all icon packs in personal or commercial projects with attribution.',
+    description: 'Perfect for: side projects, OSS work, prototypes, and any commercial product happy to keep a small attribution credit. The kit + every icon pack, free.',
     color: 'green',
     cta: 'Get Started',
     ctaHref: '/docs',
@@ -100,7 +100,7 @@ const PLANS: Plan[] = [
     price: '$9.50',
     originalPrice: '$19',
     priceSuffix: 'one-time · 1 project',
-    description: 'Remove attribution for icon assets in one shipped product. MIT code packages remain free either way.',
+    description: 'Perfect for: a solo dev shipping one paid product who needs a clean footer — no attribution credit on the icons. MIT code stays free either way.',
     color: 'gold',
     popular: true,
     cta: 'Buy Indie License',
@@ -121,7 +121,7 @@ const PLANS: Plan[] = [
     price: '$24.50',
     originalPrice: '$49',
     priceSuffix: 'one-time · unlimited projects',
-    description: 'The ultimate asset license for agencies and teams. Unlimited shipped products, all future packs, priority support.',
+    description: 'Perfect for: agencies and product teams shipping many things. Unlimited products, every future icon pack included, priority support — paid once.',
     color: 'cyan',
     cta: 'Buy Team License',
     ctaHref: 'mailto:info@pxlkit.xyz?subject=Team%20License%20Purchase',
@@ -264,9 +264,10 @@ function HeroSection() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.3 }}
       >
-        MIT code is free forever. Icon packs are free with attribution, or pay once to remove it.
+        Pay once if you need to. MIT code is free forever, icon packs are free with a credit — and a lifetime asset
+        license drops the credit when you ship to a client.
         <br />
-        <span className="text-retro-text/70">Clear split licensing for code, icon assets, and branding. No subscriptions. No gotchas.</span>
+        <span className="text-retro-text/70">No subscriptions. No per-seat math. No surprise renewal email next December.</span>
       </motion.p>
 
       <motion.p
@@ -275,7 +276,7 @@ function HeroSection() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.4 }}
       >
-        {UI_COMPONENTS_COUNT} React components · {ICON_COUNT_LABEL} pixel icons · {ICON_PACK_COUNT_LABEL} packs · Lifetime asset licenses
+        Same kit on every tier — pricing only changes the asset attribution rules
       </motion.p>
     </section>
   );
@@ -727,10 +728,11 @@ function CTASection() {
         transition={{ duration: 0.6 }}
       >
         <h2 className="font-pixel text-xl sm:text-2xl text-retro-green text-glow mb-4">
-          START BUILDING
+          INSTALL FIRST. DECIDE LATER.
         </h2>
         <p className="text-retro-muted text-base sm:text-lg font-body mb-8 max-w-lg mx-auto">
-          Get started in seconds. MIT code is free, and the icon packs are free with attribution — no sign-up required.
+          Code is MIT, icon packs are free with a credit. Build the whole product on the Community tier, then upgrade
+          only if you need the credit removed before launch.
         </p>
 
         {/* Install command */}
