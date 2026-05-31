@@ -698,7 +698,7 @@ const GhostFriend: ParallaxPxlKitData = {
   tags: ['ghost', 'cute', 'friendly', '3d', 'parallax'],
 };`}</CodeBlock>
 
-            <CodeBlock title="Available Icons ({ParallaxPack.length})">{`import { ParallaxPack } from '@pxlkit/parallax';
+            <CodeBlock title={`Available Icons (${ParallaxPack.length})`}>{`import { ParallaxPack } from '@pxlkit/parallax';
 import {
   CoolEmoji,     // Sunglasses emoji with sparkle layers
   PixelHeart,    // Beating heart with glow + particles

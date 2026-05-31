@@ -21,13 +21,22 @@ import {
   PixelPulse,
   PixelShake,
   PixelAlert,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelCluster,
+  PixelStack,
+  PixelCenter,
 } from '@pxlkit/ui-kit';
 
 /* ── CTA Banner ─────────────────────────────────────────────────────────── */
 export function CtaBannerPreview() {
   return (
-    <section className="py-20 sm:py-28 bg-retro-green/5 border-y border-retro-green/20">
-      <div className="max-w-3xl mx-auto px-6 flex flex-col items-center gap-6 text-center">
+    <PixelContainer
+      maxWidth="md"
+      padding="xl"
+      className="bg-retro-green/5 border-y border-retro-green/20"
+    >
+      <PixelStack gap={6} align="center" className="text-center">
         <PixelBounce>
           <AnimatedPxlKitIcon icon={SparkleStar} size={48} colorful />
         </PixelBounce>
@@ -48,7 +57,7 @@ export function CtaBannerPreview() {
         </p>
 
         {/* Trust indicators */}
-        <div className="flex flex-wrap items-center justify-center gap-3">
+        <PixelCluster gap={3} justify="center">
           <PixelTooltip content="Growing every day" position="top">
             <PixelBadge tone="green">
               <span className="inline-flex items-center gap-1.5">
@@ -73,10 +82,10 @@ export function CtaBannerPreview() {
               </span>
             </PixelBadge>
           </PixelTooltip>
-        </div>
+        </PixelCluster>
 
         {/* Action buttons */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+        <PixelCluster gap={3} justify="center" className="mt-2">
           <PixelButton
             tone="green"
             size="lg"
@@ -87,9 +96,9 @@ export function CtaBannerPreview() {
           <PixelButton tone="neutral" size="lg" variant="ghost">
             View Documentation
           </PixelButton>
-        </div>
-      </div>
-    </section>
+        </PixelCluster>
+      </PixelStack>
+    </PixelContainer>
   );
 }
 
@@ -105,8 +114,8 @@ const FEATURES = [
 
 export function CtaSplitPreview() {
   return (
-    <section className="py-20 sm:py-28 px-6 bg-retro-bg">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <PixelContainer maxWidth="xl" padding="xl" className="bg-retro-bg">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         <PixelFadeIn>
           <div className="mb-4">
             <PixelBadge tone="purple">
@@ -117,16 +126,15 @@ export function CtaSplitPreview() {
             </PixelBadge>
           </div>
 
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-4">
-            Level up your UI
-          </h2>
-          <p className="text-retro-muted font-mono text-sm sm:text-base mb-6 leading-relaxed max-w-md">
-            Blazingly fast, tree-shakeable components with pixel-art character.
-            No bloat — just the essentials, done right.
-          </p>
+          <PixelSectionHeader
+            size="md"
+            spacing="tight"
+            title="Level up your UI"
+            description="Blazingly fast, tree-shakeable components with pixel-art character. No bloat — just the essentials, done right."
+          />
 
           {/* Feature list */}
-          <ul className="space-y-3 mb-8">
+          <ul className="space-y-3 mb-8 mt-6">
             {FEATURES.map((f, i) => (
               <PixelTooltip key={i} content={f.tip} position="top">
                 <li className="flex items-start gap-2.5">
@@ -165,7 +173,7 @@ export function CtaSplitPreview() {
               <PixelStatCard label="Packages" value="10" tone="purple" />
             </PixelPulse>
           </div>
-          <div className="mt-4 flex items-center justify-center gap-4 px-2">
+          <PixelCluster gap={4} justify="center" className="mt-4 px-2">
             <div className="flex items-center gap-1.5">
               <PxlKitIcon icon={Trophy} size={14} colorful />
               <span className="font-mono text-xs text-retro-muted">#1 Pixel UI lib</span>
@@ -174,10 +182,10 @@ export function CtaSplitPreview() {
               <PxlKitIcon icon={CheckCircle} size={14} colorful />
               <span className="font-mono text-xs text-retro-muted">100% TypeScript</span>
             </div>
-          </div>
+          </PixelCluster>
         </PixelSlideIn>
       </div>
-    </section>
+    </PixelContainer>
   );
 }
 
@@ -186,9 +194,13 @@ export function CtaCardPreview() {
   const [signed, setSigned] = useState(false);
 
   return (
-    <section className="py-20 sm:py-28 px-6 bg-retro-bg flex items-center justify-center">
-      <div className="w-full max-w-md">
-        <div className="rounded-xl border border-retro-red/30 bg-retro-red/5 p-10 flex flex-col items-center gap-5 text-center">
+    <PixelContainer maxWidth="xl" padding="xl" className="bg-retro-bg">
+      <PixelCenter maxWidth="sm" gutter={0}>
+        <PixelStack
+          gap={5}
+          align="center"
+          className="rounded-xl border border-retro-red/30 bg-retro-red/5 p-10 text-center"
+        >
           <PixelShake trigger={true}>
             <AnimatedPxlKitIcon icon={FireSword} size={56} colorful />
           </PixelShake>
@@ -233,7 +245,7 @@ export function CtaCardPreview() {
 
           {/* Trust indicators */}
           <PixelDivider className="my-1 w-full" />
-          <div className="flex flex-wrap items-center justify-center gap-4">
+          <PixelCluster gap={4} justify="center">
             <div className="flex items-center gap-1.5">
               <PxlKitIcon icon={ShieldCheck} size={12} colorful />
               <span className="font-mono text-[11px] text-retro-muted">No spam, ever</span>
@@ -246,9 +258,9 @@ export function CtaCardPreview() {
               <PxlKitIcon icon={Community} size={12} colorful />
               <span className="font-mono text-[11px] text-retro-muted">5k+ subscribers</span>
             </div>
-          </div>
-        </div>
-      </div>
-    </section>
+          </PixelCluster>
+        </PixelStack>
+      </PixelCenter>
+    </PixelContainer>
   );
 }
