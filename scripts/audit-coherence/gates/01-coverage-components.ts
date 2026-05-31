@@ -165,19 +165,44 @@ async function resolveExport(uiKitSrcDir: string, rel: string): Promise<IndexExp
  *   - `export const Foo`, `export function Foo`, `export class Foo`
  *   - `export { Foo, Bar as Baz }`
  *   - `export const { Foo, Bar }`  (rare; we still capture identifiers)
+ *   - `export * from './X'` — recursively follows the re-export to the target
+ *     file (or directory + index.{ts,tsx}) and merges its named exports.
+ *
+ * The `seen` set guards against cycles in `export *` graphs.
  */
-async function readNamedExports(file: string): Promise<Set<string>> {
-  const out = new Set<string>();
+async function readNamedExports(
+  file: string,
+  seen: Set<string> = new Set(),
+): Promise<Set<string>> {
+  const map = await readNamedExportsWithOrigin(file, seen);
+  return new Set(map.keys());
+}
+
+/**
+ * Variant of `readNamedExports` that returns a map of `name → originFile`
+ * (the file where the symbol was DECLARED, after walking through any chain
+ * of `export * from './X'` re-exports). When the same name is discovered
+ * via multiple paths we keep the first one encountered.
+ */
+async function readNamedExportsWithOrigin(
+  file: string,
+  seen: Set<string> = new Set(),
+): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  const absFile = path.resolve(file);
+  if (seen.has(absFile)) return out;
+  seen.add(absFile);
+
   let raw: string;
   try {
-    raw = await fs.readFile(file, 'utf8');
+    raw = await fs.readFile(absFile, 'utf8');
   } catch {
     return out;
   }
   const rxConst = /export\s+(?:const|let|var|function|class|enum|interface|type)\s+([A-Za-z_$][A-Za-z0-9_$]*)/g;
   let m: RegExpExecArray | null;
   while ((m = rxConst.exec(raw)) !== null) {
-    out.add(m[1]);
+    if (!out.has(m[1])) out.set(m[1], absFile);
   }
   const rxBlock = /export\s*\{([^}]+)\}/g;
   while ((m = rxBlock.exec(raw)) !== null) {
@@ -189,7 +214,47 @@ async function readNamedExports(file: string): Promise<Set<string>> {
       const noType = trimmed.replace(/^type\s+/, '');
       const asMatch = /\bas\s+([A-Za-z_$][A-Za-z0-9_$]*)\s*$/.exec(noType);
       const id = asMatch ? asMatch[1] : noType.replace(/\s.*$/, '');
-      if (id && /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(id)) out.add(id);
+      if (id && /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(id)) {
+        if (!out.has(id)) out.set(id, absFile);
+      }
+    }
+  }
+  // Second pass — `export * from './X'`. Recurse into the target and merge.
+  const rxStar = /export\s+\*\s+(?:as\s+\w+\s+)?from\s+['"]([^'"\n]+)['"]/g;
+  const baseDir = path.dirname(absFile);
+  while ((m = rxStar.exec(raw)) !== null) {
+    const rel = m[1];
+    if (!rel || !rel.startsWith('.')) continue;
+    const target = path.resolve(baseDir, rel);
+    // Resolve target: <target>.tsx, <target>.ts, <target>/index.{ts,tsx}
+    let resolved: string | null = null;
+    for (const ext of SOURCE_EXTS) {
+      const candidate = target + ext;
+      if (await fs.pathExists(candidate)) {
+        resolved = candidate;
+        break;
+      }
+    }
+    if (!resolved && (await fs.pathExists(target))) {
+      try {
+        const stat = await fs.stat(target);
+        if (stat.isDirectory()) {
+          for (const ext of SOURCE_EXTS) {
+            const idx = path.join(target, `index${ext}`);
+            if (await fs.pathExists(idx)) {
+              resolved = idx;
+              break;
+            }
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+    if (!resolved) continue;
+    const nested = await readNamedExportsWithOrigin(resolved, seen);
+    for (const [name, origin] of nested) {
+      if (!out.has(name)) out.set(name, origin);
     }
   }
   return out;
@@ -225,20 +290,27 @@ export async function resolveComponentHomes(
 
   // Second pass — grouped barrel files & barrel directories. For each export
   // not yet attributed, read its named exports and attribute any registry hits.
+  // When the symbol arrives via `export * from './X'` we attribute the home to
+  // the ORIGIN file (where the symbol was declared), not the intermediate
+  // barrel — otherwise components re-exported through a category barrel get
+  // mis-attributed.
   for (const e of exports) {
     if (e.isBarrelDir && e.resolvedDir) {
       // Try to read an index.{ts,tsx} inside the dir.
       for (const ext of SOURCE_EXTS) {
         const idx = path.join(e.resolvedDir, `index${ext}`);
         if (await fs.pathExists(idx)) {
-          const names = await readNamedExports(idx);
-          for (const name of names) {
+          const namesWithOrigin = await readNamedExportsWithOrigin(idx);
+          for (const [name, origin] of namesWithOrigin) {
             if (!registry.has(name) || homes.has(name)) continue;
+            const originDir = path.dirname(origin);
+            const isPerComponentFile =
+              path.basename(origin, path.extname(origin)) === name;
             homes.set(name, {
-              dir: e.resolvedDir,
-              sourceFile: null,
-              rel: toPosix(path.relative(uiKitSrcDir, e.resolvedDir)),
-              fromGroup: true,
+              dir: originDir,
+              sourceFile: isPerComponentFile ? origin : null,
+              rel: toPosix(path.relative(uiKitSrcDir, isPerComponentFile ? origin : originDir)),
+              fromGroup: !isPerComponentFile,
             });
           }
           break;
@@ -249,19 +321,26 @@ export async function resolveComponentHomes(
     if (!e.isPerComponent || !e.resolvedFile || !e.resolvedDir) continue;
     const base = path.basename(e.resolvedFile, path.extname(e.resolvedFile));
     // Already mapped as canonical owner above. Now consider that the file may
-    // *also* export other components (grouped barrel like `inputs.tsx`).
-    const names = await readNamedExports(e.resolvedFile);
-    for (const name of names) {
+    // *also* export other components (grouped barrel like `inputs.tsx`) or
+    // re-export them from sibling files via `export * from './X'`.
+    const namesWithOrigin = await readNamedExportsWithOrigin(e.resolvedFile);
+    for (const [name, origin] of namesWithOrigin) {
       if (!registry.has(name) || homes.has(name)) continue;
-      // The file exports a registry component that isn't its own basename →
-      // grouped. Home is the file's parent dir; source unknown (likely will be
-      // split during Ola 4c.2 work).
-      const isOwnFile = name === base;
+      // If the symbol came from a different file (re-export), use that origin.
+      const originDir = path.dirname(origin);
+      const isPerComponentFile =
+        path.basename(origin, path.extname(origin)) === name;
+      const isOwnFile = origin === e.resolvedFile && name === base;
       homes.set(name, {
-        dir: e.resolvedDir,
-        sourceFile: isOwnFile ? e.resolvedFile : null,
-        rel: toPosix(path.relative(uiKitSrcDir, e.resolvedFile)),
-        fromGroup: !isOwnFile,
+        dir: isPerComponentFile ? originDir : e.resolvedDir,
+        sourceFile: isPerComponentFile ? origin : isOwnFile ? e.resolvedFile : null,
+        rel: toPosix(
+          path.relative(
+            uiKitSrcDir,
+            isPerComponentFile ? origin : e.resolvedFile,
+          ),
+        ),
+        fromGroup: !isPerComponentFile && !isOwnFile,
       });
     }
   }

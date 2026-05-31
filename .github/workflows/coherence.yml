@@ -31,8 +31,7 @@ jobs:
 
       - name: Run coherence audit (JSON mode)
         id: audit
-        run: npm run audit:coherence:json --workspace=@pxlkit/ui-kit -- > coherence-report.json
-        continue-on-error: true
+        run: npm run --silent audit:coherence:json --workspace=@pxlkit/ui-kit -- > coherence-report.json
 
       - name: Render coherence report (Markdown)
         if: always()
