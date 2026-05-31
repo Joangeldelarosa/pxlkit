@@ -47,15 +47,26 @@ export const metadata: Metadata = {
     'typescript game engine',
   ],
   openGraph: {
+    type: 'website',
     title: 'Voxel World Demo — 3D Engine Preview (Coming Soon) | Pxlkit',
     description:
       'Interactive preview of the @pxlkit/voxel 3D engine: procedural terrain, biomes, day/night cycles. Coming soon — built with Three.js & React Three Fiber.',
     url: 'https://pxlkit.xyz/explore',
+    images: [
+      {
+        url: '/og/explore.png',
+        width: 1280,
+        height: 640,
+        alt: 'Pxlkit voxel 3D engine preview — procedural terrain, biomes, day/night cycles',
+      },
+    ],
   },
   twitter: {
+    card: 'summary_large_image',
     title: 'Voxel World Demo — 3D Engine Preview (Coming Soon) | Pxlkit',
     description:
       'Preview the Pxlkit voxel 3D engine demo: procedural terrain, biomes & day/night cycles in React. Coming soon.',
+    images: ['/og/explore.png'],
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/explore',

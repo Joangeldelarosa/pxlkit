@@ -78,15 +78,26 @@ export const metadata: Metadata = {
     'pxlkit icon library',
   ],
   openGraph: {
+    type: 'website',
     title: 'Browse 226+ Pixel Art SVG Icons — Free React Icon Library | Pxlkit',
     description:
       '226+ hand-crafted pixel art SVG icons across 7 themed packs. Filter by category, preview animations, copy React or SVG code, and use them free in your projects.',
     url: 'https://pxlkit.xyz/icons',
+    images: [
+      {
+        url: '/og/icons.png',
+        width: 1280,
+        height: 640,
+        alt: 'Pxlkit icons — Browse 226+ free pixel-art SVG React icons',
+      },
+    ],
   },
   twitter: {
+    card: 'summary_large_image',
     title: 'Browse 226+ Pixel Art SVG Icons — Free React Icon Library | Pxlkit',
     description:
       '226+ pixel art SVG icons in 7 packs — UI, Gamification, Social, Feedback, Effects, Weather & 3D. Copy React/SVG code instantly. Free with attribution.',
+    images: ['/og/icons.png'],
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/icons',

@@ -68,15 +68,26 @@ export const metadata: Metadata = {
     'pxlkit monorepo',
   ],
   openGraph: {
+    type: 'website',
     title: 'Docs — Installation Guide, Component API & TypeScript Reference | Pxlkit',
     description:
       'Complete documentation for Pxlkit: installation guides, component API reference, icon usage, TypeScript types, and design tokens for the retro React UI kit & 226+ icons.',
     url: 'https://pxlkit.xyz/docs',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1280,
+        height: 640,
+        alt: 'Pxlkit docs — Installation, component API & TypeScript reference',
+      },
+    ],
   },
   twitter: {
+    card: 'summary_large_image',
     title: 'Docs — Installation Guide, Component API & TypeScript Reference | Pxlkit',
     description:
       'Full Pxlkit docs: installation, component API, icon usage, TypeScript types & design tokens. Get started with the retro React UI kit in minutes.',
+    images: ['/og-twitter.png'],
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/docs',
