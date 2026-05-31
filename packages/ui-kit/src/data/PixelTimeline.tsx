@@ -43,7 +43,12 @@ function useTimelineCtx(): TimelineCtx {
 }
 
 export interface PixelTimelineItemProps extends React.HTMLAttributes<HTMLLIElement> {
-  title: string;
+  /** Canonical label for the item. */
+  label?: string;
+  /**
+   * @deprecated Use `label` instead. Retained as alias for one minor.
+   */
+  title?: string;
   bullet?: React.ReactNode;
   time?: string;
   lineVariant?: LineVariant;
@@ -59,6 +64,7 @@ const lineBorderMap: Record<LineVariant, string> = {
 export const PixelTimelineItem = forwardRef<HTMLLIElement, PixelTimelineItemProps>(
   function PixelTimelineItem(props, ref) {
     const {
+      label,
       title,
       bullet,
       time,
@@ -67,6 +73,7 @@ export const PixelTimelineItem = forwardRef<HTMLLIElement, PixelTimelineItemProp
       className,
       ...rest
     } = props;
+    const resolvedLabel = label ?? title ?? '';
 
     const { bulletSize, align, surface, active, total } = useTimelineCtx();
     const index = useContext(TimelineIndexContext);
@@ -144,7 +151,7 @@ export const PixelTimelineItem = forwardRef<HTMLLIElement, PixelTimelineItemProp
         )}
         <div className={cn('min-h-[1.25rem] flex flex-col gap-1')}>
           <div className={cn('flex items-baseline gap-2', align === 'right' && 'justify-end')}>
-            <span className={titleClass}>{title}</span>
+            <span className={titleClass}>{resolvedLabel}</span>
             {time && (
               <span className={cn('text-xs text-retro-muted', s.font)}>{time}</span>
             )}

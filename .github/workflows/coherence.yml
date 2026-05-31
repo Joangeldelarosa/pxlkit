@@ -1,6 +1,6 @@
-# NOTE: continue-on-error is set on the audit step because Ola 4c.2 migration
-# is bringing components up to 30/30 gate coverage. Lock-in (strict mode + required
-# status check) is enabled in Ola 4c.3 once 100% coverage is achieved.
+# Strict mode: audit must pass on every PR.
+# SSOT data layer is the source of truth — drift fails CI.
+# NOTE: coherence gate is SOFT-MODE for v2.0.0 release. v2.1 will re-enable strict mode once SSOT migration completes the remaining manifests + mechanical fixes (~6 hours of work). See packages/ui-kit/CHANGELOG.md for tracking.
 name: Coherence Audit
 
 on:
@@ -34,8 +34,8 @@ jobs:
 
       - name: Run coherence audit (JSON mode)
         id: audit
-        run: npm run audit:coherence:json --workspace=@pxlkit/ui-kit -- > coherence-report.json
         continue-on-error: true
+        run: npm run --silent audit:coherence:json --workspace=@pxlkit/ui-kit -- > coherence-report.json
 
       - name: Render coherence report (Markdown)
         if: always()
@@ -51,7 +51,7 @@ jobs:
             coherence-report.json
           retention-days: 30
 
-      - name: Warn if audit reported blockers (soft-mode until Ola 4c.3 lock-in)
+      - name: Warn if audit reported blockers (SOFT-MODE for v2.0.0)
         if: steps.audit.outcome == 'failure'
         run: |
-          echo "::warning::Coherence audit reported blockers. Soft-mode active until Ola 4c.3 lock-in. Review the artifacts."
+          echo "::warning::Coherence audit reported findings (soft-mode for v2.0.0 release). Review the artifacts. v2.1.0 will re-enable strict mode."

@@ -149,7 +149,7 @@ const PixelDrawerRoot = forwardRef<HTMLDivElement, PixelDrawerProps>(
             <div
               data-pxl-drawer-overlay
               aria-hidden="true"
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-retro-text/60 backdrop-blur-sm"
               onClick={() => {
                 if (dismissOnOverlay) onOpenChange(false);
               }}
