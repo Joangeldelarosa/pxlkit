@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Ready-to-Use Retro Templates & Sections — Copy-Paste React Components | Pxlkit',
   description:
-    'Copy-paste retro React templates: 24 section variants across 8 categories (hero, header, footer, CTA, pricing, testimonials, FAQ, features) plus 5 full page layouts. Pixel-art styled, Tailwind CSS powered.',
+    'Copy-paste retro React templates: section variants across 8 categories (hero, header, footer, CTA, pricing, testimonials, FAQ, features) plus 6 full page layouts. Pixel-art styled, Tailwind CSS powered.',
   keywords: [
     'react templates',
     'react page templates',
@@ -68,15 +68,26 @@ export const metadata: Metadata = {
     'pxlkit sections',
   ],
   openGraph: {
+    type: 'website',
     title: 'Ready-to-Use Retro Templates & Sections — Copy-Paste React Components | Pxlkit',
     description:
-      'Copy-paste retro React templates: hero sections, pricing tables, CTAs, testimonials, headers, footers & 5 full page layouts. Pixel-art styled, Tailwind CSS powered.',
+      'Copy-paste retro React templates: hero sections, pricing tables, CTAs, testimonials, headers, footers & 6 full page layouts. Pixel-art styled, Tailwind CSS powered.',
     url: 'https://pxlkit.xyz/templates',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1280,
+        height: 640,
+        alt: 'Pxlkit templates — Copy-paste retro React sections and full-page layouts',
+      },
+    ],
   },
   twitter: {
+    card: 'summary_large_image',
     title: 'Ready-to-Use Retro Templates & Sections — Copy-Paste React Components | Pxlkit',
     description:
       'Ship faster with copy-paste retro React templates: hero sections, pricing tables, CTAs, testimonials & full pages. Pixel-art styled.',
+    images: ['/og-twitter.png'],
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/templates',

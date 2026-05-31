@@ -14,5 +14,9 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/animations/PixelTypewriter.tsx",
+    "src/navigation/PixelTabs.tsx"
+  ]
 }

@@ -28,7 +28,9 @@
 
 ## Overview
 
-`@pxlkit/ui-kit` is a comprehensive React component library in the [Pxlkit](https://pxlkit.xyz) ecosystem, providing **54 retro pixel art styled components** for building modern web applications with a nostalgic aesthetic. Every component follows a consistent pixel art design language with customizable color tones.
+`@pxlkit/ui-kit` is a comprehensive React component library in the [Pxlkit](https://pxlkit.xyz) ecosystem, providing **57 retro pixel art styled components** for building modern web applications with a nostalgic aesthetic. Every component follows a consistent pixel art design language with customizable color tones.
+
+> **New in v1.5.0** — `forwardRef` wired across every interactive primitive, full accessibility pass (ARIA + focus rings + keyboard handlers), and `PixelToast` + `PxlKitToastProvider` shipped inside the kit. See the [CHANGELOG](https://github.com/joangeldelarosa/pxlkit/blob/main/CHANGELOG.md) for the full diff.
 
 ## Installation
 
@@ -165,6 +167,13 @@ Components accept `tone?: 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' 
 | `PixelTooltip` | Tooltip popup |
 | `PixelDropdown` | Dropdown menu |
 
+### Toasts
+
+| Component | Description |
+| --- | --- |
+| `PixelToast` | Pixel-art styled toast notification with positions, tones, icon slot |
+| `PxlKitToastProvider` | Toast context provider — exposes `useToast()` for imperative toasts |
+
 ### Animations
 
 | Component | Description |
@@ -189,11 +198,17 @@ Components accept `tone?: 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' 
 | `PixelParallaxGroup` | Scroll-based parallax group |
 | `PixelMouseParallax` | Mouse-tracking parallax container |
 
-### Locale / i18n
+### Providers
+
+| Component | Description |
+| --- | --- |
+| `PxlKitSurfaceProvider` | Switch every nested component between `pixel` and `linear` surface |
+| `PxlKitLocaleProvider` | Locale context provider (supports `en` and `tr`) |
+
+### Locale / i18n utilities
 
 | Export | Description |
 | --- | --- |
-| `PxlKitLocaleProvider` | Locale context provider (supports `en` and `tr`) |
 | `usePxlKitLocale()` | Hook for locale-aware text transforms |
 | `toLocaleUpper()` | Locale-safe uppercase (handles Turkish İ/I) |
 | `toLocaleLower()` | Locale-safe lowercase (handles Turkish ı/i) |
@@ -203,7 +218,7 @@ Components accept `tone?: 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' 
 
 ## Storybook
 
-Every one of the 54 components is individually documented at **[storybook.pxlkit.xyz](https://storybook.pxlkit.xyz)** under the `UI Kit / *` sidebar. Each story has a Controls panel for live prop manipulation:
+Every one of the 57 components is individually documented at **[storybook.pxlkit.xyz](https://storybook.pxlkit.xyz)** under the `UI Kit / *` sidebar. Each story has a Controls panel for live prop manipulation:
 
 - Surface toggle (pixel ↔ linear) on every component
 - Tone selector (7 tones)

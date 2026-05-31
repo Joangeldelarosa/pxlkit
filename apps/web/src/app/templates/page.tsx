@@ -6,13 +6,131 @@ import { Check, Copy, Grid, ExternalLink } from '@pxlkit/ui';
 import { Sun, Moon } from '@pxlkit/weather';
 import {
   PixelBadge,
+  PixelBox,
+  PixelCard,
   PixelFadeIn,
   PixelDivider,
+  PixelGrid,
   PixelTooltip,
 } from '@pxlkit/ui-kit';
 import { TEMPLATE_SECTIONS, FULL_PAGE_TEMPLATES } from './data';
 import { PREVIEW_MAP } from './previews';
 import type { TemplateVariant, FullPageTemplate } from './types';
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Featured Full-Page Templates
+   ───────────────────────────────────────────────────────────────────────── */
+type FeaturedPage = {
+  href: string;
+  title: string;
+  category: string;
+  tone: 'cyan' | 'gold' | 'green' | 'purple' | 'red' | 'pink';
+  useCase: string;
+  swatch: string;
+  swatch2: string;
+};
+
+const FEATURED_PAGES: FeaturedPage[] = [
+  {
+    href: '/templates/dashboards',
+    title: 'Dashboard',
+    category: 'Admin',
+    tone: 'cyan',
+    useCase: 'analytics consoles, ops control rooms, internal tools',
+    swatch: 'bg-retro-cyan/30',
+    swatch2: 'bg-retro-cyan/15',
+  },
+  {
+    href: '/templates/changelog',
+    title: 'Changelog',
+    category: 'Product',
+    tone: 'green',
+    useCase: 'release notes, version history, public roadmap drops',
+    swatch: 'bg-retro-green/30',
+    swatch2: 'bg-retro-green/15',
+  },
+  {
+    href: '/templates/docs',
+    title: 'Docs',
+    category: 'Reference',
+    tone: 'purple',
+    useCase: 'API references, technical handbooks, knowledge bases',
+    swatch: 'bg-retro-purple/30',
+    swatch2: 'bg-retro-purple/15',
+  },
+  {
+    href: '/templates/landing-full',
+    title: 'Landing — Full SaaS',
+    category: 'Marketing',
+    tone: 'gold',
+    useCase: 'product launches, SaaS homepages, conversion funnels',
+    swatch: 'bg-retro-gold/30',
+    swatch2: 'bg-retro-gold/15',
+  },
+  {
+    href: '/templates/portfolio',
+    title: 'Portfolio',
+    category: 'Personal',
+    tone: 'pink',
+    useCase: 'designer/engineer portfolios, case studies, agency reels',
+    swatch: 'bg-retro-pink/30',
+    swatch2: 'bg-retro-pink/15',
+  },
+  {
+    href: '/templates/ecommerce',
+    title: 'E-commerce',
+    category: 'Shop',
+    tone: 'red',
+    useCase: 'product catalogs, storefronts, checkout flows',
+    swatch: 'bg-retro-red/30',
+    swatch2: 'bg-retro-red/15',
+  },
+];
+
+function FeaturedPagePlaceholder({ swatch, swatch2 }: { swatch: string; swatch2: string }) {
+  return (
+    <PixelBox
+      tone="neutral"
+      variant="soft"
+      padding="none"
+      className="relative h-32 sm:h-36 w-full overflow-hidden"
+      aria-hidden
+    >
+      <div className={`absolute inset-0 ${swatch2}`} />
+      <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 gap-1.5 p-3">
+        <div className={`col-span-2 row-span-1 ${swatch} rounded-sm`} />
+        <div className={`col-span-4 row-span-1 ${swatch2} rounded-sm border border-retro-border/30`} />
+        <div className={`col-span-3 row-span-2 ${swatch} rounded-sm`} />
+        <div className={`col-span-3 row-span-2 ${swatch2} rounded-sm border border-retro-border/30`} />
+        <div className={`col-span-6 row-span-1 ${swatch2} rounded-sm border border-retro-border/30`} />
+      </div>
+    </PixelBox>
+  );
+}
+
+function FeaturedPageCard({ page }: { page: FeaturedPage }) {
+  return (
+    <PixelCard
+      href={page.href}
+      title={page.title}
+      tone={page.tone}
+      padding="md"
+      media={<FeaturedPagePlaceholder swatch={page.swatch} swatch2={page.swatch2} />}
+    >
+      <div className="flex flex-col gap-3">
+        <div>
+          <PixelBadge tone={page.tone} variant="soft" size="sm">
+            {page.category}
+          </PixelBadge>
+        </div>
+        <p className="font-mono text-[11px] sm:text-xs text-retro-muted leading-relaxed">
+          <span className="text-retro-muted/70">Perfect for:</span>{' '}
+          <span className="text-retro-text/80">{page.useCase}</span>
+        </p>
+      </div>
+    </PixelCard>
+  );
+}
 
 /* ─────────────────────────────────────────────────────────────────────────
    Copy Button
@@ -314,12 +432,44 @@ export default function TemplatesPage() {
               </PixelBadge>
             </div>
             <h1 className="font-pixel text-lg sm:text-3xl text-retro-text leading-loose mb-3">
-              Ready-to-use Templates
+              Skip the first day of every project.
             </h1>
             <p className="text-retro-muted font-mono text-xs sm:text-sm max-w-2xl leading-relaxed">
-              Copy-paste sections and full page layouts built with Pxlkit components.
-              Pick a category, choose a variant, copy the code, and ship.
+              Section blocks and full-page layouts already composed with the kit — perfect for the &quot;new repo,
+              empty page&quot; moment. Pick a category, choose a variant, copy the code, change the words.
             </p>
+          </PixelFadeIn>
+        </div>
+      </section>
+
+      {/* Featured Full-Page Templates */}
+      <section className="px-4 sm:px-6 lg:px-8 py-8 sm:py-10 border-b border-retro-border/50">
+        <div className="max-w-7xl mx-auto">
+          <PixelFadeIn>
+            <div className="mb-5 sm:mb-6 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <div className="mb-2 inline-flex items-center gap-2">
+                  <PixelBadge tone="gold" variant="soft" size="sm">
+                    New
+                  </PixelBadge>
+                </div>
+                <h2 className="font-pixel text-base sm:text-xl text-retro-text leading-loose">
+                  Full-page templates
+                </h2>
+                <p className="font-mono text-xs sm:text-sm text-retro-muted mt-1 max-w-xl">
+                  Six complete layouts already wired end-to-end. Click a card to open the live page, then lift the
+                  whole route into your repo.
+                </p>
+              </div>
+              <PixelBadge tone="neutral" variant="outline" size="sm">
+                {FEATURED_PAGES.length} pages
+              </PixelBadge>
+            </div>
+            <PixelGrid cols={{ base: 1, sm: 2, lg: 3 }} gap={4}>
+              {FEATURED_PAGES.map((page) => (
+                <FeaturedPageCard key={page.href} page={page} />
+              ))}
+            </PixelGrid>
           </PixelFadeIn>
         </div>
       </section>
@@ -327,7 +477,7 @@ export default function TemplatesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Mobile nav strip */}
         <div className="lg:hidden mb-5">
-          <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:thin]" role="tablist" tabIndex={0}>
+          <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:thin]">
             {TEMPLATE_SECTIONS.map((section) => (
               <button
                 key={section.id}
@@ -405,7 +555,7 @@ export default function TemplatesPage() {
                     Full Page Templates
                   </h2>
                   <p className="text-retro-muted font-mono text-xs sm:text-sm mt-1">
-                    Complete page layouts ready to drop into your project.
+                    Open the file, swap the copy, ship — each layout is already wired with the kit, dark + light included.
                   </p>
                 </div>
                 <div className="space-y-6 sm:space-y-8">
