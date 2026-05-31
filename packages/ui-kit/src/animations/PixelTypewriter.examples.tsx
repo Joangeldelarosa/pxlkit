@@ -14,5 +14,5 @@ export function NoCursor() {
 }
 
 export function OnView() {
-  return <PixelTypewriter text="Types when scrolled into view." trigger="view" tone="purple" />;
+  return <PixelTypewriter text="Types when scrolled into view." trigger="inView" tone="purple" />;
 }

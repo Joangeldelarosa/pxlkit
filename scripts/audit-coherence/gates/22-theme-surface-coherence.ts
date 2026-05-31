@@ -137,6 +137,28 @@ const COMPONENT_DECL_REGEX =
 const SURFACE_DESTRUCTURE_REGEX =
   /\{\s*(?:[^{}]*?,\s*)?surface(?:\s*:\s*([A-Za-z_$][\w$]*))?(?:\s*=\s*[^,}]+)?\s*(?:,|\})/;
 
+/**
+ * Exclude non-component identifiers from surface analysis. The
+ * COMPONENT_DECL_REGEX is intentionally loose (any `export const Foo` or
+ * `function Foo`) so it also captures hooks, contexts, providers, icon
+ * helpers, and ALL_CAPS token tables. Those declare or sit next to
+ * `surface?: Surface` in shared barrel files (common.tsx, contexts, theme
+ * tokens) and produce false positives. This filter is the canonical list
+ * of "not a surface-aware component" suffixes/shapes.
+ */
+function isNonComponentExport(name: string): boolean {
+  // ALL_CAPS constants like SURFACE_TOKENS, SIZE_PAD.
+  if (/^[A-Z][A-Z0-9_]+$/.test(name)) return true;
+  // useXxx hooks (very rare for COMPONENT_DECL_REGEX to capture since it
+  // requires a leading uppercase letter, but kept for safety).
+  if (/^use[A-Z]/.test(name)) return true;
+  // Context / Provider / Icon helpers — never render surface-aware shells.
+  if (/Context$/.test(name)) return true;
+  if (/Provider$/.test(name)) return true;
+  if (/Icon$/.test(name)) return true;
+  return false;
+}
+
 // Hardcoded border literals. We tolerate `border-retro-*` since those are
 // tone tokens, not surface tokens.
 const HARDCODED_BORDER_LITERAL_REGEX =
@@ -246,6 +268,7 @@ export function analyzeSurfaceCoherence(
   for (const m of source.matchAll(COMPONENT_DECL_REGEX)) {
     const name = m[1]!;
     if (seen.has(name)) continue;
+    if (isNonComponentExport(name)) continue;
     seen.add(name);
     components.push({
       component: name,
@@ -261,18 +284,21 @@ export function analyzeSurfaceCoherence(
     });
   }
   if (components.length === 0) {
-    components.push({
-      component: path.basename(file).replace(/\.[tj]sx?$/, ''),
-      file,
-      declaresSurfaceProp,
-      surfacePropIdent,
-      callsUseEffectiveSurface,
-      useEffectiveSurfaceUsesProp,
-      callsSurfaceClasses,
-      appliesBorder,
-      appliesRadius,
-      hardcodedBorderLiteral,
-    });
+    const fallback = path.basename(file).replace(/\.[tj]sx?$/, '');
+    if (!isNonComponentExport(fallback)) {
+      components.push({
+        component: fallback,
+        file,
+        declaresSurfaceProp,
+        surfacePropIdent,
+        callsUseEffectiveSurface,
+        useEffectiveSurfaceUsesProp,
+        callsSurfaceClasses,
+        appliesBorder,
+        appliesRadius,
+        hardcodedBorderLiteral,
+      });
+    }
   }
 
   return { file, importsSurfaceType, components };
