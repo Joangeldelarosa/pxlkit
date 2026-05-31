@@ -87,8 +87,8 @@ export function LandingPageClient() {
     <div className="relative overflow-x-hidden w-full max-w-[100vw]">
       <LandingHero />
       <WhatsNewStrip
-        version="1.9.0"
-        date="2026-05-30"
+        version="2.0.0"
+        date="2026-05-31"
         items={WHATS_NEW_ITEMS}
         changelogHref="/templates/changelog"
       />

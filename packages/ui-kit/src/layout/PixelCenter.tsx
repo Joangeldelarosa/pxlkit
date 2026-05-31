@@ -22,6 +22,7 @@ export interface PixelCenterProps extends Omit<React.HTMLAttributes<HTMLDivEleme
   inline?: boolean;
   as?: keyof React.JSX.IntrinsicElements;
   surface?: Surface;
+  bordered?: boolean;
 }
 
 export const PixelCenter = forwardRef<HTMLDivElement, PixelCenterProps>(function PixelCenter(
@@ -33,6 +34,7 @@ export const PixelCenter = forwardRef<HTMLDivElement, PixelCenterProps>(function
     inline = false,
     as,
     surface: surfaceProp,
+    bordered = false,
     className,
     children,
     ...rest
@@ -53,7 +55,7 @@ export const PixelCenter = forwardRef<HTMLDivElement, PixelCenterProps>(function
         containerWidth[maxWidth],
         pageGutter[gutter],
         resolvedAlign && textMap[resolvedAlign],
-        s.border, s.radius,
+        bordered && s.border, bordered && s.radius,
         s.transition,
         className,
       )}

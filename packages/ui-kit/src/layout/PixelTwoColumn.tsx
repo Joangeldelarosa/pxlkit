@@ -62,6 +62,7 @@ export interface PixelTwoColumnProps extends React.HTMLAttributes<HTMLDivElement
   right: React.ReactNode;
   surface?: Surface;
   as?: keyof React.JSX.IntrinsicElements;
+  bordered?: boolean;
 }
 
 export const PixelTwoColumn = forwardRef<HTMLDivElement, PixelTwoColumnProps>(function PixelTwoColumn(
@@ -74,6 +75,7 @@ export const PixelTwoColumn = forwardRef<HTMLDivElement, PixelTwoColumnProps>(fu
     left,
     right,
     surface: surfaceProp,
+    bordered = false,
     className,
     as,
     ...rest
@@ -98,7 +100,7 @@ export const PixelTwoColumn = forwardRef<HTMLDivElement, PixelTwoColumnProps>(fu
         stackedTemplate,
         stackGap[gap],
         align && alignMap[align],
-        s.border, s.radius,
+        bordered && s.border, bordered && s.radius,
         s.transition,
         className,
       )}

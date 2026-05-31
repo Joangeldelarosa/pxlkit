@@ -36,6 +36,33 @@ interface Release {
 
 const RELEASES: Release[] = [
   {
+    version: '2.0.0',
+    date: '2026-05-31',
+    title: 'Ola 5 — Polish + Cinematic Hero + Sidebar Overhaul',
+    prUrl: 'https://github.com/pxlkit/pxlkit/pull/50',
+    prLabel: 'View PR #50 on GitHub',
+    changes: [
+      {
+        category: 'Changed',
+        title: 'Cinematic landing hero + sidebar redesign',
+        detail:
+          'Refined landing hero with cinematic depth, parallax tuning, and rebuilt UI Kit sidebar with sharper grouping, density controls, and improved keyboard nav.',
+      },
+      {
+        category: 'Changed',
+        title: 'Border + surface system pass',
+        detail:
+          'Tightened border tokens across primitives — buttons, cards, inputs, ribbons — for a more consistent pixel-perfect frame at every scale.',
+      },
+      {
+        category: 'Fixed',
+        title: 'Version strings + JSON-LD softwareVersion bumped to 2.0.0',
+        detail:
+          'Landing eyebrow, stats aria-label, WhatsNewStrip, UI Kit page, dashboard template, and SoftwareApplication schema all reflect v2.0.0.',
+      },
+    ],
+  },
+  {
     version: '1.9.0',
     date: '2026-05-30',
     title: 'Ola 4a — Kit Depth: DataTable + 18 new + 7 upgrades',

@@ -119,7 +119,7 @@ const UI_KIT_JSON_LD = {
   url: 'https://pxlkit.xyz/ui-kit',
   description:
     '95+ accessible retro React primitives — buttons, forms, modals, tables, charts, calendars, parallax, and more. TypeScript-first, Tailwind v4, MIT.',
-  softwareVersion: '1.9.0',
+  softwareVersion: '2.0.0',
   programmingLanguage: ['TypeScript', 'React', 'JavaScript'],
   downloadUrl: 'https://www.npmjs.com/package/@pxlkit/ui-kit',
   license: 'https://github.com/Joangeldelarosa/pxlkit/blob/main/LICENSE',
