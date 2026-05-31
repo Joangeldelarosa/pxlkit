@@ -15,6 +15,9 @@ import {
   PixelTooltip,
   PixelChip,
   PixelInput,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelTwoColumn,
 } from '@pxlkit/ui-kit';
 
 /* ── Data ───────────────────────────────────────────────────────────────── */
@@ -190,20 +193,19 @@ export function FaqAccordionPreview() {
     : ACCORDION_ITEMS;
 
   return (
-    <section className="py-20 sm:py-28 px-6 bg-retro-bg">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-14">
+    <PixelContainer maxWidth="md" padding="xl" className="bg-retro-bg">
+        <div className="mb-14">
           <PixelFadeIn>
-            <div className="inline-flex items-center gap-2 mb-4">
+            <div className="inline-flex w-full justify-center items-center gap-2 mb-4">
               <PxlKitIcon icon={ChatBubble} size={20} colorful />
               <PixelBadge tone="purple">FAQ</PixelBadge>
             </div>
-            <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-3">
-              Frequently asked questions
-            </h2>
-            <p className="text-retro-muted font-mono text-sm sm:text-base max-w-lg mx-auto">
-              Everything you need to know about Pxlkit — from installation to advanced usage.
-            </p>
+            <PixelSectionHeader
+              align="center"
+              size="md"
+              title="Frequently asked questions"
+              description="Everything you need to know about Pxlkit — from installation to advanced usage."
+            />
           </PixelFadeIn>
         </div>
 
@@ -297,8 +299,7 @@ export function FaqAccordionPreview() {
             Contact Support
           </PixelButton>
         </div>
-      </div>
-    </section>
+    </PixelContainer>
   );
 }
 
@@ -311,87 +312,93 @@ export function FaqTwoColumnPreview() {
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  return (
-    <section className="py-20 sm:py-28 px-6 bg-retro-bg">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-        {/* Left sidebar */}
-        <div className="md:col-span-1">
-          <PixelFadeIn>
-            <div className="flex items-center gap-2 mb-4">
-              <PxlKitIcon icon={Search} size={20} colorful />
-              <PixelBadge tone="green">Help Center</PixelBadge>
-            </div>
-            <h2 className="font-pixel text-xl sm:text-2xl text-retro-text leading-loose mb-3">
-              FAQ
-            </h2>
-            <p className="font-mono text-sm text-retro-muted leading-relaxed mb-6">
-              Can&apos;t find your answer? Our support team is here to help you get unblocked.
-            </p>
-            <div className="flex flex-col gap-3">
-              <PixelButton
-                tone="cyan"
-                size="md"
-                iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
-              >
-                Contact Support
-              </PixelButton>
-              <PixelButton tone="neutral" size="md" variant="ghost">
-                Read the Docs
-              </PixelButton>
-            </div>
+  const leftCol = (
+    <PixelFadeIn>
+      <div className="flex items-center gap-2 mb-4">
+        <PxlKitIcon icon={Search} size={20} colorful />
+        <PixelBadge tone="green">Help Center</PixelBadge>
+      </div>
+      <PixelSectionHeader
+        align="start"
+        size="sm"
+        title="FAQ"
+        description="Can't find your answer? Our support team is here to help you get unblocked."
+      />
+      <div className="flex flex-col gap-3 mt-6">
+        <PixelButton
+          tone="cyan"
+          size="md"
+          iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+        >
+          Contact Support
+        </PixelButton>
+        <PixelButton tone="neutral" size="md" variant="ghost">
+          Read the Docs
+        </PixelButton>
+      </div>
 
-            {/* Quick stats */}
-            <div className="mt-8 space-y-3">
-              <div className="flex items-center gap-2">
-                <PxlKitIcon icon={CheckCircle} size={14} colorful />
-                <span className="font-mono text-xs text-retro-muted">
-                  Avg. response time: 4 hrs
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <PxlKitIcon icon={ShieldCheck} size={14} colorful />
-                <span className="font-mono text-xs text-retro-muted">
-                  99% satisfaction rate
-                </span>
-              </div>
-            </div>
-          </PixelFadeIn>
+      {/* Quick stats */}
+      <div className="mt-8 space-y-3">
+        <div className="flex items-center gap-2">
+          <PxlKitIcon icon={CheckCircle} size={14} colorful />
+          <span className="font-mono text-xs text-retro-muted">
+            Avg. response time: 4 hrs
+          </span>
         </div>
-
-        {/* Right questions */}
-        <div className="md:col-span-2 space-y-6">
-          {TWO_COL_ITEMS.map((item, i) => (
-            <div
-              key={i}
-              className={`border-b border-retro-border/30 pb-6 last:border-0 last:pb-0 border-l-2 pl-4 ${CATEGORY_BORDER_COLORS[item.category]}`}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <PixelTooltip content={CATEGORY_TOOLTIPS[item.category]} position="top">
-                  <PixelBadge tone={item.tone}>{item.category}</PixelBadge>
-                </PixelTooltip>
-                <span className="font-mono text-[10px] text-retro-muted/50">
-                  #{String(i + 1).padStart(2, '0')}
-                </span>
-                <button
-                  type="button"
-                  className="ml-auto p-1 rounded transition-colors hover:bg-retro-surface/40 cursor-pointer"
-                  onClick={() => handleCopyLink(i)}
-                  aria-label={`Copy link to question ${i + 1}`}
-                >
-                  {copiedIndex === i ? (
-                    <PxlKitIcon icon={CheckCircle} size={14} colorful />
-                  ) : (
-                    <PxlKitIcon icon={ChainLink} size={14} colorful />
-                  )}
-                </button>
-              </div>
-              <p className="font-pixel text-sm text-retro-text mb-2">{item.q}</p>
-              <p className="font-mono text-sm text-retro-muted leading-relaxed">{item.a}</p>
-            </div>
-          ))}
+        <div className="flex items-center gap-2">
+          <PxlKitIcon icon={ShieldCheck} size={14} colorful />
+          <span className="font-mono text-xs text-retro-muted">
+            99% satisfaction rate
+          </span>
         </div>
       </div>
-    </section>
+    </PixelFadeIn>
+  );
+
+  const rightCol = (
+    <div className="space-y-6">
+      {TWO_COL_ITEMS.map((item, i) => (
+        <div
+          key={i}
+          className={`border-b border-retro-border/30 pb-6 last:border-0 last:pb-0 border-l-2 pl-4 ${CATEGORY_BORDER_COLORS[item.category]}`}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <PixelTooltip content={CATEGORY_TOOLTIPS[item.category]} position="top">
+              <PixelBadge tone={item.tone}>{item.category}</PixelBadge>
+            </PixelTooltip>
+            <span className="font-mono text-[10px] text-retro-muted/50">
+              #{String(i + 1).padStart(2, '0')}
+            </span>
+            <button
+              type="button"
+              className="ml-auto p-1 rounded transition-colors hover:bg-retro-surface/40 cursor-pointer"
+              onClick={() => handleCopyLink(i)}
+              aria-label={`Copy link to question ${i + 1}`}
+            >
+              {copiedIndex === i ? (
+                <PxlKitIcon icon={CheckCircle} size={14} colorful />
+              ) : (
+                <PxlKitIcon icon={ChainLink} size={14} colorful />
+              )}
+            </button>
+          </div>
+          <p className="font-pixel text-sm text-retro-text mb-2">{item.q}</p>
+          <p className="font-mono text-sm text-retro-muted leading-relaxed">{item.a}</p>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <PixelContainer maxWidth="xl" padding="xl" className="bg-retro-bg">
+      <PixelTwoColumn
+        ratio="60/40"
+        gap={12}
+        align="start"
+        left={leftCol}
+        right={rightCol}
+      />
+    </PixelContainer>
   );
 }
 
@@ -413,20 +420,19 @@ export function FaqTabbedPreview() {
     : TABBED_ITEMS[activeTab];
 
   return (
-    <section className="py-20 sm:py-28 px-6 bg-retro-bg">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-10">
+    <PixelContainer maxWidth="md" padding="xl" className="bg-retro-bg">
+        <div className="mb-10">
           <PixelFadeIn>
-            <div className="inline-flex items-center gap-2 mb-4">
+            <div className="inline-flex w-full justify-center items-center gap-2 mb-4">
               <PxlKitIcon icon={InfoCircle} size={20} colorful />
               <PixelBadge tone="gold">Knowledge Base</PixelBadge>
             </div>
-            <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-3">
-              Help Center
-            </h2>
-            <p className="text-retro-muted font-mono text-sm sm:text-base">
-              Browse answers by topic — click a tab to explore.
-            </p>
+            <PixelSectionHeader
+              align="center"
+              size="md"
+              title="Help Center"
+              description="Browse answers by topic — click a tab to explore."
+            />
           </PixelFadeIn>
         </div>
 
@@ -498,7 +504,6 @@ export function FaqTabbedPreview() {
             );
           })}
         </div>
-      </div>
-    </section>
+    </PixelContainer>
   );
 }

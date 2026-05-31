@@ -1,0 +1,67 @@
+name: Coherence Audit (Weekly Drift Detection)
+
+on:
+  schedule:
+    # Monday 09:00 UTC — weekly drift snapshot over main
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+jobs:
+  audit:
+    name: Weekly drift audit over main
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build all packages
+        run: npm run build
+
+      - name: Run coherence audit (Markdown report)
+        id: audit
+        run: npm run audit:coherence --workspace=@pxlkit/ui-kit
+        continue-on-error: true
+
+      - name: Upload weekly report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coherence-report-weekly-${{ github.run_number }}
+          path: |
+            coherence-report.md
+            coherence-report.json
+          retention-days: 90
+
+      - name: Open issue on drift detected
+        if: steps.audit.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body = 'Weekly coherence audit detected drift on `main`.\n\n';
+            try {
+              const report = fs.readFileSync('coherence-report.md', 'utf8');
+              body += '```\n' + report.slice(0, 60000) + '\n```';
+            } catch (e) {
+              body += '_(report unavailable — see workflow run artifacts)_';
+            }
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Weekly drift: coherence audit failures on main (${new Date().toISOString().slice(0,10)})`,
+              labels: ['coherence', 'drift'],
+              body,
+            });

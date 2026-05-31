@@ -39,7 +39,9 @@
     "test": "turbo test",
     "test:coverage": "turbo test:coverage",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "docs:build": "npm run docs:build --workspace=@pxlkit/ui-kit",
+    "audit": "npm run audit:coherence --workspace=@pxlkit/ui-kit"
   },
   "devDependencies": {
     "@storybook/addon-a11y": "^8.6.18",

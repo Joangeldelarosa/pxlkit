@@ -69,15 +69,26 @@ export const metadata: Metadata = {
     'pxlkit visual builder',
   ],
   openGraph: {
+    type: 'website',
     title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG | Pxlkit',
     description:
       'Design pixel art icons on a 16×16 grid and export as React component, SVG, or data URI. Free, fast, and browser-based. No signup required.',
     url: 'https://pxlkit.xyz/builder',
+    images: [
+      {
+        url: '/og/builder.png',
+        width: 1280,
+        height: 640,
+        alt: 'Pxlkit builder — Free browser-based pixel art icon editor with SVG/React export',
+      },
+    ],
   },
   twitter: {
+    card: 'summary_large_image',
     title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG | Pxlkit',
     description:
       'Create custom pixel art icons on a 16×16 grid. Export as React component, SVG, or data URI. Free, browser-based, no signup required.',
+    images: ['/og/builder.png'],
   },
   alternates: {
     canonical: 'https://pxlkit.xyz/builder',

@@ -1,102 +1,121 @@
 'use client';
 
-import Link from 'next/link';
-import { PixelBadge, PixelCard, PixelChip } from '@pxlkit/ui-kit';
+import {
+  PixelBadge,
+  PixelCluster,
+  PixelContainer,
+  PixelTextLink,
+} from '@pxlkit/ui-kit';
 
 export interface WhatsNewItem {
-  component: string;
-  blurb: string;
-  tone?: 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral';
+  name: string;
+  category: string;
+  href?: string;
+  isNew?: boolean;
 }
 
 export interface WhatsNewStripProps {
-  items?: WhatsNewItem[];
-  version?: string;
+  version: string;
+  date: string;
+  items: WhatsNewItem[];
   changelogHref?: string;
 }
 
-const DEFAULT_VERSION = '1.5.0';
+const categoryTone: Record<string, 'cyan' | 'green' | 'purple' | 'gold' | 'red' | 'neutral'> = {
+  data: 'cyan',
+  navigation: 'purple',
+  feedback: 'gold',
+  layout: 'green',
+  forms: 'red',
+};
 
-const DEFAULT_ITEMS: WhatsNewItem[] = [
-  {
-    component: 'PixelToast',
-    blurb: 'Pixel-art toast notifications wired into the kit with positions, tones, and icon slots.',
-    tone: 'green',
-  },
-  {
-    component: 'forwardRef everywhere',
-    blurb: 'Every interactive primitive now forwards refs — drop-in compatible with form libs and a11y tools.',
-    tone: 'cyan',
-  },
-  {
-    component: 'A11y wiring pass',
-    blurb: 'ARIA labels, focus rings, keyboard handlers swept across buttons, inputs, modals, and overlays.',
-    tone: 'purple',
-  },
-  {
-    component: 'PxlKitSurfaceProvider',
-    blurb: 'Switch every nested component between pixel and linear aesthetics with one provider.',
-    tone: 'gold',
-  },
-  {
-    component: 'PxlKitLocaleProvider',
-    blurb: 'Locale-safe casing (Turkish İ/I) plus Google Fonts URL builder for correct subsetting.',
-    tone: 'pink',
-  },
-  {
-    component: 'PixelParallax suite',
-    blurb: 'Mouse + scroll parallax wrappers ship inside the kit — same API as the rest of the surface system.',
-    tone: 'cyan',
-  },
-];
+function toneFor(category: string) {
+  return categoryTone[category.toLowerCase()] ?? 'neutral';
+}
 
-/**
- * Surfaces recent ui-kit changes for the showcase site. Pure presentational —
- * data is passed in via props (or falls back to the v1.5.0 highlights). Uses
- * ui-kit primitives so it doubles as dogfood for the surface system.
- */
-export default function WhatsNewStrip({
-  items = DEFAULT_ITEMS,
-  version = DEFAULT_VERSION,
-  changelogHref = 'https://github.com/joangeldelarosa/pxlkit/blob/main/CHANGELOG.md',
+function scrollToAnchor(href: string | undefined) {
+  if (!href || !href.startsWith('#')) return;
+  const el = typeof document !== 'undefined' ? document.getElementById(href.slice(1)) : null;
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+export function WhatsNewStrip({
+  version,
+  date,
+  items,
+  changelogHref = '/templates/changelog',
 }: WhatsNewStripProps) {
   return (
-    <section
-      aria-labelledby="whats-new-heading"
-      className="w-full max-w-6xl mx-auto px-4 py-10"
+    <PixelContainer
+      as="aside"
+      maxWidth="6xl"
+      padding="md"
+      aria-label={`What's new in v${version}`}
+      data-testid="whats-new-strip"
     >
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        <h2
-          id="whats-new-heading"
-          className="text-xl sm:text-2xl font-bold tracking-tight"
-        >
-          What&apos;s New in @pxlkit/ui-kit
-        </h2>
-        <PixelBadge tone="green">v{version}</PixelBadge>
-        <PixelChip label="forwardRef + a11y + PixelToast" tone="cyan" />
-      </div>
+      <div className="rounded-lg border border-retro-cyan/30 bg-retro-surface/30 p-4 sm:p-5">
+        <PixelCluster gap={3} align="center" justify="between" className="mb-3">
+          <PixelCluster gap={3} align="center">
+            <PixelBadge tone="cyan" variant="solid">{`v${version}`}</PixelBadge>
+            <span className="font-pixel text-[10px] uppercase tracking-wider text-retro-muted">
+              What&apos;s new
+            </span>
+            <span className="text-xs text-retro-muted">{date}</span>
+          </PixelCluster>
+          <PixelTextLink href={changelogHref} tone="cyan" className="text-xs">
+            See full changelog →
+          </PixelTextLink>
+        </PixelCluster>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {items.slice(0, 6).map((item) => (
-          <PixelCard key={item.component} title={item.component}>
-            <p className="text-sm leading-relaxed opacity-90">{item.blurb}</p>
-            {item.tone ? (
-              <div className="mt-3">
-                <PixelChip label={item.component} tone={item.tone} />
-              </div>
-            ) : null}
-          </PixelCard>
-        ))}
-      </div>
-
-      <div className="mt-6 text-sm">
-        <Link
-          href={changelogHref}
-          className="underline underline-offset-4 hover:opacity-80"
+        <div
+          className="-mx-1 overflow-x-auto scrollbar-thin"
+          data-testid="whats-new-track"
         >
-          See full changelog →
-        </Link>
+          <ul className="flex min-w-max items-stretch gap-2 px-1 py-1">
+            {items.map((item) => {
+              const tone = toneFor(item.category);
+              const content = (
+                <span className="relative inline-flex items-center gap-2 rounded-md border border-retro-border/50 bg-retro-bg/60 px-3 py-1.5 transition-colors hover:border-retro-cyan/60 hover:bg-retro-surface/50">
+                  {item.isNew && (
+                    <span
+                      aria-hidden
+                      className="inline-flex items-center rounded-sm border border-retro-cyan/60 bg-retro-cyan/15 px-1 py-0.5 font-pixel text-[8px] uppercase tracking-wider text-retro-cyan"
+                    >
+                      New
+                    </span>
+                  )}
+                  <span className="whitespace-nowrap font-mono text-xs text-retro-fg">{item.name}</span>
+                  <PixelBadge tone={tone} size="sm">{item.category}</PixelBadge>
+                </span>
+              );
+
+              return (
+                <li key={item.name}>
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      onClick={(e) => {
+                        if (item.href && item.href.startsWith('#')) {
+                          e.preventDefault();
+                          scrollToAnchor(item.href);
+                        }
+                      }}
+                      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg rounded-md"
+                      aria-label={`${item.isNew ? 'New: ' : ''}${item.name} (${item.category})`}
+                    >
+                      {content}
+                    </a>
+                  ) : (
+                    content
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
-    </section>
+    </PixelContainer>
   );
 }
+
+export default WhatsNewStrip;
