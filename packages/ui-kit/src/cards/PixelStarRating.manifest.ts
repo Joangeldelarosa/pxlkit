@@ -5,20 +5,22 @@ import {
   WithCount,
   GreenTone,
   Interactive,
+  CustomIcon,
 } from './PixelStarRating.examples';
 
 export default defineManifest({
   name: 'PixelStarRating',
   category: 'cards',
-  since: '1.7.0',
+  since: '2.0.2',
   status: 'stable',
   description:
     'Pixel-art star rating display with optional interactive selection and surface-aware styling.',
   highlights: [
-    'Crisp 8x8 pixel star SVGs that scale across sm/md/lg sizes',
+    'Renders the @pxlkit/gamification Star at 16/20/24px with crisp nearest-neighbour scaling',
     'Gold or green tone tokens for readonly and interactive states',
     'Optional showCount label renders "N/M" beside the stars',
     'Interactive mode exposes per-star buttons with onChange callback',
+    'Polymorphic starIcon prop swaps in any sibling-pack glyph without forking',
     'Surface-aware via useEffectiveSurface for consistent font rendering',
   ],
   examples: [
@@ -26,6 +28,7 @@ export default defineManifest({
     { id: 'with-count', label: 'With Count', Component: WithCount },
     { id: 'green-tone', label: 'Green Tone (Large)', Component: GreenTone },
     { id: 'interactive', label: 'Interactive', Component: Interactive },
+    { id: 'custom-icon', label: 'Custom Icon (Heart)', Component: CustomIcon },
   ],
   props: 'auto',
   a11y: {

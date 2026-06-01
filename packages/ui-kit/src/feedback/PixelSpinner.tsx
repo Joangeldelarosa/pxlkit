@@ -1,7 +1,7 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
+import { cn, Surface, useEffectiveSurface } from '../common';
 import { tone as toneTokens, ToneKey } from '../tokens';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
@@ -39,11 +39,10 @@ export interface PixelSpinnerProps extends React.HTMLAttributes<HTMLSpanElement>
 }
 
 export const PixelSpinner = forwardRef<HTMLSpanElement, PixelSpinnerProps>(function PixelSpinner(
-  { size = 'md', label = 'Loading', surface: surfaceProp, tone = 'neutral', decorative = false, className, ...rest },
+  { size = 'md', label = 'Loading', surface: surfaceProp, tone = 'cyan', decorative = false, className, ...rest },
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const reduced = useReducedMotion();
   const t = toneTokens[tone];
 
@@ -76,10 +75,8 @@ export const PixelSpinner = forwardRef<HTMLSpanElement, PixelSpinnerProps>(funct
           data-pxl-spinner-blade
           aria-hidden
           className={cn(
-            'block h-full w-full',
-            s.border,
-            t.border,
-            'border-t-current border-l-current',
+            'block h-full w-full border-2 border-retro-border/40 border-t-current border-l-current',
+            t.text,
           )}
           style={animationStyle}
         />
@@ -90,7 +87,8 @@ export const PixelSpinner = forwardRef<HTMLSpanElement, PixelSpinnerProps>(funct
           className={cn(
             'block h-full w-full rounded-full',
             linearBorderMap[size],
-            'border-current/30 border-t-current',
+            'border-retro-border/40 border-t-current',
+            t.text,
           )}
           style={animationStyle}
         />

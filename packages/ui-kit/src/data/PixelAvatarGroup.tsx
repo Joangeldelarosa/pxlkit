@@ -73,6 +73,7 @@ export const PixelAvatarGroup = forwardRef<HTMLDivElement, PixelAvatarGroupProps
   const slotBase = cn(
     'inline-flex items-center justify-center overflow-hidden bg-retro-bg',
     s.border,
+    'border-retro-border',
     radius,
     dim,
     ringWidth[surface],

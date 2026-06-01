@@ -1,4 +1,6 @@
 import React from 'react';
+import { PxlKitIcon } from '@pxlkit/core';
+import { Heart } from '@pxlkit/gamification';
 import { PixelStarRating } from './PixelStarRating';
 
 export function Default() {
@@ -16,4 +18,19 @@ export function GreenTone() {
 export function Interactive() {
   const [rating, setRating] = React.useState(3);
   return <PixelStarRating value={rating} interactive onChange={setRating} />;
+}
+
+export function Large() {
+  return <PixelStarRating value={4} size="lg" showCount />;
+}
+
+export function CustomIcon() {
+  return (
+    <PixelStarRating
+      value={3}
+      starIcon={
+        <PxlKitIcon icon={Heart} size={20} appearance="solid" color="#EF4444" />
+      }
+    />
+  );
 }

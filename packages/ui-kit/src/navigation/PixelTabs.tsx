@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Surface, TabItem, cn, surfaceClasses, useEffectiveSurface } from '../common';
+import { Surface, TabItem, cn, useEffectiveSurface } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
 import {
   PixelTabsContext,
@@ -72,7 +72,6 @@ function PixelTabsRoot(
   ref: React.Ref<HTMLDivElement>,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const sugar = items && items.length > 0;
   const seedDefault = defaultValue ?? defaultTab ?? items?.[0]?.id;
   const [active, setActive] = useControllableState<string | undefined>({
@@ -179,7 +178,6 @@ function PixelTabsRoot(
         ref={ref}
         className={cn(
           orientation === 'horizontal' ? 'space-y-3' : 'flex gap-3',
-          s.border, s.radius,
         )}
         data-orientation={orientation}
       >

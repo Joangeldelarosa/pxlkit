@@ -40,4 +40,24 @@ describe('PixelStarRating', () => {
     const { getByText } = render(<PixelStarRating value={3} showCount />);
     expect(getByText('3/5')).toBeTruthy();
   });
+
+  it('default filled stars render gamification Star via PxlKitIcon img', () => {
+    const { container } = render(<PixelStarRating value={3} />);
+    const imgs = container.querySelectorAll('[data-pxl-star="filled"] img[alt="star"]');
+    expect(imgs.length).toBe(3);
+  });
+
+  it('default outlined stars render inline rect-svg', () => {
+    const { container } = render(<PixelStarRating value={3} />);
+    const svg = container.querySelector('[data-pxl-star="outlined"] svg');
+    expect(svg).toBeTruthy();
+  });
+
+  it('starIcon prop overrides default glyph for filled positions', () => {
+    const { container } = render(
+      <PixelStarRating value={2} starIcon={<span data-testid="custom-glyph" />} />,
+    );
+    const customs = container.querySelectorAll('[data-pxl-star="filled"] [data-testid="custom-glyph"]');
+    expect(customs.length).toBe(2);
+  });
 });

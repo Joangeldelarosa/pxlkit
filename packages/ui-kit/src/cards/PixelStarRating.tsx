@@ -1,6 +1,8 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, type ReactNode } from 'react';
+import { PxlKitIcon } from '@pxlkit/core';
+import { Star } from '@pxlkit/gamification';
 import {
   Surface,
   cn,
@@ -12,15 +14,43 @@ import { useControllableState } from '../hooks/useControllableState';
 type StarSize = 'sm' | 'md' | 'lg';
 type StarTone = 'gold' | 'green';
 
-const sizeMap: Record<StarSize, string> = {
-  sm: 'h-3 w-3',
-  md: 'h-4 w-4',
-  lg: 'h-5 w-5',
+/**
+ * Pixel-art glyph footprint for the OUTLINED (empty) state — kept as
+ * Tailwind h/w utility classes so the silhouette of the inline rect-SVG
+ * matches the filled gamification Star at every breakpoint.
+ */
+const outlineDimMap: Record<StarSize, string> = {
+  sm: 'h-4 w-4',
+  md: 'h-5 w-5',
+  lg: 'h-6 w-6',
+};
+
+/**
+ * Pixel sizes (in CSS px) for the gamification Star rendered via
+ * {@link PxlKitIcon}. PxlKitIcon takes a numeric `size` prop, not Tailwind
+ * classes — the values mirror outlineDimMap so the filled and outlined
+ * glyphs share the same footprint.
+ */
+const sizePxMap: Record<StarSize, number> = {
+  sm: 16,
+  md: 20,
+  lg: 24,
 };
 
 const toneFill: Record<StarTone, string> = {
   gold: 'text-retro-gold',
   green: 'text-retro-green',
+};
+
+/**
+ * Solid-mode hex resolution for {@link PxlKitIcon}. The icon renders as
+ * `<img>` (isolated context) so `currentColor` is not honoured — we MUST
+ * pass an explicit hex to preserve the `tone` prop across surfaces.
+ * Values sourced from styles.css dark-mode tokens.
+ */
+const toneHex: Record<StarTone, string> = {
+  gold: '#FFD700',
+  green: '#00FF88',
 };
 
 export interface PixelStarRatingProps
@@ -29,22 +59,39 @@ export interface PixelStarRatingProps
   value?: number;
   /** Uncontrolled initial rating value (0..max). */
   defaultValue?: number;
+  /** Total number of stars rendered. Default 5. */
   max?: number;
+  /** Visual size of each star — maps to 16 / 20 / 24 px for sm / md / lg. */
   size?: StarSize;
+  /** Color tone applied to filled stars. */
   tone?: StarTone;
+  /** When true, renders "N/M" beside the stars. */
   showCount?: boolean;
+  /** When true, exposes each star as a button that updates the rating on click. */
   interactive?: boolean;
+  /** Called with the new rating when the user clicks a star (interactive only). */
   onChange?: (next: number) => void;
+  /** Override the ambient surface (pixel | linear). */
   surface?: Surface;
+  /**
+   * Polymorphic escape hatch. Replace the default gamification Star glyph
+   * with any custom node, or a render function called per-star with
+   * `{ filled, size, tone }` so the caller can choose a different sibling
+   * pack icon (Heart, Coin, Crown…) without forking the component.
+   *
+   * - `undefined` (default) → render the gamification {@link Star} for
+   *   filled positions and the inline outlined rect-SVG for empty ones.
+   * - `ReactNode` → render for filled positions only; empty positions
+   *   continue to use the outlined fallback for the empty-state silhouette.
+   * - `(args) => ReactNode` → render for both filled and empty positions,
+   *   giving full control over the glyph in every state.
+   */
+  starIcon?:
+    | ReactNode
+    | ((args: { filled: boolean; size: number; tone: StarTone }) => ReactNode);
 }
 
-function StarSvg({
-  filled,
-  className,
-}: {
-  filled: boolean;
-  className?: string;
-}) {
+function OutlinedStarSvg({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 8 8"
@@ -54,35 +101,19 @@ function StarSvg({
       preserveAspectRatio="xMidYMid meet"
       aria-hidden
     >
-      {filled ? (
-        <>
-          <rect x="3" y="0" width="2" height="1" />
-          <rect x="2" y="1" width="4" height="1" />
-          <rect x="1" y="2" width="6" height="1" />
-          <rect x="0" y="3" width="8" height="2" />
-          <rect x="1" y="5" width="6" height="1" />
-          <rect x="2" y="6" width="2" height="1" />
-          <rect x="4" y="6" width="2" height="1" />
-          <rect x="1" y="7" width="2" height="1" />
-          <rect x="5" y="7" width="2" height="1" />
-        </>
-      ) : (
-        <>
-          <rect x="3" y="0" width="2" height="1" />
-          <rect x="2" y="1" width="1" height="1" />
-          <rect x="5" y="1" width="1" height="1" />
-          <rect x="1" y="2" width="1" height="1" />
-          <rect x="6" y="2" width="1" height="1" />
-          <rect x="0" y="3" width="1" height="2" />
-          <rect x="7" y="3" width="1" height="2" />
-          <rect x="1" y="5" width="1" height="1" />
-          <rect x="6" y="5" width="1" height="1" />
-          <rect x="2" y="6" width="1" height="1" />
-          <rect x="5" y="6" width="1" height="1" />
-          <rect x="1" y="7" width="2" height="1" />
-          <rect x="5" y="7" width="2" height="1" />
-        </>
-      )}
+      <rect x="3" y="0" width="2" height="1" />
+      <rect x="2" y="1" width="1" height="1" />
+      <rect x="5" y="1" width="1" height="1" />
+      <rect x="1" y="2" width="1" height="1" />
+      <rect x="6" y="2" width="1" height="1" />
+      <rect x="0" y="3" width="1" height="2" />
+      <rect x="7" y="3" width="1" height="2" />
+      <rect x="1" y="5" width="1" height="1" />
+      <rect x="6" y="5" width="1" height="1" />
+      <rect x="2" y="6" width="1" height="1" />
+      <rect x="5" y="6" width="1" height="1" />
+      <rect x="1" y="7" width="2" height="1" />
+      <rect x="5" y="7" width="2" height="1" />
     </svg>
   );
 }
@@ -99,6 +130,7 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
       interactive = false,
       onChange,
       surface: surfaceProp,
+      starIcon,
       className,
       ...rest
     },
@@ -112,9 +144,31 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
       onChange,
     });
     const safe = Math.max(0, Math.min(max, Math.round(internalValue ?? 0)));
-    const dim = sizeMap[size];
+    const px = sizePxMap[size];
+    const outlineDim = outlineDimMap[size];
     const fillClass = toneFill[tone];
-    const outlineClass = 'text-retro-border';
+    const outlineClass = 'text-retro-muted/40';
+
+    function renderGlyph(filled: boolean): ReactNode {
+      if (typeof starIcon === 'function') {
+        return starIcon({ filled, size: px, tone });
+      }
+      if (starIcon !== undefined && filled) {
+        return starIcon;
+      }
+      if (filled) {
+        return (
+          <PxlKitIcon
+            icon={Star}
+            size={px}
+            appearance="solid"
+            color={toneHex[tone]}
+            aria-label="star"
+          />
+        );
+      }
+      return <OutlinedStarSvg className={outlineDim} />;
+    }
 
     const stars = Array.from({ length: max }).map((_, i) => {
       const filled = i < safe;
@@ -137,7 +191,7 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
               s.transition,
             )}
           >
-            <StarSvg filled={filled} className={dim} />
+            {renderGlyph(filled)}
           </button>
         );
       }
@@ -148,7 +202,7 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
           data-pxl-star={status}
           className={cn('inline-flex items-center justify-center', colorClass)}
         >
-          <StarSvg filled={filled} className={dim} />
+          {renderGlyph(filled)}
         </span>
       );
     });
@@ -160,7 +214,7 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
         aria-label={
           interactive ? `Rating, ${safe} of ${max}` : `${safe} out of ${max}`
         }
-        className={cn('inline-flex items-center gap-1', s.border, s.radius, s.font, className)}
+        className={cn('inline-flex items-center gap-1', s.font, className)}
         {...rest}
       >
         <span className="inline-flex items-center gap-0.5">{stars}</span>
