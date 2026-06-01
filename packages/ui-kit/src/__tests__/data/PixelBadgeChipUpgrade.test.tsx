@@ -41,7 +41,12 @@ describe('PixelBadge — variant', () => {
       <PixelBadge tone="cyan" variant="solid">x</PixelBadge>,
     );
     const span = container.querySelector('span') as HTMLElement;
-    expect(span.className).toContain('bg-retro-cyan/18');
+    // Regression: solid was painting the 18% tint (bg-retro-cyan/18) which
+    // collapsed contrast to ~1.06. It now paints the opaque tone fill so
+    // text-retro-bg renders crisp at WCAG AA.
+    const tokens = span.className.split(/\s+/);
+    expect(tokens).toContain('bg-retro-cyan');
+    expect(tokens).not.toContain('bg-retro-cyan/18');
     expect(span.className).toContain('text-retro-bg');
   });
 
@@ -65,12 +70,14 @@ describe('PixelBadge — variant', () => {
     expect(span.className).toContain('text-retro-purple');
   });
 
-  it('solid variant for neutral keeps readable text-retro-text', () => {
+  it('solid variant for neutral paints the opaque neutral fill with page-bg text', () => {
     const { container } = render(
       <PixelBadge tone="neutral" variant="solid">x</PixelBadge>,
     );
     const span = container.querySelector('span') as HTMLElement;
-    expect(span.className).toContain('text-retro-text');
+    // Neutral solid now uses the opaque fill (bg-retro-text) which is dark,
+    // so the text flips to text-retro-bg for contrast.
+    expect(span.className).toContain('text-retro-bg');
   });
 });
 
@@ -189,12 +196,16 @@ describe('PixelChip — variant', () => {
     expect(root.className).toContain('bg-retro-cyan/8');
   });
 
-  it('variant="solid" uses tone bg + contrasting text', () => {
+  it('variant="solid" uses opaque tone bg + contrasting text', () => {
     const { container } = render(
       <PixelChip label="x" tone="cyan" variant="solid" />,
     );
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toContain('bg-retro-cyan/18');
+    // Regression: solid was painting the 18% tint (bg-retro-cyan/18) which
+    // collapsed contrast. It now paints the opaque tone fill.
+    const tokens = root.className.split(/\s+/);
+    expect(tokens).toContain('bg-retro-cyan');
+    expect(tokens).not.toContain('bg-retro-cyan/18');
     expect(root.className).toContain('text-retro-bg');
   });
 

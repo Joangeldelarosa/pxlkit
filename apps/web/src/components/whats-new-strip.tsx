@@ -43,7 +43,7 @@ export function WhatsNewStrip({
   version,
   date,
   items,
-  changelogHref = '/templates/changelog',
+  changelogHref = '/changelog',
 }: WhatsNewStripProps) {
   return (
     <PixelContainer

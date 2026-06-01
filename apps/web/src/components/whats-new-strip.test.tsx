@@ -48,10 +48,10 @@ describe('WhatsNewStrip', () => {
     expect(link.getAttribute('href')).toBe('#pixel-data-table');
   });
 
-  it('links the changelog CTA to /templates/changelog by default', () => {
+  it('links the changelog CTA to /changelog by default', () => {
     render(<WhatsNewStrip version="2.0.0" date="2026-05-31" items={items} />);
     const cta = screen.getByRole('link', { name: /See full changelog/i });
-    expect(cta.getAttribute('href')).toBe('/templates/changelog');
+    expect(cta.getAttribute('href')).toBe('/changelog');
   });
 
   it('honors a custom changelogHref', () => {
@@ -60,11 +60,11 @@ describe('WhatsNewStrip', () => {
         version="1.9.0"
         date="2026-05-30"
         items={items}
-        changelogHref="/changelog"
+        changelogHref="/changelog#v190"
       />,
     );
     const cta = screen.getByRole('link', { name: /See full changelog/i });
-    expect(cta.getAttribute('href')).toBe('/changelog');
+    expect(cta.getAttribute('href')).toBe('/changelog#v190');
   });
 
   it('renders category badges', () => {

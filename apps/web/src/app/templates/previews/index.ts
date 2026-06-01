@@ -12,6 +12,8 @@ export {
   PageIndieGamePreview,
   PageDashboardPreview,
   PageBlogPreview,
+  PageDocsPreview,
+  PageEcommercePreview,
 } from './page-previews';
 
 import type { ComponentType } from 'react';
@@ -29,6 +31,8 @@ import {
   PageIndieGamePreview,
   PageDashboardPreview,
   PageBlogPreview,
+  PageDocsPreview,
+  PageEcommercePreview,
 } from './page-previews';
 
 /** Map every template / variant ID to its live preview component. */
@@ -64,4 +68,6 @@ export const PREVIEW_MAP: Record<string, ComponentType> = {
   'page-indie-game': PageIndieGamePreview,
   'page-admin-dashboard': PageDashboardPreview,
   'page-blog': PageBlogPreview,
+  'page-docs': PageDocsPreview,
+  'page-ecommerce': PageEcommercePreview,
 };

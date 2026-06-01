@@ -1,134 +1,61 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Check, Copy, Grid, ExternalLink } from '@pxlkit/ui';
 import { Sun, Moon } from '@pxlkit/weather';
 import {
   PixelBadge,
-  PixelBox,
-  PixelCard,
   PixelFadeIn,
   PixelDivider,
-  PixelEqualHeightGrid,
   PixelTooltip,
 } from '@pxlkit/ui-kit';
-import { TEMPLATE_SECTIONS, FULL_PAGE_TEMPLATES } from './data';
+import {
+  TEMPLATE_SECTIONS,
+  FULL_PAGE_TEMPLATES,
+  TEMPLATE_CATEGORIES,
+  type TemplateCategoryId,
+} from './data';
 import { PREVIEW_MAP } from './previews';
 import type { TemplateVariant, FullPageTemplate } from './types';
 
 /* ─────────────────────────────────────────────────────────────────────────
-   Featured Full-Page Templates
+   Category navigation — chip filter that drives both Full-Page + Sections.
+   Uses a styled toggle row rather than PixelChipGroup so we keep absolute
+   control over the cinematic dark surface and avoid radio-group semantics
+   on a soft "filter" UI.
    ───────────────────────────────────────────────────────────────────────── */
-type FeaturedPage = {
-  href: string;
-  title: string;
-  category: string;
-  tone: 'cyan' | 'gold' | 'green' | 'purple' | 'red' | 'pink';
-  useCase: string;
-  swatch: string;
-  swatch2: string;
-};
-
-const FEATURED_PAGES: FeaturedPage[] = [
-  {
-    href: '/templates/dashboards',
-    title: 'Dashboard',
-    category: 'Admin',
-    tone: 'cyan',
-    useCase: 'analytics consoles, ops control rooms, internal tools',
-    swatch: 'bg-retro-cyan/30',
-    swatch2: 'bg-retro-cyan/15',
-  },
-  {
-    href: '/templates/changelog',
-    title: 'Changelog',
-    category: 'Product',
-    tone: 'green',
-    useCase: 'release notes, version history, public roadmap drops',
-    swatch: 'bg-retro-green/30',
-    swatch2: 'bg-retro-green/15',
-  },
-  {
-    href: '/templates/docs',
-    title: 'Docs',
-    category: 'Reference',
-    tone: 'purple',
-    useCase: 'API references, technical handbooks, knowledge bases',
-    swatch: 'bg-retro-purple/30',
-    swatch2: 'bg-retro-purple/15',
-  },
-  {
-    href: '/templates/landing-full',
-    title: 'Landing — Full SaaS',
-    category: 'Marketing',
-    tone: 'gold',
-    useCase: 'product launches, SaaS homepages, conversion funnels',
-    swatch: 'bg-retro-gold/30',
-    swatch2: 'bg-retro-gold/15',
-  },
-  {
-    href: '/templates/portfolio',
-    title: 'Portfolio',
-    category: 'Personal',
-    tone: 'pink',
-    useCase: 'designer/engineer portfolios, case studies, agency reels',
-    swatch: 'bg-retro-pink/30',
-    swatch2: 'bg-retro-pink/15',
-  },
-  {
-    href: '/templates/ecommerce',
-    title: 'E-commerce',
-    category: 'Shop',
-    tone: 'red',
-    useCase: 'product catalogs, storefronts, checkout flows',
-    swatch: 'bg-retro-red/30',
-    swatch2: 'bg-retro-red/15',
-  },
-];
-
-function FeaturedPagePlaceholder({ swatch, swatch2 }: { swatch: string; swatch2: string }) {
+function TemplateCategoryNav({
+  active,
+  onChange,
+}: {
+  active: TemplateCategoryId;
+  onChange: (next: TemplateCategoryId) => void;
+}) {
   return (
-    <PixelBox
-      tone="neutral"
-      variant="soft"
-      padding="none"
-      className="relative h-32 sm:h-36 w-full overflow-hidden"
-      aria-hidden
-    >
-      <div className={`absolute inset-0 ${swatch2}`} />
-      <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 gap-1.5 p-3">
-        <div className={`col-span-2 row-span-1 ${swatch} rounded-sm`} />
-        <div className={`col-span-4 row-span-1 ${swatch2} rounded-sm border border-retro-border/30`} />
-        <div className={`col-span-3 row-span-2 ${swatch} rounded-sm`} />
-        <div className={`col-span-3 row-span-2 ${swatch2} rounded-sm border border-retro-border/30`} />
-        <div className={`col-span-6 row-span-1 ${swatch2} rounded-sm border border-retro-border/30`} />
-      </div>
-    </PixelBox>
-  );
-}
-
-function FeaturedPageCard({ page }: { page: FeaturedPage }) {
-  return (
-    <PixelCard
-      href={page.href}
-      title={page.title}
-      tone={page.tone}
-      padding="md"
-      media={<FeaturedPagePlaceholder swatch={page.swatch} swatch2={page.swatch2} />}
-    >
-      <div className="flex flex-col gap-3">
-        <div>
-          <PixelBadge tone={page.tone} variant="soft" size="sm">
-            {page.category}
-          </PixelBadge>
-        </div>
-        <p className="font-mono text-[11px] sm:text-xs text-retro-muted leading-relaxed">
-          <span className="text-retro-muted/70">Perfect for:</span>{' '}
-          <span className="text-retro-text/80">{page.useCase}</span>
-        </p>
-      </div>
-    </PixelCard>
+    <nav aria-label="Filter templates by category" className="-mx-1 overflow-x-auto pb-1 [scrollbar-width:thin]">
+      <ul className="flex min-w-max gap-2 px-1">
+        {TEMPLATE_CATEGORIES.map((cat) => {
+          const selected = active === cat.id;
+          return (
+            <li key={cat.id}>
+              <button
+                type="button"
+                aria-pressed={selected}
+                onClick={() => onChange(cat.id)}
+                className={`inline-flex items-center gap-2 px-3 py-1.5 text-xs font-mono uppercase tracking-wider rounded-sm border transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60 ${
+                  selected
+                    ? `bg-retro-${cat.tone}/15 text-retro-${cat.tone} border-retro-${cat.tone}/40`
+                    : 'bg-retro-surface/30 text-retro-muted border-retro-border hover:text-retro-text hover:border-retro-text/30'
+                }`}
+              >
+                {cat.label}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }
 
@@ -336,9 +263,9 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
       <div className="flex flex-col gap-3 px-3 sm:px-4 py-3 border-b border-retro-border bg-retro-surface/30">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 min-w-0">
-          <span className="text-2xl" role="img" aria-hidden>{tpl.icon}</span>
+            <span className="text-2xl" role="img" aria-hidden>{tpl.icon}</span>
             <div className="min-w-0">
-            <h3 className="font-pixel text-xs text-retro-text leading-relaxed">{tpl.name}</h3>
+              <h3 className="font-pixel text-xs text-retro-text leading-relaxed">{tpl.name}</h3>
               <p className="font-mono text-xs text-retro-muted mt-0.5">{tpl.description}</p>
             </div>
           </div>
@@ -364,12 +291,21 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
               className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-retro-muted border border-retro-border rounded-sm hover:text-retro-gold hover:border-retro-gold/40 transition-all"
             >
               <PxlKitIcon icon={ExternalLink} size={10} />
-              Open
+              Preview
+            </a>
+          )}
+          {tpl.fullPageHref && (
+            <a
+              href={tpl.fullPageHref}
+              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-retro-cyan border border-retro-cyan/40 bg-retro-cyan/8 rounded-sm hover:bg-retro-cyan/15 transition-all"
+            >
+              <PxlKitIcon icon={ExternalLink} size={10} />
+              Open full page
             </a>
           )}
         </div>
       </div>
-      
+
       <div className="grid grid-cols-3 border-b border-retro-border">
         {(['preview', 'code', 'install'] as const).map((t) => (
           <button
@@ -414,10 +350,21 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
    Main Page
    ───────────────────────────────────────────────────────────────────────── */
 export default function TemplatesPage() {
+  const [activeCategory, setActiveCategory] = useState<TemplateCategoryId>('all');
   const [activeSection, setActiveSection] = useState<string>(TEMPLATE_SECTIONS[0].id);
 
-  const currentSection = TEMPLATE_SECTIONS.find((s) => s.id === activeSection);
-  const isPagesView = activeSection === '__pages__';
+  const filteredPages = useMemo(() => {
+    if (activeCategory === 'all') return FULL_PAGE_TEMPLATES;
+    return FULL_PAGE_TEMPLATES.filter((p) => p.category === activeCategory);
+  }, [activeCategory]);
+
+  const filteredSections = useMemo(() => {
+    if (activeCategory === 'all') return TEMPLATE_SECTIONS;
+    return TEMPLATE_SECTIONS.filter((s) => s.category === activeCategory);
+  }, [activeCategory]);
+
+  const currentSection =
+    filteredSections.find((s) => s.id === activeSection) ?? filteredSections[0];
 
   return (
     <div className="min-h-screen bg-retro-bg text-retro-text">
@@ -435,14 +382,21 @@ export default function TemplatesPage() {
               Skip the first day of every project.
             </h1>
             <p className="text-retro-muted font-mono text-xs sm:text-sm max-w-2xl leading-relaxed">
-              Section blocks and full-page layouts already composed with the kit — perfect for the &quot;new repo,
-              empty page&quot; moment. Pick a category, choose a variant, copy the code, change the words.
+              Full-page templates wired end-to-end plus section snippets ready to copy. Preview, lift the code,
+              install the kit.
             </p>
           </PixelFadeIn>
         </div>
       </section>
 
-      {/* Featured Full-Page Templates */}
+      {/* Category filter */}
+      <section className="px-4 sm:px-6 lg:px-8 py-5 sm:py-6 border-b border-retro-border/50 bg-retro-surface/10">
+        <div className="max-w-7xl mx-auto">
+          <TemplateCategoryNav active={activeCategory} onChange={setActiveCategory} />
+        </div>
+      </section>
+
+      {/* Full Page Templates — promoted to primary surface */}
       <section className="px-4 sm:px-6 lg:px-8 py-8 sm:py-10 border-b border-retro-border/50">
         <div className="max-w-7xl mx-auto">
           <PixelFadeIn>
@@ -450,40 +404,44 @@ export default function TemplatesPage() {
               <div>
                 <div className="mb-2 inline-flex items-center gap-2">
                   <PixelBadge tone="gold" variant="soft" size="sm">
-                    New
+                    {`${filteredPages.length} page${filteredPages.length === 1 ? '' : 's'}`}
                   </PixelBadge>
                 </div>
                 <h2 className="font-pixel text-sm sm:text-base md:text-lg lg:text-xl text-retro-text leading-loose break-words">
                   Full-page templates
                 </h2>
                 <p className="font-mono text-xs sm:text-sm text-retro-muted mt-1 max-w-xl">
-                  Six complete layouts already wired end-to-end. Click a card to open the live page, then lift the
-                  whole route into your repo.
+                  Each layout is wired end-to-end with the kit, dark + light included. Preview it, copy the source, or
+                  open the live route.
                 </p>
               </div>
-              <PixelBadge tone="neutral" variant="outline" size="sm">
-                {FEATURED_PAGES.length} pages
-              </PixelBadge>
             </div>
-            <PixelEqualHeightGrid cols={{ base: 1, sm: 2, lg: 3 }} gap={4}>
-              {FEATURED_PAGES.map((page) => (
-                <FeaturedPageCard key={page.href} page={page} />
-              ))}
-            </PixelEqualHeightGrid>
+            {filteredPages.length === 0 ? (
+              <div className="py-10 text-center font-mono text-xs text-retro-muted border border-dashed border-retro-border rounded-sm">
+                No full-page templates in this category yet — try another tab.
+              </div>
+            ) : (
+              <div className="space-y-6 sm:space-y-8">
+                {filteredPages.map((tpl) => (
+                  <PageTemplateCard key={tpl.id} tpl={tpl} />
+                ))}
+              </div>
+            )}
           </PixelFadeIn>
         </div>
       </section>
 
+      {/* Sections */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Mobile nav strip */}
         <div className="lg:hidden mb-5">
           <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:thin]">
-            {TEMPLATE_SECTIONS.map((section) => (
+            {filteredSections.map((section) => (
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
                 className={`shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-mono rounded border transition-all whitespace-nowrap ${
-                  activeSection === section.id && !isPagesView
+                  activeSection === section.id
                     ? 'text-retro-green border-retro-green/40 bg-retro-green/10'
                     : 'text-retro-muted border-retro-border hover:text-retro-text hover:bg-retro-surface'
                 }`}
@@ -492,17 +450,6 @@ export default function TemplatesPage() {
                 {section.name}
               </button>
             ))}
-            <button
-              onClick={() => setActiveSection('__pages__')}
-              className={`shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-mono rounded border transition-all whitespace-nowrap ${
-                isPagesView
-                  ? 'text-retro-gold border-retro-gold/40 bg-retro-gold/10'
-                  : 'text-retro-muted border-retro-border hover:text-retro-text hover:bg-retro-surface'
-              }`}
-            >
-              <span role="img" aria-hidden>📄</span>
-              Full Pages
-            </button>
           </div>
         </div>
 
@@ -510,14 +457,14 @@ export default function TemplatesPage() {
           {/* Sidebar navigation */}
           <aside className="hidden lg:block w-56 flex-shrink-0">
             <div className="sticky top-20">
-              <p className="font-pixel text-xs text-retro-muted mb-3 uppercase">Sections</p>
+              <p className="font-pixel text-xs text-retro-muted mb-3 uppercase">Section snippets</p>
               <nav className="space-y-0.5">
-                {TEMPLATE_SECTIONS.map((section) => (
+                {filteredSections.map((section) => (
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
                     className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-mono rounded transition-all text-left ${
-                      activeSection === section.id && !isPagesView
+                      activeSection === section.id
                         ? 'text-retro-green bg-retro-green/10'
                         : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
                     }`}
@@ -527,44 +474,16 @@ export default function TemplatesPage() {
                   </button>
                 ))}
               </nav>
-
               <PixelDivider tone="neutral" spacing="sm" className="my-3" />
-
-              <p className="font-pixel text-xs text-retro-muted mb-3 uppercase">Full Pages</p>
-              <button
-                onClick={() => setActiveSection('__pages__')}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs font-mono rounded transition-all text-left ${
-                  isPagesView
-                    ? 'text-retro-gold bg-retro-gold/10'
-                    : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
-                }`}
-              >
-                <span className="text-base leading-none" role="img" aria-hidden>📄</span>
-                Page Templates
-                <span className="ml-auto"><PixelBadge tone="gold">{FULL_PAGE_TEMPLATES.length}</PixelBadge></span>
-              </button>
+              <p className="font-mono text-[10px] text-retro-muted/60 leading-relaxed">
+                Tip: combine sections from this category with the full pages above to compose a route in minutes.
+              </p>
             </div>
           </aside>
 
           {/* Main content */}
           <div className="flex-1 min-w-0">
-            {isPagesView ? (
-              <PixelFadeIn>
-                <div className="mb-6">
-                  <h2 className="font-pixel text-base text-retro-text leading-loose">
-                    Full Page Templates
-                  </h2>
-                  <p className="text-retro-muted font-mono text-xs sm:text-sm mt-1">
-                    Open the file, swap the copy, ship — each layout is already wired with the kit, dark + light included.
-                  </p>
-                </div>
-                <div className="space-y-6 sm:space-y-8">
-                  {FULL_PAGE_TEMPLATES.map((tpl) => (
-                    <PageTemplateCard key={tpl.id} tpl={tpl} />
-                  ))}
-                </div>
-              </PixelFadeIn>
-            ) : currentSection ? (
+            {currentSection ? (
               <PixelFadeIn key={currentSection.id}>
                 <div className="mb-6">
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
@@ -584,10 +503,15 @@ export default function TemplatesPage() {
                   ))}
                 </div>
               </PixelFadeIn>
-            ) : null}
+            ) : (
+              <div className="py-10 text-center font-mono text-xs text-retro-muted border border-dashed border-retro-border rounded-sm">
+                No section snippets in this category — try another tab.
+              </div>
+            )}
           </div>
         </div>
       </div>
+
     </div>
   );
 }

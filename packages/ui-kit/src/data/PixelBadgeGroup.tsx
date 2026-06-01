@@ -285,6 +285,8 @@ export const PixelChipGroup = forwardRef<HTMLDivElement, PixelChipGroupProps>(
               onClick={handleClick}
               onKeyDown={handleKeyDown}
               className={cn(
+                // Full UA reset — the inner chip paints its own surface.
+                'bg-transparent border-0 p-0 m-0 font-inherit text-inherit cursor-pointer',
                 'inline-flex items-center transition-colors',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60',
                 s.radius,

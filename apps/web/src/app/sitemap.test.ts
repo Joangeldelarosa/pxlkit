@@ -31,7 +31,6 @@ describe('sitemap()', () => {
       'https://pxlkit.xyz/pricing',
       'https://pxlkit.xyz/templates',
       'https://pxlkit.xyz/templates/dashboards',
-      'https://pxlkit.xyz/templates/changelog',
       'https://pxlkit.xyz/templates/docs',
       'https://pxlkit.xyz/templates/landing-full',
       'https://pxlkit.xyz/templates/portfolio',

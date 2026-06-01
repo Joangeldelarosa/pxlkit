@@ -53,7 +53,7 @@ const CASE_STUDIES: CaseStudy[] = [
     year: '2026',
     summary: 'A pixel-perfect React UI kit with 95+ primitives and a deterministic icon system.',
     body:
-      'Started as a Saturday spike, grew into 50+ GitHub stars and the first $25 USDT licenses inside a month. Built around a Surface system (pixel ↔ linear) so every primitive can switch aesthetics from one prop. The icon inspector + refinement skill turned visual QA into a repeatable loop.',
+      'Started as a Saturday spike, grew into thousands of downloads and the first paid licenses inside a month. Built around a Surface system (pixel ↔ linear) so every primitive can switch aesthetics from one prop. The icon inspector + refinement skill turned visual QA into a repeatable loop.',
     image:
       'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=1200&q=70',
     tags: ['React 19', 'Tailwind v4', 'Storybook', 'OSS'],
@@ -122,7 +122,7 @@ const TECH_STACK = [
   'PostgreSQL',
   'Supabase',
   'Tailwind v4',
-  'Framer Motion',
+  'Motion library',
   'Remotion',
   'Docker',
   'Cloudflare',
@@ -130,10 +130,10 @@ const TECH_STACK = [
   'Vitest',
   'Playwright',
   'PostHog',
-  'Stripe',
+  'Payments',
   'Three.js',
   'GSAP',
-  'Figma',
+  'Design tool',
 ];
 
 export default function PixelPortfolioTemplate() {

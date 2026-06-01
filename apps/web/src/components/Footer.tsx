@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Heart } from '@pxlkit/social';
 import { BrandMark } from './Logo';
+import { UI_KIT_VERSION_LABEL } from '@/lib/pxlkit-version';
 
 export function Footer() {
   return (
@@ -120,7 +121,7 @@ export function Footer() {
           </p>
           <div className="flex flex-col items-center sm:items-end gap-1">
             <p className="text-retro-muted/50 text-xs font-mono">
-              v1.0.2 — Built with <PxlKitIcon icon={Heart} size={12} colorful className="inline-block mx-1" /> and pixels
+              {UI_KIT_VERSION_LABEL} — Built with <PxlKitIcon icon={Heart} size={12} colorful className="inline-block mx-1" /> and pixels
             </p>
             <p className="text-retro-muted/40 text-[10px] font-mono">
               Created by{' '}

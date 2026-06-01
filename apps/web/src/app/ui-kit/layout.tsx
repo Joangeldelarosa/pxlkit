@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { UI_KIT_VERSION } from '@/lib/pxlkit-version';
 
 export const metadata: Metadata = {
   title: '95+ Retro Pixel-Art React Components — UI Kit with Live Demos | Pxlkit',
@@ -119,7 +120,7 @@ const UI_KIT_JSON_LD = {
   url: 'https://pxlkit.xyz/ui-kit',
   description:
     '95+ accessible retro React primitives — buttons, forms, modals, tables, charts, calendars, parallax, and more. TypeScript-first, Tailwind v4, MIT.',
-  softwareVersion: '2.0.0',
+  softwareVersion: UI_KIT_VERSION,
   programmingLanguage: ['TypeScript', 'React', 'JavaScript'],
   downloadUrl: 'https://www.npmjs.com/package/@pxlkit/ui-kit',
   license: 'https://github.com/Joangeldelarosa/pxlkit/blob/main/LICENSE',

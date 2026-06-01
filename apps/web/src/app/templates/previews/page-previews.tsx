@@ -20,6 +20,8 @@ import { TestimonialsCardsPreview, TestimonialsLargeQuotePreview, TestimonialsSl
 import { FaqAccordionPreview, FaqTwoColumnPreview, FaqTabbedPreview } from './faq-previews';
 import { CtaBannerPreview, CtaSplitPreview, CtaCardPreview } from './cta-previews';
 import { FooterMultiColumnPreview, FooterMinimalPreview, FooterCtaPreview } from './footer-previews';
+import { PixelDocsTemplate } from '@/components/templates/docs-template';
+import { PixelEcommerceTemplate } from '@/components/templates/ecommerce-template';
 
 /* ── Shared theme wrapper ────────────────────────────────────────────────── */
 
@@ -135,6 +137,34 @@ export function PageBlogPreview() {
         </>
       )}
     </ThemePreviewShell>
+  );
+}
+
+/* ── 6. Docs Site (scaled wrapper around PixelDocsTemplate) ──────────────── */
+export function PageDocsPreview() {
+  return (
+    <div className="relative overflow-hidden">
+      <div
+        className="origin-top-left"
+        style={{ transform: 'scale(0.45)', width: '222.22%', height: '222.22%' }}
+      >
+        <PixelDocsTemplate />
+      </div>
+    </div>
+  );
+}
+
+/* ── 7. Shop / Storefront (scaled wrapper around PixelEcommerceTemplate) ──── */
+export function PageEcommercePreview() {
+  return (
+    <div className="relative overflow-hidden">
+      <div
+        className="origin-top-left"
+        style={{ transform: 'scale(0.45)', width: '222.22%', height: '222.22%' }}
+      >
+        <PixelEcommerceTemplate />
+      </div>
+    </div>
   );
 }
 

@@ -33,6 +33,7 @@ import {
   useToast,
   type ColumnDef,
 } from '@pxlkit/ui-kit';
+import { UI_KIT_VERSION_LABEL } from '@/lib/pxlkit-version';
 
 /* ─────────────────────────────────────────────────────────────────────────
    Types + placeholder data
@@ -395,7 +396,7 @@ function DashboardInner() {
       <div className="relative min-h-screen bg-retro-bg text-retro-text">
         {/* Top ribbon — page-level "NEW" marker */}
         <PixelRibbon position="top-right" tone="cyan" offset="md">
-          NEW · @pxlkit/ui-kit v2.0.0
+          {`NEW · @pxlkit/ui-kit ${UI_KIT_VERSION_LABEL}`}
         </PixelRibbon>
 
         <div className="flex min-h-screen">
@@ -415,7 +416,7 @@ function DashboardInner() {
               footer={
                 !sidebarCollapsed ? (
                   <div className="text-[11px] font-mono text-retro-muted px-1 tracking-wide">
-                    v2.0.0 · build 4a
+                    {`${UI_KIT_VERSION_LABEL} · build 4a`}
                   </div>
                 ) : null
               }

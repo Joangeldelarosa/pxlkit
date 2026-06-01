@@ -87,6 +87,15 @@ export const PixelRibbon = forwardRef<HTMLDivElement, PixelRibbonProps>(function
   const inlineTilt =
     effectiveTilt !== 0 && !tiltCls ? { transform: `rotate(${effectiveTilt}deg)` } : null;
 
+  // Opaque fill + tone-aware contrast text. Warm tones get dark page text;
+  // cool/dark tones (purple/red) keep light page text; neutral uses dark.
+  const textOnFill =
+    toneProp === 'neutral'
+      ? 'text-retro-bg'
+      : toneProp === 'purple' || toneProp === 'red'
+        ? 'text-retro-text'
+        : 'text-retro-bg';
+
   return (
     <div
       ref={ref}
@@ -96,9 +105,9 @@ export const PixelRibbon = forwardRef<HTMLDivElement, PixelRibbonProps>(function
         s.border,
         s.radius,
         s.fontDisplay,
-        t.bg,
+        t.fill,
         t.border,
-        t.text,
+        textOnFill,
         positionClasses(position, offset),
         tiltCls,
         className,

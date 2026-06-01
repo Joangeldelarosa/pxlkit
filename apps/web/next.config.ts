@@ -27,6 +27,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/templates/changelog',
+        destination: '/changelog',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

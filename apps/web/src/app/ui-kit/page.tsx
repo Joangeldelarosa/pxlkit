@@ -66,6 +66,11 @@ import { Heart, Message } from '@pxlkit/social';
 import { CodeBlock } from '../../components/CodeBlock';
 import { useToast, type ToastPosition, type ToastTone } from '../../components/ToastProvider';
 import { WhatsNewStrip, type WhatsNewItem } from '../../components/whats-new-strip';
+import {
+  UI_KIT_VERSION,
+  UI_KIT_VERSION_LABEL,
+  UI_KIT_LATEST_DATE,
+} from '@/lib/pxlkit-version';
 
 /* ── Live demos imported from package SSOT .examples.tsx files.
    Each export is the `Default` example function authored alongside the component.
@@ -937,8 +942,8 @@ export default function UIKitPage() {
             {/* ══════════════════ WHAT'S NEW STRIP ══════════════════ */}
             <div className="mb-6">
               <WhatsNewStrip
-                version="2.0.0"
-                date="2026-05-31"
+                version={UI_KIT_VERSION}
+                date={UI_KIT_LATEST_DATE}
                 items={WHATS_NEW_V200_ITEMS}
               />
             </div>
@@ -3159,7 +3164,7 @@ const [active, setActive] = useState(false);
             <ParallaxDemos />
 
             {/* ============================================================
-                v2.0.0 live demos — each placeholder slug now renders the real Default
+                Live demos — each placeholder slug now renders the real Default
                 example imported from packages/ui-kit/src/<category>/<Component>.examples.tsx.
                 If a component has no examples file (rare — most ship one in SSOT),
                 LIVE_DEMOS won't have an entry and we fall back to a minimal placeholder.
@@ -3184,7 +3189,10 @@ const [active, setActive] = useState(false);
                         description={
                           <>
                             Shipped in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>. See the{' '}
-                            <PixelTextLink href="/changelog#v200">v2.0.0 changelog</PixelTextLink> for full release notes.
+                            <PixelTextLink href={`/changelog#v${UI_KIT_VERSION.replace(/\./g, '')}`}>
+                              {`${UI_KIT_VERSION_LABEL} changelog`}
+                            </PixelTextLink>{' '}
+                            for full release notes.
                           </>
                         }
                         code={`import { ${c.name} } from '@pxlkit/ui-kit';`}

@@ -799,6 +799,38 @@ export default function BlogSite() {
 }
 `;
 
+/* ─────────────────────────────────────────────────────────────────────────
+   6. Docs Site (placeholder — full template lives at /templates/docs)
+   ───────────────────────────────────────────────────────────────────────── */
+const docsSite = `\
+// Full source for the docs template lives at:
+// apps/web/src/components/templates/docs-template.tsx
+// The route /templates/docs renders <PixelDocsTemplate /> end-to-end.
+// Lift the component into your repo, theme it, swap the copy, ship.
+
+import { PixelDocsTemplate } from '@pxlkit/ui-kit/templates';
+
+export default function DocsPage() {
+  return <PixelDocsTemplate />;
+}
+`;
+
+/* ─────────────────────────────────────────────────────────────────────────
+   7. Shop / Storefront (placeholder — full template lives at /templates/ecommerce)
+   ───────────────────────────────────────────────────────────────────────── */
+const shopStorefront = `\
+// Full source for the storefront template lives at:
+// apps/web/src/components/templates/ecommerce-template.tsx
+// The route /templates/ecommerce renders <PixelEcommerceTemplate /> end-to-end.
+// Lift the component into your repo, wire it to your products + cart, ship.
+
+import { PixelEcommerceTemplate } from '@pxlkit/ui-kit/templates';
+
+export default function ShopPage() {
+  return <PixelEcommerceTemplate />;
+}
+`;
+
 export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
   {
     id: 'page-saas-landing',
@@ -807,6 +839,8 @@ export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
     icon: '🚀',
     installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/feedback @pxlkit/gamification',
     code: saasLanding,
+    category: 'marketing',
+    fullPageHref: '/templates/landing-full',
   },
   {
     id: 'page-portfolio',
@@ -815,6 +849,8 @@ export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
     icon: '🧑‍💻',
     installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/social @pxlkit/parallax',
     code: devPortfolio,
+    category: 'portfolio',
+    fullPageHref: '/templates/portfolio',
   },
   {
     id: 'page-indie-game',
@@ -823,6 +859,7 @@ export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
     icon: '🎮',
     installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/gamification @pxlkit/effects',
     code: indieGame,
+    category: 'product',
   },
   {
     id: 'page-admin-dashboard',
@@ -831,6 +868,8 @@ export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
     icon: '📊',
     installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/feedback',
     code: adminDashboard,
+    category: 'app',
+    fullPageHref: '/templates/dashboards',
   },
   {
     id: 'page-blog',
@@ -839,5 +878,26 @@ export const FULL_PAGE_TEMPLATES: FullPageTemplate[] = [
     icon: '📝',
     installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/social @pxlkit/feedback',
     code: blogSite,
+    category: 'content',
+  },
+  {
+    id: 'page-docs',
+    name: 'Docs Site',
+    description: 'Reference-style docs shell with sidebar navigation, content area, and TOC — perfect for API references, technical handbooks, and knowledge bases.',
+    icon: '📚',
+    installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui',
+    code: docsSite,
+    category: 'content',
+    fullPageHref: '/templates/docs',
+  },
+  {
+    id: 'page-ecommerce',
+    name: 'Shop / Storefront',
+    description: 'Storefront with product grid, filters, cart sheet, and checkout flow — ready to wire to your products and a payments provider.',
+    icon: '🛒',
+    installCmd: 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui',
+    code: shopStorefront,
+    category: 'shop',
+    fullPageHref: '/templates/ecommerce',
   },
 ];

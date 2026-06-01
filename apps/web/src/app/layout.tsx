@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { ConditionalShell } from '../components/ConditionalShell';
 import { ThemeProvider } from '../components/ThemeProvider';
 import { ToastProvider } from '../components/ToastProvider';
+import { UI_KIT_VERSION } from '@/lib/pxlkit-version';
 import './globals.css';
 import { Analytics } from "@vercel/analytics/next";
 
@@ -296,7 +297,7 @@ const JSON_LD = {
           description: 'Unlimited projects, all future packs, priority support',
         },
       ],
-      softwareVersion: '2.0.0',
+      softwareVersion: UI_KIT_VERSION,
       programmingLanguage: ['TypeScript', 'React', 'JavaScript'],
       downloadUrl: 'https://www.npmjs.com/package/@pxlkit/core',
       featureList: [

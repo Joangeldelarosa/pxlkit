@@ -27,6 +27,11 @@ import { useToast } from './ToastProvider';
 import type { ToastTone } from './ToastProvider';
 import { WhatsNewStrip, type WhatsNewItem } from './whats-new-strip';
 import {
+  UI_KIT_VERSION,
+  UI_KIT_VERSION_LABEL,
+  UI_KIT_LATEST_DATE,
+} from '@/lib/pxlkit-version';
+import {
   PixelAccordion,
   PixelBadge,
   PixelBento,
@@ -86,10 +91,10 @@ export function LandingPageClient() {
       <HeroCinematic />
       <StatCardStrip />
       <WhatsNewStrip
-        version="2.0.0"
-        date="2026-05-31"
+        version={UI_KIT_VERSION}
+        date={UI_KIT_LATEST_DATE}
         items={WHATS_NEW_ITEMS}
-        changelogHref="/templates/changelog"
+        changelogHref="/changelog"
       />
       <PillarsBento />
       <FeaturesShowcase />
@@ -307,7 +312,7 @@ function StatsStrip() {
         layout="grid"
         columns={2}
         tone="cyan"
-        aria-label="Pxlkit v2.0.0 by the numbers"
+        aria-label={`Pxlkit ${UI_KIT_VERSION_LABEL} by the numbers`}
         className="!grid-cols-2 sm:!grid-cols-4 items-stretch"
       >
         {stats.map((s) => (

@@ -32,7 +32,6 @@ const ROUTES: Entry[] = [
 
   // Template detail pages
   { path: '/templates/dashboards', changeFrequency: 'monthly', priority: 0.7 },
-  { path: '/templates/changelog', changeFrequency: 'monthly', priority: 0.65 },
   { path: '/templates/docs', changeFrequency: 'monthly', priority: 0.65 },
   { path: '/templates/landing-full', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/templates/portfolio', changeFrequency: 'monthly', priority: 0.65 },

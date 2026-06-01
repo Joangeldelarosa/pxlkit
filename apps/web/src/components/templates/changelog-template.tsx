@@ -14,7 +14,6 @@ import {
   PixelTimelineItem,
   PixelTwoColumn,
   PixelDivider,
-  PixelTextLink,
 } from '@pxlkit/ui-kit';
 
 type ChangeCategory = 'Added' | 'Changed' | 'Fixed' | 'Deps';
@@ -29,8 +28,6 @@ interface Release {
   version: string;
   date: string;
   title: string;
-  prUrl: string;
-  prLabel: string;
   changes: ChangeEntry[];
 }
 
@@ -39,8 +36,6 @@ const RELEASES: Release[] = [
     version: '2.0.0',
     date: '2026-05-31',
     title: 'Ola 5 — Polish + Cinematic Hero + Sidebar Overhaul',
-    prUrl: 'https://github.com/pxlkit/pxlkit/pull/50',
-    prLabel: 'View PR #50 on GitHub',
     changes: [
       {
         category: 'Changed',
@@ -66,8 +61,6 @@ const RELEASES: Release[] = [
     version: '1.9.0',
     date: '2026-05-30',
     title: 'Ola 4a — Kit Depth: DataTable + 18 new + 7 upgrades',
-    prUrl: 'https://github.com/pxlkit/pxlkit/pull/49',
-    prLabel: 'View PR #49 on GitHub',
     changes: [
       {
         category: 'Added',
@@ -116,8 +109,6 @@ const RELEASES: Release[] = [
     version: '1.8.0',
     date: '2026-05-30',
     title: 'Ola 3 — Overlay + Form Workhorses',
-    prUrl: 'https://github.com/pxlkit/pxlkit/pull/41',
-    prLabel: 'View PR #41 on GitHub',
     changes: [
       {
         category: 'Added',
@@ -166,8 +157,6 @@ const RELEASES: Release[] = [
     version: '1.7.0',
     date: '2026-05-30',
     title: 'Ola 2 — Hero + Cards + Featured Ribbon',
-    prUrl: 'https://github.com/pxlkit/pxlkit/pull/33',
-    prLabel: 'View PR #33 on GitHub',
     changes: [
       {
         category: 'Added',
@@ -210,8 +199,6 @@ const RELEASES: Release[] = [
     version: '1.6.0',
     date: '2026-05-30',
     title: 'Ola 1 — Foundation: tokens, hooks, layout primitives',
-    prUrl: 'https://github.com/pxlkit/pxlkit/pull/27',
-    prLabel: 'View PR #27 on GitHub',
     changes: [
       {
         category: 'Added',
@@ -359,17 +346,6 @@ function ReleaseEntry({
             </PixelTimeline>
           )}
         </PixelCard.Body>
-
-        <PixelCard.Footer>
-          <PixelTextLink
-            href={release.prUrl}
-            tone="cyan"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {release.prLabel} →
-          </PixelTextLink>
-        </PixelCard.Footer>
       </PixelCard>
     </div>
   );
@@ -489,26 +465,6 @@ export function PixelChangelogTemplate({
                       />
                     ))}
                   </PixelChipGroup>
-                </div>
-
-                <PixelDivider tone="neutral" spacing="sm" />
-
-                <div>
-                  <h3 className="font-pixel text-xs uppercase tracking-[0.18em] text-retro-muted mb-3">
-                    Subscribe
-                  </h3>
-                  <p className="text-sm text-retro-muted leading-relaxed mb-3">
-                    Watch the repo on GitHub to get release notifications as soon
-                    as we ship a new wave.
-                  </p>
-                  <PixelTextLink
-                    href="https://github.com/pxlkit/pxlkit/releases"
-                    tone="gold"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    All releases on GitHub →
-                  </PixelTextLink>
                 </div>
               </PixelStack>
             </aside>

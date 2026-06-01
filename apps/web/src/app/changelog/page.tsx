@@ -4,13 +4,13 @@ import { PixelChangelogTemplate } from '@/components/templates/changelog-templat
 export const metadata: Metadata = {
   title: 'Changelog — Every Pxlkit Release | Pxlkit',
   description:
-    'All shipped Pxlkit waves with details on every component and fix. Filter by version, category, and jump to the GitHub PR.',
+    'Release notes for @pxlkit/ui-kit. Track every wave, every component, every fix — filter by version and category.',
   alternates: { canonical: 'https://pxlkit.xyz/changelog' },
   openGraph: {
     type: 'website',
     title: 'Changelog — Every Pxlkit Release | Pxlkit',
     description:
-      'All shipped Pxlkit waves with details on every component and fix. Filter by version, category, jump to GitHub PR.',
+      'Release notes for @pxlkit/ui-kit. Track every wave, every component, every fix.',
     url: 'https://pxlkit.xyz/changelog',
     images: [
       {
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Changelog — Every Pxlkit Release | Pxlkit',
     description:
-      'All shipped Pxlkit waves with details on every component and fix. Filter by version, category.',
+      'Release notes for @pxlkit/ui-kit. Track every wave, every component, every fix.',
     images: ['/og-twitter.png'],
   },
 };

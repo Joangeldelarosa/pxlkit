@@ -46,7 +46,7 @@ import {
 } from '@pxlkit/ui-kit';
 
 /* ─────────────────────────────────────────────────────────────────────────
-   DATA — Codex (generic code editor SaaS)
+   DATA — Pixelpad (generic code editor SaaS placeholder, fictional brand)
    ───────────────────────────────────────────────────────────────────────── */
 
 const NAV_LINKS = [
@@ -94,7 +94,7 @@ const FEATURES = [
   {
     icon: Package,
     title: 'Extension marketplace',
-    desc: 'Compatible with thousands of VS Code extensions on day one. Bring the toolchain you already trust.',
+    desc: 'Compatible with thousands of editor extensions on day one. Bring the toolchain you already trust.',
     tone: 'red' as const,
   },
   {
@@ -109,7 +109,7 @@ const DEEP_FEATURES = [
   {
     eyebrow: 'Productivity',
     title: 'A repo-aware copilot, not a fancy autocomplete',
-    desc: 'Codex indexes your entire workspace — dependencies, comments, tests, PR history — and uses that context for every suggestion. No more renaming a variable in 47 files by hand.',
+    desc: 'Pixelpad indexes your entire workspace — dependencies, comments, tests, PR history — and uses that context for every suggestion. No more renaming a variable in 47 files by hand.',
     bullets: [
       'Multi-file refactors with diff preview',
       'Generates tests that match your existing patterns',
@@ -174,7 +174,7 @@ const PLANS: Plan[] = [
     features: [
       { label: '1 workspace, 3 collaborators' },
       { label: 'AI completions (200/day)' },
-      { label: 'Community Discord support' },
+      { label: 'Community chat support' },
       { label: 'Public repos only' },
     ],
     cta: 'Start for free',
@@ -206,7 +206,7 @@ const PLANS: Plan[] = [
       { label: 'Shared codebase context' },
       { label: 'SSO + SCIM provisioning' },
       { label: 'Audit logs (90-day retention)' },
-      { label: 'Dedicated Slack channel' },
+      { label: 'Dedicated team channel' },
     ],
     cta: 'Start Team trial',
   },
@@ -233,7 +233,7 @@ const TESTIMONIALS = [
     role: 'Staff Engineer',
     company: 'Acme Corp',
     quote:
-      'Codex collapsed our refactor cycles from days to hours. The repo-aware AI is the first one that actually understands our monorepo conventions.',
+      'Pixelpad collapsed our refactor cycles from days to hours. The repo-aware AI is the first one that actually understands our monorepo conventions.',
     tone: 'green' as const,
   },
   {
@@ -241,7 +241,7 @@ const TESTIMONIALS = [
     role: 'CTO',
     company: 'Northwind',
     quote:
-      'We replaced three internal tools with Codex in one quarter. Pair-programming, code review, and preview envs — all in one place. The team loves it.',
+      'We replaced three internal tools with Pixelpad in one quarter. Pair-programming, code review, and preview envs — all in one place. The team loves it.',
     tone: 'cyan' as const,
   },
   {
@@ -249,7 +249,7 @@ const TESTIMONIALS = [
     role: 'Tech Lead',
     company: 'Globex',
     quote:
-      'The multiplayer model is buttery. We onboarded a new hire entirely through Codex sessions — no screen-share fatigue, no missed context.',
+      'The multiplayer model is buttery. We onboarded a new hire entirely through Pixelpad sessions — no screen-share fatigue, no missed context.',
     tone: 'gold' as const,
   },
   {
@@ -257,7 +257,7 @@ const TESTIMONIALS = [
     role: 'Principal Engineer',
     company: 'Hooli',
     quote:
-      'Codex is the first AI editor where I trust the suggestions enough to skim, not audit. The codebase indexing makes a real difference.',
+      'Pixelpad is the first AI editor where I trust the suggestions enough to skim, not audit. The codebase indexing makes a real difference.',
     tone: 'purple' as const,
   },
   {
@@ -265,7 +265,7 @@ const TESTIMONIALS = [
     role: 'Engineering Manager',
     company: 'Initech',
     quote:
-      'Our code review queue dropped 40% in the first month. Inline conversations beat the GitHub PR loop for the kind of feedback that actually matters.',
+      'Our code review queue dropped 40% in the first month. Inline conversations beat the usual PR loop for the kind of feedback that actually matters.',
     tone: 'cyan' as const,
   },
   {
@@ -273,17 +273,17 @@ const TESTIMONIALS = [
     role: 'Founder',
     company: 'Pied Piper',
     quote:
-      'Cloned the repo on Tuesday, shipped a feature on Wednesday. Codex turns ramp-up into a couple of hours instead of a couple of weeks.',
+      'Cloned the repo on Tuesday, shipped a feature on Wednesday. Pixelpad turns ramp-up into a couple of hours instead of a couple of weeks.',
     tone: 'green' as const,
   },
 ];
 
 const FAQ_ITEMS = [
   {
-    id: 'what-is-codex',
-    title: 'What exactly is Codex?',
+    id: 'what-is-pixelpad',
+    title: 'What exactly is Pixelpad?',
     content:
-      'Codex is a collaborative code editor with a repo-aware AI pair-programmer built in. Think VS Code with multiplayer, contextual AI, and a shipping workflow tuned for modern teams.',
+      'Pixelpad is a collaborative code editor with a repo-aware AI pair-programmer built in. Think your favorite editor, but with multiplayer, contextual AI, and a shipping workflow tuned for modern teams.',
   },
   {
     id: 'free-forever',
@@ -299,9 +299,9 @@ const FAQ_ITEMS = [
   },
   {
     id: 'extensions',
-    title: 'Do my VS Code extensions work?',
+    title: 'Do my editor extensions work?',
     content:
-      'Codex implements the VS Code extension API surface, so the vast majority of extensions from the Marketplace work out of the box. We publish a compatibility matrix and a one-click installer for the top 200 extensions.',
+      'Pixelpad implements a familiar extension API surface, so the vast majority of editor extensions work out of the box. We publish a compatibility matrix and a one-click installer for the top 200 extensions.',
   },
   {
     id: 'self-hosted',
@@ -319,13 +319,13 @@ const FAQ_ITEMS = [
     id: 'migrate',
     title: 'Can I migrate my existing projects?',
     content:
-      'Bring any Git repo — GitHub, GitLab, Bitbucket, or self-hosted — and Codex will mirror it into a workspace within a minute. Your local .vscode settings, snippets, and keybindings are imported automatically.',
+      'Bring any Git repo — any host or self-hosted — and Pixelpad will mirror it into a workspace within a minute. Your local editor settings, snippets, and keybindings are imported automatically.',
   },
   {
     id: 'support',
     title: 'What support do you offer?',
     content:
-      'Free users get community Discord support. Pro plans include priority email with a 24-hour response SLA. Team and Enterprise plans get dedicated Slack channels, named CSMs, and 24/7 phone support for production incidents.',
+      'Free users get community chat support. Pro plans include priority email with a 24-hour response SLA. Team and Enterprise plans get dedicated team channels, named CSMs, and 24/7 phone support for production incidents.',
   },
 ];
 
@@ -361,7 +361,7 @@ function StickyNav() {
         <PixelCluster gap={4} align="center" justify="between" className="py-3">
           <a href="#top" className="inline-flex items-center gap-2">
             <PxlKitIcon icon={Grid} size={20} colorful />
-            <span className="font-pixel text-sm text-retro-text">Codex</span>
+            <span className="font-pixel text-sm text-retro-text">Pixelpad</span>
             <PixelBadge tone="green" size="sm">v2.4</PixelBadge>
           </a>
 
@@ -407,14 +407,14 @@ function HeroSection() {
           <span className="h-2 w-2 rounded-full bg-retro-gold/70" />
           <span className="h-2 w-2 rounded-full bg-retro-green/70" />
           <span className="ml-2 font-mono text-[11px] text-retro-muted tracking-wide">
-            codex / src / editor.tsx
+            pixelpad / src / editor.tsx
           </span>
         </div>
 
         <pre className="mt-10 overflow-hidden font-mono text-[11px] leading-relaxed text-retro-text">
 {`export function Editor({ repo }: Props) {
   const ctx = useRepoContext(repo)
-  const ai  = useCodexAI(ctx)
+  const ai  = usePixelpadAI(ctx)
 
   return (
     <Workspace>
@@ -447,7 +447,7 @@ function HeroSection() {
       variant="split"
       eyebrow="v2.4 — multiplayer + repo-aware AI"
       headline="The code editor your team will actually fight to use."
-      subline="Codex is a collaborative, AI-native code editor that indexes your repo, pairs in real-time, and ships preview environments without a CI rewrite."
+      subline="Pixelpad is a collaborative, AI-native code editor that indexes your repo, pairs in real-time, and ships preview environments without a CI rewrite."
       tone="green"
       minHeight="lg"
       primaryCta={
@@ -496,7 +496,7 @@ function TrustedBySection() {
         size="sm"
         spacing="tight"
         eyebrow="Trusted by 6,000+ teams"
-        title="Engineering orgs that ship every day run on Codex"
+        title="Engineering orgs that ship every day run on Pixelpad"
       />
       <div className="mt-8">
         <PixelCluster gap={4} align="center" justify="center">
@@ -524,7 +524,7 @@ function BentoSection() {
         spacing="normal"
         eyebrow="What you get"
         title="One editor. Every workflow your team already lives in."
-        description="From your first commit to your hundredth release, Codex stitches together the loops you have to do anyway — without the tab-switching tax."
+        description="From your first commit to your hundredth release, Pixelpad stitches together the loops you have to do anyway — without the tab-switching tax."
       />
 
       <div className="mt-10">
@@ -538,7 +538,7 @@ function BentoSection() {
               Repo-aware AI that reads your codebase, not just your prompt
             </h3>
             <p className="font-mono text-sm text-retro-muted leading-relaxed">
-              Codex indexes every file, dependency, comment, and merged PR in your workspace. Suggestions match your existing patterns. Multi-file refactors land with a preview, not a guess.
+              Pixelpad indexes every file, dependency, comment, and merged PR in your workspace. Suggestions match your existing patterns. Multi-file refactors land with a preview, not a guess.
             </p>
             <PixelCluster gap={2} align="center">
               <PixelChip label="Multi-file refactors" tone="cyan" />
@@ -551,7 +551,7 @@ function BentoSection() {
             <span className="font-mono text-xs text-retro-muted">Median PR cycle</span>
             <span className="font-pixel text-2xl text-retro-green">-46%</span>
             <span className="font-mono text-[11px] text-retro-muted">
-              vs GitHub PR loop, measured across 1.4k teams
+              vs the usual PR loop, measured across 1.4k teams
             </span>
           </PixelBentoCell>
 
@@ -595,7 +595,7 @@ function FeatureGridSection() {
         size="md"
         spacing="normal"
         eyebrow="Feature tour"
-        title="Six reasons engineering leads pick Codex over the alternative"
+        title="Six reasons engineering leads pick Pixelpad over the alternative"
         description="Every feature ships behind the same product principle: respect the developer's flow, kill the busywork, and never charge per integration."
       />
 
@@ -631,7 +631,7 @@ function DeepDiveSection() {
         size="md"
         spacing="normal"
         eyebrow="In depth"
-        title="Three loops Codex makes obviously better"
+        title="Three loops Pixelpad makes obviously better"
       />
 
       <div className="mt-12 space-y-12">
@@ -705,7 +705,7 @@ function StatsSection() {
         size="md"
         spacing="normal"
         eyebrow="By the numbers"
-        title="Codex isn't a beta. It's the editor 85k devs open every morning."
+        title="Pixelpad isn't a beta. It's the editor 85k devs open every morning."
       />
 
       <div className="mt-10">
@@ -713,7 +713,7 @@ function StatsSection() {
           layout="grid"
           columns={4}
           tone="cyan"
-          aria-label="Codex usage stats"
+          aria-label="Pixelpad usage stats"
         >
           {STATS.map((s) => (
             <PixelStatCard
@@ -802,8 +802,8 @@ function TestimonialsSection() {
         size="md"
         spacing="normal"
         eyebrow="Voices from the team chat"
-        title="What Codex teams actually say in stand-up"
-        description="Six unedited quotes from teams shipping on Codex today."
+        title="What Pixelpad teams actually say in stand-up"
+        description="Six unedited quotes from teams shipping on Pixelpad today."
       />
 
       <div className="mt-12">
@@ -890,7 +890,7 @@ function CtaSection() {
             id="cta-title"
             className="font-pixel text-xl sm:text-2xl md:text-3xl lg:text-4xl text-retro-text leading-tight max-w-2xl break-words"
           >
-            Stop fighting your editor. Start shipping with Codex.
+            Stop fighting your editor. Start shipping with Pixelpad.
           </h2>
 
           <p className="font-mono text-sm sm:text-base text-retro-muted max-w-xl leading-relaxed">
@@ -931,26 +931,26 @@ function FooterSection() {
   return (
     <footer className="border-t border-retro-border/60 bg-retro-bg" aria-labelledby="footer-title">
       <h2 id="footer-title" className="sr-only">
-        Codex footer
+        Pixelpad footer
       </h2>
       <PixelContainer as="div" maxWidth="xl" padding="lg">
         <PixelGrid cols={{ base: 1, sm: 2, lg: 4 }} gap={8}>
           <PixelStack gap={3} align="start">
             <a href="#top" className="inline-flex items-center gap-2">
               <PxlKitIcon icon={Grid} size={20} colorful />
-              <span className="font-pixel text-sm text-retro-text">Codex</span>
+              <span className="font-pixel text-sm text-retro-text">Pixelpad</span>
             </a>
             <p className="font-mono text-xs text-retro-muted leading-relaxed max-w-[28ch]">
               The collaborative code editor with a repo-aware AI baked in. Built by engineers who ship every day.
             </p>
             <PixelCluster gap={3} align="center">
-              <PixelTooltip content="GitHub" position="top">
-                <a href="#" aria-label="GitHub" className="opacity-60 hover:opacity-100 transition-opacity">
+              <PixelTooltip content="Source code" position="top">
+                <a href="#" aria-label="Source code" className="opacity-60 hover:opacity-100 transition-opacity">
                   <PxlKitIcon icon={ExternalLink} size={16} colorful />
                 </a>
               </PixelTooltip>
-              <PixelTooltip content="Discord" position="top">
-                <a href="#" aria-label="Discord" className="opacity-60 hover:opacity-100 transition-opacity">
+              <PixelTooltip content="Community" position="top">
+                <a href="#" aria-label="Community" className="opacity-60 hover:opacity-100 transition-opacity">
                   <PxlKitIcon icon={ChatBubble} size={16} colorful />
                 </a>
               </PixelTooltip>
@@ -987,7 +987,7 @@ function FooterSection() {
 
         <PixelCluster gap={3} align="center" justify="between">
           <span className="font-mono text-xs text-retro-muted">
-            © 2026 Codex Labs · Made for engineers who&apos;d rather ship than tweak settings.
+            © 2026 Pixelpad Inc. · Made for engineers who&apos;d rather ship than tweak settings.
           </span>
           <PixelCluster gap={3} align="center">
             <PixelBadge tone="green" variant="soft" size="sm">

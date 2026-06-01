@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { PixelBadge, PixelButton } from '@pxlkit/ui-kit';
+import { UI_KIT_VERSION_LABEL } from '@/lib/pxlkit-version';
 import { MouseProvider } from './mouseContext';
 import { HeroBackground } from './HeroBackground';
 import { IconField } from './IconField';
@@ -40,7 +41,7 @@ export function HeroCinematic() {
         >
           {/* Status badges */}
           <div className="flex flex-wrap justify-center gap-2">
-            <PixelBadge tone="purple">PIXEL-ART UI KIT v2.0.0</PixelBadge>
+            <PixelBadge tone="purple">{`PIXEL-ART UI KIT ${UI_KIT_VERSION_LABEL}`}</PixelBadge>
             <PixelBadge tone="green">MIT Code · Licensed Assets</PixelBadge>
             <PixelBadge tone="cyan">TypeScript + Tailwind</PixelBadge>
             <PixelBadge tone="gold">
