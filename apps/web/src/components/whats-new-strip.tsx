@@ -56,7 +56,7 @@ export function WhatsNewStrip({
       <div className="rounded-lg border border-retro-cyan/30 bg-retro-surface/30 p-4 sm:p-5">
         <PixelCluster gap={3} align="center" justify="between" className="mb-3">
           <PixelCluster gap={3} align="center">
-            <PixelBadge tone="cyan" variant="solid">{`v${version}`}</PixelBadge>
+            <PixelBadge tone="cyan" variant="soft">{`v${version}`}</PixelBadge>
             <span className="font-pixel text-xs uppercase tracking-wider text-retro-fg">
               What&apos;s new
             </span>

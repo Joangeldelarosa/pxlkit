@@ -73,4 +73,13 @@ describe('WhatsNewStrip', () => {
     expect(screen.getByText('navigation')).toBeInTheDocument();
     expect(screen.getByText('forms')).toBeInTheDocument();
   });
+
+  it('renders the version badge with cyan text (soft variant, not dark-on-dark solid)', () => {
+    render(<WhatsNewStrip version="2.0.0" date="2026-05-31" items={items} />);
+    const badge = screen.getByText('v2.0.0');
+    // Regression: solid variant forces text-retro-bg (near-black) over a cyan tint = illegible.
+    // Soft variant uses text-retro-cyan over bg-retro-cyan/soft.
+    expect(badge.className).toContain('text-retro-cyan');
+    expect(badge.className).not.toContain('text-retro-bg');
+  });
 });

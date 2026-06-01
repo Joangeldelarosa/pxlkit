@@ -10,10 +10,10 @@ type BentoKind = 'feature' | 'stat' | 'compact' | 'media';
 
 const spanMap: Record<BentoSpan, string> = {
   '1x1': 'col-span-1 row-span-1',
-  '2x1': 'col-span-2 row-span-1',
+  '2x1': 'col-span-1 sm:col-span-2 row-span-1',
   '1x2': 'col-span-1 row-span-2',
-  '2x2': 'col-span-2 row-span-2',
-  '3x1': 'col-span-3 row-span-1',
+  '2x2': 'col-span-1 sm:col-span-2 row-span-2',
+  '3x1': 'col-span-1 sm:col-span-2 lg:col-span-3 row-span-1',
   '1x3': 'col-span-1 row-span-3',
 };
 
@@ -22,6 +22,12 @@ const kindLayoutMap: Record<BentoKind, string> = {
   stat: 'flex flex-col items-start justify-center gap-1 p-5',
   compact: 'flex items-center gap-2 p-3',
   media: 'relative overflow-hidden p-0',
+};
+
+const columnsMap: Record<BentoColumns, string> = {
+  3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+  4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+  6: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6',
 };
 
 export interface PixelBentoProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -35,14 +41,14 @@ export const PixelBento = forwardRef<HTMLDivElement, PixelBentoProps>(function P
 ) {
   const Comp = 'div' as 'div';
   const inlineStyle: React.CSSProperties = {
-    gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
     gridAutoRows: 'minmax(160px, 1fr)',
     ...style,
   };
   return (
     <Comp
       ref={ref}
-      className={cn('grid', stackGap[gap], className)}
+      data-columns={columns}
+      className={cn('grid', columnsMap[columns], stackGap[gap], className)}
       style={inlineStyle}
       {...rest}
     >
