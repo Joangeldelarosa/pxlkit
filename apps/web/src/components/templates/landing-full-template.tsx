@@ -888,7 +888,7 @@ function CtaSection() {
 
           <h2
             id="cta-title"
-            className="font-pixel text-2xl sm:text-4xl text-retro-text leading-tight max-w-2xl"
+            className="font-pixel text-xl sm:text-2xl md:text-3xl lg:text-4xl text-retro-text leading-tight max-w-2xl break-words"
           >
             Stop fighting your editor. Start shipping with Codex.
           </h2>

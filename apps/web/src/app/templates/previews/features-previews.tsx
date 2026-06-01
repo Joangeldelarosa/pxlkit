@@ -146,7 +146,7 @@ export function FeaturesIconGridPreview() {
             <PxlKitIcon icon={Gem} size={12} colorful />
             <span className="ml-1.5">Core Features</span>
           </PixelBadge>
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-3 mt-4">
+          <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose mb-3 mt-4 break-words">
             Everything you need to ship
           </h2>
           <p className="text-retro-muted font-mono text-sm sm:text-base max-w-xl mx-auto">
@@ -225,7 +225,7 @@ export function FeaturesAlternatingPreview() {
     <section className="py-20 sm:py-28 px-6 bg-retro-bg">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-3">
+          <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose mb-3 break-words">
             Built to last
           </h2>
           <p className="text-retro-muted font-mono text-sm sm:text-base max-w-lg mx-auto">
@@ -297,7 +297,7 @@ export function FeaturesBentoPreview() {
     <section className="py-20 sm:py-28 px-6 bg-retro-bg">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-3">
+          <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose mb-3 break-words">
             The full toolkit
           </h2>
           <p className="text-retro-muted font-mono text-sm sm:text-base max-w-lg mx-auto">

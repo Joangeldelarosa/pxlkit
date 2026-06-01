@@ -42,7 +42,7 @@ export function CtaBannerPreview() {
         </PixelBounce>
 
         <PixelGlitch>
-          <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose">
+          <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose break-words">
             Start your quest
           </h2>
         </PixelGlitch>

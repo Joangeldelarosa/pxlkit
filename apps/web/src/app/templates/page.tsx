@@ -10,7 +10,7 @@ import {
   PixelCard,
   PixelFadeIn,
   PixelDivider,
-  PixelGrid,
+  PixelEqualHeightGrid,
   PixelTooltip,
 } from '@pxlkit/ui-kit';
 import { TEMPLATE_SECTIONS, FULL_PAGE_TEMPLATES } from './data';
@@ -431,7 +431,7 @@ export default function TemplatesPage() {
                 Templates
               </PixelBadge>
             </div>
-            <h1 className="font-pixel text-lg sm:text-3xl text-retro-text leading-loose mb-3">
+            <h1 className="font-pixel text-base sm:text-xl md:text-2xl lg:text-3xl text-retro-text leading-loose mb-3 break-words">
               Skip the first day of every project.
             </h1>
             <p className="text-retro-muted font-mono text-xs sm:text-sm max-w-2xl leading-relaxed">
@@ -453,7 +453,7 @@ export default function TemplatesPage() {
                     New
                   </PixelBadge>
                 </div>
-                <h2 className="font-pixel text-base sm:text-xl text-retro-text leading-loose">
+                <h2 className="font-pixel text-sm sm:text-base md:text-lg lg:text-xl text-retro-text leading-loose break-words">
                   Full-page templates
                 </h2>
                 <p className="font-mono text-xs sm:text-sm text-retro-muted mt-1 max-w-xl">
@@ -465,11 +465,11 @@ export default function TemplatesPage() {
                 {FEATURED_PAGES.length} pages
               </PixelBadge>
             </div>
-            <PixelGrid cols={{ base: 1, sm: 2, lg: 3 }} gap={4}>
+            <PixelEqualHeightGrid cols={{ base: 1, sm: 2, lg: 3 }} gap={4}>
               {FEATURED_PAGES.map((page) => (
                 <FeaturedPageCard key={page.href} page={page} />
               ))}
-            </PixelGrid>
+            </PixelEqualHeightGrid>
           </PixelFadeIn>
         </div>
       </section>

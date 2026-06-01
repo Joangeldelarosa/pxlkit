@@ -37,7 +37,6 @@ import {
   PixelContainer,
   PixelEqualHeightGrid,
   PixelFeatureCard,
-  PixelGrid,
   PixelMouseParallax,
   PixelParallaxLayer,
   PixelSectionHeader,
@@ -259,23 +258,7 @@ function FeaturesShowcase() {
   );
 }
 
-/* ──────────────────── TEMPLATES TEASER (6 PixelCard) ──────────────────── */
-type TemplateLink = {
-  slug: string;
-  name: string;
-  description: string;
-  tone: 'green' | 'gold' | 'cyan' | 'purple' | 'pink' | 'neutral';
-};
-
-const TEMPLATE_LINKS: TemplateLink[] = [
-  { slug: 'dashboards', name: 'Admin dashboards', description: 'Perfect for: ops consoles, internal tools, and analytics views you ship on Monday.', tone: 'cyan' },
-  { slug: 'changelog', name: 'Changelog', description: 'Perfect for: release notes and public roadmap drops that look intentional, not improvised.', tone: 'gold' },
-  { slug: 'docs', name: 'Docs site', description: 'Perfect for: API references and SDK guides with MDX content and live code blocks.', tone: 'green' },
-  { slug: 'landing-full', name: 'Full landing', description: 'Perfect for: product launches and SaaS homepages — hero through FAQ, ready to A/B.', tone: 'purple' },
-  { slug: 'portfolio', name: 'Portfolio', description: 'Perfect for: designer/engineer portfolios and agency reels that need a unique surface.', tone: 'pink' },
-  { slug: 'ecommerce', name: 'E-commerce', description: 'Perfect for: storefronts and checkout flows — product cards, cart drawer, stepper included.', tone: 'neutral' },
-];
-
+/* ──────────────────── TEMPLATES TEASER (single CTA → /templates) ──────────────────── */
 function TemplatesTeaser() {
   const router = useRouter();
 
@@ -288,8 +271,8 @@ function TemplatesTeaser() {
     >
       <PixelSectionHeader
         eyebrow="Templates"
-        title="Skip the first day of every project."
-        description="Six full layouts wired end-to-end with the kit. Dark + light included, components already composed — open the file, swap the copy, ship."
+        title="Six full layouts. Open, copy, swap, ship."
+        description="Dashboards, changelog, docs, full SaaS landing, portfolio, e-commerce — every page wired end-to-end with the kit, dark + light included. Preview live, copy the route, change the words."
         align="center"
         titleTone="gold"
         size="md"
@@ -297,7 +280,7 @@ function TemplatesTeaser() {
           <PixelButton
             tone="gold"
             size="md"
-            variant="ghost"
+            variant="solid"
             iconRight={<PxlKitIcon icon={ArrowRight} size={14} className="inline-block" />}
             onClick={() => router.push('/templates')}
           >
@@ -305,27 +288,6 @@ function TemplatesTeaser() {
           </PixelButton>
         }
       />
-
-      <div className="mt-10">
-        <PixelGrid cols={{ base: 1, sm: 2, lg: 3 }} gap={4}>
-          {TEMPLATE_LINKS.map((tpl) => (
-            <PixelCard
-              key={tpl.slug}
-              tone={tpl.tone}
-              interactive
-              title={tpl.name}
-              onClick={() => router.push(`/templates/${tpl.slug}`)}
-              footer={
-                <span className="font-mono text-[10px] text-retro-muted/70">
-                  /templates/{tpl.slug} →
-                </span>
-              }
-            >
-              {tpl.description}
-            </PixelCard>
-          ))}
-        </PixelGrid>
-      </div>
     </PixelContainer>
   );
 }
@@ -343,19 +305,20 @@ function StatsStrip() {
     <PixelContainer as="section" maxWidth="xl" padding="sm">
       <PixelStatGroup
         layout="grid"
-        columns={4}
+        columns={2}
         tone="cyan"
         aria-label="Pxlkit v2.0.0 by the numbers"
+        className="!grid-cols-2 sm:!grid-cols-4 items-stretch"
       >
         {stats.map((s) => (
           <div
             key={s.label}
-            className="p-4 sm:p-6 flex flex-col items-center text-center gap-1"
+            className="p-3 sm:p-4 md:p-6 h-full flex flex-col items-center justify-center text-center gap-1 min-w-0"
           >
-            <span className={`font-pixel text-base sm:text-xl text-retro-${s.tone}`}>
+            <span className={`font-pixel text-sm sm:text-lg md:text-xl text-retro-${s.tone} break-words text-center`}>
               {s.value}
             </span>
-            <span className="font-mono text-[10px] sm:text-xs text-retro-muted uppercase tracking-wider">
+            <span className="font-mono text-[10px] sm:text-xs text-retro-muted uppercase tracking-wider break-words text-center">
               {s.label}
             </span>
           </div>
@@ -707,10 +670,11 @@ function ToastSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8 items-stretch">
           {TOAST_DEMOS.map((d) => (
-            <motion.div key={d.tone} whileHover={{ scale: 1.04, y: -2 }} className="group">
+            <motion.div key={d.tone} whileHover={{ scale: 1.04, y: -2 }} className="group h-full flex">
               <PixelCard
+                className="w-full h-full"
                 title={d.title}
                 icon={<PxlKitIcon icon={d.icon} size={20} colorful className="shrink-0" />}
                 footer={
@@ -972,7 +936,7 @@ function PricingPreview() {
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 items-stretch"
           variants={staggerContainer}
           initial="initial"
           whileInView="animate"
@@ -985,7 +949,7 @@ function PricingPreview() {
                 key={plan.name}
                 variants={fadeInUp}
                 whileHover={{ scale: 1.02, transition: { type: 'spring', stiffness: 320, damping: 24 } }}
-                className={`relative rounded-xl border ${tc.border} ${tc.bg} p-5 transition-colors ${
+                className={`relative h-full flex flex-col rounded-xl border ${tc.border} ${tc.bg} p-5 transition-colors ${
                   plan.popular ? 'ring-1 ring-retro-gold/30' : ''
                 }`}
               >
@@ -994,7 +958,7 @@ function PricingPreview() {
                     <PixelBadge tone="gold">Most Popular</PixelBadge>
                   </div>
                 )}
-                <h3 className={`font-pixel text-sm ${tc.text} mb-1 ${plan.popular ? 'mt-2' : ''}`}>
+                <h3 className={`font-pixel text-sm ${tc.text} mb-1`}>
                   {plan.name}
                 </h3>
                 <div className="flex items-baseline gap-2 mb-1">
@@ -1003,8 +967,8 @@ function PricingPreview() {
                     <span className="font-mono text-xs text-retro-muted line-through">{plan.originalPrice}</span>
                   )}
                 </div>
-                <p className="font-mono text-[10px] text-retro-muted mb-4">{plan.suffix}</p>
-                <ul className="space-y-1.5 mb-5">
+                <p className="font-mono text-[10px] text-retro-muted mb-4 break-words">{plan.suffix}</p>
+                <ul className="space-y-1.5 mb-5 flex-1">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-xs text-retro-muted">
                       <span className={`w-1.5 h-1.5 rounded-full ${tc.text} bg-current shrink-0`} />
@@ -1017,7 +981,7 @@ function PricingPreview() {
                   size="sm"
                   variant={plan.popular ? 'solid' : 'ghost'}
                   onClick={() => router.push('/pricing')}
-                  className="w-full"
+                  className="w-full mt-auto"
                 >
                   {plan.price === 'Free' ? 'Get Started' : 'View Details'}
                 </PixelButton>

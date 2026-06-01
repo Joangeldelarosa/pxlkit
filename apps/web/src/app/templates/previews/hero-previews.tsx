@@ -56,7 +56,7 @@ export function HeroCenteredPreview() {
 
           <PixelFadeIn delay={120}>
             <PixelStack gap={3} align="center" className="text-center">
-              <h1 className="font-pixel text-2xl sm:text-4xl text-retro-text leading-loose">
+              <h1 className="font-pixel text-xl sm:text-2xl md:text-3xl lg:text-4xl text-retro-text leading-loose break-words">
                 <PixelGlitch trigger="hover" intensity={3} duration={800}>
                   <PixelTypewriter text="Build retro UIs" speed={55} />
                 </PixelGlitch>
@@ -161,7 +161,7 @@ export function HeroSplitPreview() {
         </PixelBadge>
 
         <PixelStack gap={3} align="start">
-          <h1 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose">
+          <h1 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose break-words">
             Gamify your <span className="text-retro-cyan">Interface</span>
           </h1>
           <p className="text-retro-muted font-mono text-sm sm:text-base max-w-md leading-relaxed">
@@ -313,7 +313,7 @@ export function HeroParallaxPreview() {
         </PixelFadeIn>
 
         <PixelFadeIn delay={100}>
-          <h1 className="font-pixel text-2xl sm:text-4xl text-retro-text leading-loose mt-6 mb-4">
+          <h1 className="font-pixel text-xl sm:text-2xl md:text-3xl lg:text-4xl text-retro-text leading-loose mt-6 mb-4 break-words">
             Experience the{' '}
             <span className="text-retro-gold">Pixel</span> Universe
           </h1>

@@ -351,7 +351,7 @@ export function PricingTogglePreview() {
   return (
     <PixelContainer as="section" maxWidth="xl" padding="xl" className="bg-retro-bg">
       <div className="text-center mb-12">
-        <h2 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose mb-5">
+        <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose mb-5 break-words">
           Choose your plan
         </h2>
 
