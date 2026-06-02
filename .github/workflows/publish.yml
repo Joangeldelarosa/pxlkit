@@ -98,7 +98,12 @@ jobs:
               skipped=$((skipped + 1))
             else
               echo "📦 $name@$local_version — new version (npm has $npm_version), publishing..."
-              if npm publish --workspace="$pkg" --provenance --access public; then
+              if npm view "$name@$local_version" version > /dev/null 2>&1; then
+                echo "skip $name@$local_version (already published)"
+                skipped=$((skipped + 1))
+                continue
+              fi
+              if npm publish -w "$name" --provenance --access public; then
                 echo "✅ $name@$local_version published successfully"
                 published=$((published + 1))
               else
