@@ -8,6 +8,7 @@ import {
   useEffectiveSurface,
 } from '../common';
 import { PixelPortal } from '../overlay-foundation/PixelPortal';
+import { OverlayBackdrop } from '../overlay/_internal/OverlayBackdrop';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { useEscape } from '../hooks/useEscape';
@@ -146,10 +147,9 @@ const PixelDrawerRoot = forwardRef<HTMLDivElement, PixelDrawerProps>(
       <PixelPortal container={container}>
         <div className="fixed inset-0 z-[80]">
           {overlay && (
-            <div
-              data-pxl-drawer-overlay
-              aria-hidden="true"
-              className="absolute inset-0 bg-retro-text/60 backdrop-blur-sm"
+            <OverlayBackdrop
+              position="absolute"
+              data-pxl-drawer-overlay=""
               onClick={() => {
                 if (dismissOnOverlay) onOpenChange(false);
               }}

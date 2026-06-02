@@ -8,6 +8,7 @@ import {
   useEffectiveSurface,
 } from '../common';
 import { PixelPortal } from '../overlay-foundation/PixelPortal';
+import { OverlayBackdrop } from '../overlay/_internal/OverlayBackdrop';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useEscape } from '../hooks/useEscape';
 import { useScrollLock } from '../hooks/useScrollLock';
@@ -105,10 +106,9 @@ export const PixelSheet = forwardRef<HTMLDivElement, PixelSheetProps>(function P
     <PixelPortal>
       <div className="fixed inset-0 z-[90]" data-pixel-sheet="">
         {/* scrim */}
-        <div
-          aria-hidden="true"
+        <OverlayBackdrop
+          position="absolute"
           onClick={() => onOpenChange(false)}
-          className="absolute inset-0 bg-retro-text/60 backdrop-blur-sm"
         />
         {/* panel */}
         <div

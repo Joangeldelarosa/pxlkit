@@ -18,6 +18,7 @@ import {
   useEffectiveSurface,
 } from '../common';
 import { PixelPortal } from '../overlay-foundation/PixelPortal';
+import { OverlayBackdrop } from '../overlay/_internal/OverlayBackdrop';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useEscape } from '../hooks/useEscape';
 import { useScrollLock } from '../hooks/useScrollLock';
@@ -225,10 +226,9 @@ export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
           className="fixed inset-0 z-[80] flex items-start justify-center p-4 pt-[10vh]"
           aria-hidden={false}
         >
-          <div
-            className="fixed inset-0 bg-retro-text/60 backdrop-blur-sm"
+          <OverlayBackdrop
+            position="fixed"
             onClick={() => onOpenChange(false)}
-            aria-hidden="true"
           />
           <div
             ref={setPanelRef}

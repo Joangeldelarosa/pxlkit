@@ -10,6 +10,7 @@ import {
 } from '../common';
 import { usePxlKitLocale } from '../locale';
 import { PixelPortal } from '../overlay-foundation/PixelPortal';
+import { OverlayBackdrop } from './_internal/OverlayBackdrop';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { useEscape } from '../hooks/useEscape';
@@ -113,10 +114,9 @@ export const PixelModal = forwardRef<HTMLDivElement, PixelModalProps>(function P
         aria-labelledby={titleId}
         aria-describedby={description ? descId : undefined}
       >
-        <div
-          className="fixed inset-0 bg-retro-text/60 backdrop-blur-sm"
+        <OverlayBackdrop
+          position="fixed"
           onClick={() => { if (!closing) void handleClose(); }}
-          aria-hidden="true"
         />
         <div
           ref={setRefs}
