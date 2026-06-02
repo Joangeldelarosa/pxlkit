@@ -47,10 +47,10 @@ describe('PixelStarRating', () => {
     expect(imgs.length).toBe(3);
   });
 
-  it('default outlined stars render inline rect-svg', () => {
+  it('default outlined stars render gamification Star via PxlKitIcon img (same silhouette as filled)', () => {
     const { container } = render(<PixelStarRating value={3} />);
-    const svg = container.querySelector('[data-pxl-star="outlined"] svg');
-    expect(svg).toBeTruthy();
+    const imgs = container.querySelectorAll('[data-pxl-star="outlined"] img[alt="star"]');
+    expect(imgs.length).toBe(2);
   });
 
   it('starIcon prop overrides default glyph for filled positions', () => {

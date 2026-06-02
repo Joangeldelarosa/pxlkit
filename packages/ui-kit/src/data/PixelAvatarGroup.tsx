@@ -106,7 +106,6 @@ export const PixelAvatarGroup = forwardRef<HTMLDivElement, PixelAvatarGroupProps
             slotBase,
             visible.length > 0 && margin,
             t.border,
-            t.bg,
             t.text,
             s.font,
             'font-pixel',
