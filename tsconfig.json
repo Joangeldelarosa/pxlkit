@@ -1,0 +1,13 @@
+{
+  // Root tsconfig so repo-level tooling (tsx, editors) picks up the shared
+  // compiler options — most importantly `jsx: react-jsx`. Without this file
+  // tsx fell back to esbuild defaults (classic JSX runtime), which broke
+  // importing any *.examples.tsx that relies on the automatic runtime.
+  // NOTE: do not exclude packages/apps here — tsx only applies these
+  // compilerOptions to files this tsconfig covers. Packages and apps keep
+  // their own nested tsconfigs for builds; editors resolve the nearest one.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  }
+}
