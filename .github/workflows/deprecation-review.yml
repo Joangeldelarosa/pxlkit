@@ -2,8 +2,12 @@ name: Deprecation Review
 
 on:
   schedule:
-    # First Monday of each month at 09:00 UTC
-    - cron: '0 9 1-7 * 1'
+    # Every Monday at 09:00 UTC; the first-monday guard step below narrows
+    # this to the first Monday of the month. A combined `1-7 * 1` cron does
+    # NOT express "first Monday" — POSIX cron ORs day-of-month with
+    # day-of-week when both are restricted, which made this fire daily on
+    # days 1-7 plus every Monday (see issues #54-#60).
+    - cron: '0 9 * * 1'
   workflow_dispatch:
 
 jobs:
@@ -16,42 +20,87 @@ jobs:
       issues: write
 
     steps:
+      - name: First-Monday guard
+        id: guard
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$(date -u +%-d)" -le 7 ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        if: steps.guard.outputs.run == 'true'
         with:
           ref: main
           fetch-depth: 0
 
       - name: Use Node.js 22
+        if: steps.guard.outputs.run == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
+        if: steps.guard.outputs.run == 'true'
         run: npm ci
 
+      # The gate ships its own CLI (exit 0 = pass, exit 1 = violations or
+      # context load failure). Calling it directly avoids the previous
+      # inline `tsx -e` eval, which crashed on top-level await (tsx compiles
+      # -e input as CJS) and then checked a nonexistent `dep.ok` field — the
+      # GateResult field is `passed`.
       - name: Run deprecated-lifecycle gate (standalone)
         id: gate
+        if: steps.guard.outputs.run == 'true'
         run: |
-          npx tsx -e "
-            import { runAudit } from './scripts/audit-coherence/run.ts';
-            const r = await runAudit({ repoRoot: process.cwd(), writeReport: false });
-            const dep = r.gates.find(g => g.id === 'deprecated-lifecycle');
-            if (!dep) { console.log('Gate not registered yet'); process.exit(0); }
-            console.log(JSON.stringify(dep, null, 2));
-            if (!dep.ok) process.exit(2);
-          "
+          npx tsx scripts/audit-coherence/gates/17-deprecated-lifecycle.ts | tee gate-output.txt
         continue-on-error: true
 
       - name: Open issue if deprecation policy violations found
-        if: steps.gate.outcome == 'failure'
+        if: steps.guard.outputs.run == 'true' && steps.gate.outcome == 'failure'
         uses: actions/github-script@v7
         with:
           script: |
-            await github.rest.issues.create({
+            const fs = require('fs');
+            let gateOutput = '';
+            try {
+              gateOutput = fs.readFileSync('gate-output.txt', 'utf8').trim();
+            } catch {
+              gateOutput = '(gate output unavailable — see workflow logs)';
+            }
+
+            // Dedupe: do not stack a new issue while a previous review is
+            // still open (the cron bug once filed six duplicates in a week).
+            const { data: existing } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Monthly deprecation review: lifecycle violations (${new Date().toISOString().slice(0,10)})`,
-              labels: ['deprecation', 'governance'],
-              body: 'The monthly deprecation review found one or more components whose lifecycle stage has expired (e.g. removal due, but still exported). See workflow logs and `docs/governance/DEPRECATION_POLICY.md`.',
+              labels: 'deprecation,governance',
+              state: 'open',
             });
+            const open = existing.find(i => i.title.startsWith('Monthly deprecation review'));
+            const body = [
+              'The monthly deprecation review found one or more components whose lifecycle stage has expired (e.g. removal due, but still exported). See `docs/governance/DEPRECATION_POLICY.md`.',
+              '',
+              '```',
+              gateOutput,
+              '```',
+            ].join('\n');
+
+            if (open) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open.number,
+                body: `Still failing as of ${new Date().toISOString().slice(0, 10)}:\n\n${body}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Monthly deprecation review: lifecycle violations (${new Date().toISOString().slice(0, 10)})`,
+                labels: ['deprecation', 'governance'],
+                body,
+              });
+            }

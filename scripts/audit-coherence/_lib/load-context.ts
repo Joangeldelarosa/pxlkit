@@ -16,7 +16,9 @@ export const ManifestRecordSchema = z.object({
   component: z.string().min(1),
   category: z.string().optional(),
   file: z.string().optional(),
-  props: z.array(z.any()).optional(),
+  // Manifests authored via defineManifest use `props: 'auto'` (string
+  // sentinel) as well as explicit arrays — accept both.
+  props: z.union([z.array(z.any()), z.string()]).optional(),
   source: z.string().optional(),
 }).passthrough();
 
@@ -107,8 +109,28 @@ function coerceManifestArray(mod: ManifestModule): unknown[] {
   const candidates = [mod.default, mod.manifests, mod.manifest];
   for (const c of candidates) {
     if (Array.isArray(c)) return c;
+    // Per-component manifests (defineManifest) export a single record, not
+    // an array — wrap it so both shapes feed the same pipeline.
+    if (typeof c === 'object' && c !== null) return [c];
   }
   return [];
+}
+
+/**
+ * Manifests authored via `defineManifest` identify the component as `name`;
+ * the audit pipeline standardized on `component`. Accept both so the loader
+ * does not silently drop every real manifest in the repo.
+ */
+function normalizeManifestRecord(item: unknown): unknown {
+  if (
+    typeof item === 'object' &&
+    item !== null &&
+    !('component' in item) &&
+    'name' in item
+  ) {
+    return { ...item, component: (item as { name: unknown }).name };
+  }
+  return item;
 }
 
 async function loadManifests(repoRoot: string, logger: Logger): Promise<ManifestRecord[]> {
@@ -117,6 +139,9 @@ async function loadManifests(repoRoot: string, logger: Logger): Promise<Manifest
       'packages/*/src/manifest.{ts,tsx,js,mjs}',
       'packages/*/src/manifests.{ts,tsx,js,mjs}',
       'packages/*/src/**/manifest.{ts,tsx,js,mjs}',
+      // The actual repo convention: one `<Component>.manifest.ts` per
+      // component (see scripts/build-docs/scan-manifests.ts MANIFEST_GLOB).
+      'packages/*/src/**/*.manifest.{ts,tsx,js,mjs}',
       'scripts/build-docs/**/manifest.{json,ts}',
       'docs/manifests/*.{json,ts}',
     ],
@@ -146,7 +171,7 @@ async function loadManifests(repoRoot: string, logger: Logger): Promise<Manifest
         raw = coerceManifestArray(mod);
       }
       for (const item of raw) {
-        const parsed = ManifestRecordSchema.safeParse(item);
+        const parsed = ManifestRecordSchema.safeParse(normalizeManifestRecord(item));
         if (parsed.success) {
           records.push({ ...parsed.data, source: parsed.data.source ?? file });
         } else {

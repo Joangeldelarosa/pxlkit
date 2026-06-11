@@ -94,7 +94,16 @@ function resolveGate(value: unknown): Gate | null {
     try {
       // Try as factory first — call with no args.
       const result = (value as (...args: unknown[]) => unknown)();
-      if (isGateInstance(result)) return result;
+      if (
+        result &&
+        typeof (result as PromiseLike<unknown>).then === 'function'
+      ) {
+        // Async factory probe — swallow any rejection so it cannot crash
+        // the process; a promise is never a usable Gate instance anyway.
+        void Promise.resolve(result as PromiseLike<unknown>).catch(() => {});
+      } else if (isGateInstance(result)) {
+        return result;
+      }
     } catch {
       // Not a factory — fall through to constructor attempt.
     }
