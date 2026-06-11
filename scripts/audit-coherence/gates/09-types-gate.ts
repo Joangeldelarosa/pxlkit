@@ -19,12 +19,12 @@
  *   0 — all examples typecheck cleanly (or none exist)
  *   1 — at least one example produced a type error, or tsc itself failed to run
  *
- * Safety: read-only. Writes only ephemeral tsconfig files inside the OS temp
- * directory; never modifies repo sources.
+ * Safety: read-only with respect to sources. Writes only ephemeral tsconfig
+ * files under `node_modules/.cache/types-gate-*` (inside the repo so tsc
+ * resolves implicit @types correctly); never modifies repo sources.
  */
 
 import { spawnSync, type SpawnSyncReturns } from 'node:child_process';
-import * as os from 'node:os';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -175,10 +175,17 @@ function parseTscDiagnostics(
 // ---------------------------------------------------------------------------
 
 async function writeEphemeralTsconfig(
+  repoRoot: string,
   examplesFile: string,
   packageTsconfig: string,
 ): Promise<{ tsconfigPath: string; cleanup: () => Promise<void> }> {
-  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'types-gate-'));
+  // The ephemeral tsconfig must live INSIDE the repo: tsc resolves implicit
+  // @types (e.g. @types/node for `process.env.NODE_ENV` dev warnings) by
+  // walking up from the tsconfig directory. From the OS temp dir that walk
+  // finds nothing and every such global becomes a false TS2580 blocker.
+  const cacheRoot = path.join(repoRoot, 'node_modules', '.cache');
+  await fs.ensureDir(cacheRoot);
+  const tmpDir = await fs.mkdtemp(path.join(cacheRoot, 'types-gate-'));
   const tsconfigPath = path.join(tmpDir, 'tsconfig.json');
   const relExtends = toPosix(path.relative(tmpDir, packageTsconfig));
   const relInclude = toPosix(examplesFile);
@@ -186,16 +193,16 @@ async function writeEphemeralTsconfig(
     extends: relExtends,
     compilerOptions: {
       noEmit: true,
-      declaration: false,
+      // Only neutralize options that conflict with noEmit. Forcing
+      // `declaration: false` here used to trip TS5069 in every run because
+      // package tsconfigs inherit `declarationDir`; leaving the declaration
+      // family inherited is consistent with noEmit.
       emitDeclarationOnly: false,
-      declarationMap: false,
       composite: false,
       incremental: false,
-      tsBuildInfoFile: undefined,
     },
     include: [relInclude],
     exclude: ['node_modules', 'dist'],
-    files: undefined,
   };
   await fs.writeJson(tsconfigPath, payload, { spaces: 2 });
   return {
@@ -210,17 +217,24 @@ async function writeEphemeralTsconfig(
   };
 }
 
-function resolveTscBinary(repoRoot: string): string {
-  // Prefer the workspace-local typescript install. Walk likely locations.
-  const candidates = [
-    path.join(repoRoot, 'packages/ui-kit/node_modules/.bin', process.platform === 'win32' ? 'tsc.cmd' : 'tsc'),
-    path.join(repoRoot, 'node_modules/.bin', process.platform === 'win32' ? 'tsc.cmd' : 'tsc'),
+function resolveTscInvocation(repoRoot: string): {
+  command: string;
+  args: string[];
+} {
+  // Invoke tsc's JS entry with the current Node binary. Spawning the .cmd
+  // shim directly with shell:false fails with EINVAL on Windows under
+  // Node's CVE-2024-27980 mitigation, which used to turn every run of this
+  // gate into a synthetic "no parseable diagnostics" blocker per file.
+  const jsCandidates = [
+    path.join(repoRoot, 'node_modules/typescript/lib/tsc.js'),
+    path.join(repoRoot, 'packages/ui-kit/node_modules/typescript/lib/tsc.js'),
   ];
-  for (const c of candidates) {
-    if (fs.pathExistsSync(c)) return c;
+  for (const c of jsCandidates) {
+    if (fs.pathExistsSync(c)) return { command: process.execPath, args: [c] };
   }
-  // Fall back to PATH.
-  return process.platform === 'win32' ? 'tsc.cmd' : 'tsc';
+  // Fall back to whatever `tsc` resolves to on PATH (POSIX shells resolve
+  // the extensionless shim fine).
+  return { command: 'tsc', args: [] };
 }
 
 export const defaultTscRunner: TscRunner = async ({
@@ -230,15 +244,16 @@ export const defaultTscRunner: TscRunner = async ({
   logger,
 }) => {
   const { tsconfigPath, cleanup } = await writeEphemeralTsconfig(
+    repoRoot,
     examplesFile,
     packageTsconfig,
   );
   try {
-    const tsc = resolveTscBinary(repoRoot);
+    const tsc = resolveTscInvocation(repoRoot);
     logger.debug(`tsc --noEmit -p ${tsconfigPath}  (for ${examplesFile})`);
     const proc: SpawnSyncReturns<string> = spawnSync(
-      tsc,
-      ['--noEmit', '-p', tsconfigPath, '--pretty', 'false'],
+      tsc.command,
+      [...tsc.args, '--noEmit', '-p', tsconfigPath, '--pretty', 'false'],
       {
         cwd: repoRoot,
         encoding: 'utf8',
@@ -340,7 +355,9 @@ export class TypesGate extends Gate {
           severity: 'blocker',
           file: toPosix(examplesFile),
           component,
-          message: `tsc exited with code ${invocation.exitCode} but produced no parseable diagnostics`,
+          message: `tsc exited with code ${invocation.exitCode} but produced no parseable diagnostics${
+            invocation.output ? ` — raw output: ${invocation.output.slice(0, 200)}` : ''
+          }`,
           suggestion:
             'Run `tsc --noEmit` against this file manually to inspect raw output.',
         });
