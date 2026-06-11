@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PixelDropdown } from '../overlay';
+import { PixelDropdown } from './PixelDropdown';
 
 export function Default() {
   return (

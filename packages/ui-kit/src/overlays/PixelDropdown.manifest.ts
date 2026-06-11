@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelDropdown } from '../overlay';
+import { PixelDropdown } from './PixelDropdown';
 import {
   Default,
   Tones,

@@ -4,7 +4,7 @@ import {
   toneMap, surfaceClasses, useEffectiveSurface,
 } from '../common';
 import { PixelPortal } from '../overlay-foundation/PixelPortal';
-import { OverlayBackdrop } from '../overlay/_internal/OverlayBackdrop';
+import { OverlayBackdrop } from './_internal/OverlayBackdrop';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useEscape } from '../hooks/useEscape';
 import { useScrollLock } from '../hooks/useScrollLock';

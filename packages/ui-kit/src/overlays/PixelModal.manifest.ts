@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelModal } from '../overlay';
+import { PixelModal } from './PixelModal';
 import {
   Default,
   Sizes,

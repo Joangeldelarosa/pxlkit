@@ -5,7 +5,7 @@ import React from 'react';
 import { PxlKitLocaleProvider } from '../locale';
 import { PixelSection, PixelDivider } from '../layout';
 import { PixelAvatar } from '../data-display';
-import { PixelModal } from '../overlay';
+import { PixelModal } from '../overlays/PixelModal';
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    PixelSection — locale-aware title uppercasing

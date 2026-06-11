@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, act, screen } from '@testing-library/react';
-import { PixelDropdown } from '../../overlay';
+import { PixelDropdown } from '../../overlays/PixelDropdown';
 
 describe('PixelDropdown — Ola 4a upgrade', () => {
   beforeEach(() => { vi.useFakeTimers(); });

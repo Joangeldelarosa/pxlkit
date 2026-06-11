@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PixelTooltip } from '../overlay';
+import { PixelTooltip } from './PixelTooltip';
 import { PixelButton } from '../actions';
 
 export function Default() {

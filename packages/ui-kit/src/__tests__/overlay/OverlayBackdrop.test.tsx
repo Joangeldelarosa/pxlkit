@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
-import { OverlayBackdrop } from '../../overlay/_internal/OverlayBackdrop';
+import { OverlayBackdrop } from '../../overlays/_internal/OverlayBackdrop';
 
 describe('OverlayBackdrop — internal scrim primitive', () => {
   it('renders a div with data-pxl-overlay-backdrop attribute', () => {

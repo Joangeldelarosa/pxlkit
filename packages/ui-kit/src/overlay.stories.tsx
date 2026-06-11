@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import { PixelModal, PixelTooltip, PixelDropdown } from './overlay';
+import { PixelModal } from './overlays/PixelModal';
+import { PixelTooltip } from './overlays/PixelTooltip';
+import { PixelDropdown } from './overlays/PixelDropdown';
 import { PixelButton } from './actions';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Gear } from '@pxlkit/ui';

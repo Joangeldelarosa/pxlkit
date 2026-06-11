@@ -9,7 +9,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 
-import { PixelModal } from '../../overlay/PixelModal';
+import { PixelModal } from '../../overlays/PixelModal';
 import { PixelDrawer } from '../../overlays/PixelDrawer';
 import { PixelCommand } from '../../overlays/PixelCommand';
 import { PixelAlertDialog } from '../../overlays/PixelAlertDialog';

@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelTooltip } from '../overlay';
+import { PixelTooltip } from './PixelTooltip';
 import {
   Default,
   Positions,

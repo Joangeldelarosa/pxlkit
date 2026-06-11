@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
-import { PixelTooltip } from '../../overlay';
+import { PixelTooltip } from '../../overlays/PixelTooltip';
 
 describe('PixelTooltip — floating-ui upgrade', () => {
   beforeEach(() => {
