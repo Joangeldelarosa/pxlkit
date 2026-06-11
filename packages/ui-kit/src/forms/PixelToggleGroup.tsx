@@ -36,7 +36,9 @@ export interface ToggleGroupContextValue {
 export const ToggleGroupContext = createContext<ToggleGroupContextValue | null>(null);
 
 // PixelToggle moved to its own file; re-exported so this module's API
-// stays unchanged.
+// stays unchanged. Keep this re-export BELOW the ToggleGroupContext
+// definition — PixelToggle.tsx imports the context back from this module
+// (intentional cycle), so the context must be initialized first.
 export { PixelToggle, type PixelToggleProps } from './PixelToggle';
 
 /** Shared props (no value/onChange — those vary by discriminator). */

@@ -100,7 +100,9 @@ export function describeChart(kind: 'sparkline' | 'bar chart' | 'area chart', da
 
 /* ──────────────────────────────────────────────────────────────────────────
    Chart components live in their own dedicated files; re-exported here so
-   this module's API stays unchanged.
+   this module's API stays unchanged. Keep these re-exports BELOW the shared
+   primitives above — the chart files import those helpers back from this
+   module (intentional cycle), so the helpers must be initialized first.
    ────────────────────────────────────────────────────────────────────────── */
 
 export { PixelSparkline, type PixelSparklineProps } from './PixelSparkline';
