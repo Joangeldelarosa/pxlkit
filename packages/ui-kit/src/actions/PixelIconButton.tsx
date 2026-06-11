@@ -64,9 +64,9 @@ PixelIconButton.displayName = 'PixelIconButton';
 /**
  * @deprecated Renamed to {@link PixelIconButton}. The `PxlKit*` prefix is
  * reserved for system primitives (`PxlKitSurfaceProvider`,
- * `PxlKitLocaleProvider`); leaf components use `Pixel*`. The alias will be
- * removed in the next major.
+ * `PxlKitLocaleProvider`); leaf components use `Pixel*`. Removal target:
+ * 3.0.0 (carried forward from 2.0.0 — see ADR-0004).
  */
 export const PxlKitButton = PixelIconButton;
-/** @deprecated Renamed to {@link PixelIconButtonProps}. */
+/** @deprecated Renamed to {@link PixelIconButtonProps}. Removal target: 3.0.0 (see ADR-0004). */
 export type PxlKitButtonProps = PixelIconButtonProps;

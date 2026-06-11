@@ -12,13 +12,14 @@ export default defineManifest({
   deprecatedNote:
     'Renamed to PixelIconButton. The PxlKit* prefix is reserved for system primitives (providers); leaf components use the Pixel* prefix.',
   deprecatedReplacement: 'PixelIconButton',
+  deprecatedRemovedIn: '3.0.0',
   description:
     'Deprecated alias for PixelIconButton — a square icon-only button with a required accessible label.',
   highlights: [
     'Identical runtime to PixelIconButton (re-exported as-is).',
     'Renders a square, icon-only button with required `label` exposed as aria-label and title.',
     'Supports tones, sizes, and pixel/linear surface aesthetics.',
-    'Kept as an alias for backward compatibility; will be removed in the next major.',
+    'Kept as an alias for backward compatibility; removal carried forward to v3.0.0 (see ADR-0004).',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
