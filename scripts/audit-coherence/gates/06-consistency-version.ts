@@ -302,27 +302,30 @@ export class ConsistencyVersionGate extends Gate {
       });
     }
 
-    if (largestSince && compareSemver(pkgVersion, largestSince) !== 0) {
+    // A manifest may legitimately trail the package version (patch releases
+    // ship no new components), but it must never claim a FUTURE version —
+    // that advertises an unreleased "since" to consumers.
+    if (largestSince && compareSemver(largestSince, pkgVersion) > 0) {
       findings.push({
         severity: 'blocker',
         file: pkg.path,
         component: pkg.package,
-        message: `version mismatch: package.json="${pkgVersion.raw}" vs largest manifest.since="${largestSince.raw}"`,
+        message: `version mismatch: largest manifest.since="${largestSince.raw}" is ahead of package.json="${pkgVersion.raw}"`,
         suggestion:
-          'bump package.json.version to match the newest component "since", or stamp the new component with the current package version',
+          'correct the manifest "since" to a released version, or release the version it claims',
       });
     }
 
     if (
       changelogVersion &&
       largestSince &&
-      compareSemver(changelogVersion, largestSince) !== 0
+      compareSemver(largestSince, changelogVersion) > 0
     ) {
       findings.push({
         severity: 'blocker',
         file: changelogRef?.path ?? pkg.path,
         component: pkg.package,
-        message: `version mismatch: CHANGELOG top="${changelogVersion.raw}" vs largest manifest.since="${largestSince.raw}"`,
+        message: `version mismatch: largest manifest.since="${largestSince.raw}" is ahead of CHANGELOG top="${changelogVersion.raw}"`,
         suggestion:
           'add a CHANGELOG entry for the latest manifest "since", or correct the manifest "since" to match the released version',
       });
