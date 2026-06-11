@@ -446,18 +446,23 @@ Sidebar categories:
 
 ## Packages
 
-| Package                | npm                                                                                                                        | Description                                     |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `@pxlkit/core`         | [![npm](https://img.shields.io/npm/v/@pxlkit/core?color=blue)](https://www.npmjs.com/package/@pxlkit/core)                 | Types, components, SVG engine                   |
-| `@pxlkit/ui-kit`       | [![npm](https://img.shields.io/npm/v/@pxlkit/ui-kit?color=blue)](https://www.npmjs.com/package/@pxlkit/ui-kit)             | 57 retro pixel art React UI components          |
-| `@pxlkit/voxel`        | [![npm](https://img.shields.io/npm/v/@pxlkit/voxel?color=blue)](https://www.npmjs.com/package/@pxlkit/voxel)               | 3D voxel utility primitives (engine in /explore)|
-| `@pxlkit/gamification` | [![npm](https://img.shields.io/npm/v/@pxlkit/gamification?color=blue)](https://www.npmjs.com/package/@pxlkit/gamification) | RPG, achievements, rewards                      |
-| `@pxlkit/feedback`     | [![npm](https://img.shields.io/npm/v/@pxlkit/feedback?color=blue)](https://www.npmjs.com/package/@pxlkit/feedback)         | Alerts, status, notifications                   |
-| `@pxlkit/social`       | [![npm](https://img.shields.io/npm/v/@pxlkit/social?color=blue)](https://www.npmjs.com/package/@pxlkit/social)             | Community, emojis, messaging                    |
-| `@pxlkit/weather`      | [![npm](https://img.shields.io/npm/v/@pxlkit/weather?color=blue)](https://www.npmjs.com/package/@pxlkit/weather)           | Climate, moon, temperature                      |
-| `@pxlkit/ui`           | [![npm](https://img.shields.io/npm/v/@pxlkit/ui?color=blue)](https://www.npmjs.com/package/@pxlkit/ui)                     | Interface controls, navigation                  |
-| `@pxlkit/effects`      | [![npm](https://img.shields.io/npm/v/@pxlkit/effects?color=blue)](https://www.npmjs.com/package/@pxlkit/effects)           | Animated VFX, particles                         |
-| `@pxlkit/parallax`     | [![npm](https://img.shields.io/npm/v/@pxlkit/parallax?color=blue)](https://www.npmjs.com/package/@pxlkit/parallax)         | Multi-layer 3D parallax icons                   |
+<!-- WORKSPACES:START -->
+<!-- auto-generated from the npm workspaces by scripts/build-docs/generate-root-readme.ts — edit workspace package.json files, then run `npm run docs:build`. -->
+
+| Workspace | Package | Version | Description |
+| --- | --- | --- | --- |
+| [`apps/web`](./apps/web) | `@pxlkit/web` _(private)_ | `1.2.0` | _(no description)_ |
+| [`packages/core`](./packages/core) | [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | `1.3.3` | Core rendering engine, React components, SVG utilities, and TypeScript types for the Pxlkit pixel art toolkit — tree-shakeable icon renderer, animated icon player, 3D parallax icons, toast notifications, and color utilities |
+| [`packages/effects`](./packages/effects) | [`@pxlkit/effects`](https://www.npmjs.com/package/@pxlkit/effects) | `1.2.3` | Animated visual effect pixel art icons — 12 icons for explosions, radar ping, flame, shockwave, signals, particles, glows, and VFX animations |
+| [`packages/feedback`](./packages/feedback) | [`@pxlkit/feedback`](https://www.npmjs.com/package/@pxlkit/feedback) | `1.2.5` | Feedback and notification pixel art icon pack — 33 icons for alerts, status indicators, checkmarks, shields, bugs, badges, and toast notifications |
+| [`packages/gamification`](./packages/gamification) | [`@pxlkit/gamification`](https://www.npmjs.com/package/@pxlkit/gamification) | `1.2.4` | Gamification icon pack — 51 pixel art icons for RPG games, achievements, rewards, trophies, swords, potions, coins, stars, and gaming UI |
+| [`packages/parallax`](./packages/parallax) | [`@pxlkit/parallax`](https://www.npmjs.com/package/@pxlkit/parallax) | `1.2.3` | Multi-layer 3D parallax pixel art icons — 10 interactive depth-based mouse-tracking icons with configurable perspective and layer separation |
+| [`packages/social`](./packages/social) | [`@pxlkit/social`](https://www.npmjs.com/package/@pxlkit/social) | `1.2.4` | Social and media pixel art icon pack — 43 icons for community, emojis, messaging, hearts, shares, users, reactions, and social media UI |
+| [`packages/ui`](./packages/ui) | [`@pxlkit/ui`](https://www.npmjs.com/package/@pxlkit/ui) | `1.2.5` | UI & interface pixel art icon pack — 41 icons for tools, controls, navigation, editor elements, home, search, settings, menus, and layout |
+| [`packages/ui-kit`](./packages/ui-kit) | [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | `2.0.1` | Production-grade React UI kit with retro-future aesthetic: 111+ components, WCAG 2.1 AA, surface system (pixel/linear), dark mode, 30-gate coherence audit, full SSOT documentation. |
+| [`packages/voxel`](./packages/voxel) | [`@pxlkit/voxel`](https://www.npmjs.com/package/@pxlkit/voxel) | `0.1.4` | MIT-licensed 3D voxel toolkit for React — voxel utility primitives (pxlToVoxels, upscaleGrid) plus types. The full procedural-world engine (biomes, chunks, day/night cycles, highways, tunnels) lives in the showcase app at pxlkit.xyz/explore and ships in the v1 package. |
+| [`packages/weather`](./packages/weather) | [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | `1.2.4` | Weather and nature pixel art icon pack — 36 icons for sun, rain, clouds, moon phases, temperature, storms, snow, and climate UI |
+<!-- WORKSPACES:END -->
 
 ## Automated npm Publishing (CI/CD)
 

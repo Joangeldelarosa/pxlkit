@@ -93,119 +93,125 @@ Components accept `tone?: 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' 
 
 ## Components
 
-### Layout
+<!-- COMPONENTS:START -->
+<!-- auto-generated from component manifests by scripts/build-docs/generate-readme-package.ts — edit the manifests, then run `npm run docs:build`. -->
 
-| Component | Description |
-| --- | --- |
-| `PixelSection` | Section container with pixel art border styling |
-| `PixelDivider` | Decorative divider with optional label |
+| Component | Status | Since | Category |
+| --- | --- | --- | --- |
+| `PixelAccordion` | stable | 1.0.0 | navigation |
+| `PixelAlert` | stable | 1.0.0 | feedback |
+| `PixelAlertDialog` | stable | 1.8.0 | overlays |
+| `PixelAreaChart` | stable | 1.9.0 | data |
+| `PixelAvatar` | stable | 1.0.0 | data |
+| `PixelAvatarGroup` | stable | 1.9.0 | data |
+| `PixelBadge` | stable | 1.0.0 | data |
+| `PixelBadgeGroup` | stable | 1.9.0 | data |
+| `PixelBarChart` | stable | 1.9.0 | data |
+| `PixelBareButton` | stable | 1.0.0 | actions |
+| `PixelBareInput` | stable | 1.0.0 | forms |
+| `PixelBareTextarea` | stable | 1.0.0 | forms |
+| `PixelBento` | stable | 1.7.0 | layout |
+| `PixelBentoCell` | stable | 1.7.0 | layout |
+| `PixelBounce` | stable | 1.6.0 | animations |
+| `PixelBox` | stable | 1.6.0 | layout |
+| `PixelBreadcrumb` | stable | 1.0.0 | navigation |
+| `PixelButton` | stable | 1.0.0 | actions |
+| `PixelCalendarGrid` | stable | 1.9.0 | forms |
+| `PixelCard` | stable | 1.0.0 | cards |
+| `PixelCarousel` | stable | 1.9.0 | data |
+| `PixelCenter` | stable | 1.6.0 | layout |
+| `PixelCheckbox` | stable | 1.0.0 | forms |
+| `PixelChip` | stable | 1.0.0 | data |
+| `PixelChipGroup` | stable | 1.9.0 | data |
+| `PixelCluster` | stable | 1.6.0 | layout |
+| `PixelCodeInline` | stable | 1.0.0 | data |
+| `PixelCollapsible` | stable | 1.0.0 | data |
+| `PixelColorInput` | stable | 1.9.0 | forms |
+| `PixelColorSwatch` | stable | 1.0.0 | data |
+| `PixelCombobox` | stable | 1.8.0 | forms |
+| `PixelCommand` | stable | 1.8.0 | overlays |
+| `PixelContainer` | stable | 1.6.0 | layout |
+| `PixelDataTable` | stable | 1.9.0 | data |
+| `PixelDatePicker` | stable | 1.8.0 | forms |
+| `PixelDateRangePicker` | stable | 1.9.0 | forms |
+| `PixelDivider` | stable | 1.6.0 | layout |
+| `PixelDrawer` | stable | 1.8.0 | overlays |
+| `PixelDropdown` | stable | 1.0.0 | overlays |
+| `PixelEmptyState` | stable | 1.0.0 | feedback |
+| `PixelEqualHeightGrid` | stable | 1.6.0 | layout |
+| `PixelFadeIn` | stable | 1.6.0 | animations |
+| `PixelFeatureCard` | stable | 1.7.0 | cards |
+| `PixelFileUpload` | stable | 1.8.0 | forms |
+| `PixelFlicker` | stable | 1.6.0 | animations |
+| `PixelFloat` | stable | 1.6.0 | animations |
+| `PixelForm` | stable | 1.8.0 | forms |
+| `PixelGlitch` | stable | 1.6.0 | animations |
+| `PixelGrid` | stable | 1.6.0 | layout |
+| `PixelHeroMedia` | stable | 1.7.0 | hero |
+| `PixelHeroSection` | stable | 1.7.0 | hero |
+| `PixelIconFrame` | stable | 1.7.0 | cards |
+| `PixelInput` | stable | 1.0.0 | forms |
+| `PixelInputGroup` | stable | 1.9.0 | forms |
+| `PixelKbd` | stable | 1.0.0 | data |
+| `PixelMenubar` | stable | 1.9.0 | navigation |
+| `PixelModal` | stable | 1.0.0 | overlays |
+| `PixelMouseParallax` | stable | 1.6.0 | parallax |
+| `PixelMultiSelect` | stable | 1.8.0 | forms |
+| `PixelNavigationMenu` | stable | 1.9.0 | navigation |
+| `PixelNumberInput` | stable | 1.8.0 | forms |
+| `PixelOTPInput` | stable | 1.8.0 | forms |
+| `PixelPagination` | stable | 1.0.0 | navigation |
+| `PixelParallaxGroup` | stable | 1.6.0 | parallax |
+| `PixelParallaxLayer` | stable | 1.6.0 | parallax |
+| `PixelPasswordInput` | stable | 1.0.0 | forms |
+| `PixelPopover` | stable | 1.8.0 | overlay-foundation |
+| `PixelPortal` | stable | 1.8.0 | overlay-foundation |
+| `PixelPricingCard` | stable | 1.7.0 | cards |
+| `PixelProgress` | stable | 1.0.0 | feedback |
+| `PixelPulse` | stable | 1.6.0 | animations |
+| `PixelRadioGroup` | stable | 1.0.0 | forms |
+| `PixelRibbon` | stable | 1.7.0 | cards |
+| `PixelRotate` | stable | 1.6.0 | animations |
+| `PixelScrollArea` | stable | 1.9.0 | layout |
+| `PixelSection` | stable | 1.6.0 | layout |
+| `PixelSectionHeader` | stable | 1.6.0 | layout |
+| `PixelSegmented` | stable | 1.0.0 | forms |
+| `PixelSelect` | stable | 1.0.0 | forms |
+| `PixelShake` | stable | 1.6.0 | animations |
+| `PixelSheet` | stable | 1.8.0 | overlays |
+| `PixelSidebar` | stable | 1.9.0 | navigation |
+| `PixelSkeleton` | stable | 1.0.0 | feedback |
+| `PixelSlideIn` | stable | 1.6.0 | animations |
+| `PixelSlider` | stable | 1.0.0 | forms |
+| `PixelSparkline` | stable | 1.9.0 | data |
+| `PixelSpinner` | stable | 1.9.0 | feedback |
+| `PixelSplitButton` | stable | 1.0.0 | actions |
+| `PixelStack` | stable | 1.6.0 | layout |
+| `PixelStarRating` | stable | 2.0.2 | cards |
+| `PixelStatCard` | stable | 1.0.0 | cards |
+| `PixelStatGroup` | stable | 1.9.0 | data |
+| `PixelStepper` | stable | 1.9.0 | navigation |
+| `PixelSwitch` | stable | 1.0.0 | forms |
+| `PixelTable` | stable | 1.0.0 | data |
+| `PixelTabs` | stable | 1.0.0 | navigation |
+| `PixelTestimonialCard` | stable | 1.7.0 | cards |
+| `PixelTextarea` | stable | 1.0.0 | forms |
+| `PixelTextLink` | stable | 1.0.0 | data |
+| `PixelTimeline` | stable | 1.9.0 | data |
+| `PixelToast` | stable | 1.0.0 | feedback |
+| `PixelToggle` | stable | 1.9.0 | forms |
+| `PixelToggleGroup` | stable | 1.9.0 | forms |
+| `PixelTooltip` | stable | 1.0.0 | overlays |
+| `PixelTwoColumn` | stable | 1.6.0 | layout |
+| `PixelTypewriter` | stable | 1.6.0 | animations |
+| `PixelZoomIn` | stable | 1.6.0 | animations |
+| `PxlKitButton` | deprecated | 1.0.0 | actions |
+| `PxlKitLocaleProvider` | stable | 1.6.0 | overlay-foundation |
+| `PxlKitSurfaceProvider` | stable | 1.6.0 | overlay-foundation |
+| `PxlKitToastProvider` | stable | 1.8.0 | feedback |
+<!-- COMPONENTS:END -->
 
-### Actions
-
-| Component | Description |
-| --- | --- |
-| `PixelButton` | Primary button with pixel art styling and color tones |
-| `PxlKitButton` | Alternative button variant |
-| `PixelSplitButton` | Split button with dropdown action |
-
-### Data Display
-
-| Component | Description |
-| --- | --- |
-| `PixelCard` | Card container with title and pixel borders |
-| `PixelStatCard` | Statistics display card |
-| `PixelTable` | Data table with pixel art styling |
-| `PixelAvatar` | User avatar component |
-| `PixelBadge` | Status/count badge |
-| `PixelChip` | Tag/chip component |
-| `PixelTextLink` | Styled text link |
-| `PixelCollapsible` | Expandable/collapsible content |
-| `PixelCodeInline` | Inline code snippet |
-| `PixelKbd` | Keyboard shortcut display |
-| `PixelColorSwatch` | Color swatch display |
-| `PixelBareButton` | Unstyled button base |
-| `PixelBareInput` | Unstyled input base |
-| `PixelBareTextarea` | Unstyled textarea base |
-
-### Inputs
-
-| Component | Description |
-| --- | --- |
-| `PixelInput` | Text input with label and validation |
-| `PixelPasswordInput` | Password input with toggle visibility |
-| `PixelTextarea` | Multi-line text input |
-| `PixelSelect` | Dropdown select |
-| `PixelCheckbox` | Checkbox with pixel styling |
-| `PixelRadioGroup` | Radio button group |
-| `PixelSwitch` | Toggle switch |
-| `PixelSlider` | Range slider |
-| `PixelSegmented` | Segmented control / tab-like selector |
-
-### Feedback
-
-| Component | Description |
-| --- | --- |
-| `PixelAlert` | Alert/notification banner |
-| `PixelProgress` | Progress bar |
-| `PixelSkeleton` | Loading skeleton placeholder |
-| `PixelEmptyState` | Empty state with message |
-
-### Navigation
-
-| Component | Description |
-| --- | --- |
-| `PixelTabs` | Tab navigation |
-| `PixelAccordion` | Accordion / expandable panels |
-| `PixelBreadcrumb` | Breadcrumb navigation |
-| `PixelPagination` | Page pagination controls |
-
-### Overlay
-
-| Component | Description |
-| --- | --- |
-| `PixelModal` | Modal dialog |
-| `PixelTooltip` | Tooltip popup |
-| `PixelDropdown` | Dropdown menu |
-
-### Toasts
-
-| Component | Description |
-| --- | --- |
-| `PixelToast` | Pixel-art styled toast notification with positions, tones, icon slot |
-| `PxlKitToastProvider` | Toast context provider — exposes `useToast()` for imperative toasts |
-
-### Animations
-
-| Component | Description |
-| --- | --- |
-| `PixelFadeIn` | Fade-in animation wrapper |
-| `PixelSlideIn` | Slide-in animation wrapper |
-| `PixelPulse` | Pulse animation wrapper |
-| `PixelBounce` | Bounce animation wrapper |
-| `PixelTypewriter` | Typewriter text effect |
-| `PixelGlitch` | Glitch animation effect |
-| `PixelFloat` | Floating animation wrapper |
-| `PixelShake` | Shake animation wrapper |
-| `PixelRotate` | Rotation animation wrapper |
-| `PixelZoomIn` | Zoom-in animation wrapper |
-| `PixelFlicker` | Flicker animation effect |
-
-### Parallax
-
-| Component | Description |
-| --- | --- |
-| `PixelParallaxLayer` | Individual parallax layer |
-| `PixelParallaxGroup` | Scroll-based parallax group |
-| `PixelMouseParallax` | Mouse-tracking parallax container |
-
-### Providers
-
-| Component | Description |
-| --- | --- |
-| `PxlKitSurfaceProvider` | Switch every nested component between `pixel` and `linear` surface |
-| `PxlKitLocaleProvider` | Locale context provider (supports `en` and `tr`) |
-
-### Locale / i18n utilities
+## Locale / i18n utilities
 
 | Export | Description |
 | --- | --- |
