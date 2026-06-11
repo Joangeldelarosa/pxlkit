@@ -86,8 +86,38 @@ export function slugifyHeading(text: string): string {
     .replace(/-+/g, '-');
 }
 
+/**
+ * Line numbers (1-based) that sit inside a fenced code block. Mirrors the
+ * fence tracking in `extractMarkdownHeadings` so links and headings agree on
+ * what is markup and what is example text.
+ */
+export function fencedLines(source: string): Set<number> {
+  const fenced = new Set<number>();
+  const lines = source.split(/\r?\n/);
+  let inFence = false;
+  let fenceMarker = '';
+  for (let i = 0; i < lines.length; i += 1) {
+    const trimmed = (lines[i] ?? '').trimStart();
+    if (trimmed.startsWith('```') || trimmed.startsWith('~~~')) {
+      const marker = trimmed.slice(0, 3);
+      if (!inFence) {
+        inFence = true;
+        fenceMarker = marker;
+      } else if (trimmed.startsWith(fenceMarker)) {
+        inFence = false;
+        fenceMarker = '';
+      }
+      fenced.add(i + 1);
+      continue;
+    }
+    if (inFence) fenced.add(i + 1);
+  }
+  return fenced;
+}
+
 export function extractMarkdownLinks(source: string, fromFile: string): LinkRef[] {
   const out: LinkRef[] = [];
+  const fenced = fencedLines(source);
   MD_LINK_RE.lastIndex = 0;
   let match: RegExpExecArray | null;
   while ((match = MD_LINK_RE.exec(source)) !== null) {
@@ -95,6 +125,8 @@ export function extractMarkdownLinks(source: string, fromFile: string): LinkRef[
     const rawHref = (match[2] ?? '').trim();
     if (rawHref.length === 0) continue;
     if (isExternal(rawHref)) continue;
+    // Links inside fenced code blocks are example text, not navigation.
+    if (fenced.has(lineOfIndex(source, match.index))) continue;
     // Reference-style or images-handled-elsewhere — these still resolve as links.
     // Split target vs anchor.
     let target = rawHref;

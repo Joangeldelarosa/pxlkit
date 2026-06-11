@@ -53,6 +53,7 @@
     "@pxlkit/ui": "^1.2.3",
     "@tanstack/react-table": "^8.21.3",
     "clsx": "^2.1.0",
+    "embla-carousel": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "react-hook-form": "^7.76.1",
     "tailwind-merge": "^2.2.1"

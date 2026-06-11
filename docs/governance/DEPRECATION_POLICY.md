@@ -81,7 +81,7 @@ If multiple deprecations land in one release, each gets its own bullet.
 
 The showcase reads `deprecations.json` at build time and renders a yellow banner on every deprecated component's page:
 
-> Deprecated in `1.4.0`, removed in `2.0.0`. Use [`Button`](./button.md). [Migration guide](./migrations/buttonv1-to-button.md).
+> Deprecated in `1.4.0`, removed in `2.0.0`. Use `Button` (linked to its showcase page). Migration guide: `docs/migrations/buttonv1-to-button.md`.
 
 This banner is generated, not hand-written. If it does not show up, the manifest entry is malformed.
 
