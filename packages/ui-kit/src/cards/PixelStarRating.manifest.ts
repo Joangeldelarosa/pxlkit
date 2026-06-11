@@ -11,7 +11,7 @@ import {
 export default defineManifest({
   name: 'PixelStarRating',
   category: 'cards',
-  since: '2.0.2',
+  since: '2.0.0',
   status: 'stable',
   description:
     'Pixel-art star rating display with optional interactive selection and surface-aware styling.',
