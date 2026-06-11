@@ -11,7 +11,14 @@
  *      from each workspace `package.json`'s `description` field
  *   4. Quick links — homepage, repository, license, contributing, changelog
  *
- * SAFE: never overwrites `README.md`. Always writes to `README.generated.md`.
+ * Marker contract: when the hand-authored root `README.md` contains the
+ *   <!-- WORKSPACES:START --> ... <!-- WORKSPACES:END -->
+ * pair, the generator owns ONLY the region between the markers and rewrites
+ * it in place with the workspace map table (markers stay, everything else is
+ * preserved byte-for-byte). This satisfies gate 16-monorepo-map.
+ *
+ * SAFE: when the markers are absent, `README.md` is never touched — the full
+ * render goes to `README.generated.md`.
  *
  * CLI:
  *   tsx scripts/build-docs/generate-root-readme.ts
@@ -249,6 +256,58 @@ export function coverageBadge(coverage?: CoverageSummaryLike): string | null {
 }
 
 // ---------------------------------------------------------------------------
+// Marker-block contract (in-place fill of the hand-authored root README.md)
+// ---------------------------------------------------------------------------
+
+export const WORKSPACES_START_MARKER = "<!-- WORKSPACES:START -->";
+export const WORKSPACES_END_MARKER = "<!-- WORKSPACES:END -->";
+
+/**
+ * Render the auto-managed workspace map block body (without the markers).
+ * One row per workspace: repo-relative dir (linked), package name (npm link
+ * for public packages, `_(private)_` tag otherwise), version, description.
+ */
+export function renderWorkspacesBlock(workspaces: WorkspaceEntry[]): string {
+  const sorted = [...workspaces].sort((a, b) => a.relDir.localeCompare(b.relDir));
+  const lines: string[] = [
+    "<!-- auto-generated from the npm workspaces by scripts/build-docs/generate-root-readme.ts — edit workspace package.json files, then run `npm run docs:build`. -->",
+    "",
+    "| Workspace | Package | Version | Description |",
+    "| --- | --- | --- | --- |",
+  ];
+  for (const w of sorted) {
+    const pkgCell = w.isPrivate
+      ? `\`${w.name}\` _(private)_`
+      : `[\`${w.name}\`](https://www.npmjs.com/package/${w.name})`;
+    const ver = w.version ? `\`${w.version}\`` : "—";
+    lines.push(
+      `| [\`${w.relDir}\`](./${w.relDir}) | ${pkgCell} | ${ver} | ${escapeCell(w.description)} |`,
+    );
+  }
+  return lines.join("\n");
+}
+
+/**
+ * Replace the marker-delimited block inside the hand-authored root README
+ * with the generated workspace map. Returns the new file content, or `null`
+ * when the markers are absent or malformed. Preserves the file's dominant
+ * line ending and every byte outside the block.
+ */
+export function fillWorkspacesBlock(
+  readme: string,
+  workspaces: WorkspaceEntry[],
+): string | null {
+  const startIdx = readme.indexOf(WORKSPACES_START_MARKER);
+  const endIdx = readme.indexOf(WORKSPACES_END_MARKER);
+  if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) return null;
+  const eol = readme.includes("\r\n") ? "\r\n" : "\n";
+  const block = renderWorkspacesBlock(workspaces).split("\n").join(eol);
+  const before = readme.slice(0, startIdx + WORKSPACES_START_MARKER.length);
+  const after = readme.slice(endIdx);
+  return `${before}${eol}${block}${eol}${after}`;
+}
+
+// ---------------------------------------------------------------------------
 // Rendering
 // ---------------------------------------------------------------------------
 
@@ -399,8 +458,22 @@ export async function generateRootReadme(
   const workspaces = await discoverWorkspaces(repoRoot, rootPkg, logger);
   const coverage = await loadCoverage(repoRoot, opts.coverageSummaryPath, logger);
 
-  const content = renderRootReadme({ rootPkg, workspaces, coverage });
-  const outPath = toPosix(path.join(repoRoot, "README.generated.md"));
+  // Marker contract: when the hand-authored README.md declares the
+  // WORKSPACES block, fill it in place instead of emitting a sibling.
+  const readmePath = path.join(repoRoot, "README.md");
+  let content: string | null = null;
+  let outPath = toPosix(path.join(repoRoot, "README.generated.md"));
+  if (await fs.pathExists(readmePath)) {
+    const existing = await fs.readFile(readmePath, "utf8");
+    const filled = fillWorkspacesBlock(existing, workspaces);
+    if (filled !== null) {
+      content = filled;
+      outPath = toPosix(readmePath);
+    }
+  }
+  if (content === null) {
+    content = renderRootReadme({ rootPkg, workspaces, coverage });
+  }
 
   if (!opts.dryRun) {
     try {

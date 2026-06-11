@@ -2,6 +2,9 @@
  * Tests for generate-changelog.ts — manifest-timeline + git-log changelog builder.
  */
 
+import fs from "fs-extra";
+import os from "node:os";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   ChangelogGenerator,
@@ -9,6 +12,7 @@ import {
   composeChangelog,
   readPackageCommits,
   renderChangelog,
+  seedChangelogVersions,
   type ChangelogPackage,
   type GitCommit,
 } from "../generate-changelog";
@@ -222,6 +226,101 @@ describe("renderChangelog", () => {
     });
     expect(md).toContain("_No history yet._");
   });
+
+  it("renders a seed header instead of the do-not-edit header when seeded", () => {
+    const pkg: ChangelogPackage = {
+      package: "@pxlkit/core",
+      packageDir: "packages/core",
+      versions: [
+        {
+          version: "1.3.3",
+          date: "2026-05-01",
+          entries: [{ category: "Added", text: "thing", source: "abc1234", date: "2026-05-01" }],
+        },
+      ],
+    };
+    const md = renderChangelog(pkg, { seeded: true });
+    expect(md).toContain("Seeded from git history");
+    expect(md).toContain("hand-maintained");
+    expect(md).not.toContain("Do not edit by hand");
+    expect(md).toContain("## 1.3.3 — 2026-05-01");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// seedChangelogVersions — anchor the derived history to the package version
+// ---------------------------------------------------------------------------
+
+describe("seedChangelogVersions", () => {
+  const base: ChangelogPackage = {
+    package: "@pxlkit/core",
+    packageDir: "packages/core",
+    versions: [
+      {
+        version: "Unreleased",
+        date: "2026-05-01",
+        entries: [{ category: "Added", text: "new thing", source: "abc1234", date: "2026-05-01" }],
+      },
+      {
+        version: "2.0.0",
+        date: "2026-04-01",
+        entries: [{ category: "Changed", text: "stray monorepo release token", source: "def5678", date: "2026-04-01" }],
+      },
+      {
+        version: "1.0.0",
+        date: "2025-01-01",
+        entries: [{ category: "Added", text: "genesis", source: "0a1b2c3", date: "2025-01-01" }],
+      },
+    ],
+  };
+
+  it("relabels Unreleased to the current package version", () => {
+    const out = seedChangelogVersions(base, "1.3.3");
+    expect(out.versions[0]!.version).toBe("1.3.3");
+    expect(out.versions[0]!.entries.some((e) => e.text === "new thing")).toBe(true);
+  });
+
+  it("folds blocks above the current version into the current version block", () => {
+    const out = seedChangelogVersions(base, "1.3.3");
+    expect(out.versions.map((v) => v.version)).toEqual(["1.3.3", "1.0.0"]);
+    expect(out.versions[0]!.entries.some((e) => e.text === "stray monorepo release token")).toBe(true);
+  });
+
+  it("keeps blocks at or below the current version intact", () => {
+    const out = seedChangelogVersions(base, "1.3.3");
+    const v1 = out.versions.find((v) => v.version === "1.0.0");
+    expect(v1).toBeDefined();
+    expect(v1!.entries[0]!.text).toBe("genesis");
+  });
+
+  it("uses the newest merged date for the anchored block", () => {
+    const out = seedChangelogVersions(base, "1.3.3");
+    expect(out.versions[0]!.date).toBe("2026-05-01");
+  });
+
+  it("merges into an existing block when one already matches the current version", () => {
+    const withCurrent: ChangelogPackage = {
+      ...base,
+      versions: [
+        ...base.versions,
+        {
+          version: "1.3.3",
+          date: "2026-03-15",
+          entries: [{ category: "Fixed", text: "pinned fix", source: "feed123", date: "2026-03-15" }],
+        },
+      ],
+    };
+    const out = seedChangelogVersions(withCurrent, "1.3.3");
+    const anchored = out.versions.filter((v) => v.version === "1.3.3");
+    expect(anchored).toHaveLength(1);
+    expect(anchored[0]!.entries.some((e) => e.text === "pinned fix")).toBe(true);
+    expect(anchored[0]!.entries.some((e) => e.text === "new thing")).toBe(true);
+  });
+
+  it("returns the package unchanged when no valid version is supplied", () => {
+    expect(seedChangelogVersions(base, undefined)).toBe(base);
+    expect(seedChangelogVersions(base, "not-semver")).toBe(base);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -289,7 +388,8 @@ describe("ChangelogGenerator.run", () => {
     const result = await generator.run(ctx);
     expect(result.writes).toHaveLength(1);
     const w = result.writes[0]!;
-    expect(w.path.endsWith("/CHANGELOG.generated.md")).toBe(true);
+    // The fake workspace dir has no CHANGELOG.md, so the generator seeds one.
+    expect(w.path.endsWith("/CHANGELOG.md")).toBe(true);
     expect(w.content).toContain("# Changelog — @pxlkit/ui-kit");
     expect(w.content).toContain("PixelButton");
     expect(w.content).toContain("1.9.0");
@@ -336,5 +436,77 @@ describe("ChangelogGenerator.run", () => {
     };
     const result = await generator.run(ctx);
     expect(result.writes).toHaveLength(0);
+  });
+
+  it("seeds CHANGELOG.md anchored to the workspace version when none exists", async () => {
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "pxl-changelog-test-"));
+    try {
+      const pkgDir = path.join(tmp, "packages", "core");
+      await fs.ensureDir(pkgDir);
+
+      const fakeRunner = (_args: string[]): string => {
+        const F = "FIELD";
+        const C = "COMMIT";
+        return [
+          ["aaaa1111", "aaaa111", "2026-05-01", "feat: brand new util", ""].join(F) + C,
+          ["bbbb2222", "bbbb222", "2026-04-01", "release(ui-kit): v2.0.0 launch", ""].join(F) + C,
+        ].join("");
+      };
+      const generator = new ChangelogGenerator({
+        gitRunner: fakeRunner,
+        workspaces: [{ name: "@pxlkit/core", dir: pkgDir.split(path.sep).join("/"), version: "1.3.3" }],
+      });
+      const ctx: GeneratorContext = {
+        repoRoot: tmp,
+        manifests: [],
+        outputs: new Map<string, string>(),
+        logger: createLogger("test"),
+      };
+
+      const result = await generator.run(ctx);
+      expect(result.writes).toHaveLength(1);
+      const w = result.writes[0]!;
+      expect(w.path.endsWith("packages/core/CHANGELOG.md")).toBe(true);
+      expect(w.content).toContain("Seeded from git history");
+      // first version heading is the package's current version, not 2.0.0
+      const firstHeading = /^##\s+(.+)$/m.exec(w.content);
+      expect(firstHeading![1]).toMatch(/^1\.3\.3\b/);
+      // entries from the v2.0.0-tagged commit got folded into 1.3.3
+      expect(w.content).toContain("v2.0.0 launch");
+    } finally {
+      await fs.remove(tmp);
+    }
+  });
+
+  it("keeps the sibling .generated.md when a hand-authored CHANGELOG.md exists", async () => {
+    const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "pxl-changelog-test-"));
+    try {
+      const pkgDir = path.join(tmp, "packages", "ui-kit");
+      await fs.ensureDir(pkgDir);
+      const handAuthored = "# Changelog\n\n## 2.0.1 — 2026-06-01\n\n- hand entry\n";
+      await fs.writeFile(path.join(pkgDir, "CHANGELOG.md"), handAuthored, "utf8");
+
+      const generator = new ChangelogGenerator({
+        gitRunner: () => "",
+        workspaces: [{ name: "@pxlkit/ui-kit", dir: pkgDir.split(path.sep).join("/"), version: "2.0.1" }],
+      });
+      const ctx: GeneratorContext = {
+        repoRoot: tmp,
+        manifests: [manifestRec("PixelButton", "1.0.0")],
+        outputs: new Map<string, string>(),
+        logger: createLogger("test"),
+      };
+
+      const result = await generator.run(ctx);
+      expect(result.writes).toHaveLength(1);
+      const w = result.writes[0]!;
+      expect(w.path.endsWith("packages/ui-kit/CHANGELOG.generated.md")).toBe(true);
+      expect(w.content).toContain("Do not edit by hand");
+      // hand-authored file untouched
+      const after = await fs.readFile(path.join(pkgDir, "CHANGELOG.md"), "utf8");
+      expect(after).toBe(handAuthored);
+    } finally {
+      await fs.remove(tmp);
+    }
   });
 });

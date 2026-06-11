@@ -21,6 +21,10 @@ import {
   discoverWorkspaces,
   generateRootReadme,
   renderRootReadme,
+  renderWorkspacesBlock,
+  fillWorkspacesBlock,
+  WORKSPACES_START_MARKER,
+  WORKSPACES_END_MARKER,
   type RootPackageJsonLike,
   type WorkspaceEntry,
 } from "../generate-root-readme";
@@ -267,6 +271,119 @@ describe("discoverWorkspaces", () => {
 });
 
 // ---------------------------------------------------------------------------
+// renderWorkspacesBlock / fillWorkspacesBlock — marker contract
+// ---------------------------------------------------------------------------
+
+describe("renderWorkspacesBlock", () => {
+  const workspaces: WorkspaceEntry[] = [
+    {
+      name: "@pxlkit/web",
+      version: "1.2.0",
+      description: "Next.js showcase site.",
+      dir: "/tmp/pxlkit/apps/web",
+      relDir: "apps/web",
+      bucket: "apps",
+      isPrivate: true,
+    },
+    {
+      name: "@pxlkit/core",
+      version: "1.3.3",
+      description: "core engine",
+      dir: "/tmp/pxlkit/packages/core",
+      relDir: "packages/core",
+      bucket: "packages",
+      isPrivate: false,
+    },
+  ];
+
+  it("lists every workspace's relDir and package name", () => {
+    const block = renderWorkspacesBlock(workspaces);
+    expect(block).toContain("| Workspace | Package | Version | Description |");
+    expect(block).toContain("packages/core");
+    expect(block).toContain("@pxlkit/core");
+    expect(block).toContain("apps/web");
+    expect(block).toContain("@pxlkit/web");
+  });
+
+  it("marks private workspaces and links public ones to npm", () => {
+    const block = renderWorkspacesBlock(workspaces);
+    expect(block).toContain("_(private)_");
+    expect(block).toContain("https://www.npmjs.com/package/@pxlkit/core");
+    expect(block).not.toContain("https://www.npmjs.com/package/@pxlkit/web");
+  });
+});
+
+describe("fillWorkspacesBlock", () => {
+  const workspaces: WorkspaceEntry[] = [
+    {
+      name: "@pxlkit/core",
+      version: "1.3.3",
+      description: "core engine",
+      dir: "/tmp/pxlkit/packages/core",
+      relDir: "packages/core",
+      bucket: "packages",
+      isPrivate: false,
+    },
+  ];
+
+  it("returns null when the markers are absent", () => {
+    expect(fillWorkspacesBlock("# nothing here\n", workspaces)).toBeNull();
+  });
+
+  it("returns null when END precedes START", () => {
+    const readme = `${WORKSPACES_END_MARKER}\n${WORKSPACES_START_MARKER}\n`;
+    expect(fillWorkspacesBlock(readme, workspaces)).toBeNull();
+  });
+
+  it("replaces only the content between the markers", () => {
+    const readme = [
+      "# root",
+      "",
+      WORKSPACES_START_MARKER,
+      "old map",
+      WORKSPACES_END_MARKER,
+      "",
+      "## Tail",
+      "rest",
+    ].join("\n");
+    const out = fillWorkspacesBlock(readme, workspaces);
+    expect(out).not.toBeNull();
+    expect(out!).not.toContain("old map");
+    expect(out!).toContain("packages/core");
+    expect(out!.startsWith(`# root\n\n${WORKSPACES_START_MARKER}`)).toBe(true);
+    expect(out!.endsWith(`${WORKSPACES_END_MARKER}\n\n## Tail\nrest`)).toBe(true);
+  });
+
+  it("is idempotent", () => {
+    const readme = [
+      "# root",
+      "",
+      WORKSPACES_START_MARKER,
+      "old",
+      WORKSPACES_END_MARKER,
+      "",
+    ].join("\n");
+    const once = fillWorkspacesBlock(readme, workspaces)!;
+    const twice = fillWorkspacesBlock(once, workspaces)!;
+    expect(twice).toBe(once);
+  });
+
+  it("preserves CRLF line endings", () => {
+    const readme = [
+      "# root",
+      "",
+      WORKSPACES_START_MARKER,
+      "old",
+      WORKSPACES_END_MARKER,
+      "",
+    ].join("\r\n");
+    const out = fillWorkspacesBlock(readme, workspaces)!;
+    expect(out).toContain(`${WORKSPACES_START_MARKER}\r\n`);
+    expect(out).not.toMatch(/[^\r]\n/);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // generateRootReadme — end-to-end
 // ---------------------------------------------------------------------------
 
@@ -337,6 +454,61 @@ describe("generateRootReadme", () => {
     const res = await generateRootReadme({ repoRoot: tmp });
     expect(res.ok).toBe(false);
     expect(res.errors.join("\n")).toMatch(/parse/i);
+  });
+
+  it("fills the WORKSPACES marker block in README.md in place when present", async () => {
+    const readme = [
+      "# hand-authored root readme",
+      "",
+      "## Packages",
+      "",
+      WORKSPACES_START_MARKER,
+      "stale workspace table",
+      WORKSPACES_END_MARKER,
+      "",
+      "## License",
+      "MIT",
+      "",
+    ].join("\n");
+    await fs.writeFile(path.join(tmp, "README.md"), readme, "utf8");
+
+    const res = await generateRootReadme({ repoRoot: tmp });
+    expect(res.ok).toBe(true);
+    expect(res.path.endsWith("README.md")).toBe(true);
+    expect(res.path.endsWith("README.generated.md")).toBe(false);
+
+    const after = await fs.readFile(path.join(tmp, "README.md"), "utf8");
+    expect(after).toContain("# hand-authored root readme");
+    expect(after).toContain("## License");
+    expect(after).toContain(WORKSPACES_START_MARKER);
+    expect(after).toContain(WORKSPACES_END_MARKER);
+    expect(after).not.toContain("stale workspace table");
+    // every workspace must be mentioned inside the block
+    expect(after).toContain("@pxlkit/ui-kit");
+    expect(after).toContain("@pxlkit/core");
+    expect(after).toContain("apps/web");
+    // no sibling emitted in marker mode
+    expect(await fs.pathExists(path.join(tmp, "README.generated.md"))).toBe(false);
+  });
+
+  it("dryRun with markers plans the in-place write without touching disk", async () => {
+    const readme = [
+      "# root",
+      "",
+      WORKSPACES_START_MARKER,
+      "old",
+      WORKSPACES_END_MARKER,
+      "",
+    ].join("\n");
+    await fs.writeFile(path.join(tmp, "README.md"), readme, "utf8");
+
+    const res = await generateRootReadme({ repoRoot: tmp, dryRun: true });
+    expect(res.ok).toBe(true);
+    expect(res.path.endsWith("README.md")).toBe(true);
+    expect(res.content).toContain("@pxlkit/ui-kit");
+
+    const untouched = await fs.readFile(path.join(tmp, "README.md"), "utf8");
+    expect(untouched).toBe(readme);
   });
 
   it("emits coverage badge when a coverage summary file exists", async () => {

@@ -13,6 +13,10 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   generateReadmePackage,
   renderPackageReadme,
+  renderComponentsBlock,
+  fillComponentsBlock,
+  COMPONENTS_START_MARKER,
+  COMPONENTS_END_MARKER,
   GenerateReadmePackageGenerator,
   type PackageReadmeInput,
 } from "../generate-readme-package";
@@ -186,6 +190,105 @@ describe("renderPackageReadme", () => {
 });
 
 // ---------------------------------------------------------------------------
+// renderComponentsBlock / fillComponentsBlock (pure, marker contract)
+// ---------------------------------------------------------------------------
+
+describe("renderComponentsBlock", () => {
+  const manifests = [
+    makeManifest("@pxlkit/ui-kit", "PixelCard", { status: "beta", category: "cards" }),
+    makeManifest("@pxlkit/ui-kit", "PixelButton"),
+  ];
+
+  it("renders one backticked row per manifest, sorted by name", () => {
+    const block = renderComponentsBlock(manifests);
+    expect(block).toContain("| Component | Status | Since | Category |");
+    expect(block).toContain("| `PixelButton` | stable | 1.0.0 | actions |");
+    expect(block).toContain("| `PixelCard` | beta | 1.0.0 | cards |");
+    expect(block.indexOf("`PixelButton`")).toBeLessThan(block.indexOf("`PixelCard`"));
+  });
+
+  it("does not leak free-text descriptions into the block", () => {
+    // Descriptions are free text and could contain backticked PascalCase
+    // tokens that would violate the coverage/consistency gates.
+    const block = renderComponentsBlock(manifests);
+    expect(block).not.toContain("description for");
+  });
+});
+
+describe("fillComponentsBlock", () => {
+  const manifests = [
+    makeManifest("@pxlkit/ui-kit", "PixelButton"),
+    makeManifest("@pxlkit/ui-kit", "PixelCard"),
+  ];
+
+  it("returns null when the markers are absent", () => {
+    expect(fillComponentsBlock("# plain readme\n", manifests)).toBeNull();
+  });
+
+  it("returns null when only the start marker is present", () => {
+    const readme = `# x\n\n${COMPONENTS_START_MARKER}\nstuff\n`;
+    expect(fillComponentsBlock(readme, manifests)).toBeNull();
+  });
+
+  it("returns null when END precedes START", () => {
+    const readme = `# x\n\n${COMPONENTS_END_MARKER}\n${COMPONENTS_START_MARKER}\n`;
+    expect(fillComponentsBlock(readme, manifests)).toBeNull();
+  });
+
+  it("replaces only the content between the markers", () => {
+    const readme = [
+      "# pkg",
+      "",
+      "## Components",
+      "",
+      COMPONENTS_START_MARKER,
+      "old hand list",
+      COMPONENTS_END_MARKER,
+      "",
+      "## After",
+      "tail",
+    ].join("\n");
+    const out = fillComponentsBlock(readme, manifests);
+    expect(out).not.toBeNull();
+    expect(out!).not.toContain("old hand list");
+    expect(out!).toContain("`PixelButton`");
+    expect(out!).toContain("`PixelCard`");
+    // markers stay, prefix and suffix preserved byte-for-byte
+    expect(out!.startsWith(`# pkg\n\n## Components\n\n${COMPONENTS_START_MARKER}`)).toBe(true);
+    expect(out!.endsWith(`${COMPONENTS_END_MARKER}\n\n## After\ntail`)).toBe(true);
+  });
+
+  it("is idempotent", () => {
+    const readme = [
+      "# pkg",
+      "",
+      COMPONENTS_START_MARKER,
+      "old",
+      COMPONENTS_END_MARKER,
+      "",
+    ].join("\n");
+    const once = fillComponentsBlock(readme, manifests)!;
+    const twice = fillComponentsBlock(once, manifests)!;
+    expect(twice).toBe(once);
+  });
+
+  it("preserves CRLF line endings", () => {
+    const readme = [
+      "# pkg",
+      "",
+      COMPONENTS_START_MARKER,
+      "old",
+      COMPONENTS_END_MARKER,
+      "",
+    ].join("\r\n");
+    const out = fillComponentsBlock(readme, manifests)!;
+    expect(out).toContain(`${COMPONENTS_START_MARKER}\r\n`);
+    expect(out).toContain("| `PixelButton` | stable | 1.0.0 | actions |\r\n");
+    expect(out).not.toMatch(/[^\r]\n/);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // generateReadmePackage (integration with temp fs)
 // ---------------------------------------------------------------------------
 
@@ -256,6 +359,65 @@ describe("generateReadmePackage", () => {
     expect(
       await fs.pathExists(path.join(pkgDir, "README.generated.md")),
     ).toBe(true);
+  });
+
+  it("fills the marker block in place when README.md declares it", async () => {
+    const pkgDir = await makePkg(tmp, "ui-kit", {
+      name: "@pxlkit/ui-kit",
+      version: "1.0.0",
+      license: "MIT",
+    });
+    const readme = [
+      "# hand-authored title",
+      "",
+      "## Components",
+      "",
+      COMPONENTS_START_MARKER,
+      "stale hand list",
+      COMPONENTS_END_MARKER,
+      "",
+      "## License",
+      "MIT",
+      "",
+    ].join("\n");
+    await fs.writeFile(path.join(pkgDir, "README.md"), readme, "utf8");
+
+    const result = await generateReadmePackage({
+      repoRoot: tmp,
+      manifests: [makeManifest("@pxlkit/ui-kit", "PixelButton")],
+    });
+
+    expect(result.outputs).toHaveLength(1);
+    expect(result.outputs[0]!.path.endsWith("packages/ui-kit/README.md")).toBe(true);
+
+    const after = await fs.readFile(path.join(pkgDir, "README.md"), "utf8");
+    expect(after).toContain("# hand-authored title");
+    expect(after).toContain("## License");
+    expect(after).toContain(COMPONENTS_START_MARKER);
+    expect(after).toContain(COMPONENTS_END_MARKER);
+    expect(after).toContain("`PixelButton`");
+    expect(after).not.toContain("stale hand list");
+    // no sibling emitted in marker mode
+    expect(await fs.pathExists(path.join(pkgDir, "README.generated.md"))).toBe(false);
+  });
+
+  it("falls back to the sibling when README.md has no markers", async () => {
+    const pkgDir = await makePkg(tmp, "ui-kit", {
+      name: "@pxlkit/ui-kit",
+      version: "1.0.0",
+      license: "MIT",
+    });
+    await fs.writeFile(path.join(pkgDir, "README.md"), "# no markers here\n", "utf8");
+
+    const result = await generateReadmePackage({
+      repoRoot: tmp,
+      manifests: [makeManifest("@pxlkit/ui-kit", "PixelButton")],
+    });
+
+    expect(result.outputs).toHaveLength(1);
+    expect(result.outputs[0]!.path.endsWith("README.generated.md")).toBe(true);
+    const untouched = await fs.readFile(path.join(pkgDir, "README.md"), "utf8");
+    expect(untouched).toBe("# no markers here\n");
   });
 
   it("skips packages that have no manifests", async () => {

@@ -21,8 +21,11 @@
  *   - read-only on apps/web/*  (the docs site rewrites generated section
  *     modules, but each individual generator already enforces its own
  *     output-path allowlist — we just trust those guards here)
- *   - never overwrites hand-authored files; every generator emits to a
- *     `.generated.*` (or sibling `_generated/`) location
+ *   - hand-authored files are only written through explicit contracts: the
+ *     marker blocks (<!-- COMPONENTS:START/END -->, <!-- WORKSPACES:START/END -->)
+ *     replace just the delimited region, and CHANGELOG.md is only created as
+ *     a one-time seed when the package has none. Everything else emits to a
+ *     `.generated.*` (or sibling `_generated/`) location.
  */
 
 import path from "node:path";

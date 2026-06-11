@@ -13,8 +13,15 @@
  *   6. API stability commitments
  *   7. Links (homepage, repo, license, changelog)
  *
- * Safety: NEVER overwrites a hand-authored README.md. Always writes
- *   README.generated.md alongside.
+ * Marker contract: when the package's hand-authored README.md contains the
+ *   <!-- COMPONENTS:START --> ... <!-- COMPONENTS:END -->
+ * pair, the generator owns ONLY the region between the markers and rewrites
+ * it in place with the auto-generated components table (markers stay, every
+ * other byte of the file is preserved). This satisfies the coherence gates
+ * (02-coverage-readmes / 07-consistency-readme) that validate the block.
+ *
+ * Safety: when the markers are absent, the hand-authored README.md is NEVER
+ *   touched — the full render goes to README.generated.md alongside.
  */
 
 import fs from "fs-extra";
@@ -53,7 +60,11 @@ export interface PackageReadmeInput {
 }
 
 export interface PackageReadmeOutput {
-  /** Absolute POSIX path to README.generated.md */
+  /**
+   * Absolute POSIX path of the planned write: the package README.md itself
+   * when it declares the COMPONENTS marker block (in-place fill), otherwise
+   * the README.generated.md sibling.
+   */
   path: string;
   /** Rendered markdown content. */
   content: string;
@@ -187,6 +198,60 @@ function componentsTable(manifests: ManifestRecord[]): string {
     return `| \`${m.name}\` | ${status} | ${since} | ${category} | ${desc} |`;
   });
   return [header, sep, ...body].join("\n");
+}
+
+// ---------------------------------------------------------------------------
+// Marker-block contract (in-place fill of hand-authored README.md)
+// ---------------------------------------------------------------------------
+
+export const COMPONENTS_START_MARKER = "<!-- COMPONENTS:START -->";
+export const COMPONENTS_END_MARKER = "<!-- COMPONENTS:END -->";
+
+/**
+ * Render the auto-managed components block body (without the markers).
+ *
+ * Deliberately structural-only: component name (backticked), status, since,
+ * category. Free-text descriptions are excluded — they may contain backticked
+ * PascalCase tokens that would violate the registry-consistency gates.
+ */
+export function renderComponentsBlock(manifests: ManifestRecord[]): string {
+  const rows = [...manifests].sort((a, b) =>
+    a.manifest.name.localeCompare(b.manifest.name),
+  );
+  const lines: string[] = [
+    "<!-- auto-generated from component manifests by scripts/build-docs/generate-readme-package.ts — edit the manifests, then run `npm run docs:build`. -->",
+    "",
+    "| Component | Status | Since | Category |",
+    "| --- | --- | --- | --- |",
+  ];
+  for (const r of rows) {
+    const m = r.manifest;
+    const status = String(m.status ?? "—");
+    const since = String(m.since ?? "—");
+    const category = String(m.category ?? "—");
+    lines.push(`| \`${m.name}\` | ${status} | ${since} | ${category} |`);
+  }
+  return lines.join("\n");
+}
+
+/**
+ * Replace the marker-delimited block inside a hand-authored README with the
+ * generated components block. Returns the new file content, or `null` when
+ * the markers are absent or malformed (END before START). Preserves the
+ * file's dominant line ending (CRLF vs LF) and every byte outside the block.
+ */
+export function fillComponentsBlock(
+  readme: string,
+  manifests: ManifestRecord[],
+): string | null {
+  const startIdx = readme.indexOf(COMPONENTS_START_MARKER);
+  const endIdx = readme.indexOf(COMPONENTS_END_MARKER);
+  if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) return null;
+  const eol = readme.includes("\r\n") ? "\r\n" : "\n";
+  const block = renderComponentsBlock(manifests).split("\n").join(eol);
+  const before = readme.slice(0, startIdx + COMPONENTS_START_MARKER.length);
+  const after = readme.slice(endIdx);
+  return `${before}${eol}${block}${eol}${after}`;
 }
 
 function apiStabilitySection(manifests: ManifestRecord[]): string {
@@ -396,14 +461,30 @@ export async function generateReadmePackage(
       skippedPackages.push(pkgJson.name);
       continue;
     }
-    const content = renderPackageReadme({
-      packageName: pkgJson.name,
-      packageDir: toPosix(packageDir),
-      packageJson: pkgJson,
-      manifests: pkgManifests,
-    });
-    const outPath = toPosix(path.join(packageDir, "README.generated.md"));
-    outputs.push({ path: outPath, content });
+
+    // Marker contract: when the hand-authored README.md declares the
+    // COMPONENTS block, fill it in place instead of emitting a sibling.
+    const readmePath = path.join(packageDir, "README.md");
+    let inPlace = false;
+    if (await fs.pathExists(readmePath)) {
+      const existing = await fs.readFile(readmePath, "utf8");
+      const filled = fillComponentsBlock(existing, pkgManifests);
+      if (filled !== null) {
+        outputs.push({ path: toPosix(readmePath), content: filled });
+        inPlace = true;
+      }
+    }
+
+    if (!inPlace) {
+      const content = renderPackageReadme({
+        packageName: pkgJson.name,
+        packageDir: toPosix(packageDir),
+        packageJson: pkgJson,
+        manifests: pkgManifests,
+      });
+      const outPath = toPosix(path.join(packageDir, "README.generated.md"));
+      outputs.push({ path: outPath, content });
+    }
   }
 
   if (!opts.dryRun) {
