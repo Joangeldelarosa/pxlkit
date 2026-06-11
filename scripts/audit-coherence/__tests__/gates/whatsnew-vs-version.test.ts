@@ -7,7 +7,7 @@ import {
   parseChangelogAdded,
   parseStripItems,
   whatsnewVsVersionGate,
-} from '../../gates/32-whatsnew-vs-version';
+} from '../../gates/34-whatsnew-vs-version';
 
 interface Fixture {
   root: string;
@@ -85,7 +85,7 @@ const CHANGELOG_OK = `# Changelog
 - **\`LegacyWidget\`** — must not appear in items[].
 `;
 
-describe('gate 32: whatsnew-vs-version', () => {
+describe('gate 34: whatsnew-vs-version', () => {
   const fixtures: Fixture[] = [];
 
   afterAll(async () => {

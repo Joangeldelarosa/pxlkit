@@ -2,7 +2,9 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { DriftItem, Gate, GateResult } from '../types';
 
-const GATE_ID = '32-whatsnew-vs-version';
+import { adaptFunctionalGate } from '../_lib/functional-gate-adapter.js';
+
+const GATE_ID = '34-whatsnew-vs-version';
 const DESCRIPTION =
   'WhatsNewStrip items[] must equal the components listed under "Added" for the current @pxlkit/ui-kit version in packages/ui-kit/CHANGELOG.md.';
 
@@ -56,15 +58,18 @@ export function parseStripItems(strip: string): string[] {
  * detected as the first backticked identifier on each bullet line.
  */
 export function parseChangelogAdded(changelog: string, version: string): string[] {
+  // NOTE: JS regex has no \Z end-of-string anchor (it matches a literal
+  // "Z"), so "end of input" is expressed as `$(?![\s\S])` — a `$` that has
+  // nothing at all after it, even under the m flag.
   const sectionRe = new RegExp(
-    `^##\\s+\\[[^\\]]*${escapeRegex(version)}[^\\]]*\\][\\s\\S]*?(?=^##\\s+\\[|\\Z)`,
+    `^##\\s+\\[[^\\]]*${escapeRegex(version)}[^\\]]*\\][\\s\\S]*?(?=^##\\s+\\[|$(?![\\s\\S]))`,
     'm',
   );
   const sectionMatch = sectionRe.exec(changelog);
   if (!sectionMatch) return [];
   const section = sectionMatch[0];
 
-  const addedRe = /^###\s+Added\b[\s\S]*?(?=^###\s+|^##\s+\[|\Z)/m;
+  const addedRe = /^###\s+Added\b[\s\S]*?(?=^###\s+|^##\s+\[|$(?![\s\S]))/m;
   const addedMatch = addedRe.exec(section);
   if (!addedMatch) return [];
   const addedBlock = addedMatch[0];
@@ -191,4 +196,11 @@ export const whatsnewVsVersionGate: Gate = async ({ repoRoot }): Promise<GateRes
   return { gateId: GATE_ID, description: DESCRIPTION, drift };
 };
 
-export default whatsnewVsVersionGate;
+// Orchestrator-compatible wrapper; the named functional export above is
+// the pure core the unit tests exercise directly.
+export default adaptFunctionalGate({
+  id: 34,
+  name: 'whatsnew-vs-version',
+  description: DESCRIPTION,
+  fn: whatsnewVsVersionGate,
+});

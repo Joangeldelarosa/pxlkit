@@ -2,6 +2,8 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { DriftItem, Gate, GateResult } from '../types';
 
+import { adaptFunctionalGate } from '../_lib/functional-gate-adapter.js';
+
 const GATE_ID = '30-component-count-coherence';
 const DESCRIPTION =
   'ui-kit registry component count must match ui-kit/package.json description, ui-kit/README.md body, and root README.md body.';
@@ -128,4 +130,11 @@ export const componentCountCoherenceGate: Gate = async ({ repoRoot }): Promise<G
   return { gateId: GATE_ID, description: DESCRIPTION, drift };
 };
 
-export default componentCountCoherenceGate;
+// Orchestrator-compatible wrapper; the named functional export above is
+// the pure core the unit tests exercise directly.
+export default adaptFunctionalGate({
+  id: 30,
+  name: 'component-count-coherence',
+  description: DESCRIPTION,
+  fn: componentCountCoherenceGate,
+});

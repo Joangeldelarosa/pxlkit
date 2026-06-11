@@ -4,6 +4,8 @@ import { promisify } from 'node:util';
 import { join } from 'node:path';
 import type { DriftItem, Gate, GateResult } from '../types';
 
+import { adaptFunctionalGate } from '../_lib/functional-gate-adapter.js';
+
 const GATE_ID = '32-changelog-vs-git';
 const DESCRIPTION =
   'Every commit since the last release tag in CHANGELOG.md must be reflected as an entry, and every CHANGELOG entry must reference a commit/PR that exists in git history.';
@@ -217,4 +219,11 @@ export const changelogVsGitGate: Gate = async ({ repoRoot }): Promise<GateResult
   return { gateId: GATE_ID, description: DESCRIPTION, drift };
 };
 
-export default changelogVsGitGate;
+// Orchestrator-compatible wrapper; the named functional export above is
+// the pure core the unit tests exercise directly.
+export default adaptFunctionalGate({
+  id: 32,
+  name: 'changelog-vs-git',
+  description: DESCRIPTION,
+  fn: changelogVsGitGate,
+});

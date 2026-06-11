@@ -2,6 +2,8 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { DriftItem, Gate, GateResult } from '../types';
 
+import { adaptFunctionalGate } from '../_lib/functional-gate-adapter.js';
+
 const GATE_ID = '31-whats-new-strip-coherence';
 const DESCRIPTION =
   'apps/web/src/components/whats-new-strip.tsx must exist, reference at least one current ui-kit registry component, and mention the current ui-kit version.';
@@ -101,4 +103,11 @@ export const whatsNewStripCoherenceGate: Gate = async ({ repoRoot }): Promise<Ga
   return { gateId: GATE_ID, description: DESCRIPTION, drift };
 };
 
-export default whatsNewStripCoherenceGate;
+// Orchestrator-compatible wrapper; the named functional export above is
+// the pure core the unit tests exercise directly.
+export default adaptFunctionalGate({
+  id: 31,
+  name: 'whats-new-strip-coherence',
+  description: DESCRIPTION,
+  fn: whatsNewStripCoherenceGate,
+});

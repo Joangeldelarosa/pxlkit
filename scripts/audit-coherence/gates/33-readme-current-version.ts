@@ -2,6 +2,8 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { DriftItem, Gate, GateResult } from '../types';
 
+import { adaptFunctionalGate } from '../_lib/functional-gate-adapter.js';
+
 const GATE_ID = '33-readme-current-version';
 const DESCRIPTION =
   'Root README.md and each packages/*/README.md should mention the current package.json version (badge row or install snippet). Root README "<N> components" mentions must match the ui-kit registry length.';
@@ -184,4 +186,11 @@ export const readmeCurrentVersionGate: Gate = async ({ repoRoot }): Promise<Gate
   return { gateId: GATE_ID, description: DESCRIPTION, drift };
 };
 
-export default readmeCurrentVersionGate;
+// Orchestrator-compatible wrapper; the named functional export above is
+// the pure core the unit tests exercise directly.
+export default adaptFunctionalGate({
+  id: 33,
+  name: 'readme-current-version',
+  description: DESCRIPTION,
+  fn: readmeCurrentVersionGate,
+});
