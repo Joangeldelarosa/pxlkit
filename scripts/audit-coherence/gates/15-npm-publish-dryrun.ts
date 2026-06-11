@@ -161,7 +161,13 @@ export const defaultNpmDryRunRunner: NpmDryRunRunner = async ({
   packageName,
   logger,
 }) => {
-  const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+  // On Windows the npm entrypoint is a .cmd shim, and Node's
+  // CVE-2024-27980 mitigation rejects spawning .cmd files with shell:false
+  // (EINVAL) — which used to fail this gate for every package. The args are
+  // fixed strings plus the package name from package.json, so enabling the
+  // shell on Windows is safe here.
+  const isWindows = process.platform === 'win32';
+  const npm = isWindows ? 'npm.cmd' : 'npm';
   logger.debug(`npm publish --dry-run --workspace=${packageName}`);
   const proc: SpawnSyncReturns<string> = spawnSync(
     npm,
@@ -169,7 +175,7 @@ export const defaultNpmDryRunRunner: NpmDryRunRunner = async ({
     {
       cwd: repoRoot,
       encoding: 'utf8',
-      shell: false,
+      shell: isWindows,
       windowsHide: true,
       // npm writes the tarball contents to stderr in older versions and
       // stdout in newer ones; we merge both manually below so callers see

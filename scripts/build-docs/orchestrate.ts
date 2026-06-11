@@ -76,7 +76,7 @@ export interface OrchestrateResult {
 }
 
 export interface OrchestrateOptions {
-  /** Repo root. Defaults to process.cwd(). */
+  /** Repo root. Defaults to the workspace root detected from process.cwd(). */
   repoRoot?: string;
   /** Optional allow-list of step names. `scan` always runs. */
   only?: string[];
@@ -294,6 +294,33 @@ async function runStep(
 // ---------------------------------------------------------------------------
 
 /**
+ * Locate the monorepo root by walking up from `startDir` until a
+ * package.json declaring "workspaces" (or a .git directory) appears.
+ * The npm workspace script runs this pipeline with cwd =
+ * packages/ui-kit; trusting process.cwd() as repoRoot made generators
+ * write stray trees like packages/ui-kit/packages/… and
+ * packages/ui-kit/scripts/….
+ */
+export function findRepoRoot(startDir: string): string {
+  let dir = path.resolve(startDir);
+  const { root } = path.parse(dir);
+  while (true) {
+    const pkgPath = path.join(dir, "package.json");
+    if (fs.existsSync(pkgPath)) {
+      try {
+        const pkg = fs.readJsonSync(pkgPath) as { workspaces?: unknown };
+        if (pkg.workspaces) return dir;
+      } catch {
+        // unreadable package.json — keep walking
+      }
+    }
+    if (fs.existsSync(path.join(dir, ".git"))) return dir;
+    if (dir === root) return path.resolve(startDir);
+    dir = path.dirname(dir);
+  }
+}
+
+/**
  * Run every selected generator in DAG order and return a structured report.
  * Throws only on programmer errors (bad inputs); individual step failures
  * surface via `result.steps[i].status === "failed"` and `result.ok === false`.
@@ -301,7 +328,7 @@ async function runStep(
 export async function orchestrate(
   options: OrchestrateOptions = {},
 ): Promise<OrchestrateResult> {
-  const repoRoot = path.resolve(options.repoRoot ?? process.cwd());
+  const repoRoot = path.resolve(options.repoRoot ?? findRepoRoot(process.cwd()));
   const logger =
     options.logger ?? (options.quiet ? createSilentLogger() : createLogger("orchestrate"));
   const dryRun = options.dryRun ?? false;
@@ -413,7 +440,7 @@ function snapshotsDiffer(
 }
 
 export async function watch(options: WatchOptions = {}): Promise<OrchestrateResult[]> {
-  const repoRoot = path.resolve(options.repoRoot ?? process.cwd());
+  const repoRoot = path.resolve(options.repoRoot ?? findRepoRoot(process.cwd()));
   const logger =
     options.logger ?? (options.quiet ? createSilentLogger() : createLogger("orchestrate:watch"));
   const intervalMs = Math.max(50, options.intervalMs ?? 500);
@@ -516,7 +543,7 @@ function printHelp(): void {
       "  --quiet, -q     Suppress info logs.",
       "  --json          Print a JSON report to stdout.",
       "  --dry-run       Plan writes but skip flushing to disk.",
-      "  --root <dir>    Repo root (defaults to process.cwd()).",
+      "  --root <dir>    Repo root (defaults to the detected workspace root).",
       "  --help, -h      Show this message.",
       "",
       "Exit codes:",
