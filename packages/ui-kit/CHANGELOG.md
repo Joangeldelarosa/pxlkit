@@ -1,5 +1,19 @@
 # @pxlkit/ui-kit — Changelog
 
+## Unreleased
+
+### Deprecated
+- `PxlKitButton` / `PxlKitButtonProps` — removal target made explicit: `3.0.0` (carried forward from 2.0.0, see ADR-0004). Use `PixelIconButton` / `PixelIconButtonProps`.
+
+### Fixed
+- Declare `embla-carousel` as a direct dependency — `PixelCarousel` imports its types directly but only `embla-carousel-react` was declared, so the bare import resolved through hoisting.
+- `PixelStarRating` manifest trimmed to the 5-highlight schema maximum (was the only schema-invalid manifest in the SSOT scan).
+
+## 2.0.1 — 2026-06-02
+
+### Changed
+- Version-only republish to unblock the npm publish pipeline after the v2.0.0 release tag. No API changes.
+
 ## 2.0.0 — 2026-05-31 (Ola 5 — Launch Ceremony)
 
 ### Released
