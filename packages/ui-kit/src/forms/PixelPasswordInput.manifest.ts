@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelPasswordInput } from '../inputs';
+import { PixelPasswordInput } from './PixelPasswordInput';
 import {
   Default,
   WithHint,

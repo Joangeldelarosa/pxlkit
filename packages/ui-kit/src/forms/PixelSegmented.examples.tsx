@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelSegmented } from '../inputs';
+import { PixelSegmented } from './PixelSegmented';
 
 const VIEWS = [
   { value: 'grid', label: 'Grid' },

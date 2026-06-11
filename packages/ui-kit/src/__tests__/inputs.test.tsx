@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
-import { PixelInput, PixelTextarea, PixelSlider } from '../inputs';
+import { PixelInput } from '../forms/PixelInput';
+import { PixelTextarea } from '../forms/PixelTextarea';
+import { PixelSlider } from '../forms/PixelSlider';
 
 describe('PixelInput — upgrades', () => {
   it('renders prefix inside the input shell', () => {

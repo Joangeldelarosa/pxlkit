@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelSelect } from '../inputs';
+import { PixelSelect } from './PixelSelect';
 
 const FRUITS = [
   { value: 'apple', label: 'Apple' },

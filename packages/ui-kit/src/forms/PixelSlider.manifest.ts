@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelSlider } from '../inputs';
+import { PixelSlider } from './PixelSlider';
 import {
   Default,
   Range,

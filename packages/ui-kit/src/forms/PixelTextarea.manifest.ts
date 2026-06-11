@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelTextarea } from '../inputs';
+import { PixelTextarea } from './PixelTextarea';
 import {
   Default,
   Uncontrolled,

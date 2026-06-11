@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelCheckbox } from '../inputs';
+import { PixelCheckbox } from './PixelCheckbox';
 import {
   Default,
   Checked,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelCheckbox } from '../inputs';
+import { PixelCheckbox } from './PixelCheckbox';
 
 export function Default() {
   const [checked, setChecked] = useState(false);

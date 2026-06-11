@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelSlider } from '../inputs';
+import { PixelSlider } from './PixelSlider';
 
 export function Default() {
   const [value, setValue] = useState(40);

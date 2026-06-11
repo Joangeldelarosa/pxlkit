@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelInput } from '../inputs';
+import { PixelInput } from './PixelInput';
 
 export function Default() {
   return (

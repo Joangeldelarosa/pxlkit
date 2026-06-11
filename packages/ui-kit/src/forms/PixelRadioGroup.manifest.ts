@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelRadioGroup } from '../inputs';
+import { PixelRadioGroup } from './PixelRadioGroup';
 import {
   Controlled,
   Default,

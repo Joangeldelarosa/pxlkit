@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelSwitch } from '../inputs';
+import { PixelSwitch } from './PixelSwitch';
 
 export function Default() {
   const [on, setOn] = useState(false);

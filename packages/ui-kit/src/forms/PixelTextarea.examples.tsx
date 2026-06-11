@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelTextarea } from '../inputs';
+import { PixelTextarea } from './PixelTextarea';
 
 export function Default() {
   return (

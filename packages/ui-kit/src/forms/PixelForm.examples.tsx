@@ -3,7 +3,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { PixelForm } from './PixelForm';
-import { PixelInput } from '../inputs';
+import { PixelInput } from './PixelInput';
 
 type DefaultValues = {
   username: string;

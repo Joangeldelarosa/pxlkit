@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelSegmented } from '../inputs';
+import { PixelSegmented } from './PixelSegmented';
 import {
   Controlled,
   Default,

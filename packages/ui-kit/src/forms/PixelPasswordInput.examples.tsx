@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelPasswordInput } from '../inputs';
+import { PixelPasswordInput } from './PixelPasswordInput';
 
 export function Default() {
   return <PixelPasswordInput label="Password" placeholder="Enter password" />;

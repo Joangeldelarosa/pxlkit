@@ -1,16 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import {
-  PixelInput,
-  PixelPasswordInput,
-  PixelTextarea,
-  PixelSelect,
-  PixelCheckbox,
-  PixelRadioGroup,
-  PixelSwitch,
-  PixelSlider,
-  PixelSegmented,
-} from './inputs';
+import { PixelInput } from './forms/PixelInput';
+import { PixelPasswordInput } from './forms/PixelPasswordInput';
+import { PixelTextarea } from './forms/PixelTextarea';
+import { PixelSelect } from './forms/PixelSelect';
+import { PixelCheckbox } from './forms/PixelCheckbox';
+import { PixelRadioGroup } from './forms/PixelRadioGroup';
+import { PixelSwitch } from './forms/PixelSwitch';
+import { PixelSlider } from './forms/PixelSlider';
+import { PixelSegmented } from './forms/PixelSegmented';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Search, Gear } from '@pxlkit/ui';
 import { Mail } from '@pxlkit/feedback';

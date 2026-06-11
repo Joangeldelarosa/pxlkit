@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelRadioGroup } from '../inputs';
+import { PixelRadioGroup } from './PixelRadioGroup';
 
 const PLANS = [
   { value: 'free', label: 'Free' },
