@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelBareButton } from '../data-display';
+import { PixelBareButton } from './PixelBareButton';
 
 export function Default() {
   return <PixelBareButton>Bare button</PixelBareButton>;

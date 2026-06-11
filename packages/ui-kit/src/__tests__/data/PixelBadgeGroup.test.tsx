@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 import { PixelBadgeGroup, PixelChipGroup } from '../../data/PixelBadgeGroup';
-import { PixelBadge } from '../../data-display';
+import { PixelBadge } from '../../data/PixelBadge';
 
 // PixelChip in data-display doesn't carry a `value` prop. The group consumes
 // `child.props.value`; the inner chip surface is purely presentational. Use a

@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelBadge } from '../data-display';
+import { PixelBadge } from './PixelBadge';
 import {
   Default,
   Tones,

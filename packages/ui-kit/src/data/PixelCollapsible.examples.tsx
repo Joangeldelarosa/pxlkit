@@ -1,4 +1,4 @@
-import { PixelCollapsible } from '../data-display';
+import { PixelCollapsible } from './PixelCollapsible';
 
 export function Default() {
   return (

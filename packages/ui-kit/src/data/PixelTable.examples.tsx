@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PixelTable, type PixelTableSortState } from '../data-display';
+import { PixelTable, type PixelTableSortState } from './PixelTable';
 
 type Row = {
   id: string;

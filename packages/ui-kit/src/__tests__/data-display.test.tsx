@@ -1,7 +1,9 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { PixelCard, PixelStatCard, PixelTable } from '../data-display';
+import { PixelCard } from '../cards/PixelCard';
+import { PixelStatCard } from '../cards/PixelStatCard';
+import { PixelTable } from '../data/PixelTable';
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    PixelCard — Ola 2 additive upgrade

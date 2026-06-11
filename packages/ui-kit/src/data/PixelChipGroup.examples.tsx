@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PixelChipGroup } from './PixelBadgeGroup';
-import { PixelChip } from '../data-display';
+import { PixelChip } from './PixelChip';
 
 // PixelChipGroup reads `value` off each child via children inspection; the chip
 // component itself forwards unknown attrs, so we use a tiny shim here so the

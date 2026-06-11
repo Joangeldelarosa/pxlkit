@@ -1,4 +1,4 @@
-import { PixelColorSwatch } from '../data-display';
+import { PixelColorSwatch } from './PixelColorSwatch';
 
 export function Default() {
   return <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" />;

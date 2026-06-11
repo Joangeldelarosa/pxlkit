@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelKbd } from '../data-display';
+import { PixelKbd } from './PixelKbd';
 import {
   Default,
   CommonKeys,

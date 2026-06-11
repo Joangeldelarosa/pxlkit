@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema'
-import { PixelStatCard } from '../data-display'
+import { PixelStatCard } from './PixelStatCard'
 import {
   Default,
   Tones,

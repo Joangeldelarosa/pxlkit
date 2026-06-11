@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelBadge } from '../data-display';
+import { PixelBadge } from './PixelBadge';
 
 export function Default() {
   return <PixelBadge>NEW</PixelBadge>;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelKbd } from '../data-display';
+import { PixelKbd } from './PixelKbd';
 
 export function Default() {
   return <PixelKbd>Enter</PixelKbd>;

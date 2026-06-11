@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelBareTextarea } from '../data-display';
+import { PixelBareTextarea } from './PixelBareTextarea';
 import {
   Default,
   Uncontrolled,

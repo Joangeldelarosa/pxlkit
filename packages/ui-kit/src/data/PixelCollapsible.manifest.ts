@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelCollapsible } from '../data-display';
+import { PixelCollapsible } from './PixelCollapsible';
 import {
   Default,
   DefaultOpen,

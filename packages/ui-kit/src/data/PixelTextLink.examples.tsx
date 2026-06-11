@@ -1,4 +1,4 @@
-import { PixelTextLink } from '../data-display';
+import { PixelTextLink } from './PixelTextLink';
 
 export function Default() {
   return <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>;

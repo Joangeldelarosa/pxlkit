@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PixelBareInput } from '../data-display';
+import { PixelBareInput } from './PixelBareInput';
 
 export function Default() {
   return <PixelBareInput placeholder="Type something" />;

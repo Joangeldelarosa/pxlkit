@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
-import { PixelAvatar } from '../../data-display';
+import { PixelAvatar } from '../../data/PixelAvatar';
 
 describe('PixelAvatar — status dot', () => {
   it('does not render a status dot when status is unset', () => {

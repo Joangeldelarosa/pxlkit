@@ -4,7 +4,7 @@ import React from 'react';
 
 import { PxlKitLocaleProvider } from '../locale';
 import { PixelSection, PixelDivider } from '../layout';
-import { PixelAvatar } from '../data-display';
+import { PixelAvatar } from '../data/PixelAvatar';
 import { PixelModal } from '../overlays/PixelModal';
 
 /* ═══════════════════════════════════════════════════════════════════════════════

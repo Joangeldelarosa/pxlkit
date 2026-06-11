@@ -1,20 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import {
-  PixelCard,
-  PixelStatCard,
-  PixelTable,
-  PixelAvatar,
-  PixelBadge,
-  PixelChip,
-  PixelTextLink,
-  PixelCollapsible,
-  PixelCodeInline,
-  PixelKbd,
-  PixelColorSwatch,
-  PixelBareButton,
-  PixelBareInput,
-  PixelBareTextarea,
-} from './data-display';
+import { PixelCard } from './cards/PixelCard';
+import { PixelStatCard } from './cards/PixelStatCard';
+import { PixelTable } from './data/PixelTable';
+import { PixelAvatar } from './data/PixelAvatar';
+import { PixelBadge } from './data/PixelBadge';
+import { PixelChip } from './data/PixelChip';
+import { PixelTextLink } from './data/PixelTextLink';
+import { PixelCollapsible } from './data/PixelCollapsible';
+import { PixelCodeInline } from './data/PixelCodeInline';
+import { PixelKbd } from './data/PixelKbd';
+import { PixelColorSwatch } from './data/PixelColorSwatch';
+import { PixelBareButton } from './actions/PixelBareButton';
+import { PixelBareInput } from './forms/PixelBareInput';
+import { PixelBareTextarea } from './forms/PixelBareTextarea';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { Trophy, Crown, Star, FireSword } from '@pxlkit/gamification';
 import { Heart } from '@pxlkit/social';

@@ -1,7 +1,8 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, screen } from '@testing-library/react';
-import { PixelBadge, PixelChip } from '../../data-display';
+import { PixelBadge } from '../../data/PixelBadge';
+import { PixelChip } from '../../data/PixelChip';
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    PixelBadge — additive upgrade: variant, size, iconLeft, onClick

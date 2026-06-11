@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelBareTextarea } from '../data-display';
+import { PixelBareTextarea } from './PixelBareTextarea';
 
 export function Default() {
   return <PixelBareTextarea placeholder="Write something..." rows={4} />;

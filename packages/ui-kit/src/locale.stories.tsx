@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { PxlKitLocaleProvider, TURKISH_CHARACTERS } from './locale';
 import { PixelButton } from './actions';
-import { PixelAvatar } from './data-display';
+import { PixelAvatar } from './data/PixelAvatar';
 import { PixelSection } from './layout';
 
 const SURFACES = ['pixel', 'linear'] as const;

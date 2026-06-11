@@ -1,6 +1,6 @@
 import React from 'react';
 import { PixelBadgeGroup } from './PixelBadgeGroup';
-import { PixelBadge } from '../data-display';
+import { PixelBadge } from './PixelBadge';
 
 export function Default() {
   return (

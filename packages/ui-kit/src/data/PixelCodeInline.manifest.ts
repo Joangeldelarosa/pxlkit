@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelCodeInline } from '../data-display';
+import { PixelCodeInline } from './PixelCodeInline';
 import {
   Default,
   Tones,

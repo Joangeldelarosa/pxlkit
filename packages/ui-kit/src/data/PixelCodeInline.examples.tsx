@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelCodeInline } from '../data-display';
+import { PixelCodeInline } from './PixelCodeInline';
 
 export function Default() {
   return <PixelCodeInline>npm install</PixelCodeInline>;

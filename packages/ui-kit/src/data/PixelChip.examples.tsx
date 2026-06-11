@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelChip } from '../data-display';
+import { PixelChip } from './PixelChip';
 
 export function Default() {
   return <PixelChip label="React" />;

@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelTextLink } from '../data-display';
+import { PixelTextLink } from './PixelTextLink';
 import {
   Default,
   Tones,

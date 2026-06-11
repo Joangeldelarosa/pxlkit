@@ -1,4 +1,4 @@
-import { PixelStatCard } from '../data-display'
+import { PixelStatCard } from './PixelStatCard'
 
 export function Default() {
   return <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />

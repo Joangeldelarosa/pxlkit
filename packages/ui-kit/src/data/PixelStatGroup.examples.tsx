@@ -1,6 +1,6 @@
 import React from 'react';
 import { PixelStatGroup } from './PixelStatGroup';
-import { PixelStatCard } from '../data-display/PixelStatCard';
+import { PixelStatCard } from '../cards/PixelStatCard';
 
 export function Default() {
   return (

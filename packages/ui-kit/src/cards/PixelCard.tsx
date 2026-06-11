@@ -4,7 +4,7 @@ import {
   surfaceClasses, useEffectiveSurface,
 } from '../common';
 import { tone as toneTokens, ToneKey } from '../tokens';
-import { PixelRibbon } from '../cards/PixelRibbon';
+import { PixelRibbon } from './PixelRibbon';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelCard — container with title, icon, body, optional footer.

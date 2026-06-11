@@ -1,6 +1,6 @@
 import React from 'react';
 import { PixelAvatarGroup } from './PixelAvatarGroup';
-import { PixelAvatar } from '../data-display';
+import { PixelAvatar } from './PixelAvatar';
 
 export function Default() {
   return (

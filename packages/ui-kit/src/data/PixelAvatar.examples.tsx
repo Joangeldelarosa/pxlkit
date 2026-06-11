@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelAvatar } from '../data-display';
+import { PixelAvatar } from './PixelAvatar';
 
 export function Default() {
   return <PixelAvatar name="Joangel De La Rosa" />;
