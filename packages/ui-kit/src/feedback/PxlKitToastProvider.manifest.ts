@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PxlKitToastProvider } from '../toast';
+import { PxlKitToastProvider } from './PxlKitToastProvider';
 import {
   Default,
   Tones,

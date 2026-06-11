@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PxlKitLocaleProvider } from '../locale';
+import { PxlKitLocaleProvider } from './PxlKitLocaleProvider';
 import { Default, Turkish } from './PxlKitLocaleProvider.examples';
 
 void PxlKitLocaleProvider;

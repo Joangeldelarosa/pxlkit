@@ -1,5 +1,5 @@
 import React from 'react';
-import { PxlKitSurfaceProvider } from '../common';
+import { PxlKitSurfaceProvider } from './PxlKitSurfaceProvider';
 
 export function Default() {
   return (

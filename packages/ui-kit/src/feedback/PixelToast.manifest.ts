@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelToast } from '../toast';
+import { PixelToast } from './PixelToast';
 import {
   Default,
   Tones,

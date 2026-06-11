@@ -114,33 +114,13 @@ export function surfaceClasses(surface: Surface = 'pixel'): SurfaceClasses {
    Each component still accepts a `surface` prop that overrides the context.
    ────────────────────────────────────────────────────────────────────────── */
 
-const PxlKitSurfaceContext = createContext<Surface>('pixel');
+// Exported for internal sharing with overlay-foundation/PxlKitSurfaceProvider.tsx
+// (the extracted provider renders this context's Provider). NOT part of the
+// package public API — index.tsx re-exports named symbols only.
+export const PxlKitSurfaceContext = createContext<Surface>('pixel');
 
 export function usePxlKitSurface(): Surface {
   return useContext(PxlKitSurfaceContext);
-}
-
-/**
- * Wrap a subtree to change the default `surface` of every nested Pxlkit
- * component without setting the prop on each one individually.
- *
- * @example
- * <PxlKitSurfaceProvider surface="linear">
- *   <PixelButton>Looks modern</PixelButton>
- * </PxlKitSurfaceProvider>
- */
-export function PxlKitSurfaceProvider({
-  surface = 'pixel',
-  children,
-}: {
-  surface?: Surface;
-  children: React.ReactNode;
-}) {
-  return (
-    <PxlKitSurfaceContext.Provider value={surface}>
-      {children}
-    </PxlKitSurfaceContext.Provider>
-  );
 }
 
 /**
@@ -428,4 +408,11 @@ export function FieldShell({
     </label>
   );
 }
+
+// PxlKitSurfaceProvider moved next to its manifest (overlay-foundation/);
+// re-exported so this module's API stays unchanged. Keep this re-export at
+// the END of the file — PxlKitSurfaceProvider.tsx imports PxlKitSurfaceContext
+// back from this module (intentional cycle), so every shared value must be
+// initialized above this re-export.
+export { PxlKitSurfaceProvider } from './overlay-foundation/PxlKitSurfaceProvider';
 

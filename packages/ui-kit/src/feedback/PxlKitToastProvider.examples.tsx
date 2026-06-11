@@ -1,5 +1,5 @@
 import React from 'react';
-import { PxlKitToastProvider, useToast } from '../toast';
+import { PxlKitToastProvider, useToast } from './PxlKitToastProvider';
 import { PixelButton } from '../actions';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {

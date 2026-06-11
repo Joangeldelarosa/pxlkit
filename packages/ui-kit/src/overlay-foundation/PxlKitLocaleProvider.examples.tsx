@@ -1,5 +1,5 @@
 import React from 'react';
-import { PxlKitLocaleProvider } from '../locale';
+import { PxlKitLocaleProvider } from './PxlKitLocaleProvider';
 
 export function Default() {
   return (

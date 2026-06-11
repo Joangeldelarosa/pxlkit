@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PxlKitSurfaceProvider } from '../common';
+import { PxlKitSurfaceProvider } from './PxlKitSurfaceProvider';
 import { Default, Linear } from './PxlKitSurfaceProvider.examples';
 
 void PxlKitSurfaceProvider;

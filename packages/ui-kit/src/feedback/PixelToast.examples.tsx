@@ -1,5 +1,6 @@
 import React from 'react';
-import { PixelToast, type ToastItem } from '../toast';
+import { PixelToast } from './PixelToast';
+import type { ToastItem } from './PxlKitToastProvider';
 import { PixelButton } from '../actions';
 
 const noop = () => {};

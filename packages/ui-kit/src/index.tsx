@@ -94,19 +94,43 @@ export * from './navigation';
 export * from './overlays/PixelModal';
 export * from './overlays/PixelTooltip';
 export * from './overlays/PixelDropdown';
-export * from './toast';
+export { PixelToast, type PixelToastProps } from './feedback/PixelToast';
+export {
+  PxlKitToastProvider,
+  useToast,
+  type PxlKitToastProviderProps,
+  type ToastTone,
+  type ToastPosition,
+  type ToastItem,
+  type ToastInput,
+  type ToastPatch,
+  type ToastPromiseOptions,
+  type ToastShortcut,
+  type UseToastReturn,
+} from './feedback/PxlKitToastProvider';
 export * from './animations';
 export * from './registry';
 export * from './parallax';
-export * from './locale';
+export {
+  PxlKitLocaleProvider,
+  usePxlKitLocale,
+  buildGoogleFontsUrl,
+  toLocaleUpper,
+  toLocaleLower,
+  PXLKIT_FONTS,
+  TURKISH_CHARACTERS,
+  type PxlKitLocale,
+  type PxlKitFontConfig,
+  type PxlKitLocaleProviderProps,
+} from './overlay-foundation/PxlKitLocaleProvider';
 // Surface system — design aesthetic switch (pixel ↔ linear)
 export {
   type Surface,
   type SurfaceClasses,
   surfaceClasses,
-  PxlKitSurfaceProvider,
   usePxlKitSurface,
 } from './common';
+export { PxlKitSurfaceProvider } from './overlay-foundation/PxlKitSurfaceProvider';
 // Public design tokens for consumers who need to compose with the system
 export {
   type Tone,
