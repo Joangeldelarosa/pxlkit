@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelBentoCell } from './PixelBento';
+import { PixelBentoCell } from './PixelBentoCell';
 import { Default, Tones, MediaCell } from './PixelBentoCell.examples';
 
 export default defineManifest({

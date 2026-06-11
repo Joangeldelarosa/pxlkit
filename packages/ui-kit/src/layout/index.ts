@@ -5,7 +5,8 @@
  * Internal helpers in _internal/ are NOT re-exported.
  */
 
-export * from './PixelBento';
+export { PixelBento, type PixelBentoProps } from './PixelBento';
+export * from './PixelBentoCell';
 export * from './PixelBox';
 export * from './PixelCenter';
 export * from './PixelCluster';

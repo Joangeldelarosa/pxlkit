@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelBarChart } from './PixelChartPrimitives';
+import { PixelBarChart } from './PixelBarChart';
 
 const sample = [
   { x: 'Mon', y: 12 },

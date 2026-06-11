@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelSparkline } from './PixelChartPrimitives';
+import { PixelSparkline } from './PixelSparkline';
 
 const sample = [
   { x: 'Mon', y: 12 },

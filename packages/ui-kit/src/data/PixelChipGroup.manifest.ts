@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelChipGroup } from './PixelBadgeGroup';
+import { PixelChipGroup } from './PixelChipGroup';
 import { Default, MultiSelect, Surfaces } from './PixelChipGroup.examples';
 
 void PixelChipGroup;

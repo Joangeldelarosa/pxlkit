@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelToggle } from './PixelToggleGroup';
+import { PixelToggle } from './PixelToggle';
 import {
   Default,
   Pressed,

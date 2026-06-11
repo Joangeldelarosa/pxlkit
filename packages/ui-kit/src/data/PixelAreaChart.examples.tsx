@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelAreaChart } from './PixelChartPrimitives';
+import { PixelAreaChart } from './PixelAreaChart';
 
 const sample = [
   { x: 'Mon', y: 12 },

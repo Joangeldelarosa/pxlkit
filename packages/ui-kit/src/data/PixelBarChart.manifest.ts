@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelBarChart } from './PixelChartPrimitives';
+import { PixelBarChart } from './PixelBarChart';
 import {
   Default,
   Tones,

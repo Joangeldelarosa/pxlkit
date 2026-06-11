@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PixelChipGroup } from './PixelBadgeGroup';
+import { PixelChipGroup } from './PixelChipGroup';
 import { PixelChip } from './PixelChip';
 
 // PixelChipGroup reads `value` off each child via children inspection; the chip

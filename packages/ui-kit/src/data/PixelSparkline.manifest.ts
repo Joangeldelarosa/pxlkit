@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { PixelSparkline } from './PixelChartPrimitives';
+import { PixelSparkline } from './PixelSparkline';
 import {
   Default,
   Tones,

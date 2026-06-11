@@ -1,5 +1,6 @@
 import React from 'react';
-import { PixelBento, PixelBentoCell } from './PixelBento';
+import { PixelBento } from './PixelBento';
+import { PixelBentoCell } from './PixelBentoCell';
 
 export function Default() {
   return (

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PixelToggle } from './PixelToggleGroup';
+import { PixelToggle } from './PixelToggle';
 
 export function Default() {
   const [pressed, setPressed] = useState(false);
