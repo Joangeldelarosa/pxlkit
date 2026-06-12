@@ -24,5 +24,14 @@
     "jsx": "preserve"
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  // src/app/ui-kit/sections + */metadata.generated.ts are emitted by
+  // `npm run docs:build` but are NOT wired into the app (and not committed —
+  // see .gitignore). Excluded so stray local generator output can never break
+  // `next build` typechecking. The wired docs sections
+  // (src/app/docs/sections) stay included and typechecked.
+  "exclude": [
+    "node_modules",
+    "src/app/ui-kit/sections",
+    "src/app/ui-kit/*/metadata.generated.ts"
+  ]
 }

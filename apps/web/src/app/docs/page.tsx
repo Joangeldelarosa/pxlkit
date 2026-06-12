@@ -13,6 +13,7 @@ import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon, ParallaxPxlKitIcon } fr
 import type { IconPack, AnyIcon } from '@pxlkit/core';
 import { ParallaxPack, GhostFriend, CoolEmoji } from '@pxlkit/parallax';
 import { PixelTextLink, PxlKitButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
+import { ComponentDocs } from './_component-docs';
 
 /* ─── Dynamic pack registry ─── */
 const ALL_PACKS: { pack: IconPack; previewIcon: AnyIcon; accent: string }[] = [
@@ -45,6 +46,7 @@ const sections = [
   { id: 'svg-generation', label: 'SVG Generation' },
   { id: 'ai-generation', label: 'AI Generation' },
   { id: 'ui-kit', label: 'UI Kit Components' },
+  { id: 'component-reference', label: 'Component Reference' },
   { id: 'contributing', label: 'Contributing' },
   { id: 'creating-packs', label: 'Creating Packs' },
 ];
@@ -967,6 +969,148 @@ import { Trophy } from '@pxlkit/gamification';
             >
               Open Full UI Kit Documentation →
             </a>
+          </Section>
+
+          {/* Component Reference — SSOT-generated per-component docs.
+              Sections live in ./sections/<Name>.section.tsx (regenerate with
+              `npm run docs:build`); each is lazy-loaded on expand via
+              ./sections/registry.tsx. The literal <section id="..."> anchors
+              below are required by the coherence audit (gate 05) and make
+              /docs#<slug> deep links resolve — keep this list in sync when
+              components are added or removed from @pxlkit/ui-kit. */}
+          <Section id="component-reference" title="Component Reference">
+            <P>
+              Per-component API reference for every <Code>@pxlkit/ui-kit</Code> component, generated
+              straight from each component&apos;s SSOT manifest — description, props, accessibility
+              contract, keyboard map, and examples, all inlined per component. Click an entry to
+              expand it, or deep-link with <Code>/docs#pixel-button</Code>. For live demos, head to
+              the <PixelTextLink href="/ui-kit">UI Kit showcase</PixelTextLink>.
+            </P>
+            <div className="space-y-1.5">
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">ACTIONS (4)</h3>
+              <section id="pixel-bare-button" className="scroll-mt-24"><ComponentDocs slug="pixel-bare-button" /></section>
+              <section id="pixel-button" className="scroll-mt-24"><ComponentDocs slug="pixel-button" /></section>
+              <section id="pixel-split-button" className="scroll-mt-24"><ComponentDocs slug="pixel-split-button" /></section>
+              <section id="pxl-kit-button" className="scroll-mt-24"><ComponentDocs slug="pxl-kit-button" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">FORMS (24)</h3>
+              <section id="pixel-bare-input" className="scroll-mt-24"><ComponentDocs slug="pixel-bare-input" /></section>
+              <section id="pixel-bare-textarea" className="scroll-mt-24"><ComponentDocs slug="pixel-bare-textarea" /></section>
+              <section id="pixel-calendar-grid" className="scroll-mt-24"><ComponentDocs slug="pixel-calendar-grid" /></section>
+              <section id="pixel-checkbox" className="scroll-mt-24"><ComponentDocs slug="pixel-checkbox" /></section>
+              <section id="pixel-color-input" className="scroll-mt-24"><ComponentDocs slug="pixel-color-input" /></section>
+              <section id="pixel-combobox" className="scroll-mt-24"><ComponentDocs slug="pixel-combobox" /></section>
+              <section id="pixel-date-picker" className="scroll-mt-24"><ComponentDocs slug="pixel-date-picker" /></section>
+              <section id="pixel-date-range-picker" className="scroll-mt-24"><ComponentDocs slug="pixel-date-range-picker" /></section>
+              <section id="pixel-file-upload" className="scroll-mt-24"><ComponentDocs slug="pixel-file-upload" /></section>
+              <section id="pixel-form" className="scroll-mt-24"><ComponentDocs slug="pixel-form" /></section>
+              <section id="pixel-input" className="scroll-mt-24"><ComponentDocs slug="pixel-input" /></section>
+              <section id="pixel-input-group" className="scroll-mt-24"><ComponentDocs slug="pixel-input-group" /></section>
+              <section id="pixel-multi-select" className="scroll-mt-24"><ComponentDocs slug="pixel-multi-select" /></section>
+              <section id="pixel-number-input" className="scroll-mt-24"><ComponentDocs slug="pixel-number-input" /></section>
+              <section id="pixel-otp-input" className="scroll-mt-24"><ComponentDocs slug="pixel-otp-input" /></section>
+              <section id="pixel-password-input" className="scroll-mt-24"><ComponentDocs slug="pixel-password-input" /></section>
+              <section id="pixel-radio-group" className="scroll-mt-24"><ComponentDocs slug="pixel-radio-group" /></section>
+              <section id="pixel-segmented" className="scroll-mt-24"><ComponentDocs slug="pixel-segmented" /></section>
+              <section id="pixel-select" className="scroll-mt-24"><ComponentDocs slug="pixel-select" /></section>
+              <section id="pixel-slider" className="scroll-mt-24"><ComponentDocs slug="pixel-slider" /></section>
+              <section id="pixel-switch" className="scroll-mt-24"><ComponentDocs slug="pixel-switch" /></section>
+              <section id="pixel-textarea" className="scroll-mt-24"><ComponentDocs slug="pixel-textarea" /></section>
+              <section id="pixel-toggle" className="scroll-mt-24"><ComponentDocs slug="pixel-toggle" /></section>
+              <section id="pixel-toggle-group" className="scroll-mt-24"><ComponentDocs slug="pixel-toggle-group" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">DATA DISPLAY (19)</h3>
+              <section id="pixel-area-chart" className="scroll-mt-24"><ComponentDocs slug="pixel-area-chart" /></section>
+              <section id="pixel-avatar" className="scroll-mt-24"><ComponentDocs slug="pixel-avatar" /></section>
+              <section id="pixel-avatar-group" className="scroll-mt-24"><ComponentDocs slug="pixel-avatar-group" /></section>
+              <section id="pixel-badge" className="scroll-mt-24"><ComponentDocs slug="pixel-badge" /></section>
+              <section id="pixel-badge-group" className="scroll-mt-24"><ComponentDocs slug="pixel-badge-group" /></section>
+              <section id="pixel-bar-chart" className="scroll-mt-24"><ComponentDocs slug="pixel-bar-chart" /></section>
+              <section id="pixel-carousel" className="scroll-mt-24"><ComponentDocs slug="pixel-carousel" /></section>
+              <section id="pixel-chip" className="scroll-mt-24"><ComponentDocs slug="pixel-chip" /></section>
+              <section id="pixel-chip-group" className="scroll-mt-24"><ComponentDocs slug="pixel-chip-group" /></section>
+              <section id="pixel-code-inline" className="scroll-mt-24"><ComponentDocs slug="pixel-code-inline" /></section>
+              <section id="pixel-collapsible" className="scroll-mt-24"><ComponentDocs slug="pixel-collapsible" /></section>
+              <section id="pixel-color-swatch" className="scroll-mt-24"><ComponentDocs slug="pixel-color-swatch" /></section>
+              <section id="pixel-data-table" className="scroll-mt-24"><ComponentDocs slug="pixel-data-table" /></section>
+              <section id="pixel-kbd" className="scroll-mt-24"><ComponentDocs slug="pixel-kbd" /></section>
+              <section id="pixel-sparkline" className="scroll-mt-24"><ComponentDocs slug="pixel-sparkline" /></section>
+              <section id="pixel-stat-group" className="scroll-mt-24"><ComponentDocs slug="pixel-stat-group" /></section>
+              <section id="pixel-table" className="scroll-mt-24"><ComponentDocs slug="pixel-table" /></section>
+              <section id="pixel-text-link" className="scroll-mt-24"><ComponentDocs slug="pixel-text-link" /></section>
+              <section id="pixel-timeline" className="scroll-mt-24"><ComponentDocs slug="pixel-timeline" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">CARDS (8)</h3>
+              <section id="pixel-card" className="scroll-mt-24"><ComponentDocs slug="pixel-card" /></section>
+              <section id="pixel-feature-card" className="scroll-mt-24"><ComponentDocs slug="pixel-feature-card" /></section>
+              <section id="pixel-icon-frame" className="scroll-mt-24"><ComponentDocs slug="pixel-icon-frame" /></section>
+              <section id="pixel-pricing-card" className="scroll-mt-24"><ComponentDocs slug="pixel-pricing-card" /></section>
+              <section id="pixel-ribbon" className="scroll-mt-24"><ComponentDocs slug="pixel-ribbon" /></section>
+              <section id="pixel-star-rating" className="scroll-mt-24"><ComponentDocs slug="pixel-star-rating" /></section>
+              <section id="pixel-stat-card" className="scroll-mt-24"><ComponentDocs slug="pixel-stat-card" /></section>
+              <section id="pixel-testimonial-card" className="scroll-mt-24"><ComponentDocs slug="pixel-testimonial-card" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">HERO (2)</h3>
+              <section id="pixel-hero-media" className="scroll-mt-24"><ComponentDocs slug="pixel-hero-media" /></section>
+              <section id="pixel-hero-section" className="scroll-mt-24"><ComponentDocs slug="pixel-hero-section" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">FEEDBACK (7)</h3>
+              <section id="pixel-alert" className="scroll-mt-24"><ComponentDocs slug="pixel-alert" /></section>
+              <section id="pixel-empty-state" className="scroll-mt-24"><ComponentDocs slug="pixel-empty-state" /></section>
+              <section id="pixel-progress" className="scroll-mt-24"><ComponentDocs slug="pixel-progress" /></section>
+              <section id="pixel-skeleton" className="scroll-mt-24"><ComponentDocs slug="pixel-skeleton" /></section>
+              <section id="pixel-spinner" className="scroll-mt-24"><ComponentDocs slug="pixel-spinner" /></section>
+              <section id="pixel-toast" className="scroll-mt-24"><ComponentDocs slug="pixel-toast" /></section>
+              <section id="pxl-kit-toast-provider" className="scroll-mt-24"><ComponentDocs slug="pxl-kit-toast-provider" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">NAVIGATION (8)</h3>
+              <section id="pixel-accordion" className="scroll-mt-24"><ComponentDocs slug="pixel-accordion" /></section>
+              <section id="pixel-breadcrumb" className="scroll-mt-24"><ComponentDocs slug="pixel-breadcrumb" /></section>
+              <section id="pixel-menubar" className="scroll-mt-24"><ComponentDocs slug="pixel-menubar" /></section>
+              <section id="pixel-navigation-menu" className="scroll-mt-24"><ComponentDocs slug="pixel-navigation-menu" /></section>
+              <section id="pixel-pagination" className="scroll-mt-24"><ComponentDocs slug="pixel-pagination" /></section>
+              <section id="pixel-sidebar" className="scroll-mt-24"><ComponentDocs slug="pixel-sidebar" /></section>
+              <section id="pixel-stepper" className="scroll-mt-24"><ComponentDocs slug="pixel-stepper" /></section>
+              <section id="pixel-tabs" className="scroll-mt-24"><ComponentDocs slug="pixel-tabs" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">OVERLAYS (7)</h3>
+              <section id="pixel-alert-dialog" className="scroll-mt-24"><ComponentDocs slug="pixel-alert-dialog" /></section>
+              <section id="pixel-command" className="scroll-mt-24"><ComponentDocs slug="pixel-command" /></section>
+              <section id="pixel-drawer" className="scroll-mt-24"><ComponentDocs slug="pixel-drawer" /></section>
+              <section id="pixel-dropdown" className="scroll-mt-24"><ComponentDocs slug="pixel-dropdown" /></section>
+              <section id="pixel-modal" className="scroll-mt-24"><ComponentDocs slug="pixel-modal" /></section>
+              <section id="pixel-sheet" className="scroll-mt-24"><ComponentDocs slug="pixel-sheet" /></section>
+              <section id="pixel-tooltip" className="scroll-mt-24"><ComponentDocs slug="pixel-tooltip" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">OVERLAY FOUNDATION (4)</h3>
+              <section id="pixel-popover" className="scroll-mt-24"><ComponentDocs slug="pixel-popover" /></section>
+              <section id="pixel-portal" className="scroll-mt-24"><ComponentDocs slug="pixel-portal" /></section>
+              <section id="pxl-kit-locale-provider" className="scroll-mt-24"><ComponentDocs slug="pxl-kit-locale-provider" /></section>
+              <section id="pxl-kit-surface-provider" className="scroll-mt-24"><ComponentDocs slug="pxl-kit-surface-provider" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">LAYOUT (14)</h3>
+              <section id="pixel-bento" className="scroll-mt-24"><ComponentDocs slug="pixel-bento" /></section>
+              <section id="pixel-bento-cell" className="scroll-mt-24"><ComponentDocs slug="pixel-bento-cell" /></section>
+              <section id="pixel-box" className="scroll-mt-24"><ComponentDocs slug="pixel-box" /></section>
+              <section id="pixel-center" className="scroll-mt-24"><ComponentDocs slug="pixel-center" /></section>
+              <section id="pixel-cluster" className="scroll-mt-24"><ComponentDocs slug="pixel-cluster" /></section>
+              <section id="pixel-container" className="scroll-mt-24"><ComponentDocs slug="pixel-container" /></section>
+              <section id="pixel-divider" className="scroll-mt-24"><ComponentDocs slug="pixel-divider" /></section>
+              <section id="pixel-equal-height-grid" className="scroll-mt-24"><ComponentDocs slug="pixel-equal-height-grid" /></section>
+              <section id="pixel-grid" className="scroll-mt-24"><ComponentDocs slug="pixel-grid" /></section>
+              <section id="pixel-scroll-area" className="scroll-mt-24"><ComponentDocs slug="pixel-scroll-area" /></section>
+              <section id="pixel-section" className="scroll-mt-24"><ComponentDocs slug="pixel-section" /></section>
+              <section id="pixel-section-header" className="scroll-mt-24"><ComponentDocs slug="pixel-section-header" /></section>
+              <section id="pixel-stack" className="scroll-mt-24"><ComponentDocs slug="pixel-stack" /></section>
+              <section id="pixel-two-column" className="scroll-mt-24"><ComponentDocs slug="pixel-two-column" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">ANIMATIONS (11)</h3>
+              <section id="pixel-bounce" className="scroll-mt-24"><ComponentDocs slug="pixel-bounce" /></section>
+              <section id="pixel-fade-in" className="scroll-mt-24"><ComponentDocs slug="pixel-fade-in" /></section>
+              <section id="pixel-flicker" className="scroll-mt-24"><ComponentDocs slug="pixel-flicker" /></section>
+              <section id="pixel-float" className="scroll-mt-24"><ComponentDocs slug="pixel-float" /></section>
+              <section id="pixel-glitch" className="scroll-mt-24"><ComponentDocs slug="pixel-glitch" /></section>
+              <section id="pixel-pulse" className="scroll-mt-24"><ComponentDocs slug="pixel-pulse" /></section>
+              <section id="pixel-rotate" className="scroll-mt-24"><ComponentDocs slug="pixel-rotate" /></section>
+              <section id="pixel-shake" className="scroll-mt-24"><ComponentDocs slug="pixel-shake" /></section>
+              <section id="pixel-slide-in" className="scroll-mt-24"><ComponentDocs slug="pixel-slide-in" /></section>
+              <section id="pixel-typewriter" className="scroll-mt-24"><ComponentDocs slug="pixel-typewriter" /></section>
+              <section id="pixel-zoom-in" className="scroll-mt-24"><ComponentDocs slug="pixel-zoom-in" /></section>
+              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">PARALLAX (3)</h3>
+              <section id="pixel-mouse-parallax" className="scroll-mt-24"><ComponentDocs slug="pixel-mouse-parallax" /></section>
+              <section id="pixel-parallax-group" className="scroll-mt-24"><ComponentDocs slug="pixel-parallax-group" /></section>
+              <section id="pixel-parallax-layer" className="scroll-mt-24"><ComponentDocs slug="pixel-parallax-layer" /></section>
+            </div>
           </Section>
 
           {/* Contributing */}

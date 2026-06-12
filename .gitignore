@@ -42,3 +42,18 @@ STORYBOOK_DEPLOY.md
 /coherence-report.json
 /docs/coherence-snapshots/*.png
 !/docs/coherence-snapshots/.gitkeep
+# SSOT docs-build outputs that stay regenerable (npm run docs:build).
+# Only the artifacts actually consumed by the web app are committed:
+# apps/web/src/app/docs/sections/*.section.tsx (wired into /docs).
+# Everything below is emitted by the pipeline but not imported anywhere yet.
+README.generated.md
+CHANGELOG.generated.md
+/scripts/build-docs/bundle-sizes.json
+/packages/ui-kit/src/registry.generated.ts
+/packages/ui-kit/src/*/*.stories.tsx
+/apps/web/src/app/ui-kit/sections/
+/apps/web/src/app/ui-kit/*/metadata.generated.ts
+# OG "images": the orchestrator currently writes the HTML template to
+# public/og/*.png (Playwright screenshotting only exists in the standalone
+# generate-og-images CLI) — not committable as images until that is fixed.
+/apps/web/public/og/

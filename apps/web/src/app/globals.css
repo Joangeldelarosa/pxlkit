@@ -160,3 +160,172 @@
     to { opacity: 0; }
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────────────
+   SSOT component reference (/docs → Component Reference).
+   Styles the AUTO-GENERATED docs sections emitted by `npm run docs:build`
+   (apps/web/src/app/docs/sections/<Name>.section.tsx). The generated markup
+   uses plain semantic HTML + `docs-*` class hooks; everything visual lives
+   here so regenerating the sections never touches the design.
+   ─────────────────────────────────────────────────────────────────────────── */
+.component-docs {
+  font-size: 0.8125rem;
+  color: var(--color-retro-muted);
+  line-height: 1.6;
+}
+.component-docs h2 {
+  font-family: var(--font-pixel, 'Press Start 2P', monospace);
+  font-size: 0.625rem;
+  color: var(--color-retro-gold);
+  margin: 1rem 0 0.5rem;
+}
+.component-docs h3 {
+  font-family: var(--font-pixel, 'Press Start 2P', monospace);
+  font-size: 0.5625rem;
+  color: var(--color-retro-cyan);
+  margin: 1.25rem 0 0.5rem;
+}
+.component-docs h4 {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-retro-text);
+  margin: 1rem 0 0.375rem;
+}
+.component-docs code,
+.component-docs kbd {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-retro-cyan);
+  background-color: color-mix(in srgb, var(--color-retro-surface) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-retro-border) 30%, transparent);
+  border-radius: 0.25rem;
+  padding: 0.0625rem 0.3125rem;
+}
+.component-docs kbd {
+  color: var(--color-retro-gold);
+}
+.component-docs .docs-lead {
+  color: var(--color-retro-text);
+  margin-bottom: 0.5rem;
+}
+.component-docs .docs-highlights,
+.component-docs .docs-aria-patterns,
+.component-docs .docs-related ul,
+.component-docs ul.docs-related {
+  list-style: disc outside;
+  margin: 0.5rem 0 0.5rem 1.25rem;
+}
+.component-docs .docs-highlights li,
+.component-docs .docs-aria-patterns li,
+.component-docs .docs-related li {
+  margin-bottom: 0.25rem;
+}
+.component-docs .docs-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  margin: 0.75rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+}
+.component-docs .docs-meta dt {
+  color: color-mix(in srgb, var(--color-retro-muted) 60%, transparent);
+  text-transform: uppercase;
+}
+.component-docs .docs-meta dd {
+  color: var(--color-retro-green);
+  margin-right: 0.75rem;
+}
+.component-docs table {
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--color-retro-border) 40%, transparent);
+  border-radius: 0.5rem;
+  border-collapse: collapse;
+  font-size: 0.6875rem;
+  margin: 0.5rem 0 1rem;
+  display: block;
+  overflow-x: auto;
+}
+.component-docs table th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-retro-muted);
+  background-color: color-mix(in srgb, var(--color-retro-surface) 40%, transparent);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-retro-border);
+  white-space: nowrap;
+}
+.component-docs table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-retro-border) 20%, transparent);
+  vertical-align: top;
+}
+.component-docs .docs-required {
+  color: var(--color-retro-red, #ff5555);
+  margin-left: 0.125rem;
+}
+.component-docs .docs-muted {
+  color: color-mix(in srgb, var(--color-retro-muted) 50%, transparent);
+}
+.component-docs .docs-empty {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: color-mix(in srgb, var(--color-retro-muted) 70%, transparent);
+}
+.component-docs .docs-aria-notes {
+  font-size: 0.75rem;
+  margin: 0.5rem 0;
+}
+.component-docs .docs-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin: 0.5rem 0;
+}
+.component-docs .docs-tags span {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--color-retro-muted);
+  border: 1px solid color-mix(in srgb, var(--color-retro-border) 40%, transparent);
+  border-radius: 0.25rem;
+  padding: 0.0625rem 0.375rem;
+}
+.component-docs .docs-example {
+  margin: 0.75rem 0;
+}
+.component-docs .docs-code {
+  background-color: var(--color-retro-bg);
+  border: 1px solid var(--color-retro-border);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  overflow-x: auto;
+  tab-size: 2;
+  margin: 0.375rem 0;
+}
+.component-docs .docs-code code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: color-mix(in srgb, var(--color-retro-text) 80%, transparent);
+}
+.component-docs .docs-deprecation {
+  border: 1px solid color-mix(in srgb, var(--color-retro-gold) 40%, transparent);
+  background-color: color-mix(in srgb, var(--color-retro-gold) 8%, transparent);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  margin: 0.5rem 0;
+  font-size: 0.75rem;
+  color: var(--color-retro-gold);
+}
+.component-docs .docs-related a {
+  color: var(--color-retro-cyan);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--color-retro-cyan) 40%, transparent);
+}
+.component-docs .docs-related a:hover {
+  text-decoration-color: var(--color-retro-cyan);
+}

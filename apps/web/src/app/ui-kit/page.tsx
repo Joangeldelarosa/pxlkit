@@ -415,41 +415,13 @@ const CATEGORIES = (() => {
 
 const ALL_SECTION_IDS = CATEGORIES.flatMap((c) => c.items.map((i) => i.id));
 
-/* Components present in the registry that don't yet have a hand-written DocSection.
-   Each gets a minimal placeholder so sidebar anchors always land somewhere instead
-   of jumping to the top of the page. As real DocSections land in follow-up waves,
-   their slugs drop out of this list (existing anchors take precedence by definition). */
-const PLACEHOLDER_COMPONENTS: { name: string; slug: string }[] = (() => {
-  const rendered = new Set<string>([
-    // Conceptual overview sections
-    'getting-started', 'design-tokens', 'surface-system', 'locale-support',
-    // Hand-written DocSections
-    'pixel-button', 'pxlkit-button', 'pixel-split-button',
-    'pixel-input', 'pixel-password-input', 'pixel-textarea', 'pixel-select',
-    'pixel-checkbox', 'pixel-radio-group', 'pixel-switch', 'pixel-slider', 'pixel-segmented',
-    'pixel-card', 'pixel-stat-card', 'pixel-table', 'pixel-avatar', 'pixel-badge', 'pixel-chip',
-    'pixel-text-link', 'pixel-collapsible',
-    'pixel-code-inline', 'pixel-kbd', 'pixel-color-swatch',
-    'pixel-bare-button', 'pixel-bare-input', 'pixel-bare-textarea',
-    'pixel-alert', 'pixel-progress', 'pixel-skeleton', 'pixel-empty-state', 'pixel-toast',
-    'pixel-tabs', 'pixel-accordion', 'pixel-breadcrumb', 'pixel-pagination',
-    'pixel-modal', 'pixel-tooltip', 'pixel-dropdown',
-    'pixel-section', 'pixel-divider',
-    'pixel-fade-in', 'pixel-slide-in', 'pixel-pulse', 'pixel-bounce', 'pixel-typewriter', 'pixel-glitch',
-    'pixel-float', 'pixel-shake', 'pixel-rotate', 'pixel-zoom-in', 'pixel-flicker',
-    // Parallax has its own dynamic-imported block with anchors
-    'pixel-parallax-layer', 'pixel-parallax-group', 'pixel-mouse-parallax',
-    // Non-component sidebar entries
-    'use-toast',
-  ]);
-  const out: { name: string; slug: string }[] = [];
-  for (const cat of CATEGORIES) {
-    for (const item of cat.items) {
-      if (!rendered.has(item.id)) out.push({ name: item.name, slug: item.id });
-    }
-  }
-  return out;
-})();
+/* NOTE (coverage-showcase gate): components without a hand-written DocSection
+   are rendered in the "More Components" block near the end of the page as one
+   literal <MoreComponentSection id="..." name="..." /> line each. The ids must
+   stay literal in this file — the coherence audit (gate 04) statically scans
+   this source for `id="<kebab-name>"` per registered manifest, so a runtime
+   .map() over derived slugs cannot satisfy it. When a component is added to
+   the kit, run `npm run docs:build` and add its line to that block. */
 
 /* PascalCase name → real Default example component imported above. Each entry
    renders a working live demo in the placeholder DocSection block (no more
@@ -565,6 +537,49 @@ function CompLink({ id, children }: { id: string; children: React.ReactNode }) {
     >
       {children}
     </PixelTextLink>
+  );
+}
+
+/* Invisible anchor target. Used where a registered component is documented
+   under a different (legacy) anchor or inside a dynamically-imported block:
+   the coherence audit expects id="<kebab-case(manifest name)>" to exist
+   statically in this file, and deep links to those ids must resolve. */
+function AnchorAlias({ id }: { id: string }) {
+  return <span id={id} className="block scroll-mt-20" aria-hidden="true" />;
+}
+
+/* One generated-registry component entry in the "More Components" block.
+   Renders the SSOT Default example (LIVE_DEMOS) inside the same DocSection
+   shell used across this page; links to the full generated reference on
+   /docs#<id>. Invoked with literal id="..." props — see the gate note above. */
+function MoreComponentSection({ id, name }: { id: string; name: string }) {
+  const Demo = LIVE_DEMOS[name];
+  return (
+    <DocSection
+      id={id}
+      title={name}
+      description={
+        <>
+          Shipped in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>. See the{' '}
+          <PixelTextLink href={`/changelog#v${UI_KIT_VERSION.replace(/\./g, '')}`}>
+            {`${UI_KIT_VERSION_LABEL} changelog`}
+          </PixelTextLink>{' '}
+          for release notes, or the{' '}
+          <PixelTextLink href={`/docs#${id}`}>full reference</PixelTextLink>{' '}
+          for props, accessibility, and keyboard docs generated from the component manifest.
+        </>
+      }
+      code={`import { ${name} } from '@pxlkit/ui-kit';`}
+    >
+      {Demo ? (
+        <Demo />
+      ) : (
+        <p className="text-retro-muted text-sm">
+          Live demo for <PixelCodeInline>{name}</PixelCodeInline> lands in a follow-up
+          docs wave. Import path and basic usage are shown below.
+        </p>
+      )}
+    </DocSection>
   );
 }
 
@@ -1088,6 +1103,8 @@ import { Search } from '@pxlkit/ui';
             </section>
 
             {/* ══════════════════ SURFACE SYSTEM ══════════════════ */}
+            {/* PxlKitSurfaceProvider is documented here — alias for kebab(manifest name) */}
+            <AnchorAlias id="pxl-kit-surface-provider" />
             <section data-section="surface-system" id="surface-system" className="scroll-mt-20 space-y-4 pt-10">
               <div className="flex items-center gap-2.5">
                 <h2 className="font-pixel text-xs text-retro-green">SURFACE SYSTEM</h2>
@@ -1176,6 +1193,8 @@ export default function RootLayout({ children }) {
             </section>
 
             {/* ══════════════════ LOCALE / TURKISH SUPPORT ══════════════════ */}
+            {/* PxlKitLocaleProvider is documented here — alias for kebab(manifest name) */}
+            <AnchorAlias id="pxl-kit-locale-provider" />
             <section data-section="locale-support" id="locale-support" className="scroll-mt-20 space-y-4 pt-10">
               <div className="flex items-center gap-2.5">
                 <h2 className="font-pixel text-xs text-retro-green">LOCALE / TURKISH SUPPORT</h2>
@@ -1447,6 +1466,8 @@ toLocaleUpper('istanbul', 'en'); // → "ISTANBUL"`}
             </DocSection>
 
             {/* ══════════════════ PxlKitBUTTON ══════════════════ */}
+            {/* Legacy anchor is "pxlkit-button"; the manifest kebab id is aliased here */}
+            <AnchorAlias id="pxl-kit-button" />
             <DocSection
               id="pxlkit-button"
               title="PxlKitButton"
@@ -2322,6 +2343,8 @@ function SaveButton() {
             </DocSection>
 
             {/* ══════════════════ useToast() hook ══════════════════ */}
+            {/* PxlKitToastProvider (the kit's provider behind this pattern) — alias for kebab(manifest name) */}
+            <AnchorAlias id="pxl-kit-toast-provider" />
             <DocSection
               id="use-toast"
               title="useToast()"
@@ -3163,54 +3186,87 @@ const [active, setActive] = useState(false);
             {/* Heavy demo block — dynamic-imported with PixelSkeleton fallback */}
             <ParallaxDemos />
 
+            {/* Static anchor targets for the dynamically-imported parallax block
+                above. The DocSections inside _parallax-demos.tsx carry the visible
+                ids once the chunk loads (and win getElementById in document order);
+                these aliases guarantee the anchors exist statically for the
+                coherence audit and for #hash deep links before the chunk mounts. */}
+            <AnchorAlias id="pixel-parallax-layer" />
+            <AnchorAlias id="pixel-parallax-group" />
+            <AnchorAlias id="pixel-mouse-parallax" />
+
             {/* ============================================================
-                Live demos — each placeholder slug now renders the real Default
-                example imported from packages/ui-kit/src/<category>/<Component>.examples.tsx.
-                If a component has no examples file (rare — most ship one in SSOT),
-                LIVE_DEMOS won't have an entry and we fall back to a minimal placeholder.
+                More Components — every registry component without a hand-written
+                DocSection above, one literal line each (coverage-showcase gate;
+                see the note next to AnchorAlias/MoreComponentSection). Each entry
+                renders the real Default example imported from
+                packages/ui-kit/src/<category>/<Component>.examples.tsx.
                 ============================================================ */}
-            {PLACEHOLDER_COMPONENTS.length > 0 && (
-              <section className="pt-10">
-                <PixelDivider label="More Components" tone="cyan" spacing="lg" />
-                <p className="mt-4 text-xs text-retro-muted max-w-2xl">
-                  Real live demos for every component that ships in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>.
-                  Each preview is the <PixelCodeInline>Default</PixelCodeInline> example function authored
-                  alongside the component in <PixelCodeInline>&lt;Component&gt;.examples.tsx</PixelCodeInline>{' '}
-                  (single source of truth).
-                </p>
-                <div className="mt-5 space-y-2">
-                  {PLACEHOLDER_COMPONENTS.map((c) => {
-                    const Demo = LIVE_DEMOS[c.name];
-                    return (
-                      <DocSection
-                        key={c.slug}
-                        id={c.slug}
-                        title={c.name}
-                        description={
-                          <>
-                            Shipped in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>. See the{' '}
-                            <PixelTextLink href={`/changelog#v${UI_KIT_VERSION.replace(/\./g, '')}`}>
-                              {`${UI_KIT_VERSION_LABEL} changelog`}
-                            </PixelTextLink>{' '}
-                            for full release notes.
-                          </>
-                        }
-                        code={`import { ${c.name} } from '@pxlkit/ui-kit';`}
-                      >
-                        {Demo ? (
-                          <Demo />
-                        ) : (
-                          <p className="text-retro-muted text-sm">
-                            Live demo for <PixelCodeInline>{c.name}</PixelCodeInline> lands in a follow-up
-                            docs wave. Import path and basic usage are shown below.
-                          </p>
-                        )}
-                      </DocSection>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
+            <section className="pt-10">
+              <PixelDivider label="More Components" tone="cyan" spacing="lg" />
+              <p className="mt-4 text-xs text-retro-muted max-w-2xl">
+                Real live demos for every component that ships in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>.
+                Each preview is the <PixelCodeInline>Default</PixelCodeInline> example function authored
+                alongside the component in <PixelCodeInline>&lt;Component&gt;.examples.tsx</PixelCodeInline>{' '}
+                (single source of truth).
+              </p>
+              <div className="mt-5 space-y-2">
+                <MoreComponentSection id="pixel-combobox" name="PixelCombobox" />
+                <MoreComponentSection id="pixel-multi-select" name="PixelMultiSelect" />
+                <MoreComponentSection id="pixel-date-picker" name="PixelDatePicker" />
+                <MoreComponentSection id="pixel-number-input" name="PixelNumberInput" />
+                <MoreComponentSection id="pixel-otp-input" name="PixelOTPInput" />
+                <MoreComponentSection id="pixel-file-upload" name="PixelFileUpload" />
+                <MoreComponentSection id="pixel-form" name="PixelForm" />
+                <MoreComponentSection id="pixel-input-group" name="PixelInputGroup" />
+                <MoreComponentSection id="pixel-toggle-group" name="PixelToggleGroup" />
+                <MoreComponentSection id="pixel-toggle" name="PixelToggle" />
+                <MoreComponentSection id="pixel-date-range-picker" name="PixelDateRangePicker" />
+                <MoreComponentSection id="pixel-calendar-grid" name="PixelCalendarGrid" />
+                <MoreComponentSection id="pixel-color-input" name="PixelColorInput" />
+                <MoreComponentSection id="pixel-ribbon" name="PixelRibbon" />
+                <MoreComponentSection id="pixel-star-rating" name="PixelStarRating" />
+                <MoreComponentSection id="pixel-icon-frame" name="PixelIconFrame" />
+                <MoreComponentSection id="pixel-data-table" name="PixelDataTable" />
+                <MoreComponentSection id="pixel-carousel" name="PixelCarousel" />
+                <MoreComponentSection id="pixel-timeline" name="PixelTimeline" />
+                <MoreComponentSection id="pixel-stat-group" name="PixelStatGroup" />
+                <MoreComponentSection id="pixel-avatar-group" name="PixelAvatarGroup" />
+                <MoreComponentSection id="pixel-badge-group" name="PixelBadgeGroup" />
+                <MoreComponentSection id="pixel-chip-group" name="PixelChipGroup" />
+                <MoreComponentSection id="pixel-sparkline" name="PixelSparkline" />
+                <MoreComponentSection id="pixel-bar-chart" name="PixelBarChart" />
+                <MoreComponentSection id="pixel-area-chart" name="PixelAreaChart" />
+                <MoreComponentSection id="pixel-feature-card" name="PixelFeatureCard" />
+                <MoreComponentSection id="pixel-pricing-card" name="PixelPricingCard" />
+                <MoreComponentSection id="pixel-testimonial-card" name="PixelTestimonialCard" />
+                <MoreComponentSection id="pixel-hero-section" name="PixelHeroSection" />
+                <MoreComponentSection id="pixel-hero-media" name="PixelHeroMedia" />
+                <MoreComponentSection id="pixel-spinner" name="PixelSpinner" />
+                <MoreComponentSection id="pixel-stepper" name="PixelStepper" />
+                <MoreComponentSection id="pixel-menubar" name="PixelMenubar" />
+                <MoreComponentSection id="pixel-navigation-menu" name="PixelNavigationMenu" />
+                <MoreComponentSection id="pixel-sidebar" name="PixelSidebar" />
+                <MoreComponentSection id="pixel-portal" name="PixelPortal" />
+                <MoreComponentSection id="pixel-popover" name="PixelPopover" />
+                <MoreComponentSection id="pixel-drawer" name="PixelDrawer" />
+                <MoreComponentSection id="pixel-command" name="PixelCommand" />
+                <MoreComponentSection id="pixel-alert-dialog" name="PixelAlertDialog" />
+                <MoreComponentSection id="pixel-sheet" name="PixelSheet" />
+                <MoreComponentSection id="pixel-box" name="PixelBox" />
+                <MoreComponentSection id="pixel-stack" name="PixelStack" />
+                <MoreComponentSection id="pixel-cluster" name="PixelCluster" />
+                <MoreComponentSection id="pixel-grid" name="PixelGrid" />
+                <MoreComponentSection id="pixel-equal-height-grid" name="PixelEqualHeightGrid" />
+                <MoreComponentSection id="pixel-center" name="PixelCenter" />
+                <MoreComponentSection id="pixel-container" name="PixelContainer" />
+                <MoreComponentSection id="pixel-two-column" name="PixelTwoColumn" />
+                <MoreComponentSection id="pixel-section-header" name="PixelSectionHeader" />
+                <MoreComponentSection id="pixel-bento" name="PixelBento" />
+                <MoreComponentSection id="pixel-bento-cell" name="PixelBentoCell" />
+                <MoreComponentSection id="pixel-scroll-area" name="PixelScrollArea" />
+              </div>
+            </section>
 
             {/* ══════════════════ COMPONENT INVENTORY ══════════════════ */}
             <section className="pt-10">
