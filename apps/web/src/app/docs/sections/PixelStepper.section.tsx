@@ -19,7 +19,7 @@ export const PixelStepperDocsMeta = {
 
 export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-stepper'} aria-labelledby={'pixel-stepper-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-stepper-heading'} className={className} data-status='stable'>
       <h2 id='pixel-stepper-heading'>PixelStepper</h2>
       <p className="docs-lead">Multi-step progress indicator with completed/active/pending/error/loading states, horizontal or vertical orientation, and full keyboard navigation.</p>
       <ul className="docs-highlights">

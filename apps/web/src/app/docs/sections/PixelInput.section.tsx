@@ -19,7 +19,7 @@ export const PixelInputDocsMeta = {
 
 export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-input'} aria-labelledby={'pixel-input-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-input-heading'} className={className} data-status='stable'>
       <h2 id='pixel-input-heading'>PixelInput</h2>
       <p className="docs-lead">Single-line text input with label, hint, error message, tone/size/surface variants, prefix/suffix slots, joinable addons, clearable button, char counter, and loading state.</p>
       <ul className="docs-highlights">

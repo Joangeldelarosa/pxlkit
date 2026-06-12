@@ -557,8 +557,11 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
     `export function ${entry.name}DocsSection({ className }: ${entry.name}DocsSectionProps): React.ReactElement {`,
   );
   lines.push(`  return (`);
+  // No `id` on the root: the /docs page wrapper owns the `#<slug>` anchor
+  // (a literal <section id> the coverage-docs gate scans for) — emitting it
+  // here too duplicated the DOM id whenever a section was expanded.
   lines.push(
-    `    <section id={${jsxAttr(entry.slug)}} aria-labelledby={${jsxAttr(`${entry.slug}-heading`)}} className={className} data-status=${jsxAttr(entry.status)}>`,
+    `    <section aria-labelledby={${jsxAttr(`${entry.slug}-heading`)}} className={className} data-status=${jsxAttr(entry.status)}>`,
   );
   lines.push(
     `      <h2 id=${jsxAttr(`${entry.slug}-heading`)}>${escapeJsxText(entry.name)}</h2>`,

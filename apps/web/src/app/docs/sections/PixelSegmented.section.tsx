@@ -19,7 +19,7 @@ export const PixelSegmentedDocsMeta = {
 
 export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-segmented'} aria-labelledby={'pixel-segmented-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-segmented-heading'} className={className} data-status='stable'>
       <h2 id='pixel-segmented-heading'>PixelSegmented</h2>
       <p className="docs-lead">Single-select segmented control for toggling between a small set of mutually exclusive options inline.</p>
       <ul className="docs-highlights">

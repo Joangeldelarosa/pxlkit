@@ -19,7 +19,7 @@ export const PxlKitButtonDocsMeta = {
 
 export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pxl-kit-button'} aria-labelledby={'pxl-kit-button-heading'} className={className} data-status='deprecated'>
+    <section aria-labelledby={'pxl-kit-button-heading'} className={className} data-status='deprecated'>
       <h2 id='pxl-kit-button-heading'>PxlKitButton</h2>
       <aside role="alert" className="docs-deprecation">
                 <strong>Deprecated.</strong>{' '}Renamed to PixelIconButton. The PxlKit* prefix is reserved for system primitives (providers); leaf components use the Pixel* prefix.{' '}Use <code>PixelIconButton</code> instead.{' '}Removed in v3.0.0.

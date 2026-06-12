@@ -19,7 +19,7 @@ export const PixelSectionDocsMeta = {
 
 export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-section'} aria-labelledby={'pixel-section-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-section-heading'} className={className} data-status='stable'>
       <h2 id='pixel-section-heading'>PixelSection</h2>
       <p className="docs-lead">Bordered section with optional uppercase title row, subtitle, and surface-aware container.</p>
       <ul className="docs-highlights">

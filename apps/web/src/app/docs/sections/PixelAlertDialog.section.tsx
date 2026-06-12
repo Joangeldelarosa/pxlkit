@@ -19,7 +19,7 @@ export const PixelAlertDialogDocsMeta = {
 
 export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-alert-dialog'} aria-labelledby={'pixel-alert-dialog-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-alert-dialog-heading'} className={className} data-status='stable'>
       <h2 id='pixel-alert-dialog-heading'>PixelAlertDialog</h2>
       <p className="docs-lead">Modal confirmation dialog for destructive or irreversible actions, with async-aware action handling and Cancel-focused defaults.</p>
       <ul className="docs-highlights">

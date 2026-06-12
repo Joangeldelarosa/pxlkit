@@ -19,7 +19,7 @@ export const PxlKitToastProviderDocsMeta = {
 
 export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProviderDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pxl-kit-toast-provider'} aria-labelledby={'pxl-kit-toast-provider-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pxl-kit-toast-provider-heading'} className={className} data-status='stable'>
       <h2 id='pxl-kit-toast-provider-heading'>PxlKitToastProvider</h2>
       <p className="docs-lead">App-root toast provider that hosts the toast queue, viewport portal, and stacked/expanded visual mode — paired with useToast() for imperative push/update/dismiss/promise APIs.</p>
       <ul className="docs-highlights">

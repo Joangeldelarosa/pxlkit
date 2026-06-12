@@ -19,7 +19,7 @@ export const PixelBarChartDocsMeta = {
 
 export function PixelBarChartDocsSection({ className }: PixelBarChartDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-bar-chart'} aria-labelledby={'pixel-bar-chart-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-bar-chart-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bar-chart-heading'>PixelBarChart</h2>
       <p className="docs-lead">Pure-SVG bar chart that renders one rect per data point, in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.</p>
       <ul className="docs-highlights">

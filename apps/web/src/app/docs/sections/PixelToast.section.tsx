@@ -19,7 +19,7 @@ export const PixelToastDocsMeta = {
 
 export function PixelToastDocsSection({ className }: PixelToastDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-toast'} aria-labelledby={'pixel-toast-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-toast-heading'} className={className} data-status='stable'>
       <h2 id='pixel-toast-heading'>PixelToast</h2>
       <p className="docs-lead">Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast().</p>
       <ul className="docs-highlights">

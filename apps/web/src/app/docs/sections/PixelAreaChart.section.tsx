@@ -19,7 +19,7 @@ export const PixelAreaChartDocsMeta = {
 
 export function PixelAreaChartDocsSection({ className }: PixelAreaChartDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-area-chart'} aria-labelledby={'pixel-area-chart-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-area-chart-heading'} className={className} data-status='stable'>
       <h2 id='pixel-area-chart-heading'>PixelAreaChart</h2>
       <p className="docs-lead">Pure-SVG filled area chart that closes the trend polyline down to the baseline, with crisp pixel edges or smoothed linear joins.</p>
       <ul className="docs-highlights">

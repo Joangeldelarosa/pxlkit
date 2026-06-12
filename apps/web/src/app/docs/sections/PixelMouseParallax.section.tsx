@@ -19,7 +19,7 @@ export const PixelMouseParallaxDocsMeta = {
 
 export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-mouse-parallax'} aria-labelledby={'pixel-mouse-parallax-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-mouse-parallax-heading'} className={className} data-status='stable'>
       <h2 id='pixel-mouse-parallax-heading'>PixelMouseParallax</h2>
       <p className="docs-lead">Cursor-tracking parallax layer that translates children based on mouse position with smooth lerp.</p>
       <ul className="docs-highlights">

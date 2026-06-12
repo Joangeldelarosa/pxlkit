@@ -19,7 +19,7 @@ export const PixelTwoColumnDocsMeta = {
 
 export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-two-column'} aria-labelledby={'pixel-two-column-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-two-column-heading'} className={className} data-status='stable'>
       <h2 id='pixel-two-column-heading'>PixelTwoColumn</h2>
       <p className="docs-lead">Two-column grid layout with preset ratios, responsive stacking, and surface-aware transitions.</p>
       <ul className="docs-highlights">

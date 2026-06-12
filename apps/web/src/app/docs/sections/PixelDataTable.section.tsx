@@ -19,7 +19,7 @@ export const PixelDataTableDocsMeta = {
 
 export function PixelDataTableDocsSection({ className }: PixelDataTableDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-data-table'} aria-labelledby={'pixel-data-table-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-data-table-heading'} className={className} data-status='stable'>
       <h2 id='pixel-data-table-heading'>PixelDataTable</h2>
       <p className="docs-lead">TanStack-powered surface-aware data table with controlled sorting, filtering, pagination, row selection, column visibility, density, sticky header, loading skeletons and empty state.</p>
       <ul className="docs-highlights">

@@ -25,7 +25,7 @@ export default defineManifest({
     patterns: ['respects prefers-reduced-motion'],
     keyboard: [],
     notes:
-      'Caret is decorative; full text is exposed to assistive tech once typing completes. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and onComplete fires once.',
+      'Caret and the character-by-character animation are aria-hidden; the complete string is exposed to assistive tech from the first render via a visually hidden span. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and onComplete fires once.',
   },
   related: [],
   apiStability: 'stable',

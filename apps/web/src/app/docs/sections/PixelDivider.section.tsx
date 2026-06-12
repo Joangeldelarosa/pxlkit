@@ -19,7 +19,7 @@ export const PixelDividerDocsMeta = {
 
 export function PixelDividerDocsSection({ className }: PixelDividerDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-divider'} aria-labelledby={'pixel-divider-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-divider-heading'} className={className} data-status='stable'>
       <h2 id='pixel-divider-heading'>PixelDivider</h2>
       <p className="docs-lead">Horizontal rule with optional centered label; pixel surface adds dotted line and diamond ornaments.</p>
       <ul className="docs-highlights">

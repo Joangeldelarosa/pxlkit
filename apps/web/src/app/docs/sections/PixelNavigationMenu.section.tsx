@@ -19,7 +19,7 @@ export const PixelNavigationMenuDocsMeta = {
 
 export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMenuDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-navigation-menu'} aria-labelledby={'pixel-navigation-menu-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-navigation-menu-heading'} className={className} data-status='stable'>
       <h2 id='pixel-navigation-menu-heading'>PixelNavigationMenu</h2>
       <p className="docs-lead">Accessible nav landmark with optional mega-panel submenus, keyboard navigation, and surface-aware styling.</p>
       <ul className="docs-highlights">

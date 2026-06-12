@@ -19,7 +19,7 @@ export const PixelGridDocsMeta = {
 
 export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-grid'} aria-labelledby={'pixel-grid-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-grid-heading'} className={className} data-status='stable'>
       <h2 id='pixel-grid-heading'>PixelGrid</h2>
       <p className="docs-lead">Surface-aware CSS grid container with responsive column maps, asymmetric gaps, and auto-fit/auto-fill modes.</p>
       <ul className="docs-highlights">

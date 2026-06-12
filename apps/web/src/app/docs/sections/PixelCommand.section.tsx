@@ -19,7 +19,7 @@ export const PixelCommandDocsMeta = {
 
 export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-command'} aria-labelledby={'pixel-command-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-command-heading'} className={className} data-status='stable'>
       <h2 id='pixel-command-heading'>PixelCommand</h2>
       <p className="docs-lead">Command palette overlay with fuzzy search, grouped items, keyboard shortcut binding, focus trap, scroll lock and Escape-to-close.</p>
       <ul className="docs-highlights">

@@ -19,7 +19,7 @@ export const PixelClusterDocsMeta = {
 
 export function PixelClusterDocsSection({ className }: PixelClusterDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-cluster'} aria-labelledby={'pixel-cluster-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-cluster-heading'} className={className} data-status='stable'>
       <h2 id='pixel-cluster-heading'>PixelCluster</h2>
       <p className="docs-lead">Horizontal wrap container for clustering inline items (chips, tags, actions) with consistent gap, alignment, and justification.</p>
       <ul className="docs-highlights">

@@ -19,7 +19,7 @@ export const PixelAccordionDocsMeta = {
 
 export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-accordion'} aria-labelledby={'pixel-accordion-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-accordion-heading'} className={className} data-status='stable'>
       <h2 id='pixel-accordion-heading'>PixelAccordion</h2>
       <p className="docs-lead">Vertical list of expandable disclosure items with wired aria-controls / aria-expanded / labelled regions.</p>
       <ul className="docs-highlights">

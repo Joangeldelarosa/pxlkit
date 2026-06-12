@@ -19,7 +19,7 @@ export const PixelTestimonialCardDocsMeta = {
 
 export function PixelTestimonialCardDocsSection({ className }: PixelTestimonialCardDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-testimonial-card'} aria-labelledby={'pixel-testimonial-card-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-testimonial-card-heading'} className={className} data-status='stable'>
       <h2 id='pixel-testimonial-card-heading'>PixelTestimonialCard</h2>
       <p className="docs-lead">Surface-aware testimonial card with quote, attribution, avatar, star rating and verified badge.</p>
       <ul className="docs-highlights">

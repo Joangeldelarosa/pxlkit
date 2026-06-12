@@ -19,7 +19,7 @@ export const PixelDatePickerDocsMeta = {
 
 export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-date-picker'} aria-labelledby={'pixel-date-picker-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-date-picker-heading'} className={className} data-status='stable'>
       <h2 id='pixel-date-picker-heading'>PixelDatePicker</h2>
       <p className="docs-lead">Accessible date input with popover calendar grid, keyboard navigation, presets, and min/max constraints.</p>
       <ul className="docs-highlights">

@@ -19,7 +19,7 @@ export const PixelToggleDocsMeta = {
 
 export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-toggle'} aria-labelledby={'pixel-toggle-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-toggle-heading'} className={className} data-status='stable'>
       <h2 id='pixel-toggle-heading'>PixelToggle</h2>
       <p className="docs-lead">Two-state toggle button with aria-pressed semantics. Works standalone or as a child of PixelToggleGroup for single/multi-select toolbars.</p>
       <ul className="docs-highlights">

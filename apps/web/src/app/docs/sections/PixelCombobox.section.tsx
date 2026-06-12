@@ -19,7 +19,7 @@ export const PixelComboboxDocsMeta = {
 
 export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-combobox'} aria-labelledby={'pixel-combobox-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-combobox-heading'} className={className} data-status='stable'>
       <h2 id='pixel-combobox-heading'>PixelCombobox</h2>
       <p className="docs-lead">Searchable single-value combobox built on a button trigger + listbox popover with type-to-filter, optional grouping, and full keyboard navigation.</p>
       <ul className="docs-highlights">

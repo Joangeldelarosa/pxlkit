@@ -19,7 +19,7 @@ export const PixelContainerDocsMeta = {
 
 export function PixelContainerDocsSection({ className }: PixelContainerDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-container'} aria-labelledby={'pixel-container-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-container-heading'} className={className} data-status='stable'>
       <h2 id='pixel-container-heading'>PixelContainer</h2>
       <p className="docs-lead">Surface-aware page section wrapper with token-driven max-width, page gutter, and vertical rhythm.</p>
       <ul className="docs-highlights">

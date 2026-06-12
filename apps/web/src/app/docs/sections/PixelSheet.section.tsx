@@ -19,7 +19,7 @@ export const PixelSheetDocsMeta = {
 
 export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-sheet'} aria-labelledby={'pixel-sheet-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-sheet-heading'} className={className} data-status='stable'>
       <h2 id='pixel-sheet-heading'>PixelSheet</h2>
       <p className="docs-lead">Mobile-first bottom/top sheet with focus trap, scroll lock, Escape-to-close and optional drag handle.</p>
       <ul className="docs-highlights">

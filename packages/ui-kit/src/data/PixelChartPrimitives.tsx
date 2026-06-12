@@ -15,24 +15,31 @@ export interface PixelChartDataPoint {
 
 export type ChartSize = 'sm' | 'md' | 'lg';
 
+/**
+ * @internal Shared between the chart files only — exported at module level
+ * so PixelSparkline/PixelBarChart/PixelAreaChart can import it, but kept out
+ * of the package root (index.tsx re-exports the components by name).
+ */
 export interface Dim {
   width: number;
   height: number;
 }
 
+/** @internal See {@link Dim}. */
 export const sizeMap: Record<ChartSize, Dim> = {
   sm: { width: 120, height: 32 },
   md: { width: 240, height: 60 },
   lg: { width: 360, height: 96 },
 };
 
+/** @internal See {@link Dim}. */
 export const barSizeMap: Record<ChartSize, Dim> = {
   sm: { width: 160, height: 64 },
   md: { width: 280, height: 120 },
   lg: { width: 420, height: 180 },
 };
 
-/** Tone → SVG class color. Uses the same retro-* classes the rest of the kit relies on. */
+/** @internal Tone → SVG class color. Uses the same retro-* classes the rest of the kit relies on. */
 export const strokeClassMap: Record<ToneKey, string> = {
   neutral: 'stroke-retro-muted',
   green: 'stroke-retro-green',
@@ -43,6 +50,7 @@ export const strokeClassMap: Record<ToneKey, string> = {
   pink: 'stroke-retro-pink',
 };
 
+/** @internal Tone → SVG fill class. */
 export const fillClassMap: Record<ToneKey, string> = {
   neutral: 'fill-retro-muted',
   green: 'fill-retro-green',
@@ -53,6 +61,7 @@ export const fillClassMap: Record<ToneKey, string> = {
   pink: 'fill-retro-pink',
 };
 
+/** @internal Tone → SVG text fill class. */
 export const textFillClassMap: Record<ToneKey, string> = {
   neutral: 'fill-retro-muted',
   green: 'fill-retro-green',
@@ -64,7 +73,7 @@ export const textFillClassMap: Record<ToneKey, string> = {
 };
 
 /**
- * Normalize data points to SVG-space coordinates.
+ * @internal Normalize data points to SVG-space coordinates.
  * X is index-based (so string x labels still spread evenly).
  * Y is min/max normalized into [pad, height - pad].
  */
@@ -90,6 +99,7 @@ export function normalize(
   });
 }
 
+/** @internal Accessible summary text for chart aria-labels. */
 export function describeChart(kind: 'sparkline' | 'bar chart' | 'area chart', data: PixelChartDataPoint[]): string {
   if (!data.length) return `${kind}, no data`;
   const ys = data.map(d => d.y);

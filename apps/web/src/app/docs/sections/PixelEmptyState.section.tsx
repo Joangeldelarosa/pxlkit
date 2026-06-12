@@ -19,7 +19,7 @@ export const PixelEmptyStateDocsMeta = {
 
 export function PixelEmptyStateDocsSection({ className }: PixelEmptyStateDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-empty-state'} aria-labelledby={'pixel-empty-state-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-empty-state-heading'} className={className} data-status='stable'>
       <h2 id='pixel-empty-state-heading'>PixelEmptyState</h2>
       <p className="docs-lead">Placeholder block for empty collections or no-results states, with optional icon, title, description, and primary action.</p>
       <ul className="docs-highlights">

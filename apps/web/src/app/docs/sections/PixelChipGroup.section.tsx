@@ -19,7 +19,7 @@ export const PixelChipGroupDocsMeta = {
 
 export function PixelChipGroupDocsSection({ className }: PixelChipGroupDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-chip-group'} aria-labelledby={'pixel-chip-group-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-chip-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-chip-group-heading'>PixelChipGroup</h2>
       <p className="docs-lead">Controlled chip row with single-select (radiogroup) or multi-select (group of checkboxes) — wraps each PixelChip in a semantic toggle button.</p>
       <ul className="docs-highlights">

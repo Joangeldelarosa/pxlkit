@@ -19,7 +19,7 @@ export const PixelSplitButtonDocsMeta = {
 
 export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-split-button'} aria-labelledby={'pixel-split-button-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-split-button-heading'} className={className} data-status='stable'>
       <h2 id='pixel-split-button-heading'>PixelSplitButton</h2>
       <p className="docs-lead">Composite button pairing a primary action with a chevron-triggered dropdown menu for related secondary actions.</p>
       <ul className="docs-highlights">

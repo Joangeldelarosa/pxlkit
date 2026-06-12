@@ -19,7 +19,7 @@ export const PxlKitLocaleProviderDocsMeta = {
 
 export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProviderDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pxl-kit-locale-provider'} aria-labelledby={'pxl-kit-locale-provider-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pxl-kit-locale-provider-heading'} className={className} data-status='stable'>
       <h2 id='pxl-kit-locale-provider-heading'>PxlKitLocaleProvider</h2>
       <p className="docs-lead">Provides locale-aware font loading and text utilities (upper/lower) to all PxlKit components via context.</p>
       <ul className="docs-highlights">

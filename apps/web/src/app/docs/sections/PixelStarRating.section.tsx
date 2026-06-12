@@ -19,7 +19,7 @@ export const PixelStarRatingDocsMeta = {
 
 export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-star-rating'} aria-labelledby={'pixel-star-rating-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-star-rating-heading'} className={className} data-status='stable'>
       <h2 id='pixel-star-rating-heading'>PixelStarRating</h2>
       <p className="docs-lead">Pixel-art star rating display with optional interactive selection and surface-aware styling.</p>
       <ul className="docs-highlights">

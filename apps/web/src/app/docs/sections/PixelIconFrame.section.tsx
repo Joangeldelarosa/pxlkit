@@ -19,7 +19,7 @@ export const PixelIconFrameDocsMeta = {
 
 export function PixelIconFrameDocsSection({ className }: PixelIconFrameDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-icon-frame'} aria-labelledby={'pixel-icon-frame-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-icon-frame-heading'} className={className} data-status='stable'>
       <h2 id='pixel-icon-frame-heading'>PixelIconFrame</h2>
       <p className="docs-lead">Decorative icon container with surface-aware borders, tone tinting, sizes, shapes, and an optional accent badge.</p>
       <ul className="docs-highlights">

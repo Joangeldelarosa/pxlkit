@@ -19,7 +19,7 @@ export const PixelHeroSectionDocsMeta = {
 
 export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-hero-section'} aria-labelledby={'pixel-hero-section-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-hero-section-heading'} className={className} data-status='stable'>
       <h2 id='pixel-hero-section-heading'>PixelHeroSection</h2>
       <p className="docs-lead">Surface-aware hero section with eyebrow, headline, subline, CTA cluster, install snippet, meta and optional media in centered, split or parallax variants.</p>
       <ul className="docs-highlights">

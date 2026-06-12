@@ -19,7 +19,7 @@ export const PixelSkeletonDocsMeta = {
 
 export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-skeleton'} aria-labelledby={'pixel-skeleton-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-skeleton-heading'} className={className} data-status='stable'>
       <h2 id='pixel-skeleton-heading'>PixelSkeleton</h2>
       <p className="docs-lead">Animated loading placeholder that reserves layout space while async content resolves.</p>
       <ul className="docs-highlights">

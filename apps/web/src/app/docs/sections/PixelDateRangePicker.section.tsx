@@ -19,7 +19,7 @@ export const PixelDateRangePickerDocsMeta = {
 
 export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePickerDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-date-range-picker'} aria-labelledby={'pixel-date-range-picker-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-date-range-picker-heading'} className={className} data-status='stable'>
       <h2 id='pixel-date-range-picker-heading'>PixelDateRangePicker</h2>
       <p className="docs-lead">Accessible date range picker with one or two-month grid, hover preview, presets, and min/max constraints.</p>
       <ul className="docs-highlights">

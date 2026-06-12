@@ -19,7 +19,7 @@ export const PixelPulseDocsMeta = {
 
 export function PixelPulseDocsSection({ className }: PixelPulseDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-pulse'} aria-labelledby={'pixel-pulse-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-pulse-heading'} className={className} data-status='stable'>
       <h2 id='pixel-pulse-heading'>PixelPulse</h2>
       <p className="docs-lead">Gently scales and dims children in a recurring pulse to draw attention.</p>
       <ul className="docs-highlights">

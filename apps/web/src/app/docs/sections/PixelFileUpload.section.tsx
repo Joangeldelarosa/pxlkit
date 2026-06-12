@@ -19,7 +19,7 @@ export const PixelFileUploadDocsMeta = {
 
 export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-file-upload'} aria-labelledby={'pixel-file-upload-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-file-upload-heading'} className={className} data-status='stable'>
       <h2 id='pixel-file-upload-heading'>PixelFileUpload</h2>
       <p className="docs-lead">Dropzone + click-to-browse file uploader with accept/size/count validation, image thumbnails, and per-item removal.</p>
       <ul className="docs-highlights">

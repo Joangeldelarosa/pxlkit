@@ -19,7 +19,7 @@ export const PixelFeatureCardDocsMeta = {
 
 export function PixelFeatureCardDocsSection({ className }: PixelFeatureCardDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-feature-card'} aria-labelledby={'pixel-feature-card-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-feature-card-heading'} className={className} data-status='stable'>
       <h2 id='pixel-feature-card-heading'>PixelFeatureCard</h2>
       <p className="docs-lead">Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as &lt;article&gt;, role=&quot;button&quot;, or &lt;a href&gt; with full-card click target.</p>
       <ul className="docs-highlights">

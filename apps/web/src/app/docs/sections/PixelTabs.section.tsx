@@ -19,7 +19,7 @@ export const PixelTabsDocsMeta = {
 
 export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-tabs'} aria-labelledby={'pixel-tabs-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-tabs-heading'} className={className} data-status='stable'>
       <h2 id='pixel-tabs-heading'>PixelTabs</h2>
       <p className="docs-lead">Tabbed panel with roving tabindex and WAI-ARIA keyboard navigation, available as a sugar items[] API or a compositional List/Trigger/Panel API.</p>
       <ul className="docs-highlights">

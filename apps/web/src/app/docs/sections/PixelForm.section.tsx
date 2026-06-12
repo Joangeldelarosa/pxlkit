@@ -19,7 +19,7 @@ export const PixelFormDocsMeta = {
 
 export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-form'} aria-labelledby={'pixel-form-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-form-heading'} className={className} data-status='stable'>
       <h2 id='pixel-form-heading'>PixelForm</h2>
       <p className="docs-lead">shadcn-style compound wrapper around react-hook-form: Root / Field / Item / Label / Control / Description / Message auto-wire ids and aria-* across each field.</p>
       <ul className="docs-highlights">

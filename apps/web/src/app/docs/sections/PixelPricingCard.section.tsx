@@ -19,7 +19,7 @@ export const PixelPricingCardDocsMeta = {
 
 export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-pricing-card'} aria-labelledby={'pixel-pricing-card-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-pricing-card-heading'} className={className} data-status='stable'>
       <h2 id='pixel-pricing-card-heading'>PixelPricingCard</h2>
       <p className="docs-lead">Pricing tier card with tone-driven highlight, optional popular ribbon, feature list, and CTA slot.</p>
       <ul className="docs-highlights">

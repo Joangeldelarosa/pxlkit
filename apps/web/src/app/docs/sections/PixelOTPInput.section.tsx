@@ -19,7 +19,7 @@ export const PixelOTPInputDocsMeta = {
 
 export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-otp-input'} aria-labelledby={'pixel-otp-input-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-otp-input-heading'} className={className} data-status='stable'>
       <h2 id='pixel-otp-input-heading'>PixelOTPInput</h2>
       <p className="docs-lead">One-time passcode input with auto-advance, paste-fill, and per-cell keyboard navigation.</p>
       <ul className="docs-highlights">

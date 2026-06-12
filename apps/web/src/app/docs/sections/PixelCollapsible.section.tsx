@@ -19,7 +19,7 @@ export const PixelCollapsibleDocsMeta = {
 
 export function PixelCollapsibleDocsSection({ className }: PixelCollapsibleDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-collapsible'} aria-labelledby={'pixel-collapsible-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-collapsible-heading'} className={className} data-status='stable'>
       <h2 id='pixel-collapsible-heading'>PixelCollapsible</h2>
       <p className="docs-lead">Toggleable disclosure block with a tone-coloured chevron header that reveals or hides arbitrary content.</p>
       <ul className="docs-highlights">

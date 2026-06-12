@@ -4,6 +4,16 @@ import { act, render } from '@testing-library/react';
 import { PixelTypewriter } from '../../animations/PixelTypewriter';
 import { mockMatchMedia } from './matchmedia-mock';
 
+/** The visual, animated layer (hidden from screen readers). */
+function visual(root: HTMLElement): HTMLElement {
+  return root.querySelector('[aria-hidden="true"]') as HTMLElement;
+}
+
+/** The screen-reader layer carrying the full text from the first render. */
+function srOnly(root: HTMLElement): HTMLElement {
+  return root.querySelector('.sr-only') as HTMLElement;
+}
+
 describe('PixelTypewriter', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -14,16 +24,28 @@ describe('PixelTypewriter', () => {
     vi.restoreAllMocks();
   });
 
-  it('types the label out one character at a time', () => {
+  it('types the label out one character at a time (visual layer)', () => {
     const { container } = render(<PixelTypewriter label="HELLO" speed={10} />);
     const el = container.firstElementChild as HTMLElement;
-    expect(el.textContent).toContain('▌'); // caret only, nothing typed yet
+    expect(visual(el).textContent).toContain('▌'); // caret only, nothing typed yet
 
     act(() => { vi.advanceTimersByTime(30); });
-    expect(el.textContent).toBe('HEL▌');
+    expect(visual(el).textContent).toBe('HEL▌');
 
     act(() => { vi.advanceTimersByTime(20); });
-    expect(el.textContent).toBe('HELLO'); // done → caret removed
+    expect(visual(el).textContent).toBe('HELLO'); // done → caret removed
+  });
+
+  it('exposes the full text to screen readers from the first render', () => {
+    const { container } = render(<PixelTypewriter label="HELLO" speed={10} />);
+    const el = container.firstElementChild as HTMLElement;
+    // Before a single character has been typed, assistive tech already has
+    // the whole string — the typing churn is purely visual.
+    expect(srOnly(el).textContent).toBe('HELLO');
+    expect(visual(el).getAttribute('aria-hidden')).toBe('true');
+
+    act(() => { vi.advanceTimersByTime(50); });
+    expect(srOnly(el).textContent).toBe('HELLO');
   });
 
   it('fires onComplete exactly once when the full string is rendered', () => {
@@ -39,9 +61,9 @@ describe('PixelTypewriter', () => {
     const { container } = render(<PixelTypewriter label="GO" speed={10} delay={100} />);
     const el = container.firstElementChild as HTMLElement;
     act(() => { vi.advanceTimersByTime(90); });
-    expect(el.textContent).toBe('▌');
+    expect(visual(el).textContent).toBe('▌');
     act(() => { vi.advanceTimersByTime(30); });
-    expect(el.textContent).toBe('GO');
+    expect(visual(el).textContent).toBe('GO');
   });
 
   it('cursor={false} never shows the caret', () => {
@@ -50,22 +72,24 @@ describe('PixelTypewriter', () => {
     );
     const el = container.firstElementChild as HTMLElement;
     act(() => { vi.advanceTimersByTime(10); });
-    expect(el.textContent).toBe('A');
-    expect(el.textContent).not.toContain('▌');
+    expect(visual(el).textContent).toBe('A');
+    expect(visual(el).textContent).not.toContain('▌');
   });
 
   it('supports the deprecated `text` alias, with `label` taking precedence', () => {
     const { container } = render(<PixelTypewriter text="OLD" speed={10} />);
     const el = container.firstElementChild as HTMLElement;
     act(() => { vi.advanceTimersByTime(30); });
-    expect(el.textContent).toBe('OLD');
+    expect(visual(el).textContent).toBe('OLD');
+    expect(srOnly(el).textContent).toBe('OLD');
 
     const { container: c2 } = render(
       <PixelTypewriter label="NEW" text="OLD" speed={10} />,
     );
     const el2 = c2.firstElementChild as HTMLElement;
     act(() => { vi.advanceTimersByTime(30); });
-    expect(el2.textContent).toBe('NEW');
+    expect(visual(el2).textContent).toBe('NEW');
+    expect(srOnly(el2).textContent).toBe('NEW');
   });
 
   it('applies tone text color, font-mono and custom className', () => {
@@ -87,23 +111,24 @@ describe('PixelTypewriter', () => {
         <PixelTypewriter label="HELLO" speed={10} onComplete={onComplete} />,
       );
       const el = container.firstElementChild as HTMLElement;
-      expect(el.textContent).toBe('HELLO');
-      expect(el.textContent).not.toContain('▌');
+      expect(visual(el).textContent).toBe('HELLO');
+      expect(visual(el).textContent).not.toContain('▌');
       expect(onComplete).toHaveBeenCalledTimes(1);
       act(() => { vi.advanceTimersByTime(500); });
-      expect(el.textContent).toBe('HELLO');
+      expect(visual(el).textContent).toBe('HELLO');
       expect(onComplete).toHaveBeenCalledTimes(1);
     } finally {
       ctl.restore();
     }
   });
 
-  it('renders nothing typed while trigger={false}', () => {
+  it('renders nothing typed while trigger={false}, but screen readers still get the text', () => {
     const { container } = render(
       <PixelTypewriter label="NOPE" speed={10} trigger={false} />,
     );
     const el = container.firstElementChild as HTMLElement;
     act(() => { vi.advanceTimersByTime(200); });
-    expect(el.textContent).toBe('');
+    expect(visual(el).textContent).toBe('');
+    expect(srOnly(el).textContent).toBe('NOPE');
   });
 });

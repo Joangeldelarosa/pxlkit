@@ -19,7 +19,7 @@ export const PixelMenubarDocsMeta = {
 
 export function PixelMenubarDocsSection({ className }: PixelMenubarDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-menubar'} aria-labelledby={'pixel-menubar-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-menubar-heading'} className={className} data-status='stable'>
       <h2 id='pixel-menubar-heading'>PixelMenubar</h2>
       <p className="docs-lead">Horizontal application menubar with nested submenus, keyboard navigation, and shortcut hints.</p>
       <ul className="docs-highlights">

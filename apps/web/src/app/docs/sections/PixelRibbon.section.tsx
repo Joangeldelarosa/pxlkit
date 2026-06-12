@@ -19,7 +19,7 @@ export const PixelRibbonDocsMeta = {
 
 export function PixelRibbonDocsSection({ className }: PixelRibbonDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-ribbon'} aria-labelledby={'pixel-ribbon-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-ribbon-heading'} className={className} data-status='stable'>
       <h2 id='pixel-ribbon-heading'>PixelRibbon</h2>
       <p className="docs-lead">Absolutely-positioned decorative ribbon for cards — surface-aware, tone-driven, with corner-tilt presets.</p>
       <ul className="docs-highlights">

@@ -19,7 +19,7 @@ export const PixelBareButtonDocsMeta = {
 
 export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-bare-button'} aria-labelledby={'pixel-bare-button-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-bare-button-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bare-button-heading'>PixelBareButton</h2>
       <p className="docs-lead">Unstyled passthrough &lt;button&gt; primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.</p>
       <ul className="docs-highlights">

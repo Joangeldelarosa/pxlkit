@@ -19,7 +19,7 @@ export const PixelGlitchDocsMeta = {
 
 export function PixelGlitchDocsSection({ className }: PixelGlitchDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-glitch'} aria-labelledby={'pixel-glitch-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-glitch-heading'} className={className} data-status='stable'>
       <h2 id='pixel-glitch-heading'>PixelGlitch</h2>
       <p className="docs-lead">Three-layer glitch effect (R/C ghost layers + main) with clip-path slices and color separation.</p>
       <ul className="docs-highlights">

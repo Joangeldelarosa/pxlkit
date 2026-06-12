@@ -19,7 +19,7 @@ export const PixelCheckboxDocsMeta = {
 
 export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-checkbox'} aria-labelledby={'pixel-checkbox-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-checkbox-heading'} className={className} data-status='stable'>
       <h2 id='pixel-checkbox-heading'>PixelCheckbox</h2>
       <p className="docs-lead">Controlled boolean checkbox with a chunky pixel check mark, tone-aware fill, and optional form serialization.</p>
       <ul className="docs-highlights">

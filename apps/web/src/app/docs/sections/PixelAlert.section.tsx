@@ -19,7 +19,7 @@ export const PixelAlertDocsMeta = {
 
 export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-alert'} aria-labelledby={'pixel-alert-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-alert-heading'} className={className} data-status='stable'>
       <h2 id='pixel-alert-heading'>PixelAlert</h2>
       <p className="docs-lead">Inline status banner with title, message, tone, optional icon, and action — announces itself to screen readers via role=&quot;alert&quot;.</p>
       <ul className="docs-highlights">

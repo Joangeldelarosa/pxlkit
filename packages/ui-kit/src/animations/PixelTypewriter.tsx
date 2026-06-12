@@ -99,8 +99,14 @@ export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>
       {...(handlers as React.DOMAttributes<HTMLSpanElement>)}
       className={cn('font-mono', toneMap[tone].text, className)}
     >
-      {displayed}
-      {cursor && !done && active && <span className="animate-pulse">▌</span>}
+      {/* Screen readers get the complete string from the first render; the
+          character-by-character churn below is purely visual (announcing
+          each partial slice would be noise, not typing). */}
+      <span className="sr-only">{resolvedText}</span>
+      <span aria-hidden="true">
+        {displayed}
+        {cursor && !done && active && <span className="animate-pulse">▌</span>}
+      </span>
     </span>
   );
 });

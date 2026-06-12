@@ -19,7 +19,7 @@ export const PixelColorSwatchDocsMeta = {
 
 export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-color-swatch'} aria-labelledby={'pixel-color-swatch-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-color-swatch-heading'} className={className} data-status='stable'>
       <h2 id='pixel-color-swatch-heading'>PixelColorSwatch</h2>
       <p className="docs-lead">Design-token preview tile that renders a CSS custom property as a color sample alongside its human name and variable identifier.</p>
       <ul className="docs-highlights">

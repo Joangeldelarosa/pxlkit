@@ -19,7 +19,7 @@ export const PixelCardDocsMeta = {
 
 export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-card'} aria-labelledby={'pixel-card-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-card-heading'} className={className} data-status='stable'>
       <h2 id='pixel-card-heading'>PixelCard</h2>
       <p className="docs-lead">Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as &lt;article&gt;, &lt;a href&gt;, or role=&quot;button&quot; depending on props.</p>
       <ul className="docs-highlights">

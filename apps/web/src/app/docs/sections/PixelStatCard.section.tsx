@@ -19,7 +19,7 @@ export const PixelStatCardDocsMeta = {
 
 export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-stat-card'} aria-labelledby={'pixel-stat-card-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-stat-card-heading'} className={className} data-status='stable'>
       <h2 id='pixel-stat-card-heading'>PixelStatCard</h2>
       <p className="docs-lead">Compact metric card surfacing a label, value, optional icon and trend line for dashboards and KPI grids.</p>
       <ul className="docs-highlights">

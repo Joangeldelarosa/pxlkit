@@ -19,7 +19,7 @@ export const PixelBareTextareaDocsMeta = {
 
 export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-bare-textarea'} aria-labelledby={'pixel-bare-textarea-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-bare-textarea-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bare-textarea-heading'>PixelBareTextarea</h2>
       <p className="docs-lead">Unstyled escape-hatch &lt;textarea&gt; passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.</p>
       <ul className="docs-highlights">

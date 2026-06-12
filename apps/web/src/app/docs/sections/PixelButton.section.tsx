@@ -19,7 +19,7 @@ export const PixelButtonDocsMeta = {
 
 export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-button'} aria-labelledby={'pixel-button-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-button-heading'} className={className} data-status='stable'>
       <h2 id='pixel-button-heading'>PixelButton</h2>
       <p className="docs-lead">Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and an asChild slot pattern for wrapping links or routers.</p>
       <ul className="docs-highlights">

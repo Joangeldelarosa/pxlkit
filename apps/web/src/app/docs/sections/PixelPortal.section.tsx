@@ -19,7 +19,7 @@ export const PixelPortalDocsMeta = {
 
 export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-portal'} aria-labelledby={'pixel-portal-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-portal-heading'} className={className} data-status='stable'>
       <h2 id='pixel-portal-heading'>PixelPortal</h2>
       <p className="docs-lead">SSR-safe portal primitive that renders children inline during SSR and first hydration, then swaps to a real createPortal after mount.</p>
       <ul className="docs-highlights">

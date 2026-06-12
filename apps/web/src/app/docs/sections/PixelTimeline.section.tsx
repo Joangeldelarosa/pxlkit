@@ -19,7 +19,7 @@ export const PixelTimelineDocsMeta = {
 
 export function PixelTimelineDocsSection({ className }: PixelTimelineDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-timeline'} aria-labelledby={'pixel-timeline-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-timeline-heading'} className={className} data-status='stable'>
       <h2 id='pixel-timeline-heading'>PixelTimeline</h2>
       <p className="docs-lead">Vertical timeline rendered as a semantic ordered list with past/active/upcoming states and surface-aware bullets and connectors.</p>
       <ul className="docs-highlights">

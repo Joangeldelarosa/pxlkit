@@ -19,7 +19,7 @@ export const PixelBentoCellDocsMeta = {
 
 export function PixelBentoCellDocsSection({ className }: PixelBentoCellDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-bento-cell'} aria-labelledby={'pixel-bento-cell-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-bento-cell-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bento-cell-heading'>PixelBentoCell</h2>
       <p className="docs-lead">Surface-aware bento grid cell with span, kind layout, and tone tokens for dashboard collages.</p>
       <ul className="docs-highlights">

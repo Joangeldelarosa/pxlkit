@@ -19,7 +19,7 @@ export const PixelChipDocsMeta = {
 
 export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-chip'} aria-labelledby={'pixel-chip-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-chip-heading'} className={className} data-status='stable'>
       <h2 id='pixel-chip-heading'>PixelChip</h2>
       <p className="docs-lead">Compact label tag for representing tags, filters, or selections, optionally clickable or removable via an inline delete control.</p>
       <ul className="docs-highlights">

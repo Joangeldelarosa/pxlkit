@@ -19,7 +19,7 @@ export const PixelAvatarGroupDocsMeta = {
 
 export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-avatar-group'} aria-labelledby={'pixel-avatar-group-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-avatar-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-avatar-group-heading'>PixelAvatarGroup</h2>
       <p className="docs-lead">Clusters PixelAvatar children into an overlapping row with a tone-aware &quot;+N&quot; overflow tile when the count exceeds max.</p>
       <ul className="docs-highlights">

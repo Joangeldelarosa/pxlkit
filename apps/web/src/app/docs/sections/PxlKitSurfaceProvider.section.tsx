@@ -19,7 +19,7 @@ export const PxlKitSurfaceProviderDocsMeta = {
 
 export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfaceProviderDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pxl-kit-surface-provider'} aria-labelledby={'pxl-kit-surface-provider-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pxl-kit-surface-provider-heading'} className={className} data-status='stable'>
       <h2 id='pxl-kit-surface-provider-heading'>PxlKitSurfaceProvider</h2>
       <p className="docs-lead">Sets the default surface (pixel | linear) for every nested PxlKit component via React context.</p>
       <ul className="docs-highlights">

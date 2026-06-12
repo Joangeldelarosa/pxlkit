@@ -19,7 +19,7 @@ export const PixelSectionHeaderDocsMeta = {
 
 export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-section-header'} aria-labelledby={'pixel-section-header-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-section-header-heading'} className={className} data-status='stable'>
       <h2 id='pixel-section-header-heading'>PixelSectionHeader</h2>
       <p className="docs-lead">Section header with eyebrow, title, description, and actions — rhythm-aware and surface-aware.</p>
       <ul className="docs-highlights">

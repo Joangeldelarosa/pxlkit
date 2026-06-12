@@ -19,7 +19,7 @@ export const PixelHeroMediaDocsMeta = {
 
 export function PixelHeroMediaDocsSection({ className }: PixelHeroMediaDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-hero-media'} aria-labelledby={'pixel-hero-media-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-hero-media-heading'} className={className} data-status='stable'>
       <h2 id='pixel-hero-media-heading'>PixelHeroMedia</h2>
       <p className="docs-lead">Aspect-ratio-preserving figure slot for hero media with optional frame, tone border, and caption.</p>
       <ul className="docs-highlights">

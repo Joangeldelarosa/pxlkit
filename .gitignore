@@ -27,16 +27,18 @@ playwright/.cache/
 .agents/
 .planning/
 .gsd/
-# Internal planning / working docs (not part of the public package)
-docs/superpowers/
-CLAUDE.md
-AGENTS.md
-GEMINI.md
-AUDIT.md
+# Internal planning / working docs (not part of the public package).
+# Root-anchored on purpose: unanchored names match at ANY depth and once
+# swallowed docs/runbooks/audit-coherence.md on case-insensitive systems.
+/docs/superpowers/
+/CLAUDE.md
+/AGENTS.md
+/GEMINI.md
+/AUDIT.md
 /AUDIT-COHERENCE.md
-AUDIT-FOLLOWUP.md
-AUDIT-STORYBOOK.md
-STORYBOOK_DEPLOY.md
+/AUDIT-FOLLOWUP.md
+/AUDIT-STORYBOOK.md
+/STORYBOOK_DEPLOY.md
 # SSOT coherence audit outputs
 /coherence-report.md
 /coherence-report.json

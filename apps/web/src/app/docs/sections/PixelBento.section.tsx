@@ -19,7 +19,7 @@ export const PixelBentoDocsMeta = {
 
 export function PixelBentoDocsSection({ className }: PixelBentoDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-bento'} aria-labelledby={'pixel-bento-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-bento-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bento-heading'>PixelBento</h2>
       <p className="docs-lead">Bento-style grid container with span- and kind-aware cells for feature, stat, compact, and media layouts.</p>
       <ul className="docs-highlights">

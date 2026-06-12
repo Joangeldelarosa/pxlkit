@@ -19,7 +19,7 @@ export const PixelColorInputDocsMeta = {
 
 export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-color-input'} aria-labelledby={'pixel-color-input-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-color-input-heading'} className={className} data-status='stable'>
       <h2 id='pixel-color-input-heading'>PixelColorInput</h2>
       <p className="docs-lead">Color picker field with a hex text input, native color swatch, and a keyboard-navigable preset grid inside a popover.</p>
       <ul className="docs-highlights">

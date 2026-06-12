@@ -19,7 +19,7 @@ export const PixelStatGroupDocsMeta = {
 
 export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-stat-group'} aria-labelledby={'pixel-stat-group-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-stat-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-stat-group-heading'>PixelStatGroup</h2>
       <p className="docs-lead">Surface-aware container that groups PixelStatCard tiles in a row with dividers or a responsive grid, with shared tone and accessible group labeling.</p>
       <ul className="docs-highlights">

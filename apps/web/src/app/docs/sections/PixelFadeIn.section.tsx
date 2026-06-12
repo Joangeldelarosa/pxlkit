@@ -19,7 +19,7 @@ export const PixelFadeInDocsMeta = {
 
 export function PixelFadeInDocsSection({ className }: PixelFadeInDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-fade-in'} aria-labelledby={'pixel-fade-in-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-fade-in-heading'} className={className} data-status='stable'>
       <h2 id='pixel-fade-in-heading'>PixelFadeIn</h2>
       <p className="docs-lead">Fades children from opacity 0 to 1 with configurable duration, delay, easing, and trigger.</p>
       <ul className="docs-highlights">

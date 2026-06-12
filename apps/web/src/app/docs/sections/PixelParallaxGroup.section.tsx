@@ -19,7 +19,7 @@ export const PixelParallaxGroupDocsMeta = {
 
 export function PixelParallaxGroupDocsSection({ className }: PixelParallaxGroupDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-parallax-group'} aria-labelledby={'pixel-parallax-group-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-parallax-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-parallax-group-heading'>PixelParallaxGroup</h2>
       <p className="docs-lead">Perspective/viewport container that clips parallax children within a shared overflow-hidden, relative-positioned area.</p>
       <ul className="docs-highlights">

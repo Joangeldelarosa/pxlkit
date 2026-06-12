@@ -19,7 +19,7 @@ export const PixelPopoverDocsMeta = {
 
 export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-popover'} aria-labelledby={'pixel-popover-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-popover-heading'} className={className} data-status='stable'>
       <h2 id='pixel-popover-heading'>PixelPopover</h2>
       <p className="docs-lead">Controlled floating panel anchored to a trigger, with focus return, dismiss-on-escape, and outside-click handling.</p>
       <ul className="docs-highlights">

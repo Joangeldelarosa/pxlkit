@@ -19,7 +19,7 @@ export const PixelInputGroupDocsMeta = {
 
 export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-input-group'} aria-labelledby={'pixel-input-group-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-input-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-input-group-heading'>PixelInputGroup</h2>
       <p className="docs-lead">Visually joins multiple form controls into a single shell — strips inner borders/radii from children and adds segment dividers, so combos like country-code + phone read as one field.</p>
       <ul className="docs-highlights">

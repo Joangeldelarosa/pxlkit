@@ -19,7 +19,7 @@ export const PixelDropdownDocsMeta = {
 
 export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-dropdown'} aria-labelledby={'pixel-dropdown-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-dropdown-heading'} className={className} data-status='stable'>
       <h2 id='pixel-dropdown-heading'>PixelDropdown</h2>
       <p className="docs-lead">Button-triggered menu of actions with keyboard navigation, typeahead, and a compositional API for advanced layouts.</p>
       <ul className="docs-highlights">

@@ -19,7 +19,7 @@ export const PixelBadgeDocsMeta = {
 
 export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-badge'} aria-labelledby={'pixel-badge-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-badge-heading'} className={className} data-status='stable'>
       <h2 id='pixel-badge-heading'>PixelBadge</h2>
       <p className="docs-lead">Compact status indicator that labels objects with tone, variant, and optional icon — renders as a pill (linear) or chamfered tag (pixel).</p>
       <ul className="docs-highlights">

@@ -19,7 +19,7 @@ export const PixelFloatDocsMeta = {
 
 export function PixelFloatDocsSection({ className }: PixelFloatDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-float'} aria-labelledby={'pixel-float-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-float-heading'} className={className} data-status='stable'>
       <h2 id='pixel-float-heading'>PixelFloat</h2>
       <p className="docs-lead">Gentle vertical sine loop, perfect for hero badges and floating accents.</p>
       <ul className="docs-highlights">

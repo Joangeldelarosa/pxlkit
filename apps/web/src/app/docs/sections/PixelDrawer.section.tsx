@@ -19,7 +19,7 @@ export const PixelDrawerDocsMeta = {
 
 export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-drawer'} aria-labelledby={'pixel-drawer-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-drawer-heading'} className={className} data-status='stable'>
       <h2 id='pixel-drawer-heading'>PixelDrawer</h2>
       <p className="docs-lead">Side-anchored modal panel (right/left/top/bottom) with focus trap, scroll lock and Escape-to-close.</p>
       <ul className="docs-highlights">

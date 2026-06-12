@@ -19,7 +19,7 @@ export const PixelSparklineDocsMeta = {
 
 export function PixelSparklineDocsSection({ className }: PixelSparklineDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-sparkline'} aria-labelledby={'pixel-sparkline-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-sparkline-heading'} className={className} data-status='stable'>
       <h2 id='pixel-sparkline-heading'>PixelSparkline</h2>
       <p className="docs-lead">Pure-SVG polyline trend chart that plots a series as a single stroke, with an optional filled area underneath — tone-aware and surface-aware.</p>
       <ul className="docs-highlights">

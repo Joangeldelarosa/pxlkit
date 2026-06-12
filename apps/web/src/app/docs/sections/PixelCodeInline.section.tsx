@@ -19,7 +19,7 @@ export const PixelCodeInlineDocsMeta = {
 
 export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-code-inline'} aria-labelledby={'pixel-code-inline-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-code-inline-heading'} className={className} data-status='stable'>
       <h2 id='pixel-code-inline-heading'>PixelCodeInline</h2>
       <p className="docs-lead">Inline &lt;code&gt; element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.</p>
       <ul className="docs-highlights">

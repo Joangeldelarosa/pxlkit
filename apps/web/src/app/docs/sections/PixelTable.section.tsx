@@ -19,7 +19,7 @@ export const PixelTableDocsMeta = {
 
 export function PixelTableDocsSection({ className }: PixelTableDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-table'} aria-labelledby={'pixel-table-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-table-heading'} className={className} data-status='stable'>
       <h2 id='pixel-table-heading'>PixelTable</h2>
       <p className="docs-lead">Generic data table with striped rows, hover highlight, controlled sorting, single/multi row selection, sticky headers, density, loading skeletons and empty state.</p>
       <ul className="docs-highlights">

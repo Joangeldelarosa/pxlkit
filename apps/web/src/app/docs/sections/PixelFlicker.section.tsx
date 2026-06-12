@@ -19,7 +19,7 @@ export const PixelFlickerDocsMeta = {
 
 export function PixelFlickerDocsSection({ className }: PixelFlickerDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-flicker'} aria-labelledby={'pixel-flicker-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-flicker-heading'} className={className} data-status='stable'>
       <h2 id='pixel-flicker-heading'>PixelFlicker</h2>
       <p className="docs-lead">Broken-neon-sign opacity flicker loop for retro signage and emphasis.</p>
       <ul className="docs-highlights">

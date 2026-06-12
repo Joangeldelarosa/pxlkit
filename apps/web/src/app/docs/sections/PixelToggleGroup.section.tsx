@@ -19,7 +19,7 @@ export const PixelToggleGroupDocsMeta = {
 
 export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-toggle-group'} aria-labelledby={'pixel-toggle-group-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-toggle-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-toggle-group-heading'>PixelToggleGroup</h2>
       <p className="docs-lead">Grouped pressable toggles with single- or multi-select semantics, roving focus, and surface-aware styling.</p>
       <ul className="docs-highlights">

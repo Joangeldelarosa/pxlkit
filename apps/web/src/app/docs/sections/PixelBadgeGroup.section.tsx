@@ -19,7 +19,7 @@ export const PixelBadgeGroupDocsMeta = {
 
 export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-badge-group'} aria-labelledby={'pixel-badge-group-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-badge-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-badge-group-heading'>PixelBadgeGroup</h2>
       <p className="docs-lead">Inline row of badges with automatic &quot;+N&quot; overflow popover when the count exceeds `max`.</p>
       <ul className="docs-highlights">

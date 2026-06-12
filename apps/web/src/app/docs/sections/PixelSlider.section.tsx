@@ -19,7 +19,7 @@ export const PixelSliderDocsMeta = {
 
 export function PixelSliderDocsSection({ className }: PixelSliderDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-slider'} aria-labelledby={'pixel-slider-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-slider-heading'} className={className} data-status='stable'>
       <h2 id='pixel-slider-heading'>PixelSlider</h2>
       <p className="docs-lead">Controlled single- or range-thumb slider with optional marks, tick grid, and per-thumb tooltips.</p>
       <ul className="docs-highlights">

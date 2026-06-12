@@ -19,7 +19,7 @@ export const PixelSpinnerDocsMeta = {
 
 export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-spinner'} aria-labelledby={'pixel-spinner-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-spinner-heading'} className={className} data-status='stable'>
       <h2 id='pixel-spinner-heading'>PixelSpinner</h2>
       <p className="docs-lead">Compact loading indicator with surface-aware animation (stepped on pixel, smooth on linear) and tone-driven color.</p>
       <ul className="docs-highlights">

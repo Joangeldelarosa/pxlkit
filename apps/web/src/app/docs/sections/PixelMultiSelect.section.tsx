@@ -19,7 +19,7 @@ export const PixelMultiSelectDocsMeta = {
 
 export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-multi-select'} aria-labelledby={'pixel-multi-select-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-multi-select-heading'} className={className} data-status='stable'>
       <h2 id='pixel-multi-select-heading'>PixelMultiSelect</h2>
       <p className="docs-lead">Multi-select combobox with chip-based selected values, optional search, and max-selection cap.</p>
       <ul className="docs-highlights">

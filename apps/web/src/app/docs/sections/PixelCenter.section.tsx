@@ -19,7 +19,7 @@ export const PixelCenterDocsMeta = {
 
 export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-center'} aria-labelledby={'pixel-center-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-center-heading'} className={className} data-status='stable'>
       <h2 id='pixel-center-heading'>PixelCenter</h2>
       <p className="docs-lead">Polymorphic max-width wrapper that centers content horizontally with token-driven page gutters.</p>
       <ul className="docs-highlights">

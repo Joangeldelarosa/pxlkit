@@ -19,7 +19,7 @@ export const PixelScrollAreaDocsMeta = {
 
 export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-scroll-area'} aria-labelledby={'pixel-scroll-area-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-scroll-area-heading'} className={className} data-status='stable'>
       <h2 id='pixel-scroll-area-heading'>PixelScrollArea</h2>
       <p className="docs-lead">Surface-aware scroll container with styled scrollbar, configurable visibility and dimensions.</p>
       <ul className="docs-highlights">

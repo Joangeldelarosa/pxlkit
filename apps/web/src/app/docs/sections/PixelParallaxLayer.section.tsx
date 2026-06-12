@@ -19,7 +19,7 @@ export const PixelParallaxLayerDocsMeta = {
 
 export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-parallax-layer'} aria-labelledby={'pixel-parallax-layer-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-parallax-layer-heading'} className={className} data-status='stable'>
       <h2 id='pixel-parallax-layer-heading'>PixelParallaxLayer</h2>
       <p className="docs-lead">Scroll-driven parallax wrapper that GPU-translates its children proportionally to scroll position.</p>
       <ul className="docs-highlights">

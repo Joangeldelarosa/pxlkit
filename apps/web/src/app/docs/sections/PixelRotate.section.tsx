@@ -19,7 +19,7 @@ export const PixelRotateDocsMeta = {
 
 export function PixelRotateDocsSection({ className }: PixelRotateDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-rotate'} aria-labelledby={'pixel-rotate-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-rotate-heading'} className={className} data-status='stable'>
       <h2 id='pixel-rotate-heading'>PixelRotate</h2>
       <p className="docs-lead">Full 360° rotation loop with configurable direction, duration, and trigger.</p>
       <ul className="docs-highlights">

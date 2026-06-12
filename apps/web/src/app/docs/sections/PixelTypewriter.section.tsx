@@ -19,7 +19,7 @@ export const PixelTypewriterDocsMeta = {
 
 export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-typewriter'} aria-labelledby={'pixel-typewriter-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-typewriter-heading'} className={className} data-status='stable'>
       <h2 id='pixel-typewriter-heading'>PixelTypewriter</h2>
       <p className="docs-lead">Types out a string one character at a time with an optional blinking caret.</p>
       <ul className="docs-highlights">
@@ -43,7 +43,7 @@ export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSec
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
       </ul>
-      <p className="docs-aria-notes">Caret is decorative; full text is exposed to assistive tech once typing completes. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and onComplete fires once.</p>
+      <p className="docs-aria-notes">Caret and the character-by-character animation are aria-hidden; the complete string is exposed to assistive tech from the first render via a visually hidden span. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and onComplete fires once.</p>
     </section>
     </section>
   );

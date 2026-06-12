@@ -19,7 +19,7 @@ export const PixelBounceDocsMeta = {
 
 export function PixelBounceDocsSection({ className }: PixelBounceDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-bounce'} aria-labelledby={'pixel-bounce-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-bounce-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bounce-heading'>PixelBounce</h2>
       <p className="docs-lead">Vertical bounce animation with damped follow-through for any inline content.</p>
       <ul className="docs-highlights">

@@ -19,7 +19,7 @@ export const PixelProgressDocsMeta = {
 
 export function PixelProgressDocsSection({ className }: PixelProgressDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-progress'} aria-labelledby={'pixel-progress-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-progress-heading'} className={className} data-status='stable'>
       <h2 id='pixel-progress-heading'>PixelProgress</h2>
       <p className="docs-lead">Determinate or indeterminate progress bar that renders as 10 segmented HP-bar blocks on the pixel surface and a smooth filled track on the linear surface.</p>
       <ul className="docs-highlights">

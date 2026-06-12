@@ -19,7 +19,7 @@ export const PixelPaginationDocsMeta = {
 
 export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-pagination'} aria-labelledby={'pixel-pagination-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-pagination-heading'} className={className} data-status='stable'>
       <h2 id='pixel-pagination-heading'>PixelPagination</h2>
       <p className="docs-lead">Windowed page-number navigator with Prev/Next, ellipses, and first/last anchors for navigating long paginated collections.</p>
       <ul className="docs-highlights">

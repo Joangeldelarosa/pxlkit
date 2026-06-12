@@ -19,7 +19,7 @@ export const PixelTextareaDocsMeta = {
 
 export function PixelTextareaDocsSection({ className }: PixelTextareaDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-textarea'} aria-labelledby={'pixel-textarea-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-textarea-heading'} className={className} data-status='stable'>
       <h2 id='pixel-textarea-heading'>PixelTextarea</h2>
       <p className="docs-lead">Multi-line text input with label, hint, error chrome plus optional auto-grow and character counter.</p>
       <ul className="docs-highlights">

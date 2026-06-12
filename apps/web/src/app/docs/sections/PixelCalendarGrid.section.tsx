@@ -19,7 +19,7 @@ export const PixelCalendarGridDocsMeta = {
 
 export function PixelCalendarGridDocsSection({ className }: PixelCalendarGridDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-calendar-grid'} aria-labelledby={'pixel-calendar-grid-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-calendar-grid-heading'} className={className} data-status='stable'>
       <h2 id='pixel-calendar-grid-heading'>PixelCalendarGrid</h2>
       <p className="docs-lead">Standalone month grid for date selection — usable inline or composed inside date pickers and range pickers.</p>
       <ul className="docs-highlights">

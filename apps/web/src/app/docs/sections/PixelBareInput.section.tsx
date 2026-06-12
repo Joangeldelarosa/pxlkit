@@ -19,7 +19,7 @@ export const PixelBareInputDocsMeta = {
 
 export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-bare-input'} aria-labelledby={'pixel-bare-input-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-bare-input-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bare-input-heading'>PixelBareInput</h2>
       <p className="docs-lead">Unstyled, forwardRef-enabled `&lt;input&gt;` primitive used as an escape hatch for fully custom field compositions.</p>
       <ul className="docs-highlights">

@@ -19,7 +19,7 @@ export const PixelPasswordInputDocsMeta = {
 
 export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-password-input'} aria-labelledby={'pixel-password-input-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-password-input-heading'} className={className} data-status='stable'>
       <h2 id='pixel-password-input-heading'>PixelPasswordInput</h2>
       <p className="docs-lead">Password text field with an inline show/hide toggle that swaps the input type between password and text.</p>
       <ul className="docs-highlights">

@@ -19,7 +19,7 @@ export const PixelZoomInDocsMeta = {
 
 export function PixelZoomInDocsSection({ className }: PixelZoomInDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-zoom-in'} aria-labelledby={'pixel-zoom-in-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-zoom-in-heading'} className={className} data-status='stable'>
       <h2 id='pixel-zoom-in-heading'>PixelZoomIn</h2>
       <p className="docs-lead">Scales children from a starting scale factor to 1 with a fade-in animation.</p>
       <ul className="docs-highlights">

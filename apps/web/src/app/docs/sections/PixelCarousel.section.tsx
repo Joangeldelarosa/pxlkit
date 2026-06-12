@@ -19,7 +19,7 @@ export const PixelCarouselDocsMeta = {
 
 export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-carousel'} aria-labelledby={'pixel-carousel-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-carousel-heading'} className={className} data-status='stable'>
       <h2 id='pixel-carousel-heading'>PixelCarousel</h2>
       <p className="docs-lead">Embla-powered surface-aware carousel with horizontal or vertical orientation, optional arrows and dot pagination, keyboard navigation and reduced-motion support.</p>
       <ul className="docs-highlights">

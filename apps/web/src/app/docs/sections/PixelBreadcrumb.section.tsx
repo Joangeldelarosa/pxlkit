@@ -19,7 +19,7 @@ export const PixelBreadcrumbDocsMeta = {
 
 export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-breadcrumb'} aria-labelledby={'pixel-breadcrumb-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-breadcrumb-heading'} className={className} data-status='stable'>
       <h2 id='pixel-breadcrumb-heading'>PixelBreadcrumb</h2>
       <p className="docs-lead">Trail of links representing the user&#39;s location in a hierarchical site structure, with pixel-chevron or slash separators per surface.</p>
       <ul className="docs-highlights">

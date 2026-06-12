@@ -19,7 +19,7 @@ export const PixelShakeDocsMeta = {
 
 export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-shake'} aria-labelledby={'pixel-shake-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-shake-heading'} className={className} data-status='stable'>
       <h2 id='pixel-shake-heading'>PixelShake</h2>
       <p className="docs-lead">Quick horizontal shake animation, ideal for validation errors or attention cues.</p>
       <ul className="docs-highlights">

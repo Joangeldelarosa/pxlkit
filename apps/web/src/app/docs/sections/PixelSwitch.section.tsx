@@ -19,7 +19,7 @@ export const PixelSwitchDocsMeta = {
 
 export function PixelSwitchDocsSection({ className }: PixelSwitchDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-switch'} aria-labelledby={'pixel-switch-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-switch-heading'} className={className} data-status='stable'>
       <h2 id='pixel-switch-heading'>PixelSwitch</h2>
       <p className="docs-lead">Two-state toggle switch with a sliding pixel thumb — flips a boolean setting on or off.</p>
       <ul className="docs-highlights">

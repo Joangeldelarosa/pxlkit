@@ -19,7 +19,7 @@ export const PixelNumberInputDocsMeta = {
 
 export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-number-input'} aria-labelledby={'pixel-number-input-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-number-input-heading'} className={className} data-status='stable'>
       <h2 id='pixel-number-input-heading'>PixelNumberInput</h2>
       <p className="docs-lead">Numeric input with spin controls, clamp behaviors, precision, prefix/suffix, and thousands-separator formatting.</p>
       <ul className="docs-highlights">

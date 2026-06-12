@@ -19,7 +19,7 @@ export const PixelModalDocsMeta = {
 
 export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-modal'} aria-labelledby={'pixel-modal-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-modal-heading'} className={className} data-status='stable'>
       <h2 id='pixel-modal-heading'>PixelModal</h2>
       <p className="docs-lead">Centered modal dialog with title bar, optional description and footer, surface-aware chrome, focus trap, scroll lock, and async close support.</p>
       <ul className="docs-highlights">

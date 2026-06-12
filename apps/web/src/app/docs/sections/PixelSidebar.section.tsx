@@ -19,7 +19,7 @@ export const PixelSidebarDocsMeta = {
 
 export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-sidebar'} aria-labelledby={'pixel-sidebar-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-sidebar-heading'} className={className} data-status='stable'>
       <h2 id='pixel-sidebar-heading'>PixelSidebar</h2>
       <p className="docs-lead">Vertical navigation rail with sections, nested items, badges, and an optional collapsible width.</p>
       <ul className="docs-highlights">

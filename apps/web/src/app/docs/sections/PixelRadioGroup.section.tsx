@@ -19,7 +19,7 @@ export const PixelRadioGroupDocsMeta = {
 
 export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-radio-group'} aria-labelledby={'pixel-radio-group-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-radio-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-radio-group-heading'>PixelRadioGroup</h2>
       <p className="docs-lead">Single-select grouped radios with a pixel dot indicator, fieldset/legend semantics, and tone + surface variants.</p>
       <ul className="docs-highlights">

@@ -19,7 +19,7 @@ export const PixelBoxDocsMeta = {
 
 export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-box'} aria-labelledby={'pixel-box-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-box-heading'} className={className} data-status='stable'>
       <h2 id='pixel-box-heading'>PixelBox</h2>
       <p className="docs-lead">Surface-aware polymorphic container with tone, variant, padding, radius, border, and shadow controls.</p>
       <ul className="docs-highlights">

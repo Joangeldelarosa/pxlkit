@@ -19,7 +19,7 @@ export const PixelSelectDocsMeta = {
 
 export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-select'} aria-labelledby={'pixel-select-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-select-heading'} className={className} data-status='stable'>
       <h2 id='pixel-select-heading'>PixelSelect</h2>
       <p className="docs-lead">Custom single-value dropdown built on a button + listbox (no native `&lt;select&gt;`) with full keyboard navigation and tone/size/surface theming.</p>
       <ul className="docs-highlights">

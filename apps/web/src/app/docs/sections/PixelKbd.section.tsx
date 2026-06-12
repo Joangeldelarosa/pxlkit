@@ -19,7 +19,7 @@ export const PixelKbdDocsMeta = {
 
 export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-kbd'} aria-labelledby={'pixel-kbd-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-kbd-heading'} className={className} data-status='stable'>
       <h2 id='pixel-kbd-heading'>PixelKbd</h2>
       <p className="docs-lead">Styled keyboard shortcut indicator that renders a native &lt;kbd&gt; element with surface-aware framing for inline docs, hints, and command menus.</p>
       <ul className="docs-highlights">

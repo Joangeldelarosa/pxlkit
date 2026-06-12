@@ -19,7 +19,7 @@ export const PixelTooltipDocsMeta = {
 
 export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-tooltip'} aria-labelledby={'pixel-tooltip-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-tooltip-heading'} className={className} data-status='stable'>
       <h2 id='pixel-tooltip-heading'>PixelTooltip</h2>
       <p className="docs-lead">Floating-UI-positioned tooltip that anchors a portal-rendered hint to a trigger, with hover/focus/click activation, controlled or uncontrolled open state, and configurable open/close delays.</p>
       <ul className="docs-highlights">

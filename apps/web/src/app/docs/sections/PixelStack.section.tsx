@@ -19,7 +19,7 @@ export const PixelStackDocsMeta = {
 
 export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-stack'} aria-labelledby={'pixel-stack-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-stack-heading'} className={className} data-status='stable'>
       <h2 id='pixel-stack-heading'>PixelStack</h2>
       <p className="docs-lead">Polymorphic flex container with token-driven gap, direction, alignment, and surface-aware transitions.</p>
       <ul className="docs-highlights">

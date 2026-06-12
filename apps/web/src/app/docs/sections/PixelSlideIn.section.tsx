@@ -19,7 +19,7 @@ export const PixelSlideInDocsMeta = {
 
 export function PixelSlideInDocsSection({ className }: PixelSlideInDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-slide-in'} aria-labelledby={'pixel-slide-in-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-slide-in-heading'} className={className} data-status='stable'>
       <h2 id='pixel-slide-in-heading'>PixelSlideIn</h2>
       <p className="docs-lead">Translates children in from one of four edges with configurable distance, duration, and trigger.</p>
       <ul className="docs-highlights">

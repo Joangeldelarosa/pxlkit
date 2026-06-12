@@ -19,7 +19,7 @@ export const PixelEqualHeightGridDocsMeta = {
 
 export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightGridDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-equal-height-grid'} aria-labelledby={'pixel-equal-height-grid-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-equal-height-grid-heading'} className={className} data-status='stable'>
       <h2 id='pixel-equal-height-grid-heading'>PixelEqualHeightGrid</h2>
       <p className="docs-lead">Grid wrapper that forces equal-height children via a 3-row subgrid (header / body / footer).</p>
       <ul className="docs-highlights">

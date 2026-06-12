@@ -19,7 +19,7 @@ export const PixelTextLinkDocsMeta = {
 
 export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-text-link'} aria-labelledby={'pixel-text-link-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-text-link-heading'} className={className} data-status='stable'>
       <h2 id='pixel-text-link-heading'>PixelTextLink</h2>
       <p className="docs-lead">Inline anchor or button styled as a tone-coloured underlined link for prose, callouts, and CTAs.</p>
       <ul className="docs-highlights">

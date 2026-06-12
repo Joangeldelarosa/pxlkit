@@ -19,7 +19,7 @@ export const PixelAvatarDocsMeta = {
 
 export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProps): React.ReactElement {
   return (
-    <section id={'pixel-avatar'} aria-labelledby={'pixel-avatar-heading'} className={className} data-status='stable'>
+    <section aria-labelledby={'pixel-avatar-heading'} className={className} data-status='stable'>
       <h2 id='pixel-avatar-heading'>PixelAvatar</h2>
       <p className="docs-lead">Displays a user identity as an initials-or-image badge with optional status dot, tone, shape, and deterministic colored fallback.</p>
       <ul className="docs-highlights">
