@@ -19,16 +19,27 @@
  *   R1. Imports `Surface` from common (sanity — without the type, the
  *       prop annotation could not resolve, so we just record it).
  *   R2. If `surface?` is declared in Props → MUST call `useEffectiveSurface`
- *       at least once in the same file. BLOCKER.
+ *       at least once in the same file, OR forward the prop to a
+ *       surface-aware child via JSX (`surface={...}` — delegation; the
+ *       child resolves provider/default itself, e.g. ToastViewport →
+ *       PixelToast). BLOCKER.
  *   R3. If `surface?` is declared in Props → MUST call `surfaceClasses` at
- *       least once in the same file. BLOCKER.
+ *       least once in the same file, OR consume the resolved surface in
+ *       another legitimate way: branch-render on it (PixelSpinner's
+ *       `surface === 'pixel'`), publish it through a context value
+ *       (PixelTabs / PixelToggleGroup), or JSX-forward it. What it must
+ *       NOT do is resolve the surface and discard it. BLOCKER.
  *   R4. `useEffectiveSurface` MUST be called with the destructured surface
  *       prop (or an equivalent identifier renamed from `surface`). If the
  *       call is `useEffectiveSurface()` with no argument, the prop is
- *       declared-but-ignored. BLOCKER.
- *   R5. The result of `surfaceClasses(...)` MUST be referenced via at least
- *       one of `.border` or `.radius` / `.radiusLg` / `.radiusFull` in the
- *       JSX. If not, the surface tokens are computed but never applied
+ *       declared-but-ignored. The hook's own function DEFINITION (in
+ *       common.tsx) is not a call and is excluded. BLOCKER.
+ *   R5. The result of `surfaceClasses(...)` MUST be consumed via at least
+ *       one property of the `SurfaceClasses` bundle (border, radius*,
+ *       shadow*, font*, transition, press). Typography-only components
+ *       (forms, layout primitives, breadcrumbs) legitimately consume only
+ *       `font` / `transition` — that still switches per surface. If NO
+ *       property is consumed, the tokens are computed but never applied
  *       (typical refactor wreckage). MAJOR.
  *   R6. The component MUST NOT render a literal hardcoded border-width
  *       (`border-2` outside the pixel branch, or `border` outside the
@@ -96,6 +107,19 @@ export interface ComponentSurfaceAnalysis {
   appliesBorder: boolean;
   /** The result of `surfaceClasses` is used as `<varname>.radius*`. */
   appliesRadius: boolean;
+  /**
+   * ANY property of the `SurfaceClasses` bundle is consumed
+   * (border / radius* / shadow* / font* / transition / press).
+   * Typography-only components apply `font` / `transition` and nothing else.
+   */
+  appliesAnyToken: boolean;
+  /** The surface prop is forwarded to a child via JSX (`surface={...}`). */
+  forwardsSurfaceProp: boolean;
+  /**
+   * A `const x = useEffectiveSurface(...)` result is referenced again after
+   * the assignment (branch rendering, context value, child props, ...).
+   */
+  usesResolvedSurface: boolean;
   /** A `border-2` or `border` literal is used in className (sanity flag). */
   hardcodedBorderLiteral: boolean;
 }
@@ -121,6 +145,17 @@ const USE_EFFECTIVE_SURFACE_CALL_REGEX = /useEffectiveSurface\s*\(\s*([^)]*)\)/g
 // the lhs variable it is assigned to.
 const SURFACE_CLASSES_ASSIGN_REGEX =
   /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*surfaceClasses\s*\(/g;
+
+// `const surface = useEffectiveSurface(...)` — the lhs ident is tracked to
+// verify the resolved surface is consumed (branch / context / forward) and
+// not just resolved-and-discarded.
+const RESOLVED_SURFACE_ASSIGN_REGEX =
+  /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*useEffectiveSurface\s*\(/g;
+
+// Every key of the `SurfaceClasses` bundle in common.tsx. Consuming ANY of
+// them means the component's rendering switches per surface.
+const SURFACE_TOKEN_KEYS =
+  'border|radius|radiusLg|radiusFull|shadow|shadowHover|shadowActive|font|fontDisplay|transition|press';
 
 // `import { ..., Surface, ... } from "./common"` — we just confirm the
 // symbol shows up in any import specifier list.
@@ -164,15 +199,110 @@ function isNonComponentExport(name: string): boolean {
 const HARDCODED_BORDER_LITERAL_REGEX =
   /\b(?:'|"|`)[^'"`]*\bborder(?:-2)?(?![A-Za-z0-9_-])/;
 
+/**
+ * Comment scrubber so a `// surface?: Surface` in a docstring does not
+ * trigger the declaration regex.
+ *
+ * STRING-AWARE on purpose. The previous regex version
+ * (`.replace(/\/\*[\s\S]*?\*\//g, '')`) treated the `/*` inside the string
+ * literal `p.endsWith('/*')` (PixelFileUpload's accept matcher) as a
+ * block-comment opener and silently deleted 44 lines of real code —
+ * including the `useEffectiveSurface` call the gate was looking for. This
+ * scanner walks the source once, copying string/template/regex literals
+ * verbatim and dropping only actual comments (newlines inside block
+ * comments are preserved). Still not a full parser — the regex-literal
+ * detection is the standard prev-token heuristic — but it can no longer be
+ * fooled by comment markers inside strings.
+ */
 function stripBlockComments(source: string): string {
-  // Cheap comment scrubber so a `// surface?: Surface` in a docstring does
-  // not trigger the declaration regex. Good enough for our gate; we are not
-  // building a real parser.
-  return source
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .split('\n')
-    .map((line) => line.replace(/(^|[^:])\/\/.*$/, '$1'))
-    .join('\n');
+  let out = '';
+  let i = 0;
+  const n = source.length;
+  // Last meaningful (non-whitespace, non-comment) char emitted — used to
+  // distinguish a regex literal from a division operator.
+  let prev = '';
+  while (i < n) {
+    const ch = source[i]!;
+    const next = i + 1 < n ? source[i + 1]! : '';
+    // Block comment — drop, preserving newlines for any line math.
+    if (ch === '/' && next === '*') {
+      const end = source.indexOf('*/', i + 2);
+      const body = end === -1 ? source.slice(i) : source.slice(i, end + 2);
+      out += body.replace(/[^\n]+/g, '');
+      i = end === -1 ? n : end + 2;
+      continue;
+    }
+    // Line comment — drop to (but not including) the newline.
+    if (ch === '/' && next === '/') {
+      const end = source.indexOf('\n', i + 2);
+      i = end === -1 ? n : end;
+      continue;
+    }
+    // String literal — copy verbatim, honouring escapes.
+    if (ch === '\'' || ch === '"') {
+      out += ch;
+      i += 1;
+      while (i < n) {
+        const c = source[i]!;
+        out += c;
+        i += 1;
+        if (c === '\\' && i < n) {
+          out += source[i]!;
+          i += 1;
+          continue;
+        }
+        if (c === ch || c === '\n') break;
+      }
+      prev = ch;
+      continue;
+    }
+    // Template literal — copy verbatim until the closing backtick.
+    // (Interpolations are copied as-is; nested edge cases are acceptable
+    // for a gate-level heuristic.)
+    if (ch === '`') {
+      out += ch;
+      i += 1;
+      while (i < n) {
+        const c = source[i]!;
+        out += c;
+        i += 1;
+        if (c === '\\' && i < n) {
+          out += source[i]!;
+          i += 1;
+          continue;
+        }
+        if (c === '`') break;
+      }
+      prev = '`';
+      continue;
+    }
+    // Possible regex literal — only when the previous meaningful char puts
+    // us in expression position (otherwise it's division).
+    if (ch === '/' && (prev === '' || '=(,:[!&|?{};'.includes(prev))) {
+      out += ch;
+      i += 1;
+      let inClass = false;
+      while (i < n) {
+        const c = source[i]!;
+        out += c;
+        i += 1;
+        if (c === '\\' && i < n) {
+          out += source[i]!;
+          i += 1;
+          continue;
+        }
+        if (c === '[') inClass = true;
+        else if (c === ']') inClass = false;
+        else if ((c === '/' && !inClass) || c === '\n') break;
+      }
+      prev = '/';
+      continue;
+    }
+    out += ch;
+    if (!/\s/.test(ch)) prev = ch;
+    i += 1;
+  }
+  return out;
 }
 
 /**
@@ -193,15 +323,35 @@ export function analyzeSurfaceCoherence(
   // compliant. In practice the ui-kit puts one component per file, and the
   // few multi-component files (e.g. `data-display.tsx`) all share the
   // same surface plumbing at the top.
-  const callsUseEffectiveSurface = USE_EFFECTIVE_SURFACE_CALL_REGEX.test(source);
-  // Reset lastIndex after .test() — RegExp.prototype.test with /g mutates state.
-  USE_EFFECTIVE_SURFACE_CALL_REGEX.lastIndex = 0;
-
-  // Pull every `useEffectiveSurface(...)` argument so we can validate R4.
+  // Pull every `useEffectiveSurface(...)` CALL (argument captured for R4).
+  // The hook's own function DEFINITION — `function useEffectiveSurface(...)`
+  // in common.tsx — also matches the call regex, with its parameter list as
+  // the "argument"; exclude it, or it poisons R4 and masks R2.
   const useEffectiveSurfaceArgs: string[] = [];
   for (const m of source.matchAll(USE_EFFECTIVE_SURFACE_CALL_REGEX)) {
+    const before = source.slice(Math.max(0, (m.index ?? 0) - 24), m.index);
+    if (/\bfunction\s*$/.test(before)) continue; // definition, not a call
     useEffectiveSurfaceArgs.push((m[1] ?? '').trim());
   }
+  const callsUseEffectiveSurface = useEffectiveSurfaceArgs.length > 0;
+
+  // R3 delegation signal A — the resolved surface is assigned and then
+  // referenced again (branch rendering, context value, child props, ...).
+  // A resolved-and-discarded surface stays false.
+  let usesResolvedSurface = false;
+  for (const m of source.matchAll(RESOLVED_SURFACE_ASSIGN_REGEX)) {
+    const ident = m[1]!;
+    const escaped = ident.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const after = source.slice((m.index ?? 0) + m[0].length);
+    if (new RegExp(`\\b${escaped}\\b`).test(after)) {
+      usesResolvedSurface = true;
+      break;
+    }
+  }
+
+  // R2/R3 delegation signal B — the prop is forwarded to a surface-aware
+  // child via JSX (`surface={...}`); the child resolves provider/default.
+  const forwardsSurfaceProp = /\bsurface=\{/.test(source);
 
   // Find every `const X = surfaceClasses(...)` so we can verify the
   // returned token bundle is actually consumed.
@@ -211,9 +361,11 @@ export function analyzeSurfaceCoherence(
   }
   const callsSurfaceClasses = surfaceClassesVars.length > 0;
 
-  // Verify each var is used as `.border` / `.radius*` somewhere downstream.
+  // Verify each var is used as `.border` / `.radius*` somewhere downstream,
+  // and whether ANY property of the SurfaceClasses bundle is consumed.
   let appliesBorder = false;
   let appliesRadius = false;
+  let appliesAnyToken = false;
   for (const v of surfaceClassesVars) {
     const escaped = v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     if (new RegExp(`\\b${escaped}\\.border\\b`).test(source)) {
@@ -223,6 +375,11 @@ export function analyzeSurfaceCoherence(
       new RegExp(`\\b${escaped}\\.(radius|radiusLg|radiusFull)\\b`).test(source)
     ) {
       appliesRadius = true;
+    }
+    if (
+      new RegExp(`\\b${escaped}\\.(?:${SURFACE_TOKEN_KEYS})\\b`).test(source)
+    ) {
+      appliesAnyToken = true;
     }
   }
 
@@ -280,6 +437,9 @@ export function analyzeSurfaceCoherence(
       callsSurfaceClasses,
       appliesBorder,
       appliesRadius,
+      appliesAnyToken,
+      forwardsSurfaceProp,
+      usesResolvedSurface,
       hardcodedBorderLiteral,
     });
   }
@@ -296,6 +456,9 @@ export function analyzeSurfaceCoherence(
         callsSurfaceClasses,
         appliesBorder,
         appliesRadius,
+        appliesAnyToken,
+        forwardsSurfaceProp,
+        usesResolvedSurface,
         hardcodedBorderLiteral,
       });
     }
@@ -322,23 +485,32 @@ export function findingsFor(
     return out;
   }
 
-  if (!analysis.callsUseEffectiveSurface) {
+  // R2 — the prop must be resolved in-file OR forwarded to a surface-aware
+  // child via JSX (delegation: the child resolves provider/default itself).
+  if (!analysis.callsUseEffectiveSurface && !analysis.forwardsSurfaceProp) {
     out.push({
       severity: 'blocker',
       file: analysis.file,
       component: analysis.component,
       message: `Component "${analysis.component}" declares "surface?: Surface" in its props but never calls useEffectiveSurface() — the prop is silently ignored.`,
-      suggestion: `Inside the component body, resolve the prop:\n  const effectiveSurface = useEffectiveSurface(${analysis.surfacePropIdent ?? 'surface'});\n  const s = surfaceClasses(effectiveSurface);\nThen spread s.border / s.radius into the rendered className.`,
+      suggestion: `Inside the component body, resolve the prop:\n  const effectiveSurface = useEffectiveSurface(${analysis.surfacePropIdent ?? 'surface'});\n  const s = surfaceClasses(effectiveSurface);\nThen spread s.border / s.radius into the rendered className. (Forwarding the prop to a surface-aware child via surface={...} also satisfies this rule.)`,
     });
   }
 
-  if (!analysis.callsSurfaceClasses) {
+  // R3 — the resolved surface must drive the render somehow: class bundle,
+  // branch rendering, context value, or JSX forwarding. Resolved-and-
+  // discarded is the violation.
+  if (
+    !analysis.callsSurfaceClasses &&
+    !analysis.forwardsSurfaceProp &&
+    !analysis.usesResolvedSurface
+  ) {
     out.push({
       severity: 'blocker',
       file: analysis.file,
       component: analysis.component,
       message: `Component "${analysis.component}" declares "surface?: Surface" but never calls surfaceClasses() — the surface-specific border/radius/shadow tokens are not being computed.`,
-      suggestion: `Add: const s = surfaceClasses(useEffectiveSurface(${analysis.surfacePropIdent ?? 'surface'})); and apply s.border + s.radius (or s.radiusLg / s.radiusFull) in your className.`,
+      suggestion: `Add: const s = surfaceClasses(useEffectiveSurface(${analysis.surfacePropIdent ?? 'surface'})); and apply s.border + s.radius (or s.radiusLg / s.radiusFull) in your className. (Branching on the resolved surface, publishing it through a context value, or JSX-forwarding it also satisfies this rule.)`,
     });
   }
 
@@ -355,17 +527,16 @@ export function findingsFor(
     });
   }
 
-  if (
-    analysis.callsSurfaceClasses &&
-    !analysis.appliesBorder &&
-    !analysis.appliesRadius
-  ) {
+  // R5 — consuming ANY property of the bundle means the render switches per
+  // surface (typography-only components apply just font/transition).
+  // Computing the bundle and consuming NOTHING is refactor wreckage.
+  if (analysis.callsSurfaceClasses && !analysis.appliesAnyToken) {
     out.push({
       severity: 'major',
       file: analysis.file,
       component: analysis.component,
-      message: `Component "${analysis.component}" computes surfaceClasses(...) but never applies s.border or s.radius* to its rendered tree — corner-radius and border styles are NOT switching per surface.`,
-      suggestion: `Spread the bundle into your className, e.g.:\n  className={cn(s.border, s.radius, s.shadow, ...)}\nIf only one of border/radius is intentional, document why and exclude this component from the gate via a manifest opt-out.`,
+      message: `Component "${analysis.component}" computes surfaceClasses(...) but never applies any of its properties (s.border / s.radius* / s.shadow* / s.font* / s.transition / s.press) to its rendered tree — the styles are NOT switching per surface.`,
+      suggestion: `Spread the bundle into your className, e.g.:\n  className={cn(s.border, s.radius, s.shadow, ...)}\nTypography-only components may consume just s.font / s.transition — any property counts.`,
     });
   }
 
@@ -392,13 +563,19 @@ export function buildSummaryFinding(
     .map((a) => {
       const border = a.appliesBorder ? 'yes' : 'no';
       const radius = a.appliesRadius ? 'yes' : 'no';
+      const anyToken = a.appliesAnyToken ? 'yes' : 'no';
+      const delegates = a.forwardsSurfaceProp
+        ? 'jsx'
+        : a.usesResolvedSurface
+          ? 'resolved'
+          : 'no';
       const ueffective = a.callsUseEffectiveSurface
         ? a.useEffectiveSurfaceUsesProp
           ? 'yes'
           : 'ignored-prop'
         : 'missing';
       const sc = a.callsSurfaceClasses ? 'yes' : 'missing';
-      return `  - ${a.component} (${path.relative(process.cwd(), a.file).replace(/\\/g, '/')}) — useEffectiveSurface=${ueffective}, surfaceClasses=${sc}, border=${border}, radius=${radius}`;
+      return `  - ${a.component} (${path.relative(process.cwd(), a.file).replace(/\\/g, '/')}) — useEffectiveSurface=${ueffective}, surfaceClasses=${sc}, border=${border}, radius=${radius}, anyToken=${anyToken}, delegates=${delegates}`;
     })
     .join('\n');
   return {

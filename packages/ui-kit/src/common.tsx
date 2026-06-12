@@ -386,7 +386,7 @@ export function FieldShell({
   label,
   hint,
   error,
-  surface = 'pixel',
+  surface: surfaceProp,
   children,
 }: {
   label?: string;
@@ -395,6 +395,12 @@ export function FieldShell({
   surface?: Surface;
   children: React.ReactNode;
 }) {
+  // Resolve like every other surface-aware component: prop wins, then the
+  // nearest PxlKitSurfaceProvider, then "pixel". (Previously hardcoded a
+  // `surface = 'pixel'` default, which bypassed the provider for callers
+  // that omit the prop — every in-kit caller passes it explicitly, so this
+  // only makes standalone usage more correct.)
+  const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   return (
     <label className="block space-y-1.5">

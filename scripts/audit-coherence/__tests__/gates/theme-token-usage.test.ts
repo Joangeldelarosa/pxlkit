@@ -319,6 +319,42 @@ describe('ThemeTokenUsageGate (integration)', () => {
     expect(r.passed).toBe(true);
   });
 
+  it('ignores colocated *.examples.tsx demo snippets (doc collateral, not component impls)', async () => {
+    // Same convention as gates 21/24/26: `<Component>.examples.tsx` files are
+    // documentation demos (often showing the component on top of arbitrary
+    // user content), NOT component implementations. They must not trip the
+    // token gate.
+    await writeUiKitFile(
+      'cards/PixelRibbon.tsx',
+      `export const PixelRibbon = () => <div className="bg-retro-green" />;`,
+    );
+    await writeUiKitFile(
+      'cards/PixelRibbon.examples.tsx',
+      `export const Default = () => <div className="border-white/20 bg-black/60 text-white bg-zinc-950" />;`,
+    );
+
+    const g = new ThemeTokenUsageGate();
+    const r = await g.run(mockCtx());
+    expect(r.passed).toBe(true);
+    const nonInfo = r.findings.filter((f) => f.severity !== 'info');
+    expect(nonInfo).toEqual([]);
+  });
+
+  it('still flags the identical violations when they live in a component impl (pin)', async () => {
+    await writeUiKitFile(
+      'cards/PixelRibbon.tsx',
+      `export const PixelRibbon = () => <div className="border-white/20 bg-black/60 bg-zinc-950" />;`,
+    );
+
+    const g = new ThemeTokenUsageGate();
+    const r = await g.run(mockCtx());
+    expect(r.passed).toBe(false);
+    const blockers = r.findings.filter((f) => f.severity === 'blocker');
+    const majors = r.findings.filter((f) => f.severity === 'major');
+    expect(blockers.length).toBe(2); // border-white/20, bg-black/60
+    expect(majors.length).toBe(1); // bg-zinc-950
+  });
+
   it('default-exported gate instance has id=20 and stable name', () => {
     expect(gate.id).toBe(20);
     expect(gate.name).toBe('theme-token-usage');

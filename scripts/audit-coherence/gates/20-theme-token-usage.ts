@@ -34,6 +34,10 @@
  *     `clsx(...)`, and bare string literals inside JSX expressions. We do
  *     NOT try to fully parse the TSX — we scan strings, which is robust
  *     for the way this kit writes classes.
+ *   - Scope is component IMPLEMENTATIONS only: tests, stories, and the
+ *     colocated `<Component>.examples.tsx` demo snippets are excluded
+ *     (same exemption gates 21 / 24 / 26 apply — examples are doc
+ *     collateral that may stage components over arbitrary user content).
  *   - For every component file we emit a frequency table of token-family
  *     usage (`retro-green: 12`, `retro-cyan: 4`, etc.) inside an `info`
  *     finding so the docs dashboard can read it from the JSON report.
@@ -598,6 +602,11 @@ const DEFAULT_IGNORE = [
   '**/__tests__/**',
   '**/*.test.tsx',
   '**/*.stories.tsx',
+  // Colocated `<Component>.examples.tsx` demo snippets are documentation
+  // collateral (often staging the component on top of arbitrary "user
+  // content" backdrops), not component implementations. Same exclusion the
+  // other implementation-level gates (21, 24, 26) apply.
+  '**/*.examples.tsx',
   '**/node_modules/**',
   '**/dist/**',
 ];

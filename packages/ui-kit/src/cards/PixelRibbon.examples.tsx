@@ -3,7 +3,7 @@ import { PixelRibbon } from './PixelRibbon';
 
 function Container({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative inline-block border-2 border-white/20 bg-black/60 p-8 text-white">
+    <div className="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
       <div>Card content</div>
       {children}
     </div>
