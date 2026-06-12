@@ -43,7 +43,6 @@ export function PixelCalendarGridDocsSection({ className }: PixelCalendarGridDoc
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>grid</code></li>
-        <li><code>roving-tabindex</code></li>
       </ul>
       <p className="docs-aria-notes">role=grid with columnheader weekday cells and gridcell day buttons; aria-selected marks the chosen day; aria-disabled marks out-of-bounds or disabled dates.</p>
       <h4>Keyboard</h4>

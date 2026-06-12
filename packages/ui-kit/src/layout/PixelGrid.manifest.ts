@@ -30,11 +30,13 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['polymorphic-grid-container'],
+    patterns: [],
     keyboard: [],
     notes:
       'Renders as <div> by default; inherits semantics from the element provided via `as` (e.g. ul, section). Authors are responsible for the semantic role of grid children.',
   },
+  // Layout primitive — the "Grid" in the name is CSS grid, not the ARIA grid widget.
+  interactive: false,
   related: ['PixelStack', 'PixelCluster', 'PixelBento', 'PixelEqualHeightGrid'],
   apiStability: 'stable',
   ssrSafe: true,

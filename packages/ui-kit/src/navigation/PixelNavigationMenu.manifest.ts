@@ -26,11 +26,7 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: [
-      'nav landmark with aria-label',
-      'submenus role=menu',
-      'mega-panel labelled by trigger',
-    ],
+    patterns: ['menubar', 'menu'],
     keyboard: [
       { key: 'ArrowRight', does: 'Focus next item', when: 'horizontal' },
       { key: 'ArrowLeft', does: 'Focus previous item', when: 'horizontal' },
@@ -42,7 +38,7 @@ export default defineManifest({
       { key: 'Escape', does: 'Close any open submenu' },
     ],
     notes:
-      'Provide a unique ariaLabel when more than one nav landmark exists on the page (WCAG 2.4.6).',
+      'Provide a unique ariaLabel when more than one nav landmark exists on the page (WCAG 2.4.6). The root is a nav landmark; submenus render role=menu and mega-panels are labelled by their trigger.',
   },
   related: [],
   apiStability: 'stable',

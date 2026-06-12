@@ -174,6 +174,13 @@ export type Manifest = {
   examples: ManifestExample[];
   props: 'auto' | { extractedFrom?: string };
   a11y: A11yBlock;
+  /**
+   * Explicit interactivity flag for the a11y-pattern-declared gate. Layout
+   * primitives whose NAME lexically suggests an ARIA widget (e.g. PixelGrid)
+   * set `false` to opt out of the pattern-declaration requirement; widgets
+   * may set `true` to opt in regardless of name.
+   */
+  interactive?: boolean;
   related: string[];
   apiStability: ApiStability;
   ssrSafe: boolean;
@@ -214,6 +221,7 @@ export const ManifestSchema = z
     examples: z.array(ManifestExampleSchema),
     props: PropsSchema,
     a11y: A11yBlockSchema,
+    interactive: z.boolean().optional(),
     related: z.array(z.string().min(1)),
     apiStability: z.enum(
       API_STABILITIES as unknown as [ApiStability, ...ApiStability[]],

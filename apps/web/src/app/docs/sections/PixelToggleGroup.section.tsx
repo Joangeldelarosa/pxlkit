@@ -43,7 +43,6 @@ export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsS
       <ul className="docs-aria-patterns">
         <li><code>radiogroup</code></li>
         <li><code>toolbar</code></li>
-        <li><code>toggle button</code></li>
       </ul>
       <p className="docs-aria-notes">Provide an aria-label (or aria-labelledby) for screen reader context. Single-select renders role="radiogroup" with role="radio" children; multi-select renders role="group" only when named.</p>
       <h4>Keyboard</h4>

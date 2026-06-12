@@ -28,7 +28,7 @@
 
 ## Overview
 
-`@pxlkit/ui-kit` is a comprehensive React component library in the [Pxlkit](https://pxlkit.xyz) ecosystem, providing **57 retro pixel art styled components** for building modern web applications with a nostalgic aesthetic. Every component follows a consistent pixel art design language with customizable color tones.
+`@pxlkit/ui-kit` is a comprehensive React component library in the [Pxlkit](https://pxlkit.xyz) ecosystem, providing **111 retro pixel art styled components** for building modern web applications with a nostalgic aesthetic. Every component follows a consistent pixel art design language with customizable color tones.
 
 > **New in v1.5.0** — `forwardRef` wired across every interactive primitive, full accessibility pass (ARIA + focus rings + keyboard handlers), and `PixelToast` + `PxlKitToastProvider` shipped inside the kit. See the [CHANGELOG](https://github.com/joangeldelarosa/pxlkit/blob/main/CHANGELOG.md) for the full diff.
 
@@ -224,7 +224,7 @@ Components accept `tone?: 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' 
 
 ## Storybook
 
-Every one of the 57 components is individually documented at **[storybook.pxlkit.xyz](https://storybook.pxlkit.xyz)** under the `UI Kit / *` sidebar. Each story has a Controls panel for live prop manipulation:
+Every one of the 111 components is individually documented at **[storybook.pxlkit.xyz](https://storybook.pxlkit.xyz)** under the `UI Kit / *` sidebar. Each story has a Controls panel for live prop manipulation:
 
 - Surface toggle (pixel ↔ linear) on every component
 - Tone selector (7 tones)

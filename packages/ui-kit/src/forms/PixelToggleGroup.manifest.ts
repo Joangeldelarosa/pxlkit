@@ -35,7 +35,7 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['radiogroup', 'toolbar', 'toggle button'],
+    patterns: ['radiogroup', 'toolbar'],
     keyboard: [
       { key: 'ArrowRight / ArrowDown', does: 'Move focus to next item', when: 'rovingFocus' },
       { key: 'ArrowLeft / ArrowUp', does: 'Move focus to previous item', when: 'rovingFocus' },

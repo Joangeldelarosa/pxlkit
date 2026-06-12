@@ -22,11 +22,7 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: [
-      'role=menubar with role=menuitem triggers',
-      'role=menu submenus with aria-labelledby + aria-activedescendant',
-      'aria-haspopup / aria-expanded on items that open submenus',
-    ],
+    patterns: ['menubar', 'menu', 'menuitem'],
     keyboard: [
       { key: 'ArrowRight / ArrowLeft', does: 'Move between top-level menus' },
       { key: 'ArrowDown / ArrowUp', does: 'Move focus within an open menu' },
@@ -37,7 +33,7 @@ export default defineManifest({
       { key: 'Escape', does: 'Close any open menu' },
     ],
     notes:
-      'Click-outside closes all open menus. Disabled and separator items are skipped during keyboard traversal.',
+      'Click-outside closes all open menus. Disabled and separator items are skipped during keyboard traversal. Triggers are role=menuitem with aria-haspopup/aria-expanded; submenus are role=menu labelled by their trigger.',
   },
   related: ['PixelDropdown', 'PixelTabs', 'PixelBreadcrumbs'],
   apiStability: 'stable',

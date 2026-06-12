@@ -42,11 +42,11 @@ export function PixelMenubarDocsSection({ className }: PixelMenubarDocsSectionPr
       <h3 id="pixel-menubar-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>role=menubar with role=menuitem triggers</code></li>
-        <li><code>role=menu submenus with aria-labelledby + aria-activedescendant</code></li>
-        <li><code>aria-haspopup / aria-expanded on items that open submenus</code></li>
+        <li><code>menubar</code></li>
+        <li><code>menu</code></li>
+        <li><code>menuitem</code></li>
       </ul>
-      <p className="docs-aria-notes">Click-outside closes all open menus. Disabled and separator items are skipped during keyboard traversal.</p>
+      <p className="docs-aria-notes">Click-outside closes all open menus. Disabled and separator items are skipped during keyboard traversal. Triggers are role=menuitem with aria-haspopup/aria-expanded; submenus are role=menu labelled by their trigger.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

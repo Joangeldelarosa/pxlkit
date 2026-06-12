@@ -106,6 +106,7 @@ export const KNOWN_PATTERNS: ReadonlySet<string> = new Set([
   'status',
   'switch',
   'tab',
+  'table',
   'tablist',
   'tabpanel',
   'textbox',

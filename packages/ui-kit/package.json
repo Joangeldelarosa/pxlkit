@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/ui-kit",
   "version": "2.0.1",
-  "description": "Production-grade React UI kit with retro-future aesthetic: 111+ components, WCAG 2.1 AA, surface system (pixel/linear), dark mode, 30-gate coherence audit, full SSOT documentation.",
+  "description": "Production-grade React UI kit with retro-future aesthetic: 111 production-ready components, WCAG 2.1 AA, surface system (pixel/linear), dark mode, 30-gate coherence audit, full SSOT documentation.",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"

@@ -6,14 +6,14 @@
 
 <p align="center">
   <strong>Bring retro aesthetics to the modern web — and build 3D voxel games with React.</strong><br/>
-  Pxlkit is a comprehensive source-available React toolkit featuring 226+ pixel art SVG icons across 7 themed packs (10 npm packages total including the code packages), 57 retro UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel toolkit on Three.js &amp; React Three Fiber. The showcase app at <a href="https://pxlkit.xyz/explore">pxlkit.xyz/explore</a> ships procedural world generation, biomes, day/night cycles, and chunk-based terrain streaming.
+  Pxlkit is a comprehensive source-available React toolkit featuring 226+ pixel art SVG icons across 7 themed packs (10 npm packages total including the code packages), 111 retro UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel toolkit on Three.js &amp; React Three Fiber. The showcase app at <a href="https://pxlkit.xyz/explore">pxlkit.xyz/explore</a> ships procedural world generation, biomes, day/night cycles, and chunk-based terrain streaming.
 </p>
 
 <p align="center">
   <a href="https://pxlkit.xyz"><img src="https://img.shields.io/badge/docs-pxlkit.xyz-00FF88?style=flat&logo=vercel&logoColor=black" alt="Documentation" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-split%20licenses-blue.svg" alt="Pxlkit split licensing" /></a>
   <img src="https://img.shields.io/badge/icons-226%2B-FFD700?style=flat" alt="226+ icons" />
-  <img src="https://img.shields.io/badge/components-57-4ECDC4?style=flat" alt="57 components" />
+  <img src="https://img.shields.io/badge/components-111-4ECDC4?style=flat" alt="111 components" />
   <img src="https://img.shields.io/badge/react-%E2%89%A518-61DAFB?logo=react&logoColor=white" alt="React ≥18" />
   <img src="https://img.shields.io/badge/typescript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict" />
   <img src="https://img.shields.io/badge/voxel%20engine-Three.js%20%2B%20R3F-black?logo=threedotjs&logoColor=white" alt="Voxel Engine: Three.js + React Three Fiber" />
@@ -23,13 +23,13 @@
 
 ## Overview
 
-**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into 7 themed packs, a retro React UI kit with **57 components**, a core rendering engine, a **3D voxel toolkit** (with a procedural world engine running live at `/explore`), and a Next.js 15 showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. Browse and visually edit them at the [official website](https://pxlkit.xyz).
+**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into 7 themed packs, a retro React UI kit with **111 components**, a core rendering engine, a **3D voxel toolkit** (with a procedural world engine running live at `/explore`), and a Next.js 15 showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. Browse and visually edit them at the [official website](https://pxlkit.xyz).
 
 ```
 pxlkit/
 ├── packages/
 │   ├── core/           → Types, React components, SVG utilities
-│   ├── ui-kit/         → 57 retro pixel art React UI components
+│   ├── ui-kit/         → 111 retro pixel art React UI components
 │   ├── gamification/   → 51 icons — RPG, achievements, rewards
 │   ├── feedback/       → 33 icons — alerts, status, notifications
 │   ├── social/         → 43 icons — community, emojis, messaging
@@ -459,7 +459,7 @@ Sidebar categories:
 | [`packages/parallax`](./packages/parallax) | [`@pxlkit/parallax`](https://www.npmjs.com/package/@pxlkit/parallax) | `1.2.3` | Multi-layer 3D parallax pixel art icons — 10 interactive depth-based mouse-tracking icons with configurable perspective and layer separation |
 | [`packages/social`](./packages/social) | [`@pxlkit/social`](https://www.npmjs.com/package/@pxlkit/social) | `1.2.4` | Social and media pixel art icon pack — 43 icons for community, emojis, messaging, hearts, shares, users, reactions, and social media UI |
 | [`packages/ui`](./packages/ui) | [`@pxlkit/ui`](https://www.npmjs.com/package/@pxlkit/ui) | `1.2.5` | UI & interface pixel art icon pack — 41 icons for tools, controls, navigation, editor elements, home, search, settings, menus, and layout |
-| [`packages/ui-kit`](./packages/ui-kit) | [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | `2.0.1` | Production-grade React UI kit with retro-future aesthetic: 111+ components, WCAG 2.1 AA, surface system (pixel/linear), dark mode, 30-gate coherence audit, full SSOT documentation. |
+| [`packages/ui-kit`](./packages/ui-kit) | [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | `2.0.1` | Production-grade React UI kit with retro-future aesthetic: 111 production-ready components, WCAG 2.1 AA, surface system (pixel/linear), dark mode, 30-gate coherence audit, full SSOT documentation. |
 | [`packages/voxel`](./packages/voxel) | [`@pxlkit/voxel`](https://www.npmjs.com/package/@pxlkit/voxel) | `0.1.4` | MIT-licensed 3D voxel toolkit for React — voxel utility primitives (pxlToVoxels, upscaleGrid) plus types. The full procedural-world engine (biomes, chunks, day/night cycles, highways, tunnels) lives in the showcase app at pxlkit.xyz/explore and ships in the v1 package. |
 | [`packages/weather`](./packages/weather) | [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | `1.2.4` | Weather and nature pixel art icon pack — 36 icons for sun, rain, clouds, moon phases, temperature, storms, snow, and climate UI |
 <!-- WORKSPACES:END -->

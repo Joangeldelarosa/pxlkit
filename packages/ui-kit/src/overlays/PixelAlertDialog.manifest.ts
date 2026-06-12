@@ -26,7 +26,7 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['alertdialog', 'focus-trap', 'initial-focus-cancel', 'aria-describedby'],
+    patterns: ['alertdialog'],
     keyboard: [
       { key: 'Escape', does: 'Closes the dialog', when: 'not pending' },
       { key: 'Tab', does: 'Cycles focus inside the dialog' },

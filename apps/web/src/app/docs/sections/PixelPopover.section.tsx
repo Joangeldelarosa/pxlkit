@@ -43,8 +43,6 @@ export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionPr
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>dialog</code></li>
-        <li><code>aria-labelledby</code></li>
-        <li><code>focus-return</code></li>
       </ul>
       <p className="docs-aria-notes">Content renders with role="dialog" by default; pair with aria-labelledby on Content. Set role="none" when an inner widget owns semantics.</p>
       <h4>Keyboard</h4>

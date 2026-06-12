@@ -31,7 +31,7 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['grid', 'roving-tabindex'],
+    patterns: ['grid'],
     keyboard: [
       { key: 'ArrowLeft', does: 'Move focus to previous day' },
       { key: 'ArrowRight', does: 'Move focus to next day' },

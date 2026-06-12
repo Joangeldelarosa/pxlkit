@@ -40,9 +40,6 @@ export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightG
     <section aria-labelledby="pixel-equal-height-grid-a11y">
       <h3 id="pixel-equal-height-grid-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
-      <ul className="docs-aria-patterns">
-        <li><code>polymorphic-subgrid-container</code></li>
-      </ul>
       <p className="docs-aria-notes">Inherits semantics from the underlying PixelGrid element (defaults to &lt;div&gt;). Use the `as` prop to render a more semantic container when appropriate.</p>
     </section>
     <section aria-label="Related components">

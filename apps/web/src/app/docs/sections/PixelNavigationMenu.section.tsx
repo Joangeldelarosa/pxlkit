@@ -42,11 +42,10 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
       <h3 id="pixel-navigation-menu-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>nav landmark with aria-label</code></li>
-        <li><code>submenus role=menu</code></li>
-        <li><code>mega-panel labelled by trigger</code></li>
+        <li><code>menubar</code></li>
+        <li><code>menu</code></li>
       </ul>
-      <p className="docs-aria-notes">Provide a unique ariaLabel when more than one nav landmark exists on the page (WCAG 2.4.6).</p>
+      <p className="docs-aria-notes">Provide a unique ariaLabel when more than one nav landmark exists on the page (WCAG 2.4.6). The root is a nav landmark; submenus render role=menu and mega-panels are labelled by their trigger.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

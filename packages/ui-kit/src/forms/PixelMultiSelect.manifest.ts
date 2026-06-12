@@ -24,7 +24,7 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['combobox', 'listbox', 'multiselectable'],
+    patterns: ['combobox', 'listbox'],
     keyboard: [
       { key: 'ArrowDown', does: 'Open popover or move highlight down' },
       { key: 'ArrowUp', does: 'Open popover or move highlight up' },

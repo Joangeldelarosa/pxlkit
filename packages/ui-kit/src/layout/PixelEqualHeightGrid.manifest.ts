@@ -23,11 +23,13 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['polymorphic-subgrid-container'],
+    patterns: [],
     keyboard: [],
     notes:
       'Inherits semantics from the underlying PixelGrid element (defaults to <div>). Use the `as` prop to render a more semantic container when appropriate.',
   },
+  // Layout primitive — the "Grid" in the name is CSS subgrid, not the ARIA grid widget.
+  interactive: false,
   related: ['PixelGrid'],
   apiStability: 'stable',
   ssrSafe: true,

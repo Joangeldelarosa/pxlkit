@@ -23,7 +23,7 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['dialog', 'aria-labelledby', 'focus-return'],
+    patterns: ['dialog'],
     keyboard: [
       { key: 'Escape', does: 'Closes the popover when closeOnEscape is true' },
     ],

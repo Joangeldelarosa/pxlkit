@@ -41,9 +41,6 @@ export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): 
     <section aria-labelledby="pixel-grid-a11y">
       <h3 id="pixel-grid-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
-      <ul className="docs-aria-patterns">
-        <li><code>polymorphic-grid-container</code></li>
-      </ul>
       <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the element provided via `as` (e.g. ul, section). Authors are responsible for the semantic role of grid children.</p>
     </section>
     <section aria-label="Related components">

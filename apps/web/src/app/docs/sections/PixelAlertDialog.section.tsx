@@ -43,9 +43,6 @@ export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsS
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>alertdialog</code></li>
-        <li><code>focus-trap</code></li>
-        <li><code>initial-focus-cancel</code></li>
-        <li><code>aria-describedby</code></li>
       </ul>
       <p className="docs-aria-notes">Initial focus is placed on the Cancel button to prevent accidental confirmation of destructive actions.</p>
       <h4>Keyboard</h4>

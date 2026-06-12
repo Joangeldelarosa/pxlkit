@@ -14,6 +14,9 @@
 - `FieldShell` (the label/hint/error shell behind form fields) now resolves its surface via `useEffectiveSurface` — prop first, then the nearest `PxlKitSurfaceProvider` — instead of hardcoding `pixel`; standalone callers that omit the `surface` prop now follow the provider (in-kit callers are unaffected).
 - Declare `embla-carousel` as a direct dependency — `PixelCarousel` imports its types directly but only `embla-carousel-react` was declared, so the bare import resolved through hoisting.
 - `PixelStarRating` manifest corrections: highlights trimmed to the 5-entry schema maximum and `since` restored to `2.0.0` (the version the component actually shipped in).
+- Animations honor `prefers-reduced-motion` for real — `useAnimationTrigger` consults `useReducedMotion`, so all 11 animation components (`PixelBounce` … `PixelZoomIn`, `PixelTypewriter`) render a static, fully visible end-state when the OS preference is set; `PixelTypewriter` shows the full text immediately. Their manifests previously claimed this behavior without implementing it.
+- `PixelCollapsible` trigger now wires `aria-expanded`/`aria-controls` to its content region (same pattern as `PixelAccordion`).
+- a11y pattern declarations cleaned across 11 manifests (`PixelMenubar`, `PixelNavigationMenu`, `PixelAlertDialog`, `PixelPopover`, `PixelCalendarGrid`, `PixelMultiSelect`, `PixelToggleGroup`, `PixelGrid`, `PixelEqualHeightGrid`, `PixelDataTable`, `PixelTable`): canonical APG tokens only, prose moved to `notes`, and layout grids opt out via the new manifest `interactive: false` flag.
 
 ## 2.0.1 — 2026-06-02
 

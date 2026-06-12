@@ -44,7 +44,6 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
       <ul className="docs-aria-patterns">
         <li><code>combobox</code></li>
         <li><code>listbox</code></li>
-        <li><code>multiselectable</code></li>
       </ul>
       <p className="docs-aria-notes">Trigger uses role=combobox with aria-controls/expanded/activedescendant. Listbox advertises aria-multiselectable. Chip remove targets carry aria-label for the screen reader.</p>
       <h4>Keyboard</h4>
