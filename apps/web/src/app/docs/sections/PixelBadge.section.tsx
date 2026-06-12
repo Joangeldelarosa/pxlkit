@@ -44,7 +44,7 @@ export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps)
       <ul className="docs-aria-patterns">
         <li><code>status</code></li>
       </ul>
-      <p className="docs-aria-notes">Default render is a non-interactive &lt;span&gt;. When onClick is set, the root becomes a native &lt;button type="button"&gt; with a visible focus ring (focus-visible:ring-2 ring-offset). iconLeft is marked aria-hidden via inline-flex wrapper — convey meaning through the badge text, not the icon alone. For live status changes (e.g., "online" → "offline"), wrap the badge in a parent with aria-live="polite".</p>
+      <p className="docs-aria-notes">Default render is a non-interactive &lt;span&gt;. When onClick is set, the root becomes a native &lt;button type=&quot;button&quot;&gt; with a visible focus ring (focus-visible:ring-2 ring-offset). iconLeft is marked aria-hidden via inline-flex wrapper — convey meaning through the badge text, not the icon alone. For live status changes (e.g., &quot;online&quot; → &quot;offline&quot;), wrap the badge in a parent with aria-live=&quot;polite&quot;.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

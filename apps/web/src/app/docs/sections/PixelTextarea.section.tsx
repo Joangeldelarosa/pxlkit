@@ -44,7 +44,7 @@ export function PixelTextareaDocsSection({ className }: PixelTextareaDocsSection
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Wraps a native &lt;textarea&gt; so multiline textbox semantics are announced by assistive tech automatically. The label prop is wired through FieldShell, error toggles aria-invalid, and hint/error are exposed via aria-describedby. The counter uses aria-live="polite" so screen readers announce updates without stealing focus.</p>
+      <p className="docs-aria-notes">Wraps a native &lt;textarea&gt; so multiline textbox semantics are announced by assistive tech automatically. The label prop is wired through FieldShell, error toggles aria-invalid, and hint/error are exposed via aria-describedby. The counter uses aria-live=&quot;polite&quot; so screen readers announce updates without stealing focus.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

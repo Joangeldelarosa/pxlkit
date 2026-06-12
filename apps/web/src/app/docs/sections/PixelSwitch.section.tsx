@@ -26,7 +26,7 @@ export function PixelSwitchDocsSection({ className }: PixelSwitchDocsSectionProp
         <li>Controlled boolean via `checked` + `onChange(next)`.</li>
         <li>Tone and surface follow the kit-wide tokens (`pixel` keeps square corners, `linear` rounds the track).</li>
         <li>Optional `name`/`value`/`required` mirror the state into a hidden input for native form submission.</li>
-        <li>Accessible: renders as `role="switch"` with `aria-checked`, `aria-disabled`, and `aria-required`.</li>
+        <li>Accessible: renders as `role=&quot;switch&quot;` with `aria-checked`, `aria-disabled`, and `aria-required`.</li>
         <li>SSR-safe and tree-shakable; no portals or browser-only APIs.</li>
       </ul>
     <dl className="docs-meta">
@@ -44,7 +44,7 @@ export function PixelSwitchDocsSection({ className }: PixelSwitchDocsSectionProp
       <ul className="docs-aria-patterns">
         <li><code>switch</code></li>
       </ul>
-      <p className="docs-aria-notes">Uses `role="switch"` with `aria-checked` reflecting the boolean state. When `disabled`, the control is both visually dimmed and functionally inert (`disabled` + `aria-disabled`). The hidden mirror input only renders while `checked` is true so unchecked switches submit as absent (standard HTML form semantics).</p>
+      <p className="docs-aria-notes">Uses `role=&quot;switch&quot;` with `aria-checked` reflecting the boolean state. When `disabled`, the control is both visually dimmed and functionally inert (`disabled` + `aria-disabled`). The hidden mirror input only renders while `checked` is true so unchecked switches submit as absent (standard HTML form semantics).</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

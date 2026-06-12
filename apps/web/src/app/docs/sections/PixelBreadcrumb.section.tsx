@@ -21,10 +21,10 @@ export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSec
   return (
     <section id={'pixel-breadcrumb'} aria-labelledby={'pixel-breadcrumb-heading'} className={className} data-status='stable'>
       <h2 id='pixel-breadcrumb-heading'>PixelBreadcrumb</h2>
-      <p className="docs-lead">Trail of links representing the user's location in a hierarchical site structure, with pixel-chevron or slash separators per surface.</p>
+      <p className="docs-lead">Trail of links representing the user&#39;s location in a hierarchical site structure, with pixel-chevron or slash separators per surface.</p>
       <ul className="docs-highlights">
         <li>Renders &lt;nav&gt; + &lt;ol&gt;/&lt;li&gt; landmark with configurable aria-label.</li>
-        <li>Active crumb marked with aria-current="page" and emphasised typography.</li>
+        <li>Active crumb marked with aria-current=&quot;page&quot; and emphasised typography.</li>
         <li>Per-item href (link), onClick (button), or plain label — choose per crumb.</li>
         <li>Pixel surface uses a crisp-edged chevron SVG; linear surface uses a slash separator.</li>
         <li>SSR-safe, tree-shakable, and inherits ambient surface context.</li>
@@ -44,7 +44,7 @@ export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSec
       <ul className="docs-aria-patterns">
         <li><code>navigation</code></li>
       </ul>
-      <p className="docs-aria-notes">Rendered as a &lt;nav&gt; landmark with a configurable aria-label (defaults to "Breadcrumb"). Crumbs live inside an ordered &lt;ol&gt;/&lt;li&gt; list reflecting the hierarchy. The active crumb carries aria-current="page" and is rendered as a non-interactive &lt;span&gt; to convey the user's current location. Separators between crumbs use aria-hidden so screen readers skip the decorative chevron or slash.</p>
+      <p className="docs-aria-notes">Rendered as a &lt;nav&gt; landmark with a configurable aria-label (defaults to &quot;Breadcrumb&quot;). Crumbs live inside an ordered &lt;ol&gt;/&lt;li&gt; list reflecting the hierarchy. The active crumb carries aria-current=&quot;page&quot; and is rendered as a non-interactive &lt;span&gt; to convey the user&#39;s current location. Separators between crumbs use aria-hidden so screen readers skip the decorative chevron or slash.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

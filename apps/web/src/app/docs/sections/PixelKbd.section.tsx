@@ -43,7 +43,7 @@ export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): Re
       <ul className="docs-aria-patterns">
         <li><code>kbd</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders as a native &lt;kbd&gt; element so screen readers convey the keyboard-input semantic. PixelKbd is presentational (not focusable, not actionable) — pair it with descriptive prose (e.g. "Press &lt;kbd&gt;Ctrl&lt;/kbd&gt; + &lt;kbd&gt;K&lt;/kbd&gt; to open the command palette") so the shortcut is meaningful when read out of context. For key combos, render multiple PixelKbd siblings with a literal "+" separator marked aria-hidden.</p>
+      <p className="docs-aria-notes">Renders as a native &lt;kbd&gt; element so screen readers convey the keyboard-input semantic. PixelKbd is presentational (not focusable, not actionable) — pair it with descriptive prose (e.g. &quot;Press &lt;kbd&gt;Ctrl&lt;/kbd&gt; + &lt;kbd&gt;K&lt;/kbd&gt; to open the command palette&quot;) so the shortcut is meaningful when read out of context. For key combos, render multiple PixelKbd siblings with a literal &quot;+&quot; separator marked aria-hidden.</p>
     </section>
     <section aria-label="Related components">
       <h3>Related</h3>

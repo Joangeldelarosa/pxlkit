@@ -44,7 +44,7 @@ export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps)
       <ul className="docs-aria-patterns">
         <li><code>dialog</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders with role="dialog" and aria-modal="true". Title is exposed via aria-labelledby; description (when provided) via aria-describedby. The close button advertises aria-busy while asyncClose is in flight. Backdrop click is equivalent to Escape and is disabled while closing to avoid double-firing.</p>
+      <p className="docs-aria-notes">Renders with role=&quot;dialog&quot; and aria-modal=&quot;true&quot;. Title is exposed via aria-labelledby; description (when provided) via aria-describedby. The close button advertises aria-busy while asyncClose is in flight. Backdrop click is equivalent to Escape and is disabled while closing to avoid double-firing.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

@@ -45,7 +45,7 @@ export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProp
         <li><code>combobox</code></li>
         <li><code>listbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Trigger is a `&lt;button role="combobox"&gt;` paired with a `role="listbox"` popup containing `role="option"` children. Provide an accessible name via `label` or `aria-describedby`; `error` automatically sets `aria-invalid`.</p>
+      <p className="docs-aria-notes">Trigger is a `&lt;button role=&quot;combobox&quot;&gt;` paired with a `role=&quot;listbox&quot;` popup containing `role=&quot;option&quot;` children. Provide an accessible name via `label` or `aria-describedby`; `error` automatically sets `aria-invalid`.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

@@ -21,11 +21,11 @@ export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps)
   return (
     <section id={'pixel-alert'} aria-labelledby={'pixel-alert-heading'} className={className} data-status='stable'>
       <h2 id='pixel-alert-heading'>PixelAlert</h2>
-      <p className="docs-lead">Inline status banner with title, message, tone, optional icon, and action — announces itself to screen readers via role="alert".</p>
+      <p className="docs-lead">Inline status banner with title, message, tone, optional icon, and action — announces itself to screen readers via role=&quot;alert&quot;.</p>
       <ul className="docs-highlights">
         <li>Seven tones (neutral, green, cyan, gold, red, purple, pink) with soft tint + matching border.</li>
         <li>Surface-aware: pixel adds a left HP-bar accent stripe and chamfered border; linear stays rounded.</li>
-        <li>Smart aria-live default — red/gold use "assertive", everything else "polite". Overridable via live prop.</li>
+        <li>Smart aria-live default — red/gold use &quot;assertive&quot;, everything else &quot;polite&quot;. Overridable via live prop.</li>
         <li>Optional icon and action slots for quick triage (e.g. Retry, Dismiss).</li>
         <li>SSR-safe, ref-forwarded, no client state.</li>
       </ul>
@@ -44,7 +44,7 @@ export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps)
       <ul className="docs-aria-patterns">
         <li><code>alert</code></li>
       </ul>
-      <p className="docs-aria-notes">Root carries role="alert" and a calculated aria-live (assertive for red/gold, polite otherwise). Icon slot is wrapped purely for layout — meaning must come from the title/message text, not the glyph. For non-urgent status (e.g. "saved"), pass live="polite" to prevent screen-reader interruption. Action buttons are exposed as siblings of the message and receive their own focus order.</p>
+      <p className="docs-aria-notes">Root carries role=&quot;alert&quot; and a calculated aria-live (assertive for red/gold, polite otherwise). Icon slot is wrapped purely for layout — meaning must come from the title/message text, not the glyph. For non-urgent status (e.g. &quot;saved&quot;), pass live=&quot;polite&quot; to prevent screen-reader interruption. Action buttons are exposed as siblings of the message and receive their own focus order.</p>
     </section>
     <section aria-label="Related components">
       <h3>Related</h3>

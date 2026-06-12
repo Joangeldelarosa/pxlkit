@@ -42,9 +42,9 @@ export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionPr
       <h3 id="pixel-command-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>role="dialog" with aria-modal="true" for the palette container</code></li>
-        <li><code>role="combobox" on the input with aria-expanded and aria-controls</code></li>
-        <li><code>role="listbox" on the results list with role="option" items</code></li>
+        <li><code>role=&quot;dialog&quot; with aria-modal=&quot;true&quot; for the palette container</code></li>
+        <li><code>role=&quot;combobox&quot; on the input with aria-expanded and aria-controls</code></li>
+        <li><code>role=&quot;listbox&quot; on the results list with role=&quot;option&quot; items</code></li>
         <li><code>aria-activedescendant points at the highlighted option for screen readers</code></li>
         <li><code>Focus trap inside the panel and scroll lock on body while open</code></li>
       </ul>

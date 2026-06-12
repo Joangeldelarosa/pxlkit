@@ -26,7 +26,7 @@ export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProp
         <li>Standalone controlled (pressed + onPressedChange) or composed inside PixelToggleGroup</li>
         <li>Inherits size, variant, and surface from a parent PixelToggleGroup context</li>
         <li>Cyan tone pressed state with surface-aware borders, radius, and transitions</li>
-        <li>Renders as role="radio" with aria-checked inside a single-select group, aria-pressed otherwise</li>
+        <li>Renders as role=&quot;radio&quot; with aria-checked inside a single-select group, aria-pressed otherwise</li>
         <li>Forwards refs and registers with the group for roving-tabindex keyboard navigation</li>
       </ul>
     <dl className="docs-meta">
@@ -44,7 +44,7 @@ export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProp
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Standalone toggle exposes aria-pressed reflecting the boolean state. When wrapped by a single-select PixelToggleGroup the role is overridden to "radio" with aria-checked so screen readers announce "one of N" semantics. Data attributes data-state and data-pxl-toggle-value support styling and testing hooks.</p>
+      <p className="docs-aria-notes">Standalone toggle exposes aria-pressed reflecting the boolean state. When wrapped by a single-select PixelToggleGroup the role is overridden to &quot;radio&quot; with aria-checked so screen readers announce &quot;one of N&quot; semantics. Data attributes data-state and data-pxl-toggle-value support styling and testing hooks.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

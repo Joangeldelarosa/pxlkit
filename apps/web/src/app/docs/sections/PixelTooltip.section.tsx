@@ -44,7 +44,7 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>tooltip</code></li>
       </ul>
-      <p className="docs-aria-notes">Floating panel has role="tooltip" and is wired to the trigger via aria-describedby when open. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers listen for clicks bubbling from the anchor child — the wrapper itself stays non-interactive so an interactive child (the common case) is not nested inside another control; anchor click tooltips to a button or link for keyboard support. Outside pointerdown and Escape close a click tooltip. Use focus or click trigger when the tooltip must be reachable without a pointer device.</p>
+      <p className="docs-aria-notes">Floating panel has role=&quot;tooltip&quot; and is wired to the trigger via aria-describedby when open. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers listen for clicks bubbling from the anchor child — the wrapper itself stays non-interactive so an interactive child (the common case) is not nested inside another control; anchor click tooltips to a button or link for keyboard support. Outside pointerdown and Escape close a click tooltip. Use focus or click trigger when the tooltip must be reachable without a pointer device.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -63,17 +63,17 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
           <tr>
             <td><kbd>Enter</kbd></td>
             <td>Toggles the tooltip</td>
-            <td>trigger="click" and the anchor child is interactive (e.g. a button)</td>
+            <td>trigger=&quot;click&quot; and the anchor child is interactive (e.g. a button)</td>
           </tr>
           <tr>
             <td><kbd>Space</kbd></td>
             <td>Toggles the tooltip</td>
-            <td>trigger="click" and the anchor child is interactive (e.g. a button)</td>
+            <td>trigger=&quot;click&quot; and the anchor child is interactive (e.g. a button)</td>
           </tr>
           <tr>
             <td><kbd>Escape</kbd></td>
             <td>Closes the tooltip</td>
-            <td>trigger="click" and open</td>
+            <td>trigger=&quot;click&quot; and open</td>
           </tr>
         </tbody>
       </table>

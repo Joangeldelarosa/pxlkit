@@ -44,7 +44,7 @@ export function PixelDividerDocsSection({ className }: PixelDividerDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>role=separator with aria-orientation=horizontal when labeled; decorative &lt;hr&gt; otherwise</code></li>
       </ul>
-      <p className="docs-aria-notes">Non-interactive. When a label is present, the wrapper exposes role="separator" and aria-label; the underlying rules are aria-hidden.</p>
+      <p className="docs-aria-notes">Non-interactive. When a label is present, the wrapper exposes role=&quot;separator&quot; and aria-label; the underlying rules are aria-hidden.</p>
     </section>
     </section>
   );

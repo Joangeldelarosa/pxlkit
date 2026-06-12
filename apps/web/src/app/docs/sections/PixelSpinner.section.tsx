@@ -44,7 +44,7 @@ export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>status</code></li>
       </ul>
-      <p className="docs-aria-notes">Default renders role=status with aria-label="Loading" and a visually-hidden label for SR. Pass `decorative` when the parent already announces busy state (e.g. button with aria-busy) to avoid double announcements. Honors prefers-reduced-motion.</p>
+      <p className="docs-aria-notes">Default renders role=status with aria-label=&quot;Loading&quot; and a visually-hidden label for SR. Pass `decorative` when the parent already announces busy state (e.g. button with aria-busy) to avoid double announcements. Honors prefers-reduced-motion.</p>
     </section>
     <section aria-label="Related components">
       <h3>Related</h3>

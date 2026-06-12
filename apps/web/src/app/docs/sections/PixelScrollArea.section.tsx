@@ -44,7 +44,7 @@ export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSec
       <ul className="docs-aria-patterns">
         <li><code>scrollable-region</code></li>
       </ul>
-      <p className="docs-aria-notes">Region is focusable (tabIndex 0, role="region") so keyboard users can scroll. Provide aria-label or aria-labelledby so screen-reader users know what they have landed on; a dev-time warning fires if none is set.</p>
+      <p className="docs-aria-notes">Region is focusable (tabIndex 0, role=&quot;region&quot;) so keyboard users can scroll. Provide aria-label or aria-labelledby so screen-reader users know what they have landed on; a dev-time warning fires if none is set.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

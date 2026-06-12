@@ -44,7 +44,7 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>progress-steps</code></li>
       </ul>
-      <p className="docs-aria-notes">The root renders role="group" with a configurable ariaLabel (defaults to "Progress steps"). Each step carries an aria-label combining its position ("Step N of M"), its label, and its state (current/completed/error). The active step is marked with aria-current="step". Steps that are not clickable (no onStepClick, or future steps when allowNextStepsSelect is false) are removed from the tab sequence via tabIndex=-1. Indicators and connectors are aria-hidden so screen readers announce only the step label and state.</p>
+      <p className="docs-aria-notes">The root renders role=&quot;group&quot; with a configurable ariaLabel (defaults to &quot;Progress steps&quot;). Each step carries an aria-label combining its position (&quot;Step N of M&quot;), its label, and its state (current/completed/error). The active step is marked with aria-current=&quot;step&quot;. Steps that are not clickable (no onStepClick, or future steps when allowNextStepsSelect is false) are removed from the tab sequence via tabIndex=-1. Indicators and connectors are aria-hidden so screen readers announce only the step label and state.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -63,22 +63,22 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
           <tr>
             <td><kbd>ArrowRight</kbd></td>
             <td>Focuses the next clickable step.</td>
-            <td>orientation="horizontal"</td>
+            <td>orientation=&quot;horizontal&quot;</td>
           </tr>
           <tr>
             <td><kbd>ArrowLeft</kbd></td>
             <td>Focuses the previous clickable step.</td>
-            <td>orientation="horizontal"</td>
+            <td>orientation=&quot;horizontal&quot;</td>
           </tr>
           <tr>
             <td><kbd>ArrowDown</kbd></td>
             <td>Focuses the next clickable step.</td>
-            <td>orientation="vertical"</td>
+            <td>orientation=&quot;vertical&quot;</td>
           </tr>
           <tr>
             <td><kbd>ArrowUp</kbd></td>
             <td>Focuses the previous clickable step.</td>
-            <td>orientation="vertical"</td>
+            <td>orientation=&quot;vertical&quot;</td>
           </tr>
           <tr>
             <td><kbd>Home</kbd></td>

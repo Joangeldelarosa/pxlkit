@@ -45,7 +45,7 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
         <li><code>menu</code></li>
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Trigger exposes `aria-haspopup="menu"`, `aria-expanded`, and `aria-controls` wired to the menu id. Items use `role="menuitem"` with `aria-disabled` for skipped rows. Separators use `role="separator"`; headers are `role="presentation"`. Click-outside and Escape both dismiss.</p>
+      <p className="docs-aria-notes">Trigger exposes `aria-haspopup=&quot;menu&quot;`, `aria-expanded`, and `aria-controls` wired to the menu id. Items use `role=&quot;menuitem&quot;` with `aria-disabled` for skipped rows. Separators use `role=&quot;separator&quot;`; headers are `role=&quot;presentation&quot;`. Click-outside and Escape both dismiss.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

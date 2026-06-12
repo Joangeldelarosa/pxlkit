@@ -23,7 +23,7 @@ export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsS
       <h2 id='pixel-alert-dialog-heading'>PixelAlertDialog</h2>
       <p className="docs-lead">Modal confirmation dialog for destructive or irreversible actions, with async-aware action handling and Cancel-focused defaults.</p>
       <ul className="docs-highlights">
-        <li>role="alertdialog" + aria-modal with initial focus pinned to Cancel for safer destructive flows</li>
+        <li>role=&quot;alertdialog&quot; + aria-modal with initial focus pinned to Cancel for safer destructive flows</li>
         <li>Async onAction with pending state, spinner, and stays open on rejection when onError is provided</li>
         <li>Destructive tone variant switches the action accent to red</li>
         <li>Surface-aware styling via useEffectiveSurface (pixel chrome vs. modern)</li>

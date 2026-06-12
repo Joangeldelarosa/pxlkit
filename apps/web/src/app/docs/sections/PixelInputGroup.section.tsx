@@ -25,7 +25,7 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
       <ul className="docs-highlights">
         <li>Composes any form children (input, button, select) into a single joined shell.</li>
         <li>`size` and `surface` props inherit the kit-wide design tokens.</li>
-        <li>Accessible: applies `role="group"` only when an `aria-label`/`aria-labelledby` is provided.</li>
+        <li>Accessible: applies `role=&quot;group&quot;` only when an `aria-label`/`aria-labelledby` is provided.</li>
         <li>Dev-mode warning when a multi-child group is missing an accessible name.</li>
         <li>Preserves child `className` (consumer styles win over the join overrides).</li>
       </ul>
@@ -44,7 +44,7 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
       </ul>
-      <p className="docs-aria-notes">Sets `role="group"` only when given an accessible name (`aria-label` / `aria-labelledby`). Decorative addons inside should use `aria-hidden`; child controls keep their own labels.</p>
+      <p className="docs-aria-notes">Sets `role=&quot;group&quot;` only when given an accessible name (`aria-label` / `aria-labelledby`). Decorative addons inside should use `aria-hidden`; child controls keep their own labels.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

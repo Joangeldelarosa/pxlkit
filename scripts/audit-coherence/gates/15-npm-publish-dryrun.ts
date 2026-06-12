@@ -177,6 +177,12 @@ export const defaultNpmDryRunRunner: NpmDryRunRunner = async ({
       encoding: 'utf8',
       shell: isWindows,
       windowsHide: true,
+      // When the audit itself is launched via `npm run --silent …` (the CI
+      // invocation), npm exports npm_config_loglevel=silent to child npm
+      // processes — which silences the dry-run tarball listing this gate
+      // parses, turning every package into a false "no tarball contents"
+      // finding. Pin the loglevel the parser needs.
+      env: { ...process.env, npm_config_loglevel: 'notice' },
       // npm writes the tarball contents to stderr in older versions and
       // stdout in newer ones; we merge both manually below so callers see
       // the combined `2>&1` view the brief promised.

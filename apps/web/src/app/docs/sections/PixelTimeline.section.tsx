@@ -23,7 +23,7 @@ export function PixelTimelineDocsSection({ className }: PixelTimelineDocsSection
       <h2 id='pixel-timeline-heading'>PixelTimeline</h2>
       <p className="docs-lead">Vertical timeline rendered as a semantic ordered list with past/active/upcoming states and surface-aware bullets and connectors.</p>
       <ul className="docs-highlights">
-        <li>Semantic &lt;ol&gt;/&lt;li&gt; with aria-current="step" on the active entry</li>
+        <li>Semantic &lt;ol&gt;/&lt;li&gt; with aria-current=&quot;step&quot; on the active entry</li>
         <li>Configurable bullet size, alignment, and per-item connector variant (solid/dashed/dotted)</li>
         <li>Surface-aware (pixel/glass/solid) styling via shared surface tokens</li>
         <li>Connector lines marked aria-hidden so screen readers ignore decoration</li>
@@ -42,7 +42,7 @@ export function PixelTimelineDocsSection({ className }: PixelTimelineDocsSection
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>semantic ol/li</code></li>
-        <li><code>aria-current="step" on active item</code></li>
+        <li><code>aria-current=&quot;step&quot; on active item</code></li>
         <li><code>connectors aria-hidden</code></li>
       </ul>
       <p className="docs-aria-notes">Decorative bullets and connector rails are aria-hidden; entry state is exposed via aria-current on the active &lt;li&gt;.</p>

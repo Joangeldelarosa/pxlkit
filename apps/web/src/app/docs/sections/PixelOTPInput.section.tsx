@@ -42,10 +42,10 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
       <h3 id="pixel-otp-input-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>role="group" with aria-label for the cell collection</code></li>
+        <li><code>role=&quot;group&quot; with aria-label for the cell collection</code></li>
         <li><code>per-cell aria-label indicating digit index and total</code></li>
         <li><code>inputmode=numeric|text matches the accepted character set</code></li>
-        <li><code>autocomplete="one-time-code" on the first cell for SMS autofill</code></li>
+        <li><code>autocomplete=&quot;one-time-code&quot; on the first cell for SMS autofill</code></li>
       </ul>
       <p className="docs-aria-notes">Invalid characters are silently rejected based on the type prop. onComplete fires once when all cells are filled.</p>
       <h4>Keyboard</h4>

@@ -42,7 +42,7 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
       <h3 id="pixel-drawer-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>role="dialog" with aria-modal="true"</code></li>
+        <li><code>role=&quot;dialog&quot; with aria-modal=&quot;true&quot;</code></li>
         <li><code>Focus trap inside panel (WCAG 2.1.2 No Keyboard Trap)</code></li>
         <li><code>Scroll lock on body while open</code></li>
         <li><code>Escape key closes the drawer</code></li>

@@ -27,7 +27,7 @@ export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSection
         <li>Seven tones via the shared toneMap palette</li>
         <li>Pixel and linear surface variants share the same API</li>
         <li>Hidden mirror input lets it participate in native &lt;form&gt; submissions when name is set</li>
-        <li>Renders as role="checkbox" with aria-checked, aria-disabled, and aria-required</li>
+        <li>Renders as role=&quot;checkbox&quot; with aria-checked, aria-disabled, and aria-required</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -44,7 +44,7 @@ export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSection
       <ul className="docs-aria-patterns">
         <li><code>checkbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Rendered as a &lt;button type="button"&gt; with role="checkbox" and aria-checked reflecting the boolean state. aria-disabled and aria-required mirror the disabled and required props. When a name prop is supplied a hidden &lt;input&gt; is emitted alongside so the value participates in native &lt;form&gt; submissions only while checked.</p>
+      <p className="docs-aria-notes">Rendered as a &lt;button type=&quot;button&quot;&gt; with role=&quot;checkbox&quot; and aria-checked reflecting the boolean state. aria-disabled and aria-required mirror the disabled and required props. When a name prop is supplied a hidden &lt;input&gt; is emitted alongside so the value participates in native &lt;form&gt; submissions only while checked.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -62,7 +62,7 @@ export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSection
           </tr>
           <tr>
             <td><kbd>Enter</kbd></td>
-            <td>Submits the enclosing form (native &lt;button type="button"&gt; behavior is keyboard-activated via Space; Enter falls back to form submission).</td>
+            <td>Submits the enclosing form (native &lt;button type=&quot;button&quot;&gt; behavior is keyboard-activated via Space; Enter falls back to form submission).</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>

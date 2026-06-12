@@ -26,7 +26,7 @@ export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsS
         <li>Primary click handler plus a menu of alternate actions in a single control</li>
         <li>Inherits tone + surface theming from the design system</li>
         <li>Closes on outside click via useClickOutside</li>
-        <li>aria-haspopup="menu" + aria-expanded on the chevron trigger</li>
+        <li>aria-haspopup=&quot;menu&quot; + aria-expanded on the chevron trigger</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -43,7 +43,7 @@ export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsS
       <ul className="docs-aria-patterns">
         <li><code>menu</code></li>
       </ul>
-      <p className="docs-aria-notes">Chevron trigger exposes aria-haspopup="menu" and aria-expanded. Dropdown container uses role="menu" with role="menuitem" children. Outside click dismisses the menu.</p>
+      <p className="docs-aria-notes">Chevron trigger exposes aria-haspopup=&quot;menu&quot; and aria-expanded. Dropdown container uses role=&quot;menu&quot; with role=&quot;menuitem&quot; children. Outside click dismisses the menu.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

@@ -44,7 +44,7 @@ export function PixelDataTableDocsSection({ className }: PixelDataTableDocsSecti
       <ul className="docs-aria-patterns">
         <li><code>table</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders semantic &lt;table&gt;, &lt;thead&gt;, &lt;tbody&gt;, &lt;th scope="col"&gt; and aria-sort on sortable column headers. Row selection checkboxes carry aria-label "Select row &#123;id&#125;" and a header checkbox labelled "Select all rows" with indeterminate state. Loading body exposes aria-busy and a role="status" with aria-live="polite" announcement. Pagination buttons declare aria-label and the page counter is announced with aria-live.</p>
+      <p className="docs-aria-notes">Renders semantic &lt;table&gt;, &lt;thead&gt;, &lt;tbody&gt;, &lt;th scope=&quot;col&quot;&gt; and aria-sort on sortable column headers. Row selection checkboxes carry aria-label &quot;Select row &#123;id&#125;&quot; and a header checkbox labelled &quot;Select all rows&quot; with indeterminate state. Loading body exposes aria-busy and a role=&quot;status&quot; with aria-live=&quot;polite&quot; announcement. Pagination buttons declare aria-label and the page counter is announced with aria-live.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

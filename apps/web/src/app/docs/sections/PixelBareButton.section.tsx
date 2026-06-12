@@ -24,7 +24,7 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
       <p className="docs-lead">Unstyled passthrough &lt;button&gt; primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.</p>
       <ul className="docs-highlights">
         <li>Zero styling — renders a raw &lt;button&gt; with all native attributes forwarded</li>
-        <li>Defaults type="button" to prevent accidental form submissions</li>
+        <li>Defaults type=&quot;button&quot; to prevent accidental form submissions</li>
         <li>Forwards refs to the underlying HTMLButtonElement</li>
         <li>Ideal for icon triggers, custom-styled CTAs, or wrapping inside compound components</li>
         <li>Tree-shakable and SSR-safe</li>

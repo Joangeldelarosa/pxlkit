@@ -45,7 +45,7 @@ export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): 
         <li><code>form</code></li>
         <li><code>labelled-control</code></li>
       </ul>
-      <p className="docs-aria-notes">Each `PixelForm.Item` generates a stable `useId()` base and links the Label (htmlFor), Control (id + aria-describedby + aria-invalid), Description (id), and Message (id, role="alert" on error) automatically — authors do not pass ids manually.</p>
+      <p className="docs-aria-notes">Each `PixelForm.Item` generates a stable `useId()` base and links the Label (htmlFor), Control (id + aria-describedby + aria-invalid), Description (id), and Message (id, role=&quot;alert&quot; on error) automatically — authors do not pass ids manually.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

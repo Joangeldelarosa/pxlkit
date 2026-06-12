@@ -45,7 +45,7 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
         <li><code>button-like dropzone</code></li>
         <li><code>aria-describedby for accepted formats</code></li>
       </ul>
-      <p className="docs-aria-notes">Dropzone exposes role="button" with tabIndex 0 (or -1 when disabled) and aria-describedby pointing at the hint/error message. The hidden &lt;input type="file"&gt; is aria-hidden while the dropzone is active.</p>
+      <p className="docs-aria-notes">Dropzone exposes role=&quot;button&quot; with tabIndex 0 (or -1 when disabled) and aria-describedby pointing at the hint/error message. The hidden &lt;input type=&quot;file&quot;&gt; is aria-hidden while the dropzone is active.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

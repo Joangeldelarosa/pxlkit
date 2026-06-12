@@ -26,7 +26,7 @@ export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSecti
         <li>Row layout with vertical dividers or grid layout with configurable columns (1–6).</li>
         <li>Tone-driven border color shared by the container and inter-cell dividers.</li>
         <li>Surface-aware: pixel chamfered border + pixel radius, or linear rounded corners.</li>
-        <li>Adopts role="group" automatically when aria-label or aria-labelledby is provided.</li>
+        <li>Adopts role=&quot;group&quot; automatically when aria-label or aria-labelledby is provided.</li>
         <li>Forwards ref to the underlying div and spreads native HTMLAttributes.</li>
       </ul>
     <dl className="docs-meta">
@@ -44,7 +44,7 @@ export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSecti
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders as a plain &lt;div&gt; by default. When aria-label or aria-labelledby is provided, the root gains role="group" to expose the collection as a named landmark to assistive tech. Without an accessible name the role is intentionally dropped to avoid an unlabeled group node. The inner stat tiles (PixelStatCard) carry their own label/value semantics.</p>
+      <p className="docs-aria-notes">Renders as a plain &lt;div&gt; by default. When aria-label or aria-labelledby is provided, the root gains role=&quot;group&quot; to expose the collection as a named landmark to assistive tech. Without an accessible name the role is intentionally dropped to avoid an unlabeled group node. The inner stat tiles (PixelStatCard) carry their own label/value semantics.</p>
     </section>
     <section aria-label="Related components">
       <h3>Related</h3>

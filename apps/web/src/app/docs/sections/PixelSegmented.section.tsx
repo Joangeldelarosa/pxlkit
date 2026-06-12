@@ -44,7 +44,7 @@ export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSecti
       <ul className="docs-aria-patterns">
         <li><code>radiogroup</code></li>
       </ul>
-      <p className="docs-aria-notes">Each option renders as a &lt;button&gt; with aria-pressed reflecting the active selection, and aria-disabled mirroring the disabled prop. When name is set a hidden &lt;input&gt; mirrors the current value so the control participates in native &lt;form&gt; submissions. The implementation uses aria-pressed (toggle-button semantics) rather than role="radio" on each button.</p>
+      <p className="docs-aria-notes">Each option renders as a &lt;button&gt; with aria-pressed reflecting the active selection, and aria-disabled mirroring the disabled prop. When name is set a hidden &lt;input&gt; mirrors the current value so the control participates in native &lt;form&gt; submissions. The implementation uses aria-pressed (toggle-button semantics) rather than role=&quot;radio&quot; on each button.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

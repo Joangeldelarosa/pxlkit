@@ -25,7 +25,7 @@ export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSection
       <ul className="docs-highlights">
         <li>Built on embla-carousel with full opts and plugins pass-through</li>
         <li>Horizontal or vertical orientation with arrow and dot navigation</li>
-        <li>Keyboard navigation (Arrow keys) and aria-roledescription="carousel" landmark</li>
+        <li>Keyboard navigation (Arrow keys) and aria-roledescription=&quot;carousel&quot; landmark</li>
         <li>Surface-aware (pixel or linear) with focus-ring tokens</li>
         <li>Honors prefers-reduced-motion by zeroing transition duration</li>
       </ul>
@@ -44,7 +44,7 @@ export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSection
       <ul className="docs-aria-patterns">
         <li><code>carousel</code></li>
       </ul>
-      <p className="docs-aria-notes">Root element is role="region" with aria-roledescription="carousel" and a focusable tabIndex. Each item is role="group" with aria-roledescription="slide" and aria-label "Slide N of M". Previous/Next buttons declare aria-label and aria-controls pointing to the viewport id. A polite live region announces the current slide index without reading slide content (per APG carousel pattern). Dots expose aria-current="true" on the active slide.</p>
+      <p className="docs-aria-notes">Root element is role=&quot;region&quot; with aria-roledescription=&quot;carousel&quot; and a focusable tabIndex. Each item is role=&quot;group&quot; with aria-roledescription=&quot;slide&quot; and aria-label &quot;Slide N of M&quot;. Previous/Next buttons declare aria-label and aria-controls pointing to the viewport id. A polite live region announces the current slide index without reading slide content (per APG carousel pattern). Dots expose aria-current=&quot;true&quot; on the active slide.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

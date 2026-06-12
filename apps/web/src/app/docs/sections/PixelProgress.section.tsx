@@ -44,7 +44,7 @@ export function PixelProgressDocsSection({ className }: PixelProgressDocsSection
       <ul className="docs-aria-patterns">
         <li><code>progressbar</code></li>
       </ul>
-      <p className="docs-aria-notes">Exposes role="progressbar" with aria-valuemin=0 and aria-valuemax=100; aria-valuenow is set from the clamped value. The label prop is forwarded to aria-label, falling back to "Progress" when omitted so the progressbar always has an accessible name. In indeterminate mode aria-valuenow is omitted and aria-busy is set to true so assistive tech announces unknown-duration work. The 10-segment pixel surface is purely visual — assistive tech reads the same progressbar attributes as the linear surface.</p>
+      <p className="docs-aria-notes">Exposes role=&quot;progressbar&quot; with aria-valuemin=0 and aria-valuemax=100; aria-valuenow is set from the clamped value. The label prop is forwarded to aria-label, falling back to &quot;Progress&quot; when omitted so the progressbar always has an accessible name. In indeterminate mode aria-valuenow is omitted and aria-busy is set to true so assistive tech announces unknown-duration work. The 10-segment pixel surface is purely visual — assistive tech reads the same progressbar attributes as the linear surface.</p>
     </section>
     <section aria-label="Related components">
       <h3>Related</h3>

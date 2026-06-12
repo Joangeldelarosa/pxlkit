@@ -25,7 +25,7 @@ export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfacePro
       <ul className="docs-highlights">
         <li>Switches the entire subtree between the pixel and linear aesthetics in one line</li>
         <li>Per-component surface prop still overrides the provider for one-off variants</li>
-        <li>Defaults to "pixel" so consumers without a provider keep the brand look</li>
+        <li>Defaults to &quot;pixel&quot; so consumers without a provider keep the brand look</li>
         <li>SSR-safe context provider with zero runtime cost when value is unchanged</li>
       </ul>
     <dl className="docs-meta">

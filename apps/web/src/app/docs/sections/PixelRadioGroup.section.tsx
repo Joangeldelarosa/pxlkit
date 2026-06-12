@@ -24,7 +24,7 @@ export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSec
       <p className="docs-lead">Single-select grouped radios with a pixel dot indicator, fieldset/legend semantics, and tone + surface variants.</p>
       <ul className="docs-highlights">
         <li>Controlled via value + onChange(next: string) over a list of options.</li>
-        <li>Renders as a real &lt;fieldset&gt; with role="radiogroup" and a &lt;legend&gt; from label.</li>
+        <li>Renders as a real &lt;fieldset&gt; with role=&quot;radiogroup&quot; and a &lt;legend&gt; from label.</li>
         <li>Seven tones and pixel/linear surfaces share the kit-wide design tokens.</li>
         <li>Optional name emits a hidden input so it serializes inside native forms.</li>
         <li>disabled cascades to every option button (not just visually).</li>
@@ -44,7 +44,7 @@ export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSec
       <ul className="docs-aria-patterns">
         <li><code>radiogroup</code></li>
       </ul>
-      <p className="docs-aria-notes">Wrapped in a &lt;fieldset role="radiogroup"&gt; with &lt;legend&gt; derived from label and aria-disabled / aria-required mirroring the props. Each option is a &lt;button role="radio"&gt; with aria-checked reflecting selection. When name is set a hidden &lt;input&gt; mirrors the current value so the group participates in native &lt;form&gt; submissions.</p>
+      <p className="docs-aria-notes">Wrapped in a &lt;fieldset role=&quot;radiogroup&quot;&gt; with &lt;legend&gt; derived from label and aria-disabled / aria-required mirroring the props. Each option is a &lt;button role=&quot;radio&quot;&gt; with aria-checked reflecting selection. When name is set a hidden &lt;input&gt; mirrors the current value so the group participates in native &lt;form&gt; submissions.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

@@ -44,7 +44,7 @@ export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSec
       <ul className="docs-aria-patterns">
         <li><code>navigation</code></li>
       </ul>
-      <p className="docs-aria-notes">Rendered as a &lt;nav&gt; landmark with a configurable aria-label. The current page button carries aria-current="page"; ellipses are aria-hidden so screen readers skip decorative gaps. Prev/Next buttons disable at the edges instead of being removed, preserving layout and predictable tab order.</p>
+      <p className="docs-aria-notes">Rendered as a &lt;nav&gt; landmark with a configurable aria-label. The current page button carries aria-current=&quot;page&quot;; ellipses are aria-hidden so screen readers skip decorative gaps. Prev/Next buttons disable at the edges instead of being removed, preserving layout and predictable tab order.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

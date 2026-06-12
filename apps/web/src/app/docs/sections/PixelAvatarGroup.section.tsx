@@ -21,13 +21,13 @@ export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsS
   return (
     <section id={'pixel-avatar-group'} aria-labelledby={'pixel-avatar-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-avatar-group-heading'>PixelAvatarGroup</h2>
-      <p className="docs-lead">Clusters PixelAvatar children into an overlapping row with a tone-aware "+N" overflow tile when the count exceeds max.</p>
+      <p className="docs-lead">Clusters PixelAvatar children into an overlapping row with a tone-aware &quot;+N&quot; overflow tile when the count exceeds max.</p>
       <ul className="docs-highlights">
         <li>Overlapping layout with surface-aware ring isolation against the page background</li>
-        <li>Configurable max — extras collapse into a single "+N more" tile (tone-aware)</li>
+        <li>Configurable max — extras collapse into a single &quot;+N more&quot; tile (tone-aware)</li>
         <li>Five sizes (xs/sm/md/lg/xl) with proportional negative-margin overlap</li>
         <li>Surface-aware radius (pixel → squared 3px / linear → fully rounded)</li>
-        <li>role="group" only when an accessible name is provided (aria-label / aria-labelledby)</li>
+        <li>role=&quot;group&quot; only when an accessible name is provided (aria-label / aria-labelledby)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -44,7 +44,7 @@ export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsS
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
       </ul>
-      <p className="docs-aria-notes">Provide aria-label or aria-labelledby summarizing the count (e.g. "5 team members"); without one, role=group is dropped so the cluster is treated as presentational. The "+N" overflow tile carries its own aria-label ("N more users") so assistive tech announces the hidden count.</p>
+      <p className="docs-aria-notes">Provide aria-label or aria-labelledby summarizing the count (e.g. &quot;5 team members&quot;); without one, role=group is dropped so the cluster is treated as presentational. The &quot;+N&quot; overflow tile carries its own aria-label (&quot;N more users&quot;) so assistive tech announces the hidden count.</p>
     </section>
     <section aria-label="Related components">
       <h3>Related</h3>

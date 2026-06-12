@@ -44,7 +44,7 @@ export function PixelSliderDocsSection({ className }: PixelSliderDocsSectionProp
       <ul className="docs-aria-patterns">
         <li><code>slider</code></li>
       </ul>
-      <p className="docs-aria-notes">Each thumb is rendered with role="slider" and exposes aria-valuemin, aria-valuemax, aria-valuenow, and an accessible label derived from the label prop. In range mode the lower thumb is constrained ≤ upper thumb on every change. Pointer interaction uses setPointerCapture so dragging tracks the cursor even when it leaves the track.</p>
+      <p className="docs-aria-notes">Each thumb is rendered with role=&quot;slider&quot; and exposes aria-valuemin, aria-valuemax, aria-valuenow, and an accessible label derived from the label prop. In range mode the lower thumb is constrained ≤ upper thumb on every change. Pointer interaction uses setPointerCapture so dragging tracks the cursor even when it leaves the track.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

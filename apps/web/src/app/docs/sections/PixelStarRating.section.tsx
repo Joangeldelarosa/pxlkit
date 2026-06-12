@@ -25,7 +25,7 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
       <ul className="docs-highlights">
         <li>Renders the @pxlkit/gamification Star at 16/20/24px with crisp nearest-neighbour scaling</li>
         <li>Gold or green tone tokens for readonly and interactive states, surface-aware via useEffectiveSurface</li>
-        <li>Optional showCount label renders "N/M" beside the stars</li>
+        <li>Optional showCount label renders &quot;N/M&quot; beside the stars</li>
         <li>Interactive mode exposes per-star buttons with onChange callback</li>
         <li>Polymorphic starIcon prop swaps in any sibling-pack glyph without forking</li>
       </ul>
@@ -42,7 +42,7 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
       <h3 id="pixel-star-rating-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>role=img with aria-label="N out of M" for readonly display</code></li>
+        <li><code>role=img with aria-label=&quot;N out of M&quot; for readonly display</code></li>
         <li><code>role=group with per-star buttons (aria-pressed) for interactive mode</code></li>
       </ul>
       <p className="docs-aria-notes">Interactive mode exposes each star as a button with aria-pressed reflecting filled state; readonly mode collapses to a single aria-labeled image.</p>

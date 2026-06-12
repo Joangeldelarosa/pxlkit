@@ -44,7 +44,7 @@ export function PixelTableDocsSection({ className }: PixelTableDocsSectionProps)
       <ul className="docs-aria-patterns">
         <li><code>table</code></li>
       </ul>
-      <p className="docs-aria-notes">Uses native &lt;table&gt;, &lt;thead&gt;, &lt;tbody&gt;, &lt;th scope="col"&gt; and aria-sort on sortable columns. Loading state exposes role="status" with aria-live="polite". The multi-select header checkbox reflects indeterminate state when only some rows are selected.</p>
+      <p className="docs-aria-notes">Uses native &lt;table&gt;, &lt;thead&gt;, &lt;tbody&gt;, &lt;th scope=&quot;col&quot;&gt; and aria-sort on sortable columns. Loading state exposes role=&quot;status&quot; with aria-live=&quot;polite&quot;. The multi-select header checkbox reflects indeterminate state when only some rows are selected.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

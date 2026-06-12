@@ -44,7 +44,7 @@ export function PixelToastDocsSection({ className }: PixelToastDocsSectionProps)
       <ul className="docs-aria-patterns">
         <li><code>alert</code></li>
       </ul>
-      <p className="docs-aria-notes">Each card declares its own role (alert for assertive tones like red/gold, status for the rest) plus matching aria-live and aria-atomic="true" so screen readers announce title + message together. Hovering or focusing the card pauses the auto-dismiss timer to give assistive-tech users time to read. The dismiss button has aria-label="Dismiss notification" and a visible focus ring. The parent PxlKitToastProvider hosts a single role="region" landmark — toasts should not be nested inside another aria-live region to avoid double announcements.</p>
+      <p className="docs-aria-notes">Each card declares its own role (alert for assertive tones like red/gold, status for the rest) plus matching aria-live and aria-atomic=&quot;true&quot; so screen readers announce title + message together. Hovering or focusing the card pauses the auto-dismiss timer to give assistive-tech users time to read. The dismiss button has aria-label=&quot;Dismiss notification&quot; and a visible focus ring. The parent PxlKitToastProvider hosts a single role=&quot;region&quot; landmark — toasts should not be nested inside another aria-live region to avoid double announcements.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

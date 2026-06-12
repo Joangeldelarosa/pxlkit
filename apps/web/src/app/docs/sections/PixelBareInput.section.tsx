@@ -43,7 +43,7 @@ export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSecti
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Because this primitive is unstyled, callers MUST supply an accessible name via `aria-label`, `aria-labelledby`, or an associated `&lt;label&gt;` element. Visual focus styling is the consumer's responsibility.</p>
+      <p className="docs-aria-notes">Because this primitive is unstyled, callers MUST supply an accessible name via `aria-label`, `aria-labelledby`, or an associated `&lt;label&gt;` element. Visual focus styling is the consumer&#39;s responsibility.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

@@ -21,11 +21,11 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
   return (
     <section id={'pixel-badge-group'} aria-labelledby={'pixel-badge-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-badge-group-heading'>PixelBadgeGroup</h2>
-      <p className="docs-lead">Inline row of badges with automatic "+N" overflow popover when the count exceeds `max`.</p>
+      <p className="docs-lead">Inline row of badges with automatic &quot;+N&quot; overflow popover when the count exceeds `max`.</p>
       <ul className="docs-highlights">
-        <li>Renders the first `max - 1` badges inline; remaining items collapse into a "+N" trigger.</li>
+        <li>Renders the first `max - 1` badges inline; remaining items collapse into a &quot;+N&quot; trigger.</li>
         <li>Overflow trigger opens a PixelPopover with the hidden badges, surface-matched.</li>
-        <li>Wrapper becomes `role="group"` when an accessible name (aria-label or aria-labelledby) is provided.</li>
+        <li>Wrapper becomes `role=&quot;group&quot;` when an accessible name (aria-label or aria-labelledby) is provided.</li>
         <li>Surface-aware: pixel chamfered radius + pixel font or linear pill, propagated to the popover.</li>
         <li>Forwarded ref to the underlying div and full passthrough of HTMLAttributes.</li>
       </ul>
@@ -45,7 +45,7 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
         <li><code>group</code></li>
         <li><code>disclosure</code></li>
       </ul>
-      <p className="docs-aria-notes">Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled "group" announcement. The overflow button carries aria-label="Show N more", aria-expanded, aria-haspopup="dialog", and aria-controls wired by PixelPopover.</p>
+      <p className="docs-aria-notes">Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled &quot;group&quot; announcement. The overflow button carries aria-label=&quot;Show N more&quot;, aria-expanded, aria-haspopup=&quot;dialog&quot;, and aria-controls wired by PixelPopover.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

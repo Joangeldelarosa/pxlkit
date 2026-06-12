@@ -23,7 +23,7 @@ export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsS
       <h2 id='pixel-toggle-group-heading'>PixelToggleGroup</h2>
       <p className="docs-lead">Grouped pressable toggles with single- or multi-select semantics, roving focus, and surface-aware styling.</p>
       <ul className="docs-highlights">
-        <li>Discriminated union API: type="single" → string value, type="multiple" → string[] value</li>
+        <li>Discriminated union API: type=&quot;single&quot; → string value, type=&quot;multiple&quot; → string[] value</li>
         <li>Optional roving tabindex with arrow-key navigation and Home/End support</li>
         <li>Single mode exposes radiogroup/radio semantics; multi mode uses aria-pressed buttons</li>
         <li>Surface-aware (pixel/linear) and supports soft, solid, outline, and ghost variants</li>
@@ -44,7 +44,7 @@ export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsS
         <li><code>radiogroup</code></li>
         <li><code>toolbar</code></li>
       </ul>
-      <p className="docs-aria-notes">Provide an aria-label (or aria-labelledby) for screen reader context. Single-select renders role="radiogroup" with role="radio" children; multi-select renders role="group" only when named.</p>
+      <p className="docs-aria-notes">Provide an aria-label (or aria-labelledby) for screen reader context. Single-select renders role=&quot;radiogroup&quot; with role=&quot;radio&quot; children; multi-select renders role=&quot;group&quot; only when named.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

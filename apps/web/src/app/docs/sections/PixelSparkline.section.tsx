@@ -44,7 +44,7 @@ export function PixelSparklineDocsSection({ className }: PixelSparklineDocsSecti
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
       </ul>
-      <p className="docs-aria-notes">The SVG renders as role="img" with an auto-derived aria-label summarizing the trend (kind, point count, min..max range). Pass a custom aria-label for richer narrative context. For full data accessibility, render a visually-hidden &lt;table&gt; sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.</p>
+      <p className="docs-aria-notes">The SVG renders as role=&quot;img&quot; with an auto-derived aria-label summarizing the trend (kind, point count, min..max range). Pass a custom aria-label for richer narrative context. For full data accessibility, render a visually-hidden &lt;table&gt; sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.</p>
     </section>
     <section aria-label="Related components">
       <h3>Related</h3>

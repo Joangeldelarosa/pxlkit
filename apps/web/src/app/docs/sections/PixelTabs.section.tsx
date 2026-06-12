@@ -44,7 +44,7 @@ export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): 
       <ul className="docs-aria-patterns">
         <li><code>tablist</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders role="tablist" on the list container with aria-orientation reflecting the orientation prop, role="tab" on each trigger with aria-selected and aria-controls wiring, and role="tabpanel" on the panel with aria-labelledby pointing back at its trigger. Panels are tabIndex=0 so keyboard users can reach panel content after activating a tab. The active panel is the only one rendered by default; keepMounted preserves all panels in the DOM and uses the hidden attribute to mask inactive ones.</p>
+      <p className="docs-aria-notes">Renders role=&quot;tablist&quot; on the list container with aria-orientation reflecting the orientation prop, role=&quot;tab&quot; on each trigger with aria-selected and aria-controls wiring, and role=&quot;tabpanel&quot; on the panel with aria-labelledby pointing back at its trigger. Panels are tabIndex=0 so keyboard users can reach panel content after activating a tab. The active panel is the only one rendered by default; keepMounted preserves all panels in the DOM and uses the hidden attribute to mask inactive ones.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -63,22 +63,22 @@ export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): 
           <tr>
             <td><kbd>ArrowRight</kbd></td>
             <td>Focuses the next tab (wraps to first).</td>
-            <td>orientation="horizontal"</td>
+            <td>orientation=&quot;horizontal&quot;</td>
           </tr>
           <tr>
             <td><kbd>ArrowLeft</kbd></td>
             <td>Focuses the previous tab (wraps to last).</td>
-            <td>orientation="horizontal"</td>
+            <td>orientation=&quot;horizontal&quot;</td>
           </tr>
           <tr>
             <td><kbd>ArrowDown</kbd></td>
             <td>Focuses the next tab (wraps to first).</td>
-            <td>orientation="vertical"</td>
+            <td>orientation=&quot;vertical&quot;</td>
           </tr>
           <tr>
             <td><kbd>ArrowUp</kbd></td>
             <td>Focuses the previous tab (wraps to last).</td>
-            <td>orientation="vertical"</td>
+            <td>orientation=&quot;vertical&quot;</td>
           </tr>
           <tr>
             <td><kbd>Home</kbd></td>
@@ -93,12 +93,12 @@ export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): 
           <tr>
             <td><kbd>Enter</kbd></td>
             <td>Activates the focused tab.</td>
-            <td>activationMode="manual"</td>
+            <td>activationMode=&quot;manual&quot;</td>
           </tr>
           <tr>
             <td><kbd>Space</kbd></td>
             <td>Activates the focused tab.</td>
-            <td>activationMode="manual"</td>
+            <td>activationMode=&quot;manual&quot;</td>
           </tr>
         </tbody>
       </table>

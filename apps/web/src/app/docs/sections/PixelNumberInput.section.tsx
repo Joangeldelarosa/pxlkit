@@ -44,7 +44,7 @@ export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsS
       <ul className="docs-aria-patterns">
         <li><code>spinbutton</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders role="spinbutton" with aria-valuemin/aria-valuemax/aria-valuenow reflecting the current numeric state. Error state sets aria-invalid.</p>
+      <p className="docs-aria-notes">Renders role=&quot;spinbutton&quot; with aria-valuemin/aria-valuemax/aria-valuenow reflecting the current numeric state. Error state sets aria-invalid.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

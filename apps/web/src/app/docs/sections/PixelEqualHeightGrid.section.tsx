@@ -26,7 +26,7 @@ export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightG
         <li>Inherits PixelGrid props (cols, gap, surface, etc.) minus align (forced to stretch)</li>
         <li>Clones children with grid-rows-[auto_1fr_auto] so footers align across the row</li>
         <li>Surface-aware via useEffectiveSurface for consistent borders and transitions</li>
-        <li>rowAlign="top" opts out of stretching while keeping equal-height children</li>
+        <li>rowAlign=&quot;top&quot; opts out of stretching while keeping equal-height children</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

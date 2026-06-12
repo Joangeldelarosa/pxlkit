@@ -44,7 +44,7 @@ export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSecti
       <ul className="docs-aria-patterns">
         <li><code>disclosure</code></li>
       </ul>
-      <p className="docs-aria-notes">Each header is a native &lt;button&gt; with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels are plain containers labelled by their header via aria-labelledby — no role="region", which would proliferate landmarks (and collide when several accordions share titles) — matching the WAI-ARIA disclosure pattern stacked into an accordion.</p>
+      <p className="docs-aria-notes">Each header is a native &lt;button&gt; with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels are plain containers labelled by their header via aria-labelledby — no role=&quot;region&quot;, which would proliferate landmarks (and collide when several accordions share titles) — matching the WAI-ARIA disclosure pattern stacked into an accordion.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

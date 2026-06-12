@@ -21,10 +21,10 @@ export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): 
   return (
     <section id={'pixel-card'} aria-labelledby={'pixel-card-heading'} className={className} data-status='stable'>
       <h2 id='pixel-card-heading'>PixelCard</h2>
-      <p className="docs-lead">Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as &lt;article&gt;, &lt;a href&gt;, or role="button" depending on props.</p>
+      <p className="docs-lead">Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as &lt;article&gt;, &lt;a href&gt;, or role=&quot;button&quot; depending on props.</p>
       <ul className="docs-highlights">
         <li>Pixel + linear surfaces with optional tone tint on border and soft background</li>
-        <li>Polymorphic root: renders as &lt;article&gt;, &lt;a href&gt;, or interactive role="button" with Enter/Space activation</li>
+        <li>Polymorphic root: renders as &lt;article&gt;, &lt;a href&gt;, or interactive role=&quot;button&quot; with Enter/Space activation</li>
         <li>Media slot, corner ribbon badge, clamped description, padding scale, and composable Header/Body/Footer subcomponents</li>
         <li>Focus-visible ring + keyboard parity when interactive or anchored</li>
       </ul>
@@ -43,7 +43,7 @@ export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): 
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">When interactive without href, the root renders as &lt;div role="button" tabIndex=&#123;0&#125;&gt; with Enter/Space activation parity (&lt;article&gt; does not permit role="button"). When href is set, the root renders as a native &lt;a&gt; — nesting interactive children (buttons, links) inside footer or media is invalid in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.</p>
+      <p className="docs-aria-notes">When interactive without href, the root renders as &lt;div role=&quot;button&quot; tabIndex=&#123;0&#125;&gt; with Enter/Space activation parity (&lt;article&gt; does not permit role=&quot;button&quot;). When href is set, the root renders as a native &lt;a&gt; — nesting interactive children (buttons, links) inside footer or media is invalid in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -56,12 +56,12 @@ export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): 
         <tbody>
           <tr>
             <td><kbd>Enter</kbd></td>
-            <td>Activates the card when interactive (role="button") or follows the link when href is set</td>
+            <td>Activates the card when interactive (role=&quot;button&quot;) or follows the link when href is set</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>Space</kbd></td>
-            <td>Activates the card when interactive (role="button")</td>
+            <td>Activates the card when interactive (role=&quot;button&quot;)</td>
             <td>interactive prop is true and href is not set</td>
           </tr>
           <tr>

@@ -27,7 +27,7 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
         <li>Sonner-style stacked mode: collapsed cards peek behind the front, hover/focus expands the stack.</li>
         <li>Configurable max simultaneous toasts; oldest are dropped when the queue exceeds the cap.</li>
         <li>Surface-aware (auto / pixel / linear) — pixel surface adds an HP-bar tone accent to each toast.</li>
-        <li>Single role="region" landmark announces "Notifications"; per-toast aria-live avoids double announcements.</li>
+        <li>Single role=&quot;region&quot; landmark announces &quot;Notifications&quot;; per-toast aria-live avoids double announcements.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -44,7 +44,7 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
       <ul className="docs-aria-patterns">
         <li><code>alert</code></li>
       </ul>
-      <p className="docs-aria-notes">The provider mounts a single role="region" with aria-label="Notifications" as a landmark for the toast viewport. Individual toasts declare their own role (alert for assertive tones like red/gold, status for the rest) with matching aria-live (assertive/polite) and aria-atomic="true", so nesting another aria-live region here is intentionally avoided to prevent double announcements. Hovering or focusing the viewport expands the stacked layout so assistive-tech users can read all queued toasts; focusing inside any toast also pauses its auto-dismiss timer.</p>
+      <p className="docs-aria-notes">The provider mounts a single role=&quot;region&quot; with aria-label=&quot;Notifications&quot; as a landmark for the toast viewport. Individual toasts declare their own role (alert for assertive tones like red/gold, status for the rest) with matching aria-live (assertive/polite) and aria-atomic=&quot;true&quot;, so nesting another aria-live region here is intentionally avoided to prevent double announcements. Hovering or focusing the viewport expands the stacked layout so assistive-tech users can read all queued toasts; focusing inside any toast also pauses its auto-dismiss timer.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
