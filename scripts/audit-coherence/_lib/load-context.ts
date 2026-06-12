@@ -199,10 +199,19 @@ export async function loadAuditContext(
   options: LoadAuditContextOptions = {},
 ): Promise<AuditContext> {
   const logger = options.logger ?? createLogger();
-  const absRoot = path.resolve(repoRoot);
+  let absRoot = path.resolve(repoRoot);
 
   if (!(await fs.pathExists(absRoot))) {
     throw new Error(`repoRoot does not exist: ${absRoot}`);
+  }
+  // Canonicalize the root (drive-letter casing included). On Windows a
+  // lowercase `c:\` cwd makes the manifest imports resolve through a
+  // different module path than the entry chain, duplicating React and
+  // crashing hooks at the @pxlkit/core boundary during example renders.
+  try {
+    absRoot = await fs.realpath(absRoot);
+  } catch {
+    // realpath is best-effort; the resolved path already exists.
   }
 
   const uiKitSrcDir = path.join(absRoot, 'packages/ui-kit/src');
