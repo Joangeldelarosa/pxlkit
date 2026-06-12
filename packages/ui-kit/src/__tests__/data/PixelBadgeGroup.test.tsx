@@ -1,15 +1,11 @@
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
-import { PixelBadgeGroup, PixelChipGroup } from '../../data/PixelBadgeGroup';
+import { PixelBadgeGroup } from '../../data/PixelBadgeGroup';
 import { PixelBadge } from '../../data/PixelBadge';
 
-// PixelChip in data-display doesn't carry a `value` prop. The group consumes
-// `child.props.value`; the inner chip surface is purely presentational. Use a
-// thin stand-in so TS stays happy.
-function Chip({ value: _value, label }: { value: string; label: string }) {
-  return <span>{label}</span>;
-}
+// PixelChipGroup tests moved to ./PixelChipGroup.test.tsx (mirrored
+// per-component file).
 
 describe('PixelBadgeGroup', () => {
   it('renders all children when count <= max', () => {
@@ -53,58 +49,5 @@ describe('PixelBadgeGroup', () => {
     expect(getByText('C')).toBeTruthy();
     expect(getByText('D')).toBeTruthy();
     expect(getByText('E')).toBeTruthy();
-  });
-});
-
-describe('PixelChipGroup', () => {
-  it('multi=true allows multiple selection', () => {
-    const onChange = vi.fn();
-    const { getByText, rerender } = render(
-      <PixelChipGroup multiple value={[]} onChange={onChange}>
-        <Chip value="a" label="Alpha" />
-        <Chip value="b" label="Bravo" />
-        <Chip value="c" label="Charlie" />
-      </PixelChipGroup>,
-    );
-
-    fireEvent.click(getByText('Alpha'));
-    expect(onChange).toHaveBeenLastCalledWith(['a']);
-
-    rerender(
-      <PixelChipGroup multiple value={['a']} onChange={onChange}>
-        <Chip value="a" label="Alpha" />
-        <Chip value="b" label="Bravo" />
-        <Chip value="c" label="Charlie" />
-      </PixelChipGroup>,
-    );
-
-    fireEvent.click(getByText('Bravo'));
-    // multi: appends, keeping previous
-    expect(onChange).toHaveBeenLastCalledWith(['a', 'b']);
-  });
-
-  it('single mode deselects others on click', () => {
-    const onChange = vi.fn();
-    const { getByText, rerender } = render(
-      <PixelChipGroup value={['a']} onChange={onChange}>
-        <Chip value="a" label="Alpha" />
-        <Chip value="b" label="Bravo" />
-      </PixelChipGroup>,
-    );
-
-    fireEvent.click(getByText('Bravo'));
-    // single: replaces previous → only 'b'
-    expect(onChange).toHaveBeenLastCalledWith(['b']);
-
-    rerender(
-      <PixelChipGroup value={['b']} onChange={onChange}>
-        <Chip value="a" label="Alpha" />
-        <Chip value="b" label="Bravo" />
-      </PixelChipGroup>,
-    );
-
-    // Clicking selected chip in single mode deselects
-    fireEvent.click(getByText('Bravo'));
-    expect(onChange).toHaveBeenLastCalledWith([]);
   });
 });
