@@ -187,7 +187,7 @@ Components accept `tone?: 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' 
 | `PixelSpinner` | stable | 1.9.0 | feedback |
 | `PixelSplitButton` | stable | 1.0.0 | actions |
 | `PixelStack` | stable | 1.6.0 | layout |
-| `PixelStarRating` | stable | 2.0.2 | cards |
+| `PixelStarRating` | stable | 2.0.0 | cards |
 | `PixelStatCard` | stable | 1.0.0 | cards |
 | `PixelStatGroup` | stable | 1.9.0 | data |
 | `PixelStepper` | stable | 1.9.0 | navigation |
