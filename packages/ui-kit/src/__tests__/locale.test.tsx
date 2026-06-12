@@ -1,6 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import React from 'react';
 
 import {
   toLocaleUpper,
@@ -8,8 +6,6 @@ import {
   buildGoogleFontsUrl,
   PXLKIT_FONTS,
   TURKISH_CHARACTERS,
-  PxlKitLocaleProvider,
-  usePxlKitLocale,
 } from '../locale';
 
 /* ═══════════════════════════════════════════════════════════════════════════════
@@ -319,131 +315,9 @@ describe('TURKISH_CHARACTERS', () => {
   });
 });
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   PxlKitLocaleProvider & usePxlKitLocale
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-/** Helper component to read context and render values for testing */
-function LocaleInspector() {
-  const { locale, upper, lower, fontsUrl } = usePxlKitLocale();
-  return (
-    <div>
-      <span data-testid="locale">{locale}</span>
-      <span data-testid="upper-istanbul">{upper('istanbul')}</span>
-      <span data-testid="lower-ISTANBUL">{lower('ISTANBUL')}</span>
-      <span data-testid="fonts-url">{fontsUrl}</span>
-      <span data-testid="upper-i">{upper('i')}</span>
-      <span data-testid="lower-I">{lower('I')}</span>
-    </div>
-  );
-}
-
-describe('PxlKitLocaleProvider', () => {
-  describe('with Turkish locale', () => {
-    it('provides locale="tr" to children', () => {
-      render(
-        <PxlKitLocaleProvider locale="tr">
-          <LocaleInspector />
-        </PxlKitLocaleProvider>,
-      );
-      expect(screen.getByTestId('locale').textContent).toBe('tr');
-    });
-
-    it('upper() correctly handles Turkish i → İ', () => {
-      render(
-        <PxlKitLocaleProvider locale="tr">
-          <LocaleInspector />
-        </PxlKitLocaleProvider>,
-      );
-      expect(screen.getByTestId('upper-istanbul').textContent).toBe('İSTANBUL');
-      expect(screen.getByTestId('upper-i').textContent).toBe('İ');
-    });
-
-    it('lower() correctly handles Turkish I → ı', () => {
-      render(
-        <PxlKitLocaleProvider locale="tr">
-          <LocaleInspector />
-        </PxlKitLocaleProvider>,
-      );
-      expect(screen.getByTestId('lower-ISTANBUL').textContent).toBe('ıstanbul');
-      expect(screen.getByTestId('lower-I').textContent).toBe('ı');
-    });
-
-    it('provides a Google Fonts URL with latin-ext subset', () => {
-      render(
-        <PxlKitLocaleProvider locale="tr">
-          <LocaleInspector />
-        </PxlKitLocaleProvider>,
-      );
-      const url = screen.getByTestId('fonts-url').textContent!;
-      expect(url).toContain('latin-ext');
-    });
-
-    it('renders a wrapper div with lang="tr"', () => {
-      const { container } = render(
-        <PxlKitLocaleProvider locale="tr">
-          <span data-testid="child">Test</span>
-        </PxlKitLocaleProvider>,
-      );
-      const langDiv = container.querySelector('[lang="tr"]') as HTMLElement | null;
-      expect(langDiv).not.toBeNull();
-      expect(langDiv!.tagName.toLowerCase()).toBe('div');
-      expect(langDiv!.style.display).toBe('contents');
-    });
-  });
-
-  describe('with English locale', () => {
-    it('provides locale="en" to children', () => {
-      render(
-        <PxlKitLocaleProvider locale="en">
-          <LocaleInspector />
-        </PxlKitLocaleProvider>,
-      );
-      expect(screen.getByTestId('locale').textContent).toBe('en');
-    });
-
-    it('upper() uses English casing (i → I)', () => {
-      render(
-        <PxlKitLocaleProvider locale="en">
-          <LocaleInspector />
-        </PxlKitLocaleProvider>,
-      );
-      expect(screen.getByTestId('upper-istanbul').textContent).toBe('ISTANBUL');
-      expect(screen.getByTestId('upper-i').textContent).toBe('I');
-    });
-
-    it('lower() uses English casing (I → i)', () => {
-      render(
-        <PxlKitLocaleProvider locale="en">
-          <LocaleInspector />
-        </PxlKitLocaleProvider>,
-      );
-      expect(screen.getByTestId('lower-ISTANBUL').textContent).toBe('istanbul');
-      expect(screen.getByTestId('lower-I').textContent).toBe('i');
-    });
-  });
-
-  describe('default behavior (no locale prop)', () => {
-    it('defaults to English locale', () => {
-      render(
-        <PxlKitLocaleProvider>
-          <LocaleInspector />
-        </PxlKitLocaleProvider>,
-      );
-      expect(screen.getByTestId('locale').textContent).toBe('en');
-      expect(screen.getByTestId('upper-i').textContent).toBe('I');
-    });
-  });
-});
-
-describe('usePxlKitLocale without provider', () => {
-  it('uses English defaults when no provider is present', () => {
-    render(<LocaleInspector />);
-    expect(screen.getByTestId('locale').textContent).toBe('en');
-    expect(screen.getByTestId('upper-istanbul').textContent).toBe('ISTANBUL');
-    expect(screen.getByTestId('lower-ISTANBUL').textContent).toBe('istanbul');
-  });
-});
+/* PxlKitLocaleProvider & usePxlKitLocale component tests moved to
+   __tests__/overlay-foundation/PxlKitLocaleProvider.test.tsx (mirrored
+   per-component test layout). This file keeps the pure utility coverage. */
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    Edge cases & Unicode boundary testing

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import React from 'react';
 
 import { PxlKitLocaleProvider } from '../locale';
@@ -253,93 +253,7 @@ describe('PixelModal — full Turkish title verification', () => {
   });
 });
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   Nested PxlKitLocaleProvider — inner overrides outer
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-describe('Nested PxlKitLocaleProvider', () => {
-  it('inner Turkish provider overrides outer English provider', () => {
-    render(
-      <PxlKitLocaleProvider locale="en">
-        <PxlKitLocaleProvider locale="tr">
-          <PixelSection title="istanbul">
-            <p>content</p>
-          </PixelSection>
-        </PxlKitLocaleProvider>
-      </PxlKitLocaleProvider>,
-    );
-    const heading = document.querySelector('h3');
-    // Inner provider is Turkish, so "istanbul" → "İSTANBUL"
-    expect(heading!.textContent).toBe('İSTANBUL');
-  });
-
-  it('inner English provider overrides outer Turkish provider', () => {
-    render(
-      <PxlKitLocaleProvider locale="tr">
-        <PxlKitLocaleProvider locale="en">
-          <PixelSection title="istanbul">
-            <p>content</p>
-          </PixelSection>
-        </PxlKitLocaleProvider>
-      </PxlKitLocaleProvider>,
-    );
-    const heading = document.querySelector('h3');
-    // Inner provider is English, so "istanbul" → "ISTANBUL"
-    expect(heading!.textContent).toBe('ISTANBUL');
-  });
-
-  it('nested providers set correct lang attributes', () => {
-    const { container } = render(
-      <PxlKitLocaleProvider locale="en">
-        <PxlKitLocaleProvider locale="tr">
-          <span data-testid="inner">Test</span>
-        </PxlKitLocaleProvider>
-      </PxlKitLocaleProvider>,
-    );
-    // Both lang divs should exist
-    expect(container.querySelector('div[lang="en"]')).not.toBeNull();
-    expect(container.querySelector('div[lang="tr"]')).not.toBeNull();
-    // Inner child should be inside the tr div
-    const trDiv = container.querySelector('div[lang="tr"]');
-    expect(trDiv!.querySelector('[data-testid="inner"]')).not.toBeNull();
-  });
-});
-
-/* ═══════════════════════════════════════════════════════════════════════════════
-   CSS lang attribute — ensures provider sets lang for CSS text-transform
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-describe('PxlKitLocaleProvider lang attribute', () => {
-  it('sets lang="tr" on wrapper div for Turkish', () => {
-    const { container } = render(
-      <PxlKitLocaleProvider locale="tr">
-        <span>Test</span>
-      </PxlKitLocaleProvider>,
-    );
-    const wrapper = container.querySelector('div[lang="tr"]') as HTMLElement | null;
-    expect(wrapper).not.toBeNull();
-    expect(wrapper!.style.display).toBe('contents');
-  });
-
-  it('sets lang="en" on wrapper div for English', () => {
-    const { container } = render(
-      <PxlKitLocaleProvider locale="en">
-        <span>Test</span>
-      </PxlKitLocaleProvider>,
-    );
-    const wrapper = container.querySelector('div[lang="en"]');
-    expect(wrapper).not.toBeNull();
-  });
-
-  it('display:contents does not create a layout box', () => {
-    const { container } = render(
-      <PxlKitLocaleProvider locale="tr">
-        <span data-testid="child">Content</span>
-      </PxlKitLocaleProvider>,
-    );
-    const wrapper = container.querySelector('div[lang="tr"]') as HTMLElement | null;
-    expect(wrapper!.style.display).toBe('contents');
-    // The child should still be accessible
-    expect(screen.getByTestId('child')).not.toBeNull();
-  });
-});
+/* Nested-provider and lang-attribute coverage moved to
+   __tests__/overlay-foundation/PxlKitLocaleProvider.test.tsx (mirrored
+   per-component test layout). This file keeps locale-aware COMPONENT
+   integration tests only. */
