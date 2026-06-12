@@ -53,7 +53,7 @@ CHANGELOG.generated.md
 /packages/ui-kit/src/*/*.stories.tsx
 /apps/web/src/app/ui-kit/sections/
 /apps/web/src/app/ui-kit/*/metadata.generated.ts
-# OG "images": the orchestrator currently writes the HTML template to
-# public/og/*.png (Playwright screenshotting only exists in the standalone
-# generate-og-images CLI) — not committable as images until that is fixed.
+# OG images: real PNGs rendered via Playwright (orchestrator step or the
+# standalone generate-og-images CLI). Generated artifacts — regenerate with
+# `npm run docs:build`; kept out of git.
 /apps/web/public/og/

@@ -151,7 +151,15 @@ export function defaultPipelineSteps(repoRoot: string): StepDescriptor[] {
     { name: "generate-readme-package", factory: () => new GenerateReadmePackageGenerator() },
     { name: "generate-readme-root", factory: () => new GenerateRootReadmeGenerator() },
     { name: "generate-changelog", factory: () => new ChangelogGenerator() },
-    { name: "generate-og-images", factory: () => new GenerateOgImagesGenerator(out.ogImages) },
+    // generate-og-images screenshots real PNGs via Playwright (binary writes,
+    // outside the text-write contract) and SKIPs itself when Playwright is
+    // unavailable. Like extract-bundle it is environment-dependent, so a
+    // failure here must not abort generate-metadata behind it.
+    {
+      name: "generate-og-images",
+      factory: () => new GenerateOgImagesGenerator(out.ogImages),
+      required: false,
+    },
     { name: "generate-metadata", factory: () => new GenerateMetadataGenerator(out.metadata) },
   ];
 }

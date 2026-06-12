@@ -421,9 +421,9 @@ describe("PIPELINE_STEPS", () => {
     ]);
   });
 
-  it("marks extract-bundle as optional and everything else as required by default", () => {
+  it("marks the environment-dependent steps (extract-bundle, generate-og-images) as optional", () => {
     const optional = PIPELINE_STEPS.filter((s) => s.required === false).map((s) => s.name);
-    expect(optional).toEqual(["extract-bundle"]);
+    expect(optional).toEqual(["extract-bundle", "generate-og-images"]);
   });
 });
 

@@ -21,6 +21,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
   DEFAULT_TONE,
+  GenerateOgImagesGenerator,
   MemoryRenderer,
   OG_HEIGHT,
   OG_WIDTH,
@@ -34,7 +35,7 @@ import {
   resolveVersion,
   slugFor,
 } from "../generate-og-images";
-import type { ManifestRecord } from "../_lib/generator-base";
+import type { GeneratorContext, Logger, ManifestRecord } from "../_lib/generator-base";
 
 function fakeRecord(
   partial: Partial<{
@@ -375,5 +376,111 @@ describe("generateOgImages (e2e with MemoryRenderer)", () => {
     const expectedSuffix = "apps/web/public/og/pixel-kbd.png";
     const out = report.entries[0]!.outFile.split(path.sep).join("/");
     expect(out.endsWith(expectedSuffix)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// GenerateOgImagesGenerator — orchestrator step contract
+//
+// The step must NEVER funnel HTML template bytes through the orchestrator's
+// text-write contract as fake `.png` files. It either renders real PNGs via
+// the render backend (Playwright in production, MemoryRenderer here) or
+// SKIPs honestly with a logged instruction and zero writes.
+// ---------------------------------------------------------------------------
+
+describe("GenerateOgImagesGenerator (orchestrator step)", () => {
+  let tmpRoot: string;
+  let outRoot: string;
+
+  function stubLogger(sink?: { warns: string[] }): Logger {
+    return {
+      info: () => undefined,
+      warn: (msg: string) => {
+        sink?.warns.push(msg);
+      },
+      error: () => undefined,
+      success: () => undefined,
+      table: () => undefined,
+    } as unknown as Logger;
+  }
+
+  function ctxFor(manifests: ManifestRecord[], logger: Logger = stubLogger()): GeneratorContext {
+    return {
+      repoRoot: tmpRoot,
+      manifests,
+      outputs: new Map<string, string>(),
+      logger,
+    };
+  }
+
+  beforeEach(async () => {
+    tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), "gen-og-step-"));
+    outRoot = path.join(tmpRoot, "out");
+  });
+
+  afterEach(async () => {
+    await fs.remove(tmpRoot);
+  });
+
+  it("renders PNGs via the injected backend and contributes ZERO orchestrator text writes", async () => {
+    const renderer = new MemoryRenderer();
+    const gen = new GenerateOgImagesGenerator(outRoot, { renderer });
+
+    const result = await gen.run(
+      ctxFor([
+        fakeRecord({ name: "PixelButton", category: "actions", since: "1.0.0" }),
+        fakeRecord({ name: "PixelChip", category: "data" }),
+      ]),
+    );
+
+    // PNG bytes never travel through the utf-8 write contract.
+    expect(result.writes).toEqual([]);
+
+    const buttonFile = path.join(outRoot, "pixel-button.png");
+    expect(await fs.pathExists(buttonFile)).toBe(true);
+    const head = await fs.readFile(buttonFile);
+    expect(head[0]).toBe(0x89); // PNG signature, NOT '<' from an HTML doc
+    expect(head[1]).toBe(0x50);
+    expect(renderer.captured).toHaveLength(2);
+  });
+
+  it("SKIPs with a logged instruction and zero writes when playwright is unavailable", async () => {
+    const sink = { warns: [] as string[] };
+    const gen = new GenerateOgImagesGenerator(outRoot, { probe: async () => false });
+
+    const result = await gen.run(
+      ctxFor([fakeRecord({ name: "PixelChip", category: "data" })], stubLogger(sink)),
+    );
+
+    expect(result.writes).toEqual([]);
+    expect(await fs.pathExists(path.join(outRoot, "pixel-chip.png"))).toBe(false);
+    const logged = sink.warns.join("\n");
+    expect(logged).toMatch(/SKIP/);
+    expect(logged).toMatch(/generate-og-images/);
+  });
+
+  it("an injected renderer bypasses the availability probe", async () => {
+    const renderer = new MemoryRenderer();
+    const gen = new GenerateOgImagesGenerator(outRoot, {
+      renderer,
+      probe: async () => false, // would skip if consulted
+    });
+
+    const result = await gen.run(ctxFor([fakeRecord({ name: "PixelKbd" })]));
+    expect(result.writes).toEqual([]);
+    expect(await fs.pathExists(path.join(outRoot, "pixel-kbd.png"))).toBe(true);
+  });
+
+  it("throws (failing the step honestly) when the render report contains errors", async () => {
+    const renderer = new MemoryRenderer();
+    const badRec: ManifestRecord = {
+      manifest: { description: "no name" } as unknown as ManifestRecord["manifest"],
+      sourceFile: "/repo/src/Bad.tsx",
+      manifestFile: "/repo/src/Bad.manifest.ts",
+      package: "@pxlkit/ui-kit",
+    };
+    const gen = new GenerateOgImagesGenerator(outRoot, { renderer });
+
+    await expect(gen.run(ctxFor([badRec]))).rejects.toThrow(/missing a string `name`/);
   });
 });

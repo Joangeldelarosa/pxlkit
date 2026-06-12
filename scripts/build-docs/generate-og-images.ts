@@ -8,7 +8,17 @@
  *
  * SAFE: only writes under `apps/web/public/og/*.png`. The template is built
  * in-memory and never touches hand-authored files. Existing PNGs at the
- * target path are overwritten (they are themselves generated artifacts).
+ * target path are overwritten (they are themselves generated artifacts —
+ * the whole `apps/web/public/og/` directory is gitignored).
+ *
+ * ARCHITECTURE (orchestrator step): the orchestrator's GeneratorWrite
+ * contract is utf-8 text only, so PNG bytes can never travel through it.
+ * `GenerateOgImagesGenerator` therefore delegates to `generateOgImages()`
+ * (the same Playwright-backed path the standalone CLI uses), which writes
+ * the binary PNGs itself, and the step contributes ZERO orchestrator
+ * writes. When Playwright (or its Chromium binary) is not available, the
+ * step SKIPs honestly: a logged warning with the install/CLI instructions,
+ * zero files written — it never writes HTML bytes to a `.png` path.
  *
  * Usage (CLI):
  *   tsx scripts/build-docs/generate-og-images.ts                     # writes PNGs
@@ -376,7 +386,11 @@ interface MinimalPwBrowser {
   close(): Promise<void>;
 }
 interface MinimalPwModule {
-  chromium: { launch(opts?: unknown): Promise<MinimalPwBrowser> };
+  chromium: {
+    launch(opts?: unknown): Promise<MinimalPwBrowser>;
+    /** Absolute path of the managed Chromium binary (playwright ≥1.x). */
+    executablePath?(): string;
+  };
 }
 
 /**
@@ -488,19 +502,79 @@ function matchesFilter(name: string, filter: string | undefined): boolean {
 // Generator class
 // ---------------------------------------------------------------------------
 
+/**
+ * Probe whether the Playwright render path is actually usable: the package
+ * must resolve AND its managed Chromium binary must exist on disk. Cheap —
+ * no browser is launched.
+ */
+export async function isPlaywrightUsable(): Promise<boolean> {
+  try {
+    const pw = (await import("playwright")) as unknown as MinimalPwModule;
+    const exe = pw.chromium.executablePath?.();
+    // Can't introspect the binary path on this playwright version — assume
+    // usable and let real render errors surface (and fail the step) honestly.
+    if (!exe) return true;
+    return await fs.pathExists(exe);
+  } catch {
+    return false;
+  }
+}
+
+export interface GenerateOgImagesGeneratorOptions {
+  /**
+   * Injectable render backend (tests use MemoryRenderer). When provided the
+   * availability probe is skipped — the caller vouches for the backend.
+   */
+  renderer?: RenderBackend;
+  /** Injectable availability probe. Defaults to {@link isPlaywrightUsable}. */
+  probe?: () => Promise<boolean>;
+}
+
 export class GenerateOgImagesGenerator extends Generator {
   name = "generate-og-images";
 
-  constructor(private readonly outRoot: string) {
+  constructor(
+    private readonly outRoot: string,
+    private readonly options: GenerateOgImagesGeneratorOptions = {},
+  ) {
     super();
   }
 
   async run(ctx: GeneratorContext): Promise<GeneratorResult> {
-    const writes = ctx.manifests.map((rec) => {
-      const entry = planEntryFor(rec, this.outRoot);
-      return { path: entry.outFile, content: renderOgHtml(entry) };
+    const usable = this.options.renderer
+      ? true
+      : await (this.options.probe ?? isPlaywrightUsable)();
+
+    if (!usable) {
+      ctx.logger.warn(
+        "generate-og-images: SKIP — playwright (or its chromium binary) is not available; wrote 0 files. " +
+          "To render the PNG OG cards: `npx playwright install chromium`, then " +
+          "`npx tsx scripts/build-docs/generate-og-images.ts`.",
+      );
+      return { writes: [] };
+    }
+
+    const report = await generateOgImages({
+      repoRoot: ctx.repoRoot,
+      outRoot: this.outRoot,
+      manifests: ctx.manifests,
+      renderer: this.options.renderer,
+      logger: ctx.logger,
     });
-    return { writes };
+
+    if (!report.ok) {
+      const first = report.errors[0];
+      throw new Error(
+        `generate-og-images: ${report.errors.length} error(s) — first: ${first?.name ?? "?"}: ${first?.message ?? "unknown"}`,
+      );
+    }
+
+    ctx.logger.info(
+      `generate-og-images: rendered ${report.written} PNG(s) → ${ensurePosix(this.outRoot)} (binary writes, outside the orchestrator text-write contract)`,
+    );
+    // PNGs are binary and written by the render backend itself; the utf-8
+    // GeneratorWrite contract intentionally carries nothing here.
+    return { writes: [] };
   }
 }
 
