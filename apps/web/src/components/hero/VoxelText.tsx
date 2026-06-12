@@ -29,19 +29,23 @@ export function VoxelText({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (reduced) return;
+    const el = innerRef.current;
+    if (!el) return;
+
+    // Only run the rAF loop while the pointer is actually over the hero —
+    // the previous version kept scheduling frames forever just to keep
+    // writing zeros once the mouse left.
+    if (!active) {
+      el.style.setProperty('--tilt-x', '0deg');
+      el.style.setProperty('--tilt-y', '0deg');
+      return;
+    }
+
     let raf = 0;
     const tick = () => {
-      const el = innerRef.current;
-      if (el) {
-        if (active) {
-          const { tiltX, tiltY } = computeTilt(mouseRef.current.x, mouseRef.current.y);
-          el.style.setProperty('--tilt-x', `${tiltX}deg`);
-          el.style.setProperty('--tilt-y', `${tiltY}deg`);
-        } else {
-          el.style.setProperty('--tilt-x', '0deg');
-          el.style.setProperty('--tilt-y', '0deg');
-        }
-      }
+      const { tiltX, tiltY } = computeTilt(mouseRef.current.x, mouseRef.current.y);
+      el.style.setProperty('--tilt-x', `${tiltX}deg`);
+      el.style.setProperty('--tilt-y', `${tiltY}deg`);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);

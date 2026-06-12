@@ -3,6 +3,7 @@
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Float } from '@react-three/drei';
+import { useInView } from 'framer-motion';
 import * as THREE from 'three';
 
 /* ═══════════════════════════════════════════════════════════
@@ -638,6 +639,11 @@ function Sparkles({ count = 30, range = 18, color = '#FFD700' }: { count?: numbe
     return geo;
   }, [count, range]);
 
+  // R3F only auto-disposes objects it creates from JSX — a geometry built
+  // imperatively and passed as a prop leaks its GPU buffers on every scene
+  // tab switch unless we release it ourselves.
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
   useFrame(({ clock }) => {
     if (!ref.current) return;
     const t = clock.getElapsedTime();
@@ -1038,6 +1044,11 @@ const TABS: { id: SceneTab; label: string; icon: string }[] = [
 
 export default function VoxelPreview({ onTabChange, initialTab = 'island', showTabs = true }: { onTabChange?: (tab: SceneTab) => void; initialTab?: SceneTab; showTabs?: boolean }) {
   const [tab, setTab] = useState<SceneTab>(initialTab);
+  // R3F's default frameloop renders 60fps forever — even with this section
+  // scrolled far out of view, the GPU kept compositing the scene under every
+  // other animation on the page. Freeze the loop while offscreen.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(rootRef, { margin: '200px 0px' });
 
   const handleTab = (t: SceneTab) => {
     setTab(t);
@@ -1045,7 +1056,7 @@ export default function VoxelPreview({ onTabChange, initialTab = 'island', showT
   };
 
   return (
-    <div className="w-full h-full relative">
+    <div ref={rootRef} className="w-full h-full relative">
       {/* Tab buttons */}
       {showTabs && (
         <div className="absolute top-2 sm:top-3 left-0 right-0 z-10 flex justify-center gap-1 sm:gap-2 px-2 pointer-events-auto">
@@ -1073,6 +1084,7 @@ export default function VoxelPreview({ onTabChange, initialTab = 'island', showT
         camera={{ position: [0, 10, 24], fov: 42, near: 0.1, far: 100 }}
         shadows
         dpr={[1, 1.5]}
+        frameloop={inView ? 'always' : 'never'}
         gl={{ antialias: true, alpha: true, toneMapping: THREE.NoToneMapping }}
         style={{ background: 'transparent' }}
       >

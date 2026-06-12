@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { AnimatedPxlKitProps, AnimationTrigger, PxlKitData } from '../types';
 import { PxlKitIcon } from './PxlKitIcon';
+import { observeVisibility } from '../utils/visibilityObserver';
 
 /**
  * Resolves the effective trigger for an animated icon.
@@ -116,10 +117,21 @@ export function AnimatedPxlKitIcon({
   const [isHovering, setIsHovering] = useState(false);
   const [hasAppeared, setHasAppeared] = useState(false);
   const [playedOnce, setPlayedOnce] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // ── Pause off-screen ──
+  // Every interval tick is a React state update; a page with dozens of
+  // looping icons would keep re-rendering them forever while scrolled away.
+  // One shared observer serves all icon instances.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    return observeVisibility(el, setIsVisible);
+  }, []);
+
   // ── Determine if animation should be running ──
-  const shouldPlay = (() => {
+  const shouldPlay = isVisible && (() => {
     // Explicit playing prop overrides trigger logic (backward compat)
     if (playingProp !== undefined) return playingProp;
     if (frameCount <= 1) return false;

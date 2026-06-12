@@ -21,7 +21,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState, useCallback, Suspense, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
-import { TOTAL_ICON_COUNT } from './HeroCollage';
+import { ALL_ICONS } from './hero/iconPool';
 import { HeroCinematic, StatCardStrip } from './hero';
 import { useToast } from './ToastProvider';
 import type { ToastTone } from './ToastProvider';
@@ -87,6 +87,9 @@ const fadeInUp = {
 const staggerContainer = {
   animate: { transition: { staggerChildren: 0.1 } },
 };
+
+/** Derived from the icon data already bundled for the hero + showcase. */
+const TOTAL_ICON_COUNT = ALL_ICONS.length + ParallaxPack.length;
 
 const WHATS_NEW_ITEMS: WhatsNewItem[] = [
   { name: 'PixelDataTable', category: 'data', href: '/ui-kit#pixel-data-table', isNew: true },

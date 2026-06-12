@@ -327,3 +327,66 @@ describe('AnimatedPxlKitIcon', () => {
     expect(container.querySelector('img')).not.toBeNull();
   });
 });
+
+describe('AnimatedPxlKitIcon — off-screen pausing (shared visibility observer)', () => {
+  type IOCallback = (entries: Array<{ target: Element; isIntersecting: boolean }>) => void;
+  let ioCallback: IOCallback | null = null;
+  let observed: Element[] = [];
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    observed = [];
+    ioCallback = null;
+    // Manual IO mock — jsdom has none, and the component degrades to
+    // "always visible" without it, which the rest of this suite relies on.
+    (globalThis as Record<string, unknown>).IntersectionObserver = class {
+      constructor(cb: IOCallback) {
+        ioCallback = cb;
+      }
+      observe(el: Element) {
+        observed.push(el);
+      }
+      unobserve() {}
+      disconnect() {}
+    };
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    delete (globalThis as Record<string, unknown>).IntersectionObserver;
+  });
+
+  it('pauses a looping icon while off-screen and resumes when visible again', () => {
+    const { container } = render(<AnimatedPxlKitIcon icon={testAnimatedIcon} trigger="loop" />);
+    const wrapper = container.firstElementChild as Element;
+    const firstSrc = getInnerImg(container).getAttribute('src');
+
+    // Report the icon as off-screen.
+    act(() => {
+      ioCallback?.([{ target: wrapper, isIntersecting: false }]);
+    });
+    act(() => {
+      vi.advanceTimersByTime(testAnimatedIcon.frameDuration * 5);
+    });
+    expect(getInnerImg(container).getAttribute('src')).toBe(firstSrc);
+
+    // Back on screen: frames advance again.
+    act(() => {
+      ioCallback?.([{ target: wrapper, isIntersecting: true }]);
+    });
+    act(() => {
+      vi.advanceTimersByTime(testAnimatedIcon.frameDuration + 20);
+    });
+    expect(getInnerImg(container).getAttribute('src')).not.toBe(firstSrc);
+  });
+
+  it('subscribes every icon instance to one shared observer', () => {
+    render(
+      <>
+        <AnimatedPxlKitIcon icon={testAnimatedIcon} trigger="loop" />
+        <AnimatedPxlKitIcon icon={testAnimatedIcon} trigger="ping-pong" />
+      </>
+    );
+    expect(observed.length).toBe(2);
+  });
+});

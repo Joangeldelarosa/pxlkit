@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useCallback,
+  useMemo,
   useState,
   useRef,
   useEffect,
@@ -154,7 +155,9 @@ function isBottomPosition(pos: ToastPosition): boolean {
 function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: () => void }) {
   const theme = TONE_THEME[item.tone];
   const progressMV = useMotionValue(1);
-  const progressWidth = useTransform(progressMV, [0, 1], ['0%', '100%']);
+  // scaleX (compositor-only) instead of width — animating width forces a
+  // layout pass per frame per toast.
+  const progressScaleX = useTransform(progressMV, [0, 1], [0, 1]);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const animRef = useRef<ReturnType<typeof animate> | null>(null);
 
@@ -184,21 +187,24 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: () => void
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: slide.x, y: slide.y, scale: 0.85, filter: 'blur(8px)' }}
+      // Transform/opacity only — animating `filter: blur()` re-rasterizes
+      // every frame and multiplied across stacked cards it tanked FPS. The
+      // old exit bezier had a negative overshoot ([0.36,0,0.66,-0.56]) that
+      // bounced the leaving card BACK over the stack (the "toasts render on
+      // top of each other" report); a clean easeIn leaves without re-entry.
+      initial={{ opacity: 0, x: slide.x, y: slide.y, scale: 0.85 }}
       animate={{
         opacity: 1,
         x: 0,
         y: 0,
         scale: 1,
-        filter: 'blur(0px)',
         transition: { type: 'spring', stiffness: 400, damping: 28, mass: 0.8 },
       }}
       exit={{
         opacity: 0,
         x: slide.x * 0.6,
         scale: 0.9,
-        filter: 'blur(4px)',
-        transition: { duration: 0.25, ease: [0.36, 0, 0.66, -0.56] },
+        transition: { duration: 0.2, ease: 'easeIn' },
       }}
       className="pointer-events-auto relative"
     >
@@ -290,7 +296,9 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: () => void
           <motion.div
             className="h-full"
             style={{
-              width: progressWidth,
+              width: '100%',
+              scaleX: progressScaleX,
+              transformOrigin: 'left',
               background: `linear-gradient(90deg, ${theme.progressFrom}, ${theme.progressTo})`,
               boxShadow: `0 0 8px ${theme.accent}66`,
             }}
@@ -374,7 +382,13 @@ export function ToastProvider({
     [addToast]
   );
 
-  const value: ToastContextValue = { toast: addToast, success, error, info, warning, dismiss, dismissAll };
+  // Memoized: a fresh object here would re-render every useToast() consumer
+  // (entire landing sections) on each toast add/dismiss — measured FPS drops
+  // during toast bursts traced back to exactly that.
+  const value: ToastContextValue = useMemo(
+    () => ({ toast: addToast, success, error, info, warning, dismiss, dismissAll }),
+    [addToast, success, error, info, warning, dismiss, dismissAll],
+  );
 
   // Group by position
   const grouped = toasts.reduce<Record<string, ToastItem[]>>((acc, t) => {
