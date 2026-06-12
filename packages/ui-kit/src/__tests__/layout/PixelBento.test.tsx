@@ -1,7 +1,9 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
-import { PixelBento, PixelBentoCell } from '../../layout/PixelBento';
+import { PixelBento } from '../../layout/PixelBento';
+
+// PixelBentoCell-specific behavior lives in ./PixelBentoCell.test.tsx.
 
 describe('PixelBento', () => {
   it('renders responsive grid with columns=3 by default (mobile-first 1-col stack)', () => {
@@ -33,38 +35,4 @@ describe('PixelBento', () => {
     expect(el.getAttribute('data-columns')).toBe('6');
   });
 
-  it('PixelBentoCell span="2x2" applies col-span (clamped on mobile) + row-span-2', () => {
-    const { getByTestId } = render(
-      <PixelBento>
-        <PixelBentoCell data-testid="cell" span="2x2" />
-      </PixelBento>,
-    );
-    const el = getByTestId('cell');
-    // Mobile: 1 col so spans clamp; sm and up: 2-col span
-    expect(el.className).toContain('col-span-1');
-    expect(el.className).toContain('sm:col-span-2');
-    expect(el.className).toContain('row-span-2');
-  });
-
-  it('PixelBentoCell kind="stat" renders a stat-style layout', () => {
-    const { getByTestId } = render(
-      <PixelBento>
-        <PixelBentoCell data-testid="cell" kind="stat">
-          <span>42</span>
-        </PixelBentoCell>
-      </PixelBento>,
-    );
-    const el = getByTestId('cell');
-    expect(el.getAttribute('data-kind')).toBe('stat');
-  });
-
-  it('PixelBentoCell tone="purple" bordered applies purple border', () => {
-    const { getByTestId } = render(
-      <PixelBento>
-        <PixelBentoCell data-testid="cell" tone="purple" bordered />
-      </PixelBento>,
-    );
-    const el = getByTestId('cell');
-    expect(el.className).toContain('border-retro-purple/30');
-  });
 });

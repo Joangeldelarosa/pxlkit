@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { PixelModal } from '../overlays/PixelModal';
+import { PixelModal } from '../../overlays/PixelModal';
 
 describe('PixelModal — hardening', () => {
   it('renders into document.body via portal by default', () => {

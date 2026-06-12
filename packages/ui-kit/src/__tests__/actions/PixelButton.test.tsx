@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
-import { PixelButton } from '../actions';
+import { PixelButton } from '../../actions';
 
 describe('PixelButton — variant upgrades', () => {
   it('renders solid variant (default) with tone bg class', () => {

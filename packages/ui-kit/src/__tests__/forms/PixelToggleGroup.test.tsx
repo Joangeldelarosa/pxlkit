@@ -106,40 +106,7 @@ describe('PixelToggleGroup', () => {
     expect(a.getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('PixelToggle pressed state toggles (standalone, controlled)', () => {
-    const onPressedChange = vi.fn();
-    function Wrapper() {
-      const [pressed, setPressed] = useState(false);
-      return (
-        <PixelToggle
-          value="bold"
-          pressed={pressed}
-          onPressedChange={(next) => {
-            onPressedChange(next);
-            setPressed(next);
-          }}
-        >
-          B
-        </PixelToggle>
-      );
-    }
-
-    const { getByText } = render(<Wrapper />);
-    const btn = getByText('B').closest('button')!;
-    expect(btn.getAttribute('aria-pressed')).toBe('false');
-
-    act(() => {
-      fireEvent.click(btn);
-    });
-    expect(onPressedChange).toHaveBeenLastCalledWith(true);
-    expect(btn.getAttribute('aria-pressed')).toBe('true');
-
-    act(() => {
-      fireEvent.click(btn);
-    });
-    expect(onPressedChange).toHaveBeenLastCalledWith(false);
-    expect(btn.getAttribute('aria-pressed')).toBe('false');
-  });
+  // Standalone (group-less) PixelToggle behavior lives in ./PixelToggle.test.tsx.
 
   it('Arrow keys move focus with rovingFocus=true', () => {
     const { getByText } = render(
