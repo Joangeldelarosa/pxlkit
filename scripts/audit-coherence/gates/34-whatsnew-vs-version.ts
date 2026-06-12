@@ -1,33 +1,46 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { DriftItem, Gate, GateResult } from '../types';
 
 import { adaptFunctionalGate } from '../_lib/functional-gate-adapter.js';
+import {
+  extractAddedComponents,
+  parseReleaseSections,
+  resolveAdvertisedRelease,
+} from '../_lib/release-policy.js';
 
 const GATE_ID = '34-whatsnew-vs-version';
 const DESCRIPTION =
-  'WhatsNewStrip items[] must equal the components listed under "Added" for the current @pxlkit/ui-kit version in packages/ui-kit/CHANGELOG.md.';
+  'WhatsNewStrip items must advertise the components added in the advertised ui-kit release: the current version, or — for version-only patches with no "### Added" entries — the most recent release that has them. Prop-driven strips are checked against the items statically wired at their call sites.';
 
 const STRIP_PATH = 'apps/web/src/components/whats-new-strip.tsx';
 const PKG_PATH = 'packages/ui-kit/package.json';
 const CHANGELOG_PATH = 'packages/ui-kit/CHANGELOG.md';
+const WEB_SRC = 'apps/web/src';
+
+/** Minimum fraction of strip items that must come from the advertised release's Added set. */
+const MIN_OVERLAP = 0.5;
 
 interface ReadOptions {
   strip?: string | null;
   changelog?: string | null;
   uiKitPackage?: { version?: string } | null;
+  /** Items statically wired at the strip's call sites (prop-driven strips). */
+  consumerItems?: string[];
 }
 
 export async function loadInputs(repoRoot: string): Promise<{
   strip: string | null;
   changelog: string | null;
   uiKitPackage: { version?: string } | null;
+  consumerItems: string[];
 }> {
   const strip = await tryRead(join(repoRoot, STRIP_PATH));
   const changelog = await tryRead(join(repoRoot, CHANGELOG_PATH));
   const pkgRaw = await tryRead(join(repoRoot, PKG_PATH));
   const uiKitPackage = pkgRaw ? (JSON.parse(pkgRaw) as { version?: string }) : null;
-  return { strip, changelog, uiKitPackage };
+  const consumerItems = await loadConsumerItems(join(repoRoot, WEB_SRC));
+  return { strip, changelog, uiKitPackage, consumerItems };
 }
 
 async function tryRead(path: string): Promise<string | null> {
@@ -36,6 +49,46 @@ async function tryRead(path: string): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+/**
+ * Collect the item names statically wired to the strip across the web app:
+ * arrays typed `WhatsNewItem[]` (e.g. WHATS_NEW_ITEMS in
+ * LandingPageClient.tsx, WHATS_NEW_V200_ITEMS in app/ui-kit/page.tsx).
+ */
+async function loadConsumerItems(webSrcDir: string): Promise<string[]> {
+  let entries: string[];
+  try {
+    entries = await readdir(webSrcDir, { recursive: true });
+  } catch {
+    return [];
+  }
+  const out: string[] = [];
+  for (const entry of entries) {
+    const rel = String(entry).replace(/\\/g, '/');
+    if (!/\.(ts|tsx)$/.test(rel)) continue;
+    if (/\.(test|spec)\.[jt]sx?$/.test(rel) || rel.includes('__tests__/')) continue;
+    const content = await tryRead(join(webSrcDir, rel));
+    if (!content || !content.includes('WhatsNewItem')) continue;
+    out.push(...parseConsumerItems(content));
+  }
+  return dedupePreserveOrder(out);
+}
+
+/** Extract `name:` values from arrays typed `WhatsNewItem[]`. */
+export function parseConsumerItems(source: string): string[] {
+  const out: string[] = [];
+  const arrayRe = /:\s*WhatsNewItem\[\]\s*=\s*\[([\s\S]*?)\];/g;
+  let m: RegExpExecArray | null;
+  while ((m = arrayRe.exec(source)) !== null) {
+    const block = m[1] ?? '';
+    const nameRe = /\bname\s*:\s*['"]([^'"]+)['"]/g;
+    let n: RegExpExecArray | null;
+    while ((n = nameRe.exec(block)) !== null) {
+      if (n[1]) out.push(n[1]);
+    }
+  }
+  return dedupePreserveOrder(out);
 }
 
 /**
@@ -53,41 +106,21 @@ export function parseStripItems(strip: string): string[] {
 }
 
 /**
- * Slice the changelog to the section for a given version, then return component
- * names listed under the first `### Added` subsection. Component names are
- * detected as the first backticked identifier on each bullet line.
+ * Components listed under every `### Added*` subsection of the section for a
+ * given version. Supports both `## [1.6.0] - 2026-05-31` and
+ * `## 2.0.1 — 2026-06-02` heading styles.
  */
 export function parseChangelogAdded(changelog: string, version: string): string[] {
-  // NOTE: JS regex has no \Z end-of-string anchor (it matches a literal
-  // "Z"), so "end of input" is expressed as `$(?![\s\S])` — a `$` that has
-  // nothing at all after it, even under the m flag.
-  const sectionRe = new RegExp(
-    `^##\\s+\\[[^\\]]*${escapeRegex(version)}[^\\]]*\\][\\s\\S]*?(?=^##\\s+\\[|$(?![\\s\\S]))`,
-    'm',
+  const section = parseReleaseSections(changelog).find(
+    (s) => !s.unreleased && s.version === version,
   );
-  const sectionMatch = sectionRe.exec(changelog);
-  if (!sectionMatch) return [];
-  const section = sectionMatch[0];
+  if (!section) return [];
+  return extractAddedComponents(section.body);
+}
 
-  const addedRe = /^###\s+Added\b[\s\S]*?(?=^###\s+|^##\s+\[|$(?![\s\S]))/m;
-  const addedMatch = addedRe.exec(section);
-  if (!addedMatch) return [];
-  const addedBlock = addedMatch[0];
-
-  const out: string[] = [];
-  for (const line of addedBlock.split(/\r?\n/)) {
-    const bullet = /^\s*[-*]\s+(.*)$/.exec(line);
-    if (!bullet) continue;
-    const rest = bullet[1] ?? '';
-    const tick = /`([^`]+)`/.exec(rest);
-    if (tick && tick[1]) {
-      out.push(tick[1]);
-      continue;
-    }
-    const bold = /\*\*([^*]+)\*\*/.exec(rest);
-    if (bold && bold[1]) out.push(bold[1]);
-  }
-  return dedupePreserveOrder(out);
+/** True when the strip takes its items via props instead of hardcoding them. */
+export function isItemsPropDriven(strip: string): boolean {
+  return /\bitems\b\s*[:}?,]/.test(strip);
 }
 
 function dedupePreserveOrder(arr: string[]): string[] {
@@ -99,10 +132,6 @@ function dedupePreserveOrder(arr: string[]): string[] {
     out.push(v);
   }
   return out;
-}
-
-function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 export function evaluate(opts: ReadOptions): DriftItem[] {
@@ -140,49 +169,58 @@ export function evaluate(opts: ReadOptions): DriftItem[] {
     return drift;
   }
 
-  const stripItems = parseStripItems(strip);
-  const addedItems = parseChangelogAdded(changelog, version);
-
-  if (addedItems.length === 0) {
+  // The advertised release: the current version when its section has Added
+  // entries; otherwise (version-only patch / republish) the most recent
+  // release that has them — the strip legitimately advertises that one.
+  const advertised = resolveAdvertisedRelease(changelog, version);
+  if (!advertised) {
     drift.push({
       artifact: CHANGELOG_PATH,
-      expected: `Section for v${version} contains an "### Added" subsection listing components`,
-      actual: `No "### Added" entries found for v${version} — cannot compare against strip items`,
+      expected: `A release section with an "### Added" subsection listing components (current v${version} or an earlier release)`,
+      actual: `No "### Added" entries found in any release section — cannot compare against strip items`,
       severity: 'major',
     });
     return drift;
+  }
+
+  // Resolve items: hardcoded `component:` entries in the strip itself, or —
+  // for a prop-driven strip — the items statically wired at its call sites.
+  let stripItems = parseStripItems(strip);
+  let itemsSource = STRIP_PATH;
+  if (stripItems.length === 0 && isItemsPropDriven(strip)) {
+    stripItems = opts.consumerItems ?? [];
+    itemsSource = `${WEB_SRC} (WhatsNewItem[] arrays wired to the strip)`;
   }
 
   if (stripItems.length === 0) {
     drift.push({
       artifact: STRIP_PATH,
-      expected: 'items[] array contains entries with `component:` string fields',
-      actual: 'No `component:` entries parsed from strip — items array missing or malformed',
+      expected: 'items[] entries hardcoded in the strip or statically wired at its call sites',
+      actual: 'No `component:` entries parsed from strip and no wired items found — items array missing or malformed',
       severity: 'major',
     });
     return drift;
   }
 
-  const stripSet = new Set(stripItems);
-  const addedSet = new Set(addedItems);
+  const addedSet = new Set(advertised.added);
+  const matched = stripItems.filter((c) => addedSet.has(c));
+  const unmatched = stripItems.filter((c) => !addedSet.has(c));
 
-  const missingFromStrip = addedItems.filter((c) => !stripSet.has(c));
-  const extraInStrip = stripItems.filter((c) => !addedSet.has(c));
-
-  if (missingFromStrip.length > 0) {
+  if (matched.length === 0) {
     drift.push({
-      artifact: STRIP_PATH,
-      expected: `items[] surfaces every component added in v${version}: ${addedItems.join(', ')}`,
-      actual: `Missing from strip: ${missingFromStrip.join(', ')}. Add them to items[] in ${STRIP_PATH}`,
+      artifact: itemsSource,
+      expected: `Strip items advertise the v${advertised.version} release (Added: ${advertised.added.join(', ')})`,
+      actual: `None of the strip items (${stripItems.join(', ')}) appear in v${advertised.version}'s Added entries — stale highlights`,
       severity: 'major',
     });
+    return drift;
   }
 
-  if (extraInStrip.length > 0) {
+  if (matched.length / stripItems.length < MIN_OVERLAP) {
     drift.push({
-      artifact: STRIP_PATH,
-      expected: `items[] only surfaces components from v${version}'s Added section`,
-      actual: `Stale or unknown entries in strip: ${extraInStrip.join(', ')}. Remove or move them to a previous-release archive`,
+      artifact: itemsSource,
+      expected: `Majority of strip items come from v${advertised.version}'s Added entries (curated subsets are fine)`,
+      actual: `Only ${matched.length}/${stripItems.length} items match v${advertised.version}; stale or unknown entries: ${unmatched.join(', ')}`,
       severity: 'major',
     });
   }

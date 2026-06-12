@@ -16,6 +16,7 @@ async function createFixture(opts: {
   stripContent: string | null;
   registryComponents: string[];
   uiKitVersion: string | null;
+  uiKitChangelog?: string;
 }): Promise<Fixture> {
   const root = await mkdtemp(join(tmpdir(), 'pxlkit-gate-31-'));
 
@@ -27,6 +28,10 @@ async function createFixture(opts: {
       join(root, 'apps/web/src/components/whats-new-strip.tsx'),
       opts.stripContent,
     );
+  }
+
+  if (opts.uiKitChangelog) {
+    await writeFile(join(root, 'packages/ui-kit/CHANGELOG.md'), opts.uiKitChangelog);
   }
 
   const entries = opts.registryComponents.map((c) => `  '${c}',`).join('\n');
@@ -152,5 +157,105 @@ describe('gate 31: whats-new-strip coherence', () => {
     });
     expect(drift.length).toBe(1);
     expect(drift[0]?.severity).toBe('blocker');
+  });
+
+  describe('release-policy version fallback (version-only patches)', () => {
+    /** 2.0.1 is a version-only republish; 2.0.0 carries the Added content. */
+    const FALLBACK_CHANGELOG = `# @pxlkit/ui-kit — Changelog
+
+## Unreleased
+
+### Fixed
+- something pending.
+
+## 2.0.1 — 2026-06-02
+
+### Changed
+- Version-only republish to unblock the npm publish pipeline. No API changes.
+
+## 2.0.0 — 2026-05-31
+
+### Added
+- **\`PixelCard\`** — launch component.
+`;
+
+    it('accepts a strip pinned to the advertised release when current is a version-only patch', async () => {
+      const f = await createFixture({
+        stripContent: `
+          import { PixelCard } from '@pxlkit/ui-kit';
+          export default function Strip() {
+            return <PixelCard title="v2.0.0">launch highlights</PixelCard>;
+          }
+        `,
+        registryComponents: ['PixelCard', 'PixelBadge'],
+        uiKitVersion: '2.0.1',
+        uiKitChangelog: FALLBACK_CHANGELOG,
+      });
+      fixtures.push(f);
+
+      const result = await whatsNewStripCoherenceGate({ repoRoot: f.root });
+      expect(result.drift).toEqual([]);
+    });
+
+    it('still flags a strip pinned to a version that is neither current nor advertised', async () => {
+      const f = await createFixture({
+        stripContent: `
+          import { PixelCard } from '@pxlkit/ui-kit';
+          export default function Strip() {
+            return <PixelCard title="v1.0.0">ancient highlights</PixelCard>;
+          }
+        `,
+        registryComponents: ['PixelCard'],
+        uiKitVersion: '2.0.1',
+        uiKitChangelog: FALLBACK_CHANGELOG,
+      });
+      fixtures.push(f);
+
+      const result = await whatsNewStripCoherenceGate({ repoRoot: f.root });
+      const versionDrift = result.drift.find((d) => d.expected.includes('2.0.1'));
+      expect(versionDrift).toBeDefined();
+      expect(versionDrift?.severity).toBe('major');
+      expect(versionDrift?.expected).toContain('2.0.0');
+    });
+  });
+
+  describe('prop-driven strips (version injected from the SoT)', () => {
+    it('accepts a strip with no hardcoded version that declares a version prop', async () => {
+      const f = await createFixture({
+        stripContent: `
+          import { PixelCard } from '@pxlkit/ui-kit';
+          export interface Props { version: string; }
+          export default function Strip({ version }: Props) {
+            return <PixelCard title={\`v\${version}\`}>fresh by construction</PixelCard>;
+          }
+        `,
+        registryComponents: ['PixelCard'],
+        uiKitVersion: '2.0.1',
+      });
+      fixtures.push(f);
+
+      const result = await whatsNewStripCoherenceGate({ repoRoot: f.root });
+      expect(result.drift).toEqual([]);
+    });
+
+    it('flags a strip with neither a version literal nor a version prop', async () => {
+      const f = await createFixture({
+        stripContent: `
+          import { PixelCard } from '@pxlkit/ui-kit';
+          export default function Strip() {
+            return <PixelCard title="no idea what release this is">stale-prone</PixelCard>;
+          }
+        `,
+        registryComponents: ['PixelCard'],
+        uiKitVersion: '2.0.1',
+      });
+      fixtures.push(f);
+
+      const result = await whatsNewStripCoherenceGate({ repoRoot: f.root });
+      const versionDrift = result.drift.find((d) => d.expected.includes('2.0.1'));
+      expect(versionDrift).toBeDefined();
+      expect(versionDrift?.severity).toBe('major');
+      expect(versionDrift?.actual).toContain('No version literal');
+    });
   });
 });

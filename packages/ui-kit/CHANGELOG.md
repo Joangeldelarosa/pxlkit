@@ -5,9 +5,15 @@
 ### Deprecated
 - `PxlKitButton` / `PxlKitButtonProps` — removal target made explicit: `3.0.0` (carried forward from 2.0.0, see ADR-0004). Use `PixelIconButton` / `PixelIconButtonProps`.
 
+### Changed
+- `PixelDropdown` items now accept native button DOM props — `DropdownItemProps` extends `ButtonHTMLAttributes`, so `data-*`/`aria-*` attributes pass through to the rendered `<button>`, `className` merges, and consumer `onClick`/`onMouseEnter` compose with the internal handlers; checkbox and radio items inherit the same passthrough (prop-inheritance migration).
+- Internal file layout (Ola 4e), zero public API change: toast, locale and surface providers, chart, chip-group, toggle and bento-cell split into dedicated one-file-per-component files; `data-display/`, `inputs/` and `overlay/` folders dissolved into `cards/`, `data/`, `forms/`, `actions/` and `overlays/` next to their manifests.
+
 ### Fixed
+- a11y: semantic fixes across 10 components, clearing all 28 axe gate findings — `PixelCard`/`PixelFeatureCard` interactive variant renders `role="button"` on a `<div>`, `PixelCalendarGrid` wraps weekday columnheaders in a `role="row"`, `PixelSidebar` restores native list semantics, `PixelNavigationMenu` drops `aria-orientation` from the nav landmark, `PixelProgress` falls back to `aria-label="Progress"`, `PixelAccordion` panels drop `role="region"`, `PixelTooltip` click triggers no longer nest interactives, `PixelBareInput`/`PixelInputGroup` examples label their inputs.
+- `FieldShell` (the label/hint/error shell behind form fields) now resolves its surface via `useEffectiveSurface` — prop first, then the nearest `PxlKitSurfaceProvider` — instead of hardcoding `pixel`; standalone callers that omit the `surface` prop now follow the provider (in-kit callers are unaffected).
 - Declare `embla-carousel` as a direct dependency — `PixelCarousel` imports its types directly but only `embla-carousel-react` was declared, so the bare import resolved through hoisting.
-- `PixelStarRating` manifest trimmed to the 5-highlight schema maximum (was the only schema-invalid manifest in the SSOT scan).
+- `PixelStarRating` manifest corrections: highlights trimmed to the 5-entry schema maximum and `since` restored to `2.0.0` (the version the component actually shipped in).
 
 ## 2.0.1 — 2026-06-02
 

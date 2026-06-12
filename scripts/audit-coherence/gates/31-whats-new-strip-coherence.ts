@@ -3,10 +3,11 @@ import { join } from 'node:path';
 import type { DriftItem, Gate, GateResult } from '../types';
 
 import { adaptFunctionalGate } from '../_lib/functional-gate-adapter.js';
+import { resolveAdvertisedRelease } from '../_lib/release-policy.js';
 
 const GATE_ID = '31-whats-new-strip-coherence';
 const DESCRIPTION =
-  'apps/web/src/components/whats-new-strip.tsx must exist, reference at least one current ui-kit registry component, and mention the current ui-kit version.';
+  'apps/web/src/components/whats-new-strip.tsx must exist, reference at least one current ui-kit registry component, and pin to a coherent ui-kit version: the current version, the advertised release (most recent with "### Added" entries, for version-only patches), or a dynamic `version` prop fed from the version SoT.';
 
 const STRIP_PATH = 'apps/web/src/components/whats-new-strip.tsx';
 
@@ -14,18 +15,21 @@ interface ReadOptions {
   strip?: string | null;
   registry?: string | null;
   uiKitPackage?: { version?: string } | null;
+  uiKitChangelog?: string | null;
 }
 
 export async function loadInputs(repoRoot: string): Promise<{
   strip: string | null;
   registry: string | null;
   uiKitPackage: { version?: string } | null;
+  uiKitChangelog: string | null;
 }> {
   const strip = await tryRead(join(repoRoot, STRIP_PATH));
   const registry = await tryRead(join(repoRoot, 'packages/ui-kit/src/registry.ts'));
   const pkgRaw = await tryRead(join(repoRoot, 'packages/ui-kit/package.json'));
   const uiKitPackage = pkgRaw ? (JSON.parse(pkgRaw) as { version?: string }) : null;
-  return { strip, registry, uiKitPackage };
+  const uiKitChangelog = await tryRead(join(repoRoot, 'packages/ui-kit/CHANGELOG.md'));
+  return { strip, registry, uiKitPackage, uiKitChangelog };
 }
 
 async function tryRead(path: string): Promise<string | null> {
@@ -41,9 +45,24 @@ export function parseRegistryComponents(registry: string): string[] {
   return matches.map((m) => m.slice(1, -1));
 }
 
+/**
+ * True when the strip receives its version dynamically (a `version` prop /
+ * template interpolation) instead of hardcoding a literal. A prop-driven
+ * strip is fed from the version SoT (apps/web/src/lib/pxlkit-version.ts →
+ * packages/ui-kit/package.json#version) at the call sites, so it can never
+ * go stale by construction.
+ */
+export function isVersionPropDriven(strip: string): boolean {
+  return (
+    /\bversion\b\s*[:?]/.test(strip) ||
+    /\$\{\s*version\s*\}/.test(strip) ||
+    /\bprops\.version\b/.test(strip)
+  );
+}
+
 export function evaluate(opts: ReadOptions): DriftItem[] {
   const drift: DriftItem[] = [];
-  const { strip, registry, uiKitPackage } = opts;
+  const { strip, registry, uiKitPackage, uiKitChangelog } = opts;
 
   if (!strip) {
     drift.push({
@@ -85,11 +104,39 @@ export function evaluate(opts: ReadOptions): DriftItem[] {
       actual: 'version field missing — cannot validate strip version reference',
       severity: 'major',
     });
-  } else if (!strip.includes(version)) {
+    return drift;
+  }
+
+  // Accepted versions: the current package version, plus — when the current
+  // version is a version-only patch with no "### Added" entries — the
+  // advertised release (most recent version that HAS Added entries). The
+  // strip legitimately keeps advertising that release's content.
+  const accepted = new Set([version]);
+  if (uiKitChangelog) {
+    const advertised = resolveAdvertisedRelease(uiKitChangelog, version);
+    if (advertised?.isFallback) accepted.add(advertised.version);
+  }
+
+  // No word boundaries: version literals usually appear as "v1.5.0".
+  const literals = strip.match(/\d+\.\d+\.\d+/g) ?? [];
+  if (literals.length > 0) {
+    if (!literals.some((l) => accepted.has(l))) {
+      drift.push({
+        artifact: STRIP_PATH,
+        expected: `Strip mentions current ui-kit version (${version})${
+          accepted.size > 1
+            ? ` or the advertised release (${Array.from(accepted).filter((v) => v !== version).join(', ')})`
+            : ''
+        }`,
+        actual: `Hardcoded version(s) ${literals.join(', ')} match neither — likely stale highlights`,
+        severity: 'major',
+      });
+    }
+  } else if (!isVersionPropDriven(strip)) {
     drift.push({
       artifact: STRIP_PATH,
-      expected: `Strip mentions current ui-kit version (${version})`,
-      actual: `Version ${version} not found in strip source — likely stale highlights`,
+      expected: `Strip mentions current ui-kit version (${version}) or receives a dynamic \`version\` prop from the version SoT`,
+      actual: 'No version literal and no `version` prop found in strip source',
       severity: 'major',
     });
   }
