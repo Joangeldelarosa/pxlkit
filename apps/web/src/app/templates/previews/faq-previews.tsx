@@ -227,7 +227,7 @@ export function FaqAccordionPreview() {
               No questions match your search.
             </p>
           )}
-          {filteredItems.map((item, i) => {
+          {filteredItems.map((item) => {
             const originalIndex = ACCORDION_ITEMS.indexOf(item);
             return (
               <div

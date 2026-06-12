@@ -249,7 +249,6 @@ const CATEGORY_FILTER: { label: string; value: ChangeCategory | 'all' }[] = [
  * declare `value` in its TS surface, so we declare it here.
  */
 function FilterChip({
-  value: _value,
   label,
   tone,
   variant,

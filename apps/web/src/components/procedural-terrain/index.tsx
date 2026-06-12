@@ -181,21 +181,6 @@ function encodeSceneToURL(seed: number, pos: [number, number, number], rot: [num
 }
 
 /** Decode scene from URL search params */
-function decodeSceneFromURL(): { seed: number; pos: [number, number, number]; rot: [number, number, number] } | null {
-  try {
-    const params = new URLSearchParams(window.location.search);
-    const seedStr = params.get('seed');
-    const px = params.get('px'), py = params.get('py'), pz = params.get('pz');
-    const rx = params.get('rx'), ry = params.get('ry'), rz = params.get('rz');
-    if (!seedStr || !px || !py || !pz) return null;
-    return {
-      seed: parseInt(seedStr, 10),
-      pos: [parseFloat(px), parseFloat(py), parseFloat(pz)],
-      rot: rx && ry && rz ? [parseFloat(rx), parseFloat(ry), parseFloat(rz)] : [0, 0, 0],
-    };
-  } catch { return null; }
-}
-
 /* ═══════════════════════════════════════════════════════════════
  *  Camera Tracker (converts camera pos → biome name for HUD)
  * ═══════════════════════════════════════════════════════════════ */

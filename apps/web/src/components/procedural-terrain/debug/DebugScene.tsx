@@ -81,35 +81,6 @@ const GridLayer = memo(function GridLayer({
 });
 
 /** Build instanced quads from a per-chunk source function. */
-function buildOverlayInstances(
-  chunks: Map<string, ChunkVoxelData>,
-  source: (data: ChunkVoxelData, lx: number, lz: number) => { y: number; color: THREE.Color; alpha?: number } | null,
-): { matrices: THREE.Matrix4[]; colors: THREE.Color[] } {
-  const matrices: THREE.Matrix4[] = [];
-  const colors: THREE.Color[] = [];
-  const m = new THREE.Matrix4();
-  const halfV = VOXEL_SIZE / 2;
-  for (const data of chunks.values()) {
-    const bX = data.chunkX * CHUNK_SIZE * VOXEL_SIZE;
-    const bZ = data.chunkZ * CHUNK_SIZE * VOXEL_SIZE;
-    for (let lx = 0; lx < CHUNK_SIZE; lx++) {
-      for (let lz = 0; lz < CHUNK_SIZE; lz++) {
-        const cell = source(data, lx, lz);
-        if (!cell) continue;
-        m.identity();
-        m.makeTranslation(
-          bX + (lx + 0.5) * VOXEL_SIZE - halfV,
-          cell.y,
-          bZ + (lz + 0.5) * VOXEL_SIZE - halfV,
-        );
-        matrices.push(m.clone());
-        colors.push(cell.color.clone());
-      }
-    }
-  }
-  return { matrices, colors };
-}
-
 const BiomeLayer = memo(function BiomeLayer({
   chunks,
 }: { chunks: Map<string, ChunkVoxelData> }) {
@@ -117,7 +88,6 @@ const BiomeLayer = memo(function BiomeLayer({
     const positions: number[] = [];
     const colorArr: number[] = [];
     const c = new THREE.Color();
-    const halfV = VOXEL_SIZE / 2;
     for (const data of chunks.values()) {
       const bX = data.chunkX * CHUNK_SIZE * VOXEL_SIZE;
       const bZ = data.chunkZ * CHUNK_SIZE * VOXEL_SIZE;

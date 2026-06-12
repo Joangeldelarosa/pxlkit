@@ -10,9 +10,9 @@
 
 import type { TerrainSamplerInputs } from '../utils/terrain-sampler';
 import { sampleTerrain } from '../utils/terrain-sampler';
-import { getInterHighwayInfo, INTER_HW_SPACING } from '../city/layout';
+import { getInterHighwayInfo } from '../city/layout';
 import { isTunnelAt, isOverWaterHighway } from '../utils/highway-geom';
-import { VOXEL_SIZE, MAX_HEIGHT } from '../constants';
+import { VOXEL_SIZE } from '../constants';
 import type { BiomeType } from '../types';
 import type { TeleportTarget } from './url-params';
 

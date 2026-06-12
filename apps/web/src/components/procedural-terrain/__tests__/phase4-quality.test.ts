@@ -13,7 +13,7 @@
 import { describe, it, expect } from 'vitest';
 import { createNoise2D } from '../utils/noise';
 import { generateChunkData } from '../generation/chunk';
-import { CHUNK_SIZE, VOXEL_SIZE } from '../constants';
+import { CHUNK_SIZE } from '../constants';
 import { DEFAULT_CONFIG } from '../types';
 import type { WorldConfig } from '../types';
 import {

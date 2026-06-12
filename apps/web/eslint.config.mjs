@@ -5,7 +5,17 @@ const eslintConfig = [
   ...nextCoreWebVitals,
   ...nextTypescript,
   {
-    ignores: ["node_modules/**", ".next/**", "out/**", "build/**", "next-env.d.ts"],
+    ignores: [
+      "node_modules/**",
+      ".next/**",
+      "out/**",
+      "build/**",
+      "next-env.d.ts",
+      // docs:build emits these locally but they are unwired + gitignored
+      // (see repo .gitignore) — CI never sees them, lint shouldn't either.
+      "src/app/ui-kit/sections/**",
+      "src/app/ui-kit/*/metadata.generated.ts",
+    ],
   },
   {
     // The /explore voxel demo uses React Three Fiber patterns that the newer

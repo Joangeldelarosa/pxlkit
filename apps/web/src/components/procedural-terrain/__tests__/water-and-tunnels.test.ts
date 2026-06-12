@@ -14,18 +14,16 @@
 import { describe, it, expect } from 'vitest';
 import { createNoise2D } from '../utils/noise';
 import { generateChunkData } from '../generation/chunk';
-import { CHUNK_SIZE, VOXEL_SIZE, MAX_HEIGHT } from '../constants';
+import { CHUNK_SIZE, VOXEL_SIZE } from '../constants';
 import { DEFAULT_CONFIG } from '../types';
 import type { WorldConfig } from '../types';
 import {
   isTunnelAt,
   allowsTunnelInBiome,
   computeRoadLevelAt,
-  TUNNEL_TRIGGER_DELTA,
 } from '../utils/highway-geom';
-import { sampleTerrain } from '../utils/terrain-sampler';
 import type { TerrainSamplerInputs } from '../utils/terrain-sampler';
-import { getInterHighwayInfo, getHighwayClass, INTER_HW_SPACING, TUNNEL_HEIGHT } from '../city/layout';
+import { getInterHighwayInfo, getHighwayClass, INTER_HW_SPACING } from '../city/layout';
 
 /* ── Test utilities ── */
 

@@ -11,7 +11,7 @@
  *  installs at mount.
  * ═══════════════════════════════════════════════════════════════ */
 
-import type { BiomeType } from '../types';
+
 import { sampleTerrain } from '../utils/terrain-sampler';
 import {
   isTunnelAt as isTunnelAtImpl,
@@ -19,7 +19,7 @@ import {
   isOverWaterHighway,
 } from '../utils/highway-geom';
 import { getInterHighwayInfo } from '../city/layout';
-import { VOXEL_SIZE, CHUNK_SIZE } from '../constants';
+import { VOXEL_SIZE } from '../constants';
 import { findTeleportTarget } from './teleport';
 import type { TeleportResult } from './teleport';
 import type { TeleportTarget } from './url-params';

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { loadWorld, readDebugApi } from '../_fixtures/world';
+import { loadWorld } from '../_fixtures/world';
 
 test.describe('Boats spawn over deep water', () => {
   test('archipelago seed shows at least one boat candidate cell', async ({ page }) => {
@@ -17,7 +17,6 @@ test.describe('Boats spawn over deep water', () => {
       const api = (window as any).__pxlTerrain;
       const cam = api.getCamera();
       const VOXEL_SIZE = 0.5;
-      const CHUNK_SIZE = 16;
       // Sample around camera
       let viableCells = 0;
       let bestDepth = 0;

@@ -15,8 +15,8 @@
 
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { WorldConfig, ChunkVoxelData } from '../types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { WorldConfig } from '../types';
 import type { TerrainSamplerInputs } from '../utils/terrain-sampler';
 import { sampleTerrain } from '../utils/terrain-sampler';
 import {
@@ -76,7 +76,7 @@ export interface DebugControllerProps {
 export function DebugController(props: DebugControllerProps) {
   const {
     enabled, initialOverlays, chunkCacheRef, seed, setSeed,
-    getCamera, teleport, config, setConfig, sampler, isLocked,
+    getCamera, teleport, setConfig, sampler, isLocked,
     onOverlaysChange, dismissWelcome,
   } = props;
 
