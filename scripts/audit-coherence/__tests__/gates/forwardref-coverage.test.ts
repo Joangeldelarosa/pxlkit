@@ -526,6 +526,39 @@ describe('ForwardRefCoverageGate.run', () => {
     expect(components.has('Clean')).toBe(false);
   });
 
+  it('default discovery ignores Component.examples.tsx demo files (header-documented exemption)', async () => {
+    // Repo convention: doc demo snippets live in `<Component>.examples.tsx`
+    // next to the implementation (NOT only under an examples/ directory).
+    // Those exports (Default, Sizes, AsChild, ...) are usage demos, not kit
+    // components — the gate header explicitly excludes examples.
+    const srcDir = path.join(tmpRoot, 'packages/ui-kit/src/forms');
+    await fs.ensureDir(srcDir);
+    await fs.writeFile(
+      path.join(srcDir, 'PixelThing.examples.tsx'),
+      [
+        '// demo snippet — exported example render, not a component implementation',
+        'export function Sizes() {',
+        '  return <button onClick={() => {}}>demo</button>;',
+        '}',
+      ].join('\n'),
+      'utf8',
+    );
+    // A REAL violator in the same tree must still be flagged.
+    await fs.writeFile(
+      path.join(srcDir, 'PixelThing.tsx'),
+      'export const PixelThing = (p) => <button {...p} />;',
+      'utf8',
+    );
+    const ctx = await makeCtx(tmpRoot);
+    const gate = new ForwardRefCoverageGate(); // real default discovery
+    const result = await gate.run(ctx);
+    expect(result.passed).toBe(false);
+    expect(result.findings.map((f) => f.component)).toEqual(['PixelThing']);
+    expect(
+      result.findings.every((f) => !(f.file ?? '').includes('.examples.')),
+    ).toBe(true);
+  });
+
   it('returns a non-negative duration_ms', async () => {
     const ctx = await makeCtx(tmpRoot);
     const gate = new ForwardRefCoverageGate({

@@ -12,7 +12,8 @@
  * What it does
  * ------------
  *  - Scans every `.tsx` under `packages/ui-kit/src` (excludes tests, stories,
- *    showcases, examples — those are not component implementations).
+ *    showcases, examples — those are not component implementations; this
+ *    includes the colocated `<Component>.examples.tsx` demo-snippet files).
  *  - For each component declaration it can find, determines two facts:
  *      (1) Does it render a "leaf interactive" host element directly?
  *          - JSX intrinsics: <button>, <a>, <input>, <textarea>, <select>,
@@ -124,6 +125,10 @@ const SCAN_IGNORE = [
   '**/*.stories.tsx',
   '**/*.test.tsx',
   '**/*.spec.tsx',
+  // Colocated doc demo snippets (`PixelButton.examples.tsx`) export example
+  // render functions (Default, Sizes, AsChild, ...), not kit components —
+  // same exemption gate 23 applies.
+  '**/*.examples.tsx',
   '**/showcase/**',
   '**/examples/**',
 ];

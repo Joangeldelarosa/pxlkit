@@ -299,9 +299,12 @@ const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(functio
 });
 DropdownContent.displayName = 'PixelDropdown.Content';
 
-interface DropdownItemProps {
+interface DropdownItemProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'onSelect'> {
+  /** Item identity for highlight/typeahead registration (NOT the HTML form `value`). */
   value?: string;
   children: React.ReactNode;
+  /** Selection callback (NOT the DOM `select` event). */
   onSelect?: () => void;
   disabled?: boolean;
   /** Visually marks the row red; equivalent to `tone="red"`. */
@@ -312,7 +315,10 @@ interface DropdownItemProps {
 }
 
 const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(function DropdownItem(
-  { value, children, onSelect, disabled = false, destructive = false, tone, icon, shortcut },
+  {
+    value, children, onSelect, disabled = false, destructive = false, tone, icon, shortcut,
+    className, onClick, onMouseEnter, ...rest
+  },
   ref,
 ) {
   const { setOpen, surface, highlightedValue, setHighlightedValue, registerItem, unregisterItem, labelMap, registerItemHandler } = useDropdownContext('PixelDropdown.Item');
@@ -349,13 +355,19 @@ const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(function D
         disabled && 'cursor-not-allowed opacity-50',
         toneTextClass(effectiveTone),
         s.font, s.radius,
+        className,
       )}
-      onMouseEnter={() => { if (!disabled) setHighlightedValue(itemValue); }}
-      onClick={() => {
+      onMouseEnter={(e) => {
+        onMouseEnter?.(e);
+        if (!disabled) setHighlightedValue(itemValue);
+      }}
+      onClick={(e) => {
+        onClick?.(e);
         if (disabled) return;
         onSelect?.();
         setOpen(false);
       }}
+      {...rest}
     >
       {icon && <span className="mr-2 inline-flex items-center justify-center opacity-80 shrink-0">{icon}</span>}
       <span className="flex-1 truncate">{children}</span>

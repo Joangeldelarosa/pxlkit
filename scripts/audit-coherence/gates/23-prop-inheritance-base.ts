@@ -13,6 +13,18 @@
  *     means consumers cannot pass `aria-*`, `data-*`, `onClick`, etc, and
  *     TypeScript silently accepts garbage. MAJOR.
  *
+ *     Recognised equivalents (NOT findings):
+ *       - SVG-rooted components extending `React.SVGAttributes<...>` /
+ *         `React.SVGProps<...>` — HTMLAttributes would be the WRONG base for
+ *         an `<svg>` root.
+ *       - Transitive inheritance: Props extending another `*Props` interface
+ *         (anywhere in the scan set) that itself — directly or transitively —
+ *         extends an HTMLAttributes/SVGAttributes-family base
+ *         (e.g. `PixelEqualHeightGridProps extends Omit<PixelGridProps, 'align'>`).
+ *       - Compositional `*Root` components pair with the base Props name:
+ *         `PixelCarouselRoot` → `PixelCarouselProps` (the public component is
+ *         the Root re-exported under the base name).
+ *
  *  2. **Layout-primitive base signature.** The seven layout primitives
  *     (`PixelBox`, `PixelStack`, `PixelCluster`, `PixelGrid`, `PixelCenter`,
  *     `PixelContainer`, `PixelTwoColumn`) MUST share an identical base prop
@@ -207,6 +219,14 @@ const HTML_ATTR_INTERFACES = new Set([
   'WebViewHTMLAttributes',
 ]);
 
+/**
+ * SVG-family attribute interfaces. For a component whose root element is an
+ * SVG intrinsic (`<svg>`, `<path>`, ...), these are the CORRECT rest-spread
+ * bases — `HTMLAttributes` would be wrong (no SVG-specific attrs, wrong
+ * element type param). Treated as rest-spread safe alongside the HTML set.
+ */
+const SVG_ATTR_INTERFACES = new Set(['SVGAttributes', 'SVGProps']);
+
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
@@ -309,7 +329,9 @@ const RE_TYPE_DECL =
 
 /**
  * Recognises any reference to `React.HTMLAttributes<…>`, `HTMLAttributes<…>`,
- * `ButtonHTMLAttributes<…>`, `Omit<React.HTMLAttributes<…>, …>`, etc.
+ * `ButtonHTMLAttributes<…>`, `Omit<React.HTMLAttributes<…>, …>`, etc. — plus
+ * the SVG-family equivalents (`SVGAttributes`, `SVGProps`) which are the
+ * correct rest-spread base for svg-rooted components.
  *
  * Returns the bare interface name (e.g. "HTMLAttributes") on match, null on
  * no match.
@@ -317,11 +339,44 @@ const RE_TYPE_DECL =
 export function detectHTMLAttrsInterface(text: string): string | null {
   // Match either `React.XxxHTMLAttributes` or bare `XxxHTMLAttributes`,
   // tolerating leading `Omit<` wrapper or `&` intersections.
-  const re = /\b(?:React\s*\.\s*)?([A-Z][A-Za-z]*HTMLAttributes|HTMLAttributes|AllHTMLAttributes)\s*</;
+  const re = /\b(?:React\s*\.\s*)?([A-Z][A-Za-z]*HTMLAttributes|HTMLAttributes|AllHTMLAttributes|SVGAttributes|SVGProps)\s*</;
   const m = re.exec(text);
   if (!m) return null;
   const name = m[1];
-  if (HTML_ATTR_INTERFACES.has(name)) return name;
+  if (HTML_ATTR_INTERFACES.has(name) || SVG_ATTR_INTERFACES.has(name)) return name;
+  return null;
+}
+
+/**
+ * Transitive rest-spread-safety resolver. A Props interface that does NOT
+ * directly extend an HTMLAttributes/SVGAttributes-family base may still be
+ * safe when its extends clause references another `*Props` interface (e.g.
+ * `extends Omit<PixelGridProps, 'align'>`) that itself — directly or further
+ * up the chain — extends one. Resolution is scoped to interfaces discovered
+ * in the scan set; unresolvable references stay UNSAFE (conservative).
+ *
+ * Returns the base interface name the chain bottoms out at, or null.
+ */
+export function resolveTransitiveHTMLAttributes(
+  iface: PropsInterface,
+  propsByName: ReadonlyMap<string, PropsInterface>,
+  seen: Set<string> = new Set(),
+): string | null {
+  if (iface.extendsHTMLAttributes) return iface.htmlAttrsInterface;
+  if (seen.has(iface.name)) return null;
+  seen.add(iface.name);
+  // Local regex instance — module-level lastIndex state would corrupt the
+  // outer iteration during recursion.
+  const reRef = /\b([A-Z]\w*Props)\b/g;
+  let m: RegExpExecArray | null;
+  while ((m = reRef.exec(iface.extendsClause)) !== null) {
+    const refName = m[1];
+    if (refName === iface.name) continue;
+    const target = propsByName.get(refName);
+    if (!target) continue;
+    const resolved = resolveTransitiveHTMLAttributes(target, propsByName, seen);
+    if (resolved) return resolved;
+  }
   return null;
 }
 
@@ -560,6 +615,15 @@ export class PropInheritanceBaseGate extends Gate {
       { file: string; analysis: FileAnalysis }
     >();
 
+    // ---------------------------------------------------------------------
+    // Pass 1: analyze every file, index components AND Props interfaces.
+    // The global Props index powers transitive inheritance resolution
+    // (PixelDerivedProps extends Omit<PixelGridProps, 'align'> — PixelGrid
+    // may live in another file).
+    // ---------------------------------------------------------------------
+    const analyses: Array<{ src: ScannedSource; analysis: FileAnalysis }> = [];
+    const propsByName = new Map<string, PropsInterface>();
+
     for (const src of files) {
       let analysis: FileAnalysis;
       try {
@@ -575,24 +639,39 @@ export class PropInheritanceBaseGate extends Gate {
         continue;
       }
 
+      analyses.push({ src, analysis });
+
       // Index each component for the cross-file primitives check.
       for (const c of analysis.components) {
         if (c.componentName && !componentIndex.has(c.componentName)) {
           componentIndex.set(c.componentName, { file: src.file, analysis });
         }
       }
+      for (const p of analysis.props) {
+        if (!propsByName.has(p.name)) propsByName.set(p.name, p);
+      }
+    }
 
-      // -------------------------------------------------------------------
-      // Check 1: rest-spread safety
-      // -------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    // Pass 2 / Check 1: rest-spread safety
+    // ---------------------------------------------------------------------
+    for (const { src, analysis } of analyses) {
       for (const comp of analysis.components) {
         if (!comp.spreadsRest || !comp.forwardsRestToJSX) continue;
         // Heuristic: match the component to its Props interface by name
-        // (PixelX → PixelXProps). If the file declares exactly one Props
-        // interface, fall back to that.
+        // (PixelX → PixelXProps). Compositional internals named `PixelXRoot`
+        // pair with the base name (`PixelXProps`) — the Root IS the public
+        // component, re-exported under the base name. If the file declares
+        // exactly one Props interface, fall back to that.
         const candidatePropsName = `${comp.componentName}Props`;
+        const candidateNames = [candidatePropsName];
+        if (comp.componentName && /Root$/.test(comp.componentName)) {
+          candidateNames.push(
+            `${comp.componentName.replace(/Root$/, '')}Props`,
+          );
+        }
         let propsIface =
-          analysis.props.find((p) => p.name === candidatePropsName) ??
+          analysis.props.find((p) => candidateNames.includes(p.name)) ??
           (analysis.props.length === 1 ? analysis.props[0] : undefined);
 
         if (!propsIface) {
@@ -609,12 +688,24 @@ export class PropInheritanceBaseGate extends Gate {
         }
 
         if (!propsIface.extendsHTMLAttributes) {
+          // Not direct — maybe transitively safe via another Props interface
+          // in the scan set (e.g. extends Omit<PixelGridProps, 'align'>).
+          const inherited = resolveTransitiveHTMLAttributes(
+            propsIface,
+            propsByName,
+          );
+          if (inherited) {
+            ctx.logger.debug(
+              `${toPosix(src.file)} ${comp.componentName} — ${propsIface.name} transitively extends ${inherited}, rest-spread safe`,
+            );
+            continue;
+          }
           findings.push({
             severity: 'major',
             file: toPosix(src.file),
             component: comp.componentName ?? undefined,
             message: `${comp.componentName} forwards \`...${comp.restIdentifier}\` to JSX but ${propsIface.name} (line ${propsIface.line}) does not extend \`React.HTMLAttributes<...>\`. Consumers cannot type aria-*, data-*, onClick, etc.`,
-            suggestion: `Update the declaration to:\n  export interface ${propsIface.name} extends React.HTMLAttributes<HTMLDivElement> {\n    /* existing pixel-art props (tone, surface, ...) */\n  }\nIf the root element is not a div, use the matching typed interface (e.g. ButtonHTMLAttributes<HTMLButtonElement>). If you need to redefine an attribute, use \`Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>\`.`,
+            suggestion: `Update the declaration to:\n  export interface ${propsIface.name} extends React.HTMLAttributes<HTMLDivElement> {\n    /* existing pixel-art props (tone, surface, ...) */\n  }\nIf the root element is not a div, use the matching typed interface (e.g. ButtonHTMLAttributes<HTMLButtonElement>; SVGAttributes<SVGSVGElement> for svg roots). If you need to redefine an attribute, use \`Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>\`.`,
           });
         }
       }

@@ -168,4 +168,69 @@ describe('PixelDropdown — Ola 4a upgrade', () => {
     const del = screen.getByRole('menuitem', { name: /delete/i });
     expect(del.className).toMatch(/text-retro-red/);
   });
+
+  /* ─── v2.1 prop-inheritance migration: DOM props reach the <button> ── */
+
+  it('Item forwards DOM props (data-*, aria-*), merges className, and forwards its ref', () => {
+    const ref = React.createRef<HTMLButtonElement>();
+    render(
+      <PixelDropdown.Root defaultOpen>
+        <PixelDropdown.Trigger>Open</PixelDropdown.Trigger>
+        <PixelDropdown.Content>
+          <PixelDropdown.Item
+            ref={ref}
+            value="copy"
+            onSelect={() => {}}
+            data-testid="custom-item"
+            aria-keyshortcuts="Meta+C"
+            className="my-custom-class"
+          >
+            Copy
+          </PixelDropdown.Item>
+        </PixelDropdown.Content>
+      </PixelDropdown.Root>,
+    );
+    const item = screen.getByTestId('custom-item');
+    expect(item.getAttribute('aria-keyshortcuts')).toBe('Meta+C');
+    expect(item.className).toMatch(/my-custom-class/);
+    // Base classes preserved alongside the consumer class.
+    expect(item.className).toMatch(/items-center/);
+    expect(ref.current).toBe(item);
+  });
+
+  it('Item composes a consumer onClick with the internal select/close behavior', () => {
+    const onSelect = vi.fn();
+    const onClick = vi.fn();
+    render(
+      <PixelDropdown.Root defaultOpen>
+        <PixelDropdown.Trigger>Open</PixelDropdown.Trigger>
+        <PixelDropdown.Content>
+          <PixelDropdown.Item value="copy" onSelect={onSelect} onClick={onClick}>
+            Copy
+          </PixelDropdown.Item>
+        </PixelDropdown.Content>
+      </PixelDropdown.Root>,
+    );
+    fireEvent.click(screen.getByRole('menuitem', { name: /copy/i }));
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it('CheckboxItem and RadioItem funnel DOM props through to the underlying button', () => {
+    render(
+      <PixelDropdown.Root defaultOpen>
+        <PixelDropdown.Trigger>Open</PixelDropdown.Trigger>
+        <PixelDropdown.Content>
+          <PixelDropdown.CheckboxItem value="a" checked data-testid="chk" onSelect={() => {}}>
+            Check me
+          </PixelDropdown.CheckboxItem>
+          <PixelDropdown.RadioItem value="b" checked data-testid="rad" onSelect={() => {}}>
+            Pick me
+          </PixelDropdown.RadioItem>
+        </PixelDropdown.Content>
+      </PixelDropdown.Root>,
+    );
+    expect(screen.getByTestId('chk').getAttribute('role')).toBe('menuitem');
+    expect(screen.getByTestId('rad').getAttribute('role')).toBe('menuitem');
+  });
 });

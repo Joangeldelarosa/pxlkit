@@ -183,6 +183,21 @@ describe('detectHTMLAttrsInterface', () => {
     expect(detectHTMLAttrsInterface('SomeUnrelatedProps')).toBeNull();
     expect(detectHTMLAttrsInterface('')).toBeNull();
   });
+
+  it('detects React.SVGAttributes<...> as a rest-spread-safe base (svg-rooted components)', () => {
+    expect(detectHTMLAttrsInterface('React.SVGAttributes<SVGSVGElement>')).toBe(
+      'SVGAttributes',
+    );
+    expect(detectHTMLAttrsInterface('SVGAttributes<SVGSVGElement>')).toBe(
+      'SVGAttributes',
+    );
+  });
+
+  it('detects SVGProps, including Omit-wrapped', () => {
+    expect(
+      detectHTMLAttrsInterface("Omit<React.SVGProps<SVGSVGElement>, 'width'>"),
+    ).toBe('SVGProps');
+  });
 });
 
 describe('analyzeFile', () => {
@@ -336,6 +351,146 @@ export const PixelBtn = forwardRef<HTMLButtonElement, PixelBtnProps>(function Pi
     });
     const result = await gate.run(ctx);
     expect(result.passed).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Check 1 extensions: SVG roots, transitive inheritance, *Root pairing
+// ---------------------------------------------------------------------------
+
+describe('Check 1 — SVG-rooted components', () => {
+  it('PASSES when an <svg>-rooted component extends React.SVGAttributes (HTMLAttributes would be the WRONG base)', async () => {
+    const ctx = await makeCtx(tmpRoot);
+    const src = `
+'use client';
+import React, { forwardRef } from 'react';
+export interface PixelChartProps extends React.SVGAttributes<SVGSVGElement> {
+  data: number[];
+  tone?: string;
+}
+export const PixelChart = forwardRef<SVGSVGElement, PixelChartProps>(function PixelChart(
+  { data, tone, className, ...rest },
+  ref,
+) {
+  return <svg ref={ref} role="img" className={className} {...rest} />;
+});
+`;
+    const gate = new PropInheritanceBaseGate({
+      discoverFiles: async () => [srcFile('PixelChart.tsx', src)],
+    });
+    const result = await gate.run(ctx);
+    expect(result.passed).toBe(true);
+    expect(result.findings).toEqual([]);
+  });
+});
+
+describe('Check 1 — transitive Props inheritance', () => {
+  it('PASSES when Props extends another Props interface (in the scan set) that itself extends HTMLAttributes', async () => {
+    const ctx = await makeCtx(tmpRoot);
+    const base = `
+import React, { forwardRef } from 'react';
+export interface PixelBaseProps extends React.HTMLAttributes<HTMLDivElement> {
+  gap?: number;
+  align?: 'start' | 'end';
+}
+export const PixelBase = forwardRef<HTMLDivElement, PixelBaseProps>(function PixelBase(
+  { gap, align, className, children, ...rest },
+  ref,
+) {
+  return <div ref={ref} className={className} {...rest}>{children}</div>;
+});
+`;
+    const derived = `
+import React, { forwardRef } from 'react';
+import { PixelBase, PixelBaseProps } from './PixelBase';
+export interface PixelDerivedProps extends Omit<PixelBaseProps, 'align'> {
+  rowAlign?: 'top' | 'stretch';
+}
+export const PixelDerived = forwardRef<HTMLDivElement, PixelDerivedProps>(function PixelDerived(
+  { rowAlign, className, children, ...rest },
+  ref,
+) {
+  return (
+    <PixelBase ref={ref} align="start" className={className} {...rest}>
+      {children}
+    </PixelBase>
+  );
+});
+`;
+    const gate = new PropInheritanceBaseGate({
+      discoverFiles: async () => [
+        srcFile('PixelBase.tsx', base),
+        srcFile('PixelDerived.tsx', derived),
+      ],
+    });
+    const result = await gate.run(ctx);
+    expect(result.passed).toBe(true);
+    expect(result.findings).toEqual([]);
+  });
+
+  it('still FAILS when the extends chain never reaches an HTMLAttributes-family base', async () => {
+    const ctx = await makeCtx(tmpRoot);
+    const orphan = `
+import React, { forwardRef } from 'react';
+interface PixelLooseProps {
+  tone?: string;
+}
+export interface PixelOrphanProps extends Omit<PixelLooseProps, 'tone'> {
+  surface?: string;
+}
+export const PixelOrphan = forwardRef<HTMLDivElement, PixelOrphanProps>(function PixelOrphan(
+  { surface, className, children, ...rest },
+  ref,
+) {
+  return <div ref={ref} className={className} {...rest}>{children}</div>;
+});
+`;
+    const gate = new PropInheritanceBaseGate({
+      discoverFiles: async () => [srcFile('PixelOrphan.tsx', orphan)],
+    });
+    const result = await gate.run(ctx);
+    expect(result.passed).toBe(false);
+    const major = result.findings.find(
+      (f) => f.severity === 'major' && f.component === 'PixelOrphan',
+    );
+    expect(major).toBeDefined();
+  });
+});
+
+describe('Check 1 — *Root component pairing', () => {
+  it('pairs PixelFooRoot with PixelFooProps (compositional Root convention) instead of emitting an info finding', async () => {
+    const ctx = await makeCtx(tmpRoot);
+    // Two Props interfaces in the file so the single-interface fallback can't
+    // mask the pairing logic.
+    const src = `
+'use client';
+import React, { forwardRef } from 'react';
+export interface PixelFooProps extends React.HTMLAttributes<HTMLDivElement> {
+  loop?: boolean;
+}
+interface PixelFooItemProps extends React.HTMLAttributes<HTMLDivElement> {
+  index?: number;
+}
+const PixelFooItem = forwardRef<HTMLDivElement, PixelFooItemProps>(function PixelFooItem(
+  { index, className, children, ...rest },
+  ref,
+) {
+  return <div ref={ref} className={className} {...rest}>{children}</div>;
+});
+const PixelFooRoot = forwardRef<HTMLDivElement, PixelFooProps>(function PixelFoo(
+  { loop, className, children, ...rest },
+  ref,
+) {
+  return <div ref={ref} className={className} {...rest}>{children}</div>;
+});
+export const PixelFoo = Object.assign(PixelFooRoot, { Item: PixelFooItem });
+`;
+    const gate = new PropInheritanceBaseGate({
+      discoverFiles: async () => [srcFile('PixelFoo.tsx', src)],
+    });
+    const result = await gate.run(ctx);
+    expect(result.passed).toBe(true);
+    expect(result.findings).toEqual([]);
   });
 });
 
