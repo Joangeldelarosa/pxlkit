@@ -17,9 +17,11 @@ import gate, {
   discoverSourceFiles,
   extractPropDeclarations,
   extractPropsBlocks,
+  isCssColorValueProp,
   isHeadingLikeContext,
   isNativeHtmlTypeUnion,
   isRhfContext,
+  isSingleLiteralDiscriminant,
 } from '../../gates/24-prop-naming-vocabulary.js';
 
 // ---------------------------------------------------------------------------
@@ -157,6 +159,39 @@ describe('isHeadingLikeContext', () => {
   });
 });
 
+describe('isSingleLiteralDiscriminant', () => {
+  it('returns true for a single string-literal type (discriminated-union tag)', () => {
+    expect(isSingleLiteralDiscriminant(`type?: 'single';`)).toBe(true);
+    expect(isSingleLiteralDiscriminant(`type: 'multiple';`)).toBe(true);
+  });
+
+  it('returns false for multi-literal unions (a real choice = a variant)', () => {
+    expect(isSingleLiteralDiscriminant(`type?: 'info' | 'warning';`)).toBe(false);
+    expect(isSingleLiteralDiscriminant(`type?: 'single' | 'multiple';`)).toBe(false);
+  });
+
+  it('returns false for non-literal types', () => {
+    expect(isSingleLiteralDiscriminant(`type?: string;`)).toBe(false);
+  });
+});
+
+describe('isCssColorValueProp', () => {
+  it('returns true for a plain string-typed color (CSS color value, not a tone)', () => {
+    expect(isCssColorValueProp(`color?: string;`)).toBe(true);
+    expect(isCssColorValueProp(`readonly color: string;`)).toBe(true);
+  });
+
+  it('returns false for tone-like literal unions', () => {
+    expect(isCssColorValueProp(`color?: 'red' | 'blue';`)).toBe(false);
+    expect(isCssColorValueProp(`color?: Tone;`)).toBe(false);
+  });
+
+  it('returns false for other alias names even when string-typed', () => {
+    expect(isCssColorValueProp(`theme?: string;`)).toBe(false);
+    expect(isCssColorValueProp(`palette?: string;`)).toBe(false);
+  });
+});
+
 describe('isRhfContext', () => {
   it('detects react-hook-form imports', () => {
     expect(isRhfContext(`import { useForm } from 'react-hook-form';`)).toBe(
@@ -283,7 +318,7 @@ export interface PixelButtonProps {
   it('flags multiple distinct aliases on the same Props block', () => {
     const src = `
 export interface PixelInputProps {
-  color?: string;
+  color?: 'red' | 'blue';
   scale?: number;
   kind?: 'A' | 'B';
   mode?: 'pixel' | 'linear';
@@ -417,6 +452,127 @@ export interface PixelXProps {
 `;
     expect(analyseSource('/x/PixelX.tsx', src)).toEqual([]);
   });
+
+  // ----- Detector calibration: @deprecated back-compat aliases -----
+
+  it('exempts @deprecated alias props retained per the deprecation policy', () => {
+    const src = `
+export interface PixelAlertProps {
+  /** Short label shown in tone color (canonical name for the title). */
+  label?: string;
+  /**
+   * @deprecated Use \`label\` instead. Retained as alias for one minor.
+   */
+  title?: string;
+  message: string;
+}
+`;
+    expect(analyseSource('/x/PixelAlert.tsx', src)).toEqual([]);
+  });
+
+  it('exempts single-line // @deprecated comments and trailing markers too', () => {
+    const src = `
+export interface PixelCellProps {
+  variant?: 'feature' | 'stat';
+  // @deprecated Use \`variant\` instead.
+  kind?: 'feature' | 'stat';
+}
+`;
+    expect(analyseSource('/x/PixelCell.tsx', src)).toEqual([]);
+  });
+
+  it('still flags the alias when no @deprecated marker is present', () => {
+    const src = `
+export interface PixelCellProps {
+  variant?: 'feature' | 'stat';
+  kind?: 'feature' | 'stat';
+}
+`;
+    const v = analyseSource('/x/PixelCell.tsx', src);
+    expect(v).toHaveLength(1);
+    expect(v[0].propName).toBe('kind');
+  });
+
+  it('does not let a @deprecated marker leak onto the NEXT prop', () => {
+    const src = `
+export interface PixelCellProps {
+  /** @deprecated Use \`variant\` instead. */
+  kind?: 'feature' | 'stat';
+  mode?: 'pixel' | 'linear';
+}
+`;
+    const v = analyseSource('/x/PixelCell.tsx', src);
+    expect(v).toHaveLength(1);
+    expect(v[0].propName).toBe('mode');
+  });
+
+  // ----- Detector calibration: discriminated-union tags -----
+
+  it('exempts single-literal `type` discriminants (discriminated-union tags)', () => {
+    const src = `
+interface PixelGroupSingleProps {
+  type?: 'single';
+  value?: string;
+}
+interface PixelGroupMultipleProps {
+  type: 'multiple';
+  value?: string[];
+}
+`;
+    expect(analyseSource('/x/PixelGroup.tsx', src)).toEqual([]);
+  });
+
+  // ----- Detector calibration: CSS color values -----
+
+  it('exempts string-typed `color` props (CSS color values, not tone enums)', () => {
+    const src = `
+export interface PxlKitProps {
+  icon: unknown;
+  /** Tint hue or flat colour. Falls back to currentColor. */
+  color?: string;
+}
+`;
+    expect(analyseSource('/x/types.ts', src)).toEqual([]);
+  });
+
+  it('still flags `color` when it is a tone-like literal union', () => {
+    const src = `
+export interface PixelBadgeProps {
+  color?: 'red' | 'green' | 'cyan';
+}
+`;
+    const v = analyseSource('/x/PixelBadge.tsx', src);
+    expect(v).toHaveLength(1);
+    expect(v[0].propName).toBe('color');
+    expect(v[0].canonical).toBe('tone');
+  });
+
+  // ----- Detector calibration: title + message = heading-like context -----
+
+  it('exempts `title` when the block pairs it with a `message` body (toast/banner shape)', () => {
+    const src = `
+export interface PixelToastProps {
+  visible: boolean;
+  title: string;
+  message?: string;
+}
+`;
+    expect(analyseSource('/x/types.ts', src)).toEqual([]);
+  });
+
+  // ----- Detector calibration: union type aliases must not scan foreign blocks -----
+
+  it('does not attribute a later unrelated block to a braceless union type alias', () => {
+    const src = `
+export type PixelGroupProps = PixelGroupSingleProps | PixelGroupMultipleProps;
+
+const styleMap = {
+  color: 'red',
+  kind: 'feature',
+};
+`;
+    expect(analyseSource('/x/PixelGroup.tsx', src)).toEqual([]);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -479,7 +635,7 @@ export interface PixelButtonProps {
     const r = await runGateOn({
       [`${uiKitSrc}/PixelButton.tsx`]: `
 export interface PixelButtonProps {
-  color?: string;
+  color?: 'red' | 'gold';
 }
 `,
       [`${uiKitSrc}/PixelBadge.tsx`]: `

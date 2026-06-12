@@ -36,6 +36,24 @@
  *   - `type` is allowed when the prop is clearly a native HTML input type union
  *     (`'button' | 'submit' | 'reset' | ...`) — the gate inspects the type
  *     literal on the same line.
+ *   - `type` is also allowed when its type is a SINGLE string literal
+ *     (`type?: 'single'` / `type: 'multiple'`) — that is a discriminated-union
+ *     tag (Radix-style API discriminant), not a visual variant. The gate's rule
+ *     only targets `type` "when type means visual variant".
+ *   - **`@deprecated` back-compat aliases pass through.** The deprecation policy
+ *     (docs/governance/DEPRECATION_POLICY.md) REQUIRES retaining a renamed prop
+ *     as a deprecated alias for at least one minor. A prop whose JSDoc carries
+ *     `@deprecated` already completed its vocabulary migration — the canonical
+ *     prop coexists and the alias is scheduled for removal. Flagging it would
+ *     force a policy violation. Lifecycle policing of deprecated props belongs
+ *     to the deprecated-lifecycle gate, not this one.
+ *   - `color?: string` (plain string type) passes — a free-form CSS color value
+ *     (`currentColor` contract, hex strings) IS a color, not a visual mood. The
+ *     `tone` rule targets tone-like enums (`color?: 'red' | 'green'`), which
+ *     stay flagged.
+ *   - `title` is allowed when the block pairs it with a `message` body prop
+ *     (toast/banner heading+body shape), in addition to the existing
+ *     `subtitle`/`description`/`level` siblings and heading-like file names.
  *
  * Programmatic API:
  *
@@ -113,6 +131,10 @@ export const CANONICAL_VOCABULARY: readonly VocabularyRule[] = Object.freeze([
     canonical: 'tone',
     intent: 'visual mood / color family',
     aliases: ['color', 'variantColor', 'theme', 'intent', 'palette'],
+    // `color?: string` is a literal CSS color value (hex / currentColor
+    // passthrough — the icon components' documented v1.3 contract), not a
+    // visual-mood enum. Tone-like literal unions stay flagged.
+    exempt: ({ propLine }) => isCssColorValueProp(propLine),
   },
   {
     canonical: 'size',
@@ -130,7 +152,10 @@ export const CANONICAL_VOCABULARY: readonly VocabularyRule[] = Object.freeze([
     canonical: 'variant',
     intent: 'structural variant (type-as-variant)',
     aliases: ['type'],
-    exempt: ({ propLine }) => isNativeHtmlTypeUnion(propLine),
+    // Native input-type unions AND single-literal discriminated-union tags
+    // (`type?: 'single'`) are not visual variants.
+    exempt: ({ propLine }) =>
+      isNativeHtmlTypeUnion(propLine) || isSingleLiteralDiscriminant(propLine),
   },
   {
     canonical: 'surface',
@@ -251,11 +276,36 @@ export function isNativeHtmlTypeUnion(propLine: string): boolean {
 }
 
 /**
+ * Detect when a prop named `type` is a discriminated-union tag — its type is
+ * exactly ONE string literal (`type?: 'single'` / `type: 'multiple'`). A
+ * visual variant offers the consumer a choice (≥2 literals); a single literal
+ * is an API discriminant (Radix-style), which the vocabulary rule explicitly
+ * does not target ("type — when type means visual variant").
+ */
+export function isSingleLiteralDiscriminant(propLine: string): boolean {
+  return /:\s*['"][^'"|]+['"]\s*[;,]?\s*(?:\/\/.*|\/\*.*)?$/.test(
+    propLine.trim(),
+  );
+}
+
+/**
+ * Detect when a prop named `color` carries a plain `string` type — i.e. it is
+ * a literal CSS color value (hex string / `currentColor` passthrough), not a
+ * visual-mood enum. Only the exact prop name `color` qualifies; tone-like
+ * literal unions (`color?: 'red' | 'green'`) and token types stay flagged.
+ */
+export function isCssColorValueProp(propLine: string): boolean {
+  return /^(?:readonly\s+)?color\??\s*:\s*string\s*[;,]?\s*(?:\/\/.*|\/\*.*)?$/.test(
+    propLine.trim(),
+  );
+}
+
+/**
  * Detect when `title` is legitimately a heading-level label. Heuristic:
  *   - file basename hints at a heading-like component (`Heading`, `Title`,
- *     `Modal`, `Dialog`, `Drawer`, `Sheet`, `PageHeader`, `Hero`), OR
- *   - the Props block also declares `subtitle`, `description`, or `level` —
- *     all strong indicators of a heading context.
+ *     `Modal`, `Dialog`, `Drawer`, `Sheet`, `PageHeader`, `Hero`, `Toast`), OR
+ *   - the Props block also declares `subtitle`, `description`, `message`, or
+ *     `level` — all strong indicators of a heading+body context.
  */
 export function isHeadingLikeContext(
   file: string,
@@ -272,11 +322,13 @@ export function isHeadingLikeContext(
     'pageheader',
     'hero',
     'banner',
+    'toast',
   ];
   if (HEADING_HINTS.some((h) => base.includes(h))) return true;
   return (
     /\bsubtitle\??\s*:/.test(propsBlock) ||
     /\bdescription\??\s*:/.test(propsBlock) ||
+    /\bmessage\??\s*:/.test(propsBlock) ||
     /\blevel\??\s*:\s*(?:1|2|3|4|5|6|number)/.test(propsBlock)
   );
 }
@@ -313,6 +365,12 @@ export interface PropDeclaration {
   line: number;
   /** Full line text — used for inline exemption checks. */
   lineText: string;
+  /**
+   * True when the prop's immediately-preceding JSDoc / line comment (or the
+   * prop line itself) carries `@deprecated` — i.e. it is a back-compat alias
+   * retained per the deprecation policy, not active vocabulary.
+   */
+  deprecated: boolean;
 }
 
 /**
@@ -331,6 +389,15 @@ export function extractPropsBlocks(source: string): PropsBlock[] {
     // union type alias, not a record we can scan).
     let openIdx = source[headerEnd - 1] === '{' ? headerEnd - 1 : source.indexOf('{', headerEnd);
     if (openIdx < 0) continue;
+    // Braceless union aliases (`type XProps = AProps | BProps;`) must not be
+    // attributed the NEXT unrelated `{ ... }` block in the file: if a `;`
+    // terminates the alias statement before the `{` we found, skip the alias.
+    if (
+      source[headerEnd - 1] !== '{' &&
+      source.slice(headerEnd, openIdx).includes(';')
+    ) {
+      continue;
+    }
     const closeIdx = findMatchingBrace(source, openIdx);
     if (closeIdx < 0) continue;
     const body = source.slice(openIdx + 1, closeIdx);
@@ -408,6 +475,9 @@ export function extractPropDeclarations(
   const out: PropDeclaration[] = [];
   const lines = body.split(/\r?\n/);
   let depth = 0;
+  // Tracks whether the comment run immediately preceding the next prop line
+  // contains `@deprecated`. Reset whenever a prop or blank line is consumed.
+  let pendingDeprecated = false;
   for (let i = 0; i < lines.length; i++) {
     const raw = lines[i];
     // Track nested-brace depth so we only report top-level props.
@@ -419,9 +489,16 @@ export function extractPropDeclarations(
     if (prevDepth > 0) continue;
 
     const lineText = raw.trim();
-    if (!lineText || lineText.startsWith('//') || lineText.startsWith('*') || lineText.startsWith('/*')) {
+    if (!lineText) {
+      pendingDeprecated = false;
       continue;
     }
+    if (lineText.startsWith('//') || lineText.startsWith('*') || lineText.startsWith('/*')) {
+      if (lineText.includes('@deprecated')) pendingDeprecated = true;
+      continue;
+    }
+    const deprecated = pendingDeprecated || lineText.includes('@deprecated');
+    pendingDeprecated = false;
     // Bracketed string props: ['data-testid']?: string;
     const bracketed = /^\[\s*['"]([^'"]+)['"]\s*\]\s*\??\s*:/.exec(lineText);
     if (bracketed) {
@@ -429,6 +506,7 @@ export function extractPropDeclarations(
         name: bracketed[1],
         line: blockStartLine + i,
         lineText,
+        deprecated,
       });
       continue;
     }
@@ -439,6 +517,7 @@ export function extractPropDeclarations(
         name: plain[1],
         line: blockStartLine + i,
         lineText,
+        deprecated,
       });
     }
   }
@@ -483,6 +562,10 @@ export function analyseSource(
       if (UNIVERSAL_EXEMPTIONS.has(prop.name)) continue;
       if (prop.name.startsWith('aria-') || prop.name.startsWith('data-')) continue;
       if (prop.name.startsWith('on') && prop.name === 'onSubmit') continue;
+      // @deprecated back-compat aliases are retained per DEPRECATION_POLICY.md
+      // (one minor minimum) — the canonical prop already exists and the alias
+      // is scheduled for removal. Vocabulary enforcement on it is moot.
+      if (prop.deprecated) continue;
       // Find the first rule whose aliases include this prop.
       for (const rule of vocabulary) {
         if (!rule.aliases.includes(prop.name)) continue;

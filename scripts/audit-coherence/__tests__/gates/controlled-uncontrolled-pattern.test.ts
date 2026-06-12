@@ -236,6 +236,91 @@ export function PixelButton(props: PixelButtonProps) {
 }
 `.trimStart();
 
+const GENERIC_CALL_SOURCE = `
+import React, { forwardRef } from 'react';
+import { useControllableState } from '../hooks/useControllableState';
+
+export interface PixelGenericInputProps {
+  value?: number | undefined;
+  defaultValue?: number | undefined;
+  onChange?: (next: number | undefined) => void;
+}
+
+export const PixelGenericInput = forwardRef<HTMLInputElement, PixelGenericInputProps>(
+  function PixelGenericInput({ value, defaultValue, onChange }, ref) {
+    const [current, setCurrent] = useControllableState<number | undefined>({
+      value,
+      defaultValue,
+      onChange,
+    });
+    return <input ref={ref} value={current ?? ''} onChange={(e) => setCurrent(Number(e.target.value))} />;
+  },
+);
+`.trimStart();
+
+const CHECKBOX_CONVENTION_SOURCE = `
+import React, { forwardRef } from 'react';
+import { useControllableState } from '../hooks/useControllableState';
+
+export interface PixelCheckboxProps {
+  label: string;
+  /** Controlled checked state. */
+  checked?: boolean;
+  /** Uncontrolled initial checked state. */
+  defaultChecked?: boolean;
+  onChange?: (next: boolean) => void;
+  /** HTML form value when checked. Defaults to 'on'. NOT a state slot. */
+  value?: string;
+  name?: string;
+}
+
+export const PixelCheckbox = forwardRef<HTMLButtonElement, PixelCheckboxProps>(
+  function PixelCheckbox({ checked, defaultChecked, onChange, value = 'on' }, ref) {
+    const [isChecked, setChecked] = useControllableState<boolean>({
+      value: checked,
+      defaultValue: defaultChecked ?? false,
+      onChange,
+    });
+    return <button ref={ref} role="checkbox" aria-checked={isChecked} onClick={() => setChecked(!isChecked)} />;
+  },
+);
+`.trimStart();
+
+const CHECKBOX_MISSING_DEFAULT_SOURCE = `
+import React from 'react';
+import { useControllableState } from '../hooks/useControllableState';
+
+export interface PixelBrokenSwitchProps {
+  checked?: boolean;
+  onChange?: (next: boolean) => void;
+}
+
+export function PixelBrokenSwitch(props: PixelBrokenSwitchProps) {
+  const [v, setV] = useControllableState<boolean>({ value: props.checked, defaultValue: false, onChange: props.onChange });
+  return <button onClick={() => setV(!v)}>{String(v)}</button>;
+}
+`.trimStart();
+
+const IDENTITY_VALUE_SOURCE = `
+import React, { forwardRef } from 'react';
+
+export interface MenuItemProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'onSelect'> {
+  /** Item identity for highlight/typeahead registration (NOT form state). */
+  value?: string;
+  children: React.ReactNode;
+  onSelect?: () => void;
+  disabled?: boolean;
+}
+
+export const MenuItem = forwardRef<HTMLButtonElement, MenuItemProps>(function MenuItem(
+  { value, children, onSelect },
+  ref,
+) {
+  return <button ref={ref} role="menuitem" data-value={value} onClick={onSelect}>{children}</button>;
+});
+`.trimStart();
+
 const MULTI_BLOCK_SOURCE = `
 import React from 'react';
 import { useControllableState } from '../hooks/useControllableState';
@@ -330,6 +415,43 @@ describe('helpers', () => {
   it('isFormLike returns false for non-form blocks', () => {
     const sig = readSlotSignature('label: string; onClick?: () => void;');
     expect(isFormLike(sig)).toBe(false);
+  });
+
+  it('isFormLike returns false for identity-only value props (no onChange / defaultValue)', () => {
+    // A lone `value?` with no change callback and no uncontrolled slot is an
+    // identity/display prop (menu-item value, progress display) — not form state.
+    const sig = readSlotSignature('value?: string; children: React.ReactNode; onSelect?: () => void;');
+    expect(isFormLike(sig)).toBe(false);
+  });
+
+  it('isFormLike stays true for partial form APIs (genuine R1 candidates)', () => {
+    expect(isFormLike(readSlotSignature('value?: number; onChange?: (n: number) => void;'))).toBe(true);
+    expect(isFormLike(readSlotSignature('defaultValue?: string;'))).toBe(true);
+    expect(isFormLike(readSlotSignature('value?: string; defaultValue?: string;'))).toBe(true);
+  });
+
+  it('readSlotSignature maps checked/defaultChecked to the controlled pair (checkbox convention)', () => {
+    const sig = readSlotSignature(
+      'checked?: boolean; defaultChecked?: boolean; onChange?: (next: boolean) => void; value?: string;',
+    );
+    expect(sig.hasValue).toBe(true);
+    expect(sig.hasDefaultValue).toBe(true);
+    expect(sig.hasOnChange).toBe(true);
+    expect(sig.valueTypeText).toBe('boolean');
+    expect(sig.valueSlotName).toBe('checked');
+    expect(sig.defaultValueSlotName).toBe('defaultChecked');
+  });
+
+  it('readSlotSignature reports plain slot names outside the checkbox convention', () => {
+    const sig = readSlotSignature('value?: string; defaultValue?: string; onChange?: (s: string) => void;');
+    expect(sig.valueSlotName).toBe('value');
+    expect(sig.defaultValueSlotName).toBe('defaultValue');
+  });
+
+  it('scanSource detects hook calls with explicit generic type arguments', () => {
+    const scan = scanSource('/x/generic.tsx', GENERIC_CALL_SOURCE);
+    expect(scan.importsUseControllableState).toBe(true);
+    expect(scan.callsUseControllableState).toBe(true);
   });
 
   it('isEventStyleOnChange detects React.ChangeEvent and friends', () => {
@@ -488,6 +610,48 @@ describe('ControlledUncontrolledPatternGate', () => {
     );
     expect(eventFinding).toBeDefined();
     expect(eventFinding!.severity).toBe('major');
+  });
+
+  // ----- Detector calibration: generic call syntax (R2) -----
+
+  it('passes when useControllableState is called with explicit generic type arguments', async () => {
+    const file = path.join(tmpRoot, 'PixelGenericInput.tsx');
+    const gate = gateWith({ [file]: GENERIC_CALL_SOURCE });
+    const result = await gate.run(makeCtx(tmpRoot));
+    expect(result.passed).toBe(true);
+    expect(result.findings).toEqual([]);
+  });
+
+  // ----- Detector calibration: checkbox convention (R1) -----
+
+  it('passes checkbox-convention components (checked/defaultChecked + HTML form value)', async () => {
+    const file = path.join(tmpRoot, 'PixelCheckbox.tsx');
+    const gate = gateWith({ [file]: CHECKBOX_CONVENTION_SOURCE });
+    const result = await gate.run(makeCtx(tmpRoot));
+    expect(result.passed).toBe(true);
+    expect(result.findings).toEqual([]);
+  });
+
+  it('still flags checkbox-convention components missing defaultChecked', async () => {
+    const file = path.join(tmpRoot, 'PixelBrokenSwitch.tsx');
+    const gate = gateWith({ [file]: CHECKBOX_MISSING_DEFAULT_SOURCE });
+    const result = await gate.run(makeCtx(tmpRoot));
+    expect(result.passed).toBe(false);
+    const missing = result.findings.find((f) => f.message.includes('defaultChecked?'));
+    expect(missing).toBeDefined();
+    expect(missing!.severity).toBe('major');
+    expect(missing!.component).toBe('PixelBrokenSwitch');
+    expect(missing!.suggestion).toMatch(/defaultChecked\?: boolean/);
+  });
+
+  // ----- Detector calibration: value-as-identity (form-likeness) -----
+
+  it('skips blocks whose only slot is an identity value (no onChange / defaultValue)', async () => {
+    const file = path.join(tmpRoot, 'MenuItem.tsx');
+    const gate = gateWith({ [file]: IDENTITY_VALUE_SOURCE });
+    const result = await gate.run(makeCtx(tmpRoot));
+    expect(result.passed).toBe(true);
+    expect(result.findings).toEqual([]);
   });
 
   // ----- Multi-block files -----

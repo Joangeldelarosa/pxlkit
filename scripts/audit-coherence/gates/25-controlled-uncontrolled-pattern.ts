@@ -8,9 +8,17 @@
  * use it as a self-managing widget without lifting state.
  *
  * Concretely, a component is "form-like" if its props interface declares ANY of:
- *   - `value?:   T`  (controlled value slot)
  *   - `onChange?: (next: T) => void`
- *   - `defaultValue?: T`
+ *   - `defaultValue?: T` (or `defaultChecked?:` — see checkbox convention)
+ *
+ * A LONE `value?:` (no onChange, no defaultValue) does NOT make a block
+ * form-like: that shape is an identity/display prop (menu-item `value`,
+ * composite-child registration), not controllable state.
+ *
+ * Checkbox convention: blocks declaring `checked?:` / `defaultChecked?:`
+ * (native React checkbox/switch API) use THOSE as the controlled/uncontrolled
+ * pair; a sibling `value?:` is the HTML form-serialization attribute
+ * (`<input type="checkbox" value>`) and is ignored for slot detection.
  *
  * Once a component is detected as form-like, this gate enforces three rules:
  *
@@ -20,7 +28,8 @@
  *   R2 — MUST import and call `useControllableState` from `../hooks/useControllableState`
  *        (or `../../hooks/useControllableState` for nested folders). This is the
  *        single source of truth for the controlled/uncontrolled fork; hand-rolled
- *        forks drift out of sync with hook semantics over time.
+ *        forks drift out of sync with hook semantics over time. Calls with
+ *        explicit generic type arguments (`useControllableState<T>(...)`) count.
  *
  *   R3 — `onChange` MUST have signature `(next: T) => void` where `T` is the
  *        value type — NOT `(event: React.ChangeEvent<...>) => void`. Event-style
@@ -92,16 +101,20 @@ export interface FormComponentScan {
 }
 
 export interface SlotSignature {
-  /** Whether the block declares `value?:` (controlled slot). */
+  /** Whether the block declares the controlled slot (`value?:` — or `checked?:` under the checkbox convention). */
   hasValue: boolean;
-  /** Whether the block declares `defaultValue?:` (uncontrolled slot). */
+  /** Whether the block declares the uncontrolled slot (`defaultValue?:` — or `defaultChecked?:`). */
   hasDefaultValue: boolean;
   /** Whether the block declares `onChange?:`. */
   hasOnChange: boolean;
   /** Raw type text immediately after `onChange?:`, or null when absent. */
   onChangeTypeText: string | null;
-  /** Inferred value-type text (from `value?:` or `defaultValue?:`), or null. */
+  /** Inferred value-type text (from the controlled or uncontrolled slot), or null. */
   valueTypeText: string | null;
+  /** Name of the controlled slot: `'value'` normally, `'checked'` for checkbox-convention blocks. */
+  valueSlotName: string;
+  /** Name of the uncontrolled slot: `'defaultValue'` normally, `'defaultChecked'` for checkbox-convention blocks. */
+  defaultValueSlotName: string;
 }
 
 export interface ControlledUncontrolledPatternGateOptions {
@@ -140,7 +153,10 @@ const SCAN_IGNORE = [
 
 const USE_CONTROLLABLE_IMPORT_RE =
   /from\s+['"][^'"]*hooks\/useControllableState['"]/;
-const USE_CONTROLLABLE_CALL_RE = /\buseControllableState\s*\(/;
+// Calls may carry explicit generic type arguments — `useControllableState<boolean>(`,
+// `useControllableState<Date | null>(`, even multi-line generics. `[^(]*` deliberately
+// spans newlines (char classes match `\n`) and nested `<>` until the call paren.
+const USE_CONTROLLABLE_CALL_RE = /\buseControllableState\s*(?:<[^(]*>)?\s*\(/;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -359,17 +375,40 @@ export function readPropType(body: string, propName: string): string | null {
 
 /**
  * Parse the controlled/uncontrolled slot signature out of a props body.
+ *
+ * Checkbox convention: when the block declares `checked?:` and/or
+ * `defaultChecked?:` (native React checkbox/switch API), THOSE are the
+ * controlled/uncontrolled pair. A `value?:` prop alongside them is the HTML
+ * form-serialization attribute (`<input type="checkbox" value>`), not a
+ * state slot, and must not be confused with the controlled slot.
  */
 export function readSlotSignature(body: string): SlotSignature {
+  const checkedTypeText = readPropType(body, 'checked');
+  const defaultCheckedTypeText = readPropType(body, 'defaultChecked');
+  const onChangeTypeText = readPropType(body, 'onChange');
+
+  if (checkedTypeText !== null || defaultCheckedTypeText !== null) {
+    return {
+      hasValue: checkedTypeText !== null,
+      hasDefaultValue: defaultCheckedTypeText !== null,
+      hasOnChange: onChangeTypeText !== null,
+      onChangeTypeText,
+      valueTypeText: checkedTypeText ?? defaultCheckedTypeText,
+      valueSlotName: 'checked',
+      defaultValueSlotName: 'defaultChecked',
+    };
+  }
+
   const valueTypeText = readPropType(body, 'value');
   const defaultTypeText = readPropType(body, 'defaultValue');
-  const onChangeTypeText = readPropType(body, 'onChange');
   return {
     hasValue: valueTypeText !== null,
     hasDefaultValue: defaultTypeText !== null,
     hasOnChange: onChangeTypeText !== null,
     onChangeTypeText,
     valueTypeText: valueTypeText ?? defaultTypeText,
+    valueSlotName: 'value',
+    defaultValueSlotName: 'defaultValue',
   };
 }
 
@@ -409,12 +448,16 @@ export function scanSource(absFile: string, source: string): FormComponentScan {
 }
 
 /**
- * Decide whether a block is "form-like" — i.e. it declares ANY of the three
- * slots. Components that don't touch value semantics at all are silently
- * skipped (e.g. `PixelButtonProps`).
+ * Decide whether a block is "form-like". Components that don't touch value
+ * semantics at all are silently skipped (e.g. `PixelButtonProps`).
+ *
+ * A lone controlled slot (`value?` with NO `onChange` and NO `defaultValue`)
+ * does NOT count: without a change callback or an uncontrolled slot there is
+ * no state to fork — that shape is an identity/display prop (menu-item
+ * `value`, progress display, composite-child registration), not form state.
  */
 export function isFormLike(sig: SlotSignature): boolean {
-  return sig.hasValue || sig.hasDefaultValue || sig.hasOnChange;
+  return sig.hasDefaultValue || sig.hasOnChange;
 }
 
 // ---------------------------------------------------------------------------
@@ -502,10 +545,11 @@ export class ControlledUncontrolledPatternGate extends Gate {
       }
 
       for (const { block, sig } of formBlocks) {
-        // R1 — must have ALL THREE slots
+        // R1 — must have ALL THREE slots (convention-aware: checkbox-style
+        // blocks use `checked`/`defaultChecked` as the pair).
         const missing: string[] = [];
-        if (!sig.hasValue) missing.push('value?');
-        if (!sig.hasDefaultValue) missing.push('defaultValue?');
+        if (!sig.hasValue) missing.push(`${sig.valueSlotName}?`);
+        if (!sig.hasDefaultValue) missing.push(`${sig.defaultValueSlotName}?`);
         if (!sig.hasOnChange) missing.push('onChange?');
         if (missing.length > 0) {
           const valueType =
@@ -517,7 +561,7 @@ export class ControlledUncontrolledPatternGate extends Gate {
             message: `${block.propsTypeName} is missing required slot(s): ${missing.join(
               ', ',
             )}. Form components must expose BOTH controlled and uncontrolled APIs.`,
-            suggestion: `Add the missing prop(s) to ${block.propsTypeName}:\n  value?: ${valueType};\n  defaultValue?: ${valueType};\n  onChange?: (next: ${valueType}) => void;\nThen fork with useControllableState.`,
+            suggestion: `Add the missing prop(s) to ${block.propsTypeName}:\n  ${sig.valueSlotName}?: ${valueType};\n  ${sig.defaultValueSlotName}?: ${valueType};\n  onChange?: (next: ${valueType}) => void;\nThen fork with useControllableState.`,
           });
         }
 
