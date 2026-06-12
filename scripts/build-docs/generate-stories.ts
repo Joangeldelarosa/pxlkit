@@ -195,10 +195,43 @@ export function exampleIdToExportName(id: string): string {
 }
 
 /**
+ * U+2028 LINE SEPARATOR / U+2029 PARAGRAPH SEPARATOR. Built via fromCharCode
+ * so the characters themselves never appear in this source file (they are
+ * line terminators and would be invalid inside regex/string literals).
+ */
+const LINE_SEP = String.fromCharCode(0x2028);
+const PARA_SEP = String.fromCharCode(0x2029);
+
+/**
  * Single quote escaper for inlining literals safely.
+ * Also escapes line terminators (\r, \n, U+2028, U+2029) — a raw newline
+ * inside a single-quoted literal is a syntax error.
  */
 function escSingle(s: string): string {
-  return s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  return s
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/\r/g, "\\r")
+    .replace(/\n/g, "\\n")
+    .split(LINE_SEP)
+    .join("\\u2028")
+    .split(PARA_SEP)
+    .join("\\u2029");
+}
+
+/**
+ * Sanitizer for text inlined into block comments. A literal star-slash in a
+ * label or description would terminate the comment early and break the parse.
+ * Newlines are flattened so the JSDoc banner stays a single line.
+ */
+function escComment(s: string): string {
+  return s
+    .replace(/\*\//g, "*\\/")
+    .replace(/\r?\n/g, " ")
+    .split(LINE_SEP)
+    .join(" ")
+    .split(PARA_SEP)
+    .join(" ");
 }
 
 // ---------------------------------------------------------------------------
@@ -282,9 +315,22 @@ export function renderStoryStub(input: StoryStubInput): string {
     "",
   );
 
+  // Export names are PascalCased from example ids; distinct ids can collide
+  // (e.g. "with-icon" / "with_icon"). Duplicate exports are a module-level
+  // SyntaxError at runtime, so suffix repeats with a counter.
+  const usedExportNames = new Map<string, number>();
+
   for (const ex of examples) {
-    const exportName = exampleIdToExportName(ex.id);
-    const sourceRef = `(examples as any).${ex.id} ?? (examples as any)['${escSingle(ex.id)}']`;
+    const baseExportName = exampleIdToExportName(ex.id);
+    const seen = usedExportNames.get(baseExportName) ?? 0;
+    usedExportNames.set(baseExportName, seen + 1);
+    const exportName = seen === 0 ? baseExportName : `${baseExportName}${seen + 1}`;
+    // NEVER dot-access the raw id: kebab ids parse as subtraction and break
+    // outright when a segment is a reserved word (`class`, `in`, `with`,
+    // `default`). Examples modules export PascalCase functions, so the
+    // identifier lookup uses the derived export name; the raw id stays
+    // available via (always-valid) bracket access.
+    const sourceRef = `(examples as any).${baseExportName} ?? (examples as any)['${escSingle(ex.id)}']`;
     const manifestRef = `(manifest as any)?.examples?.find?.((e: any) => e?.id === '${escSingle(ex.id)}')?.Component`;
     const descLiteral = ex.description ? `'${escSingle(ex.description)}'` : "undefined";
     const labelLiteral = `'${escSingle(ex.label)}'`;
@@ -293,7 +339,7 @@ export function renderStoryStub(input: StoryStubInput): string {
     );
 
     lines.push(
-      `/** ${ex.label}${ex.description ? ` — ${ex.description}` : ""} */`,
+      `/** ${escComment(ex.label)}${ex.description ? ` — ${escComment(ex.description)}` : ""} */`,
       `export const ${exportName}: Story = {`,
       `  name: ${labelLiteral},`,
       `  tags: ${tagsLiteral},`,
@@ -307,7 +353,9 @@ export function renderStoryStub(input: StoryStubInput): string {
       `    if (!ExampleComponent) {`,
       `      return (`,
       `        <pre style={{ color: 'crimson' }}>`,
-      `          Missing example '${escSingle(ex.id)}' for ${componentName}.`,
+      // JSX expression container with a JSON-escaped literal: ids may contain
+      // characters that are JSX-hostile as raw text ({, }, <, >).
+      `          {${JSON.stringify(`Missing example '${ex.id}' for ${componentName}.`)}}`,
       `        </pre>`,
       `      );`,
       `    }`,

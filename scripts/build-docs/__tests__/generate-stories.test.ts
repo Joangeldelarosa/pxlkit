@@ -16,6 +16,7 @@ import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import fs from "fs-extra";
 import os from "node:os";
 import path from "node:path";
+import ts from "typescript";
 import {
   deriveStoriesPath,
   deriveStorybookTitle,
@@ -172,6 +173,146 @@ describe("renderStoryStub", () => {
         examples: [],
       }),
     ).toThrow(/zero examples/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Renderer — escaping / syntax safety
+//
+// Regression suite for the Ola 4c.x bug where 7 of 111 generated stories were
+// syntactically invalid TypeScript. Root cause: example ids were inlined as
+// dot-access (`(examples as any).collapsed-by-default`), which parses as
+// subtraction and becomes a hard syntax error whenever a kebab segment is a
+// reserved word (`class`, `in`, `with`, `default`). The renderer must produce
+// valid TSX for ANY schema-valid manifest content.
+// ---------------------------------------------------------------------------
+
+/**
+ * Syntax oracle: transpile the rendered stub with the TypeScript compiler and
+ * return its syntactic diagnostics. transpileModule does no type checking, so
+ * any diagnostic here is a genuine parse error — exactly the failure class
+ * that broke `tsc --noEmit -p packages/ui-kit`.
+ */
+function syntaxErrors(code: string): string[] {
+  const out = ts.transpileModule(code, {
+    reportDiagnostics: true,
+    compilerOptions: {
+      jsx: ts.JsxEmit.React,
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.ESNext,
+    },
+    fileName: "Stub.stories.tsx",
+  });
+  return (out.diagnostics ?? []).map((d) =>
+    ts.flattenDiagnosticMessageText(d.messageText, "\n"),
+  );
+}
+
+describe("renderStoryStub — escaping / syntax safety", () => {
+  const base: StoryStubInput = {
+    componentName: "PixelAccordion",
+    storybookTitle: "UI Kit / Navigation / PixelAccordion",
+    componentImport: "./PixelAccordion",
+    manifestImport: "./PixelAccordion.manifest",
+    examplesImport: "./PixelAccordion.examples",
+    examples: [{ id: "default", label: "Default" }],
+    status: "stable",
+    category: "navigation",
+  };
+
+  it("emits syntactically valid TSX for kebab ids whose segments are reserved words", () => {
+    // The exact ids that broke 7 real components in Ola 4c.x.
+    const out = renderStoryStub({
+      ...base,
+      examples: [
+        { id: "collapsed-by-default", label: "Collapsed" }, // `default`
+        { id: "inline-in-prose", label: "Inline" }, // `in`
+        { id: "with-custom-class", label: "Custom class" }, // `class`
+        { id: "range-with-marks", label: "Marks" }, // `with`
+      ],
+    });
+    expect(syntaxErrors(out)).toEqual([]);
+  });
+
+  it("never dot-accesses a raw non-identifier id; looks up the PascalCase export instead", () => {
+    const out = renderStoryStub({
+      ...base,
+      examples: [{ id: "collapsed-by-default", label: "Collapsed" }],
+    });
+    expect(out).not.toContain("(examples as any).collapsed-by-default");
+    // Examples modules export PascalCase functions (e.g. CollapsedByDefault),
+    // so the identifier lookup must use the derived export name…
+    expect(out).toContain("(examples as any).CollapsedByDefault");
+    // …while keeping the raw-id bracket lookup as a fallback.
+    expect(out).toContain(`(examples as any)['collapsed-by-default']`);
+  });
+
+  it("escapes quotes and newlines in labels and descriptions", () => {
+    const out = renderStoryStub({
+      ...base,
+      examples: [
+        {
+          id: "default",
+          label: "It's 'quoted'",
+          description: "line one\nline two with a backslash \\ and 'quotes'",
+        },
+      ],
+    });
+    expect(syntaxErrors(out)).toEqual([]);
+    expect(out).toContain(`name: 'It\\'s \\'quoted\\''`);
+  });
+
+  it("does not let '*/' in labels or descriptions terminate the JSDoc banner", () => {
+    const out = renderStoryStub({
+      ...base,
+      examples: [
+        {
+          id: "default",
+          label: "evil */ label",
+          description: "desc with */ inside",
+        },
+      ],
+    });
+    expect(syntaxErrors(out)).toEqual([]);
+  });
+
+  it("keeps the missing-example JSX fallback valid when ids contain JSX-hostile characters", () => {
+    const out = renderStoryStub({
+      ...base,
+      examples: [{ id: "weird{id}<x>", label: "Weird" }],
+    });
+    expect(syntaxErrors(out)).toEqual([]);
+  });
+
+  it("dedupes colliding export names so the module never declares duplicate exports", () => {
+    const out = renderStoryStub({
+      ...base,
+      examples: [
+        { id: "with-icon", label: "A" },
+        { id: "with_icon", label: "B" },
+      ],
+    });
+    expect(syntaxErrors(out)).toEqual([]);
+    expect(out).toContain("export const WithIcon: Story");
+    expect(out).toContain("export const WithIcon2: Story");
+  });
+
+  it("renders a fully parseable stub for the realistic worst-case manifest", () => {
+    const out = renderStoryStub({
+      ...base,
+      examples: [
+        { id: "default", label: "Default" },
+        {
+          id: "phone-with-country-code",
+          label: "Phone — with 'country' code",
+          description: "Uses the <PixelSelect /> sibling.\nMulti-line.",
+          tags: ["forms", "composed"],
+        },
+      ],
+    });
+    expect(syntaxErrors(out)).toEqual([]);
+    expect(out).toContain("export const Default: Story");
+    expect(out).toContain("export const PhoneWithCountryCode: Story");
   });
 });
 
