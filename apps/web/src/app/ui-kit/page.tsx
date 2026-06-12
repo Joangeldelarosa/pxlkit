@@ -197,19 +197,12 @@ const PROP_CHILDREN_REQUIRED: PropDef = {
   default: '—',
   description: 'Required — the content rendered inside the component.',
 };
-const PROP_STYLE: PropDef = {
-  name: 'style',
-  type: 'CSSProperties',
-  default: '—',
-  description: 'Inline styles forwarded to the outer element.',
-};
 
 // Bundles for the most common component shapes. Use these in `props=[...specific, ...COMMON_X]`.
 const COMMON_INTERACTIVE: PropDef[] = [PROP_SURFACE, PROP_DISABLED, PROP_CLASSNAME];
 const COMMON_DISPLAY: PropDef[] = [PROP_SURFACE, PROP_CLASSNAME];
 const COMMON_CONTAINER: PropDef[] = [PROP_SURFACE, PROP_CLASSNAME, PROP_CHILDREN_REQUIRED];
 const COMMON_ANIMATION: PropDef[] = [PROP_CLASSNAME, PROP_CHILDREN_REQUIRED];
-const COMMON_PARALLAX: PropDef[] = [PROP_CLASSNAME, PROP_STYLE, PROP_CHILDREN_REQUIRED];
 
 /* ── Sidebar categories are DERIVED from UI_KIT_COMPONENTS to kill drift.
    Add a component to the registry and it shows up in the sidebar automatically.

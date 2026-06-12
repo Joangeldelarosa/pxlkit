@@ -12,14 +12,14 @@ import {
   FeedbackPack,
   CheckCircle, XCircle, InfoCircle, WarningTriangle, Bell,
 } from '@pxlkit/feedback';
-import { SocialPack, Heart } from '@pxlkit/social';
-import { WeatherPack, Sun } from '@pxlkit/weather';
+import { SocialPack } from '@pxlkit/social';
+import { WeatherPack } from '@pxlkit/weather';
 import { EffectsPack } from '@pxlkit/effects';
 import { ParallaxPack } from '@pxlkit/parallax';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useState, useCallback, Suspense } from 'react';
+import { useState, useCallback, Suspense, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { TOTAL_ICON_COUNT } from './HeroCollage';
 import { HeroCinematic, StatCardStrip } from './hero';
@@ -32,26 +32,42 @@ import {
   UI_KIT_LATEST_DATE,
 } from '@/lib/pxlkit-version';
 import {
+  UI_COMPONENTS_COUNT,
+  ICON_COUNT_LABEL,
+  ICON_PACK_COUNT,
+  PAGE_TEMPLATE_COUNT,
+  A11Y_BASELINE,
+} from '@/lib/pxlkit-counts';
+import { LANDING_FAQS } from '@/lib/landing-faq';
+import {
   PixelAccordion,
+  PixelAreaChart,
   PixelBadge,
+  PixelBarChart,
   PixelBento,
   PixelBentoCell,
   PixelButton,
-  PixelCard,
   PixelCluster,
   PixelContainer,
+  PixelDataTable,
   PixelEqualHeightGrid,
   PixelFeatureCard,
+  PixelInput,
   PixelMouseParallax,
   PixelParallaxLayer,
   PixelSectionHeader,
   PixelSegmented,
+  PixelSelect,
+  PixelSlider,
+  PixelSparkline,
+  PixelStatCard,
   PixelStatGroup,
+  PixelStepper,
+  PixelSwitch,
   PixelTextarea,
-  UI_KIT_COMPONENTS,
+  createColumnHelper,
+  type ColumnDef,
 } from '@pxlkit/ui-kit';
-
-const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
 
 const VoxelPreview = dynamic(() => import('./VoxelPreview'), {
   ssr: false,
@@ -97,14 +113,14 @@ export function LandingPageClient() {
         changelogHref="/changelog"
       />
       <PillarsBento />
+      <LiveKitDemo />
+      <HowItWorks />
       <FeaturesShowcase />
       <TemplatesTeaser />
-      <StatsStrip />
-      <HowItWorks />
       <ParallaxShowcase />
       <IconShowcase />
-      <ToastSection />
       <AISection />
+      <StatsStrip />
       <PricingPreview />
       <FAQSection />
       <VoxelComingSoon />
@@ -118,9 +134,9 @@ function PillarsBento() {
   return (
     <PixelContainer as="section" maxWidth="xl" padding="md">
       <PixelSectionHeader
-        eyebrow="Built on three pillars"
+        eyebrow="Why teams keep it"
         title="Pick the aesthetic. Keep the engineering."
-        description="A switchable surface, accessibility on every interactive, and batteries you'd otherwise spend two sprints assembling. Same kit, three reasons it's worth keeping."
+        description="A pixel skin you can swap for flat in one prop, accessibility wired into every interactive, and the boring components already built."
         align="center"
         titleTone="cyan"
         size="md"
@@ -128,7 +144,7 @@ function PillarsBento() {
 
       <div className="mt-10">
         <PixelBento columns={3} gap={4}>
-          <PixelBentoCell tone="cyan" kind="feature">
+          <PixelBentoCell tone="cyan" variant="feature">
             <div className="flex items-center gap-3 mb-1">
               <PxlKitIcon icon={Palette} size={24} colorful />
               <h3 className="font-pixel text-sm text-retro-cyan">Surface system</h3>
@@ -140,7 +156,7 @@ function PillarsBento() {
             </p>
           </PixelBentoCell>
 
-          <PixelBentoCell tone="green" kind="feature">
+          <PixelBentoCell tone="green" variant="feature">
             <div className="flex items-center gap-3 mb-1">
               <PxlKitIcon icon={CheckCircle} size={24} colorful />
               <h3 className="font-pixel text-sm text-retro-green">Accessibility-first</h3>
@@ -148,11 +164,11 @@ function PillarsBento() {
             <p className="text-sm text-retro-muted leading-relaxed">
               WAI-ARIA roles, keyboard nav, focus rings, and reduced-motion
               fallbacks ship with every interactive — not retrofitted later.
-              WCAG 2.1 contrast tokens by default.
+              WCAG 2.1 AA contrast tokens by default.
             </p>
           </PixelBentoCell>
 
-          <PixelBentoCell tone="gold" kind="feature">
+          <PixelBentoCell tone="gold" variant="feature">
             <div className="flex items-center gap-3 mb-1">
               <PxlKitIcon icon={Package} size={24} colorful />
               <h3 className="font-pixel text-sm text-retro-gold">Batteries-included</h3>
@@ -160,12 +176,436 @@ function PillarsBento() {
             <p className="text-sm text-retro-muted leading-relaxed">
               DataTable, Stepper, Sidebar, Timeline, Calendar, Charts, OTPInput,
               Toasts — the boring bits are already done. Drop them in, theme once,
-              focus on what makes your product different.
+              spend your sprints on the product.
             </p>
           </PixelBentoCell>
         </PixelBento>
       </div>
     </PixelContainer>
+  );
+}
+
+/* ──────────────────── LIVE KIT DEMO (flagship — the kit selling itself) ──────────────────── */
+
+const SIGNUPS_WEEK = [
+  { x: 'Mon', y: 42 },
+  { x: 'Tue', y: 58 },
+  { x: 'Wed', y: 51 },
+  { x: 'Thu', y: 74 },
+  { x: 'Fri', y: 69 },
+  { x: 'Sat', y: 88 },
+  { x: 'Sun', y: 96 },
+];
+
+const PLAN_REVENUE = [
+  { x: 'Indie', y: 4200 },
+  { x: 'Team', y: 6800 },
+  { x: 'Custom', y: 1480 },
+];
+
+const CONVERSION_TREND = [
+  { x: '1', y: 2.1 }, { x: '2', y: 2.4 }, { x: '3', y: 2.2 }, { x: '4', y: 2.8 },
+  { x: '5', y: 2.6 }, { x: '6', y: 3.1 }, { x: '7', y: 2.9 }, { x: '8', y: 3.4 },
+  { x: '9', y: 3.2 }, { x: '10', y: 3.8 }, { x: '11', y: 3.6 }, { x: '12', y: 4.1 },
+  { x: '13', y: 4.0 }, { x: '14', y: 4.4 },
+];
+
+type DemoRow = {
+  customer: string;
+  plan: string;
+  mrr: string;
+  status: 'active' | 'trial' | 'past due';
+};
+
+const DEMO_ROWS: DemoRow[] = [
+  { customer: 'Moonlit Forge', plan: 'Team', mrr: '$49', status: 'active' },
+  { customer: 'Bitwave Studio', plan: 'Indie', mrr: '$19', status: 'active' },
+  { customer: 'Pixel & Co.', plan: 'Team', mrr: '$49', status: 'trial' },
+  { customer: 'Retro Supply', plan: 'Indie', mrr: '$19', status: 'past due' },
+  { customer: '8-Bit Bakery', plan: 'Free', mrr: '$0', status: 'active' },
+];
+
+const demoColumnHelper = createColumnHelper<DemoRow>();
+
+const DEMO_COLUMNS: ColumnDef<DemoRow, unknown>[] = [
+  demoColumnHelper.accessor('customer', { header: 'Customer' }) as ColumnDef<DemoRow, unknown>,
+  demoColumnHelper.accessor('plan', { header: 'Plan' }) as ColumnDef<DemoRow, unknown>,
+  demoColumnHelper.accessor('mrr', { header: 'MRR' }) as ColumnDef<DemoRow, unknown>,
+  demoColumnHelper.accessor('status', {
+    header: 'Status',
+    cell: (info) => {
+      const s = info.getValue() as DemoRow['status'];
+      const tone = s === 'active' ? 'green' : s === 'trial' ? 'gold' : 'red';
+      return <PixelBadge tone={tone}>{s}</PixelBadge>;
+    },
+  }) as ColumnDef<DemoRow, unknown>,
+];
+
+const TOAST_DEMOS: { tone: ToastTone; title: string; message: string; icon: PxlKitData; buttonTone: 'green' | 'red' | 'cyan' | 'gold' }[] = [
+  { tone: 'success', title: 'SAVED',       message: 'Your changes have been saved',        icon: CheckCircle,     buttonTone: 'green' },
+  { tone: 'error',   title: 'ERROR',       message: 'Could not connect to server',         icon: XCircle,         buttonTone: 'red' },
+  { tone: 'info',    title: 'NEW UPDATE',  message: `Pxlkit ${UI_KIT_VERSION_LABEL} is live`, icon: InfoCircle,   buttonTone: 'cyan' },
+  { tone: 'warning', title: 'LOW STORAGE', message: 'Only 12MB remaining — clean up soon', icon: WarningTriangle, buttonTone: 'gold' },
+];
+
+type DemoCellTone = 'green' | 'gold' | 'cyan' | 'purple' | 'red' | 'pink';
+
+const DEMO_TONE_TEXT: Record<DemoCellTone, string> = {
+  green: 'text-retro-green',
+  gold: 'text-retro-gold',
+  cyan: 'text-retro-cyan',
+  purple: 'text-retro-purple',
+  red: 'text-retro-red',
+  pink: 'text-retro-pink',
+};
+
+function DemoCell({
+  title,
+  components,
+  slug,
+  tone,
+  span = '1x1',
+  children,
+}: {
+  title: string;
+  components: string;
+  slug: string;
+  tone: DemoCellTone;
+  span?: '1x1' | '2x1' | '3x1';
+  children: ReactNode;
+}) {
+  return (
+    <PixelBentoCell tone={tone} variant="feature" span={span} bordered>
+      <div className="w-full flex items-baseline justify-between gap-2 flex-wrap">
+        <h3 className={`font-pixel text-[11px] ${DEMO_TONE_TEXT[tone]}`}>{title}</h3>
+        <span className="font-mono text-[9px] text-retro-muted/70">{components}</span>
+      </div>
+      <div className="w-full flex-1 min-w-0">{children}</div>
+      <div className="w-full pt-2 mt-auto flex items-center gap-4 font-mono text-[10px] border-t border-retro-border/20">
+        <Link href={`/ui-kit#${slug}`} className="text-retro-cyan hover:underline">
+          Live playground →
+        </Link>
+        <Link href={`/docs#${slug}`} className="text-retro-muted hover:text-retro-text hover:underline">
+          API reference
+        </Link>
+      </div>
+    </PixelBentoCell>
+  );
+}
+
+function LiveKitDemo() {
+  const { toast } = useToast();
+
+  /* Sortable table state */
+  const [sorting, setSorting] = useState<{ id: string; desc: boolean }[]>([]);
+
+  /* Controlled forms state */
+  const [projectName, setProjectName] = useState('Dungeon Tracker');
+  const [region, setRegion] = useState('us-east');
+  const [autosave, setAutosave] = useState(true);
+  const [seats, setSeats] = useState(5);
+
+  /* Stepper state */
+  const [step, setStep] = useState(1);
+
+  const fireDemo = useCallback((d: typeof TOAST_DEMOS[number]) => {
+    toast({ tone: d.tone, title: d.title, message: d.message, icon: d.icon, position: 'top-right', duration: 3500 });
+  }, [toast]);
+
+  const fireBurst = useCallback(() => {
+    TOAST_DEMOS.forEach((d, i) => {
+      setTimeout(() => {
+        toast({ tone: d.tone, title: d.title, message: d.message, icon: d.icon, position: 'top-right', duration: 5000 });
+      }, i * 350);
+    });
+  }, [toast]);
+
+  return (
+    <PixelContainer
+      as="section"
+      maxWidth="xl"
+      padding="md"
+      className="border-t border-retro-border/30 bg-retro-surface/10"
+    >
+      <PixelSectionHeader
+        eyebrow="No mockups on this page"
+        title="This section is built from the kit itself."
+        description="Charts, a sortable table, controlled forms, a checkout stepper, real toasts — every cell below renders live from @pxlkit/ui-kit. Click around; it all works."
+        align="center"
+        titleTone="purple"
+        size="md"
+      />
+
+      <div className="mt-10">
+        <PixelBento columns={3} gap={4} style={{ gridAutoRows: 'auto' }}>
+          <DemoCell
+            title="Analytics"
+            components="PixelStatCard · PixelAreaChart"
+            slug="pixel-area-chart"
+            tone="cyan"
+            span="2x1"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full mb-3">
+              <PixelStatCard label="MRR" value="$12,480" trend="+8.2% this month" tone="green" size="sm" />
+              <PixelStatCard label="Active users" value="1,287" trend="+212 this week" tone="cyan" size="sm" />
+            </div>
+            <div
+              role="img"
+              aria-label="Pixel area chart of daily signups this week, rising from 42 on Monday to 96 on Sunday"
+              className="w-full overflow-x-auto"
+            >
+              <PixelAreaChart data={SIGNUPS_WEEK} tone="cyan" smooth />
+            </div>
+          </DemoCell>
+
+          <DemoCell
+            title="Revenue by plan"
+            components="PixelBarChart · PixelSparkline"
+            slug="pixel-bar-chart"
+            tone="gold"
+          >
+            <div
+              role="img"
+              aria-label="Pixel bar chart of monthly revenue by license: Indie 4200, Team 6800, Custom 1480 dollars"
+              className="w-full overflow-x-auto"
+            >
+              <PixelBarChart data={PLAN_REVENUE} tone="gold" showValues />
+            </div>
+            <div className="mt-3">
+              <span className="font-mono text-[9px] text-retro-muted block mb-1">
+                Checkout conversion — last 14 days
+              </span>
+              <div
+                role="img"
+                aria-label="Sparkline of checkout conversion rate over the last 14 days, trending up from 2.1 to 4.4 percent"
+              >
+                <PixelSparkline data={CONVERSION_TREND} tone="green" showArea />
+              </div>
+            </div>
+          </DemoCell>
+
+          <DemoCell
+            title="Customers"
+            components="PixelDataTable — click a header to sort"
+            slug="pixel-data-table"
+            tone="purple"
+            span="3x1"
+          >
+            <div className="w-full overflow-x-auto">
+              <PixelDataTable<DemoRow>
+                data={DEMO_ROWS}
+                columns={DEMO_COLUMNS}
+                sorting={sorting}
+                onSortingChange={setSorting}
+                density="compact"
+              />
+            </div>
+          </DemoCell>
+
+          <DemoCell
+            title="Project settings"
+            components="PixelInput · PixelSelect · PixelSwitch · PixelSlider"
+            slug="pixel-input"
+            tone="green"
+          >
+            <div className="flex flex-col gap-3 w-full">
+              <PixelInput
+                label="Project name"
+                value={projectName}
+                onChange={(e) => setProjectName(e.target.value)}
+                tone="green"
+              />
+              <PixelSelect
+                label="Region"
+                options={[
+                  { value: 'us-east', label: 'US East' },
+                  { value: 'eu-west', label: 'EU West' },
+                  { value: 'sa-east', label: 'South America' },
+                ]}
+                value={region}
+                onChange={setRegion}
+                tone="green"
+              />
+              <PixelSwitch label="Autosave" checked={autosave} onChange={setAutosave} tone="green" />
+              <PixelSlider label={`Team seats — ${seats}`} value={seats} onChange={setSeats} min={1} max={20} tone="green" />
+              <p className="font-mono text-[10px] text-retro-muted break-words" aria-live="polite">
+                <span className="text-retro-green">●</span> {projectName || 'Untitled'} · {region} · {seats} seats · autosave {autosave ? 'on' : 'off'}
+              </p>
+            </div>
+          </DemoCell>
+
+          <DemoCell
+            title="Checkout flow"
+            components="PixelStepper — click a step"
+            slug="pixel-stepper"
+            tone="cyan"
+          >
+            <div className="flex flex-col gap-4 w-full">
+              <PixelStepper active={step} onStepClick={setStep} orientation="vertical">
+                <PixelStepper.Step label="Cart" description="3 items" />
+                <PixelStepper.Step label="Shipping" description="Pixel post — 2 days" />
+                <PixelStepper.Step label="Pay" description="Confirm order" />
+              </PixelStepper>
+              <div className="flex gap-2">
+                <PixelButton size="sm" variant="ghost" tone="cyan" onClick={() => setStep((s) => Math.max(0, s - 1))}>
+                  Back
+                </PixelButton>
+                <PixelButton size="sm" tone="cyan" onClick={() => setStep((s) => Math.min(2, s + 1))}>
+                  Next
+                </PixelButton>
+              </div>
+            </div>
+          </DemoCell>
+
+          <DemoCell
+            title="Notifications"
+            components="PixelToast via useToast()"
+            slug="pixel-toast"
+            tone="pink"
+          >
+            <div className="flex flex-col gap-3 w-full">
+              <p className="font-mono text-[10px] text-retro-muted">
+                One hook, four tones, six screen positions. Try it:
+              </p>
+              <div className="grid grid-cols-2 gap-2 w-full">
+                {TOAST_DEMOS.map((d) => (
+                  <PixelButton
+                    key={d.tone}
+                    size="sm"
+                    variant="ghost"
+                    tone={d.buttonTone}
+                    onClick={() => fireDemo(d)}
+                  >
+                    {d.title}
+                  </PixelButton>
+                ))}
+              </div>
+              <PixelButton size="sm" tone="gold" onClick={fireBurst}>
+                Stack all 4
+              </PixelButton>
+            </div>
+          </DemoCell>
+        </PixelBento>
+      </div>
+    </PixelContainer>
+  );
+}
+
+/* ──────────────────── HOW IT WORKS — install → wrap → use ──────────────────── */
+
+const STEP_INSTALL = `npm install @pxlkit/core @pxlkit/ui-kit tailwindcss`;
+
+const STEP_PROVIDER = `/* globals.css */
+@import "tailwindcss";
+@import "@pxlkit/ui-kit/styles.css";
+@source "../node_modules/@pxlkit/ui-kit";
+
+/* app/layout.tsx */
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
+
+<PxlKitLocaleProvider locale="en">
+  <App />
+</PxlKitLocaleProvider>`;
+
+const STEP_USE = `import {
+  PixelButton, PixelInput, PixelStatCard,
+} from '@pxlkit/ui-kit';
+
+<PixelStatCard label="Revenue" value="$12,480"
+  trend="+8.2% this week" tone="green" />
+<PixelInput label="Email" tone="cyan"
+  placeholder="you@studio.dev" />
+<PixelButton tone="green">Ship it</PixelButton>`;
+
+const HOW_IT_WORKS_STEPS: { step: string; title: string; code: string; tone: 'green' | 'cyan' | 'gold' }[] = [
+  { step: '01', title: 'Install', code: STEP_INSTALL, tone: 'green' },
+  { step: '02', title: 'Wire styles + provider', code: STEP_PROVIDER, tone: 'cyan' },
+  { step: '03', title: 'Use components', code: STEP_USE, tone: 'gold' },
+];
+
+function HowItWorks() {
+  const router = useRouter();
+  const { toast } = useToast();
+
+  return (
+    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30">
+      <div className="max-w-6xl mx-auto">
+        <PixelSectionHeader
+          eyebrow="Adoption path"
+          title="From npm install to shipped UI in 3 steps."
+          description="Install once, wrap your app once, and every component — table to toast — is ready. The strip below is the exact output of step 3."
+          align="center"
+          titleTone="cyan"
+          size="md"
+        />
+
+        <motion.div
+          className="mt-10 grid md:grid-cols-3 gap-5 sm:gap-6 items-start"
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, margin: '-80px' }}
+        >
+          {HOW_IT_WORKS_STEPS.map((s) => (
+            <motion.div key={s.step} variants={fadeInUp}>
+              <div className="flex items-center gap-2 mb-3">
+                <span className={`font-pixel text-xs ${DEMO_TONE_TEXT[s.tone]}`}>
+                  {s.step}
+                </span>
+                <span className="font-mono text-xs text-retro-muted">{s.title}</span>
+                <div className="flex-1 border-t border-retro-border/20" />
+              </div>
+              <pre className="code-block text-xs leading-relaxed overflow-x-auto">
+                <code className="text-retro-text/90">{s.code}</code>
+              </pre>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="mt-8 rounded-xl border border-retro-border bg-retro-surface p-5 sm:p-6"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <p className="font-mono text-[10px] text-retro-muted mb-4">
+            Step 3, rendered live — the exact code above:
+          </p>
+          <div className="flex flex-wrap items-end gap-4 sm:gap-6">
+            <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% this week" tone="green" size="sm" />
+            <div className="w-56 max-w-full">
+              <PixelInput label="Email" placeholder="you@studio.dev" tone="cyan" />
+            </div>
+            <PixelButton
+              tone="green"
+              onClick={() =>
+                toast({
+                  tone: 'success',
+                  title: 'SHIPPED',
+                  message: 'That button was real, by the way.',
+                  icon: CheckCircle,
+                  position: 'top-right',
+                  duration: 3500,
+                })
+              }
+            >
+              Ship it
+            </PixelButton>
+          </div>
+        </motion.div>
+
+        <div className="mt-8 flex justify-center">
+          <PixelCluster gap={3} justify="center">
+            <PixelButton tone="cyan" onClick={() => router.push('/docs#ui-kit')}>
+              Read the setup docs
+            </PixelButton>
+            <PixelButton tone="green" variant="ghost" onClick={() => router.push('/ui-kit')}>
+              Browse all {UI_COMPONENTS_COUNT} components
+            </PixelButton>
+          </PixelCluster>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -182,19 +622,19 @@ const FEATURES: FeatureRow[] = [
   {
     icon: Package,
     title: 'Skip the design-system sprint',
-    description: `${UI_COMPONENTS_COUNT}+ accessible React primitives — buttons, inputs, DataTable, Stepper, Calendar, Sidebar, Timeline, Charts — wired to the same surface/tone/density contract. Drop them in and theme once.`,
+    description: `${UI_COMPONENTS_COUNT} accessible React primitives — buttons, inputs, DataTable, Stepper, Calendar, Sidebar, Timeline, Charts — wired to the same surface/tone/density contract. Drop them in and theme once.`,
     tone: 'green',
   },
   {
     icon: Lightning,
     title: 'Land your first screens this week',
-    description: 'Sections (hero, pricing, FAQ, header, footer) and 6 full-page layouts you copy-paste into the route. Dark + light included, responsive out of the box.',
+    description: `Sections (hero, pricing, FAQ, header, footer) and ${PAGE_TEMPLATE_COUNT} full-page layouts you copy-paste into the route. Dark + light included, responsive out of the box.`,
     tone: 'gold',
   },
   {
     icon: FireSword,
     title: 'Bundle stays tiny — only what you import',
-    description: `${TOTAL_ICON_COUNT}+ hand-crafted 16×16 SVG icons across 7 packs, fully tree-shakeable. Pure SVG, zero runtime deps, no font loading. Your bundle only carries what you actually render.`,
+    description: `${TOTAL_ICON_COUNT}+ hand-crafted 16×16 SVG icons across ${ICON_PACK_COUNT} packs, fully tree-shakeable. Pure SVG, zero runtime deps, no font loading. Your bundle only carries what you actually render.`,
     tone: 'red',
     animated: true,
   },
@@ -222,9 +662,9 @@ function FeaturesShowcase() {
   return (
     <PixelContainer as="section" maxWidth="xl" padding="md">
       <PixelSectionHeader
-        eyebrow="What you actually get back"
+        eyebrow="What you get back"
         title="The hours you'd spend rolling your own."
-        description="Six reasons teams swap their half-built design system for Pxlkit — measured in days of work you don't repeat."
+        description="Six jobs Pxlkit already finished — measured in days you don't spend rebuilding them."
         align="center"
         titleTone="green"
         size="md"
@@ -289,7 +729,7 @@ function TemplatesTeaser() {
             iconRight={<PxlKitIcon icon={ArrowRight} size={14} className="inline-block" />}
             onClick={() => router.push('/templates')}
           >
-            Browse all templates
+            Browse all {PAGE_TEMPLATE_COUNT} templates
           </PixelButton>
         }
       />
@@ -298,12 +738,19 @@ function TemplatesTeaser() {
 }
 
 /* ──────────────────── STATS STRIP (PixelStatGroup) ──────────────────── */
+const STAT_TONE_TEXT: Record<'green' | 'gold' | 'cyan' | 'purple', string> = {
+  green: 'text-retro-green',
+  gold: 'text-retro-gold',
+  cyan: 'text-retro-cyan',
+  purple: 'text-retro-purple',
+};
+
 function StatsStrip() {
-  const stats = [
-    { label: 'Components', value: '95+', tone: 'green' as const },
-    { label: 'Tests', value: '745', tone: 'cyan' as const },
-    { label: 'Waves shipped', value: '5', tone: 'gold' as const },
-    { label: 'A11y baseline', value: 'WCAG 2.1', tone: 'purple' as const },
+  const stats: { label: string; value: string; tone: 'green' | 'gold' | 'cyan' | 'purple' }[] = [
+    { label: 'Components', value: `${UI_COMPONENTS_COUNT}`, tone: 'green' },
+    { label: `Icons · ${ICON_PACK_COUNT} packs`, value: ICON_COUNT_LABEL, tone: 'gold' },
+    { label: 'Page templates', value: `${PAGE_TEMPLATE_COUNT}`, tone: 'cyan' },
+    { label: 'Accessibility', value: A11Y_BASELINE, tone: 'purple' },
   ];
 
   return (
@@ -320,7 +767,7 @@ function StatsStrip() {
             key={s.label}
             className="p-3 sm:p-4 md:p-6 h-full flex flex-col items-center justify-center text-center gap-1 min-w-0"
           >
-            <span className={`font-pixel text-sm sm:text-lg md:text-xl text-retro-${s.tone} break-words text-center`}>
+            <span className={`font-pixel text-sm sm:text-lg md:text-xl ${STAT_TONE_TEXT[s.tone]} break-words text-center`}>
               {s.value}
             </span>
             <span className="font-mono text-[10px] sm:text-xs text-retro-muted uppercase tracking-wider break-words text-center">
@@ -333,142 +780,7 @@ function StatsStrip() {
   );
 }
 
-/* ──────────────────── HOW IT WORKS (preserved) ──────────────────── */
-function HowItWorks() {
-  const sampleCode = `import type { PxlKitData } from '@pxlkit/core';
-
-export const Trophy: PxlKitData = {
-  name: 'trophy',
-  size: 16,
-  category: 'gamification',
-  grid: [
-    '................',
-    '..GGGGGGGGGGGG..',
-    '.GG.YYYYYYYY.GG.',
-    '.G..YYYYYYYY..G.',
-    '.G..YYYWYYYY..G.',
-    '.GG.YYYYYYYY.GG.',
-    '..GGGGGGGGGGGG..',
-    '....GGGGGGGG....',
-    '.....GGGGGG.....',
-    '......GGGG......',
-    '......GGGG......',
-    '.....DDDDDD.....',
-    '....DDDDDDDD....',
-    '....BBBBBBBB....',
-    '...BBBBBBBBBB...',
-    '................',
-  ],
-  palette: {
-    'G': '#FFD700',
-    'Y': '#FFF44F',
-    'D': '#B8860B',
-    'B': '#8B4513',
-    'W': '#FFFFFF',
-  },
-  tags: ['trophy', 'achievement'],
-};`;
-
-  const usageCode = `import { PxlKitIcon } from '@pxlkit/core';
-import { Trophy } from '@pxlkit/gamification';
-
-<PxlKitIcon icon={Trophy} size={32} colorful />
-<PxlKitIcon icon={Trophy} size={32} />
-<PxlKitIcon icon={Trophy} size={48} color="#FF0000" />`;
-
-  return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30">
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          className="text-center mb-10 sm:mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-cyan mb-2 sm:mb-3">
-            FROM NPM INSTALL TO RENDERED ICON IN 3 STEPS
-          </h2>
-          <p className="text-retro-muted max-w-xl mx-auto text-xs sm:text-sm px-2">
-            Icons are simple character grids where each letter maps to a color — readable by humans and by LLMs.
-            Install, import, render.
-          </p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-2 gap-6 sm:gap-8 items-start">
-          <PixelParallaxLayer speed={0.04}>
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="w-3 h-3 rounded-full bg-retro-red" />
-                <span className="w-3 h-3 rounded-full bg-retro-gold" />
-                <span className="w-3 h-3 rounded-full bg-retro-green" />
-                <span className="ml-2 font-mono text-xs text-retro-muted">
-                  trophy.ts — Icon Definition
-                </span>
-              </div>
-              <pre className="code-block text-xs leading-relaxed overflow-x-auto">
-                <code className="text-retro-text/90">{sampleCode}</code>
-              </pre>
-            </motion.div>
-          </PixelParallaxLayer>
-
-          <PixelParallaxLayer speed={-0.04}>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="w-3 h-3 rounded-full bg-retro-red" />
-                <span className="w-3 h-3 rounded-full bg-retro-gold" />
-                <span className="w-3 h-3 rounded-full bg-retro-green" />
-                <span className="ml-2 font-mono text-xs text-retro-muted">App.tsx — Usage</span>
-              </div>
-              <pre className="code-block text-xs leading-relaxed mb-6 overflow-x-auto">
-                <code className="text-retro-text/90">{usageCode}</code>
-              </pre>
-
-              <div className="p-6 rounded-xl border border-retro-border bg-retro-surface">
-                <p className="font-mono text-xs text-retro-muted mb-4">Live Preview:</p>
-                <div className="flex flex-wrap items-end gap-4 sm:gap-6">
-                  <div className="text-center">
-                    <PxlKitIcon icon={Trophy} size={48} colorful />
-                    <span className="block mt-2 font-mono text-[9px] text-retro-muted">Trophy</span>
-                  </div>
-                  <div className="text-center">
-                    <PxlKitIcon icon={Heart} size={48} colorful />
-                    <span className="block mt-2 font-mono text-[9px] text-retro-muted">Heart</span>
-                  </div>
-                  <div className="text-center">
-                    <PxlKitIcon icon={Sun} size={48} colorful />
-                    <span className="block mt-2 font-mono text-[9px] text-retro-muted">Sun</span>
-                  </div>
-                  <div className="text-center">
-                    <PxlKitIcon icon={Bell} size={48} colorful />
-                    <span className="block mt-2 font-mono text-[9px] text-retro-muted">Bell</span>
-                  </div>
-                  <div className="text-center">
-                    <AnimatedPxlKitIcon icon={FireSword} size={48} colorful />
-                    <span className="block mt-2 font-mono text-[9px] text-retro-gold">Animated</span>
-                  </div>
-                  <div className="text-center text-retro-green">
-                    <PxlKitIcon icon={Trophy} size={48} />
-                    <span className="block mt-2 font-mono text-[9px] text-retro-muted">mono</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </PixelParallaxLayer>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ──────────────────── PARALLAX SHOWCASE (preserved) ──────────────────── */
+/* ──────────────────── PARALLAX SHOWCASE ──────────────────── */
 function ParallaxShowcase() {
   return (
     <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 bg-retro-surface/20 relative overflow-hidden">
@@ -490,7 +802,7 @@ function ParallaxShowcase() {
             ICONS THAT POP OFF THE SCREEN
           </h2>
           <p className="text-retro-muted max-w-2xl mx-auto text-xs sm:text-sm px-2">
-            Multi-layer 3D icons with mouse rotation and click interactions — particles, layer explosions, color shifts.
+            Multi-layer 3D icons that tilt with your mouse and react on click — particles, layer explosions, color shifts. Move your cursor over them.
           </p>
         </motion.div>
 
@@ -533,7 +845,7 @@ function ParallaxShowcase() {
   );
 }
 
-/* ──────────────────── ICON SHOWCASE (preserved, slim) ──────────────────── */
+/* ──────────────────── ICON SHOWCASE ──────────────────── */
 const SHOWCASE_PACKS: {
   pack: { id: string; name: string; description: string; icons: AnyIcon[] };
   color: string;
@@ -564,7 +876,7 @@ function IconShowcase() {
             {TOTAL_ICON_COUNT}+ HAND-CRAFTED PIXEL ART SVG ICONS
           </h2>
           <p className="text-retro-muted font-mono text-xs sm:text-sm max-w-lg mx-auto px-2">
-            Every icon is a 16×16 pixel masterpiece across 7 themed packs — tree-shake the rest away.
+            Seven themed packs of 16×16 pixel art, crisp at any size — tree-shaking drops every icon you don&apos;t import.
           </p>
         </motion.div>
 
@@ -635,79 +947,7 @@ function IconShowcase() {
   );
 }
 
-/* ──────────────────── TOAST SECTION (preserved) ──────────────────── */
-const TOAST_DEMOS: { tone: ToastTone; title: string; message: string; icon: PxlKitData; color: string }[] = [
-  { tone: 'success', title: 'SAVED',      message: 'Your changes have been saved',         icon: CheckCircle,      color: '#00ff88' },
-  { tone: 'error',   title: 'ERROR',       message: 'Could not connect to server',          icon: XCircle,          color: '#ff6b6b' },
-  { tone: 'info',    title: 'NEW UPDATE',  message: 'Pxlkit v2.0 is now available',         icon: InfoCircle,       color: '#4ecdc4' },
-  { tone: 'warning', title: 'LOW STORAGE', message: 'Only 12MB remaining — clean up soon', icon: WarningTriangle,  color: '#ffa300' },
-];
-
-function ToastSection() {
-  const router = useRouter();
-  const { toast } = useToast();
-
-  const fireDemo = useCallback((d: typeof TOAST_DEMOS[number]) => {
-    toast({ tone: d.tone, title: d.title, message: d.message, icon: d.icon, position: 'top-right', duration: 3500 });
-  }, [toast]);
-
-  const fireBurst = useCallback(() => {
-    TOAST_DEMOS.forEach((d, i) => {
-      setTimeout(() => {
-        toast({ tone: d.tone, title: d.title, message: d.message, icon: d.icon, position: 'top-right', duration: 5000 });
-      }, i * 350);
-    });
-  }, [toast]);
-
-  return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 bg-retro-surface/20">
-      <div className="max-w-5xl mx-auto">
-        <motion.div
-          className="text-center mb-8 sm:mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-purple mb-2 sm:mb-3">DROP A TOAST IN ONE LINE</h2>
-          <p className="text-retro-muted max-w-lg mx-auto text-xs sm:text-sm px-2">
-            One useToast() hook for success, error, warning, info — animated icons, stacking, and 6 positions handled.
-            No extra dependency to pin or wire to Sentry.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8 items-stretch">
-          {TOAST_DEMOS.map((d) => (
-            <motion.div key={d.tone} whileHover={{ scale: 1.04, y: -2 }} className="group h-full flex">
-              <PixelCard
-                className="w-full h-full"
-                title={d.title}
-                icon={<PxlKitIcon icon={d.icon} size={20} colorful className="shrink-0" />}
-                footer={
-                  <PixelButton tone="purple" size="sm" onClick={() => fireDemo(d)}>
-                    Trigger Toast
-                  </PixelButton>
-                }
-              >
-                {d.message}
-              </PixelCard>
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
-            <PixelButton tone="gold" onClick={fireBurst}>Stack All 4</PixelButton>
-          </motion.div>
-          <PixelButton tone="cyan" variant="ghost" onClick={() => router.push('/ui-kit#pixel-toast')}>
-            Explore PixelToast
-          </PixelButton>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ──────────────────── AI SECTION (preserved) ──────────────────── */
+/* ──────────────────── AI SECTION ──────────────────── */
 const INCOMING_ICON_KEY = 'pxlkit-builder-incoming';
 
 function AISection() {
@@ -882,7 +1122,7 @@ function AISection() {
   );
 }
 
-/* ──────────────────── PRICING (preserved) ──────────────────── */
+/* ──────────────────── PRICING ──────────────────── */
 function PricingPreview() {
   const router = useRouter();
 
@@ -892,7 +1132,7 @@ function PricingPreview() {
       price: 'Free',
       suffix: 'perfect for: side projects, OSS, prototypes',
       color: 'green' as const,
-      features: [`${TOTAL_ICON_COUNT}+ pixel art icons`, '7 thematic packs', `${UI_COMPONENTS_COUNT}+ React components`, 'All section templates', 'Asset attribution required'],
+      features: [`${ICON_COUNT_LABEL} pixel art icons`, `${ICON_PACK_COUNT} thematic packs`, `${UI_COMPONENTS_COUNT} React components`, 'All section templates', 'Asset attribution required'],
     },
     {
       name: 'Indie',
@@ -999,43 +1239,8 @@ function PricingPreview() {
   );
 }
 
-/* ──────────────────── FAQ (preserved) ──────────────────── */
+/* ──────────────────── FAQ — data shared with the FAQPage JSON-LD in app/layout.tsx ──────────────────── */
 function FAQSection() {
-  const faqs = [
-    {
-      q: 'Is Pxlkit really free?',
-      a: 'Yes. The code packages (UI kit, core, parallax) are MIT-licensed and completely free. The icon packs are free with a small attribution link. Paid licenses only remove the icon/asset attribution requirement.',
-    },
-    {
-      q: 'What templates are included?',
-      a: 'Pxlkit ships 8 section categories — hero, header, footer, CTA, pricing, testimonials, FAQ, and features — with 3 design variants each. Plus 6 complete page templates: full landing, portfolio, admin dashboards, changelog, docs site, and e-commerce.',
-    },
-    {
-      q: 'What React components does the UI kit include?',
-      a: `The UI kit provides ${UI_COMPONENTS_COUNT}+ production-ready components: buttons, inputs, textareas, selects, checkboxes, switches, cards, modals, tables, badges, tooltips, toasts, code blocks, sidebars, command palettes, and more. All are TypeScript-first, Tailwind-powered, and fully themed.`,
-    },
-    {
-      q: 'Does Pxlkit work with Next.js?',
-      a: 'Yes. Pxlkit is built for React with TypeScript and integrates seamlessly with Next.js, Vite, Create React App, Remix, and any React setup.',
-    },
-    {
-      q: 'Will it slow down my app?',
-      a: 'No. Every icon and component is tree-shakeable — your final bundle only includes the code you actually import. Icons are pure SVG with zero runtime dependencies.',
-    },
-    {
-      q: 'Can I use Pxlkit in a commercial product?',
-      a: 'Absolutely. MIT code packages can be used commercially without attribution. If you ship the icon packs and want to remove attribution there too, grab an Indie ($9.50) or Team ($24.50) asset license.',
-    },
-    {
-      q: 'How many icons are included?',
-      a: `${TOTAL_ICON_COUNT}+ hand-crafted 16×16 SVG icons across 7 themed packs.`,
-    },
-    {
-      q: 'How do I create custom icons?',
-      a: 'Three ways: use the visual builder on our website, let AI generate them with our prompt templates, or hand-code the simple grid + palette JSON format directly.',
-    },
-  ];
-
   return (
     <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 bg-retro-surface/20">
       <div className="max-w-3xl mx-auto">
@@ -1054,7 +1259,7 @@ function FAQSection() {
         </motion.div>
 
         <PixelAccordion
-          items={faqs.map((faq, i) => ({
+          items={LANDING_FAQS.map((faq, i) => ({
             id: `faq-${i}`,
             title: faq.q,
             content: (
@@ -1069,7 +1274,7 @@ function FAQSection() {
   );
 }
 
-/* ──────────────────── VOXEL COMING SOON (preserved) ──────────────────── */
+/* ──────────────────── VOXEL COMING SOON ──────────────────── */
 function VoxelComingSoon() {
   return (
     <section className="relative py-10 sm:py-14 px-4 sm:px-6 border-t border-retro-border/20 overflow-hidden">
@@ -1135,7 +1340,7 @@ function VoxelComingSoon() {
   );
 }
 
-/* ──────────────────── CTA (Ola 1 PixelContainer + PixelSectionHeader + PixelCluster) ──────────────────── */
+/* ──────────────────── CLOSING CTA ──────────────────── */
 function LandingCta() {
   const router = useRouter();
 
@@ -1197,4 +1402,3 @@ function LandingCta() {
     </section>
   );
 }
-

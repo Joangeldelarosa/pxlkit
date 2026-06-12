@@ -5,11 +5,8 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useToast } from '../../components/ToastProvider';
-import { PixelButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
-
-const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
-const ICON_COUNT_LABEL = '226+';
-const ICON_PACK_COUNT_LABEL = '7';
+import { PixelButton } from '@pxlkit/ui-kit';
+import { UI_COMPONENTS_COUNT, ICON_COUNT_LABEL, ICON_PACK_COUNT } from '@/lib/pxlkit-counts';
 
 /* ─── Animation helpers ─── */
 const fadeInUp = {
@@ -85,7 +82,7 @@ const PLANS: Plan[] = [
     ctaHref: '/docs',
     features: [
       { text: `${ICON_COUNT_LABEL} pixel art icons`, included: true },
-      { text: `${ICON_PACK_COUNT_LABEL} thematic icon packs`, included: true },
+      { text: `${ICON_PACK_COUNT} thematic icon packs`, included: true },
       { text: 'Static & animated icons', included: true },
       { text: 'MIT code packages', included: true },
       { text: 'Visual Icon Builder', included: true },
@@ -563,7 +560,7 @@ function PurchaseCheckout({ plan, buttonClass }: { plan: Plan, buttonClass: stri
 function ComparisonTable() {
   const rows = [
     { feature: `${ICON_COUNT_LABEL} pixel art icons`, community: true, indie: true, team: true },
-    { feature: 'React components & SVG export', community: true, indie: true, team: true },
+    { feature: `${UI_COMPONENTS_COUNT} React components & SVG export`, community: true, indie: true, team: true },
     { feature: 'Visual Icon Builder', community: true, indie: true, team: true },
     { feature: 'Toast notification system', community: true, indie: true, team: true },
     { feature: 'Static & animated icons', community: true, indie: true, team: true },

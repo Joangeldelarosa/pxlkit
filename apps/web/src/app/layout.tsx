@@ -3,15 +3,17 @@ import { ConditionalShell } from '../components/ConditionalShell';
 import { ThemeProvider } from '../components/ThemeProvider';
 import { ToastProvider } from '../components/ToastProvider';
 import { UI_KIT_VERSION } from '@/lib/pxlkit-version';
+import { UI_COMPONENTS_COUNT, ICON_COUNT_LABEL, ICON_PACK_COUNT, PAGE_TEMPLATE_COUNT } from '@/lib/pxlkit-counts';
+import { LANDING_FAQS } from '@/lib/landing-faq';
 import './globals.css';
 import { Analytics } from "@vercel/analytics/next";
 
 /* ─── SEO Constants ─── */
 const SITE_NAME = 'Pxlkit';
 const SITE_URL = 'https://pxlkit.xyz';
-const SITE_TAGLINE = 'Retro React UI Kit — Pixel-Art Components, Ready-Made Templates & 226+ SVG Icons';
+const SITE_TAGLINE = `Retro React UI Kit — Pixel-Art Components, Ready-Made Templates & ${ICON_COUNT_LABEL} SVG Icons`;
 const SITE_DESCRIPTION =
-  '95+ retro pixel-art React components, 226+ SVG icons across 7 themed packs, section variants & 6 full-page templates. TypeScript-first, Tailwind CSS, tree-shakeable. Open-source UI kit.';
+  `${UI_COMPONENTS_COUNT} retro pixel-art React components, ${ICON_COUNT_LABEL} SVG icons across ${ICON_PACK_COUNT} themed packs, section variants & ${PAGE_TEMPLATE_COUNT} full-page templates. TypeScript-first, Tailwind CSS, tree-shakeable. Open-source UI kit.`;
 
 export const viewport: Viewport = {
   themeColor: [
@@ -270,7 +272,7 @@ const JSON_LD = {
       applicationSubCategory: 'React Component Library',
       operatingSystem: 'Web',
       description:
-        'Open-source retro React UI kit with 95+ pixel-art components, 226+ SVG icons across 7 themed packs, section variants and 6 full-page templates (dashboard, landing, portfolio, ecommerce, docs, changelog). TypeScript-first, Tailwind CSS-powered, tree-shakeable.',
+        `Open-source retro React UI kit with ${UI_COMPONENTS_COUNT} pixel-art components, ${ICON_COUNT_LABEL} SVG icons across ${ICON_PACK_COUNT} themed packs, section variants and ${PAGE_TEMPLATE_COUNT} full-page templates (dashboard, landing, portfolio, ecommerce, docs, changelog). TypeScript-first, Tailwind CSS-powered, tree-shakeable.`,
       url: SITE_URL,
       author: { '@id': `${SITE_URL}/#organization` },
       license: 'https://github.com/Joangeldelarosa/pxlkit/blob/main/LICENSE',
@@ -301,8 +303,8 @@ const JSON_LD = {
       programmingLanguage: ['TypeScript', 'React', 'JavaScript'],
       downloadUrl: 'https://www.npmjs.com/package/@pxlkit/core',
       featureList: [
-        '95+ retro pixel-art UI components',
-        '226+ hand-crafted SVG icons across 7 packs',
+        `${UI_COMPONENTS_COUNT} retro pixel-art UI components`,
+        `${ICON_COUNT_LABEL} hand-crafted SVG icons across ${ICON_PACK_COUNT} packs`,
         'Section variants — hero, pricing, CTA, testimonial, FAQ, features, header & footer',
         '6 complete page templates — dashboard, landing, portfolio, ecommerce, docs, changelog',
         'Visual pixel icon builder',
@@ -341,7 +343,7 @@ const JSON_LD = {
           position: 1,
           name: '@pxlkit/ui-kit',
           url: 'https://www.npmjs.com/package/@pxlkit/ui-kit',
-          description: '95+ retro pixel-art React UI components — buttons, inputs, modals, data tables, charts, calendars, selects, animations, parallax, locale support, and more',
+          description: `${UI_COMPONENTS_COUNT} retro pixel-art React UI components — buttons, inputs, modals, data tables, charts, calendars, selects, animations, parallax, locale support, and more`,
         },
         {
           '@type': 'ListItem',
@@ -408,75 +410,17 @@ const JSON_LD = {
         },
       ],
     },
-    /* ── FAQPage ── */
+    /* ── FAQPage — mirrors the visible landing FAQ verbatim (SSoT: lib/landing-faq.ts) ── */
     {
       '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'Is Pxlkit free to use?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes! Pxlkit code packages are MIT-licensed and completely free. Icon packs are free with attribution. Paid licenses only remove the attribution requirement for icons and assets.',
-          },
+      mainEntity: LANDING_FAQS.map((faq) => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.a,
         },
-        {
-          '@type': 'Question',
-          name: 'What React components does Pxlkit include?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Pxlkit ships 95+ retro pixel-art React components: buttons, inputs, cards, modals, tables, data tables, charts, calendars, selects, badges, tooltips, toast notifications, animation primitives, parallax wrappers, and a locale provider. All are TypeScript-first, Tailwind CSS-powered, and tree-shakeable.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What ready-to-use templates and sections are available?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Pxlkit provides ready-to-use section variants across 8 categories (hero, header, footer, CTA, pricing, testimonials, FAQ, features). Plus 6 complete page templates (admin dashboard, SaaS landing, portfolio, ecommerce, docs, changelog) that drop into any React or Next.js project.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How many icons are included and what styles are available?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Pxlkit includes 226+ hand-crafted 16×16 SVG pixel art icons across 7 themed packs: UI controls, gamification, social, weather, feedback, effects, and parallax. All icons are tree-shakeable React components with optional 3D parallax and animation effects.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Does Pxlkit work with Next.js and Tailwind CSS?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes. Pxlkit is built for React with TypeScript and integrates seamlessly with Next.js, Vite, and any React setup. It uses Tailwind CSS for styling with full tree-shaking support, so your bundle only includes the components you actually use.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Is the bundle size small?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes. Every icon and component is tree-shakeable. Import only what you use — your final bundle includes zero unused code. Pxlkit uses zero native browser UI elements, giving you full styling control.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Can I build landing pages with Pxlkit?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Absolutely. Pxlkit provides copy-paste ready hero sections, pricing tables, CTA blocks, testimonial carousels, FAQ accordions, feature grids, headers, and footers. Combine them with the 6 included full-page templates to ship retro-styled landing pages in minutes.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What is the visual icon builder?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Pxlkit includes a browser-based pixel editor that lets you create custom 16×16 SVG icons visually. You can also generate icons using AI via LLM prompts. All icons export as optimized, tree-shakeable React SVG components.',
-          },
-        },
-      ],
+      })),
     },
   ],
 };

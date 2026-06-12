@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
 import { UI_KIT_VERSION } from '@/lib/pxlkit-version';
+import { UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
+
+const UI_KIT_TITLE = `${UI_COMPONENTS_COUNT} Retro Pixel-Art React Components — UI Kit with Live Demos | Pxlkit`;
 
 export const metadata: Metadata = {
-  title: '95+ Retro Pixel-Art React Components — UI Kit with Live Demos | Pxlkit',
+  title: UI_KIT_TITLE,
   description:
-    'Production-ready retro React UI kit: 95+ pixel-art components — buttons, forms, modals, tables, animations, parallax & more. TypeScript, Tailwind CSS. MIT-licensed.',
+    `Production-ready retro React UI kit: ${UI_COMPONENTS_COUNT} pixel-art components — buttons, forms, modals, tables, animations, parallax & more. TypeScript, Tailwind CSS. MIT-licensed.`,
   keywords: [
     'react ui kit',
     'react component library',
@@ -79,24 +82,24 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: 'website',
-    title: '95+ Retro Pixel-Art React Components — UI Kit with Live Demos | Pxlkit',
+    title: UI_KIT_TITLE,
     description:
-      '95+ hand-crafted retro React components: buttons, forms, modals, tables, toast notifications, animations, parallax, locale support, and more. TypeScript-first, Tailwind-powered, zero native UI. MIT-licensed and free to use.',
+      `${UI_COMPONENTS_COUNT} hand-crafted retro React components: buttons, forms, modals, tables, toast notifications, animations, parallax, locale support, and more. TypeScript-first, Tailwind-powered, zero native UI. MIT-licensed and free to use.`,
     url: 'https://pxlkit.xyz/ui-kit',
     images: [
       {
         url: '/og-image.png',
         width: 1280,
         height: 640,
-        alt: 'Pxlkit UI Kit — 95+ retro pixel-art React components with live demos',
+        alt: `Pxlkit UI Kit — ${UI_COMPONENTS_COUNT} retro pixel-art React components with live demos`,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: '95+ Retro Pixel-Art React Components — UI Kit with Live Demos | Pxlkit',
+    title: UI_KIT_TITLE,
     description:
-      'Production-ready retro pixel-art React UI kit: 95+ components with live demos. TypeScript, Tailwind CSS, tree-shakeable. MIT-licensed.',
+      `Production-ready retro pixel-art React UI kit: ${UI_COMPONENTS_COUNT} components with live demos. TypeScript, Tailwind CSS, tree-shakeable. MIT-licensed.`,
     images: ['/og-twitter.png'],
   },
   alternates: {
@@ -119,7 +122,7 @@ const UI_KIT_JSON_LD = {
   operatingSystem: 'Web',
   url: 'https://pxlkit.xyz/ui-kit',
   description:
-    '95+ accessible retro React primitives — buttons, forms, modals, tables, charts, calendars, parallax, and more. TypeScript-first, Tailwind v4, MIT.',
+    `${UI_COMPONENTS_COUNT} accessible retro React primitives — buttons, forms, modals, tables, charts, calendars, parallax, and more. TypeScript-first, Tailwind v4, MIT.`,
   softwareVersion: UI_KIT_VERSION,
   programmingLanguage: ['TypeScript', 'React', 'JavaScript'],
   downloadUrl: 'https://www.npmjs.com/package/@pxlkit/ui-kit',
