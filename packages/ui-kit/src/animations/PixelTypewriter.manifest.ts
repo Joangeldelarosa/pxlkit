@@ -22,9 +22,10 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['aria-live=polite for incremental text', 'respects prefers-reduced-motion'],
+    patterns: ['respects prefers-reduced-motion'],
     keyboard: [],
-    notes: 'Caret is decorative; full text is exposed to assistive tech once typing completes.',
+    notes:
+      'Caret is decorative; full text is exposed to assistive tech once typing completes. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and onComplete fires once.',
   },
   related: [],
   apiStability: 'stable',

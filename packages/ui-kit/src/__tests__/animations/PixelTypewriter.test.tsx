@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { PixelTypewriter } from '../../animations/PixelTypewriter';
+import { mockMatchMedia } from './matchmedia-mock';
 
 describe('PixelTypewriter', () => {
   beforeEach(() => {
@@ -76,6 +77,25 @@ describe('PixelTypewriter', () => {
     expect(el.className).toContain('font-mono');
     expect(el.className).toContain('text-retro-cyan');
     expect(el.className).toContain('custom');
+  });
+
+  it('shows the full text immediately (no caret) when the user prefers reduced motion', () => {
+    const ctl = mockMatchMedia(true);
+    try {
+      const onComplete = vi.fn();
+      const { container } = render(
+        <PixelTypewriter label="HELLO" speed={10} onComplete={onComplete} />,
+      );
+      const el = container.firstElementChild as HTMLElement;
+      expect(el.textContent).toBe('HELLO');
+      expect(el.textContent).not.toContain('▌');
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      act(() => { vi.advanceTimersByTime(500); });
+      expect(el.textContent).toBe('HELLO');
+      expect(onComplete).toHaveBeenCalledTimes(1);
+    } finally {
+      ctl.restore();
+    }
   });
 
   it('renders nothing typed while trigger={false}', () => {

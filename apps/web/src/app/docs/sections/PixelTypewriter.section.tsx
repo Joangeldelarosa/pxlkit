@@ -41,10 +41,9 @@ export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSec
       <h3 id="pixel-typewriter-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>aria-live=polite for incremental text</code></li>
         <li><code>respects prefers-reduced-motion</code></li>
       </ul>
-      <p className="docs-aria-notes">Caret is decorative; full text is exposed to assistive tech once typing completes.</p>
+      <p className="docs-aria-notes">Caret is decorative; full text is exposed to assistive tech once typing completes. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and onComplete fires once.</p>
     </section>
     </section>
   );

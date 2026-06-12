@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { cn, Tone, toneMap } from '../common';
 import type { AnimationTrigger } from './types';
 import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
@@ -48,11 +48,25 @@ export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>
   forwardedRef,
 ) {
   const resolvedText = label ?? text ?? '';
-  const { ref, active, handlers, endAnimation } = useAnimationTrigger(trigger, onComplete);
+  const { ref, active, reducedMotion, handlers, endAnimation } = useAnimationTrigger(trigger, onComplete);
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
+  const reducedCompleteRef = useRef(false);
 
   useEffect(() => {
+    if (reducedMotion) {
+      /* Reduced motion: skip the typing animation — show the full text
+         immediately, regardless of trigger mode. `onComplete` still fires
+         (once) because its contract is "full string rendered", which is
+         satisfied instantly. */
+      setDisplayed(resolvedText);
+      setDone(true);
+      if (!reducedCompleteRef.current) {
+        reducedCompleteRef.current = true;
+        endAnimation();
+      }
+      return;
+    }
     if (!active) {
       setDisplayed('');
       setDone(false);
@@ -77,7 +91,7 @@ export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>
       clearTimeout(timeoutId);
       if (intervalId) clearInterval(intervalId);
     };
-  }, [active, resolvedText, speed, delay, endAnimation]);
+  }, [active, reducedMotion, resolvedText, speed, delay, endAnimation]);
 
   return (
     <span

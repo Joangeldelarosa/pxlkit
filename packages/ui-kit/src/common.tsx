@@ -169,6 +169,12 @@ export function useClickOutside(ref: React.RefObject<HTMLElement | null>, handle
  *  - `ring`  40 % — keyboard focus ring.
  *  - `fill`  opaque — solid tone backgrounds (`solid` variant of any
  *    component).
+ *
+ * NOTE: `tokens.ts` exports a *separate* `tone` map for layout/surface-scale
+ * components (cards, hero, bento, …) that intentionally uses `border-*\/30`
+ * + a `glow` tier. The two maps are different design tiers, not a drifted
+ * copy — see the decision comment on `tone` in tokens.ts before changing
+ * either one to "match" the other.
  */
 export const toneMap: Record<Tone, { ring: string; text: string; border: string; bg: string; soft: string; hover: string; fill: string }> = {
   green: {

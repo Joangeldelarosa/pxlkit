@@ -51,6 +51,23 @@ export const rhythm = {
   metaToInstall: 'mt-5',
 } as const;
 
+/**
+ * Layout/surface-scale tone tokens — consumed by the card/layout/hero family
+ * (PixelCard, PixelBox, PixelBentoCell, PixelHeroSection, PixelSidebar, …).
+ *
+ * DECISION (do not "sync" with `toneMap` in common.tsx): this map and
+ * `toneMap` are two deliberately distinct tiers, and BOTH are rendered
+ * truth for their own consumers:
+ *  - `toneMap` (common.tsx) targets control-scale chrome (buttons, badges,
+ *    inputs, chips) and uses `border-*\/40` — borders must stay visible at
+ *    body-text sizes.
+ *  - this `tone` map targets large surfaces (cards, sections) and uses
+ *    `border-*\/30` plus a `glow` shadow — large areas need softer borders
+ *    to avoid visual heaviness (and it has no `hover` tier; surfaces are
+ *    not interactive by default).
+ * Aligning the values either way would change rendered pixels for one of
+ * the two component families, so the divergence is intentional and kept.
+ */
 export const tone = {
   neutral: {
     border: 'border-retro-border',

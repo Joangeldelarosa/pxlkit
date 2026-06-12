@@ -51,6 +51,64 @@ describe('PixelCollapsible — toggle behavior', () => {
   });
 });
 
+describe('PixelCollapsible — aria wiring (disclosure pattern)', () => {
+  it('trigger exposes aria-expanded reflecting the open state', () => {
+    render(
+      <PixelCollapsible label="Details">
+        <p>body</p>
+      </PixelCollapsible>,
+    );
+    const trigger = screen.getByRole('button', { name: /Details/ });
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+    fireEvent.click(trigger);
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    fireEvent.click(trigger);
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('defaultOpen renders with aria-expanded="true"', () => {
+    render(
+      <PixelCollapsible label="Open me" defaultOpen>
+        <p>body</p>
+      </PixelCollapsible>,
+    );
+    const trigger = screen.getByRole('button', { name: /Open me/ });
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('trigger aria-controls points at the content region id, content labelled by the trigger', () => {
+    render(
+      <PixelCollapsible label="Linked" defaultOpen>
+        <p>linked body</p>
+      </PixelCollapsible>,
+    );
+    const trigger = screen.getByRole('button', { name: /Linked/ });
+    const controls = trigger.getAttribute('aria-controls');
+    expect(controls).toBeTruthy();
+
+    const content = document.getElementById(controls!);
+    expect(content).not.toBeNull();
+    expect(content!.textContent).toContain('linked body');
+    expect(content!.getAttribute('aria-labelledby')).toBe(trigger.id);
+    expect(trigger.id).toBeTruthy();
+  });
+
+  it('keeps a stable aria-controls id across toggles', () => {
+    render(
+      <PixelCollapsible label="Stable">
+        <p>body</p>
+      </PixelCollapsible>,
+    );
+    const trigger = screen.getByRole('button', { name: /Stable/ });
+    const before = trigger.getAttribute('aria-controls');
+    fireEvent.click(trigger);
+    expect(trigger.getAttribute('aria-controls')).toBe(before);
+    expect(document.getElementById(before!)).not.toBeNull();
+  });
+});
+
 describe('PixelCollapsible — chrome props', () => {
   it('bordered adds surface border + radius chrome to the wrapper', () => {
     const { container } = render(

@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 import { PixelGlitch } from '../../animations/PixelGlitch';
+import { mockMatchMedia } from './matchmedia-mock';
 
 /**
  * jsdom lacks native CSS animation support, so React registers the
@@ -60,6 +61,20 @@ describe('PixelGlitch', () => {
     const main = wrapper.lastElementChild as HTMLElement;
     dispatchAnimationEnd(main);
     expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders a single static copy (no ghost layers, no animation) when the user prefers reduced motion', () => {
+    const ctl = mockMatchMedia(true);
+    try {
+      const { container, getAllByText } = render(<PixelGlitch>calm</PixelGlitch>);
+      expect(container.querySelectorAll('[aria-hidden]')).toHaveLength(0);
+      expect(getAllByText('calm')).toHaveLength(1);
+      const wrapper = container.firstElementChild as HTMLElement;
+      const main = wrapper.lastElementChild as HTMLElement;
+      expect(main.style.animation).toBe('');
+    } finally {
+      ctl.restore();
+    }
   });
 
   it('merges className onto the relative inline-block wrapper', () => {

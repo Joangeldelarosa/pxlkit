@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 import { PixelPulse } from '../../animations/PixelPulse';
+import { mockMatchMedia } from './matchmedia-mock';
 
 /**
  * jsdom lacks native CSS animation support, so React registers the
@@ -58,6 +59,18 @@ describe('PixelPulse', () => {
     );
     dispatchAnimationEnd(container.firstElementChild as HTMLElement);
     expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders children statically (no animation) when the user prefers reduced motion', () => {
+    const ctl = mockMatchMedia(true);
+    try {
+      const { container, getByText } = render(<PixelPulse>calm</PixelPulse>);
+      const el = container.firstElementChild as HTMLElement;
+      expect(el.style.animation).toBe('');
+      expect(getByText('calm')).toBeTruthy();
+    } finally {
+      ctl.restore();
+    }
   });
 
   it('forwards className and injects the shared keyframes stylesheet once', () => {

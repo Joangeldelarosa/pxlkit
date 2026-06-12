@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useReducedMotion } from '../../hooks/useReducedMotion';
 import type { AnimationRepeat, AnimationTrigger } from '../types';
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -59,10 +60,22 @@ export function usePixelAnimations() {
  * Shared hook that determines *when* an animation is active based on the
  * chosen trigger mode.  Returns a `ref` to attach to the outermost element,
  * an `active` boolean to conditionally apply the CSS animation, event
- * `handlers` to spread on the same element, and a `handleAnimEnd` callback
- * for the animated element's `onAnimationEnd`.
+ * `handlers` to spread on the same element, a `handleAnimEnd` callback
+ * for the animated element's `onAnimationEnd`, and the `reducedMotion`
+ * flag the override below is derived from.
+ *
+ * Reduced motion: when the user has `prefers-reduced-motion: reduce`
+ * active, `active` is forced to `false` regardless of the trigger mode, so
+ * every animation component renders its children statically in their final,
+ * fully visible state (no animation styles applied). Because no CSS
+ * animation ever runs, `onComplete` does not fire for CSS-driven
+ * animations under reduced motion — there is no animation to complete.
+ * JS-driven components (PixelTypewriter) consume the returned
+ * `reducedMotion` flag to render their end state immediately instead.
+ * This is implemented once here rather than in each of the 11 components.
  */
 export function useAnimationTrigger(trigger: AnimationTrigger = 'mount', onComplete?: () => void) {
+  const reducedMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null!);
   const [hov, setHov] = useState(false);
   const [foc, setFoc] = useState(false);
@@ -84,7 +97,7 @@ export function useAnimationTrigger(trigger: AnimationTrigger = 'mount', onCompl
     return () => obs.disconnect();
   }, [trigger]);
 
-  const active =
+  const triggerActive =
     typeof trigger === 'boolean'
       ? trigger
       : trigger === 'mount'
@@ -98,6 +111,9 @@ export function useAnimationTrigger(trigger: AnimationTrigger = 'mount', onCompl
               : trigger === 'inView'
                 ? iv
                 : true;
+
+  /* prefers-reduced-motion wins over every trigger mode (incl. controlled). */
+  const active = reducedMotion ? false : triggerActive;
 
   /* endAnimation — call to signal the animation finished (programmatic use) */
   const endAnimation = useCallback(() => {
@@ -135,5 +151,5 @@ export function useAnimationTrigger(trigger: AnimationTrigger = 'mount', onCompl
     handlers.onBlur = () => setFoc(false);
   }
 
-  return { ref, active, handlers, handleAnimEnd, endAnimation };
+  return { ref, active, reducedMotion, handlers, handleAnimEnd, endAnimation };
 }

@@ -44,7 +44,7 @@ export function PixelCollapsibleDocsSection({ className }: PixelCollapsibleDocsS
       <ul className="docs-aria-patterns">
         <li><code>disclosure</code></li>
       </ul>
-      <p className="docs-aria-notes">Header is a native &lt;button&gt; so assistive tech announces it as a button trigger. Consider wiring aria-expanded and aria-controls on the header when composing into accordion-like patterns; PixelAccordion handles that automatically.</p>
+      <p className="docs-aria-notes">Header is a native &lt;button&gt; so assistive tech announces it as a button trigger. The trigger exposes aria-expanded reflecting the open state and aria-controls pointing at the content region (a stable generated id); the content region is labelled by the trigger via aria-labelledby — the same wiring PixelAccordion uses.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

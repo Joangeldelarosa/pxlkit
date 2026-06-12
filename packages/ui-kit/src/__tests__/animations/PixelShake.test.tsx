@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 import { PixelShake } from '../../animations/PixelShake';
+import { mockMatchMedia } from './matchmedia-mock';
 
 /**
  * jsdom lacks native CSS animation support, so React registers the
@@ -56,6 +57,18 @@ describe('PixelShake', () => {
     const { container } = render(<PixelShake onComplete={onComplete}>x</PixelShake>);
     dispatchAnimationEnd(container.firstElementChild as HTMLElement);
     expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders children statically (no animation) when the user prefers reduced motion', () => {
+    const ctl = mockMatchMedia(true);
+    try {
+      const { container, getByText } = render(<PixelShake>calm</PixelShake>);
+      const el = container.firstElementChild as HTMLElement;
+      expect(el.style.animation).toBe('');
+      expect(getByText('calm')).toBeTruthy();
+    } finally {
+      ctl.restore();
+    }
   });
 
   it('merges className with inline-block and injects keyframes once', () => {

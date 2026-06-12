@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 import { PixelSlideIn } from '../../animations/PixelSlideIn';
+import { mockMatchMedia } from './matchmedia-mock';
 
 /**
  * jsdom lacks native CSS animation support, so React registers the
@@ -65,6 +66,18 @@ describe('PixelSlideIn', () => {
     const { container } = render(<PixelSlideIn onComplete={onComplete}>x</PixelSlideIn>);
     dispatchAnimationEnd(container.firstElementChild as HTMLElement);
     expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders children statically (fully visible, no animation) when the user prefers reduced motion', () => {
+    const ctl = mockMatchMedia(true);
+    try {
+      const { container, getByText } = render(<PixelSlideIn>calm</PixelSlideIn>);
+      const el = container.firstElementChild as HTMLElement;
+      expect(el.style.animation).toBe('');
+      expect(getByText('calm')).toBeTruthy();
+    } finally {
+      ctl.restore();
+    }
   });
 
   it('forwards className and injects the shared keyframes stylesheet once', () => {
