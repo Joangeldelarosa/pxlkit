@@ -30,7 +30,9 @@ export function Password() {
 }
 
 export function Number() {
-  return <PixelBareInput type="number" min={0} max={100} step={1} defaultValue={42} />;
+  return (
+    <PixelBareInput type="number" min={0} max={100} step={1} defaultValue={42} aria-label="number-input" />
+  );
 }
 
 export function Disabled() {

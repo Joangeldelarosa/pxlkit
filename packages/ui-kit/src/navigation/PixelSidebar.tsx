@@ -111,7 +111,9 @@ function SidebarItem({
   );
 
   return (
-    <li role="none">
+    // Native <li> listitem semantics — role="none" would leave the parent
+    // role="list" with zero owned listitems (axe: aria-required-children).
+    <li>
       {isLink ? (
         <a
           href={item.href}
@@ -135,7 +137,7 @@ function SidebarItem({
         </button>
       )}
       {hasNested && !collapsed && (
-        <ul role="group" className="mt-1 space-y-0.5">
+        <ul className="mt-1 space-y-0.5">
           {item.nested!.map((child) => (
             <SidebarItem
               key={child.id}

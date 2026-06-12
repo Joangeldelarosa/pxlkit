@@ -224,9 +224,11 @@ export const PixelFeatureCard = forwardRef<HTMLElement, PixelFeatureCardProps>(
     }
 
     if (interactive) {
+      // <article> does not permit role="button" (axe: aria-allowed-role), so
+      // the interactive variant renders a generic <div> instead.
       return (
-        <article
-          ref={ref as React.Ref<HTMLElement>}
+        <div
+          ref={ref as React.Ref<HTMLDivElement>}
           className={root}
           role="button"
           tabIndex={0}
@@ -236,7 +238,7 @@ export const PixelFeatureCard = forwardRef<HTMLElement, PixelFeatureCardProps>(
         >
           {body}
           {children}
-        </article>
+        </div>
       );
     }
 

@@ -238,9 +238,11 @@ const PixelCardImpl = forwardRef<CardRoot, PixelCardProps>(function PixelCard(
   }
 
   if (interactive) {
+    // <article> does not permit role="button" (axe: aria-allowed-role), so the
+    // interactive variant renders a generic <div> instead.
     return (
-      <article
-        ref={ref as React.Ref<HTMLElement>}
+      <div
+        ref={ref as React.Ref<HTMLDivElement>}
         className={rootCls}
         role="button"
         tabIndex={0}
@@ -249,7 +251,7 @@ const PixelCardImpl = forwardRef<CardRoot, PixelCardProps>(function PixelCard(
         {...rest}
       >
         {inner}
-      </article>
+      </div>
     );
   }
 

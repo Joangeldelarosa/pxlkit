@@ -40,7 +40,7 @@ export default defineManifest({
     wcag: '2.1 AA',
     patterns: ['progressbar'],
     notes:
-      'Exposes role="progressbar" with aria-valuemin=0 and aria-valuemax=100; aria-valuenow is set from the clamped value. The label prop is forwarded to aria-label. In indeterminate mode aria-valuenow is omitted and aria-busy is set to true so assistive tech announces unknown-duration work. The 10-segment pixel surface is purely visual — assistive tech reads the same progressbar attributes as the linear surface.',
+      'Exposes role="progressbar" with aria-valuemin=0 and aria-valuemax=100; aria-valuenow is set from the clamped value. The label prop is forwarded to aria-label, falling back to "Progress" when omitted so the progressbar always has an accessible name. In indeterminate mode aria-valuenow is omitted and aria-busy is set to true so assistive tech announces unknown-duration work. The 10-segment pixel surface is purely visual — assistive tech reads the same progressbar attributes as the linear surface.',
   },
   related: ['PixelSpinner', 'PixelSkeleton', 'PixelSlider'],
   apiStability: 'stable',

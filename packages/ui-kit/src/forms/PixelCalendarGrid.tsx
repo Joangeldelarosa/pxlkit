@@ -377,15 +377,20 @@ export const PixelCalendarGrid = forwardRef<HTMLDivElement, PixelCalendarGridPro
           className="grid grid-cols-7 gap-0.5"
           onKeyDown={handleGridKeyDown}
         >
-          {WEEKDAY_SHORT.map((wd) => (
-            <div
-              key={wd}
-              role="columnheader"
-              className="text-center text-[10px] uppercase text-retro-muted py-1"
-            >
-              {wd}
-            </div>
-          ))}
+          {/* role="grid" only allows row/rowgroup children, and columnheader
+              cells must live inside a row — wrap the weekday header strip in
+              its own display:contents row like the week rows below. */}
+          <div role="row" className="contents">
+            {WEEKDAY_SHORT.map((wd) => (
+              <div
+                key={wd}
+                role="columnheader"
+                className="text-center text-[10px] uppercase text-retro-muted py-1"
+              >
+                {wd}
+              </div>
+            ))}
+          </div>
           {weekRows.map((week, rowIdx) => (
             <div key={`row-${rowIdx}`} role="row" className="contents">
               {week.map((cell) => {

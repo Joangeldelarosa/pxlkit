@@ -71,9 +71,12 @@ export const PixelAccordion = forwardRef<HTMLDivElement, PixelAccordionProps>(fu
               <ChevronDownIcon className={cn('text-retro-muted transition-transform duration-200', isOpen && 'rotate-180')} />
             </button>
             {isOpen && (
+              // No role="region": the component cannot guarantee unique panel
+              // names across instances, and duplicate region landmarks trip
+              // axe's landmark-unique rule (APG also discourages region here
+              // to avoid landmark proliferation).
               <div
                 id={panelId}
-                role="region"
                 aria-labelledby={headerId}
                 className="border-t border-retro-border/30 px-3 py-2.5 text-sm text-retro-muted"
               >

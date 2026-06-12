@@ -138,10 +138,9 @@ export const PixelNavigationMenu = forwardRef<
     <nav
       ref={forwardedRef}
       // <nav> already implies role=navigation; the previously-redundant
-      // role attr was removed. aria-orientation is non-standard on a nav
-      // landmark but kept for back-compat with existing tests/consumers.
+      // role attr was removed. aria-orientation is NOT allowed on a nav
+      // landmark (axe: aria-allowed-attr) — it lives on the menubar below.
       aria-label={ariaLabel}
-      aria-orientation={orientation}
       className={cn('relative inline-block', s.font, className)}
       onMouseLeave={handleRootMouseLeave}
       {...rest}

@@ -45,12 +45,12 @@ export default defineManifest({
     patterns: ['tooltip'],
     keyboard: [
       { key: 'Tab', does: 'Moves focus to the trigger; hover and focus triggers open the tooltip on focus' },
-      { key: 'Enter', does: 'Toggles the tooltip', when: 'trigger="click"' },
-      { key: 'Space', does: 'Toggles the tooltip', when: 'trigger="click"' },
+      { key: 'Enter', does: 'Toggles the tooltip', when: 'trigger="click" and the anchor child is interactive (e.g. a button)' },
+      { key: 'Space', does: 'Toggles the tooltip', when: 'trigger="click" and the anchor child is interactive (e.g. a button)' },
       { key: 'Escape', does: 'Closes the tooltip', when: 'trigger="click" and open' },
     ],
     notes:
-      'Floating panel has role="tooltip" and is wired to the trigger via aria-describedby when open. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers expose role="button" + aria-expanded + aria-controls on the wrapper so keyboard users can open the tooltip with Enter/Space; outside pointerdown and Escape close it. Use focus or click trigger when the tooltip must be reachable without a pointer device.',
+      'Floating panel has role="tooltip" and is wired to the trigger via aria-describedby when open. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers listen for clicks bubbling from the anchor child — the wrapper itself stays non-interactive so an interactive child (the common case) is not nested inside another control; anchor click tooltips to a button or link for keyboard support. Outside pointerdown and Escape close a click tooltip. Use focus or click trigger when the tooltip must be reachable without a pointer device.',
   },
   related: ['PixelPopover', 'PixelDropdown'],
   apiStability: 'stable',

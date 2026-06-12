@@ -53,7 +53,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus to the card when interactive or anchored' },
     ],
     notes:
-      'Semantic <article> by default. When interactive without href, the root becomes <article role="button" tabIndex={0}> with Enter/Space activation parity. When href is set, the root renders as a native <a> with the entire card as the click target — nesting interactive children (PixelButton, PixelTextLink) inside footer is invalid HTML in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.',
+      'Semantic <article> by default. When interactive without href, the root becomes <div role="button" tabIndex={0}> with Enter/Space activation parity (<article> does not permit role="button"). When href is set, the root renders as a native <a> with the entire card as the click target — nesting interactive children (PixelButton, PixelTextLink) inside footer is invalid HTML in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.',
   },
   related: ['PixelCard', 'PixelStatCard', 'PixelPricingCard', 'PixelTestimonialCard'],
   apiStability: 'stable',

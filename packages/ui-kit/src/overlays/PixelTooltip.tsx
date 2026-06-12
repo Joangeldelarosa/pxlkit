@@ -142,19 +142,13 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
     triggerProps.onFocus = scheduleOpen;
     triggerProps.onBlur = scheduleClose;
   } else if (trigger === 'click') {
+    // The wrapper stays non-interactive: role="button" + tabIndex here nests
+    // interactive controls when the anchor child is a button/link — the
+    // common case — which axe flags as nested-interactive. Clicks on the
+    // child bubble up to this handler, and a native-button child provides
+    // Enter/Space activation for free. Anchor click tooltips to an
+    // interactive child for keyboard support.
     triggerProps.onClick = () => { clearTimers(); setOpen(!open); };
-    // Make wrapper focusable so keyboard users can open a click tooltip.
-    triggerProps.tabIndex = 0;
-    triggerProps.onKeyDown = (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        clearTimers();
-        setOpen(!open);
-      }
-    };
-    triggerProps.role = 'button';
-    (triggerProps as Record<string, unknown>)['aria-expanded'] = open;
-    (triggerProps as Record<string, unknown>)['aria-controls'] = open ? tipId : undefined;
   }
 
   const setWrapperRef = (node: HTMLSpanElement | null) => {

@@ -41,7 +41,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus between item headers' },
     ],
     notes:
-      'Each header is a native <button> with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels render as role="region" with aria-labelledby pointing to the header, matching the WAI-ARIA disclosure pattern stacked into an accordion.',
+      'Each header is a native <button> with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels are plain containers labelled by their header via aria-labelledby — no role="region", which would proliferate landmarks (and collide when several accordions share titles) — matching the WAI-ARIA disclosure pattern stacked into an accordion.',
   },
   related: ['PixelTabs', 'PixelCollapsible'],
   apiStability: 'stable',

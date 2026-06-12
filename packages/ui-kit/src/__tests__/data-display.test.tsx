@@ -60,9 +60,11 @@ describe('PixelCard — interactive hover', () => {
         body
       </PixelCard>,
     );
-    const article = container.querySelector('article');
-    expect(article!.className).toContain('hover:-translate-y-[2px]');
-    expect(article!.className).toContain('hover:shadow-lg');
+    // Interactive cards render a <div role="button"> — <article> does not
+    // permit role="button".
+    const card = container.querySelector('[role="button"]');
+    expect(card!.className).toContain('hover:-translate-y-[2px]');
+    expect(card!.className).toContain('hover:shadow-lg');
   });
 
   it('omits hover translate when interactive is not set', () => {
@@ -285,10 +287,13 @@ describe('PixelCard — interactive without href', () => {
         body
       </PixelCard>,
     );
-    const article = container.querySelector('article');
-    expect(article!.getAttribute('role')).toBe('button');
-    expect(article!.getAttribute('tabindex')).toBe('0');
-    expect(article!.className).toContain('focus-visible:ring-2');
+    // Interactive cards render a <div role="button"> — <article> does not
+    // permit role="button" (axe: aria-allowed-role).
+    expect(container.querySelector('article')).toBeNull();
+    const card = container.querySelector('div[role="button"]');
+    expect(card).not.toBeNull();
+    expect(card!.getAttribute('tabindex')).toBe('0');
+    expect(card!.className).toContain('focus-visible:ring-2');
   });
 
   it('Enter key activates onClick on the interactive non-href card', () => {
@@ -298,8 +303,8 @@ describe('PixelCard — interactive without href', () => {
         body
       </PixelCard>,
     );
-    const article = container.querySelector('article') as HTMLElement;
-    fireEvent.keyDown(article, { key: 'Enter' });
+    const card = container.querySelector('div[role="button"]') as HTMLElement;
+    fireEvent.keyDown(card, { key: 'Enter' });
     expect(onClick).toHaveBeenCalled();
   });
 });

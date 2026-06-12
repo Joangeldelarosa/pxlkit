@@ -15,7 +15,10 @@ export interface PixelProgressProps {
   value: number;
   /** Tone determines fill color. Defaults to `'green'`. */
   tone?: Tone;
-  /** Optional label rendered above the bar. */
+  /**
+   * Optional label rendered above the bar. Also used as the progressbar's
+   * accessible name; falls back to "Progress" when omitted.
+   */
   label?: string;
   /** Whether to show the numeric percentage on the right. Defaults to `true`. */
   showValue?: boolean;
@@ -47,7 +50,7 @@ export const PixelProgress = forwardRef<HTMLDivElement, PixelProgressProps>(func
           aria-valuenow={indeterminate ? undefined : safe}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label={label}
+          aria-label={label ?? 'Progress'}
           aria-busy={indeterminate || undefined}
           className={cn('flex gap-0.5 p-0.5', s.border, s.radius, 'border-retro-border/60 bg-retro-surface/60')}
         >
@@ -77,7 +80,7 @@ export const PixelProgress = forwardRef<HTMLDivElement, PixelProgressProps>(func
           aria-valuenow={indeterminate ? undefined : safe}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label={label}
+          aria-label={label ?? 'Progress'}
           aria-busy={indeterminate || undefined}
           className="h-2.5 overflow-hidden rounded-full border border-retro-border bg-retro-surface/80"
         >

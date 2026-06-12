@@ -42,8 +42,12 @@ describe('PixelNavigationMenu', () => {
     const { getByRole } = render(
       <PixelNavigationMenu items={baseItems} orientation="vertical" />,
     );
+    // aria-orientation belongs on the menubar, not the nav landmark
+    // (aria-allowed-attr: navigation does not support aria-orientation).
     const nav = getByRole('navigation');
-    expect(nav.getAttribute('aria-orientation')).toBe('vertical');
+    expect(nav.getAttribute('aria-orientation')).toBeNull();
+    const menubar = getByRole('menubar');
+    expect(menubar.getAttribute('aria-orientation')).toBe('vertical');
   });
 
   it('navigation role applied', () => {
