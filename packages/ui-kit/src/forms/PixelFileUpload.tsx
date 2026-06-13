@@ -199,7 +199,7 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
   const t = toneMap[tone];
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
       <div ref={ref} className={cn('space-y-3', className)} data-pxl-name={name || undefined}>
         {dropzone && (
           <div

@@ -509,6 +509,7 @@ export const PixelDateRangePicker = forwardRef<
   );
 
   const reactId = React.useId();
+  const triggerId = id ?? `pxl-daterange-${reactId}`;
   const leftPanelId = `${reactId}-left`;
   const rightPanelId = `${reactId}-right`;
 
@@ -518,7 +519,7 @@ export const PixelDateRangePicker = forwardRef<
   const displayTo = pendingFrom ? undefined : range.to;
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
       <span className="relative block">
         <PixelPopover
           open={open}
@@ -531,7 +532,7 @@ export const PixelDateRangePicker = forwardRef<
             <button
               ref={ref}
               type="button"
-              id={id}
+              id={triggerId}
               data-testid={dataTestId}
               aria-haspopup="dialog"
               aria-invalid={error ? true : undefined}

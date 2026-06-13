@@ -393,12 +393,18 @@ export function FieldShell({
   hint,
   error,
   surface: surfaceProp,
+  htmlFor,
   children,
 }: {
   label?: string;
   hint?: string;
   error?: string;
   surface?: Surface;
+  /**
+   * Id of the field's primary control. When provided, the label text is a
+   * real `<label htmlFor>`; without it the text renders as a plain span.
+   */
+  htmlFor?: string;
   children: React.ReactNode;
 }) {
   // Resolve like every other surface-aware component: prop wins, then the
@@ -408,16 +414,29 @@ export function FieldShell({
   // only makes standalone usage more correct.)
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
+  // NOT a wrapping <label>: native label activation forwards clicks to the
+  // contained control, which DOUBLE-fired fields whose children also
+  // trigger it programmatically (PixelFileUpload's dropzone opened the OS
+  // file dialog twice and dropped the first selection). Explicit htmlFor
+  // keeps a single, correct association instead.
+  const labelClass = cn('text-xs text-retro-muted', s.font);
   return (
-    <label className="block space-y-1.5">
-      {label && <span className={cn('text-xs text-retro-muted', s.font)}>{label}</span>}
+    <div className="block space-y-1.5">
+      {label &&
+        (htmlFor ? (
+          <label htmlFor={htmlFor} className={labelClass}>
+            {label}
+          </label>
+        ) : (
+          <span className={labelClass}>{label}</span>
+        ))}
       {children}
       {error ? (
         <span className={cn('text-xs text-retro-red', s.font)}>{error}</span>
       ) : hint ? (
         <span className={cn('text-xs text-retro-muted', s.font)}>{hint}</span>
       ) : null}
-    </label>
+    </div>
   );
 }
 

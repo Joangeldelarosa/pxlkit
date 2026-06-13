@@ -213,7 +213,7 @@ export const PixelColorInput = forwardRef<HTMLButtonElement, PixelColorInputProp
     };
 
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface}>
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
         <span className="relative block">
           <PixelPopover
             open={open}

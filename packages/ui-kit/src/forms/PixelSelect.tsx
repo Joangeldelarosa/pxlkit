@@ -2,7 +2,7 @@
    PixelSelect — fully custom dropdown with keyboard nav. No native <select>.
    ───────────────────────────────────────────────────────────────────────── */
 
-import React, { forwardRef, useRef, useState } from 'react';
+import React, { forwardRef, useId, useRef, useState } from 'react';
 import {
   Tone, Size, Surface, Option, cn, useClickOutside,
   toneMap, focusRing, sizeHeight, surfaceClasses, useEffectiveSurface,
@@ -64,6 +64,8 @@ export const PixelSelect = forwardRef<HTMLButtonElement, PixelSelectProps>(funct
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
+  const reactId = useId();
+  const triggerId = id ?? `pxl-select-${reactId}`;
   const s = surfaceClasses(surface);
   const [value, setValue] = useControllableState<string>({
     value: controlledValue,
@@ -113,12 +115,12 @@ export const PixelSelect = forwardRef<HTMLButtonElement, PixelSelectProps>(funct
   };
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
       <div ref={containerRef} className="relative">
         {name && <input type="hidden" name={name} value={value} required={required} />}
         <button
           ref={ref}
-          id={id}
+          id={triggerId}
           type="button"
           role="combobox"
           aria-expanded={open}

@@ -124,7 +124,9 @@ export const PixelCombobox = forwardRef<HTMLButtonElement, PixelComboboxProps>(
     const [query, setQuery] = useState('');
     const [highlighted, setHighlighted] = useState(0);
     const searchRef = useRef<HTMLInputElement | null>(null);
-    const listboxId = useId();
+    const reactId = useId();
+    const listboxId = `${reactId}-listbox`;
+    const triggerId = id ?? `${reactId}-trigger`;
 
     const filtered = useMemo(() => filterOptions(options, query), [options, query]);
     const { rows, items } = useMemo(() => buildRows(filtered), [filtered]);
@@ -190,7 +192,7 @@ export const PixelCombobox = forwardRef<HTMLButtonElement, PixelComboboxProps>(
     const activeId = items[highlighted] ? optionIdFor(items[highlighted].value) : undefined;
 
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface}>
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
         <div className="relative">
           {name && (
             <input
@@ -213,7 +215,7 @@ export const PixelCombobox = forwardRef<HTMLButtonElement, PixelComboboxProps>(
             <PixelPopover.Trigger>
               <button
                 ref={ref}
-                id={id}
+                id={triggerId}
                 type="button"
                 role="combobox"
                 aria-expanded={open}

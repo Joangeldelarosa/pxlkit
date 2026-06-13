@@ -2,7 +2,7 @@
    PixelPasswordInput — password field with show/hide toggle.
    ───────────────────────────────────────────────────────────────────────── */
 
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useId, useState } from 'react';
 import {
   Tone, Size, Surface, cn,
   toneMap, focusRing, inputBase, sizeHeight, surfaceClasses, useEffectiveSurface,
@@ -41,10 +41,13 @@ export const PixelPasswordInput = forwardRef<HTMLInputElement, PixelPasswordInpu
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const [visible, setVisible] = useState(false);
+  const reactId = useId();
+  const inputId = rest.id ?? `pxl-password-${reactId}`;
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
       <span className="relative block">
         <input
+          id={inputId}
           ref={ref}
           type={visible ? 'text' : 'password'}
           aria-invalid={error ? true : undefined}

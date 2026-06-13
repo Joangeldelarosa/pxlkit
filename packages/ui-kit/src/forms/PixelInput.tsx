@@ -2,7 +2,7 @@
    PixelInput — single-line text input with label/hint/error, icon slot.
    ───────────────────────────────────────────────────────────────────────── */
 
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useId, useState } from 'react';
 import {
   Tone, Size, Surface, cn,
   toneMap, focusRing, inputBase, sizeHeight, surfaceClasses, useEffectiveSurface,
@@ -82,6 +82,9 @@ export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
 
+  const reactId = useId();
+  const inputId = rest.id ?? `pxl-input-${reactId}`;
+
   const isControlled = value !== undefined;
   const [internalValue, setInternalValue] = useState<string>(
     defaultValue !== undefined ? String(defaultValue) : '',
@@ -123,9 +126,10 @@ export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function
         </span>
       )}
       <input
+        id={inputId}
         ref={ref}
         aria-invalid={error ? true : undefined}
-        aria-describedby={error || hint ? `${rest.id ?? 'pxl-input'}-msg` : undefined}
+        aria-describedby={error || hint ? `${inputId}-msg` : undefined}
         value={isControlled ? (value as string | number) : undefined}
         defaultValue={!isControlled ? defaultValue : undefined}
         onChange={handleChange}
@@ -199,7 +203,7 @@ export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function
   ) : inputEl;
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
       {shellBody}
       {showCount && (
         <span

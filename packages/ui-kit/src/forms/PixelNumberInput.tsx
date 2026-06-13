@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useId, useRef, useState } from 'react';
 import {
   Surface,
   Tone,
@@ -234,10 +234,11 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
       onKeyDown?.(e);
     };
 
-    const inputId = id ?? (label ? `pxl-number-${name ?? 'input'}` : undefined);
+    const reactId = useId();
+    const inputId = id ?? `pxl-number-${reactId}`;
 
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface}>
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
         <span className="relative block">
           {prefix && (
             <span

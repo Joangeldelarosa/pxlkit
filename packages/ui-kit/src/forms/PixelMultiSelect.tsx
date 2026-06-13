@@ -190,7 +190,7 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
     const showClear = clearable && value.length > 0;
 
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface}>
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
         {name &&
           value.map((v) => (
             <input key={v} type="hidden" name={name} value={v} />

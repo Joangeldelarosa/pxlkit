@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
   Surface,
   Size,
@@ -136,6 +136,8 @@ export const PixelDatePicker = forwardRef<
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
+  const reactId = useId();
+  const triggerId = id ?? `pxl-date-${reactId}`;
   const s = surfaceClasses(surface);
 
   const [current, setCurrent] = useControllableState<Date | null>({
@@ -347,7 +349,7 @@ export const PixelDatePicker = forwardRef<
   );
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
       <span className="relative block">
         <PixelPopover
           open={open}
@@ -360,7 +362,7 @@ export const PixelDatePicker = forwardRef<
             <button
               ref={ref}
               type="button"
-              id={id}
+              id={triggerId}
               data-testid={dataTestId}
               aria-haspopup="dialog"
               aria-invalid={error ? true : undefined}

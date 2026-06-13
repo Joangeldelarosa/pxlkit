@@ -141,3 +141,29 @@ describe('PixelFileUpload', () => {
     expect(last[0].name).toBe('b.txt');
   });
 });
+
+describe('PixelFileUpload — single file-dialog activation (FieldShell label regression)', () => {
+  it('one click on the dropzone triggers the hidden input exactly once', () => {
+    // FieldShell used to wrap the whole field in a <label>; native label
+    // activation forwarded the click to the contained file input ON TOP of
+    // the dropzone's programmatic inputRef.click() — the OS file dialog
+    // opened twice and the first selection was lost.
+    const clickSpy = vi.spyOn(HTMLInputElement.prototype, 'click');
+    try {
+      const { container } = render(<PixelFileUpload label="Attachments" />);
+      const dropzone = container.querySelector('[data-pxl-dropzone="true"]') as HTMLElement;
+      expect(dropzone).not.toBeNull();
+      fireEvent.click(dropzone);
+      expect(clickSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      clickSpy.mockRestore();
+    }
+  });
+
+  it('the file input is not nested inside any <label> (structural pin)', () => {
+    const { container } = render(<PixelFileUpload label="Attachments" />);
+    const input = container.querySelector('input[type="file"]') as HTMLElement;
+    expect(input).not.toBeNull();
+    expect(input.closest('label')).toBeNull();
+  });
+});

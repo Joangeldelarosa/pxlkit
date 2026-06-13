@@ -2,7 +2,7 @@
    PixelTextarea — multi-line text input.
    ───────────────────────────────────────────────────────────────────────── */
 
-import React, { forwardRef, useCallback, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useId, useRef, useState } from 'react';
 import {
   Tone, Surface, cn,
   toneMap, focusRing, inputBase, surfaceClasses, useEffectiveSurface,
@@ -52,6 +52,8 @@ export const PixelTextarea = forwardRef<HTMLTextAreaElement, PixelTextareaProps>
 ) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
+  const reactId = useId();
+  const textareaId = rest.id ?? `pxl-textarea-${reactId}`;
 
   const isControlled = value !== undefined;
   const [internalValue, setInternalValue] = useState<string>(
@@ -110,8 +112,9 @@ export const PixelTextarea = forwardRef<HTMLTextAreaElement, PixelTextareaProps>
   const countText = max !== undefined ? `${valueLen}/${max}` : `${valueLen}`;
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={textareaId}>
       <textarea
+        id={textareaId}
         ref={setRefs}
         aria-invalid={error ? true : undefined}
         value={isControlled ? (value as string | number) : undefined}
