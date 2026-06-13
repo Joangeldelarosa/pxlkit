@@ -481,7 +481,8 @@ describe("generateDocsPage (e2e against tmpdir)", () => {
 
     expect(report.ok).toBe(true);
     expect(report.count).toBe(2);
-    expect(report.written).toBe(2);
+    // 2 sections + the usage-snippets map module
+    expect(report.written).toBe(3);
     expect(report.errors).toEqual([]);
 
     const a = path.join(outRoot, `PixelButton${FILE_EXT}`);
@@ -527,7 +528,8 @@ describe("generateDocsPage (e2e against tmpdir)", () => {
     });
 
     expect(report.ok).toBe(false);
-    expect(report.written).toBe(1);
+    // 1 valid section + the usage-snippets map module
+    expect(report.written).toBe(2);
     expect(report.errors).toHaveLength(1);
     expect(report.errors[0]!.message).toMatch(/missing a string `name`/);
   });

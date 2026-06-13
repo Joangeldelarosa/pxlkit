@@ -48,6 +48,7 @@ import {
 } from "./_lib/generator-base.js";
 import { createLogger, type Logger } from "./_lib/logger.js";
 import { findComponentDirs } from "./_lib/scan-fs.js";
+import { extractExportFunctions, toUsageSnippet } from "./extract-example-source.js";
 
 // ---------------------------------------------------------------------------
 // Public contract
@@ -113,6 +114,12 @@ export interface DocsPagePlanEntry {
   keyboard: KeyboardEntry[];
   /** Examples with code (may be empty). */
   examples: ExampleEntry[];
+  /**
+   * Consumer-ready usage lead: the examples file's preamble (imports +
+   * shared data) plus its first export, with relative imports rewritten to
+   * the package specifier. Null when no examples file exists.
+   */
+  usageSnippet: string | null;
   /** Related component names (may be empty). */
   related: string[];
   /** Tags (may be empty). */
@@ -220,7 +227,10 @@ export function normalizeKeyboard(manifest: PermissiveManifest): KeyboardEntry[]
 }
 
 /** Normalize examples: only include examples that carry a renderable code string. */
-export function normalizeExamples(manifest: PermissiveManifest): ExampleEntry[] {
+export function normalizeExamples(
+  manifest: PermissiveManifest,
+  exportSources: Record<string, string> = {},
+): ExampleEntry[] {
   const ex = manifest.examples as unknown;
   if (!Array.isArray(ex)) return [];
   const out: ExampleEntry[] = [];
@@ -230,13 +240,18 @@ export function normalizeExamples(manifest: PermissiveManifest): ExampleEntry[] 
     const id = clean(rec.id);
     const label = clean(rec.label) || id;
     if (!id && !label) continue;
-    // Examples carrying a renderable code snippet — either `codeOverride`
-    // (strict schema) or a permissive `code` field — are emitted as <pre>
-    // blocks. Examples without code are skipped: the runtime <Component>
+    // Code precedence: an explicit `codeOverride`/`code` string wins; when
+    // absent (the normal SSOT case — manifests reference live Components),
+    // the example's own export source from `<Name>.examples.tsx` is used.
+    // Examples with no source at all are skipped: the runtime <Component>
     // cannot survive serialization through a generated file.
-    const code = clean(
-      typeof rec.codeOverride === "string" ? rec.codeOverride : (rec.code as string | undefined),
-    );
+    // NB: extracted source is multi-line — never run it through clean(),
+    // which collapses all whitespace.
+    const extracted = exportSources[exportNameForExampleId(id || label)]?.trimEnd();
+    const code =
+      clean(
+        typeof rec.codeOverride === "string" ? rec.codeOverride : (rec.code as string | undefined),
+      ) || extracted || "";
     if (!code) continue;
     out.push({
       id: id || slugFor(label),
@@ -295,6 +310,14 @@ export function planEntryFor(
   const ariaPatterns = asStringArray(a11y.patterns);
   const ariaNotes = clean((a11y.notes as string) ?? "");
 
+  // The SSOT examples are live components, so manifests carry no code
+  // strings — usage code comes from the sibling `<Name>.examples.tsx`
+  // SOURCE: a consumer-ready lead snippet plus one verbatim block per
+  // exported example.
+  const examplesSource = readExamplesSource(rec.manifestFile, name);
+  const exportSources = examplesSource ? extractExportFunctions(examplesSource) : {};
+  const usageSnippet = examplesSource ? toUsageSnippet(examplesSource) : null;
+
   return {
     name,
     slug,
@@ -309,11 +332,31 @@ export function planEntryFor(
     ariaPatterns,
     ariaNotes,
     keyboard: normalizeKeyboard(manifest),
-    examples: normalizeExamples(manifest),
+    examples: normalizeExamples(manifest, exportSources),
+    usageSnippet,
     related: asStringArray(manifest.related),
     tags: asStringArray(manifest.tags),
     deprecation: normalizeDeprecation(manifest),
   };
+}
+
+/** Read the sibling `<Name>.examples.tsx` for a manifest, or null. */
+function readExamplesSource(manifestFile: string, name: string): string | null {
+  try {
+    const file = path.join(path.dirname(manifestFile), `${name}.examples.tsx`);
+    return fs.readFileSync(file, "utf8");
+  } catch {
+    return null;
+  }
+}
+
+/** Derive the examples-file export name for a manifest example id. */
+export function exportNameForExampleId(id: string): string {
+  return id
+    .split(/[^a-zA-Z0-9]+/)
+    .filter(Boolean)
+    .map((s) => s[0]!.toUpperCase() + s.slice(1))
+    .join("");
 }
 
 // ---------------------------------------------------------------------------
@@ -585,6 +628,15 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
 
   lines.push(renderA11ySection(entry));
 
+  if (entry.usageSnippet) {
+    lines.push(`    <section aria-labelledby="${entry.slug}-usage">`);
+    lines.push(`      <h3 id="${entry.slug}-usage">Usage</h3>`);
+    lines.push(
+      `      <pre className="docs-code"><code>{\`${escapeForTemplateLiteral(entry.usageSnippet)}\`}</code></pre>`,
+    );
+    lines.push(`    </section>`);
+  }
+
   const examples = renderExamples(entry.examples);
   if (examples) lines.push(examples);
 
@@ -640,12 +692,36 @@ export class GenerateDocsPageGenerator extends Generator {
   }
 
   async run(ctx: GeneratorContext): Promise<GeneratorResult> {
-    const writes = ctx.manifests.map((rec) => {
-      const entry = planEntryFor(rec, this.outRoot);
-      return { path: entry.outFile, content: renderSectionModule(entry) };
+    const entries = ctx.manifests.map((rec) => planEntryFor(rec, this.outRoot));
+    const writes = entries.map((entry) => ({
+      path: entry.outFile,
+      content: renderSectionModule(entry),
+    }));
+    writes.push({
+      path: ensurePosix(path.join(this.outRoot, "usage-snippets.generated.ts")),
+      content: renderUsageSnippetsModule(entries),
     });
     return { writes };
   }
+}
+
+/**
+ * Slug → consumer-ready usage snippet map for pages that surface a quick
+ * "how do I use this" block outside the full /docs reference (e.g. the
+ * /ui-kit showcase).
+ */
+export function renderUsageSnippetsModule(entries: DocsPagePlanEntry[]): string {
+  const lines: string[] = [];
+  lines.push(FILE_BANNER.trimEnd());
+  lines.push(``);
+  lines.push(`export const USAGE_SNIPPETS: Record<string, string> = {`);
+  for (const e of [...entries].sort((a, b) => a.slug.localeCompare(b.slug))) {
+    if (!e.usageSnippet) continue;
+    lines.push(`  '${e.slug}': \`${escapeForTemplateLiteral(e.usageSnippet)}\`,`);
+  }
+  lines.push(`};`);
+  lines.push(``);
+  return lines.join("\n");
 }
 
 // ---------------------------------------------------------------------------
@@ -691,6 +767,14 @@ export async function generateDocsPage(
         message: (err as Error).message,
       });
     }
+  }
+
+  if (!opts.dryRun && entries.length > 0) {
+    await writeOutput(
+      ensurePosix(path.join(outRoot, "usage-snippets.generated.ts")),
+      renderUsageSnippetsModule(entries),
+    );
+    written++;
   }
 
   return {
