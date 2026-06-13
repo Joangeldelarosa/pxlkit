@@ -89,6 +89,84 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-multi-select-usage">
+      <h3 id="pixel-multi-select-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import React from 'react';
+import { PixelMultiSelect } from '@pxlkit/ui-kit';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+export function Default() {
+  const [value, setValue] = React.useState<string[]>(['react']);
+  return (
+    <PixelMultiSelect
+      label="Frameworks"
+      options={OPTIONS}
+      value={value}
+      onChange={setValue}
+      placeholder="Pick frameworks…"
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [value, setValue] = React.useState<string[]>(['react']);
+  return (
+    <PixelMultiSelect
+      label="Frameworks"
+      options={OPTIONS}
+      value={value}
+      onChange={setValue}
+      placeholder="Pick frameworks…"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-searchable">
+        <h4>Searchable + Clearable</h4>
+        <pre className="docs-code"><code>{`export function Searchable() {
+  const [value, setValue] = React.useState<string[]>([]);
+  return (
+    <PixelMultiSelect
+      label="Frameworks"
+      hint="Type to filter"
+      options={OPTIONS}
+      value={value}
+      onChange={setValue}
+      searchable
+      clearable
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-max">
+        <h4>With Max</h4>
+        <pre className="docs-code"><code>{`export function WithMax() {
+  const [value, setValue] = React.useState<string[]>(['react', 'vue']);
+  return (
+    <PixelMultiSelect
+      label="Pick up to 2"
+      options={OPTIONS}
+      value={value}
+      onChange={setValue}
+      max={2}
+      clearable
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

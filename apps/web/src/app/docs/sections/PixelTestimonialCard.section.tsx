@@ -46,6 +46,73 @@ export function PixelTestimonialCardDocsSection({ className }: PixelTestimonialC
       </ul>
       <p className="docs-aria-notes">Renders as &lt;article&gt; with a &lt;blockquote&gt; for the testimonial body; verified badge exposes an aria-label.</p>
     </section>
+    <section aria-labelledby="pixel-testimonial-card-usage">
+      <h3 id="pixel-testimonial-card-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelTestimonialCard
+      quote="pxlkit dropped the polish ceiling. Our marketing site felt like a product launch in a week."
+      name="Marisol Quintero"
+      role="Head of Design"
+      company="Northbeam"
+      stars={5}
+      verified
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelTestimonialCard
+      quote="pxlkit dropped the polish ceiling. Our marketing site felt like a product launch in a week."
+      name="Marisol Quintero"
+      role="Head of Design"
+      company="Northbeam"
+      stars={5}
+      verified
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-avatar-and-tone">
+        <h4>With avatar + tone</h4>
+        <pre className="docs-code"><code>{`export function WithAvatarAndTone() {
+  return (
+    <PixelTestimonialCard
+      tone="cyan"
+      quote="The retro surface tokens just clicked with our brand. Zero CSS surgery, all signal."
+      name="Diego Salas"
+      role="Staff Engineer"
+      company="Halcyon Labs"
+      avatar={{ name: 'Diego Salas', tone: 'cyan' }}
+      stars={4}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-compact-quote">
+        <h4>Compact quote</h4>
+        <pre className="docs-code"><code>{`export function CompactQuote() {
+  return (
+    <PixelTestimonialCard
+      quoteSize="compact"
+      quote="Short. Sharp. Shipped."
+      name="Ana Pereira"
+      role="PM"
+      tone="gold"
+      verified
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

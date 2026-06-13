@@ -68,6 +68,109 @@ export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsS
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-number-input-usage">
+      <h3 id="pixel-number-input-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function Default() {
+  const [value, setValue] = useState<number>(5);
+  return (
+    <PixelNumberInput
+      label="Quantity"
+      value={value}
+      onChange={setValue}
+      min={0}
+      max={100}
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [value, setValue] = useState<number>(5);
+  return (
+    <PixelNumberInput
+      label="Quantity"
+      value={value}
+      onChange={setValue}
+      min={0}
+      max={100}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-prefix-suffix">
+        <h4>With Prefix &amp; Suffix</h4>
+        <pre className="docs-code"><code>{`export function WithPrefixSuffix() {
+  const [value, setValue] = useState<number>(19.99);
+  return (
+    <PixelNumberInput
+      label="Price"
+      value={value}
+      onChange={setValue}
+      prefix="$"
+      suffix="USD"
+      precision={2}
+      step={0.01}
+      min={0}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-thousands-separator">
+        <h4>Thousands Separator</h4>
+        <pre className="docs-code"><code>{`export function ThousandsSeparator() {
+  const [value, setValue] = useState<number>(1500000);
+  return (
+    <PixelNumberInput
+      label="Population"
+      value={value}
+      onChange={setValue}
+      thousandsSeparator=","
+      min={0}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-hide-controls">
+        <h4>Hide Controls</h4>
+        <pre className="docs-code"><code>{`export function HideControls() {
+  const [value, setValue] = useState<number>(42);
+  return (
+    <PixelNumberInput
+      label="Age"
+      value={value}
+      onChange={setValue}
+      hideControls
+      min={0}
+      max={120}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-error">
+        <h4>With Error</h4>
+        <pre className="docs-code"><code>{`export function WithError() {
+  const [value, setValue] = useState<number>(150);
+  return (
+    <PixelNumberInput
+      label="Score"
+      value={value}
+      onChange={setValue}
+      min={0}
+      max={100}
+      error="Score must be between 0 and 100"
+      tone="red"
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

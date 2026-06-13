@@ -42,6 +42,69 @@ export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightG
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <p className="docs-aria-notes">Inherits semantics from the underlying PixelGrid element (defaults to &lt;div&gt;). Use the `as` prop to render a more semantic container when appropriate.</p>
     </section>
+    <section aria-labelledby="pixel-equal-height-grid-usage">
+      <h3 id="pixel-equal-height-grid-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+
+function Card({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="border border-retro-border p-4">
+      <h3 className="text-sm font-semibold text-retro-fg">{title}</h3>
+      <p className="text-sm text-retro-muted">{body}</p>
+      <div className="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  );
+}
+
+export function Default() {
+  return (
+    <PixelEqualHeightGrid cols={3} gap={4}>
+      <Card title="One" body="Short copy." />
+      <Card title="Two" body="A longer body that forces the row to grow taller than the first card." />
+      <Card title="Three" body="Medium length copy here." />
+    </PixelEqualHeightGrid>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelEqualHeightGrid cols={3} gap={4}>
+      <Card title="One" body="Short copy." />
+      <Card title="Two" body="A longer body that forces the row to grow taller than the first card." />
+      <Card title="Three" body="Medium length copy here." />
+    </PixelEqualHeightGrid>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-row-align-top">
+        <h4>Row Align Top</h4>
+        <pre className="docs-code"><code>{`export function RowAlignTop() {
+  return (
+    <PixelEqualHeightGrid cols={3} gap={4} rowAlign="top">
+      <Card title="One" body="Short copy." />
+      <Card title="Two" body="A longer body that would otherwise stretch siblings." />
+      <Card title="Three" body="Medium length copy here." />
+    </PixelEqualHeightGrid>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel Surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  return (
+    <PixelEqualHeightGrid cols={2} gap={4} surface="pixel">
+      <Card title="Pixel A" body="Surface-aware grid item." />
+      <Card title="Pixel B" body="Renders with the pixel surface tokens applied to the grid." />
+    </PixelEqualHeightGrid>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

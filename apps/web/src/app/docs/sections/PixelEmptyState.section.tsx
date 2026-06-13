@@ -43,6 +43,99 @@ export function PixelEmptyStateDocsSection({ className }: PixelEmptyStateDocsSec
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <p className="docs-aria-notes">Renders as a non-interactive &lt;div&gt; with a semantic &lt;h4&gt; for the title and a &lt;p&gt; for the description. The icon is marked aria-hidden so it is not announced. Any action passed via the action slot owns its own keyboard + screen reader semantics.</p>
     </section>
+    <section aria-labelledby="pixel-empty-state-usage">
+      <h3 id="pixel-empty-state-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelEmptyState } from '@pxlkit/ui-kit';
+import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelEmptyState
+      title="No results found"
+      description="Try adjusting your filters or search terms to find what you are looking for."
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelEmptyState
+      title="No results found"
+      description="Try adjusting your filters or search terms to find what you are looking for."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-icon">
+        <h4>With Icon</h4>
+        <pre className="docs-code"><code>{`export function WithIcon() {
+  return (
+    <PixelEmptyState
+      icon={<FolderIcon />}
+      title="No projects yet"
+      description="Create your first project to get started organizing your work."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-action">
+        <h4>With Action</h4>
+        <pre className="docs-code"><code>{`export function WithAction() {
+  return (
+    <PixelEmptyState
+      title="Your inbox is empty"
+      description="When you receive new messages, they will appear here."
+      action={
+        <PixelButton size="sm" tone="cyan" variant="solid">
+          Refresh
+        </PixelButton>
+      }
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-icon-and-action">
+        <h4>With Icon + Action</h4>
+        <pre className="docs-code"><code>{`export function WithIconAndAction() {
+  return (
+    <PixelEmptyState
+      icon={<FolderIcon />}
+      title="No documents"
+      description="Upload a file or create a new document to begin."
+      action={
+        <PixelButton size="sm" tone="green" variant="solid">
+          Create document
+        </PixelButton>
+      }
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-4">
+      <PixelEmptyState
+        surface="linear"
+        title="Linear surface"
+        description="Soft dashed border with rounded corners."
+      />
+      <PixelEmptyState
+        surface="pixel"
+        title="Pixel surface"
+        description="Chamfered dashed border with retro typography."
+      />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

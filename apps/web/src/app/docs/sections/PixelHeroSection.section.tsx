@@ -46,6 +46,70 @@ export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsS
       </ul>
       <p className="docs-aria-notes">Author should set id on the headline and aria-labelledby on the section when the hero acts as a labelled landmark.</p>
     </section>
+    <section aria-labelledby="pixel-hero-section-usage">
+      <h3 id="pixel-hero-section-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import React from 'react'
+import { PixelHeroSection } from '@pxlkit/ui-kit'
+
+export function Default() {
+  return (
+    <PixelHeroSection
+      eyebrow="Introducing"
+      headline="Pixel-perfect retro UI for modern web"
+      subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+      primaryCta={<button type="button">Get started</button>}
+      secondaryCta={<button type="button">View docs</button>}
+    />
+  )
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelHeroSection
+      eyebrow="Introducing"
+      headline="Pixel-perfect retro UI for modern web"
+      subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+      primaryCta={<button type="button">Get started</button>}
+      secondaryCta={<button type="button">View docs</button>}
+    />
+  )
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-split">
+        <h4>Split with media</h4>
+        <pre className="docs-code"><code>{`export function Split() {
+  return (
+    <PixelHeroSection
+      variant="split"
+      eyebrow="New in v2"
+      headline="Compose richer hero sections"
+      subline="Pair a tagline with media on the side using the split variant."
+      primaryCta={<button type="button">Try it</button>}
+      media={<div style={{ width: '100%', height: 240, background: '#111', border: '1px solid #333' }} />}
+      tone="cyan"
+    />
+  )
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-compact">
+        <h4>Compact density</h4>
+        <pre className="docs-code"><code>{`export function Compact() {
+  return (
+    <PixelHeroSection
+      density="compact"
+      minHeight="sm"
+      headline="Compact density"
+      subline="Tighter rhythm for denser layouts."
+    />
+  )
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

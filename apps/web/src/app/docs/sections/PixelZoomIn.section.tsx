@@ -45,6 +45,60 @@ export function PixelZoomInDocsSection({ className }: PixelZoomInDocsSectionProp
       </ul>
       <p className="docs-aria-notes">Animation is suppressed when the user requests reduced motion.</p>
     </section>
+    <section aria-labelledby="pixel-zoom-in-usage">
+      <h3 id="pixel-zoom-in-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelZoomIn } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelZoomIn>
+      <div style={{ padding: 16, background: '#0EA5E9', color: '#fff', borderRadius: 8 }}>
+        Zoom in content
+      </div>
+    </PixelZoomIn>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelZoomIn>
+      <div style={{ padding: 16, background: '#0EA5E9', color: '#fff', borderRadius: 8 }}>
+        Zoom in content
+      </div>
+    </PixelZoomIn>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-custom-start-scale">
+        <h4>Custom Start Scale</h4>
+        <pre className="docs-code"><code>{`export function CustomStartScale() {
+  return (
+    <PixelZoomIn startScale={0.6} duration={500}>
+      <div style={{ padding: 16, background: '#A855F7', color: '#fff', borderRadius: 8 }}>
+        Bigger zoom from 0.6
+      </div>
+    </PixelZoomIn>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-hover-trigger">
+        <h4>Hover Trigger</h4>
+        <pre className="docs-code"><code>{`export function HoverTrigger() {
+  return (
+    <PixelZoomIn trigger="hover" repeat="infinite" duration={600}>
+      <button style={{ padding: 12, background: '#111', color: '#fff', borderRadius: 6 }}>
+        Hover me
+      </button>
+    </PixelZoomIn>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

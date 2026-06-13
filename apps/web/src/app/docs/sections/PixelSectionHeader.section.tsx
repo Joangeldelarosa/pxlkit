@@ -47,6 +47,85 @@ export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderD
       </ul>
       <p className="docs-aria-notes">Choose `as` to match the document outline of the page. The eyebrow is visually decorative but is preserved for screen readers via sr-only prefix on the heading.</p>
     </section>
+    <section aria-labelledby="pixel-section-header-usage">
+      <h3 id="pixel-section-header-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelSectionHeader
+      eyebrow="Section"
+      title="Build pixel-perfect interfaces"
+      description="A retro-cinematic component kit with surface awareness and rhythm tokens."
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelSectionHeader
+      eyebrow="Section"
+      title="Build pixel-perfect interfaces"
+      description="A retro-cinematic component kit with surface awareness and rhythm tokens."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-centered">
+        <h4>Centered</h4>
+        <pre className="docs-code"><code>{`export function Centered() {
+  return (
+    <PixelSectionHeader
+      align="center"
+      eyebrow="Features"
+      title="Designed for clarity"
+      description="Centered headers work great as page intros above a feature grid."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-actions">
+        <h4>With Actions</h4>
+        <pre className="docs-code"><code>{`export function WithActions() {
+  return (
+    <PixelSectionHeader
+      eyebrow="Dashboard"
+      title="Recent activity"
+      description="What happened across your workspace today."
+      titleTone="cyan"
+      actions={
+        <>
+          <button type="button">Refresh</button>
+          <button type="button">Export</button>
+        </>
+      }
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-large-hero">
+        <h4>Large Hero</h4>
+        <pre className="docs-code"><code>{`export function LargeHero() {
+  return (
+    <PixelSectionHeader
+      as="h1"
+      size="lg"
+      align="center"
+      spacing="loose"
+      eyebrow="Introducing pxlkit"
+      title="The retro-cinematic UI kit"
+      description="Build interfaces that feel handcrafted, with a coherent token system."
+      titleTone="green"
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

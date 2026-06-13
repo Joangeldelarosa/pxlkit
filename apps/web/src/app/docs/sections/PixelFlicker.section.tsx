@@ -46,6 +46,52 @@ export function PixelFlickerDocsSection({ className }: PixelFlickerDocsSectionPr
       </ul>
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
+    <section aria-labelledby="pixel-flicker-usage">
+      <h3 id="pixel-flicker-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelFlicker } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelFlicker>
+      <span>OPEN 24/7</span>
+    </PixelFlicker>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelFlicker>
+      <span>OPEN 24/7</span>
+    </PixelFlicker>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-faster-flicker">
+        <h4>Faster Flicker</h4>
+        <pre className="docs-code"><code>{`export function FasterFlicker() {
+  return (
+    <PixelFlicker duration={900}>
+      <span>NEON</span>
+    </PixelFlicker>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-hover-trigger">
+        <h4>Hover Trigger</h4>
+        <pre className="docs-code"><code>{`export function HoverTrigger() {
+  return (
+    <PixelFlicker trigger="hover" repeat={1}>
+      <span>Hover me</span>
+    </PixelFlicker>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

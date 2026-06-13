@@ -46,6 +46,94 @@ export function PixelProgressDocsSection({ className }: PixelProgressDocsSection
       </ul>
       <p className="docs-aria-notes">Exposes role=&quot;progressbar&quot; with aria-valuemin=0 and aria-valuemax=100; aria-valuenow is set from the clamped value. The label prop is forwarded to aria-label, falling back to &quot;Progress&quot; when omitted so the progressbar always has an accessible name. In indeterminate mode aria-valuenow is omitted and aria-busy is set to true so assistive tech announces unknown-duration work. The 10-segment pixel surface is purely visual — assistive tech reads the same progressbar attributes as the linear surface.</p>
     </section>
+    <section aria-labelledby="pixel-progress-usage">
+      <h3 id="pixel-progress-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelProgress } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelProgress value={60} label="HP" />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelProgress value={60} label="HP" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="space-y-3">
+      <PixelProgress value={70} tone="neutral" label="Neutral" />
+      <PixelProgress value={70} tone="green" label="Green" />
+      <PixelProgress value={70} tone="cyan" label="Cyan" />
+      <PixelProgress value={70} tone="gold" label="Gold" />
+      <PixelProgress value={70} tone="red" label="Red" />
+      <PixelProgress value={70} tone="purple" label="Purple" />
+      <PixelProgress value={70} tone="pink" label="Pink" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="space-y-4">
+      <PixelProgress value={55} label="Pixel (segmented)" surface="pixel" />
+      <PixelProgress value={55} label="Linear (smooth)" surface="linear" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-without-value">
+        <h4>Without value</h4>
+        <pre className="docs-code"><code>{`export function WithoutValue() {
+  return <PixelProgress value={45} label="Loading assets" showValue={false} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-without-label">
+        <h4>Without label</h4>
+        <pre className="docs-code"><code>{`export function WithoutLabel() {
+  return <PixelProgress value={80} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-indeterminate">
+        <h4>Indeterminate</h4>
+        <pre className="docs-code"><code>{`export function Indeterminate() {
+  return <PixelProgress value={0} label="Working…" indeterminate />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-clamped">
+        <h4>Clamped</h4>
+        <pre className="docs-code"><code>{`export function Clamped() {
+  return (
+    <div className="space-y-3">
+      <PixelProgress value={-25} label="Below 0 (clamped to 0)" />
+      <PixelProgress value={150} label="Above 100 (clamped to 100)" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-steps">
+        <h4>Steps</h4>
+        <pre className="docs-code"><code>{`export function Steps() {
+  return (
+    <div className="space-y-3">
+      <PixelProgress value={0} label="0%" />
+      <PixelProgress value={25} label="25%" />
+      <PixelProgress value={50} label="50%" />
+      <PixelProgress value={75} label="75%" />
+      <PixelProgress value={100} label="100%" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

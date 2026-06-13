@@ -47,6 +47,76 @@ export function PixelTimelineDocsSection({ className }: PixelTimelineDocsSection
       </ul>
       <p className="docs-aria-notes">Decorative bullets and connector rails are aria-hidden; entry state is exposed via aria-current on the active &lt;li&gt;.</p>
     </section>
+    <section aria-labelledby="pixel-timeline-usage">
+      <h3 id="pixel-timeline-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelTimeline active={1}>
+      <PixelTimelineItem title="Order placed" time="09:00">
+        Confirmation email sent.
+      </PixelTimelineItem>
+      <PixelTimelineItem title="Packed" time="11:20">
+        At the warehouse.
+      </PixelTimelineItem>
+      <PixelTimelineItem title="Shipped" time="—">
+        Awaiting carrier pickup.
+      </PixelTimelineItem>
+    </PixelTimeline>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelTimeline active={1}>
+      <PixelTimelineItem title="Order placed" time="09:00">
+        Confirmation email sent.
+      </PixelTimelineItem>
+      <PixelTimelineItem title="Packed" time="11:20">
+        At the warehouse.
+      </PixelTimelineItem>
+      <PixelTimelineItem title="Shipped" time="—">
+        Awaiting carrier pickup.
+      </PixelTimelineItem>
+    </PixelTimeline>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-dashed">
+        <h4>Dashed connectors</h4>
+        <pre className="docs-code"><code>{`export function Dashed() {
+  return (
+    <PixelTimeline active={0} bulletSize="lg">
+      <PixelTimelineItem title="Draft" lineVariant="dashed">
+        Currently editing.
+      </PixelTimelineItem>
+      <PixelTimelineItem title="Review" lineVariant="dashed">
+        Pending approval.
+      </PixelTimelineItem>
+      <PixelTimelineItem title="Published" lineVariant="dashed" />
+    </PixelTimeline>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-right-aligned">
+        <h4>Right aligned</h4>
+        <pre className="docs-code"><code>{`export function RightAligned() {
+  return (
+    <PixelTimeline active={2} align="right">
+      <PixelTimelineItem title="Step 1" time="Mon" />
+      <PixelTimelineItem title="Step 2" time="Tue" />
+      <PixelTimelineItem title="Step 3" time="Wed" />
+    </PixelTimeline>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

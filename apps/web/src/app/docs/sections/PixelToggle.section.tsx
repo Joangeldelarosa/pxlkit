@@ -83,6 +83,88 @@ export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProp
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-toggle-usage">
+      <h3 id="pixel-toggle-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelToggle } from '@pxlkit/ui-kit';
+
+export function Default() {
+  const [pressed, setPressed] = useState(false);
+  return (
+    <PixelToggle value="bold" pressed={pressed} onPressedChange={setPressed}>
+      Bold
+    </PixelToggle>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [pressed, setPressed] = useState(false);
+  return (
+    <PixelToggle value="bold" pressed={pressed} onPressedChange={setPressed}>
+      Bold
+    </PixelToggle>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pressed">
+        <h4>Pressed</h4>
+        <pre className="docs-code"><code>{`export function Pressed() {
+  const [pressed, setPressed] = useState(true);
+  return (
+    <PixelToggle value="italic" pressed={pressed} onPressedChange={setPressed}>
+      Italic
+    </PixelToggle>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  const [pixel, setPixel] = useState(true);
+  const [linear, setLinear] = useState(true);
+  return (
+    <div className="flex items-center gap-2">
+      <PixelToggle
+        value="pixel"
+        surface="pixel"
+        pressed={pixel}
+        onPressedChange={setPixel}
+      >
+        Pixel
+      </PixelToggle>
+      <PixelToggle
+        value="linear"
+        surface="linear"
+        pressed={linear}
+        onPressedChange={setLinear}
+      >
+        Linear
+      </PixelToggle>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <div className="flex items-center gap-2">
+      <PixelToggle value="off" disabled pressed={false} onPressedChange={() => {}}>
+        Disabled off
+      </PixelToggle>
+      <PixelToggle value="on" disabled pressed={true} onPressedChange={() => {}}>
+        Disabled on
+      </PixelToggle>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

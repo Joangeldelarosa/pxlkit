@@ -46,6 +46,70 @@ export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsS
       </ul>
       <p className="docs-aria-notes">Renders as &lt;article&gt;. Strikethrough price and excluded features are announced via sr-only labels. CTA inherits its own a11y from the consumer-provided node.</p>
     </section>
+    <section aria-labelledby="pixel-pricing-card-usage">
+      <h3 id="pixel-pricing-card-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelPricingCard } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelPricingCard
+      tone="cyan"
+      name="Starter"
+      description="Everything you need to ship your first project."
+      price={{ amount: '$19', period: '/mo' }}
+      features={[
+        { label: '10 projects' },
+        { label: 'Basic analytics' },
+        { label: 'Email support' },
+        { label: 'Priority support', included: false },
+      ]}
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelPricingCard
+      tone="cyan"
+      name="Starter"
+      description="Everything you need to ship your first project."
+      price={{ amount: '$19', period: '/mo' }}
+      features={[
+        { label: '10 projects' },
+        { label: 'Basic analytics' },
+        { label: 'Email support' },
+        { label: 'Priority support', included: false },
+      ]}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-popular">
+        <h4>Popular (highlighted)</h4>
+        <pre className="docs-code"><code>{`export function Popular() {
+  return (
+    <PixelPricingCard
+      tone="gold"
+      highlight
+      name="Pro"
+      description="For teams that want more power and priority."
+      price={{ amount: '$49', period: '/mo', strikethrough: '$79' }}
+      popular={{ label: 'POPULAR', tone: 'gold' }}
+      features={[
+        { label: 'Unlimited projects' },
+        { label: 'Advanced analytics' },
+        { label: 'Priority support' },
+      ]}
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

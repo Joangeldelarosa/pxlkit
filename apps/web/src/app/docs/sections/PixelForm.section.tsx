@@ -69,6 +69,121 @@ export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): 
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-form-usage">
+      <h3 id="pixel-form-usage">Usage</h3>
+      <pre className="docs-code"><code>{`'use client';
+
+import { useForm } from 'react-hook-form';
+import { PixelForm } from '@pxlkit/ui-kit';
+import { PixelInput } from '@pxlkit/ui-kit';
+
+type DefaultValues = {
+  username: string;
+  email: string;
+};
+
+export function Default() {
+  const form = useForm<DefaultValues>({
+    defaultValues: { username: '', email: '' },
+  });
+
+  return (
+    <PixelForm
+      form={form}
+      onSubmit={(data) => {
+        // eslint-disable-next-line no-console
+        console.log('submit', data);
+      }}
+    >
+      <PixelForm.Field
+        name="username"
+        rules={{ required: 'Username is required' }}
+        render={({ field }) => (
+          <PixelForm.Item>
+            <PixelForm.Label>Username</PixelForm.Label>
+            <PixelForm.Control>
+              <PixelInput placeholder="pxlhero" {...field} />
+            </PixelForm.Control>
+            <PixelForm.Description>Your retro alias.</PixelForm.Description>
+            <PixelForm.Message />
+          </PixelForm.Item>
+        )}
+      />
+
+      <PixelForm.Field
+        name="email"
+        rules={{
+          required: 'Email is required',
+          pattern: { value: /.+@.+\\..+/, message: 'Enter a valid email' },
+        }}
+        render={({ field }) => (
+          <PixelForm.Item>
+            <PixelForm.Label>Email</PixelForm.Label>
+            <PixelForm.Control>
+              <PixelInput type="email" placeholder="hero@pxlkit.xyz" {...field} />
+            </PixelForm.Control>
+            <PixelForm.Message />
+          </PixelForm.Item>
+        )}
+      />
+    </PixelForm>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const form = useForm<DefaultValues>({
+    defaultValues: { username: '', email: '' },
+  });
+
+  return (
+    <PixelForm
+      form={form}
+      onSubmit={(data) => {
+        // eslint-disable-next-line no-console
+        console.log('submit', data);
+      }}
+    >
+      <PixelForm.Field
+        name="username"
+        rules={{ required: 'Username is required' }}
+        render={({ field }) => (
+          <PixelForm.Item>
+            <PixelForm.Label>Username</PixelForm.Label>
+            <PixelForm.Control>
+              <PixelInput placeholder="pxlhero" {...field} />
+            </PixelForm.Control>
+            <PixelForm.Description>Your retro alias.</PixelForm.Description>
+            <PixelForm.Message />
+          </PixelForm.Item>
+        )}
+      />
+
+      <PixelForm.Field
+        name="email"
+        rules={{
+          required: 'Email is required',
+          pattern: { value: /.+@.+\\..+/, message: 'Enter a valid email' },
+        }}
+        render={({ field }) => (
+          <PixelForm.Item>
+            <PixelForm.Label>Email</PixelForm.Label>
+            <PixelForm.Control>
+              <PixelInput type="email" placeholder="hero@pxlkit.xyz" {...field} />
+            </PixelForm.Control>
+            <PixelForm.Message />
+          </PixelForm.Item>
+        )}
+      />
+    </PixelForm>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

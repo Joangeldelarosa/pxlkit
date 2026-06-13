@@ -73,6 +73,154 @@ export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSec
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-radio-group-usage">
+      <h3 id="pixel-radio-group-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelRadioGroup } from '@pxlkit/ui-kit';
+
+const PLANS = [
+  { value: 'free', label: 'Free' },
+  { value: 'pro', label: 'Pro' },
+  { value: 'team', label: 'Team' },
+];
+
+export function Default() {
+  const [value, setValue] = useState('free');
+  return (
+    <PixelRadioGroup
+      label="Plan"
+      value={value}
+      options={PLANS}
+      onChange={setValue}
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [value, setValue] = useState('free');
+  return (
+    <PixelRadioGroup
+      label="Plan"
+      value={value}
+      options={PLANS}
+      onChange={setValue}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-controlled">
+        <h4>Controlled</h4>
+        <pre className="docs-code"><code>{`export function Controlled() {
+  const [value, setValue] = useState('pro');
+  return (
+    <div className="space-y-2">
+      <PixelRadioGroup
+        label="Selected plan"
+        value={value}
+        options={PLANS}
+        onChange={setValue}
+        tone="cyan"
+      />
+      <p className="text-xs text-retro-muted">Picked: {value}</p>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  const [value, setValue] = useState('pro');
+  return (
+    <div className="grid grid-cols-2 gap-6">
+      <PixelRadioGroup label="Neutral" tone="neutral" value={value} options={PLANS} onChange={setValue} />
+      <PixelRadioGroup label="Green" tone="green" value={value} options={PLANS} onChange={setValue} />
+      <PixelRadioGroup label="Cyan" tone="cyan" value={value} options={PLANS} onChange={setValue} />
+      <PixelRadioGroup label="Gold" tone="gold" value={value} options={PLANS} onChange={setValue} />
+      <PixelRadioGroup label="Red" tone="red" value={value} options={PLANS} onChange={setValue} />
+      <PixelRadioGroup label="Purple" tone="purple" value={value} options={PLANS} onChange={setValue} />
+      <PixelRadioGroup label="Pink" tone="pink" value={value} options={PLANS} onChange={setValue} />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  const [pixel, setPixel] = useState('pro');
+  const [linear, setLinear] = useState('pro');
+  return (
+    <div className="grid grid-cols-2 gap-6">
+      <PixelRadioGroup
+        label="Pixel surface"
+        surface="pixel"
+        value={pixel}
+        options={PLANS}
+        onChange={setPixel}
+      />
+      <PixelRadioGroup
+        label="Linear surface"
+        surface="linear"
+        value={linear}
+        options={PLANS}
+        onChange={setLinear}
+      />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <PixelRadioGroup
+      label="Plan (locked)"
+      value="pro"
+      options={PLANS}
+      onChange={() => {}}
+      disabled
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-required">
+        <h4>Required</h4>
+        <pre className="docs-code"><code>{`export function Required() {
+  const [value, setValue] = useState('');
+  return (
+    <PixelRadioGroup
+      label="Pick a plan to continue"
+      value={value}
+      options={PLANS}
+      onChange={setValue}
+      required
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-form-name">
+        <h4>With form name</h4>
+        <pre className="docs-code"><code>{`export function WithFormName() {
+  const [value, setValue] = useState('pro');
+  return (
+    <form>
+      <PixelRadioGroup
+        label="Plan"
+        name="plan"
+        value={value}
+        options={PLANS}
+        onChange={setValue}
+        required
+      />
+    </form>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

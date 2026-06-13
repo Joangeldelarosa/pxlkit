@@ -46,6 +46,71 @@ export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionPr
       </ul>
       <p className="docs-aria-notes">Default renders role=status with aria-label=&quot;Loading&quot; and a visually-hidden label for SR. Pass `decorative` when the parent already announces busy state (e.g. button with aria-busy) to avoid double announcements. Honors prefers-reduced-motion.</p>
     </section>
+    <section aria-labelledby="pixel-spinner-usage">
+      <h3 id="pixel-spinner-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import React from 'react'
+import { PixelSpinner } from '@pxlkit/ui-kit'
+
+export function Default() {
+  return <PixelSpinner />
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelSpinner />
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="flex items-center gap-4">
+      <PixelSpinner size="xs" />
+      <PixelSpinner size="sm" />
+      <PixelSpinner size="md" />
+      <PixelSpinner size="lg" />
+    </div>
+  )
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex items-center gap-4">
+      <PixelSpinner tone="neutral" />
+      <PixelSpinner tone="green" />
+      <PixelSpinner tone="cyan" />
+      <PixelSpinner tone="gold" />
+      <PixelSpinner tone="red" />
+      <PixelSpinner tone="purple" />
+      <PixelSpinner tone="pink" />
+    </div>
+  )
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  return <PixelSpinner surface="pixel" size="lg" tone="cyan" />
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-decorative">
+        <h4>Decorative (inside aria-busy parent)</h4>
+        <pre className="docs-code"><code>{`export function Decorative() {
+  return (
+    <button type="button" aria-busy="true" className="inline-flex items-center gap-2">
+      <PixelSpinner decorative size="sm" />
+      <span>Saving…</span>
+    </button>
+  )
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

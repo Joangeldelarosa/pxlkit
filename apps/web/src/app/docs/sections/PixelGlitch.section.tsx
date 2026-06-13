@@ -47,6 +47,52 @@ export function PixelGlitchDocsSection({ className }: PixelGlitchDocsSectionProp
       </ul>
       <p className="docs-aria-notes">Ghost layers are marked aria-hidden so assistive tech reads only the underlying content. Animation is suppressed when the user prefers reduced motion.</p>
     </section>
+    <section aria-labelledby="pixel-glitch-usage">
+      <h3 id="pixel-glitch-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelGlitch } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelGlitch>
+      <span className="text-2xl font-bold">SYSTEM ONLINE</span>
+    </PixelGlitch>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelGlitch>
+      <span className="text-2xl font-bold">SYSTEM ONLINE</span>
+    </PixelGlitch>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-high-intensity">
+        <h4>High intensity</h4>
+        <pre className="docs-code"><code>{`export function HighIntensity() {
+  return (
+    <PixelGlitch intensity={8} duration={2000}>
+      <span className="text-2xl font-bold">CRITICAL ERROR</span>
+    </PixelGlitch>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-hover-trigger">
+        <h4>Hover trigger</h4>
+        <pre className="docs-code"><code>{`export function HoverTrigger() {
+  return (
+    <PixelGlitch trigger="hover">
+      <span className="text-2xl font-bold">HOVER ME</span>
+    </PixelGlitch>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

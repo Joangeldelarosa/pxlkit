@@ -45,6 +45,42 @@ export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfacePro
       </ul>
       <p className="docs-aria-notes">Visual-only context provider — does not render interactive DOM and does not affect focus order or ARIA semantics of descendants.</p>
     </section>
+    <section aria-labelledby="pxl-kit-surface-provider-usage">
+      <h3 id="pxl-kit-surface-provider-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PxlKitSurfaceProvider surface="pixel">
+      <p>Nested PxlKit components default to the pixel surface.</p>
+    </PxlKitSurfaceProvider>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default (Pixel)</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PxlKitSurfaceProvider surface="pixel">
+      <p>Nested PxlKit components default to the pixel surface.</p>
+    </PxlKitSurfaceProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-linear">
+        <h4>Linear</h4>
+        <pre className="docs-code"><code>{`export function Linear() {
+  return (
+    <PxlKitSurfaceProvider surface="linear">
+      <p>Nested PxlKit components default to the linear surface.</p>
+    </PxlKitSurfaceProvider>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

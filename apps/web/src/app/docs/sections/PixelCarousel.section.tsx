@@ -83,6 +83,130 @@ export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSection
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-carousel-usage">
+      <h3 id="pixel-carousel-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function Default() {
+  return (
+    <PixelCarousel aria-label="Featured items">
+      <PixelCarousel.Item>
+        <Slide label="Slide 1" tone="rgba(14,165,233,0.15)" />
+      </PixelCarousel.Item>
+      <PixelCarousel.Item>
+        <Slide label="Slide 2" tone="rgba(168,85,247,0.15)" />
+      </PixelCarousel.Item>
+      <PixelCarousel.Item>
+        <Slide label="Slide 3" tone="rgba(34,197,94,0.15)" />
+      </PixelCarousel.Item>
+    </PixelCarousel>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelCarousel aria-label="Featured items">
+      <PixelCarousel.Item>
+        <Slide label="Slide 1" tone="rgba(14,165,233,0.15)" />
+      </PixelCarousel.Item>
+      <PixelCarousel.Item>
+        <Slide label="Slide 2" tone="rgba(168,85,247,0.15)" />
+      </PixelCarousel.Item>
+      <PixelCarousel.Item>
+        <Slide label="Slide 3" tone="rgba(34,197,94,0.15)" />
+      </PixelCarousel.Item>
+    </PixelCarousel>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-dots">
+        <h4>With dots</h4>
+        <pre className="docs-code"><code>{`export function WithDots() {
+  return (
+    <PixelCarousel aria-label="Featured items with dots" showDots>
+      <PixelCarousel.Item>
+        <Slide label="One" tone="rgba(14,165,233,0.15)" />
+      </PixelCarousel.Item>
+      <PixelCarousel.Item>
+        <Slide label="Two" tone="rgba(168,85,247,0.15)" />
+      </PixelCarousel.Item>
+      <PixelCarousel.Item>
+        <Slide label="Three" tone="rgba(34,197,94,0.15)" />
+      </PixelCarousel.Item>
+    </PixelCarousel>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-looping">
+        <h4>Looping</h4>
+        <pre className="docs-code"><code>{`export function Looping() {
+  return (
+    <PixelCarousel aria-label="Looping carousel" opts={{ loop: true }} showDots>
+      <PixelCarousel.Item>
+        <Slide label="Alpha" tone="rgba(14,165,233,0.15)" />
+      </PixelCarousel.Item>
+      <PixelCarousel.Item>
+        <Slide label="Beta" tone="rgba(168,85,247,0.15)" />
+      </PixelCarousel.Item>
+      <PixelCarousel.Item>
+        <Slide label="Gamma" tone="rgba(34,197,94,0.15)" />
+      </PixelCarousel.Item>
+    </PixelCarousel>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-vertical">
+        <h4>Vertical</h4>
+        <pre className="docs-code"><code>{`export function Vertical() {
+  return (
+    <div style={{ height: 240 }}>
+      <PixelCarousel aria-label="Vertical carousel" orientation="vertical" showDots>
+        <PixelCarousel.Item>
+          <Slide label="Top" tone="rgba(14,165,233,0.15)" />
+        </PixelCarousel.Item>
+        <PixelCarousel.Item>
+          <Slide label="Middle" tone="rgba(168,85,247,0.15)" />
+        </PixelCarousel.Item>
+        <PixelCarousel.Item>
+          <Slide label="Bottom" tone="rgba(34,197,94,0.15)" />
+        </PixelCarousel.Item>
+      </PixelCarousel>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-linear-surface">
+        <h4>Linear surface</h4>
+        <pre className="docs-code"><code>{`export function LinearSurface() {
+  return (
+    <PixelCarousel aria-label="Linear surface carousel" surface="linear" showDots>
+      <PixelCarousel.Item>
+        <Slide label="Slide 1" tone="rgba(14,165,233,0.15)" />
+      </PixelCarousel.Item>
+      <PixelCarousel.Item>
+        <Slide label="Slide 2" tone="rgba(168,85,247,0.15)" />
+      </PixelCarousel.Item>
+    </PixelCarousel>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

@@ -68,6 +68,159 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pxl-kit-toast-provider-usage">
+      <h3 id="pxl-kit-toast-provider-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import React from 'react';
+import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
+import { PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function DefaultTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton size="sm" onClick={() => toast({ title: 'Saved', message: 'Your changes were persisted.' })}>
+        Push toast
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function Default() {
+  return (
+    <PxlKitToastProvider>
+      <DefaultTriggers />
+    </PxlKitToastProvider>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PxlKitToastProvider>
+      <DefaultTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <PxlKitToastProvider>
+      <ToneTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-bottom-right">
+        <h4>Bottom Right</h4>
+        <pre className="docs-code"><code>{`export function BottomRight() {
+  return (
+    <PxlKitToastProvider position="bottom-right">
+      <PositionTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-top-center">
+        <h4>Top Center</h4>
+        <pre className="docs-code"><code>{`export function TopCenter() {
+  return (
+    <PxlKitToastProvider position="top-center">
+      <PositionTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-stacked">
+        <h4>Stacked</h4>
+        <pre className="docs-code"><code>{`export function Stacked() {
+  return (
+    <PxlKitToastProvider stacked stackVisible={2}>
+      <StackedTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-flat">
+        <h4>Flat</h4>
+        <pre className="docs-code"><code>{`export function Flat() {
+  return (
+    <PxlKitToastProvider stacked={false}>
+      <StackedTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel Surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  return (
+    <PxlKitToastProvider surface="pixel">
+      <SurfaceTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-linear-surface">
+        <h4>Linear Surface</h4>
+        <pre className="docs-code"><code>{`export function LinearSurface() {
+  return (
+    <PxlKitToastProvider surface="linear">
+      <SurfaceTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-loading">
+        <h4>Loading → Success</h4>
+        <pre className="docs-code"><code>{`export function Loading() {
+  return (
+    <PxlKitToastProvider>
+      <LoadingTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-promise-flow">
+        <h4>Promise Flow</h4>
+        <pre className="docs-code"><code>{`export function PromiseFlow() {
+  return (
+    <PxlKitToastProvider>
+      <PromiseTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-max-limit">
+        <h4>Max Limit</h4>
+        <pre className="docs-code"><code>{`export function MaxLimit() {
+  return (
+    <PxlKitToastProvider max={2}>
+      <MaxTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-action">
+        <h4>With Action</h4>
+        <pre className="docs-code"><code>{`export function WithAction() {
+  return (
+    <PxlKitToastProvider>
+      <ActionTriggers />
+    </PxlKitToastProvider>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

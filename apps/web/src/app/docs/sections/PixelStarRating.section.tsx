@@ -69,6 +69,58 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-star-rating-usage">
+      <h3 id="pixel-star-rating-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PxlKitIcon } from '@pxlkit/core';
+import { Heart } from '@pxlkit/gamification';
+import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelStarRating value={4} />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelStarRating value={4} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-count">
+        <h4>With Count</h4>
+        <pre className="docs-code"><code>{`export function WithCount() {
+  return <PixelStarRating value={3} max={5} showCount />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-green-tone">
+        <h4>Green Tone (Large)</h4>
+        <pre className="docs-code"><code>{`export function GreenTone() {
+  return <PixelStarRating value={5} tone="green" size="lg" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-interactive">
+        <h4>Interactive</h4>
+        <pre className="docs-code"><code>{`export function Interactive() {
+  const [rating, setRating] = React.useState(3);
+  return <PixelStarRating value={rating} interactive onChange={setRating} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-custom-icon">
+        <h4>Custom Icon (Heart)</h4>
+        <pre className="docs-code"><code>{`export function CustomIcon() {
+  return (
+    <PixelStarRating
+      value={3}
+      starIcon={
+        <PxlKitIcon icon={Heart} size={20} appearance="solid" color="#EF4444" />
+      }
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

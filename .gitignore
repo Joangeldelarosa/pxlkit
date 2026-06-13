@@ -52,7 +52,6 @@ README.generated.md
 CHANGELOG.generated.md
 /scripts/build-docs/bundle-sizes.json
 /packages/ui-kit/src/registry.generated.ts
-/packages/ui-kit/src/*/*.stories.tsx
 /apps/web/src/app/ui-kit/sections/
 /apps/web/src/app/ui-kit/*/metadata.generated.ts
 # OG images: real PNGs rendered via Playwright (orchestrator step or the

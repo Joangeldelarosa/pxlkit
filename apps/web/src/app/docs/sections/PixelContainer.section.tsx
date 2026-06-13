@@ -46,6 +46,62 @@ export function PixelContainerDocsSection({ className }: PixelContainerDocsSecti
       </ul>
       <p className="docs-aria-notes">Inherits semantics from the `as` element (defaults to `section`). When rendered as a landmark, provide aria-label or aria-labelledby for an accessible name.</p>
     </section>
+    <section aria-labelledby="pixel-container-usage">
+      <h3 id="pixel-container-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelContainer } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelContainer>
+      <p className="text-sm text-retro-muted">Default container — section landmark, xl max-width, lg rhythm.</p>
+    </PixelContainer>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelContainer>
+      <p className="text-sm text-retro-muted">Default container — section landmark, xl max-width, lg rhythm.</p>
+    </PixelContainer>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-narrow">
+        <h4>Narrow</h4>
+        <pre className="docs-code"><code>{`export function Narrow() {
+  return (
+    <PixelContainer maxWidth="md" padding="md">
+      <p className="text-sm text-retro-muted">Narrow container with md rhythm.</p>
+    </PixelContainer>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-as-main">
+        <h4>As Main</h4>
+        <pre className="docs-code"><code>{`export function AsMain() {
+  return (
+    <PixelContainer as="main" aria-label="Page content" maxWidth="2xl" padding={{ x: 'lg', y: 'xl' }}>
+      <p className="text-sm text-retro-muted">Rendered as the main landmark with split padding.</p>
+    </PixelContainer>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-prose-width">
+        <h4>Prose Width</h4>
+        <pre className="docs-code"><code>{`export function ProseWidth() {
+  return (
+    <PixelContainer maxWidth="prose" padding="sm">
+      <p className="text-sm text-retro-muted">Prose-width container ideal for long-form reading.</p>
+    </PixelContainer>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

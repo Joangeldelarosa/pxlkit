@@ -77,6 +77,108 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-sheet-usage">
+      <h3 id="pixel-sheet-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelSheet } from '@pxlkit/ui-kit';
+
+export function Default() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open sheet
+      </button>
+      <PixelSheet
+        open={open}
+        onOpenChange={setOpen}
+        title="Quick actions"
+        description="Pick an action below"
+      >
+        <p>Sheet content goes here.</p>
+        <button type="button" onClick={() => setOpen(false)}>
+          Close
+        </button>
+      </PixelSheet>
+    </>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open sheet
+      </button>
+      <PixelSheet
+        open={open}
+        onOpenChange={setOpen}
+        title="Quick actions"
+        description="Pick an action below"
+      >
+        <p>Sheet content goes here.</p>
+        <button type="button" onClick={() => setOpen(false)}>
+          Close
+        </button>
+      </PixelSheet>
+    </>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-drag-handle">
+        <h4>With drag handle</h4>
+        <pre className="docs-code"><code>{`export function WithDragHandle() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open sheet
+      </button>
+      <PixelSheet
+        open={open}
+        onOpenChange={setOpen}
+        size="lg"
+        dragHandle
+        title="Drag handle"
+      >
+        <p>Bottom sheet with a drag handle affordance.</p>
+      </PixelSheet>
+    </>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-top-full">
+        <h4>Top side, full height</h4>
+        <pre className="docs-code"><code>{`export function TopFull() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open top sheet
+      </button>
+      <PixelSheet
+        open={open}
+        onOpenChange={setOpen}
+        side="top"
+        size="full"
+        aria-label="Top full-screen sheet"
+      >
+        <p>Top-anchored full-height sheet.</p>
+        <button type="button" onClick={() => setOpen(false)}>
+          Close
+        </button>
+      </PixelSheet>
+    </>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

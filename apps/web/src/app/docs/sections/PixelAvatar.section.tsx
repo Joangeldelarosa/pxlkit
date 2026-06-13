@@ -46,6 +46,116 @@ export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProp
       </ul>
       <p className="docs-aria-notes">Avatar is a presentational identity badge. The user name is exposed via `title`; when `status` is set the status word is appended into the accessible name (no live region — status dots are not transient announcements). When `src` is provided the inner &lt;img&gt; uses the same accessible name as its alt text.</p>
     </section>
+    <section aria-labelledby="pixel-avatar-usage">
+      <h3 id="pixel-avatar-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelAvatar name="Joangel De La Rosa" />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelAvatar name="Joangel De La Rosa" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="flex items-end gap-3">
+      <PixelAvatar name="Ana Lopez" size="xs" />
+      <PixelAvatar name="Ana Lopez" size="sm" />
+      <PixelAvatar name="Ana Lopez" size="md" />
+      <PixelAvatar name="Ana Lopez" size="lg" />
+      <PixelAvatar name="Ana Lopez" size="xl" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-wrap gap-3">
+      <PixelAvatar name="Green User" tone="green" />
+      <PixelAvatar name="Cyan User" tone="cyan" />
+      <PixelAvatar name="Gold User" tone="gold" />
+      <PixelAvatar name="Red User" tone="red" />
+      <PixelAvatar name="Purple User" tone="purple" />
+      <PixelAvatar name="Pink User" tone="pink" />
+      <PixelAvatar name="Neutral User" tone="neutral" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex items-center gap-3">
+      <PixelAvatar name="Pixel Surface" surface="pixel" />
+      <PixelAvatar name="Linear Surface" surface="linear" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-shapes">
+        <h4>Shapes</h4>
+        <pre className="docs-code"><code>{`export function Shapes() {
+  return (
+    <div className="flex items-center gap-3">
+      <PixelAvatar name="Circle Shape" shape="circle" />
+      <PixelAvatar name="Rounded Shape" shape="rounded" />
+      <PixelAvatar name="Square Shape" shape="square" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-statuses">
+        <h4>Statuses</h4>
+        <pre className="docs-code"><code>{`export function Statuses() {
+  return (
+    <div className="flex items-center gap-3">
+      <PixelAvatar name="Online User" status="online" />
+      <PixelAvatar name="Away User" status="away" />
+      <PixelAvatar name="Busy User" status="busy" />
+      <PixelAvatar name="Offline User" status="offline" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-image">
+        <h4>With Image</h4>
+        <pre className="docs-code"><code>{`export function WithImage() {
+  return (
+    <PixelAvatar
+      name="Joangel"
+      src="https://i.pravatar.cc/80?img=12"
+      size="lg"
+      status="online"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-color-seed">
+        <h4>Color Seed</h4>
+        <pre className="docs-code"><code>{`export function ColorSeed() {
+  return (
+    <div className="flex items-center gap-3">
+      <PixelAvatar name="Alice Adams" colorSeed="alice@example.com" />
+      <PixelAvatar name="Bob Brown" colorSeed="bob@example.com" />
+      <PixelAvatar name="Carol Chen" colorSeed="carol@example.com" />
+      <PixelAvatar name="Dave Diaz" colorSeed="dave@example.com" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

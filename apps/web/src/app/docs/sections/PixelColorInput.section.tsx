@@ -85,6 +85,80 @@ export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSec
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-color-input-usage">
+      <h3 id="pixel-color-input-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelColorInput } from '@pxlkit/ui-kit';
+
+export function Default() {
+  const [value, setValue] = useState<string>('#06b6d4');
+  return (
+    <PixelColorInput
+      label="Brand color"
+      value={value}
+      onChange={setValue}
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [value, setValue] = useState<string>('#06b6d4');
+  return (
+    <PixelColorInput
+      label="Brand color"
+      value={value}
+      onChange={setValue}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-rgb-format">
+        <h4>RGB format</h4>
+        <pre className="docs-code"><code>{`export function RgbFormat() {
+  const [value, setValue] = useState<string>('rgb(34, 197, 94)');
+  return (
+    <PixelColorInput
+      label="Accent color"
+      format="rgb"
+      value={value}
+      onChange={setValue}
+      hint="Stored as rgb()"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-custom-presets">
+        <h4>Custom presets</h4>
+        <pre className="docs-code"><code>{`export function CustomPresets() {
+  const [value, setValue] = useState<string>('#ef4444');
+  return (
+    <PixelColorInput
+      label="Theme tone"
+      presets={['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#a855f7']}
+      value={value}
+      onChange={setValue}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-error">
+        <h4>With error</h4>
+        <pre className="docs-code"><code>{`export function WithError() {
+  return (
+    <PixelColorInput
+      label="Background"
+      defaultValue="not-a-color"
+      error="Invalid color value"
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

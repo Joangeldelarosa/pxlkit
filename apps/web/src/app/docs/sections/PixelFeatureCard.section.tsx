@@ -74,6 +74,169 @@ export function PixelFeatureCardDocsSection({ className }: PixelFeatureCardDocsS
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-feature-card-usage">
+      <h3 id="pixel-feature-card-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function Default() {
+  return (
+    <PixelFeatureCard
+      title="Realtime sync"
+      description="Push every keystroke to peers via WebSockets — under 50ms p95."
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelFeatureCard
+      title="Realtime sync"
+      description="Push every keystroke to peers via WebSockets — under 50ms p95."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-icon">
+        <h4>With Icon</h4>
+        <pre className="docs-code"><code>{`export function WithIcon() {
+  return (
+    <PixelFeatureCard
+      icon={PixelIcon}
+      title="Pixel-perfect"
+      description="Crisp edges on every retina ratio thanks to shape-rendering: crispEdges."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-badge">
+        <h4>With Badge</h4>
+        <pre className="docs-code"><code>{`export function WithBadge() {
+  return (
+    <PixelFeatureCard
+      icon={PixelIcon}
+      badge={{ label: 'NEW', tone: 'gold' }}
+      title="AI Companion"
+      description="A built-in copilot that learns your codebase as you ship it."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <PixelFeatureCard icon={PixelIcon} tone="cyan" title="Cyan" description="Tinted icon frame." />
+      <PixelFeatureCard icon={PixelIcon} tone="green" title="Green" description="Tinted icon frame." />
+      <PixelFeatureCard icon={PixelIcon} tone="gold" title="Gold" description="Tinted icon frame." />
+      <PixelFeatureCard icon={PixelIcon} tone="purple" title="Purple" description="Tinted icon frame." />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <PixelFeatureCard surface="pixel" icon={PixelIcon} title="Pixel" description="Thick border + offset shadow." />
+      <PixelFeatureCard surface="linear" icon={PixelIcon} title="Linear" description="Soft border + smooth radius." />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-horizontal">
+        <h4>Horizontal</h4>
+        <pre className="docs-code"><code>{`export function Horizontal() {
+  return (
+    <PixelFeatureCard
+      orientation="horizontal"
+      icon={PixelIcon}
+      title="Horizontal layout"
+      description="Icon sits to the left of the title and description."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-interactive">
+        <h4>Interactive</h4>
+        <pre className="docs-code"><code>{`export function Interactive() {
+  return (
+    <PixelFeatureCard
+      interactive
+      onClick={() => alert('feature clicked')}
+      icon={PixelIcon}
+      title="Click me"
+      description="Press Enter or Space to activate via keyboard."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-as-link">
+        <h4>As Link</h4>
+        <pre className="docs-code"><code>{`export function AsLink() {
+  return (
+    <PixelFeatureCard
+      href="https://example.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      icon={PixelIcon}
+      title="Read the docs"
+      description="Root renders as <a href> when href is provided."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-footer">
+        <h4>With Footer</h4>
+        <pre className="docs-code"><code>{`export function WithFooter() {
+  return (
+    <PixelFeatureCard
+      icon={PixelIcon}
+      title="Realtime sync"
+      description="Push every keystroke to peers via WebSockets."
+      footer={<span className="text-xs text-retro-muted">Learn more →</span>}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-clamped-description">
+        <h4>Clamped Description</h4>
+        <pre className="docs-code"><code>{`export function ClampedDescription() {
+  return (
+    <PixelFeatureCard
+      icon={PixelIcon}
+      title="Long Description"
+      description="This description is intentionally long to demonstrate the line-clamp behavior. It will be truncated to the configured number of lines with an ellipsis, while maintaining a minimum height so cards stay aligned in a grid."
+      descriptionLines={2}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-icon-sizes">
+        <h4>Icon Sizes</h4>
+        <pre className="docs-code"><code>{`export function IconSizes() {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <PixelFeatureCard icon={PixelIcon} iconSize={48} title="Small" description="48px icon frame." />
+      <PixelFeatureCard icon={PixelIcon} iconSize={80} title="Large" description="80px icon frame." />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

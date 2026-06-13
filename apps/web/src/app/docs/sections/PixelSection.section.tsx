@@ -45,6 +45,66 @@ export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionPr
       </ul>
       <p className="docs-aria-notes">Renders as a semantic &lt;section&gt;. When `title` is provided it becomes the section heading; consumers may add aria-labelledby externally when needed.</p>
     </section>
+    <section aria-labelledby="pixel-section-usage">
+      <h3 id="pixel-section-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelSection } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelSection title="Overview" subtitle="Key metrics for this period.">
+      <p className="text-sm text-retro-muted">
+        Section content goes here. Wrap any layout block.
+      </p>
+    </PixelSection>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelSection title="Overview" subtitle="Key metrics for this period.">
+      <p className="text-sm text-retro-muted">
+        Section content goes here. Wrap any layout block.
+      </p>
+    </PixelSection>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-without-title">
+        <h4>Without Title</h4>
+        <pre className="docs-code"><code>{`export function WithoutTitle() {
+  return (
+    <PixelSection>
+      <p className="text-sm text-retro-muted">A bare section without a title row.</p>
+    </PixelSection>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel Surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  return (
+    <PixelSection surface="pixel" title="Pixel Surface" subtitle="8-bit aesthetic.">
+      <p className="text-sm text-retro-muted">Renders with the pixel surface tokens.</p>
+    </PixelSection>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-no-container">
+        <h4>No Container</h4>
+        <pre className="docs-code"><code>{`export function NoContainer() {
+  return (
+    <PixelSection container={false} horizontalGutter="md" title="Full Width">
+      <p className="text-sm text-retro-muted">No centered container; uses page gutters.</p>
+    </PixelSection>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

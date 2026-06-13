@@ -46,6 +46,60 @@ export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerD
       </ul>
       <p className="docs-aria-notes">Parallax is decorative; consumers should gate motion or apply aria-hidden on purely decorative layers.</p>
     </section>
+    <section aria-labelledby="pixel-parallax-layer-usage">
+      <h3 id="pixel-parallax-layer-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelParallaxLayer speed={0.5} axis="y">
+      <div style={{ padding: 24, background: '#111', color: '#fff' }}>
+        Scroll to see this layer move at half speed.
+      </div>
+    </PixelParallaxLayer>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default (background)</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelParallaxLayer speed={0.5} axis="y">
+      <div style={{ padding: 24, background: '#111', color: '#fff' }}>
+        Scroll to see this layer move at half speed.
+      </div>
+    </PixelParallaxLayer>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-foreground">
+        <h4>Foreground (reverse)</h4>
+        <pre className="docs-code"><code>{`export function Foreground() {
+  return (
+    <PixelParallaxLayer speed={-0.3} axis="y">
+      <div style={{ padding: 24, background: '#222', color: '#fff' }}>
+        Foreground float-up (negative speed).
+      </div>
+    </PixelParallaxLayer>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-horizontal">
+        <h4>Horizontal axis</h4>
+        <pre className="docs-code"><code>{`export function Horizontal() {
+  return (
+    <PixelParallaxLayer speed={0.4} axis="x">
+      <div style={{ padding: 24, background: '#0EA5E9', color: '#fff' }}>
+        Horizontal parallax drift.
+      </div>
+    </PixelParallaxLayer>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

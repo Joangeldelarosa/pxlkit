@@ -70,6 +70,109 @@ export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionPr
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-sidebar-usage">
+      <h3 id="pixel-sidebar-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelSidebar } from '@pxlkit/ui-kit';
+
+const sections = [
+  {
+    title: 'Workspace',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', active: true },
+      { id: 'projects', label: 'Projects', badge: { label: '4', tone: 'cyan' as const } },
+      { id: 'tasks', label: 'Tasks' },
+    ],
+  },
+  {
+    title: 'Account',
+    items: [
+      { id: 'settings', label: 'Settings' },
+      { id: 'billing', label: 'Billing', badge: { label: 'NEW', tone: 'green' as const } },
+    ],
+  },
+];
+
+export function Default() {
+  return (
+    <div style={{ height: 320 }}>
+      <PixelSidebar sections={sections} header={<span className="text-xs text-retro-text">pxlkit</span>} />
+    </div>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <div style={{ height: 320 }}>
+      <PixelSidebar sections={sections} header={<span className="text-xs text-retro-text">pxlkit</span>} />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-collapsible">
+        <h4>Collapsible</h4>
+        <pre className="docs-code"><code>{`export function Collapsible() {
+  const [collapsed, setCollapsed] = React.useState(false);
+  return (
+    <div style={{ height: 320 }}>
+      <PixelSidebar
+        collapsible
+        collapsed={collapsed}
+        onCollapsedChange={setCollapsed}
+        sections={sections}
+        header={<span className="text-xs text-retro-text">pxlkit</span>}
+      />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-nested">
+        <h4>Nested items</h4>
+        <pre className="docs-code"><code>{`export function Nested() {
+  const nestedSections = [
+    {
+      title: 'Library',
+      items: [
+        {
+          id: 'components',
+          label: 'Components',
+          active: true,
+          nested: [
+            { id: 'buttons', label: 'Buttons' },
+            { id: 'forms', label: 'Forms' },
+            { id: 'navigation', label: 'Navigation' },
+          ],
+        },
+        { id: 'tokens', label: 'Tokens' },
+      ],
+    },
+  ];
+  return (
+    <div style={{ height: 320 }}>
+      <PixelSidebar sections={nestedSections} />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-footer">
+        <h4>With footer</h4>
+        <pre className="docs-code"><code>{`export function WithFooter() {
+  return (
+    <div style={{ height: 320 }}>
+      <PixelSidebar
+        sections={sections}
+        header={<span className="text-xs text-retro-text">pxlkit</span>}
+        footer={<span className="text-[10px] text-retro-muted">v2.0.0</span>}
+      />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

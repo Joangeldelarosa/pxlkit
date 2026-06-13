@@ -45,6 +45,52 @@ export function PixelPulseDocsSection({ className }: PixelPulseDocsSectionProps)
       </ul>
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
+    <section aria-labelledby="pixel-pulse-usage">
+      <h3 id="pixel-pulse-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelPulse } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelPulse>
+      <span>Pulse</span>
+    </PixelPulse>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelPulse>
+      <span>Pulse</span>
+    </PixelPulse>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-faster-pulse">
+        <h4>Faster Pulse</h4>
+        <pre className="docs-code"><code>{`export function FasterPulse() {
+  return (
+    <PixelPulse duration={1000}>
+      <span>Quick Pulse</span>
+    </PixelPulse>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-hover-trigger">
+        <h4>Hover Trigger</h4>
+        <pre className="docs-code"><code>{`export function HoverTrigger() {
+  return (
+    <PixelPulse trigger="hover" repeat={1}>
+      <span>Hover me</span>
+    </PixelPulse>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

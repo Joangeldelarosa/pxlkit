@@ -68,6 +68,98 @@ export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps)
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-badge-usage">
+      <h3 id="pixel-badge-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelBadge>NEW</PixelBadge>;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelBadge>NEW</PixelBadge>;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <PixelBadge tone="neutral">neutral</PixelBadge>
+      <PixelBadge tone="green">green</PixelBadge>
+      <PixelBadge tone="cyan">cyan</PixelBadge>
+      <PixelBadge tone="gold">gold</PixelBadge>
+      <PixelBadge tone="red">red</PixelBadge>
+      <PixelBadge tone="purple">purple</PixelBadge>
+      <PixelBadge tone="pink">pink</PixelBadge>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <PixelBadge size="sm" tone="cyan">small</PixelBadge>
+      <PixelBadge size="md" tone="cyan">medium</PixelBadge>
+      <PixelBadge size="lg" tone="cyan">large</PixelBadge>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-variants">
+        <h4>Variants</h4>
+        <pre className="docs-code"><code>{`export function Variants() {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <PixelBadge variant="soft" tone="green">soft</PixelBadge>
+      <PixelBadge variant="solid" tone="green">solid</PixelBadge>
+      <PixelBadge variant="outline" tone="green">outline</PixelBadge>
+      <PixelBadge variant="ghost" tone="green">ghost</PixelBadge>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <PixelBadge surface="pixel" tone="gold">pixel</PixelBadge>
+      <PixelBadge surface="linear" tone="gold">linear</PixelBadge>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-icon">
+        <h4>With Icon</h4>
+        <pre className="docs-code"><code>{`export function WithIcon() {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <PixelBadge tone="green" iconLeft={<DotIcon />}>online</PixelBadge>
+      <PixelBadge tone="red" iconLeft={<DotIcon />}>error</PixelBadge>
+      <PixelBadge tone="gold" iconLeft={<DotIcon />}>warn</PixelBadge>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-clickable">
+        <h4>Clickable</h4>
+        <pre className="docs-code"><code>{`export function Clickable() {
+  return (
+    <PixelBadge tone="cyan" variant="outline" onClick={() => undefined}>
+      click me
+    </PixelBadge>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

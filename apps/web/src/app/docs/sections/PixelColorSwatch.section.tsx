@@ -45,6 +45,63 @@ export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsS
       </ul>
       <p className="docs-aria-notes">Non-interactive presentational block. The visible token name + cssVar string provide the textual description of the color sample for screen readers; no separate alt text is required because the chip itself carries no semantic meaning beyond the adjacent label.</p>
     </section>
+    <section aria-labelledby="pixel-color-swatch-usage">
+      <h3 id="pixel-color-swatch-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-palette">
+        <h4>Palette</h4>
+        <pre className="docs-code"><code>{`export function Palette() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl">
+      <PixelColorSwatch name="green" cssVar="--color-retro-green" />
+      <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" />
+      <PixelColorSwatch name="gold" cssVar="--color-retro-gold" />
+      <PixelColorSwatch name="purple" cssVar="--color-retro-purple" />
+      <PixelColorSwatch name="red" cssVar="--color-retro-red" />
+      <PixelColorSwatch name="pink" cssVar="--color-retro-pink" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-4">
+      <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" surface="pixel" />
+      <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" surface="linear" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surface-tokens">
+        <h4>Surface Tokens</h4>
+        <pre className="docs-code"><code>{`export function SurfaceTokens() {
+  return (
+    <div className="grid grid-cols-2 gap-3 max-w-md">
+      <PixelColorSwatch name="surface" cssVar="--color-retro-surface" />
+      <PixelColorSwatch name="border" cssVar="--color-retro-border" />
+      <PixelColorSwatch name="text" cssVar="--color-retro-text" />
+      <PixelColorSwatch name="muted" cssVar="--color-retro-muted" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

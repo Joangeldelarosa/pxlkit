@@ -69,6 +69,75 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-file-upload-usage">
+      <h3 id="pixel-file-upload-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelFileUpload } from '@pxlkit/ui-kit';
+
+export function Default() {
+  const [files, setFiles] = useState<File[]>([]);
+  return (
+    <PixelFileUpload
+      label="Upload files"
+      hint="PNG or JPG, up to 5 MB each"
+      value={files}
+      onChange={setFiles}
+      accept="image/*"
+      multiple
+      maxSize={5 * 1024 * 1024}
+      maxFiles={5}
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [files, setFiles] = useState<File[]>([]);
+  return (
+    <PixelFileUpload
+      label="Upload files"
+      hint="PNG or JPG, up to 5 MB each"
+      value={files}
+      onChange={setFiles}
+      accept="image/*"
+      multiple
+      maxSize={5 * 1024 * 1024}
+      maxFiles={5}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-button-mode">
+        <h4>Button mode</h4>
+        <pre className="docs-code"><code>{`export function ButtonMode() {
+  const [files, setFiles] = useState<File[]>([]);
+  return (
+    <PixelFileUpload
+      label="Choose a file"
+      value={files}
+      onChange={setFiles}
+      dropzone={false}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-error">
+        <h4>With error</h4>
+        <pre className="docs-code"><code>{`export function WithError() {
+  return (
+    <PixelFileUpload
+      label="Attachments"
+      error="At least one file is required"
+      accept=".pdf,.doc,.docx"
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

@@ -45,6 +45,73 @@ export function PixelClusterDocsSection({ className }: PixelClusterDocsSectionPr
       </ul>
       <p className="docs-aria-notes">Polymorphic wrap container; inherits semantics from `as`. Defaults to &lt;div&gt; with no implicit role.</p>
     </section>
+    <section aria-labelledby="pixel-cluster-usage">
+      <h3 id="pixel-cluster-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import React from 'react';
+import { PixelCluster } from '@pxlkit/ui-kit';
+
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded border border-retro-border px-2 py-1 text-xs text-retro-fg">
+      {children}
+    </span>
+  );
+}
+
+export function Default() {
+  return (
+    <PixelCluster>
+      <Chip>react</Chip>
+      <Chip>typescript</Chip>
+      <Chip>tailwind</Chip>
+      <Chip>next</Chip>
+      <Chip>vite</Chip>
+    </PixelCluster>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelCluster>
+      <Chip>react</Chip>
+      <Chip>typescript</Chip>
+      <Chip>tailwind</Chip>
+      <Chip>next</Chip>
+      <Chip>vite</Chip>
+    </PixelCluster>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-justified">
+        <h4>Justified</h4>
+        <pre className="docs-code"><code>{`export function Justified() {
+  return (
+    <PixelCluster justify="between" gap={6}>
+      <Chip>left</Chip>
+      <Chip>middle</Chip>
+      <Chip>right</Chip>
+    </PixelCluster>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel Surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  return (
+    <PixelCluster surface="pixel" gap={3}>
+      <Chip>alpha</Chip>
+      <Chip>beta</Chip>
+      <Chip>gamma</Chip>
+    </PixelCluster>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

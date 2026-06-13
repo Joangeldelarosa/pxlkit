@@ -69,6 +69,137 @@ export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputD
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-password-input-usage">
+      <h3 id="pixel-password-input-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelPasswordInput label="Password" placeholder="Enter password" />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelPasswordInput label="Password" placeholder="Enter password" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-hint">
+        <h4>With hint</h4>
+        <pre className="docs-code"><code>{`export function WithHint() {
+  return (
+    <PixelPasswordInput
+      label="Password"
+      hint="At least 8 characters, mixing letters and numbers."
+      placeholder="Enter password"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-error">
+        <h4>With error</h4>
+        <pre className="docs-code"><code>{`export function WithError() {
+  return (
+    <PixelPasswordInput
+      label="Password"
+      error="Password is too short."
+      defaultValue="abc"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="space-y-3">
+      <PixelPasswordInput label="Neutral" tone="neutral" placeholder="Password" />
+      <PixelPasswordInput label="Green" tone="green" placeholder="Password" />
+      <PixelPasswordInput label="Cyan" tone="cyan" placeholder="Password" />
+      <PixelPasswordInput label="Gold" tone="gold" placeholder="Password" />
+      <PixelPasswordInput label="Red" tone="red" placeholder="Password" />
+      <PixelPasswordInput label="Purple" tone="purple" placeholder="Password" />
+      <PixelPasswordInput label="Pink" tone="pink" placeholder="Password" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="space-y-3">
+      <PixelPasswordInput label="Small" size="sm" placeholder="Password" />
+      <PixelPasswordInput label="Medium" size="md" placeholder="Password" />
+      <PixelPasswordInput label="Large" size="lg" placeholder="Password" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="space-y-3">
+      <PixelPasswordInput label="Pixel surface" surface="pixel" placeholder="Password" />
+      <PixelPasswordInput label="Linear surface" surface="linear" placeholder="Password" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <PixelPasswordInput
+      label="Password"
+      disabled
+      defaultValue="cannot-edit"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-custom-toggle-labels">
+        <h4>Custom toggle labels</h4>
+        <pre className="docs-code"><code>{`export function CustomToggleLabels() {
+  return (
+    <PixelPasswordInput
+      label="Password"
+      toggleLabels={['View', 'Mask']}
+      placeholder="Enter password"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-controlled">
+        <h4>Controlled</h4>
+        <pre className="docs-code"><code>{`export function Controlled() {
+  const [value, setValue] = useState('');
+  return (
+    <PixelPasswordInput
+      label="Password"
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      hint={\`Length: \${value.length}\`}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-uncontrolled">
+        <h4>Uncontrolled</h4>
+        <pre className="docs-code"><code>{`export function Uncontrolled() {
+  return (
+    <PixelPasswordInput
+      label="Password"
+      defaultValue="hunter2"
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

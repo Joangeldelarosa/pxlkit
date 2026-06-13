@@ -46,6 +46,52 @@ export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps)
       </ul>
       <p className="docs-aria-notes">Animation is automatically disabled when the user has requested reduced motion.</p>
     </section>
+    <section aria-labelledby="pixel-shake-usage">
+      <h3 id="pixel-shake-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelShake } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelShake>
+      <span>Shake on mount</span>
+    </PixelShake>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelShake>
+      <span>Shake on mount</span>
+    </PixelShake>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-on-hover">
+        <h4>On Hover</h4>
+        <pre className="docs-code"><code>{`export function OnHover() {
+  return (
+    <PixelShake trigger="hover" repeat="infinite" duration={300}>
+      <span>Hover to shake</span>
+    </PixelShake>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-strong-shake">
+        <h4>Strong Shake</h4>
+        <pre className="docs-code"><code>{`export function StrongShake() {
+  return (
+    <PixelShake distance={6} duration={600} repeat={3}>
+      <span>Stronger shake</span>
+    </PixelShake>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

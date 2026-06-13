@@ -46,6 +46,72 @@ export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProp
       </ul>
       <p className="docs-aria-notes">Renders as &lt;div&gt; by default; consumers pass `as` to inherit appropriate semantics (e.g. section, main, article). No additional ARIA is required.</p>
     </section>
+    <section aria-labelledby="pixel-center-usage">
+      <h3 id="pixel-center-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelCenter } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelCenter>
+      <p className="text-sm text-retro-muted">
+        Centered content with the default max-width and page gutter.
+      </p>
+    </PixelCenter>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelCenter>
+      <p className="text-sm text-retro-muted">
+        Centered content with the default max-width and page gutter.
+      </p>
+    </PixelCenter>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-narrow-prose">
+        <h4>Narrow Prose</h4>
+        <pre className="docs-code"><code>{`export function NarrowProse() {
+  return (
+    <PixelCenter maxWidth="2xl" text="left">
+      <p className="text-sm text-retro-muted">
+        A narrower max-width is useful for long-form reading flows where measure matters.
+      </p>
+    </PixelCenter>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-text-centered">
+        <h4>Text Centered</h4>
+        <pre className="docs-code"><code>{`export function TextCentered() {
+  return (
+    <PixelCenter maxWidth="3xl" text="center" gutter="md">
+      <p className="text-sm text-retro-muted">
+        Both the wrapper and the inner text are centered.
+      </p>
+    </PixelCenter>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-as-section">
+        <h4>As Section</h4>
+        <pre className="docs-code"><code>{`export function AsSection() {
+  return (
+    <PixelCenter as="section" maxWidth="4xl" gutter="lg" surface="pixel">
+      <p className="text-sm text-retro-muted">
+        Polymorphic: renders as a semantic &lt;section&gt; on the pixel surface.
+      </p>
+    </PixelCenter>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

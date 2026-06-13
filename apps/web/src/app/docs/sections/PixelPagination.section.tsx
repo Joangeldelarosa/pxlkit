@@ -73,6 +73,96 @@ export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSec
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-pagination-usage">
+      <h3 id="pixel-pagination-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelPagination } from '@pxlkit/ui-kit';
+
+export function Default() {
+  const [page, setPage] = useState(1);
+  return <PixelPagination page={page} total={10} onChange={setPage} />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [page, setPage] = useState(1);
+  return <PixelPagination page={page} total={10} onChange={setPage} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-many-pages">
+        <h4>Many Pages</h4>
+        <pre className="docs-code"><code>{`export function ManyPages() {
+  const [page, setPage] = useState(5);
+  return <PixelPagination page={page} total={50} onChange={setPage} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-mid-window">
+        <h4>Mid Window</h4>
+        <pre className="docs-code"><code>{`export function MidWindow() {
+  const [page, setPage] = useState(10);
+  return <PixelPagination page={page} total={20} onChange={setPage} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-more-siblings">
+        <h4>More Siblings</h4>
+        <pre className="docs-code"><code>{`export function MoreSiblings() {
+  const [page, setPage] = useState(8);
+  return <PixelPagination page={page} total={20} onChange={setPage} siblings={2} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel Surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  const [page, setPage] = useState(3);
+  return <PixelPagination page={page} total={12} onChange={setPage} surface="pixel" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-linear-surface">
+        <h4>Linear Surface</h4>
+        <pre className="docs-code"><code>{`export function LinearSurface() {
+  const [page, setPage] = useState(3);
+  return <PixelPagination page={page} total={12} onChange={setPage} surface="linear" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-localised-labels">
+        <h4>Localised Labels</h4>
+        <pre className="docs-code"><code>{`export function LocalisedLabels() {
+  const [page, setPage] = useState(2);
+  return (
+    <PixelPagination
+      page={page}
+      total={8}
+      onChange={setPage}
+      prevLabel="Anterior"
+      nextLabel="Siguiente"
+      ariaLabel="Paginación"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-first-page">
+        <h4>First Page</h4>
+        <pre className="docs-code"><code>{`export function FirstPage() {
+  return <PixelPagination page={1} total={10} onChange={() => {}} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-last-page">
+        <h4>Last Page</h4>
+        <pre className="docs-code"><code>{`export function LastPage() {
+  return <PixelPagination page={10} total={10} onChange={() => {}} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-single-page">
+        <h4>Single Page</h4>
+        <pre className="docs-code"><code>{`export function SinglePage() {
+  return <PixelPagination page={1} total={1} onChange={() => {}} />;
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

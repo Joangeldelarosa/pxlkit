@@ -91,6 +91,83 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-otp-input-usage">
+      <h3 id="pixel-otp-input-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import React from 'react'
+import { PixelOTPInput } from '@pxlkit/ui-kit'
+
+export function Default() {
+  const [value, setValue] = React.useState('')
+  return <PixelOTPInput length={6} value={value} onChange={setValue} />
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [value, setValue] = React.useState('')
+  return <PixelOTPInput length={6} value={value} onChange={setValue} />
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-numeric-4">
+        <h4>4-digit Numeric</h4>
+        <pre className="docs-code"><code>{`export function Numeric4() {
+  const [value, setValue] = React.useState('')
+  return (
+    <PixelOTPInput
+      length={4}
+      type="numeric"
+      value={value}
+      onChange={setValue}
+    />
+  )
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-alphanumeric">
+        <h4>Alphanumeric</h4>
+        <pre className="docs-code"><code>{`export function Alphanumeric() {
+  const [value, setValue] = React.useState('')
+  return (
+    <PixelOTPInput
+      length={6}
+      type="alphanumeric"
+      value={value}
+      onChange={setValue}
+    />
+  )
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-masked">
+        <h4>Masked</h4>
+        <pre className="docs-code"><code>{`export function Masked() {
+  const [value, setValue] = React.useState('')
+  return (
+    <PixelOTPInput
+      length={6}
+      mask
+      value={value}
+      onChange={setValue}
+    />
+  )
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-separator">
+        <h4>With Separator</h4>
+        <pre className="docs-code"><code>{`export function WithSeparator() {
+  const [value, setValue] = React.useState('')
+  return (
+    <PixelOTPInput
+      length={6}
+      separator={<span>-</span>}
+      value={value}
+      onChange={setValue}
+    />
+  )
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

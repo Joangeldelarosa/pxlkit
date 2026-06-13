@@ -72,6 +72,197 @@ export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): 
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-card-usage">
+      <h3 id="pixel-card-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelCard title="Project Atlas">
+      <p>Compact dossier on the Atlas migration. Status nominal.</p>
+    </PixelCard>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelCard title="Project Atlas">
+      <p>Compact dossier on the Atlas migration. Status nominal.</p>
+    </PixelCard>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-icon">
+        <h4>With Icon</h4>
+        <pre className="docs-code"><code>{`export function WithIcon() {
+  const Icon = (
+    <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-3 w-3">
+      <rect x="3" y="0" width="2" height="8" />
+      <rect x="0" y="3" width="8" height="2" />
+    </svg>
+  );
+  return (
+    <PixelCard title="System Health" icon={Icon}>
+      <p>All checks green. Last sync 3 minutes ago.</p>
+    </PixelCard>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-description">
+        <h4>With Description</h4>
+        <pre className="docs-code"><code>{`export function WithDescription() {
+  return (
+    <PixelCard
+      title="Release Notes"
+      description="A short summary of what changed in this release, useful as a card subtitle."
+    >
+      <p>Body content sits under the description.</p>
+    </PixelCard>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-footer">
+        <h4>With Footer</h4>
+        <pre className="docs-code"><code>{`export function WithFooter() {
+  return (
+    <PixelCard
+      title="Invoice #1042"
+      footer={<span className="text-xs text-retro-muted">Due in 7 days</span>}
+    >
+      <p>Total: $1,250.00</p>
+    </PixelCard>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <PixelCard title="Cyan" tone="cyan">Tinted border + soft background.</PixelCard>
+      <PixelCard title="Green" tone="green">Tinted border + soft background.</PixelCard>
+      <PixelCard title="Gold" tone="gold">Tinted border + soft background.</PixelCard>
+      <PixelCard title="Purple" tone="purple">Tinted border + soft background.</PixelCard>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <PixelCard title="Pixel" surface="pixel">Thick border + offset shadow.</PixelCard>
+      <PixelCard title="Linear" surface="linear">Soft border + smooth radius.</PixelCard>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-interactive">
+        <h4>Interactive</h4>
+        <pre className="docs-code"><code>{`export function Interactive() {
+  return (
+    <PixelCard
+      title="Click me"
+      interactive
+      onClick={() => alert('card clicked')}
+      description="Press Enter or Space to activate via keyboard."
+    >
+      <p>Renders as role=button with focus ring.</p>
+    </PixelCard>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-as-link">
+        <h4>As Link</h4>
+        <pre className="docs-code"><code>{`export function AsLink() {
+  return (
+    <PixelCard
+      title="Read the docs"
+      href="https://example.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      description="Root renders as <a href> when href is provided."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-media">
+        <h4>With Media</h4>
+        <pre className="docs-code"><code>{`export function WithMedia() {
+  const Media = (
+    <div className="h-24 w-full bg-gradient-to-br from-retro-cyan/40 to-retro-purple/40" />
+  );
+  return (
+    <PixelCard title="Cover Story" media={Media} description="Media slot sits above the header.">
+      <p>Card body.</p>
+    </PixelCard>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-badge">
+        <h4>With Ribbon Badge</h4>
+        <pre className="docs-code"><code>{`export function WithBadge() {
+  return (
+    <PixelCard
+      title="New Feature"
+      badge={{ label: 'NEW', tone: 'gold' }}
+      description="Ribbon badge anchors in the top-right corner."
+    >
+      <p>Useful for highlighting fresh content.</p>
+    </PixelCard>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-clamped-description">
+        <h4>Clamped Description</h4>
+        <pre className="docs-code"><code>{`export function ClampedDescription() {
+  return (
+    <PixelCard
+      title="Long Description"
+      description="This description is intentionally long to demonstrate the line-clamp behavior. It will be truncated to the configured number of lines with an ellipsis, while maintaining a minimum height so cards stay aligned in a grid."
+      descriptionLines={2}
+    >
+      <p>Body still renders below the clamp.</p>
+    </PixelCard>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-padding-scale">
+        <h4>Padding Scale</h4>
+        <pre className="docs-code"><code>{`export function PaddingScale() {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <PixelCard title="Small" padding="sm">Tight padding.</PixelCard>
+      <PixelCard title="Large" padding="lg">Roomy padding.</PixelCard>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-subcomponents">
+        <h4>With Subcomponents</h4>
+        <pre className="docs-code"><code>{`export function WithSubcomponents() {
+  return (
+    <PixelCard title="Composed">
+      <PixelCard.Header>
+        <span className="text-sm font-semibold">Custom header</span>
+      </PixelCard.Header>
+      <PixelCard.Body>
+        <p>Body slot via subcomponent.</p>
+      </PixelCard.Body>
+      <PixelCard.Footer>
+        <span className="text-xs text-retro-muted">Footer slot</span>
+      </PixelCard.Footer>
+    </PixelCard>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

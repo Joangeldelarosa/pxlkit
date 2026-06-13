@@ -77,6 +77,126 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-drawer-usage">
+      <h3 id="pixel-drawer-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelDrawer } from '@pxlkit/ui-kit';
+
+export function Default() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open drawer
+      </button>
+      <PixelDrawer open={open} onOpenChange={setOpen} title="Settings">
+        <PixelDrawer.Header>
+          <span>Settings</span>
+          <button type="button" onClick={() => setOpen(false)}>
+            Close
+          </button>
+        </PixelDrawer.Header>
+        <PixelDrawer.Body>
+          <p>Drawer content goes here.</p>
+        </PixelDrawer.Body>
+        <PixelDrawer.Footer>
+          <button type="button" onClick={() => setOpen(false)}>
+            Done
+          </button>
+        </PixelDrawer.Footer>
+      </PixelDrawer>
+    </>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open drawer
+      </button>
+      <PixelDrawer open={open} onOpenChange={setOpen} title="Settings">
+        <PixelDrawer.Header>
+          <span>Settings</span>
+          <button type="button" onClick={() => setOpen(false)}>
+            Close
+          </button>
+        </PixelDrawer.Header>
+        <PixelDrawer.Body>
+          <p>Drawer content goes here.</p>
+        </PixelDrawer.Body>
+        <PixelDrawer.Footer>
+          <button type="button" onClick={() => setOpen(false)}>
+            Done
+          </button>
+        </PixelDrawer.Footer>
+      </PixelDrawer>
+    </>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-left-side">
+        <h4>Left side, large</h4>
+        <pre className="docs-code"><code>{`export function LeftSide() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open left drawer
+      </button>
+      <PixelDrawer
+        open={open}
+        onOpenChange={setOpen}
+        side="left"
+        size="lg"
+        title="Navigation"
+      >
+        <PixelDrawer.Header>Navigation</PixelDrawer.Header>
+        <PixelDrawer.Body>
+          <p>Menu items here.</p>
+        </PixelDrawer.Body>
+      </PixelDrawer>
+    </>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-bottom-sheet">
+        <h4>Bottom sheet</h4>
+        <pre className="docs-code"><code>{`export function BottomSheet() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open bottom sheet
+      </button>
+      <PixelDrawer
+        open={open}
+        onOpenChange={setOpen}
+        side="bottom"
+        size="md"
+        title="Quick actions"
+        description="Pick an action below"
+      >
+        <PixelDrawer.Body>
+          <p>Sheet content.</p>
+        </PixelDrawer.Body>
+        <PixelDrawer.Footer>
+          <button type="button" onClick={() => setOpen(false)}>
+            Cancel
+          </button>
+        </PixelDrawer.Footer>
+      </PixelDrawer>
+    </>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

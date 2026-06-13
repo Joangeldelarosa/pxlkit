@@ -45,6 +45,52 @@ export function PixelFloatDocsSection({ className }: PixelFloatDocsSectionProps)
       </ul>
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
+    <section aria-labelledby="pixel-float-usage">
+      <h3 id="pixel-float-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelFloat } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelFloat>
+      <span>Float</span>
+    </PixelFloat>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelFloat>
+      <span>Float</span>
+    </PixelFloat>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-farther-travel">
+        <h4>Farther Travel</h4>
+        <pre className="docs-code"><code>{`export function FartherTravel() {
+  return (
+    <PixelFloat distance={14} duration={2800}>
+      <span>Drifting Higher</span>
+    </PixelFloat>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-hover-trigger">
+        <h4>Hover Trigger</h4>
+        <pre className="docs-code"><code>{`export function HoverTrigger() {
+  return (
+    <PixelFloat trigger="hover" repeat={3}>
+      <span>Hover me</span>
+    </PixelFloat>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

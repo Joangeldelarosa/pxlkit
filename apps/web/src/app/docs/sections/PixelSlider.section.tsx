@@ -93,6 +93,218 @@ export function PixelSliderDocsSection({ className }: PixelSliderDocsSectionProp
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-slider-usage">
+      <h3 id="pixel-slider-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function Default() {
+  const [value, setValue] = useState(40);
+  return (
+    <PixelSlider
+      label="Volume"
+      value={value}
+      onChange={setValue}
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [value, setValue] = useState(40);
+  return (
+    <PixelSlider
+      label="Volume"
+      value={value}
+      onChange={setValue}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-range">
+        <h4>Range</h4>
+        <pre className="docs-code"><code>{`export function Range() {
+  const [value, setValue] = useState<[number, number]>([20, 80]);
+  return (
+    <PixelSlider
+      label="Price range"
+      value={value}
+      onChange={setValue}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  const [neutral, setNeutral] = useState(40);
+  const [green, setGreen] = useState(50);
+  const [cyan, setCyan] = useState(60);
+  const [gold, setGold] = useState(70);
+  const [red, setRed] = useState(30);
+  const [purple, setPurple] = useState(45);
+  const [pink, setPink] = useState(55);
+  return (
+    <div className="space-y-4">
+      <PixelSlider label="Neutral" tone="neutral" value={neutral} onChange={setNeutral} />
+      <PixelSlider label="Green" tone="green" value={green} onChange={setGreen} />
+      <PixelSlider label="Cyan" tone="cyan" value={cyan} onChange={setCyan} />
+      <PixelSlider label="Gold" tone="gold" value={gold} onChange={setGold} />
+      <PixelSlider label="Red" tone="red" value={red} onChange={setRed} />
+      <PixelSlider label="Purple" tone="purple" value={purple} onChange={setPurple} />
+      <PixelSlider label="Pink" tone="pink" value={pink} onChange={setPink} />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  const [pixel, setPixel] = useState(40);
+  const [linear, setLinear] = useState(60);
+  return (
+    <div className="space-y-4">
+      <PixelSlider label="Pixel surface" surface="pixel" value={pixel} onChange={setPixel} />
+      <PixelSlider label="Linear surface" surface="linear" value={linear} onChange={setLinear} />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-min-max">
+        <h4>With min/max</h4>
+        <pre className="docs-code"><code>{`export function WithMinMax() {
+  const [value, setValue] = useState(75);
+  return (
+    <PixelSlider
+      label="Brightness"
+      min={0}
+      max={200}
+      step={5}
+      showMinMax
+      value={value}
+      onChange={setValue}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-marks">
+        <h4>With marks</h4>
+        <pre className="docs-code"><code>{`export function WithMarks() {
+  const [value, setValue] = useState(50);
+  return (
+    <PixelSlider
+      label="Quality"
+      value={value}
+      onChange={setValue}
+      marks={[
+        { value: 0, label: 'Low' },
+        { value: 25, label: 'Med' },
+        { value: 50, label: 'High' },
+        { value: 75, label: 'Ultra' },
+        { value: 100, label: 'Max' },
+      ]}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-ticks">
+        <h4>With ticks</h4>
+        <pre className="docs-code"><code>{`export function WithTicks() {
+  const [value, setValue] = useState(40);
+  return (
+    <PixelSlider
+      label="Step ticks"
+      min={0}
+      max={100}
+      step={10}
+      ticks
+      value={value}
+      onChange={setValue}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-tooltip">
+        <h4>Always tooltip</h4>
+        <pre className="docs-code"><code>{`export function WithTooltip() {
+  const [value, setValue] = useState(60);
+  return (
+    <PixelSlider
+      label="Always tooltip"
+      value={value}
+      onChange={setValue}
+      showTooltip="always"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tooltip-on-drag">
+        <h4>Tooltip on drag</h4>
+        <pre className="docs-code"><code>{`export function TooltipOnDrag() {
+  const [value, setValue] = useState(35);
+  return (
+    <PixelSlider
+      label="Drag tooltip"
+      value={value}
+      onChange={setValue}
+      showTooltip="drag"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <PixelSlider
+      label="Disabled"
+      value={50}
+      onChange={() => {}}
+      disabled
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-required">
+        <h4>Required</h4>
+        <pre className="docs-code"><code>{`export function Required() {
+  const [value, setValue] = useState(30);
+  return (
+    <PixelSlider
+      label="Required setting"
+      value={value}
+      onChange={setValue}
+      required
+      name="setting"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-range-with-marks">
+        <h4>Range with marks</h4>
+        <pre className="docs-code"><code>{`export function RangeWithMarks() {
+  const [value, setValue] = useState<[number, number]>([30, 70]);
+  return (
+    <PixelSlider
+      label="Filter range"
+      value={value}
+      onChange={setValue}
+      showMinMax
+      showTooltip="always"
+      marks={[
+        { value: 0, label: '0' },
+        { value: 50, label: '50' },
+        { value: 100, label: '100' },
+      ]}
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

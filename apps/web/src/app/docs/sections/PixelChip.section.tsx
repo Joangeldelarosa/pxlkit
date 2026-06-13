@@ -73,6 +73,134 @@ export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): 
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-chip-usage">
+      <h3 id="pixel-chip-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelChip } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelChip label="React" />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelChip label="React" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelChip label="Neutral" tone="neutral" />
+      <PixelChip label="Green" tone="green" />
+      <PixelChip label="Cyan" tone="cyan" />
+      <PixelChip label="Gold" tone="gold" />
+      <PixelChip label="Red" tone="red" />
+      <PixelChip label="Purple" tone="purple" />
+      <PixelChip label="Pink" tone="pink" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <PixelChip label="Small" size="sm" />
+      <PixelChip label="Medium" size="md" />
+      <PixelChip label="Large" size="lg" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-variants">
+        <h4>Variants</h4>
+        <pre className="docs-code"><code>{`export function Variants() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelChip label="Soft" variant="soft" tone="cyan" />
+      <PixelChip label="Solid" variant="solid" tone="cyan" />
+      <PixelChip label="Outline" variant="outline" tone="cyan" />
+      <PixelChip label="Ghost" variant="ghost" tone="cyan" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelChip label="Pixel" surface="pixel" tone="green" />
+      <PixelChip label="Linear" surface="linear" tone="green" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-icon">
+        <h4>With Icon</h4>
+        <pre className="docs-code"><code>{`export function WithIcon() {
+  return (
+    <PixelChip
+      label="TypeScript"
+      tone="cyan"
+      iconLeft={<span aria-hidden>TS</span>}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-clickable">
+        <h4>Clickable</h4>
+        <pre className="docs-code"><code>{`export function Clickable() {
+  return (
+    <PixelChip
+      label="Click me"
+      tone="gold"
+      onClick={() => {
+        /* noop */
+      }}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-deletable">
+        <h4>Deletable</h4>
+        <pre className="docs-code"><code>{`export function Deletable() {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return null;
+  return (
+    <PixelChip
+      label="Remove me"
+      tone="red"
+      onDelete={() => setVisible(false)}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-clickable-and-deletable">
+        <h4>Clickable + Deletable</h4>
+        <pre className="docs-code"><code>{`export function ClickableAndDeletable() {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return null;
+  return (
+    <PixelChip
+      label="Tag"
+      tone="purple"
+      onClick={() => {
+        /* select */
+      }}
+      onDelete={() => setVisible(false)}
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

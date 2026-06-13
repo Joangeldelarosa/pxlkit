@@ -46,6 +46,86 @@ export function PixelIconFrameDocsSection({ className }: PixelIconFrameDocsSecti
       </ul>
       <p className="docs-aria-notes">Inner icon and accent are aria-hidden. Provide an accessible label on a parent element when the frame conveys meaning.</p>
     </section>
+    <section aria-labelledby="pixel-icon-frame-usage">
+      <h3 id="pixel-icon-frame-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelIconFrame } from '@pxlkit/ui-kit';
+
+const Glyph = () => (
+  <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{'>_'}</span>
+);
+
+const Dot = () => (
+  <span style={{ width: 6, height: 6, borderRadius: 9999, background: 'currentColor', display: 'inline-block' }} />
+);
+
+export function Default() {
+  return <PixelIconFrame icon={<Glyph />} />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelIconFrame icon={<Glyph />} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <PixelIconFrame icon={<Glyph />} tone="neutral" />
+      <PixelIconFrame icon={<Glyph />} tone="cyan" />
+      <PixelIconFrame icon={<Glyph />} tone="green" />
+      <PixelIconFrame icon={<Glyph />} tone="gold" />
+      <PixelIconFrame icon={<Glyph />} tone="red" />
+      <PixelIconFrame icon={<Glyph />} tone="purple" />
+      <PixelIconFrame icon={<Glyph />} tone="pink" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <PixelIconFrame icon={<Glyph />} size={48} />
+      <PixelIconFrame icon={<Glyph />} size={56} />
+      <PixelIconFrame icon={<Glyph />} size={64} />
+      <PixelIconFrame icon={<Glyph />} size={80} />
+      <PixelIconFrame icon={<Glyph />} size={112} />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-shapes">
+        <h4>Shapes</h4>
+        <pre className="docs-code"><code>{`export function Shapes() {
+  return (
+    <div style={{ display: 'flex', gap: 12 }}>
+      <PixelIconFrame icon={<Glyph />} shape="square" />
+      <PixelIconFrame icon={<Glyph />} shape="rounded" />
+      <PixelIconFrame icon={<Glyph />} shape="circle" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-accent">
+        <h4>With Accent</h4>
+        <pre className="docs-code"><code>{`export function WithAccent() {
+  return (
+    <PixelIconFrame
+      icon={<Glyph />}
+      tone="cyan"
+      accent={{ icon: <Dot />, position: 'top-right' }}
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

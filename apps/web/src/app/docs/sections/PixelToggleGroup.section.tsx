@@ -83,6 +83,178 @@ export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsS
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-toggle-group-usage">
+      <h3 id="pixel-toggle-group-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Default() {
+  const [value, setValue] = useState<string>('left');
+  return (
+    <PixelToggleGroup
+      type="single"
+      value={value}
+      onChange={setValue}
+      aria-label="Text alignment"
+    >
+      <PixelToggle value="left">Left</PixelToggle>
+      <PixelToggle value="center">Center</PixelToggle>
+      <PixelToggle value="right">Right</PixelToggle>
+    </PixelToggleGroup>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [value, setValue] = useState<string>('left');
+  return (
+    <PixelToggleGroup
+      type="single"
+      value={value}
+      onChange={setValue}
+      aria-label="Text alignment"
+    >
+      <PixelToggle value="left">Left</PixelToggle>
+      <PixelToggle value="center">Center</PixelToggle>
+      <PixelToggle value="right">Right</PixelToggle>
+    </PixelToggleGroup>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-multiple">
+        <h4>Multiple</h4>
+        <pre className="docs-code"><code>{`export function Multiple() {
+  const [value, setValue] = useState<string[]>(['bold']);
+  return (
+    <PixelToggleGroup
+      type="multiple"
+      value={value}
+      onChange={setValue}
+      aria-label="Text formatting"
+    >
+      <PixelToggle value="bold">Bold</PixelToggle>
+      <PixelToggle value="italic">Italic</PixelToggle>
+      <PixelToggle value="underline">Underline</PixelToggle>
+    </PixelToggleGroup>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-variants">
+        <h4>Variants</h4>
+        <pre className="docs-code"><code>{`export function Variants() {
+  const [a, setA] = useState<string>('one');
+  const [b, setB] = useState<string>('one');
+  const [c, setC] = useState<string>('one');
+  const [d, setD] = useState<string>('one');
+  return (
+    <div className="space-y-3">
+      <PixelToggleGroup type="single" variant="soft" value={a} onChange={setA} aria-label="Soft">
+        <PixelToggle value="one">One</PixelToggle>
+        <PixelToggle value="two">Two</PixelToggle>
+        <PixelToggle value="three">Three</PixelToggle>
+      </PixelToggleGroup>
+      <PixelToggleGroup type="single" variant="solid" value={b} onChange={setB} aria-label="Solid">
+        <PixelToggle value="one">One</PixelToggle>
+        <PixelToggle value="two">Two</PixelToggle>
+        <PixelToggle value="three">Three</PixelToggle>
+      </PixelToggleGroup>
+      <PixelToggleGroup type="single" variant="outline" value={c} onChange={setC} aria-label="Outline">
+        <PixelToggle value="one">One</PixelToggle>
+        <PixelToggle value="two">Two</PixelToggle>
+        <PixelToggle value="three">Three</PixelToggle>
+      </PixelToggleGroup>
+      <PixelToggleGroup type="single" variant="ghost" value={d} onChange={setD} aria-label="Ghost">
+        <PixelToggle value="one">One</PixelToggle>
+        <PixelToggle value="two">Two</PixelToggle>
+        <PixelToggle value="three">Three</PixelToggle>
+      </PixelToggleGroup>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  const [sm, setSm] = useState<string>('a');
+  const [md, setMd] = useState<string>('a');
+  const [lg, setLg] = useState<string>('a');
+  return (
+    <div className="space-y-3">
+      <PixelToggleGroup type="single" size="sm" value={sm} onChange={setSm} aria-label="Small">
+        <PixelToggle value="a">A</PixelToggle>
+        <PixelToggle value="b">B</PixelToggle>
+        <PixelToggle value="c">C</PixelToggle>
+      </PixelToggleGroup>
+      <PixelToggleGroup type="single" size="md" value={md} onChange={setMd} aria-label="Medium">
+        <PixelToggle value="a">A</PixelToggle>
+        <PixelToggle value="b">B</PixelToggle>
+        <PixelToggle value="c">C</PixelToggle>
+      </PixelToggleGroup>
+      <PixelToggleGroup type="single" size="lg" value={lg} onChange={setLg} aria-label="Large">
+        <PixelToggle value="a">A</PixelToggle>
+        <PixelToggle value="b">B</PixelToggle>
+        <PixelToggle value="c">C</PixelToggle>
+      </PixelToggleGroup>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-roving-focus">
+        <h4>Roving focus</h4>
+        <pre className="docs-code"><code>{`export function RovingFocus() {
+  const [value, setValue] = useState<string>('list');
+  return (
+    <PixelToggleGroup
+      type="single"
+      rovingFocus
+      loop
+      value={value}
+      onChange={setValue}
+      aria-label="View mode"
+    >
+      <PixelToggle value="list">List</PixelToggle>
+      <PixelToggle value="grid">Grid</PixelToggle>
+      <PixelToggle value="board">Board</PixelToggle>
+    </PixelToggleGroup>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  const [pixel, setPixel] = useState<string>('one');
+  const [linear, setLinear] = useState<string>('one');
+  return (
+    <div className="space-y-3">
+      <PixelToggleGroup
+        type="single"
+        surface="pixel"
+        value={pixel}
+        onChange={setPixel}
+        aria-label="Pixel surface"
+      >
+        <PixelToggle value="one">One</PixelToggle>
+        <PixelToggle value="two">Two</PixelToggle>
+      </PixelToggleGroup>
+      <PixelToggleGroup
+        type="single"
+        surface="linear"
+        value={linear}
+        onChange={setLinear}
+        aria-label="Linear surface"
+      >
+        <PixelToggle value="one">One</PixelToggle>
+        <PixelToggle value="two">Two</PixelToggle>
+      </PixelToggleGroup>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

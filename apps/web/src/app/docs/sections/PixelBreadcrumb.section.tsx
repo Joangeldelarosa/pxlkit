@@ -73,6 +73,86 @@ export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSec
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-breadcrumb-usage">
+      <h3 id="pixel-breadcrumb-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelBreadcrumb } from '@pxlkit/ui-kit';
+
+const TRAIL = [
+  { label: 'Home', href: '/' },
+  { label: 'Docs', href: '/docs' },
+  { label: 'Components', href: '/docs/components' },
+  { label: 'Breadcrumb', active: true },
+];
+
+export function Default() {
+  return <PixelBreadcrumb items={TRAIL} />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelBreadcrumb items={TRAIL} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  return <PixelBreadcrumb items={TRAIL} surface="pixel" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-linear-surface">
+        <h4>Linear surface</h4>
+        <pre className="docs-code"><code>{`export function LinearSurface() {
+  return <PixelBreadcrumb items={TRAIL} surface="linear" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-plain-labels">
+        <h4>Plain labels</h4>
+        <pre className="docs-code"><code>{`export function PlainLabels() {
+  return (
+    <PixelBreadcrumb
+      items={[
+        { label: 'Library' },
+        { label: 'Albums' },
+        { label: 'Photos', active: true },
+      ]}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-single-crumb">
+        <h4>Single crumb</h4>
+        <pre className="docs-code"><code>{`export function SingleCrumb() {
+  return <PixelBreadcrumb items={[{ label: 'Home', active: true }]} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-localised-label">
+        <h4>Localised label</h4>
+        <pre className="docs-code"><code>{`export function LocalisedLabel() {
+  return <PixelBreadcrumb items={TRAIL} ariaLabel="Ruta de navegación" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-deep-trail">
+        <h4>Deep trail</h4>
+        <pre className="docs-code"><code>{`export function DeepTrail() {
+  return (
+    <PixelBreadcrumb
+      items={[
+        { label: 'Org', href: '/' },
+        { label: 'Workspaces', href: '/workspaces' },
+        { label: 'Engineering', href: '/workspaces/eng' },
+        { label: 'Projects', href: '/workspaces/eng/projects' },
+        { label: 'pxlkit', href: '/workspaces/eng/projects/pxlkit' },
+        { label: 'Settings', active: true },
+      ]}
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

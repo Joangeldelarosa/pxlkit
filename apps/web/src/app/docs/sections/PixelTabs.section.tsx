@@ -103,6 +103,114 @@ export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): 
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-tabs-usage">
+      <h3 id="pixel-tabs-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelTabs } from '@pxlkit/ui-kit';
+import type { TabItem } from '@pxlkit/ui-kit';
+
+const ITEMS: TabItem[] = [
+  { id: 'overview', label: 'Overview', content: <p>High-level summary of the project.</p> },
+  { id: 'activity', label: 'Activity', content: <p>Recent events and commits.</p> },
+  { id: 'settings', label: 'Settings', content: <p>Configuration for this workspace.</p> },
+];
+
+export function Default() {
+  return <PixelTabs items={ITEMS} defaultTab="overview" />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelTabs items={ITEMS} defaultTab="overview" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-controlled">
+        <h4>Controlled</h4>
+        <pre className="docs-code"><code>{`export function Controlled() {
+  const [active, setActive] = useState('activity');
+  return (
+    <div className="space-y-2">
+      <PixelTabs items={ITEMS} value={active} onChange={setActive} />
+      <p className="text-xs text-retro-muted">Active tab: {active}</p>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-vertical">
+        <h4>Vertical</h4>
+        <pre className="docs-code"><code>{`export function Vertical() {
+  return <PixelTabs items={ITEMS} defaultTab="overview" orientation="vertical" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-manual-activation">
+        <h4>Manual activation</h4>
+        <pre className="docs-code"><code>{`export function ManualActivation() {
+  return (
+    <PixelTabs
+      items={ITEMS}
+      defaultTab="overview"
+      activationMode="manual"
+      ariaLabel="Manual activation tabs"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="grid grid-cols-1 gap-6">
+      <PixelTabs items={ITEMS} defaultTab="overview" surface="pixel" ariaLabel="Pixel tabs" />
+      <PixelTabs items={ITEMS} defaultTab="overview" surface="linear" ariaLabel="Linear tabs" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-scrollable">
+        <h4>Scrollable</h4>
+        <pre className="docs-code"><code>{`export function Scrollable() {
+  return (
+    <div className="max-w-sm">
+      <PixelTabs items={MANY} defaultTab="tab-1" scrollable ariaLabel="Scrollable tabs" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-keep-mounted">
+        <h4>Keep mounted</h4>
+        <pre className="docs-code"><code>{`export function KeepMounted() {
+  return (
+    <PixelTabs
+      items={ITEMS}
+      defaultTab="overview"
+      keepMounted
+      ariaLabel="Persistent panels"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-compositional">
+        <h4>Compositional</h4>
+        <pre className="docs-code"><code>{`export function Compositional() {
+  return (
+    <PixelTabs defaultTab="one">
+      <PixelTabs.List ariaLabel="Compositional tabs">
+        <PixelTabs.Trigger value="one">One</PixelTabs.Trigger>
+        <PixelTabs.Trigger value="two">Two</PixelTabs.Trigger>
+        <PixelTabs.Trigger value="three">Three</PixelTabs.Trigger>
+      </PixelTabs.List>
+      <PixelTabs.Panel value="one">First panel.</PixelTabs.Panel>
+      <PixelTabs.Panel value="two">Second panel.</PixelTabs.Panel>
+      <PixelTabs.Panel value="three">Third panel.</PixelTabs.Panel>
+    </PixelTabs>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

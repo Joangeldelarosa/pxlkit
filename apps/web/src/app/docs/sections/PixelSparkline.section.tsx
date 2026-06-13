@@ -46,6 +46,78 @@ export function PixelSparklineDocsSection({ className }: PixelSparklineDocsSecti
       </ul>
       <p className="docs-aria-notes">The SVG renders as role=&quot;img&quot; with an auto-derived aria-label summarizing the trend (kind, point count, min..max range). Pass a custom aria-label for richer narrative context. For full data accessibility, render a visually-hidden &lt;table&gt; sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.</p>
     </section>
+    <section aria-labelledby="pixel-sparkline-usage">
+      <h3 id="pixel-sparkline-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelSparkline } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Default() {
+  return <PixelSparkline data={sample} />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelSparkline data={sample} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-wrap items-center gap-4">
+      <PixelSparkline data={sample} tone="cyan" />
+      <PixelSparkline data={sample} tone="green" />
+      <PixelSparkline data={sample} tone="gold" />
+      <PixelSparkline data={sample} tone="red" />
+      <PixelSparkline data={sample} tone="purple" />
+      <PixelSparkline data={sample} tone="pink" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="flex flex-wrap items-center gap-4">
+      <PixelSparkline data={sample} size="sm" tone="cyan" />
+      <PixelSparkline data={sample} size="md" tone="cyan" />
+      <PixelSparkline data={sample} size="lg" tone="cyan" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-area">
+        <h4>With Area</h4>
+        <pre className="docs-code"><code>{`export function WithArea() {
+  return <PixelSparkline data={sample} tone="green" showArea />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-wrap items-center gap-4">
+      <PixelSparkline data={sample} surface="pixel" tone="purple" />
+      <PixelSparkline data={sample} surface="linear" tone="purple" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

@@ -67,6 +67,98 @@ export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSecti
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-bare-input-usage">
+      <h3 id="pixel-bare-input-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import * as React from 'react';
+import { PixelBareInput } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelBareInput placeholder="Type something" />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelBareInput placeholder="Type something" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-uncontrolled">
+        <h4>Uncontrolled</h4>
+        <pre className="docs-code"><code>{`export function Uncontrolled() {
+  return <PixelBareInput defaultValue="hello world" aria-label="uncontrolled-input" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-controlled">
+        <h4>Controlled</h4>
+        <pre className="docs-code"><code>{`export function Controlled() {
+  const [value, setValue] = React.useState('');
+  return (
+    <PixelBareInput
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      placeholder="Controlled"
+      aria-label="controlled-input"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-email">
+        <h4>Email</h4>
+        <pre className="docs-code"><code>{`export function Email() {
+  return <PixelBareInput type="email" placeholder="you@example.com" autoComplete="email" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-password">
+        <h4>Password</h4>
+        <pre className="docs-code"><code>{`export function Password() {
+  return <PixelBareInput type="password" placeholder="••••••••" autoComplete="current-password" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-number">
+        <h4>Number</h4>
+        <pre className="docs-code"><code>{`export function Number() {
+  return (
+    <PixelBareInput type="number" min={0} max={100} step={1} defaultValue={42} aria-label="number-input" />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return <PixelBareInput defaultValue="not editable" disabled aria-label="disabled-input" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-read-only">
+        <h4>Read-only</h4>
+        <pre className="docs-code"><code>{`export function ReadOnly() {
+  return <PixelBareInput defaultValue="read only" readOnly aria-label="readonly-input" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-required">
+        <h4>Required</h4>
+        <pre className="docs-code"><code>{`export function Required() {
+  return <PixelBareInput required placeholder="required field" aria-label="required-input" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-ref">
+        <h4>With ref</h4>
+        <pre className="docs-code"><code>{`export function WithRef() {
+  const ref = React.useRef<HTMLInputElement>(null);
+  return (
+    <PixelBareInput
+      ref={ref}
+      placeholder="Focus me via ref"
+      onFocus={() => {
+        /* ref attached */
+      }}
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

@@ -110,6 +110,82 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-date-picker-usage">
+      <h3 id="pixel-date-picker-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelDatePicker } from '@pxlkit/ui-kit';
+
+export function Default() {
+  const [date, setDate] = useState<Date | null>(null);
+  return (
+    <PixelDatePicker
+      label="Pick a date"
+      value={date}
+      onChange={setDate}
+      placeholder="Select date"
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  const [date, setDate] = useState<Date | null>(null);
+  return (
+    <PixelDatePicker
+      label="Pick a date"
+      value={date}
+      onChange={setDate}
+      placeholder="Select date"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-presets">
+        <h4>With Presets</h4>
+        <pre className="docs-code"><code>{`export function WithPresets() {
+  const [date, setDate] = useState<Date | null>(null);
+  const today = new Date();
+  const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+  const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+  return (
+    <PixelDatePicker
+      label="Due date"
+      value={date}
+      onChange={setDate}
+      clearable
+      presets={[
+        { label: 'Today', value: today },
+        { label: 'Tomorrow', value: tomorrow },
+        { label: 'Next week', value: nextWeek },
+      ]}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-min-max">
+        <h4>With Min/Max</h4>
+        <pre className="docs-code"><code>{`export function WithMinMax() {
+  const [date, setDate] = useState<Date | null>(null);
+  const today = new Date();
+  const min = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const max = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+  return (
+    <PixelDatePicker
+      label="Within one month"
+      hint="Only the next 30 days are selectable"
+      value={date}
+      onChange={setDate}
+      min={min}
+      max={max}
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

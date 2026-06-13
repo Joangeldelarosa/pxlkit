@@ -74,6 +74,89 @@ export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSection
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-text-link-usage">
+      <h3 id="pixel-text-link-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelTextLink } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      <PixelTextLink href="#" tone="cyan">Cyan link</PixelTextLink>
+      <PixelTextLink href="#" tone="green">Green link</PixelTextLink>
+      <PixelTextLink href="#" tone="gold">Gold link</PixelTextLink>
+      <PixelTextLink href="#" tone="red">Red link</PixelTextLink>
+      <PixelTextLink href="#" tone="purple">Purple link</PixelTextLink>
+      <PixelTextLink href="#" tone="pink">Pink link</PixelTextLink>
+      <PixelTextLink href="#" tone="neutral">Neutral link</PixelTextLink>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-as-button">
+        <h4>As button</h4>
+        <pre className="docs-code"><code>{`export function AsButton() {
+  return (
+    <PixelTextLink tone="cyan" onClick={() => console.log('clicked')}>
+      Trigger an action
+    </PixelTextLink>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelTextLink href="#" surface="pixel">Pixel surface</PixelTextLink>
+      <PixelTextLink href="#" surface="linear">Linear surface</PixelTextLink>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-external-link">
+        <h4>External link</h4>
+        <pre className="docs-code"><code>{`export function ExternalLink() {
+  return (
+    <PixelTextLink
+      href="https://pxlkit.dev"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Open in new tab
+    </PixelTextLink>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-inline-in-prose">
+        <h4>Inline in prose</h4>
+        <pre className="docs-code"><code>{`export function InlineInProse() {
+  return (
+    <p className="max-w-md">
+      Built with{' '}
+      <PixelTextLink href="https://pxlkit.dev" tone="green">
+        pxlkit
+      </PixelTextLink>
+      , a tone-coloured component library for retro interfaces.
+    </p>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

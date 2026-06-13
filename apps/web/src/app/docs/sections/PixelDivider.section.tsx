@@ -46,6 +46,81 @@ export function PixelDividerDocsSection({ className }: PixelDividerDocsSectionPr
       </ul>
       <p className="docs-aria-notes">Non-interactive. When a label is present, the wrapper exposes role=&quot;separator&quot; and aria-label; the underlying rules are aria-hidden.</p>
     </section>
+    <section aria-labelledby="pixel-divider-usage">
+      <h3 id="pixel-divider-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelDivider } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelDivider />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelDivider />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-label">
+        <h4>With Label</h4>
+        <pre className="docs-code"><code>{`export function WithLabel() {
+  return <PixelDivider label="Section" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-col gap-4">
+      <PixelDivider label="Neutral" tone="neutral" />
+      <PixelDivider label="Green" tone="green" />
+      <PixelDivider label="Cyan" tone="cyan" />
+      <PixelDivider label="Gold" tone="gold" />
+      <PixelDivider label="Red" tone="red" />
+      <PixelDivider label="Purple" tone="purple" />
+      <PixelDivider label="Pink" tone="pink" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-spacings">
+        <h4>Spacings</h4>
+        <pre className="docs-code"><code>{`export function Spacings() {
+  return (
+    <div>
+      <PixelDivider label="None" spacing="none" />
+      <PixelDivider label="Small" spacing="sm" />
+      <PixelDivider label="Medium" spacing="md" />
+      <PixelDivider label="Large" spacing="lg" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-6">
+      <PixelDivider label="Pixel surface" surface="pixel" />
+      <PixelDivider label="Linear surface" surface="linear" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-plain-rule">
+        <h4>Plain Rule</h4>
+        <pre className="docs-code"><code>{`export function PlainRule() {
+  return (
+    <div className="flex flex-col gap-6">
+      <PixelDivider surface="pixel" />
+      <PixelDivider surface="linear" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

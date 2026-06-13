@@ -45,6 +45,42 @@ export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProvi
       </ul>
       <p className="docs-aria-notes">Wraps children in a div with lang=&#123;locale&#125; so assistive tech and CSS text-transform pick up the correct language. For Next.js apps, also set lang on the &lt;html&gt; tag.</p>
     </section>
+    <section aria-labelledby="pxl-kit-locale-provider-usage">
+      <h3 id="pxl-kit-locale-provider-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PxlKitLocaleProvider locale="en">
+      <p>Hello, world!</p>
+    </PxlKitLocaleProvider>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PxlKitLocaleProvider locale="en">
+      <p>Hello, world!</p>
+    </PxlKitLocaleProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-turkish">
+        <h4>Turkish</h4>
+        <pre className="docs-code"><code>{`export function Turkish() {
+  return (
+    <PxlKitLocaleProvider locale="tr">
+      <p>İstanbul güneşli bir şehirdir</p>
+    </PxlKitLocaleProvider>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

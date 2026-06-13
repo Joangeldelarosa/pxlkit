@@ -99,6 +99,175 @@ export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProp
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-select-usage">
+      <h3 id="pixel-select-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelSelect } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+const REGIONS = [
+  { value: 'us', label: 'United States' },
+  { value: 've', label: 'Venezuela' },
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+];
+
+export function Default() {
+  return (
+    <PixelSelect
+      label="Fruit"
+      options={FRUITS}
+      placeholder="Pick a fruit"
+      hint="Choose your favorite"
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelSelect
+      label="Fruit"
+      options={FRUITS}
+      placeholder="Pick a fruit"
+      hint="Choose your favorite"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-uncontrolled">
+        <h4>Uncontrolled</h4>
+        <pre className="docs-code"><code>{`export function Uncontrolled() {
+  return (
+    <PixelSelect
+      label="Region"
+      options={REGIONS}
+      defaultValue="ve"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-controlled">
+        <h4>Controlled</h4>
+        <pre className="docs-code"><code>{`export function Controlled() {
+  const [value, setValue] = useState('banana');
+  return (
+    <PixelSelect
+      label="Controlled fruit"
+      options={FRUITS}
+      value={value}
+      onChange={setValue}
+      tone="cyan"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelSelect label="Neutral" options={FRUITS} tone="neutral" defaultValue="apple" />
+      <PixelSelect label="Cyan" options={FRUITS} tone="cyan" defaultValue="apple" />
+      <PixelSelect label="Green" options={FRUITS} tone="green" defaultValue="apple" />
+      <PixelSelect label="Gold" options={FRUITS} tone="gold" defaultValue="apple" />
+      <PixelSelect label="Purple" options={FRUITS} tone="purple" defaultValue="apple" />
+      <PixelSelect label="Pink" options={FRUITS} tone="pink" defaultValue="apple" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelSelect label="Small" options={FRUITS} size="sm" placeholder="sm" />
+      <PixelSelect label="Medium" options={FRUITS} size="md" placeholder="md" />
+      <PixelSelect label="Large" options={FRUITS} size="lg" placeholder="lg" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelSelect label="Pixel" options={FRUITS} surface="pixel" placeholder="pixel surface" />
+      <PixelSelect label="Linear" options={FRUITS} surface="linear" placeholder="linear surface" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <PixelSelect
+      label="Disabled"
+      options={FRUITS}
+      defaultValue="apple"
+      disabled
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-error">
+        <h4>With error</h4>
+        <pre className="docs-code"><code>{`export function WithError() {
+  return (
+    <PixelSelect
+      label="Region"
+      options={REGIONS}
+      placeholder="Pick one"
+      error="Please choose a region"
+      tone="red"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-required">
+        <h4>Required</h4>
+        <pre className="docs-code"><code>{`export function Required() {
+  return (
+    <PixelSelect
+      label="Region"
+      options={REGIONS}
+      name="region"
+      required
+      placeholder="Required field"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-form-name">
+        <h4>With form name</h4>
+        <pre className="docs-code"><code>{`export function WithFormName() {
+  return (
+    <form>
+      <PixelSelect
+        label="Fruit"
+        options={FRUITS}
+        name="fruit"
+        defaultValue="cherry"
+        hint="Value participates in native form submission"
+      />
+    </form>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

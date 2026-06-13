@@ -45,6 +45,54 @@ export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxD
       </ul>
       <p className="docs-aria-notes">Pointer-only effect with no keyboard or assistive impact. Honor prefers-reduced-motion at the page level when wrapping critical content.</p>
     </section>
+    <section aria-labelledby="pixel-mouse-parallax-usage">
+      <h3 id="pixel-mouse-parallax-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelMouseParallax } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <div className="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+      <PixelMouseParallax strength={20}>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan">
+          Follows the cursor
+        </div>
+      </PixelMouseParallax>
+    </div>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <div className="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+      <PixelMouseParallax strength={20}>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan">
+          Follows the cursor
+        </div>
+      </PixelMouseParallax>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-inverted">
+        <h4>Inverted</h4>
+        <pre className="docs-code"><code>{`export function Inverted() {
+  return (
+    <div className="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+      <PixelMouseParallax strength={30} invert>
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-purple/20 px-4 py-2 text-sm text-retro-purple">
+          Repels from the cursor
+        </div>
+      </PixelMouseParallax>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

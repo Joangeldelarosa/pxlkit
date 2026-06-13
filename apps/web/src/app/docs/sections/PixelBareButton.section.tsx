@@ -68,6 +68,86 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-bare-button-usage">
+      <h3 id="pixel-bare-button-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelBareButton>Bare button</PixelBareButton>;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelBareButton>Bare button</PixelBareButton>;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-custom-class">
+        <h4>With custom class</h4>
+        <pre className="docs-code"><code>{`export function WithCustomClass() {
+  return (
+    <PixelBareButton className="rounded-md border border-retro-border bg-retro-surface px-3 py-1 text-sm text-retro-text">
+      Styled by consumer
+    </PixelBareButton>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-on-click">
+        <h4>With onClick</h4>
+        <pre className="docs-code"><code>{`export function WithOnClick() {
+  const [count, setCount] = React.useState(0);
+  return (
+    <PixelBareButton onClick={() => setCount((c) => c + 1)}>
+      Clicked {count} times
+    </PixelBareButton>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <PixelBareButton disabled className="cursor-not-allowed opacity-50">
+      Disabled
+    </PixelBareButton>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-submit-type">
+        <h4>Submit / reset type</h4>
+        <pre className="docs-code"><code>{`export function SubmitType() {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+      }}
+      className="flex gap-2"
+    >
+      <PixelBareButton type="submit">Submit</PixelBareButton>
+      <PixelBareButton type="reset">Reset</PixelBareButton>
+    </form>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-as-icon-trigger">
+        <h4>As icon trigger</h4>
+        <pre className="docs-code"><code>{`export function AsIconTrigger() {
+  return (
+    <PixelBareButton
+      aria-label="Close"
+      className="inline-flex h-6 w-6 items-center justify-center text-retro-muted hover:text-retro-text"
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+    </PixelBareButton>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

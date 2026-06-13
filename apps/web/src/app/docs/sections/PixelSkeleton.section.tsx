@@ -46,6 +46,79 @@ export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSection
       </ul>
       <p className="docs-aria-notes">Renders with `role=&quot;status&quot;` and a polite implicit live region. Override `ariaLabel` when the placeholder represents a specific resource (e.g. &quot;Loading user profile&quot;) so assistive tech announces what is loading.</p>
     </section>
+    <section aria-labelledby="pixel-skeleton-usage">
+      <h3 id="pixel-skeleton-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelSkeleton width="12rem" height="1rem" />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelSkeleton width="12rem" height="1rem" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-text-block">
+        <h4>Text Block</h4>
+        <pre className="docs-code"><code>{`export function TextBlock() {
+  return (
+    <div className="flex flex-col gap-2">
+      <PixelSkeleton width="14rem" height="0.75rem" />
+      <PixelSkeleton width="11rem" height="0.75rem" />
+      <PixelSkeleton width="9rem" height="0.75rem" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-rounded">
+        <h4>Rounded</h4>
+        <pre className="docs-code"><code>{`export function Rounded() {
+  return (
+    <div className="flex items-center gap-3">
+      <PixelSkeleton width="2.5rem" height="2.5rem" rounded />
+      <div className="flex flex-col gap-1.5">
+        <PixelSkeleton width="8rem" height="0.75rem" />
+        <PixelSkeleton width="5rem" height="0.75rem" />
+      </div>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelSkeleton surface="linear" width="14rem" height="1rem" />
+      <PixelSkeleton surface="pixel" width="14rem" height="1rem" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-card-placeholder">
+        <h4>Card Placeholder</h4>
+        <pre className="docs-code"><code>{`export function CardPlaceholder() {
+  return (
+    <div className="flex w-72 flex-col gap-3 rounded border border-retro-border/60 p-4">
+      <PixelSkeleton width="100%" height="8rem" />
+      <PixelSkeleton width="80%" height="0.875rem" />
+      <PixelSkeleton width="60%" height="0.75rem" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-custom-label">
+        <h4>Custom Label</h4>
+        <pre className="docs-code"><code>{`export function CustomLabel() {
+  return <PixelSkeleton width="10rem" height="1rem" ariaLabel="Loading user profile" />;
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

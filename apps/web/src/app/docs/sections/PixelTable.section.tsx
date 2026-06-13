@@ -73,6 +73,179 @@ export function PixelTableDocsSection({ className }: PixelTableDocsSectionProps)
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-table-usage">
+      <h3 id="pixel-table-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import * as React from 'react';
+import { PixelTable, type PixelTableSortState } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function Default() {
+  return <PixelTable<Row> columns={baseColumns} data={rows} />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelTable<Row> columns={baseColumns} data={rows} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-striped">
+        <h4>Striped</h4>
+        <pre className="docs-code"><code>{`export function Striped() {
+  return <PixelTable<Row> columns={baseColumns} data={rows} striped />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  return <PixelTable<Row> columns={baseColumns} data={rows} surface="pixel" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-linear-surface">
+        <h4>Linear surface</h4>
+        <pre className="docs-code"><code>{`export function LinearSurface() {
+  return <PixelTable<Row> columns={baseColumns} data={rows} surface="linear" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sortable">
+        <h4>Sortable columns</h4>
+        <pre className="docs-code"><code>{`export function Sortable() {
+  const [sort, setSort] = React.useState<PixelTableSortState>({ key: 'name', dir: 'asc' });
+  const sortable = [
+    { key: 'name', header: 'Name', sortable: true },
+    { key: 'role', header: 'Role', sortable: true },
+    { key: 'status', header: 'Status' },
+  ];
+  return (
+    <PixelTable<Row>
+      columns={sortable}
+      data={rows}
+      sort={sort}
+      onSortChange={setSort}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-single-selection">
+        <h4>Single selection</h4>
+        <pre className="docs-code"><code>{`export function SingleSelection() {
+  const [selected, setSelected] = React.useState<string[]>(['1']);
+  return (
+    <PixelTable<Row>
+      columns={baseColumns}
+      data={rows}
+      selection="single"
+      selectedIds={selected}
+      onSelectionChange={setSelected}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-multi-selection">
+        <h4>Multi selection</h4>
+        <pre className="docs-code"><code>{`export function MultiSelection() {
+  const [selected, setSelected] = React.useState<string[]>([]);
+  return (
+    <PixelTable<Row>
+      columns={baseColumns}
+      data={rows}
+      selection="multi"
+      selectedIds={selected}
+      onSelectionChange={setSelected}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-compact-density">
+        <h4>Compact density</h4>
+        <pre className="docs-code"><code>{`export function CompactDensity() {
+  return <PixelTable<Row> columns={baseColumns} data={rows} density="compact" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-comfortable-density">
+        <h4>Comfortable density</h4>
+        <pre className="docs-code"><code>{`export function ComfortableDensity() {
+  return <PixelTable<Row> columns={baseColumns} data={rows} density="comfortable" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-loading">
+        <h4>Loading</h4>
+        <pre className="docs-code"><code>{`export function Loading() {
+  return <PixelTable<Row> columns={baseColumns} data={[]} loading />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-empty">
+        <h4>Empty state</h4>
+        <pre className="docs-code"><code>{`export function Empty() {
+  return (
+    <PixelTable<Row>
+      columns={baseColumns}
+      data={[]}
+      emptyState={<span>No records found.</span>}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sticky-header">
+        <h4>Sticky header</h4>
+        <pre className="docs-code"><code>{`export function StickyHeader() {
+  return <PixelTable<Row> columns={baseColumns} data={rows} stickyHeader />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-custom-render">
+        <h4>Custom cell render</h4>
+        <pre className="docs-code"><code>{`export function CustomRender() {
+  const columns = [
+    { key: 'name', header: 'Name' },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (row: Row) => (
+        <span style={{ textTransform: 'uppercase' }}>{row.status}</span>
+      ),
+    },
+  ];
+  return <PixelTable<Row> columns={columns} data={rows} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-clickable-rows">
+        <h4>Clickable rows</h4>
+        <pre className="docs-code"><code>{`export function ClickableRows() {
+  const [last, setLast] = React.useState<string>('');
+  return (
+    <div>
+      <PixelTable<Row>
+        columns={baseColumns}
+        data={rows}
+        onRowClick={(row) => setLast(row.name)}
+      />
+      <p>Last clicked: {last || 'none'}</p>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

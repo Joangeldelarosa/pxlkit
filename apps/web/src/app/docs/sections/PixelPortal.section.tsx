@@ -47,6 +47,43 @@ export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProp
       </ul>
       <p className="docs-aria-notes">Portal content remains in the React tree, so focus order, events, and context providers behave as if the children were rendered in place.</p>
     </section>
+    <section aria-labelledby="pixel-portal-usage">
+      <h3 id="pixel-portal-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import React from 'react'
+import { PixelPortal } from '@pxlkit/ui-kit'
+
+export function Default() {
+  return (
+    <PixelPortal>
+      <div>Portaled content (renders into document.body after mount)</div>
+    </PixelPortal>
+  )
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelPortal>
+      <div>Portaled content (renders into document.body after mount)</div>
+    </PixelPortal>
+  )
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled (inline)</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <PixelPortal disabled>
+      <div>Rendered inline — portal disabled</div>
+    </PixelPortal>
+  )
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

@@ -99,6 +99,98 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-navigation-menu-usage">
+      <h3 id="pixel-navigation-menu-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import React from 'react'
+import { PixelNavigationMenu } from '@pxlkit/ui-kit'
+
+export function Default() {
+  return (
+    <PixelNavigationMenu
+      items={[
+        { label: 'Home', href: '#home' },
+        {
+          label: 'Products',
+          content: (
+            <div className="grid gap-2 text-sm text-retro-text">
+              <a href="#analytics" className="hover:underline">Analytics</a>
+              <a href="#dashboard" className="hover:underline">Dashboard</a>
+              <a href="#reports" className="hover:underline">Reports</a>
+            </div>
+          ),
+        },
+        { label: 'Docs', href: '#docs' },
+        { label: 'Pricing', href: '#pricing' },
+      ]}
+    />
+  )
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelNavigationMenu
+      items={[
+        { label: 'Home', href: '#home' },
+        {
+          label: 'Products',
+          content: (
+            <div className="grid gap-2 text-sm text-retro-text">
+              <a href="#analytics" className="hover:underline">Analytics</a>
+              <a href="#dashboard" className="hover:underline">Dashboard</a>
+              <a href="#reports" className="hover:underline">Reports</a>
+            </div>
+          ),
+        },
+        { label: 'Docs', href: '#docs' },
+        { label: 'Pricing', href: '#pricing' },
+      ]}
+    />
+  )
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-vertical">
+        <h4>Vertical</h4>
+        <pre className="docs-code"><code>{`export function Vertical() {
+  return (
+    <PixelNavigationMenu
+      orientation="vertical"
+      items={[
+        { label: 'Overview', href: '#overview' },
+        { label: 'Settings', href: '#settings' },
+        { label: 'Billing', href: '#billing' },
+      ]}
+    />
+  )
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-inline-panels">
+        <h4>Inline Panels</h4>
+        <pre className="docs-code"><code>{`export function InlinePanels() {
+  return (
+    <PixelNavigationMenu
+      viewport={false}
+      items={[
+        { label: 'Home', href: '#home' },
+        {
+          label: 'Resources',
+          content: (
+            <div className="grid gap-2 text-sm text-retro-text">
+              <a href="#guides" className="hover:underline">Guides</a>
+              <a href="#api" className="hover:underline">API Reference</a>
+            </div>
+          ),
+        },
+      ]}
+    />
+  )
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

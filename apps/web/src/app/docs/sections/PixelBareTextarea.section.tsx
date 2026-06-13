@@ -73,6 +73,121 @@ export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDoc
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-bare-textarea-usage">
+      <h3 id="pixel-bare-textarea-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelBareTextarea } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelBareTextarea placeholder="Write something..." rows={4} />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelBareTextarea placeholder="Write something..." rows={4} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-uncontrolled">
+        <h4>Uncontrolled</h4>
+        <pre className="docs-code"><code>{`export function Uncontrolled() {
+  return (
+    <PixelBareTextarea
+      defaultValue="Initial draft text"
+      rows={4}
+      aria-label="Notes"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-controlled">
+        <h4>Controlled</h4>
+        <pre className="docs-code"><code>{`export function Controlled() {
+  const [value, setValue] = useState('');
+  return (
+    <div className="flex flex-col gap-2">
+      <PixelBareTextarea
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Type to see live updates"
+        rows={4}
+        aria-label="Message"
+      />
+      <span className="text-xs text-retro-muted">{value.length} chars</span>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <PixelBareTextarea
+      disabled
+      defaultValue="Cannot edit this field"
+      rows={3}
+      aria-label="Disabled textarea"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-read-only">
+        <h4>Read only</h4>
+        <pre className="docs-code"><code>{`export function ReadOnly() {
+  return (
+    <PixelBareTextarea
+      readOnly
+      defaultValue="Read-only content for reference"
+      rows={3}
+      aria-label="Read-only textarea"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-custom-styling">
+        <h4>With custom styling</h4>
+        <pre className="docs-code"><code>{`export function WithCustomStyling() {
+  return (
+    <PixelBareTextarea
+      className="w-full rounded border border-retro-line bg-retro-elev p-3 font-mono text-sm text-retro-text"
+      placeholder="Escape-hatch: bring your own styles"
+      rows={5}
+      aria-label="Custom styled textarea"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-max-length">
+        <h4>With max length</h4>
+        <pre className="docs-code"><code>{`export function WithMaxLength() {
+  return (
+    <PixelBareTextarea
+      maxLength={140}
+      placeholder="Up to 140 characters"
+      rows={3}
+      aria-label="Short bio"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-required">
+        <h4>Required</h4>
+        <pre className="docs-code"><code>{`export function Required() {
+  return (
+    <PixelBareTextarea
+      required
+      placeholder="This field is required"
+      rows={3}
+      aria-label="Required textarea"
+      aria-required="true"
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

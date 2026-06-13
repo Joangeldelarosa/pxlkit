@@ -46,6 +46,83 @@ export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps)
       </ul>
       <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the `as` prop when overridden.</p>
     </section>
+    <section aria-labelledby="pixel-stack-usage">
+      <h3 id="pixel-stack-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelStack gap={4}>
+      <div className="text-sm text-retro-muted">First item</div>
+      <div className="text-sm text-retro-muted">Second item</div>
+      <div className="text-sm text-retro-muted">Third item</div>
+    </PixelStack>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelStack gap={4}>
+      <div className="text-sm text-retro-muted">First item</div>
+      <div className="text-sm text-retro-muted">Second item</div>
+      <div className="text-sm text-retro-muted">Third item</div>
+    </PixelStack>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-row">
+        <h4>Row</h4>
+        <pre className="docs-code"><code>{`export function Row() {
+  return (
+    <PixelStack direction="row" gap={3} align="center">
+      <div className="text-sm text-retro-muted">Left</div>
+      <div className="text-sm text-retro-muted">Center</div>
+      <div className="text-sm text-retro-muted">Right</div>
+    </PixelStack>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-space-between">
+        <h4>Space Between</h4>
+        <pre className="docs-code"><code>{`export function SpaceBetween() {
+  return (
+    <PixelStack direction="row" justify="between" align="center">
+      <div className="text-sm text-retro-muted">Start</div>
+      <div className="text-sm text-retro-muted">End</div>
+    </PixelStack>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-wrapped">
+        <h4>Wrapped</h4>
+        <pre className="docs-code"><code>{`export function Wrapped() {
+  return (
+    <PixelStack direction="row" gap={2} wrap>
+      <div className="text-sm text-retro-muted">Tag A</div>
+      <div className="text-sm text-retro-muted">Tag B</div>
+      <div className="text-sm text-retro-muted">Tag C</div>
+      <div className="text-sm text-retro-muted">Tag D</div>
+    </PixelStack>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel Surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  return (
+    <PixelStack surface="pixel" gap={4}>
+      <div className="text-sm text-retro-muted">Surface-aware item</div>
+      <div className="text-sm text-retro-muted">Picks up pixel transition</div>
+    </PixelStack>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

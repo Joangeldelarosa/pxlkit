@@ -46,6 +46,86 @@ export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSecti
       </ul>
       <p className="docs-aria-notes">Renders as &lt;div&gt; with semantic neutrality; relies on inner content for landmarks and headings.</p>
     </section>
+    <section aria-labelledby="pixel-two-column-usage">
+      <h3 id="pixel-two-column-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelTwoColumn
+      left={<div className="text-sm text-retro-muted">Left column</div>}
+      right={<div className="text-sm text-retro-muted">Right column</div>}
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelTwoColumn
+      left={<div className="text-sm text-retro-muted">Left column</div>}
+      right={<div className="text-sm text-retro-muted">Right column</div>}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sixty-forty">
+        <h4>Sixty Forty</h4>
+        <pre className="docs-code"><code>{`export function SixtyForty() {
+  return (
+    <PixelTwoColumn
+      ratio="60/40"
+      gap={6}
+      left={<div className="text-sm text-retro-muted">Main content (60%)</div>}
+      right={<div className="text-sm text-retro-muted">Sidebar (40%)</div>}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-reversed">
+        <h4>Reversed</h4>
+        <pre className="docs-code"><code>{`export function Reversed() {
+  return (
+    <PixelTwoColumn
+      ratio="70/30"
+      reverse
+      left={<div className="text-sm text-retro-muted">Logical left</div>}
+      right={<div className="text-sm text-retro-muted">Visually first</div>}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-stacked-below-lg">
+        <h4>Stacked Below Lg</h4>
+        <pre className="docs-code"><code>{`export function StackedBelowLg() {
+  return (
+    <PixelTwoColumn
+      stackBelow="lg"
+      align="center"
+      left={<div className="text-sm text-retro-muted">Stacks below lg</div>}
+      right={<div className="text-sm text-retro-muted">Side-by-side at lg+</div>}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel Surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  return (
+    <PixelTwoColumn
+      surface="pixel"
+      ratio="50/50"
+      left={<div className="text-sm text-retro-muted">Surface-aware left</div>}
+      right={<div className="text-sm text-retro-muted">Surface-aware right</div>}
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

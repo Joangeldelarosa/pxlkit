@@ -45,6 +45,52 @@ export function PixelBounceDocsSection({ className }: PixelBounceDocsSectionProp
       </ul>
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
+    <section aria-labelledby="pixel-bounce-usage">
+      <h3 id="pixel-bounce-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelBounce } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelBounce>
+      <span>Bounce</span>
+    </PixelBounce>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelBounce>
+      <span>Bounce</span>
+    </PixelBounce>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-taller-bounce">
+        <h4>Taller Bounce</h4>
+        <pre className="docs-code"><code>{`export function TallerBounce() {
+  return (
+    <PixelBounce height={16} duration={1000}>
+      <span>Higher Jump</span>
+    </PixelBounce>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-hover-trigger">
+        <h4>Hover Trigger</h4>
+        <pre className="docs-code"><code>{`export function HoverTrigger() {
+  return (
+    <PixelBounce trigger="hover" repeat={1}>
+      <span>Hover me</span>
+    </PixelBounce>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

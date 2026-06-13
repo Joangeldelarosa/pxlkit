@@ -45,6 +45,42 @@ export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSec
       </ul>
       <p className="docs-aria-notes">Caret and the character-by-character animation are aria-hidden; the complete string is exposed to assistive tech from the first render via a visually hidden span. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and onComplete fires once.</p>
     </section>
+    <section aria-labelledby="pixel-typewriter-usage">
+      <h3 id="pixel-typewriter-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelTypewriter } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelTypewriter text="Hello, pxlkit." />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelTypewriter text="Hello, pxlkit." />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-fast-cyan">
+        <h4>Fast (cyan)</h4>
+        <pre className="docs-code"><code>{`export function FastCyan() {
+  return <PixelTypewriter text="Typing fast in cyan..." speed={30} tone="cyan" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-no-cursor">
+        <h4>No cursor</h4>
+        <pre className="docs-code"><code>{`export function NoCursor() {
+  return <PixelTypewriter text="No blinking caret here." cursor={false} tone="gold" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-on-view">
+        <h4>On view</h4>
+        <pre className="docs-code"><code>{`export function OnView() {
+  return <PixelTypewriter text="Types when scrolled into view." trigger="inView" tone="purple" />;
+}`}</code></pre>
+      </article>
+    </section>
     </section>
   );
 }

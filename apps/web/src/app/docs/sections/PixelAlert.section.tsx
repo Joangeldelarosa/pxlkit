@@ -46,6 +46,116 @@ export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps)
       </ul>
       <p className="docs-aria-notes">Root carries role=&quot;alert&quot; and a calculated aria-live (assertive for red/gold, polite otherwise). Icon slot is wrapped purely for layout — meaning must come from the title/message text, not the glyph. For non-urgent status (e.g. &quot;saved&quot;), pass live=&quot;polite&quot; to prevent screen-reader interruption. Action buttons are exposed as siblings of the message and receive their own focus order.</p>
     </section>
+    <section aria-labelledby="pixel-alert-usage">
+      <h3 id="pixel-alert-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelAlert } from '@pxlkit/ui-kit';
+import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelAlert
+      title="Something went wrong"
+      message="Your session expired. Please sign in again to continue."
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelAlert
+      title="Something went wrong"
+      message="Your session expired. Please sign in again to continue."
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelAlert tone="neutral" title="Heads up" message="Neutral informational banner." />
+      <PixelAlert tone="green" title="Saved" message="Your changes have been persisted." />
+      <PixelAlert tone="cyan" title="New feature" message="Try the redesigned inbox." />
+      <PixelAlert tone="gold" title="Warning" message="Storage is almost full." />
+      <PixelAlert tone="red" title="Error" message="Failed to upload the file." />
+      <PixelAlert tone="purple" title="Tip" message="Use ⌘K to jump anywhere." />
+      <PixelAlert tone="pink" title="Highlight" message="You unlocked a new badge." />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelAlert
+        surface="linear"
+        tone="cyan"
+        title="Linear surface"
+        message="Soft border with rounded corners."
+      />
+      <PixelAlert
+        surface="pixel"
+        tone="cyan"
+        title="Pixel surface"
+        message="Chamfered border with a left accent stripe."
+      />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-icon">
+        <h4>With Icon</h4>
+        <pre className="docs-code"><code>{`export function WithIcon() {
+  return (
+    <PixelAlert
+      tone="cyan"
+      title="Pro tip"
+      message="You can drag-and-drop files anywhere on the page."
+      icon={<InfoIcon />}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-action">
+        <h4>With Action</h4>
+        <pre className="docs-code"><code>{`export function WithAction() {
+  return (
+    <PixelAlert
+      tone="red"
+      title="Connection lost"
+      message="We couldn't reach the server. Check your network and retry."
+      icon={<InfoIcon />}
+      action={
+        <PixelButton size="sm" tone="red" variant="outline">
+          Retry
+        </PixelButton>
+      }
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-polite-live">
+        <h4>Polite Live Region</h4>
+        <pre className="docs-code"><code>{`export function PoliteLive() {
+  return (
+    <PixelAlert
+      tone="green"
+      live="polite"
+      title="Auto-saved"
+      message="Drafts are saved every few seconds."
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

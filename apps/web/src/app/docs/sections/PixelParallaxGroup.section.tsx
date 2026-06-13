@@ -46,6 +46,55 @@ export function PixelParallaxGroupDocsSection({ className }: PixelParallaxGroupD
       </ul>
       <p className="docs-aria-notes">Purely a layout/clipping container; children handle motion and respect prefers-reduced-motion individually.</p>
     </section>
+    <section aria-labelledby="pixel-parallax-group-usage">
+      <h3 id="pixel-parallax-group-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelParallaxGroup } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelParallaxGroup
+      style={{ height: 240, background: '#0b0b0f', color: '#e5e7eb' }}
+    >
+      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }}>
+        Parallax viewport
+      </div>
+    </PixelParallaxGroup>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelParallaxGroup
+      style={{ height: 240, background: '#0b0b0f', color: '#e5e7eb' }}
+    >
+      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }}>
+        Parallax viewport
+      </div>
+    </PixelParallaxGroup>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-as-section">
+        <h4>As Section</h4>
+        <pre className="docs-code"><code>{`export function AsSection() {
+  return (
+    <PixelParallaxGroup
+      as="section"
+      style={{ height: 200, background: '#111827', color: '#e5e7eb' }}
+    >
+      <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }}>
+        Section variant
+      </div>
+    </PixelParallaxGroup>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

@@ -45,6 +45,52 @@ export function PixelRotateDocsSection({ className }: PixelRotateDocsSectionProp
       </ul>
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
+    <section aria-labelledby="pixel-rotate-usage">
+      <h3 id="pixel-rotate-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelRotate } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelRotate>
+      <span>Rotate</span>
+    </PixelRotate>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelRotate>
+      <span>Rotate</span>
+    </PixelRotate>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-reverse-direction">
+        <h4>Reverse Direction</h4>
+        <pre className="docs-code"><code>{`export function ReverseDirection() {
+  return (
+    <PixelRotate direction="reverse" duration={2400}>
+      <span>Reverse</span>
+    </PixelRotate>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-hover-trigger">
+        <h4>Hover Trigger</h4>
+        <pre className="docs-code"><code>{`export function HoverTrigger() {
+  return (
+    <PixelRotate trigger="hover" repeat={1} duration={900}>
+      <span>Hover me</span>
+    </PixelRotate>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

@@ -73,6 +73,160 @@ export function PixelDataTableDocsSection({ className }: PixelDataTableDocsSecti
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-data-table-usage">
+      <h3 id="pixel-data-table-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import * as React from 'react';
+import {
+  PixelDataTable,
+  createColumnHelper,
+  type ColumnDef,
+} from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+export function Default() {
+  return <PixelDataTable<Row> data={rows} columns={columns} />;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelDataTable<Row> data={rows} columns={columns} />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pixel-surface">
+        <h4>Pixel surface</h4>
+        <pre className="docs-code"><code>{`export function PixelSurface() {
+  return <PixelDataTable<Row> data={rows} columns={columns} surface="pixel" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-linear-surface">
+        <h4>Linear surface</h4>
+        <pre className="docs-code"><code>{`export function LinearSurface() {
+  return <PixelDataTable<Row> data={rows} columns={columns} surface="linear" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sortable">
+        <h4>Sortable columns</h4>
+        <pre className="docs-code"><code>{`export function Sortable() {
+  const [sorting, setSorting] = React.useState<{ id: string; desc: boolean }[]>([
+    { id: 'name', desc: false },
+  ]);
+  return (
+    <PixelDataTable<Row>
+      data={rows}
+      columns={columns}
+      sorting={sorting}
+      onSortingChange={setSorting}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-row-selection">
+        <h4>Row selection</h4>
+        <pre className="docs-code"><code>{`export function RowSelection() {
+  const [selection, setSelection] = React.useState<Record<string, boolean>>({});
+  return (
+    <PixelDataTable<Row>
+      data={rows}
+      columns={columns}
+      rowSelection={selection}
+      onRowSelectionChange={setSelection}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-pagination">
+        <h4>Pagination</h4>
+        <pre className="docs-code"><code>{`export function Pagination() {
+  const [pagination, setPagination] = React.useState({ pageIndex: 0, pageSize: 2 });
+  return (
+    <PixelDataTable<Row>
+      data={rows}
+      columns={columns}
+      pagination={pagination}
+      onPaginationChange={setPagination}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-compact-density">
+        <h4>Compact density</h4>
+        <pre className="docs-code"><code>{`export function CompactDensity() {
+  return <PixelDataTable<Row> data={rows} columns={columns} density="compact" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-comfortable-density">
+        <h4>Comfortable density</h4>
+        <pre className="docs-code"><code>{`export function ComfortableDensity() {
+  return <PixelDataTable<Row> data={rows} columns={columns} density="comfortable" />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-loading">
+        <h4>Loading</h4>
+        <pre className="docs-code"><code>{`export function Loading() {
+  return <PixelDataTable<Row> data={[]} columns={columns} loading />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-empty">
+        <h4>Empty state</h4>
+        <pre className="docs-code"><code>{`export function Empty() {
+  return (
+    <PixelDataTable<Row>
+      data={[]}
+      columns={columns}
+      emptyState={<span>No records found.</span>}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sticky-header">
+        <h4>Sticky header</h4>
+        <pre className="docs-code"><code>{`export function StickyHeader() {
+  return <PixelDataTable<Row> data={rows} columns={columns} stickyHeader />;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-clickable-rows">
+        <h4>Clickable rows</h4>
+        <pre className="docs-code"><code>{`export function ClickableRows() {
+  const [last, setLast] = React.useState<string>('');
+  return (
+    <div>
+      <PixelDataTable<Row>
+        data={rows}
+        columns={columns}
+        onRowClick={(row) => setLast(row.name)}
+      />
+      <p>Last clicked: {last || 'none'}</p>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

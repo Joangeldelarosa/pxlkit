@@ -78,6 +78,86 @@ export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSec
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-scroll-area-usage">
+      <h3 id="pixel-scroll-area-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelScrollArea } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelScrollArea aria-label="Sample scrollable region" maxHeight={160}>
+      <div className="space-y-2 p-3">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <p key={i} className="text-sm text-retro-muted">
+            Scroll item {i + 1}
+          </p>
+        ))}
+      </div>
+    </PixelScrollArea>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelScrollArea aria-label="Sample scrollable region" maxHeight={160}>
+      <div className="space-y-2 p-3">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <p key={i} className="text-sm text-retro-muted">
+            Scroll item {i + 1}
+          </p>
+        ))}
+      </div>
+    </PixelScrollArea>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-always-visible">
+        <h4>Always Visible</h4>
+        <pre className="docs-code"><code>{`export function AlwaysVisible() {
+  return (
+    <PixelScrollArea
+      aria-label="Always-visible scrollbar"
+      type="always"
+      maxHeight={140}
+      offsetScrollbars
+    >
+      <div className="space-y-2 p-3">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <p key={i} className="text-sm text-retro-muted">
+            Row {i + 1}
+          </p>
+        ))}
+      </div>
+    </PixelScrollArea>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-custom-scrollbar-size">
+        <h4>Custom Scrollbar Size</h4>
+        <pre className="docs-code"><code>{`export function CustomScrollbarSize() {
+  return (
+    <PixelScrollArea
+      aria-label="Custom scrollbar size"
+      type="hover"
+      maxHeight={140}
+      scrollbarSize={10}
+    >
+      <div className="space-y-2 p-3">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <p key={i} className="text-sm text-retro-muted">
+            Hover row {i + 1}
+          </p>
+        ))}
+      </div>
+    </PixelScrollArea>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

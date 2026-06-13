@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { USAGE_SNIPPETS } from '../docs/sections/usage-snippets.generated';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import {
   PixelAccordion,
@@ -562,7 +563,7 @@ function MoreComponentSection({ id, name }: { id: string; name: string }) {
           for props, accessibility, and keyboard docs generated from the component manifest.
         </>
       }
-      code={`import { ${name} } from '@pxlkit/ui-kit';`}
+      code={USAGE_SNIPPETS[id] ?? `import { ${name} } from '@pxlkit/ui-kit';`}
     >
       {Demo ? (
         <Demo />

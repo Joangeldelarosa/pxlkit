@@ -46,6 +46,96 @@ export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSecti
       </ul>
       <p className="docs-aria-notes">Renders as a plain &lt;div&gt; by default. When aria-label or aria-labelledby is provided, the root gains role=&quot;group&quot; to expose the collection as a named landmark to assistive tech. Without an accessible name the role is intentionally dropped to avoid an unlabeled group node. The inner stat tiles (PixelStatCard) carry their own label/value semantics.</p>
     </section>
+    <section aria-labelledby="pixel-stat-group-usage">
+      <h3 id="pixel-stat-group-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelStatGroup } from '@pxlkit/ui-kit';
+import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelStatGroup aria-label="Key metrics">
+      <PixelStatCard label="Users" value="1,284" />
+      <PixelStatCard label="Revenue" value="$12.4k" />
+      <PixelStatCard label="Active" value="312" />
+    </PixelStatGroup>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelStatGroup aria-label="Key metrics">
+      <PixelStatCard label="Users" value="1,284" />
+      <PixelStatCard label="Revenue" value="$12.4k" />
+      <PixelStatCard label="Active" value="312" />
+    </PixelStatGroup>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-row-layout">
+        <h4>Row layout</h4>
+        <pre className="docs-code"><code>{`export function RowLayout() {
+  return (
+    <PixelStatGroup layout="row" aria-label="Row metrics">
+      <PixelStatCard label="Sessions" value="842" />
+      <PixelStatCard label="Conversions" value="56" />
+      <PixelStatCard label="Bounce" value="24%" />
+    </PixelStatGroup>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-grid-layout">
+        <h4>Grid layout</h4>
+        <pre className="docs-code"><code>{`export function GridLayout() {
+  return (
+    <PixelStatGroup layout="grid" columns={4} aria-label="Grid metrics">
+      <PixelStatCard label="A" value="10" />
+      <PixelStatCard label="B" value="20" />
+      <PixelStatCard label="C" value="30" />
+      <PixelStatCard label="D" value="40" />
+    </PixelStatGroup>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelStatGroup tone="cyan" aria-label="Cyan group">
+        <PixelStatCard label="Cyan" value="1" tone="cyan" />
+        <PixelStatCard label="Cyan" value="2" tone="cyan" />
+      </PixelStatGroup>
+      <PixelStatGroup tone="green" aria-label="Green group">
+        <PixelStatCard label="Green" value="1" tone="green" />
+        <PixelStatCard label="Green" value="2" tone="green" />
+      </PixelStatGroup>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelStatGroup surface="pixel" aria-label="Pixel surface">
+        <PixelStatCard label="Pixel" value="42" />
+        <PixelStatCard label="Pixel" value="84" />
+      </PixelStatGroup>
+      <PixelStatGroup surface="linear" aria-label="Linear surface">
+        <PixelStatCard label="Linear" value="42" />
+        <PixelStatCard label="Linear" value="84" />
+      </PixelStatGroup>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

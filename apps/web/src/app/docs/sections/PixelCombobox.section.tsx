@@ -89,6 +89,189 @@ export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSection
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-combobox-usage">
+      <h3 id="pixel-combobox-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+const GROUPED = [
+  { value: 'us', label: 'United States', group: 'Americas' },
+  { value: 've', label: 'Venezuela', group: 'Americas' },
+  { value: 'mx', label: 'Mexico', group: 'Americas' },
+  { value: 'es', label: 'Spain', group: 'Europe' },
+  { value: 'fr', label: 'France', group: 'Europe' },
+  { value: 'de', label: 'Germany', group: 'Europe' },
+  { value: 'jp', label: 'Japan', group: 'Asia' },
+  { value: 'kr', label: 'South Korea', group: 'Asia' },
+];
+
+export function Default() {
+  return (
+    <PixelCombobox
+      label="Fruit"
+      options={FRUITS}
+      placeholder="Pick a fruit"
+      hint="Type to filter"
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelCombobox
+      label="Fruit"
+      options={FRUITS}
+      placeholder="Pick a fruit"
+      hint="Type to filter"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-uncontrolled">
+        <h4>Uncontrolled</h4>
+        <pre className="docs-code"><code>{`export function Uncontrolled() {
+  return (
+    <PixelCombobox
+      label="Fruit"
+      options={FRUITS}
+      defaultValue="banana"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-controlled">
+        <h4>Controlled</h4>
+        <pre className="docs-code"><code>{`export function Controlled() {
+  const [value, setValue] = useState('cherry');
+  return (
+    <PixelCombobox
+      label="Controlled fruit"
+      options={FRUITS}
+      value={value}
+      onChange={setValue}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-grouped">
+        <h4>Grouped options</h4>
+        <pre className="docs-code"><code>{`export function Grouped() {
+  return (
+    <PixelCombobox
+      label="Country"
+      options={GROUPED}
+      placeholder="Pick a country"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-not-searchable">
+        <h4>Without search</h4>
+        <pre className="docs-code"><code>{`export function NotSearchable() {
+  return (
+    <PixelCombobox
+      label="Fruit"
+      options={FRUITS}
+      searchable={false}
+      placeholder="No filter"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelCombobox label="Small" options={FRUITS} size="sm" placeholder="sm" />
+      <PixelCombobox label="Medium" options={FRUITS} size="md" placeholder="md" />
+      <PixelCombobox label="Large" options={FRUITS} size="lg" placeholder="lg" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelCombobox label="Pixel" options={FRUITS} surface="pixel" placeholder="pixel surface" />
+      <PixelCombobox label="Linear" options={FRUITS} surface="linear" placeholder="linear surface" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <PixelCombobox
+      label="Disabled"
+      options={FRUITS}
+      defaultValue="apple"
+      disabled
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-error">
+        <h4>With error</h4>
+        <pre className="docs-code"><code>{`export function WithError() {
+  return (
+    <PixelCombobox
+      label="Fruit"
+      options={FRUITS}
+      placeholder="Pick one"
+      error="Please choose a fruit"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-form-name">
+        <h4>With form name</h4>
+        <pre className="docs-code"><code>{`export function WithFormName() {
+  return (
+    <form>
+      <PixelCombobox
+        label="Fruit"
+        options={FRUITS}
+        name="fruit"
+        defaultValue="cherry"
+        hint="Value participates in native form submission"
+      />
+    </form>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-custom-empty-message">
+        <h4>Custom empty message</h4>
+        <pre className="docs-code"><code>{`export function CustomEmptyMessage() {
+  return (
+    <PixelCombobox
+      label="Fruit"
+      options={FRUITS}
+      placeholder="Type 'xyz'"
+      emptyMessage="No fruits match your filter"
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

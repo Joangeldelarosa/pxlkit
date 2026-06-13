@@ -45,6 +45,80 @@ export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSec
       </ul>
       <p className="docs-aria-notes">Renders as a native &lt;code&gt; element so screen readers convey the inline-code semantic. PixelCodeInline is presentational (not focusable, not actionable) — tone is purely decorative, so the surrounding prose must carry the meaning (e.g. mark error snippets with adjacent text, not tone alone). For multi-line code blocks use a block-level &lt;pre&gt;&lt;code&gt; primitive instead.</p>
     </section>
+    <section aria-labelledby="pixel-code-inline-usage">
+      <h3 id="pixel-code-inline-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelCodeInline } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelCodeInline>npm install</PixelCodeInline>;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelCodeInline>npm install</PixelCodeInline>;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <PixelCodeInline tone="neutral">neutral</PixelCodeInline>
+      <PixelCodeInline tone="cyan">cyan</PixelCodeInline>
+      <PixelCodeInline tone="green">green</PixelCodeInline>
+      <PixelCodeInline tone="gold">gold</PixelCodeInline>
+      <PixelCodeInline tone="red">red</PixelCodeInline>
+      <PixelCodeInline tone="purple">purple</PixelCodeInline>
+      <PixelCodeInline tone="pink">pink</PixelCodeInline>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <PixelCodeInline surface="pixel">surface=&quot;pixel&quot;</PixelCodeInline>
+      <PixelCodeInline surface="linear">surface=&quot;linear&quot;</PixelCodeInline>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-inline-in-prose">
+        <h4>Inline in Prose</h4>
+        <pre className="docs-code"><code>{`export function InlineInProse() {
+  return (
+    <p className="text-sm text-retro-text">
+      Run <PixelCodeInline>pnpm dev</PixelCodeInline> to start the local server,
+      then open <PixelCodeInline tone="green">http://localhost:3000</PixelCodeInline>.
+    </p>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-code-samples">
+        <h4>Code Samples</h4>
+        <pre className="docs-code"><code>{`export function CodeSamples() {
+  return (
+    <div className="flex flex-col gap-2">
+      <div>
+        Import: <PixelCodeInline>{\`import { PixelCodeInline } from '@pxlkit/ui'\`}</PixelCodeInline>
+      </div>
+      <div>
+        Hotkey: <PixelCodeInline tone="purple">Ctrl+K</PixelCodeInline>
+      </div>
+      <div>
+        Error: <PixelCodeInline tone="red">EACCES</PixelCodeInline>
+      </div>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

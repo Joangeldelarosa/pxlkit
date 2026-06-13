@@ -45,6 +45,71 @@ export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): Re
       </ul>
       <p className="docs-aria-notes">Renders as a native &lt;kbd&gt; element so screen readers convey the keyboard-input semantic. PixelKbd is presentational (not focusable, not actionable) — pair it with descriptive prose (e.g. &quot;Press &lt;kbd&gt;Ctrl&lt;/kbd&gt; + &lt;kbd&gt;K&lt;/kbd&gt; to open the command palette&quot;) so the shortcut is meaningful when read out of context. For key combos, render multiple PixelKbd siblings with a literal &quot;+&quot; separator marked aria-hidden.</p>
     </section>
+    <section aria-labelledby="pixel-kbd-usage">
+      <h3 id="pixel-kbd-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelKbd>Enter</PixelKbd>;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelKbd>Enter</PixelKbd>;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-common-keys">
+        <h4>Common Keys</h4>
+        <pre className="docs-code"><code>{`export function CommonKeys() {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <PixelKbd>Esc</PixelKbd>
+      <PixelKbd>Tab</PixelKbd>
+      <PixelKbd>Enter</PixelKbd>
+      <PixelKbd>Space</PixelKbd>
+      <PixelKbd>Shift</PixelKbd>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-combo">
+        <h4>Combo (Ctrl + K)</h4>
+        <pre className="docs-code"><code>{`export function Combo() {
+  return (
+    <div className="flex items-center gap-1 text-xs">
+      <PixelKbd>Ctrl</PixelKbd>
+      <span aria-hidden>+</span>
+      <PixelKbd>K</PixelKbd>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <PixelKbd surface="pixel">P</PixelKbd>
+      <PixelKbd surface="linear">L</PixelKbd>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-inline-in-prose">
+        <h4>Inline in Prose</h4>
+        <pre className="docs-code"><code>{`export function InlineInProse() {
+  return (
+    <p className="text-sm text-retro-text">
+      Press <PixelKbd>/</PixelKbd> to focus the search bar, then <PixelKbd>Esc</PixelKbd> to dismiss it.
+    </p>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

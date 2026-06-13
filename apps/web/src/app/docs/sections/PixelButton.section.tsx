@@ -68,6 +68,132 @@ export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProp
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-button-usage">
+      <h3 id="pixel-button-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return <PixelButton>Click me</PixelButton>;
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return <PixelButton>Click me</PixelButton>;
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelButton tone="green">Green</PixelButton>
+      <PixelButton tone="cyan">Cyan</PixelButton>
+      <PixelButton tone="gold">Gold</PixelButton>
+      <PixelButton tone="red">Red</PixelButton>
+      <PixelButton tone="purple">Purple</PixelButton>
+      <PixelButton tone="pink">Pink</PixelButton>
+      <PixelButton tone="neutral">Neutral</PixelButton>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <PixelButton size="sm">Small</PixelButton>
+      <PixelButton size="md">Medium</PixelButton>
+      <PixelButton size="lg">Large</PixelButton>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-variants">
+        <h4>Variants</h4>
+        <pre className="docs-code"><code>{`export function Variants() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelButton variant="solid">Solid</PixelButton>
+      <PixelButton variant="soft">Soft</PixelButton>
+      <PixelButton variant="outline">Outline</PixelButton>
+      <PixelButton variant="ghost">Ghost</PixelButton>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelButton surface="pixel">Pixel</PixelButton>
+      <PixelButton surface="linear">Linear</PixelButton>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-icons">
+        <h4>With icons</h4>
+        <pre className="docs-code"><code>{`export function WithIcons() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelButton iconLeft={<Arrow />}>Leading</PixelButton>
+      <PixelButton iconRight={<Arrow />}>Trailing</PixelButton>
+      <PixelButton iconLeft={<Arrow />} iconRight={<Arrow />}>Both</PixelButton>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-loading">
+        <h4>Loading</h4>
+        <pre className="docs-code"><code>{`export function Loading() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelButton loading>Saving</PixelButton>
+      <PixelButton loading tone="cyan" variant="outline">Loading</PixelButton>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelButton disabled>Disabled</PixelButton>
+      <PixelButton disabled variant="outline">Disabled outline</PixelButton>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-full-width">
+        <h4>Full width</h4>
+        <pre className="docs-code"><code>{`export function FullWidth() {
+  return (
+    <div className="w-full max-w-sm">
+      <PixelButton fullWidth>Full width</PixelButton>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-as-child">
+        <h4>As child (link)</h4>
+        <pre className="docs-code"><code>{`export function AsChild() {
+  return (
+    <PixelButton asChild tone="cyan">
+      <a href="https://pxlkit.dev" target="_blank" rel="noreferrer">
+        External link
+      </a>
+    </PixelButton>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

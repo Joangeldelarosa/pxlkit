@@ -46,6 +46,122 @@ export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsS
       </ul>
       <p className="docs-aria-notes">Provide aria-label or aria-labelledby summarizing the count (e.g. &quot;5 team members&quot;); without one, role=group is dropped so the cluster is treated as presentational. The &quot;+N&quot; overflow tile carries its own aria-label (&quot;N more users&quot;) so assistive tech announces the hidden count.</p>
     </section>
+    <section aria-labelledby="pixel-avatar-group-usage">
+      <h3 id="pixel-avatar-group-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelAvatarGroup } from '@pxlkit/ui-kit';
+import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelAvatarGroup aria-label="3 team members">
+      <PixelAvatar name="Joangel De La Rosa" />
+      <PixelAvatar name="Ana Lopez" />
+      <PixelAvatar name="Carlos Diaz" />
+    </PixelAvatarGroup>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelAvatarGroup aria-label="3 team members">
+      <PixelAvatar name="Joangel De La Rosa" />
+      <PixelAvatar name="Ana Lopez" />
+      <PixelAvatar name="Carlos Diaz" />
+    </PixelAvatarGroup>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-overflow">
+        <h4>With Overflow</h4>
+        <pre className="docs-code"><code>{`export function WithOverflow() {
+  return (
+    <PixelAvatarGroup aria-label="6 team members" max={4}>
+      <PixelAvatar name="Joangel De La Rosa" />
+      <PixelAvatar name="Ana Lopez" />
+      <PixelAvatar name="Carlos Diaz" />
+      <PixelAvatar name="Diana Perez" />
+      <PixelAvatar name="Eduardo Ruiz" />
+      <PixelAvatar name="Fabiola Garcia" />
+    </PixelAvatarGroup>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelAvatarGroup aria-label="Extra small group" size="xs">
+        <PixelAvatar name="Ana Lopez" size="xs" />
+        <PixelAvatar name="Bob Brown" size="xs" />
+        <PixelAvatar name="Carol Chen" size="xs" />
+      </PixelAvatarGroup>
+      <PixelAvatarGroup aria-label="Medium group" size="md">
+        <PixelAvatar name="Ana Lopez" size="md" />
+        <PixelAvatar name="Bob Brown" size="md" />
+        <PixelAvatar name="Carol Chen" size="md" />
+      </PixelAvatarGroup>
+      <PixelAvatarGroup aria-label="Extra large group" size="xl">
+        <PixelAvatar name="Ana Lopez" size="xl" />
+        <PixelAvatar name="Bob Brown" size="xl" />
+        <PixelAvatar name="Carol Chen" size="xl" />
+      </PixelAvatarGroup>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelAvatarGroup aria-label="Cyan team" tone="cyan" max={3}>
+        <PixelAvatar name="Ana Lopez" tone="cyan" />
+        <PixelAvatar name="Bob Brown" tone="cyan" />
+        <PixelAvatar name="Carol Chen" tone="cyan" />
+        <PixelAvatar name="Dave Diaz" tone="cyan" />
+      </PixelAvatarGroup>
+      <PixelAvatarGroup aria-label="Gold team" tone="gold" max={3}>
+        <PixelAvatar name="Ana Lopez" tone="gold" />
+        <PixelAvatar name="Bob Brown" tone="gold" />
+        <PixelAvatar name="Carol Chen" tone="gold" />
+        <PixelAvatar name="Dave Diaz" tone="gold" />
+      </PixelAvatarGroup>
+      <PixelAvatarGroup aria-label="Purple team" tone="purple" max={3}>
+        <PixelAvatar name="Ana Lopez" tone="purple" />
+        <PixelAvatar name="Bob Brown" tone="purple" />
+        <PixelAvatar name="Carol Chen" tone="purple" />
+        <PixelAvatar name="Dave Diaz" tone="purple" />
+      </PixelAvatarGroup>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelAvatarGroup aria-label="Pixel surface group" surface="pixel">
+        <PixelAvatar name="Ana Lopez" surface="pixel" />
+        <PixelAvatar name="Bob Brown" surface="pixel" />
+        <PixelAvatar name="Carol Chen" surface="pixel" />
+      </PixelAvatarGroup>
+      <PixelAvatarGroup aria-label="Linear surface group" surface="linear">
+        <PixelAvatar name="Ana Lopez" surface="linear" />
+        <PixelAvatar name="Bob Brown" surface="linear" />
+        <PixelAvatar name="Carol Chen" surface="linear" />
+      </PixelAvatarGroup>
+    </div>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

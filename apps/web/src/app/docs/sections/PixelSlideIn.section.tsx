@@ -46,6 +46,60 @@ export function PixelSlideInDocsSection({ className }: PixelSlideInDocsSectionPr
       </ul>
       <p className="docs-aria-notes">Animation is suppressed when the user prefers reduced motion.</p>
     </section>
+    <section aria-labelledby="pixel-slide-in-usage">
+      <h3 id="pixel-slide-in-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelSlideIn } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelSlideIn>
+      <div style={{ padding: 16, background: '#111', color: '#fff' }}>
+        Slides in from below on mount
+      </div>
+    </PixelSlideIn>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelSlideIn>
+      <div style={{ padding: 16, background: '#111', color: '#fff' }}>
+        Slides in from below on mount
+      </div>
+    </PixelSlideIn>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-from-left">
+        <h4>From Left</h4>
+        <pre className="docs-code"><code>{`export function FromLeft() {
+  return (
+    <PixelSlideIn from="left" duration={500} distance={20}>
+      <div style={{ padding: 16, background: '#0EA5E9', color: '#000' }}>
+        Slides in from the left
+      </div>
+    </PixelSlideIn>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-on-hover">
+        <h4>On Hover</h4>
+        <pre className="docs-code"><code>{`export function OnHover() {
+  return (
+    <PixelSlideIn trigger="hover" from="right" duration={300}>
+      <div style={{ padding: 16, background: '#222', color: '#0EA5E9' }}>
+        Hover to slide in from the right
+      </div>
+    </PixelSlideIn>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

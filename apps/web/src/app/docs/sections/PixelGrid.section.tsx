@@ -43,6 +43,90 @@ export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): 
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the element provided via `as` (e.g. ul, section). Authors are responsible for the semantic role of grid children.</p>
     </section>
+    <section aria-labelledby="pixel-grid-usage">
+      <h3 id="pixel-grid-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import React from 'react';
+import { PixelGrid } from '@pxlkit/ui-kit';
+
+function Cell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-fg">
+      {children}
+    </div>
+  );
+}
+
+export function Default() {
+  return (
+    <PixelGrid cols={3} gap={4}>
+      <Cell>One</Cell>
+      <Cell>Two</Cell>
+      <Cell>Three</Cell>
+      <Cell>Four</Cell>
+      <Cell>Five</Cell>
+      <Cell>Six</Cell>
+    </PixelGrid>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelGrid cols={3} gap={4}>
+      <Cell>One</Cell>
+      <Cell>Two</Cell>
+      <Cell>Three</Cell>
+      <Cell>Four</Cell>
+      <Cell>Five</Cell>
+      <Cell>Six</Cell>
+    </PixelGrid>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-responsive">
+        <h4>Responsive Columns</h4>
+        <pre className="docs-code"><code>{`export function Responsive() {
+  return (
+    <PixelGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={4}>
+      <Cell>1</Cell>
+      <Cell>2</Cell>
+      <Cell>3</Cell>
+      <Cell>4</Cell>
+    </PixelGrid>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-auto-fit">
+        <h4>Auto Fit</h4>
+        <pre className="docs-code"><code>{`export function AutoFit() {
+  return (
+    <PixelGrid autoFit minColWidth="12rem" gap={4}>
+      <Cell>Auto A</Cell>
+      <Cell>Auto B</Cell>
+      <Cell>Auto C</Cell>
+      <Cell>Auto D</Cell>
+    </PixelGrid>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-asymmetric-gaps">
+        <h4>Asymmetric Gaps</h4>
+        <pre className="docs-code"><code>{`export function AsymmetricGaps() {
+  return (
+    <PixelGrid cols={2} colGap={8} rowGap={2}>
+      <Cell>A</Cell>
+      <Cell>B</Cell>
+      <Cell>C</Cell>
+      <Cell>D</Cell>
+    </PixelGrid>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

@@ -68,6 +68,142 @@ export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps)
         </tbody>
       </table>
     </section>
+    <section aria-labelledby="pixel-input-usage">
+      <h3 id="pixel-input-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { useState } from 'react';
+import { PixelInput } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelInput
+      label="Username"
+      placeholder="hero@pxlkit.xyz"
+      hint="Your retro alias"
+    />
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelInput
+      label="Username"
+      placeholder="hero@pxlkit.xyz"
+      hint="Your retro alias"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-controlled">
+        <h4>Controlled</h4>
+        <pre className="docs-code"><code>{`export function Controlled() {
+  const [value, setValue] = useState('');
+  return (
+    <PixelInput
+      label="Email"
+      type="email"
+      placeholder="hero@pxlkit.xyz"
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      tone="cyan"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-uncontrolled">
+        <h4>Uncontrolled</h4>
+        <pre className="docs-code"><code>{`export function Uncontrolled() {
+  return (
+    <PixelInput
+      label="Display name"
+      defaultValue="Pixel Hero"
+      hint="Edit me — uncontrolled"
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-tones">
+        <h4>Tones</h4>
+        <pre className="docs-code"><code>{`export function Tones() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelInput label="Neutral" tone="neutral" defaultValue="neutral" />
+      <PixelInput label="Cyan" tone="cyan" defaultValue="cyan" />
+      <PixelInput label="Green" tone="green" defaultValue="green" />
+      <PixelInput label="Gold" tone="gold" defaultValue="gold" />
+      <PixelInput label="Purple" tone="purple" defaultValue="purple" />
+      <PixelInput label="Pink" tone="pink" defaultValue="pink" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-sizes">
+        <h4>Sizes</h4>
+        <pre className="docs-code"><code>{`export function Sizes() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelInput label="Small" size="sm" placeholder="sm" />
+      <PixelInput label="Medium" size="md" placeholder="md" />
+      <PixelInput label="Large" size="lg" placeholder="lg" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-surfaces">
+        <h4>Surfaces</h4>
+        <pre className="docs-code"><code>{`export function Surfaces() {
+  return (
+    <div className="flex flex-col gap-3">
+      <PixelInput label="Pixel" surface="pixel" placeholder="pixel surface" />
+      <PixelInput label="Linear" surface="linear" placeholder="linear surface" />
+    </div>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-clearable">
+        <h4>Clearable</h4>
+        <pre className="docs-code"><code>{`export function Clearable() {
+  const [value, setValue] = useState('clear me');
+  return (
+    <PixelInput
+      label="Clearable"
+      clearable
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onClear={() => setValue('')}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-loading">
+        <h4>Loading</h4>
+        <pre className="docs-code"><code>{`export function Loading() {
+  return (
+    <PixelInput
+      label="Verifying handle"
+      defaultValue="pxlhero"
+      loading
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-disabled">
+        <h4>Disabled</h4>
+        <pre className="docs-code"><code>{`export function Disabled() {
+  return (
+    <PixelInput
+      label="Disabled"
+      defaultValue="cannot edit"
+      disabled
+    />
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

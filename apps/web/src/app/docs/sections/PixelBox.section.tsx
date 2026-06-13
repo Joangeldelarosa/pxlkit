@@ -46,6 +46,62 @@ export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): Re
       </ul>
       <p className="docs-aria-notes">Inherits semantics from the `as` element. When `as` is a landmark (section, nav, aside, main), provide aria-label or aria-labelledby for an accessible name.</p>
     </section>
+    <section aria-labelledby="pixel-box-usage">
+      <h3 id="pixel-box-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelBox } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelBox tone="neutral" variant="solid" padding="md">
+      <p className="text-sm text-retro-muted">Surface-aware container box.</p>
+    </PixelBox>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelBox tone="neutral" variant="solid" padding="md">
+      <p className="text-sm text-retro-muted">Surface-aware container box.</p>
+    </PixelBox>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-outline">
+        <h4>Outline</h4>
+        <pre className="docs-code"><code>{`export function Outline() {
+  return (
+    <PixelBox tone="cyan" variant="outline" padding="lg">
+      <p className="text-sm text-retro-muted">Outline variant with implicit border.</p>
+    </PixelBox>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-soft">
+        <h4>Soft</h4>
+        <pre className="docs-code"><code>{`export function Soft() {
+  return (
+    <PixelBox tone="purple" variant="soft" padding="md" radius="md">
+      <p className="text-sm text-retro-muted">Soft tonal background.</p>
+    </PixelBox>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-as-section">
+        <h4>As Section</h4>
+        <pre className="docs-code"><code>{`export function AsSection() {
+  return (
+    <PixelBox as="section" aria-label="Stats" tone="green" variant="soft" padding="md" shadow>
+      <p className="text-sm text-retro-muted">Rendered as a semantic section landmark.</p>
+    </PixelBox>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">

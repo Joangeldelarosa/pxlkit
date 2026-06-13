@@ -46,6 +46,60 @@ export function PixelFadeInDocsSection({ className }: PixelFadeInDocsSectionProp
       </ul>
       <p className="docs-aria-notes">Animation is suppressed when the user prefers reduced motion.</p>
     </section>
+    <section aria-labelledby="pixel-fade-in-usage">
+      <h3 id="pixel-fade-in-usage">Usage</h3>
+      <pre className="docs-code"><code>{`import { PixelFadeIn } from '@pxlkit/ui-kit';
+
+export function Default() {
+  return (
+    <PixelFadeIn>
+      <div style={{ padding: 16, background: '#111', color: '#fff' }}>
+        Fades in on mount
+      </div>
+    </PixelFadeIn>
+  );
+}
+`}</code></pre>
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <pre className="docs-code"><code>{`export function Default() {
+  return (
+    <PixelFadeIn>
+      <div style={{ padding: 16, background: '#111', color: '#fff' }}>
+        Fades in on mount
+      </div>
+    </PixelFadeIn>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-delayed">
+        <h4>Delayed</h4>
+        <pre className="docs-code"><code>{`export function Delayed() {
+  return (
+    <PixelFadeIn duration={600} delay={200} easing="ease-out">
+      <div style={{ padding: 16, background: '#0EA5E9', color: '#000' }}>
+        Delayed fade-in
+      </div>
+    </PixelFadeIn>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-on-hover">
+        <h4>On Hover</h4>
+        <pre className="docs-code"><code>{`export function OnHover() {
+  return (
+    <PixelFadeIn trigger="hover" duration={300}>
+      <div style={{ padding: 16, background: '#222', color: '#0EA5E9' }}>
+        Hover to fade in
+      </div>
+    </PixelFadeIn>
+  );
+}`}</code></pre>
+      </article>
+    </section>
     <section aria-label="Related components">
       <h3>Related</h3>
       <ul className="docs-related">
