@@ -40,6 +40,36 @@ describe('PixelStatCard — size prop', () => {
   });
 });
 
+describe('PixelStatCard — valueTone + align', () => {
+  it('valueTone colors the value with the tone text color', () => {
+    const { container } = render(
+      <PixelStatCard label="L" value="V" tone="cyan" valueTone />,
+    );
+    const valueEl = Array.from(container.querySelectorAll('p')).find(
+      (p) => p.textContent === 'V',
+    );
+    expect(valueEl!.className).toContain('text-retro-cyan');
+    expect(valueEl!.className).not.toContain('text-retro-text');
+  });
+
+  it('value keeps the default text color without valueTone', () => {
+    const { container } = render(<PixelStatCard label="L" value="V" tone="cyan" />);
+    const valueEl = Array.from(container.querySelectorAll('p')).find(
+      (p) => p.textContent === 'V',
+    );
+    expect(valueEl!.className).toContain('text-retro-text');
+    expect(valueEl!.className).not.toContain('text-retro-cyan');
+  });
+
+  it('align="center" centers the card content', () => {
+    const { container } = render(
+      <PixelStatCard label="L" value="V" align="center" />,
+    );
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.className).toContain('text-center');
+  });
+});
+
 describe('PixelStatCard — iconPosition prop', () => {
   it('iconPosition="right" renders icon in right cell of a grid', () => {
     const { container, getByTestId } = render(

@@ -54,7 +54,7 @@ export const PixelPagination = forwardRef<HTMLElement, PixelPaginationProps>(fun
   const pages = useMemo(() => buildPageWindow(page, total, siblings), [page, total, siblings]);
 
   return (
-    <nav ref={ref} aria-label={ariaLabel} className="inline-flex items-center gap-1">
+    <nav ref={ref} aria-label={ariaLabel} className="inline-flex max-w-full flex-wrap items-center gap-1">
       <button
         type="button"
         disabled={page <= 1}

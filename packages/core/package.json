@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/core",
-  "version": "1.3.3",
-  "description": "Core rendering engine, React components, SVG utilities, and TypeScript types for the Pxlkit pixel art toolkit \u2014 tree-shakeable icon renderer, animated icon player, 3D parallax icons, toast notifications, and color utilities",
+  "version": "1.3.4",
+  "description": "Core rendering engine, React components, SVG utilities, and TypeScript types for the Pxlkit pixel art toolkit — tree-shakeable icon renderer, animated icon player, 3D parallax icons, toast notifications, and color utilities",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",

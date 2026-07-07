@@ -73,7 +73,7 @@ export const PixelAreaChart = forwardRef<SVGSVGElement, PixelAreaChartProps>(fun
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
       shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible', bordered && s.border, bordered && s.radius, className)}
+      className={cn('overflow-visible max-w-full', bordered && s.border, bordered && s.radius, className)}
       data-tone-glow={t.glow}
       data-smooth={smooth || undefined}
       {...rest}

@@ -3,7 +3,7 @@ import { PixelGrid } from './PixelGrid';
 
 function Cell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-fg">
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
       {children}
     </div>
   );

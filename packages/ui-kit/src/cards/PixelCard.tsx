@@ -30,8 +30,8 @@ const lineClampMap = {
 } as const;
 
 export interface PixelCardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
-  /** Heading rendered inside the auto-generated header. */
-  title: string;
+  /** Heading rendered inside the auto-generated header. Omit for a headerless container/well card. */
+  title?: string;
   /** Optional leading icon for the auto-generated header. */
   icon?: React.ReactNode;
   /** Card body content. */
@@ -195,7 +195,7 @@ const PixelCardImpl = forwardRef<CardRoot, PixelCardProps>(function PixelCard(
         </PixelRibbon>
       )}
       <div className={cn(hasMedia && padCls, 'flex flex-1 flex-col')}>
-        {!hasExplicitHeader && (
+        {!hasExplicitHeader && title !== undefined && (
           <header className={cn('flex items-center gap-2 border-b border-retro-border/30 pb-3', description ? 'mb-2' : 'mb-3')}>
             {icon && <span className="inline-flex items-center justify-center shrink-0">{icon}</span>}
             <h4 className={cn('text-sm font-semibold text-retro-text', s.font)}>{title}</h4>

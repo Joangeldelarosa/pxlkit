@@ -43,6 +43,7 @@ export const PixelSplitButton = forwardRef<HTMLDivElement, PixelSplitButtonProps
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   const [open, setOpen] = useState(false);
+  const [alignRight, setAlignRight] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   useClickOutside(rootRef, () => setOpen(false));
 
@@ -77,7 +78,12 @@ export const PixelSplitButton = forwardRef<HTMLDivElement, PixelSplitButtonProps
             toneMap[tone].border,
             toneMap[tone].bg, toneMap[tone].hover, toneMap[tone].text,
           )}
-          onClick={() => setOpen(!open)}
+          onClick={() => {
+            if (!open && rootRef.current) {
+              setAlignRight(rootRef.current.getBoundingClientRect().left + 168 > window.innerWidth);
+            }
+            setOpen(!open);
+          }}
         >
           <ChevronDownIcon className={cn('transition-transform', open && 'rotate-180')} />
         </button>
@@ -86,7 +92,8 @@ export const PixelSplitButton = forwardRef<HTMLDivElement, PixelSplitButtonProps
         <div
           role="menu"
           className={cn(
-            'absolute left-0 top-full z-40 mt-1 min-w-40 bg-retro-bg p-1 shadow-xl',
+            'absolute top-full z-40 mt-1 min-w-40 max-w-[calc(100vw-1rem)] bg-retro-bg p-1 shadow-xl',
+            alignRight ? 'right-0' : 'left-0',
             s.border, s.radiusLg, 'border-retro-border-strong',
           )}
         >
@@ -96,7 +103,7 @@ export const PixelSplitButton = forwardRef<HTMLDivElement, PixelSplitButtonProps
               type="button"
               role="menuitem"
               className={cn(
-                'flex w-full items-center text-left text-xs px-3 py-2 text-retro-muted transition-colors hover:bg-retro-surface hover:text-retro-text',
+                'flex w-full items-center text-left text-xs break-words px-3 py-2 text-retro-muted transition-colors hover:bg-retro-surface hover:text-retro-text',
                 s.font, s.radius,
               )}
               onClick={() => { onSelect?.(opt.value); setOpen(false); }}

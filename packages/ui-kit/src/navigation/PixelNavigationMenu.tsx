@@ -141,7 +141,7 @@ export const PixelNavigationMenu = forwardRef<
       // role attr was removed. aria-orientation is NOT allowed on a nav
       // landmark (axe: aria-allowed-attr) — it lives on the menubar below.
       aria-label={ariaLabel}
-      className={cn('relative inline-block', s.font, className)}
+      className={cn('relative inline-block max-w-full', s.font, className)}
       onMouseLeave={handleRootMouseLeave}
       {...rest}
     >
@@ -156,7 +156,7 @@ export const PixelNavigationMenu = forwardRef<
           const triggerId = `${baseId}-trigger-${idx}`;
           const panelId = `${baseId}-panel-${idx}`;
           const sharedClass = cn(
-            'inline-flex items-center gap-2 px-3 py-2 text-sm text-retro-text outline-none',
+            'inline-flex max-w-full items-center gap-2 px-3 py-2 text-sm text-retro-text outline-none',
             'cursor-pointer select-none',
             s.font,
             s.radius,
@@ -203,7 +203,7 @@ export const PixelNavigationMenu = forwardRef<
             <li
               key={`${item.label}-${idx}`}
               role="none"
-              className="relative list-none"
+              className="relative list-none min-w-0"
             >
               {item.href ? (
                 <a
@@ -248,7 +248,7 @@ export const PixelNavigationMenu = forwardRef<
                   role="menu"
                   aria-labelledby={triggerId}
                   className={cn(
-                    'absolute left-0 top-full z-50 mt-2 min-w-[16rem] bg-retro-bg p-3 shadow-xl',
+                    'absolute left-0 top-full z-50 mt-2 min-w-[min(16rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] bg-retro-bg p-3 shadow-xl',
                     s.border,
                     s.radiusLg,
                     'border-retro-border',
@@ -271,8 +271,8 @@ export const PixelNavigationMenu = forwardRef<
           className={cn(
             orientation === 'horizontal'
               ? 'absolute left-0 top-full mt-2'
-              : 'absolute left-full top-0 ml-2',
-            'z-50 min-w-[20rem] bg-retro-bg p-4 shadow-xl',
+              : 'absolute left-0 top-full mt-2 sm:left-full sm:top-0 sm:ml-2 sm:mt-0',
+            'z-50 min-w-[min(20rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] bg-retro-bg p-4 shadow-xl',
             s.border,
             s.radiusLg,
             'border-retro-border',

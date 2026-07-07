@@ -25,7 +25,7 @@ export function PixelCodeInline({
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
   return (
-    <code className={cn('px-1.5 py-0.5 text-xs', s.border, s.radius, s.font, toneMap[tone].border, toneMap[tone].soft, toneMap[tone].text)}>
+    <code className={cn('px-1.5 py-0.5 text-xs break-words box-decoration-clone', s.border, s.radius, s.font, toneMap[tone].border, toneMap[tone].soft, toneMap[tone].text)}>
       {children}
     </code>
   );

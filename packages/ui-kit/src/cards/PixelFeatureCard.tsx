@@ -187,7 +187,7 @@ export const PixelFeatureCard = forwardRef<HTMLElement, PixelFeatureCardProps>(
       <>
         {badgeSlot}
         {iconSlot}
-        <div className="flex flex-col">
+        <div className="min-w-0 flex flex-col">
           {titleSlot}
           {descSlot}
           {footerSlot}

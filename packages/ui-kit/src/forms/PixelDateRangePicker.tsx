@@ -565,7 +565,7 @@ export const PixelDateRangePicker = forwardRef<
           <PixelPopover.Content
             surface={surface}
             className={cn(
-              numberOfMonths === 2 ? 'w-[34rem]' : 'w-[18rem]',
+              numberOfMonths === 2 ? 'w-[34rem] max-w-[calc(100vw-1rem)]' : 'w-[18rem]',
               s.font,
             )}
           >
@@ -598,7 +598,7 @@ export const PixelDateRangePicker = forwardRef<
             <div
               className={cn(
                 'grid gap-4',
-                numberOfMonths === 2 ? 'grid-cols-2' : 'grid-cols-1',
+                numberOfMonths === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1',
               )}
             >
               <CalendarPanel

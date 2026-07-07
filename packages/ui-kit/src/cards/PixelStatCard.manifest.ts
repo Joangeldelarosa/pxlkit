@@ -7,6 +7,7 @@ import {
   Surfaces,
   IconPositions,
   WithoutTrend,
+  TonedValueCentered,
 } from './PixelStatCard.examples'
 
 export default defineManifest({
@@ -30,6 +31,7 @@ export default defineManifest({
     { id: 'surfaces', label: 'Surfaces', Component: Surfaces },
     { id: 'icon-positions', label: 'Icon positions', Component: IconPositions },
     { id: 'without-trend', label: 'Without trend', Component: WithoutTrend },
+    { id: 'toned-value-centered', label: 'Toned value (centered)', Component: TonedValueCentered },
   ],
   props: 'auto',
   a11y: {

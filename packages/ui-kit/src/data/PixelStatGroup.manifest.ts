@@ -4,6 +4,7 @@ import {
   Default,
   RowLayout,
   GridLayout,
+  GridWithGap,
   Tones,
   Surfaces,
 } from './PixelStatGroup.examples';
@@ -28,6 +29,7 @@ export default defineManifest({
     { id: 'default', label: 'Default', Component: Default },
     { id: 'row-layout', label: 'Row layout', Component: RowLayout },
     { id: 'grid-layout', label: 'Grid layout', Component: GridLayout },
+    { id: 'grid-with-gap', label: 'Grid with gap', Component: GridWithGap },
     { id: 'tones', label: 'Tones', Component: Tones },
     { id: 'surfaces', label: 'Surfaces', Component: Surfaces },
   ],

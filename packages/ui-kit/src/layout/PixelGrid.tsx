@@ -180,7 +180,7 @@ export const PixelGrid = forwardRef<HTMLDivElement, PixelGridProps>(function Pix
 
   const inlineStyle: React.CSSProperties = { ...style };
   if (useAuto) {
-    inlineStyle.gridTemplateColumns = `repeat(${autoMode}, minmax(${minColWidth}, 1fr))`;
+    inlineStyle.gridTemplateColumns = `repeat(${autoMode}, minmax(min(${minColWidth}, 100%), 1fr))`;
   }
 
   return (

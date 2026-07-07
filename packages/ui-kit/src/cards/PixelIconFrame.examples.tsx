@@ -29,7 +29,7 @@ export function Tones() {
 
 export function Sizes() {
   return (
-    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+    <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
       <PixelIconFrame icon={<Glyph />} size={48} />
       <PixelIconFrame icon={<Glyph />} size={56} />
       <PixelIconFrame icon={<Glyph />} size={64} />
@@ -41,7 +41,7 @@ export function Sizes() {
 
 export function Shapes() {
   return (
-    <div style={{ display: 'flex', gap: 12 }}>
+    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
       <PixelIconFrame icon={<Glyph />} shape="square" />
       <PixelIconFrame icon={<Glyph />} shape="rounded" />
       <PixelIconFrame icon={<Glyph />} shape="circle" />

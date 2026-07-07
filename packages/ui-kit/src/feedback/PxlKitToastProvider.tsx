@@ -303,7 +303,7 @@ function ToastViewport({
         }
       }}
       className={cn(
-        'pointer-events-none fixed z-[90] flex w-full max-w-sm flex-col gap-2 p-0',
+        'pointer-events-none fixed z-[90] flex w-full max-w-[min(24rem,calc(100vw-2rem))] flex-col gap-2 p-0',
         POSITION_CLASS[position],
       )}
     >

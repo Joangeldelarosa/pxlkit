@@ -56,7 +56,7 @@ export const PixelInputGroup = forwardRef<HTMLDivElement, PixelInputGroupProps>(
       // Strip inner border + radius so children look like one shell, then
       // add a right divider between segments (except on the last child).
       const joinedClass = cn(
-        'border-0 rounded-none focus:z-10 focus-visible:z-10 relative',
+        'min-w-0 border-0 rounded-none focus:z-10 focus-visible:z-10 relative',
         !isLast && cn('border-r', s.border, 'border-retro-border/60'),
         // Keep the original child className last so consumer styles win where needed.
         el.props.className,

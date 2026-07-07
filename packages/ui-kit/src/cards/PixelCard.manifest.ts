@@ -1,6 +1,7 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
 import {
   Default,
+  Headerless,
   WithIcon,
   WithDescription,
   WithFooter,
@@ -30,6 +31,7 @@ export default defineManifest({
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
+    { id: 'headerless', label: 'Headerless', Component: Headerless },
     { id: 'with-icon', label: 'With Icon', Component: WithIcon },
     { id: 'with-description', label: 'With Description', Component: WithDescription },
     { id: 'with-footer', label: 'With Footer', Component: WithFooter },

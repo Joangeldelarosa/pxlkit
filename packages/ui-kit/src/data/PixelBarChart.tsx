@@ -86,7 +86,7 @@ export const PixelBarChart = forwardRef<SVGSVGElement, PixelBarChartProps>(funct
       height={height}
       viewBox={`0 0 ${width} ${height}`}
       shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible', bordered && s.border, bordered && s.radius, className)}
+      className={cn('overflow-visible max-w-full h-auto', bordered && s.border, bordered && s.radius, className)}
       {...rest}
     >
       {bars.map((b, i) => (

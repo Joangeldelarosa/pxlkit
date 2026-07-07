@@ -9,6 +9,14 @@ export function Default() {
   );
 }
 
+export function Headerless() {
+  return (
+    <PixelCard>
+      <p>Omit the title to get a plain well container — no header, no divider.</p>
+    </PixelCard>
+  );
+}
+
 export function WithIcon() {
   const Icon = (
     <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-3 w-3">

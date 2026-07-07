@@ -234,7 +234,7 @@ export const PixelOTPInput = forwardRef<HTMLInputElement, PixelOTPInputProps>(
       <div
         role="group"
         aria-label="One-time passcode"
-        className={cn('inline-flex items-center', s.font)}
+        className={cn('inline-flex max-w-full flex-wrap items-center', s.font)}
       >
         {Array.from({ length }).map((_, i) => {
           const ch = chars[i] ?? '';

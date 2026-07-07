@@ -250,7 +250,7 @@ export const PixelMenubar = forwardRef<HTMLDivElement, PixelMenubarProps>(
         {menus.map((menu, mIdx) => {
           const isOpen = openMenu === mIdx;
           return (
-            <div key={`${menu.label}-${mIdx}`} className="relative">
+            <div key={`${menu.label}-${mIdx}`} className="relative max-sm:static">
               <button
                 ref={(node) => {
                   triggerRefs.current[mIdx] = node;
@@ -285,7 +285,7 @@ export const PixelMenubar = forwardRef<HTMLDivElement, PixelMenubarProps>(
                     activeItem >= 0 ? itemId(mIdx, activeItem) : undefined
                   }
                   className={cn(
-                    'absolute left-0 top-full z-50 mt-1 min-w-48 bg-retro-bg p-1 shadow-xl',
+                    'absolute left-0 top-full z-50 mt-1 min-w-48 bg-retro-bg p-1 shadow-xl max-sm:left-1 max-sm:right-1',
                     s.border,
                     s.radiusLg,
                     'border-retro-border',
@@ -365,7 +365,7 @@ export const PixelMenubar = forwardRef<HTMLDivElement, PixelMenubarProps>(
                             role="menu"
                             aria-label={`${item.label} submenu`}
                             className={cn(
-                              'absolute left-full top-0 z-50 ml-1 min-w-44 bg-retro-bg p-1 shadow-xl',
+                              'absolute left-0 top-full z-50 mt-1 min-w-44 max-w-[calc(100vw-2rem)] bg-retro-bg p-1 shadow-xl sm:left-full sm:top-0 sm:ml-1 sm:mt-0 sm:max-w-none',
                               s.border,
                               s.radiusLg,
                               'border-retro-border',

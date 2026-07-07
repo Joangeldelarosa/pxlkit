@@ -101,7 +101,7 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
         className={cn(
           eyebrowSize,
           s.fontDisplay,
-          'uppercase tracking-[0.18em]',
+          'uppercase tracking-[0.18em] max-w-full break-words',
           t.text,
         )}
       >
@@ -114,7 +114,7 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
         className={cn(
           headlineSize[density],
           s.fontDisplay,
-          'font-bold leading-tight text-retro-text',
+          'font-bold leading-tight text-retro-text max-w-full break-words',
           eyebrow && sp.eyebrowToHeadline,
         )}
       >
@@ -127,7 +127,7 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
         className={cn(
           sublineSize[density],
           s.font,
-          'text-retro-muted leading-relaxed max-w-prose',
+          'text-retro-muted leading-relaxed max-w-prose break-words',
           sp.headlineToSubline,
           align === 'center' && 'mx-auto',
         )}

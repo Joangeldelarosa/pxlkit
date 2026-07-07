@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
-import { Default, Popular } from './PixelPricingCard.examples';
+import { Default, WithPriceBadge, Popular } from './PixelPricingCard.examples';
 
 export default defineManifest({
   name: 'PixelPricingCard',
@@ -17,6 +17,7 @@ export default defineManifest({
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
+    { id: 'with-price-badge', label: 'With price badge', Component: WithPriceBadge },
     { id: 'popular', label: 'Popular (highlighted)', Component: Popular },
   ],
   props: 'auto',

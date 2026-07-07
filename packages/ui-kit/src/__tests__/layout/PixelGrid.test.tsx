@@ -27,7 +27,7 @@ describe('PixelGrid', () => {
     );
     const el = getByTestId('grid');
     expect(el.style.gridTemplateColumns).toContain('auto-fit');
-    expect(el.style.gridTemplateColumns).toContain('minmax(200px');
+    expect(el.style.gridTemplateColumns).toContain('minmax(min(200px, 100%)');
   });
 
   it('gap=6 produces gap-6', () => {

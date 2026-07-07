@@ -230,7 +230,7 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
               <span className={cn('font-medium', dragActive ? t.text : 'text-retro-text')}>
                 {dragActive ? 'Drop to upload' : 'Drop files or click to browse'}
               </span>
-              {accept && <span className="text-[10px] text-retro-muted">Accepts: {accept}</span>}
+              {accept && <span className="text-[10px] text-retro-muted break-all max-w-full">Accepts: {accept}</span>}
             </div>
           </div>
         )}

@@ -64,7 +64,7 @@ export function PixelToast({
           )}
 
           <div className="min-w-0 flex-1">
-            <p className="font-pixel text-[10px] leading-relaxed" style={{ color: accentColor }}>
+            <p className="font-pixel text-[10px] leading-relaxed break-words" style={{ color: accentColor }}>
               {title}
             </p>
             {message ? (

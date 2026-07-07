@@ -16,9 +16,13 @@ export interface PixelPricingCardProps extends React.HTMLAttributes<HTMLElement>
   icon?: React.ReactNode;
   name: string;
   description?: string;
+  /** Clamp the description to N lines. Defaults to 2; use 'none' to let long copy flow. */
+  descriptionLines?: 2 | 3 | 'none';
   price: { amount: string | number; period?: string; strikethrough?: string | number };
+  /** Promo badge rendered beside the price (e.g. a discount PixelBadge). */
+  priceBadge?: React.ReactNode;
   popular?: { label?: string; tone?: ToneKey };
-  features?: { label: string; tooltip?: string; included?: boolean }[];
+  features?: { label: string; tooltip?: string; included?: boolean; highlight?: boolean }[];
   cta?: React.ReactNode;
   highlight?: boolean;
   footer?: React.ReactNode;
@@ -34,7 +38,9 @@ export const PixelPricingCard = forwardRef<HTMLElement, PixelPricingCardProps>(
       icon,
       name,
       description,
+      descriptionLines = 2,
       price,
+      priceBadge,
       popular,
       features,
       cta,
@@ -100,7 +106,9 @@ export const PixelPricingCard = forwardRef<HTMLElement, PixelPricingCardProps>(
           <p
             data-pxl-description-slot
             className={cn(
-              'mt-1 text-sm text-retro-muted line-clamp-2 min-h-[2.5em]',
+              'mt-1 text-sm text-retro-muted',
+              descriptionLines === 2 && 'line-clamp-2 min-h-[2.5em]',
+              descriptionLines === 3 && 'line-clamp-3 min-h-[3.75em]',
               s.font,
             )}
           >
@@ -108,7 +116,7 @@ export const PixelPricingCard = forwardRef<HTMLElement, PixelPricingCardProps>(
           </p>
         </div>
 
-        <div className="mt-4 flex items-baseline gap-2">
+        <div className="mt-4 flex flex-wrap items-baseline gap-2">
           {price.strikethrough !== undefined && (
             <s className={cn('line-through text-sm text-retro-muted', s.font)}>
               <span className="sr-only">Previous price </span>
@@ -120,6 +128,11 @@ export const PixelPricingCard = forwardRef<HTMLElement, PixelPricingCardProps>(
           </span>
           {price.period && (
             <span className={cn('text-sm text-retro-muted', s.font)}>{price.period}</span>
+          )}
+          {priceBadge && (
+            <span data-pxl-price-badge-slot className="self-center">
+              {priceBadge}
+            </span>
           )}
         </div>
 
@@ -141,7 +154,11 @@ export const PixelPricingCard = forwardRef<HTMLElement, PixelPricingCardProps>(
                   <span
                     title={f.tooltip}
                     className={cn(
-                      included ? 'text-retro-text' : 'text-retro-muted line-through',
+                      included
+                        ? f.highlight
+                          ? cn(t.text, 'font-medium')
+                          : 'text-retro-text'
+                        : 'text-retro-muted line-through',
                     )}
                   >
                     <span className="sr-only">{included ? 'Included: ' : 'Not included: '}</span>

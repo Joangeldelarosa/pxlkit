@@ -66,7 +66,7 @@ export const PixelSparkline = forwardRef<SVGSVGElement, PixelSparklineProps>(fun
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
       shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible', bordered && s.border, bordered && s.radius, className)}
+      className={cn('overflow-visible max-w-full', bordered && s.border, bordered && s.radius, className)}
       {...rest}
     >
       {showArea && areaPoints && (

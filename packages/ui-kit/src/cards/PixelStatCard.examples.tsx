@@ -58,3 +58,12 @@ export function IconPositions() {
 export function WithoutTrend() {
   return <PixelStatCard label="Total users" value="12,480" tone="cyan" />
 }
+
+export function TonedValueCentered() {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <PixelStatCard label="Uptime" value="99.98%" tone="green" valueTone align="center" />
+      <PixelStatCard label="Error rate" value="0.02%" tone="red" valueTone align="center" />
+    </div>
+  )
+}

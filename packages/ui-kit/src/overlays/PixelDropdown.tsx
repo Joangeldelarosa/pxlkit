@@ -24,6 +24,12 @@
 
 import React, { forwardRef, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
 import {
+  autoUpdate,
+  offset as floatingOffset,
+  shift,
+  useFloating,
+} from '@floating-ui/react-dom';
+import {
   Tone, Surface, Option, cn, useClickOutside,
   surfaceClasses, useEffectiveSurface,
   ChevronDownIcon,
@@ -76,6 +82,7 @@ interface DropdownContextValue {
   setOpen: (v: boolean) => void;
   surface: Surface;
   menuId: string;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   highlightedValue: string | null;
   setHighlightedValue: (v: string | null) => void;
   registerItem: (value: string, disabled: boolean) => void;
@@ -185,7 +192,7 @@ function DropdownRoot({ open: openProp, defaultOpen = false, onOpenChange, surfa
 
   const labelMap = labelMapRef.current;
   const ctx: DropdownContextValue = useMemo(() => ({
-    open, setOpen, surface, menuId,
+    open, setOpen, surface, menuId, containerRef,
     highlightedValue, setHighlightedValue,
     registerItem, unregisterItem, getOrderedValues, typeaheadJump,
     labelMap,
@@ -278,17 +285,30 @@ const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(functio
   { children, className },
   ref,
 ) {
-  const { open, surface, menuId } = useDropdownContext('PixelDropdown.Content');
+  const { open, surface, menuId, containerRef } = useDropdownContext('PixelDropdown.Content');
   const s = surfaceClasses(surface);
+  const { refs, floatingStyles } = useFloating({
+    open,
+    placement: 'bottom-start',
+    whileElementsMounted: autoUpdate,
+    elements: { reference: containerRef.current },
+    middleware: [floatingOffset(6), shift({ padding: 8 })],
+  });
+  const setRefs = (node: HTMLDivElement | null) => {
+    refs.setFloating(node);
+    if (typeof ref === 'function') ref(node);
+    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+  };
   if (!open) return null;
   return (
     <div
-      ref={ref}
+      ref={setRefs}
       id={menuId}
       role="menu"
       aria-orientation="vertical"
+      style={floatingStyles}
       className={cn(
-        'absolute left-0 top-full z-40 mt-1.5 min-w-44 bg-retro-bg p-1 shadow-xl',
+        'z-40 min-w-44 max-w-[calc(100vw-1rem)] bg-retro-bg p-1 shadow-xl',
         s.border, s.radiusLg, 'border-retro-border',
         className,
       )}

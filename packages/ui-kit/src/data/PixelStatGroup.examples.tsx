@@ -33,6 +33,16 @@ export function GridLayout() {
   );
 }
 
+export function GridWithGap() {
+  return (
+    <PixelStatGroup layout="grid" columns={3} gap={3} aria-label="Spaced grid metrics">
+      <PixelStatCard label="Users" value="1,284" />
+      <PixelStatCard label="Revenue" value="$12.4k" />
+      <PixelStatCard label="Active" value="312" />
+    </PixelStatGroup>
+  );
+}
+
 export function Tones() {
   return (
     <div className="flex flex-col gap-3">

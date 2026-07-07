@@ -32,6 +32,10 @@ export interface PixelStatCardProps {
   size?: PixelStatCardSize;
   /** Icon placement relative to label/value. Defaults to `'top'`. */
   iconPosition?: PixelStatCardIconPosition;
+  /** Color the value with the tone color instead of the default text color. */
+  valueTone?: boolean;
+  /** Horizontal alignment of label/value/trend. Defaults to `'start'`. */
+  align?: 'start' | 'center';
   /** Render with surface-aware border + radius chrome. Defaults to true — a stat card needs visible chrome. */
   bordered?: boolean;
 }
@@ -45,8 +49,11 @@ export function PixelStatCard({
   surface: surfaceProp,
   size = 'md',
   iconPosition = 'top',
+  valueTone = false,
+  align = 'start',
   bordered = true,
 }: PixelStatCardProps) {
+  const centered = align === 'center';
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
 
@@ -62,7 +69,7 @@ export function PixelStatCard({
   const trendGap = size === 'sm' ? 'mt-1.5' : size === 'lg' ? 'mt-3' : 'mt-2';
 
   const labelEl = <p className={cn(labelSize, 'text-retro-muted', s.font)}>{label}</p>;
-  const valueEl = <p className={cn('text-retro-text', valueSize)}>{value}</p>;
+  const valueEl = <p className={cn(valueTone ? toneMap[tone].text : 'text-retro-text', valueSize)}>{value}</p>;
   const iconEl = icon ? (
     <span className={cn('inline-flex items-center justify-center shrink-0', iconBoxSize, toneMap[tone].text)}>{icon}</span>
   ) : null;
@@ -70,6 +77,7 @@ export function PixelStatCard({
 
   const baseClass = cn(
     padding,
+    centered && 'text-center',
     bordered && s.border,
     bordered && s.radiusLg,
     bordered && toneMap[tone].border,
@@ -79,7 +87,7 @@ export function PixelStatCard({
   if (iconPosition === 'right') {
     return (
       <div className={cn(baseClass, 'grid grid-cols-[1fr_auto] items-center gap-3')}>
-        <div>
+        <div className="min-w-0">
           {labelEl}
           <div className={valueGap}>{valueEl}</div>
           {trendEl}
@@ -93,7 +101,7 @@ export function PixelStatCard({
     return (
       <div className={cn(baseClass, 'flex items-center gap-3')}>
         {iconEl}
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           {labelEl}
           <div className={valueGap}>{valueEl}</div>
           {trendEl}
@@ -104,12 +112,12 @@ export function PixelStatCard({
 
   if (iconPosition === 'bottom-left') {
     return (
-      <div className={cn(baseClass, 'relative')}>
+      <div className={cn(baseClass, 'relative overflow-hidden')}>
         <div className="mb-3 flex items-center justify-between">{labelEl}</div>
         {valueEl}
         {trendEl}
         {iconEl && (
-          <span className={cn('absolute bottom-0 left-0 inline-flex items-center justify-center', padding, iconBoxSize, toneMap[tone].text)}>
+          <span className={cn('absolute bottom-0 left-0 inline-flex max-w-full items-center justify-center', padding, iconBoxSize, toneMap[tone].text)}>
             {icon}
           </span>
         )}
@@ -119,7 +127,7 @@ export function PixelStatCard({
 
   return (
     <div className={baseClass}>
-      <div className="mb-3 flex items-center justify-between">
+      <div className={cn('mb-3 flex items-center', centered ? 'justify-center gap-2' : 'justify-between')}>
         {labelEl}
         {iconEl}
       </div>

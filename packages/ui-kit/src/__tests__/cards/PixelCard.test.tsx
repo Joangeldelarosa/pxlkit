@@ -31,6 +31,27 @@ describe('PixelCard — legacy behavior preserved', () => {
   });
 });
 
+describe('PixelCard — headerless (no title)', () => {
+  it('does not render a <header> when title is omitted', () => {
+    const { container } = render(
+      <PixelCard>
+        <p>well content</p>
+      </PixelCard>,
+    );
+    expect(container.querySelector('header')).toBeNull();
+    const article = container.querySelector('article');
+    expect(article).not.toBeNull();
+    expect(article!.textContent).toContain('well content');
+  });
+
+  it('still renders the <header> when title is provided', () => {
+    const { container } = render(<PixelCard title="Titled">body</PixelCard>);
+    const header = container.querySelector('header');
+    expect(header).not.toBeNull();
+    expect(header!.textContent).toContain('Titled');
+  });
+});
+
 describe('PixelCard — tone tint', () => {
   it('applies cyan tone classes when tone="cyan"', () => {
     const { container } = render(

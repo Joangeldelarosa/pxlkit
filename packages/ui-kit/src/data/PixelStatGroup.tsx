@@ -2,22 +2,24 @@
 
 import React, { forwardRef } from 'react';
 import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
-import { tone as toneTokens, ToneKey } from '../tokens';
+import { tone as toneTokens, ToneKey, stackGap, StackGapKey } from '../tokens';
 
 type Layout = 'row' | 'grid';
 
 const colsMap: Record<number, string> = {
   1: 'grid-cols-1',
   2: 'grid-cols-2',
-  3: 'grid-cols-3',
-  4: 'grid-cols-4',
-  5: 'grid-cols-5',
-  6: 'grid-cols-6',
+  3: 'grid-cols-1 sm:grid-cols-3',
+  4: 'grid-cols-2 sm:grid-cols-4',
+  5: 'grid-cols-2 sm:grid-cols-5',
+  6: 'grid-cols-2 sm:grid-cols-6',
 };
 
 export interface PixelStatGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   layout?: Layout;
   columns?: number;
+  /** Gap between grid cells (stackGap scale). Only applies to layout="grid"; omit for flush cells. */
+  gap?: StackGapKey;
   tone?: ToneKey;
   surface?: Surface;
   /** Render with surface-aware border + radius chrome. Defaults to true — group needs visible chrome. */
@@ -32,6 +34,7 @@ export const PixelStatGroup = forwardRef<HTMLDivElement, PixelStatGroupProps>(fu
   {
     layout = 'row',
     columns = 3,
+    gap,
     tone = 'neutral',
     surface: surfaceProp,
     bordered = true,
@@ -47,8 +50,8 @@ export const PixelStatGroup = forwardRef<HTMLDivElement, PixelStatGroupProps>(fu
 
   const layoutClass =
     layout === 'row'
-      ? cn('flex flex-row divide-x', t.border)
-      : cn('grid', colsMap[columns] ?? colsMap[3]);
+      ? cn('flex flex-row divide-x overflow-x-auto', t.border)
+      : cn('grid', colsMap[columns] ?? colsMap[3], gap !== undefined && stackGap[gap]);
 
   const ariaLabel = (rest as { 'aria-label'?: string })['aria-label'];
   const ariaLabelledBy = (rest as { 'aria-labelledby'?: string })['aria-labelledby'];

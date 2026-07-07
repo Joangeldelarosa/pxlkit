@@ -119,7 +119,7 @@ export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function
   const countText = max !== undefined ? `${valueLen}/${max}` : `${valueLen}`;
 
   const inputEl = (
-    <span className="relative block w-full">
+    <span className="relative block w-full min-w-0">
       {leftInside && (
         <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-retro-muted shrink-0">
           {leftInside}

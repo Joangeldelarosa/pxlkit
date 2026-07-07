@@ -23,10 +23,12 @@ export function Foreground() {
 
 export function Horizontal() {
   return (
-    <PixelParallaxLayer speed={0.4} axis="x">
-      <div style={{ padding: 24, background: '#0EA5E9', color: '#fff' }}>
-        Horizontal parallax drift.
-      </div>
-    </PixelParallaxLayer>
+    <div className="relative w-full overflow-hidden">
+      <PixelParallaxLayer speed={0.4} axis="x">
+        <div style={{ padding: 24, background: '#0EA5E9', color: '#fff' }}>
+          Horizontal parallax drift.
+        </div>
+      </PixelParallaxLayer>
+    </div>
   );
 }

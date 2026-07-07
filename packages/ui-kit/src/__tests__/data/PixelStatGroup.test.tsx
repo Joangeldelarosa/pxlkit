@@ -46,6 +46,28 @@ describe('PixelStatGroup', () => {
     expect(group.className).not.toMatch(/divide-x/);
   });
 
+  it('layout="grid" + gap applies the stackGap class', () => {
+    const { getByTestId } = render(
+      <PixelStatGroup data-testid="group" layout="grid" columns={3} gap={4}>
+        <div>A</div>
+        <div>B</div>
+      </PixelStatGroup>,
+    );
+    const group = getByTestId('group');
+    expect(group.className).toContain('gap-4');
+  });
+
+  it('layout="grid" without gap keeps cells flush', () => {
+    const { getByTestId } = render(
+      <PixelStatGroup data-testid="group" layout="grid" columns={3}>
+        <div>A</div>
+        <div>B</div>
+      </PixelStatGroup>,
+    );
+    const group = getByTestId('group');
+    expect(group.className).not.toMatch(/\bgap-\d/);
+  });
+
   it('tone="cyan" applies cyan border', () => {
     const { getByTestId } = render(
       <PixelStatGroup data-testid="group" tone="cyan">

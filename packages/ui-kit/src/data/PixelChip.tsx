@@ -23,6 +23,8 @@ const chipSizeCls: Record<Size, string> = {
 export interface PixelChipProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onClick'> {
   /** Chip label. */
   label: string;
+  /** Selection value consumed by a wrapping PixelChipGroup. Never rendered to the DOM. */
+  value?: string;
   /** Tone tint. Defaults to `'cyan'`. */
   tone?: Tone;
   /** Visual surface override. */
@@ -46,6 +48,7 @@ export interface PixelChipProps extends Omit<React.HTMLAttributes<HTMLElement>, 
 export const PixelChip = forwardRef<HTMLElement, PixelChipProps>(function PixelChip(
   {
     label,
+    value: _value,
     tone = 'cyan',
     surface: surfaceProp,
     variant = 'soft',

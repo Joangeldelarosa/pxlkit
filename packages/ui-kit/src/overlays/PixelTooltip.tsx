@@ -185,7 +185,7 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
             role="tooltip"
             style={{ ...floatingStyles, zIndex: 70 }}
             className={cn(
-              'whitespace-nowrap bg-retro-bg px-2 py-1 text-[11px] text-retro-text shadow-lg',
+              'w-max max-w-[calc(100vw-16px)] break-words bg-retro-bg px-2 py-1 text-[11px] text-retro-text shadow-lg',
               // Hover/focus tooltips are non-interactive; click tooltips
               // must accept clicks (e.g. to copy text or click links inside).
               trigger === 'click' ? '' : 'pointer-events-none',

@@ -18,6 +18,21 @@ describe('PixelSegmented', () => {
     expect(getAllByRole('button').length).toBe(3);
   });
 
+  it('renders no label paragraph when label is empty and takes aria-label as group name', () => {
+    const { container, getByRole } = render(
+      <PixelSegmented label="" aria-label="Range" value="day" options={OPTIONS} onChange={() => {}} />,
+    );
+    expect(container.querySelector('p')).toBeNull();
+    expect(getByRole('group', { name: 'Range' })).toBeTruthy();
+  });
+
+  it('renders no label paragraph when label is omitted', () => {
+    const { container } = render(
+      <PixelSegmented value="day" options={OPTIONS} onChange={() => {}} />,
+    );
+    expect(container.querySelector('p')).toBeNull();
+  });
+
   it('marks only the active segment aria-pressed=true', () => {
     const { getAllByRole } = render(
       <PixelSegmented label="Range" value="week" options={OPTIONS} onChange={() => {}} />,

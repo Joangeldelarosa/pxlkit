@@ -128,4 +128,54 @@ describe('PixelPricingCard', () => {
     expect(desc).not.toBeNull();
     expect(desc!.className).toContain('min-h-[2.5em]');
   });
+
+  it('descriptionLines="none" drops line-clamp and min-h from the description slot', () => {
+    const { getByTestId } = render(
+      <PixelPricingCard
+        data-testid="card"
+        name="Pro"
+        price={{ amount: 29 }}
+        description="A very long description that should flow freely."
+        descriptionLines="none"
+      />,
+    );
+    const desc = getByTestId('card').querySelector('[data-pxl-description-slot]');
+    expect(desc).not.toBeNull();
+    expect(desc!.className).not.toContain('line-clamp');
+    expect(desc!.className).not.toContain('min-h-');
+  });
+
+  it('renders priceBadge beside the price', () => {
+    const { getByTestId } = render(
+      <PixelPricingCard
+        data-testid="card"
+        name="Pro"
+        price={{ amount: 29 }}
+        priceBadge={<span data-testid="promo">-20%</span>}
+      />,
+    );
+    const slot = getByTestId('card').querySelector('[data-pxl-price-badge-slot]');
+    expect(slot).not.toBeNull();
+    expect(slot!.contains(getByTestId('promo'))).toBe(true);
+  });
+
+  it('features with highlight=true render the label with the tone text color', () => {
+    const { container } = render(
+      <PixelPricingCard
+        name="Pro"
+        price={{ amount: 29 }}
+        tone="cyan"
+        features={[
+          { label: 'Plain feature' },
+          { label: 'Key feature', highlight: true },
+        ]}
+      />,
+    );
+    const items = container.querySelectorAll('li');
+    const plain = items[0].querySelector('span:not([aria-hidden]):not(.sr-only)');
+    const highlighted = items[1].querySelector('span:not([aria-hidden]):not(.sr-only)');
+    expect((plain as HTMLElement).className).toContain('text-retro-text');
+    expect((highlighted as HTMLElement).className).toContain('text-retro-cyan');
+    expect((highlighted as HTMLElement).className).toContain('font-medium');
+  });
 });
