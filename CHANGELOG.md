@@ -5,6 +5,77 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [ui-kit 2.1.0 / core 1.3.4] - 2026-07-06 — Responsive hardening + dogfooding pass
+
+A full mobile-responsiveness audit of the kit (320–430px, statically audited and
+empirically verified with Playwright on every route), a dogfooding refactor so the
+site consumes the kit structurally, and a template refinement pass.
+
+### Added — `@pxlkit/ui-kit` v2.1.0
+
+- `PixelCard`: `title` is now optional — omit it for a headerless container/well
+  card (no auto header, no divider). Removes the need for hidden-header hacks.
+- `PixelPricingCard`: `descriptionLines` (`2 | 3 | 'none'`), a `priceBadge` slot
+  rendered beside the price (e.g. a discount `PixelBadge`), and per-feature
+  `highlight` (tone-colored check + emphasized label). The price row now wraps
+  on narrow cards instead of clipping.
+- `PixelStatCard`: `valueTone` (value takes the tone color) and
+  `align="center"`.
+- `PixelStatGroup`: `gap` prop for the grid layout (stackGap scale; omit for
+  flush cells).
+- `PixelChip`: `value` prop so chips compose directly with `PixelChipGroup`
+  without local wrapper components.
+
+### Fixed — `@pxlkit/ui-kit` v2.1.0 (responsive hardening)
+
+- Grids that never collapsed on mobile: `PixelStatGroup` column maps are now
+  responsive (`grid-cols-2 sm:grid-cols-4`, etc.); `layout="row"` scrolls
+  instead of overflowing.
+- Fixed-width SVG charts (`PixelSparkline`, `PixelBarChart`, `PixelAreaChart`)
+  now clamp to `max-width: 100%`.
+- Popovers and menus clamp to the viewport: `PixelDateRangePicker` (34rem
+  two-month panel + calendar grid collapse), `PixelMenubar` submenus,
+  `PixelNavigationMenu` panels, `PixelDropdown`, and `PixelSplitButton`
+  (collision-aware right alignment).
+- `PxlKitToastProvider` viewport clamps to `min(24rem, 100vw - 2rem)`.
+- Flex/grid shrink fixes (`min-w-0`): `PixelFeatureCard` horizontal,
+  `PixelStatCard` icon variants, `PixelInput` with addons, `PixelInputGroup`.
+- Wrap/scroll fixes: `PixelOTPInput`, `PixelSegmented`, `PixelPagination`,
+  `PixelToggleGroup`.
+- Long-token overflow fixes (`break-words`): `PixelHeroSection` headline and
+  copy, `PixelCodeInline`, `PixelTooltip` (no more `whitespace-nowrap`),
+  `PixelFileUpload` accept list.
+- `PixelGrid` autoFit/autoFill min track now clamps:
+  `minmax(min(<minColWidth>, 100%), 1fr)`.
+- `PixelStatCard` bottom-left icon/sparkline can no longer paint outside the
+  card.
+- Example sources swept for the same anti-patterns (they feed the docs pages)
+  and the nonexistent `text-retro-fg` token replaced with `text-retro-text`.
+
+### Fixed — `@pxlkit/core` v1.3.4
+
+- `PixelToast`: the title now breaks long unbroken strings (`break-words`),
+  matching the existing behavior of the message body.
+
+### Changed — `@pxlkit/web` v1.3.0 (site + templates dogfooding)
+
+- The site now consumes the kit structurally: `/pricing` rebuilt on
+  `PixelPricingCard`/`PixelModal`/`PixelInput`/`PixelTable`/`PixelAccordion`;
+  landing stats strip, pricing preview and icon tiles on kit components with
+  zero `!important` overrides; a single `PropsTable` on `PixelTable` shared by
+  `/ui-kit` and `/docs`; `IconCard` on headerless `PixelCard`.
+- Landing mobile overflow fixed: HowItWorks and AISection grids define a
+  `grid-cols-1` base so cards no longer size to the widest `<pre>`.
+- Templates refined: portfolio doubled section padding removed
+  (`PixelContainer as="section"`), docs-template button demos render real
+  `PixelButton`s, dashboard stat cells unified flush with landing-full and
+  portfolio, landing-full CTA framed with `PixelCard tone="green"`,
+  header→content rhythm standardized to `mt-10`, sticky-header z-index unified,
+  dead code removed.
+- Sellable template snippets (`/templates` data) rewritten to the canonical kit
+  patterns (`PixelSection` + `PixelSectionHeader` + `PixelGrid` +
+  `PixelFeatureCard`) so buyers copy current best practice.
+
 ## [ui 1.2.5] - 2026-05-28 — UI pack refinement pass
 
 A visual-quality pass on the `@pxlkit/ui` pack using the `/dev/inspector`

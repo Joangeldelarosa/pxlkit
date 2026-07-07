@@ -21,6 +21,7 @@ storybook-static/
 test-results/
 playwright-report/
 playwright/.cache/
+.playwright-mcp/
 .artifacts/
 # Local tooling
 .claude/
