@@ -493,27 +493,14 @@ const LIVE_DEMOS: Record<string, React.ComponentType> = {
   PixelSectionHeader: PixelSectionHeaderDefault,
 };
 
-/* Items shipped in Ola 4a (v2.0.0). DocSection anchors land in a follow-up wave —
-   until then each link lands on the changelog v1.9 entry so the click is never a no-op. */
-const WHATS_NEW_V200_ITEMS: WhatsNewItem[] = [
-  { name: 'PixelDataTable', category: 'data', href: '/changelog#v190-pixel-data-table', isNew: true },
-  { name: 'PixelStepper', category: 'navigation', href: '/changelog#v190-pixel-stepper', isNew: true },
-  { name: 'PixelSpinner', category: 'feedback', href: '/changelog#v190-pixel-spinner', isNew: true },
-  { name: 'PixelScrollArea', category: 'layout', href: '/changelog#v190-pixel-scroll-area', isNew: true },
-  { name: 'PixelMenubar', category: 'navigation', href: '/changelog#v190-pixel-menubar', isNew: true },
-  { name: 'PixelNavigationMenu', category: 'navigation', href: '/changelog#v190-pixel-navigation-menu', isNew: true },
-  { name: 'PixelSidebar', category: 'navigation', href: '/changelog#v190-pixel-sidebar', isNew: true },
-  { name: 'PixelCarousel', category: 'data', href: '/changelog#v190-pixel-carousel', isNew: true },
-  { name: 'PixelTimeline', category: 'data', href: '/changelog#v190-pixel-timeline', isNew: true },
-  { name: 'PixelStatGroup', category: 'data', href: '/changelog#v190-pixel-stat-group', isNew: true },
-  { name: 'PixelAvatarGroup', category: 'data', href: '/changelog#v190-pixel-avatar-group', isNew: true },
-  { name: 'PixelBadgeGroup', category: 'data', href: '/changelog#v190-pixel-badge-group', isNew: true },
-  { name: 'PixelInputGroup', category: 'forms', href: '/changelog#v190-pixel-input-group', isNew: true },
-  { name: 'PixelToggleGroup', category: 'forms', href: '/changelog#v190-pixel-toggle-group', isNew: true },
-  { name: 'PixelDateRangePicker', category: 'forms', href: '/changelog#v190-pixel-date-range-picker', isNew: true },
-  { name: 'PixelCalendarGrid', category: 'forms', href: '/changelog#v190-pixel-calendar-grid', isNew: true },
-  { name: 'PixelColorInput', category: 'forms', href: '/changelog#v190-pixel-color-input', isNew: true },
-  { name: 'PixelChartPrimitives', category: 'data', href: '/changelog#v190-pixel-chart-primitives', isNew: true },
+/* v2.1.0 highlights — API upgrades from the responsive-hardening + dogfooding release.
+   Links land on each component's DocSection anchor on this page. */
+const WHATS_NEW_V210_ITEMS: WhatsNewItem[] = [
+  { name: 'PixelCard', category: 'cards', href: '#pixel-card', isNew: true },
+  { name: 'PixelPricingCard', category: 'cards', href: '#pixel-pricing-card', isNew: true },
+  { name: 'PixelStatCard', category: 'cards', href: '#pixel-stat-card', isNew: true },
+  { name: 'PixelStatGroup', category: 'data', href: '#pixel-stat-group', isNew: true },
+  { name: 'PixelChip', category: 'data', href: '#pixel-chip', isNew: true },
 ];
 
 /* ═══════════════════════════════════════════════════════════════════════════════
@@ -922,7 +909,7 @@ export default function UIKitPage() {
               <WhatsNewStrip
                 version={UI_KIT_VERSION}
                 date={UI_KIT_LATEST_DATE}
-                items={WHATS_NEW_V200_ITEMS}
+                items={WHATS_NEW_V210_ITEMS}
               />
             </div>
 

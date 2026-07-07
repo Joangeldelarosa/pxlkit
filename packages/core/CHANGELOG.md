@@ -3,6 +3,12 @@
 <!-- Seeded from git history by scripts/build-docs/generate-changelog.ts (initial generation). -->
 <!-- This file is hand-maintained from this point on — add an entry at the top for each release. -->
 
+## 1.3.4 — 2026-07-06
+
+### Fixed
+
+- `PixelToast`: the title now breaks long unbroken strings (`break-words`), matching the existing behavior of the message body.
+
 ## 1.3.3 — 2026-05-27
 
 ### Added

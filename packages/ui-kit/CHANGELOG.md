@@ -1,6 +1,26 @@
 # @pxlkit/ui-kit — Changelog
 
-## Unreleased
+## 2.1.0 — 2026-07-06
+
+### Added
+- `PixelCard`: `title` is now optional — omit it for a headerless container/well card (no auto header, no divider).
+- `PixelPricingCard`: `descriptionLines` (`2 | 3 | 'none'`), a `priceBadge` slot rendered beside the price, and per-feature `highlight` (tone-colored check + emphasized label). The price row now wraps on narrow cards instead of clipping.
+- `PixelStatCard`: `valueTone` (value takes the tone color) and `align="center"`.
+- `PixelStatGroup`: `gap` prop for the grid layout (stackGap scale; omit for flush cells).
+- `PixelChip`: `value` prop so chips compose directly with `PixelChipGroup` without wrapper components.
+
+### Fixed (responsive hardening — full 320–430px audit)
+- `PixelStatGroup` grid columns now collapse responsively (`grid-cols-2 sm:grid-cols-4`, …); `layout="row"` scrolls instead of overflowing.
+- Fixed-width SVG charts (`PixelSparkline`, `PixelBarChart`, `PixelAreaChart`) clamp to `max-width: 100%`.
+- Popovers and menus clamp to the viewport: `PixelDateRangePicker` (two-month panel + calendar grid collapse), `PixelMenubar` submenus, `PixelNavigationMenu` panels, `PixelDropdown`, `PixelSplitButton` (collision-aware alignment).
+- `PxlKitToastProvider` viewport clamps to `min(24rem, 100vw - 2rem)`.
+- Flex/grid shrink fixes (`min-w-0`): `PixelFeatureCard` horizontal, `PixelStatCard` icon variants, `PixelInput` with addons, `PixelInputGroup`.
+- Wrap/scroll fixes: `PixelOTPInput`, `PixelSegmented`, `PixelPagination`, `PixelToggleGroup`.
+- Long-token overflow (`break-words`): `PixelHeroSection`, `PixelCodeInline`, `PixelTooltip` (drops `whitespace-nowrap`), `PixelFileUpload`.
+- `PixelGrid` autoFit/autoFill min track clamps: `minmax(min(<minColWidth>, 100%), 1fr)`.
+- `PixelStatCard` bottom-left icon/sparkline can no longer paint outside the card.
+- `PixelSegmented` no longer renders a stray empty `<p>` when `label` is omitted; `aria-label` provides the accessible group name.
+- Example sources swept for the same anti-patterns and the nonexistent `text-retro-fg` token replaced with `text-retro-text`.
 
 ### Deprecated
 - `PxlKitButton` / `PxlKitButtonProps` — removal target made explicit: `3.0.0` (carried forward from 2.0.0, see ADR-0004). Use `PixelIconButton` / `PixelIconButtonProps`.

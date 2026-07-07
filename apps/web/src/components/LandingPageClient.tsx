@@ -95,17 +95,13 @@ const staggerContainer = {
 /** Derived from the icon data already bundled for the hero + showcase. */
 const TOTAL_ICON_COUNT = ALL_ICONS.length + ParallaxPack.length;
 
+/* v2.1.0 highlights — API upgrades from the responsive-hardening + dogfooding release. */
 const WHATS_NEW_ITEMS: WhatsNewItem[] = [
-  { name: 'PixelDataTable', category: 'data', href: '/ui-kit#pixel-data-table', isNew: true },
-  { name: 'PixelStepper', category: 'navigation', href: '/ui-kit#pixel-stepper', isNew: true },
-  { name: 'PixelSidebar', category: 'navigation', href: '/ui-kit#pixel-sidebar', isNew: true },
-  { name: 'PixelTimeline', category: 'data', href: '/ui-kit#pixel-timeline', isNew: true },
-  { name: 'PixelCarousel', category: 'data', href: '/ui-kit#pixel-carousel', isNew: true },
-  { name: 'PixelCalendarGrid', category: 'forms', href: '/ui-kit#pixel-calendar-grid', isNew: true },
-  { name: 'PixelDatePicker', category: 'forms', href: '/ui-kit#pixel-date-picker', isNew: true },
-  { name: 'PixelColorInput', category: 'forms', href: '/ui-kit#pixel-color-input', isNew: true },
+  { name: 'PixelCard', category: 'cards', href: '/ui-kit#pixel-card', isNew: true },
+  { name: 'PixelPricingCard', category: 'cards', href: '/ui-kit#pixel-pricing-card', isNew: true },
+  { name: 'PixelStatCard', category: 'cards', href: '/ui-kit#pixel-stat-card', isNew: true },
   { name: 'PixelStatGroup', category: 'data', href: '/ui-kit#pixel-stat-group', isNew: true },
-  { name: 'PixelChartPrimitives', category: 'data', href: '/ui-kit#pixel-chart-primitives', isNew: true },
+  { name: 'PixelChip', category: 'data', href: '/ui-kit#pixel-chip', isNew: true },
 ];
 
 export function LandingPageClient() {
