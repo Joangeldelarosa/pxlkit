@@ -136,7 +136,7 @@ export function Default() {
         <pre className="docs-code"><code>{`export function Tones() {
   const [value, setValue] = useState('grid');
   return (
-    <div className="grid grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <PixelSegmented label="Neutral" tone="neutral" value={value} options={VIEWS} onChange={setValue} />
       <PixelSegmented label="Green" tone="green" value={value} options={VIEWS} onChange={setValue} />
       <PixelSegmented label="Cyan" tone="cyan" value={value} options={VIEWS} onChange={setValue} />
@@ -154,7 +154,7 @@ export function Default() {
   const [pixel, setPixel] = useState('grid');
   const [linear, setLinear] = useState('grid');
   return (
-    <div className="grid grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <PixelSegmented
         label="Pixel surface"
         surface="pixel"

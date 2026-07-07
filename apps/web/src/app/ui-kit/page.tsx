@@ -65,6 +65,7 @@ import { Trophy, Lightning, FireSword, Crown, Shield, Coin, Star } from '@pxlkit
 import { Bell, CheckCircle, WarningTriangle, InfoCircle } from '@pxlkit/feedback';
 import { Heart, Message } from '@pxlkit/social';
 import { CodeBlock } from '../../components/CodeBlock';
+import { PropsTable, type PropDef } from './_doc-section';
 import { useToast, type ToastPosition, type ToastTone } from '../../components/ToastProvider';
 import { WhatsNewStrip, type WhatsNewItem } from '../../components/whats-new-strip';
 import {
@@ -167,7 +168,6 @@ const ParallaxDemos = dynamic(() => import('./_parallax-demos'), {
    TYPES & DATA
    ═══════════════════════════════════════════════════════════════════════════════ */
 
-type PropDef = { name: string; type: string; default: string; description: string };
 const UI_COMPONENTS_COUNT = UI_KIT_COMPONENTS.length;
 
 /* Cross-cutting props that almost every component accepts. Defined once
@@ -574,37 +574,6 @@ function MoreComponentSection({ id, name }: { id: string; name: string }) {
         </p>
       )}
     </DocSection>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════════
-   INTERNAL: PropsTable
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-function PropsTable({ data }: { data: PropDef[] }) {
-  return (
-    <div className="overflow-x-auto rounded-lg border border-retro-border/40">
-      <table className="w-full text-left text-xs">
-        <thead>
-          <tr className="border-b border-retro-border bg-retro-surface/40">
-            <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Prop</th>
-            <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Type</th>
-            <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Default</th>
-            <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((p) => (
-            <tr key={p.name} className="border-b border-retro-border/20">
-              <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-cyan">{p.name}</td>
-              <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-purple">{p.type}</td>
-              <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-gold">{p.default || '—'}</td>
-              <td className="px-3 py-2 text-retro-muted">{p.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
   );
 }
 
@@ -1203,38 +1172,20 @@ export default function RootLayout({ children }) {
               {/* ── Why Turkish needs special handling ── */}
               <div className="rounded-lg border border-retro-border/30 bg-retro-surface/30 p-4 space-y-3">
                 <h3 className="font-mono text-xs font-semibold text-retro-text">Why Turkish Needs Special Handling</h3>
-                <div className="overflow-x-auto rounded-lg border border-retro-border/40">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-retro-border bg-retro-surface/40">
-                        <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Input</th>
-                        <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">English Uppercase</th>
-                        <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Turkish Uppercase</th>
-                        <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Note</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-retro-border/20">
-                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-cyan">i</td>
-                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-gold">I</td>
-                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-green">İ (U+0130)</td>
-                        <td className="px-3 py-2 text-retro-muted">Dotted uppercase İ in Turkish</td>
-                      </tr>
-                      <tr className="border-b border-retro-border/20">
-                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-cyan">ı (U+0131)</td>
-                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-gold">I</td>
-                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-green">I</td>
-                        <td className="px-3 py-2 text-retro-muted">Dotless ı is unique to Turkish</td>
-                      </tr>
-                      <tr className="border-b border-retro-border/20">
-                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-cyan">istanbul</td>
-                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-gold">{toLocaleUpper('istanbul', 'en')}</td>
-                        <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-green">{toLocaleUpper('istanbul', 'tr')}</td>
-                        <td className="px-3 py-2 text-retro-muted">Complete word difference</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                <PixelTable
+                  columns={[
+                    { key: 'input', header: 'Input', className: 'whitespace-nowrap', render: (r) => <span className="text-retro-cyan">{r.input}</span> },
+                    { key: 'en', header: 'English Uppercase', className: 'whitespace-nowrap', render: (r) => <span className="text-retro-gold">{r.en}</span> },
+                    { key: 'tr', header: 'Turkish Uppercase', className: 'whitespace-nowrap', render: (r) => <span className="text-retro-green">{r.tr}</span> },
+                    { key: 'note', header: 'Note', render: (r) => <span className="text-retro-muted">{r.note}</span> },
+                  ]}
+                  data={[
+                    { input: 'i', en: 'I', tr: 'İ (U+0130)', note: 'Dotted uppercase İ in Turkish' },
+                    { input: 'ı (U+0131)', en: 'I', tr: 'I', note: 'Dotless ı is unique to Turkish' },
+                    { input: 'istanbul', en: toLocaleUpper('istanbul', 'en'), tr: toLocaleUpper('istanbul', 'tr'), note: 'Complete word difference' },
+                  ]}
+                  getRowId={(r) => r.input}
+                />
               </div>
 
               {/* ── Live demo ── */}

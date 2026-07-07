@@ -52,7 +52,7 @@ import { PixelCluster } from '@pxlkit/ui-kit';
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded border border-retro-border px-2 py-1 text-xs text-retro-fg">
+    <span className="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">
       {children}
     </span>
   );

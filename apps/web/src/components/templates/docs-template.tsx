@@ -8,6 +8,7 @@ import {
   PixelSectionHeader,
   PixelScrollArea,
   PixelSidebar,
+  PixelButton,
   PixelCard,
   PixelAlert,
   PixelDataTable,
@@ -86,14 +87,7 @@ const USAGE_EXAMPLES: UsageExample[] = [
 export function Example() {
   return <PixelButton>Press Start</PixelButton>;
 }`,
-    preview: (
-      <button
-        type="button"
-        className="px-4 py-2 text-xs font-semibold bg-retro-cyan/15 text-retro-cyan border border-retro-cyan/40 hover:bg-retro-cyan/25 transition-colors"
-      >
-        Press Start
-      </button>
-    ),
+    preview: <PixelButton>Press Start</PixelButton>,
   },
   {
     id: 'tones',
@@ -103,18 +97,8 @@ export function Example() {
 <PixelButton tone="red">Delete</PixelButton>`,
     preview: (
       <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          className="px-4 py-2 text-xs font-semibold bg-retro-gold/15 text-retro-gold border border-retro-gold/40 hover:bg-retro-gold/25 transition-colors"
-        >
-          Continue
-        </button>
-        <button
-          type="button"
-          className="px-4 py-2 text-xs font-semibold bg-retro-red/15 text-retro-red border border-retro-red/40 hover:bg-retro-red/25 transition-colors"
-        >
-          Delete
-        </button>
+        <PixelButton tone="gold">Continue</PixelButton>
+        <PixelButton tone="red">Delete</PixelButton>
       </div>
     ),
   },
@@ -127,15 +111,9 @@ export function Example() {
 <PixelButton size="lg">Large</PixelButton>`,
     preview: (
       <div className="flex flex-wrap items-center gap-2">
-        <button type="button" className="px-3 py-1 text-[11px] font-semibold bg-retro-surface/60 text-retro-text border border-retro-border tracking-wide">
-          Small
-        </button>
-        <button type="button" className="px-4 py-2 text-xs font-semibold bg-retro-surface/60 text-retro-text border border-retro-border">
-          Medium
-        </button>
-        <button type="button" className="px-6 py-3 text-sm font-semibold bg-retro-surface/60 text-retro-text border border-retro-border">
-          Large
-        </button>
+        <PixelButton size="sm">Small</PixelButton>
+        <PixelButton size="md">Medium</PixelButton>
+        <PixelButton size="lg">Large</PixelButton>
       </div>
     ),
   },
@@ -144,8 +122,8 @@ export function Example() {
 const PROPS_DATA: PropRow[] = [
   {
     prop: 'tone',
-    type: '"cyan" | "gold" | "red" | "purple" | "green" | "neutral"',
-    default: '"cyan"',
+    type: '"green" | "cyan" | "gold" | "red" | "purple" | "pink" | "neutral"',
+    default: '"green"',
     description: 'Semantic color intent. Drives background, border, and text token.',
   },
   {
@@ -156,7 +134,7 @@ const PROPS_DATA: PropRow[] = [
   },
   {
     prop: 'variant',
-    type: '"solid" | "outline" | "ghost"',
+    type: '"solid" | "soft" | "ghost" | "outline"',
     default: '"solid"',
     description: 'Fill style. Use ghost inside tight toolbars to reduce visual weight.',
   },
@@ -199,7 +177,7 @@ function OnThisPageRail() {
     <aside aria-labelledby="on-this-page-title" className="hidden xl:block sticky top-16 self-start pl-4">
       <h2
         id="on-this-page-title"
-        className="text-[11px] uppercase tracking-[0.18em] text-retro-fg mb-3 font-semibold"
+        className="font-pixel text-xs uppercase tracking-[0.18em] text-retro-muted mb-3"
       >
         On this page
       </h2>
@@ -286,7 +264,7 @@ export function PixelDocsTemplate() {
                   size="md"
                 />
 
-                <PixelStack gap={6} className="mt-8">
+                <PixelStack gap={6} className="mt-10">
                   <section id="installation" aria-labelledby="installation-title">
                     <h3
                       id="installation-title"

@@ -49,6 +49,7 @@ export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsS
     <section aria-labelledby="pixel-pricing-card-usage">
       <h3 id="pixel-pricing-card-usage">Usage</h3>
       <pre className="docs-code"><code>{`import { PixelPricingCard } from '@pxlkit/ui-kit';
+import { PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -84,6 +85,26 @@ export function Default() {
         { label: 'Basic analytics' },
         { label: 'Email support' },
         { label: 'Priority support', included: false },
+      ]}
+    />
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-with-price-badge">
+        <h4>With price badge</h4>
+        <pre className="docs-code"><code>{`export function WithPriceBadge() {
+  return (
+    <PixelPricingCard
+      tone="green"
+      name="Team"
+      description="Annual billing with every collaboration feature unlocked, plus hands-on onboarding for larger workspaces — the description flows freely with descriptionLines set to 'none'."
+      descriptionLines="none"
+      price={{ amount: '$39', period: '/mo', strikethrough: '$59' }}
+      priceBadge={<PixelBadge tone="green" size="sm">-33%</PixelBadge>}
+      features={[
+        { label: 'Unlimited projects' },
+        { label: 'SSO + audit log', highlight: true },
+        { label: 'Priority support' },
       ]}
     />
   );

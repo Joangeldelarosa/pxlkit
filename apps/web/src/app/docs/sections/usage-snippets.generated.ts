@@ -345,7 +345,7 @@ import { PixelCluster } from '@pxlkit/ui-kit';
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded border border-retro-border px-2 py-1 text-xs text-retro-fg">
+    <span className="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">
       {children}
     </span>
   );
@@ -640,7 +640,7 @@ export function Default() {
 function Card({ title, body }: { title: string; body: string }) {
   return (
     <div className="border border-retro-border p-4">
-      <h3 className="text-sm font-semibold text-retro-fg">{title}</h3>
+      <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
       <p className="text-sm text-retro-muted">{body}</p>
       <div className="mt-2 text-xs text-retro-muted">Footer</div>
     </div>
@@ -649,7 +649,7 @@ function Card({ title, body }: { title: string; body: string }) {
 
 export function Default() {
   return (
-    <PixelEqualHeightGrid cols={3} gap={4}>
+    <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={4}>
       <Card title="One" body="Short copy." />
       <Card title="Two" body="A longer body that forces the row to grow taller than the first card." />
       <Card title="Three" body="Medium length copy here." />
@@ -800,7 +800,7 @@ import { PixelGrid } from '@pxlkit/ui-kit';
 
 function Cell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-fg">
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
       {children}
     </div>
   );
@@ -1117,6 +1117,7 @@ export function Default() {
 }
 `,
   'pixel-pricing-card': `import { PixelPricingCard } from '@pxlkit/ui-kit';
+import { PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (

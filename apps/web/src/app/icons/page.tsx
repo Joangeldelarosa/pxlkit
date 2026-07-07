@@ -14,7 +14,7 @@ import { ParallaxPack } from '@pxlkit/parallax';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ToastProvider';
 import type { ToastTone } from '@/components/ToastProvider';
-import { PixelButton, PxlKitButton, PixelInput, PixelSlider } from '@pxlkit/ui-kit';
+import { PixelBadge, PixelButton, PixelCard, PixelChip, PixelChipGroup, PixelIconFrame, PxlKitButton, PixelInput, PixelSlider } from '@pxlkit/ui-kit';
 
 // ─── Registry ───────────────────────────────
 const ALL_PACKS: IconPack[] = [GamificationPack, FeedbackPack, SocialPack, WeatherPack, UiPack, EffectsPack];
@@ -27,6 +27,8 @@ function toPascal(name: string): string {
     .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
     .join('');
 }
+
+const LIGHT_SWATCH = 'bg-white border-gray-200';
 
 // ─── Page ───────────────────────────────────
 export default function IconsPage() {
@@ -185,50 +187,40 @@ export default function IconsPage() {
         </div>
 
         {/* Pack filter chips */}
-        <div className="flex flex-wrap justify-center gap-2">
-          <PixelButton
-            onClick={() => setActivePack(null)}
+        <PixelChipGroup
+          value={[activePack ?? 'all']}
+          onChange={(next) => {
+            const v = next[0];
+            setActivePack(!v || v === 'all' ? null : v);
+          }}
+          aria-label="Filter icons by pack"
+          className="w-full justify-center"
+        >
+          <PixelChip
+            value="all"
+            label={`All (${TOTAL_COUNT})`}
             size="sm"
-            variant="ghost"
             tone={!activePack ? 'green' : 'neutral'}
-            className={`rounded-full ${
-              !activePack
-                ? 'border-retro-green/50 bg-retro-green/10 text-retro-green'
-                : 'border-retro-border/40 text-retro-muted hover:text-retro-text hover:border-retro-border'
-            }`}
-          >
-            All ({TOTAL_COUNT})
-          </PixelButton>
+            variant={!activePack ? 'soft' : 'outline'}
+          />
           {ALL_PACKS.map((pack) => (
-            <PixelButton
+            <PixelChip
               key={pack.id}
-              onClick={() => setActivePack(activePack === pack.id ? null : pack.id)}
+              value={pack.id}
+              label={`${pack.name} (${pack.icons.length})`}
               size="sm"
-              variant="ghost"
               tone={activePack === pack.id ? 'cyan' : 'neutral'}
-              className={`rounded-full ${
-                activePack === pack.id
-                  ? 'border-retro-cyan/50 bg-retro-cyan/10 text-retro-cyan'
-                  : 'border-retro-border/40 text-retro-muted hover:text-retro-text hover:border-retro-border'
-              }`}
-            >
-              {pack.name} ({pack.icons.length})
-            </PixelButton>
+              variant={activePack === pack.id ? 'soft' : 'outline'}
+            />
           ))}
-          <PixelButton
-            onClick={() => setActivePack(activePack === 'parallax' ? null : 'parallax')}
+          <PixelChip
+            value="parallax"
+            label={`3D Parallax (${ParallaxPack.length})`}
             size="sm"
-            variant="ghost"
-            tone={activePack === 'parallax' ? 'cyan' : 'neutral'}
-            className={`rounded-full ${
-              activePack === 'parallax'
-                ? 'border-retro-gold/50 bg-retro-gold/10 text-retro-gold'
-                : 'border-retro-border/40 text-retro-muted hover:text-retro-text hover:border-retro-border'
-            }`}
-          >
-            3D Parallax ({ParallaxPack.length})
-          </PixelButton>
-        </div>
+            tone={activePack === 'parallax' ? 'gold' : 'neutral'}
+            variant={activePack === 'parallax' ? 'soft' : 'outline'}
+          />
+        </PixelChipGroup>
 
         {(query || activePack) && (
           <p className="text-center font-mono text-xs text-retro-muted/70">
@@ -240,7 +232,7 @@ export default function IconsPage() {
       {/* ─── Packs ─── */}
       {filteredPacks.map((pack) => (
         <section key={pack.id} className="mb-16">
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex flex-wrap items-center gap-4 mb-6">
             <h2 className="font-pixel text-sm text-retro-cyan">{pack.name}</h2>
             <span className="text-retro-muted/50 font-mono text-xs">
               {pack.icons.length} icon{pack.icons.length !== 1 ? 's' : ''}
@@ -283,11 +275,11 @@ export default function IconsPage() {
         (icon) => icon.name.includes(query) || icon.tags.some((tag) => tag.includes(query))
       )) && (
         <section className="mb-16">
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex flex-wrap items-center gap-4 mb-6">
             <h2 className="font-pixel text-sm text-retro-gold">3D Parallax Pack</h2>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[8px] font-mono bg-retro-gold/10 text-retro-gold border border-retro-gold/30 rounded">
+            <PixelBadge tone="gold" size="sm">
               NEW · INTERACTIVE
-            </span>
+            </PixelBadge>
             <span className="text-retro-muted/50 font-mono text-xs">
               {ParallaxPack.length} icon{ParallaxPack.length !== 1 ? 's' : ''}
             </span>
@@ -306,21 +298,25 @@ export default function IconsPage() {
               <motion.div
                 key={icon.name}
                 whileHover={{ scale: 1.05 }}
-                className="relative flex flex-col items-center gap-2 p-4 rounded-lg border border-retro-gold/20 bg-retro-surface/30 hover:bg-retro-card transition-colors group"
+                className="group"
               >
-                <ParallaxPxlKitIcon
-                  icon={icon}
-                  size={64}
-                  strength={16}
-                  interactive
-                  colorful
-                />
-                <span className="font-mono text-[9px] text-retro-muted truncate w-full text-center group-hover:text-retro-gold transition-colors">
-                  {icon.name}
-                </span>
-                <span className="font-mono text-[8px] text-retro-gold/50">
-                  {icon.layers.length} layers
-                </span>
+                <PixelCard tone="gold" className="h-full">
+                  <div className="flex flex-col items-center gap-2">
+                    <ParallaxPxlKitIcon
+                      icon={icon}
+                      size={64}
+                      strength={16}
+                      interactive
+                      colorful
+                    />
+                    <span className="font-mono text-[10px] text-retro-muted truncate w-full text-center group-hover:text-retro-gold transition-colors">
+                      {icon.name}
+                    </span>
+                    <span className="font-mono text-[10px] text-retro-gold/50">
+                      {icon.layers.length} layers
+                    </span>
+                  </div>
+                </PixelCard>
               </motion.div>
             ))}
           </div>
@@ -331,7 +327,7 @@ export default function IconsPage() {
               {' · '}
               Uses <span className="text-retro-cyan">ParallaxPxlKitIcon</span> from @pxlkit/core
               {' · '}
-              <a href="/docs#parallax-icons" className="text-retro-gold hover:underline">View docs →</a>
+              <a href="/docs#parallax-icons" className="inline-flex min-h-6 items-center text-retro-gold hover:underline">View docs →</a>
             </p>
           </div>
         </section>
@@ -388,17 +384,20 @@ export default function IconsPage() {
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 shrink-0">
                   {isAnimatedIcon(selectedIcon) ? (
                     <>
-                      <div className="p-3 bg-retro-surface rounded-xl border border-retro-border">
-                        <AnimatedPxlKitIcon
-                          icon={selectedIcon}
-                          size={56}
-                          colorful
-                          trigger={animTrigger}
-                          speed={animSpeed}
-                          playing={animPlaying}
-                        />
-                      </div>
-                      <div className="p-3 bg-white rounded-xl border border-gray-200">
+                      <PixelIconFrame
+                        size={80}
+                        icon={
+                          <AnimatedPxlKitIcon
+                            icon={selectedIcon}
+                            size={56}
+                            colorful
+                            trigger={animTrigger}
+                            speed={animSpeed}
+                            playing={animPlaying}
+                          />
+                        }
+                      />
+                      <div className={`p-3 rounded-xl border ${LIGHT_SWATCH}`}>
                         <AnimatedPxlKitIcon
                           icon={selectedIcon}
                           size={56}
@@ -411,10 +410,11 @@ export default function IconsPage() {
                     </>
                   ) : (
                     <>
-                      <div className="p-3 bg-retro-surface rounded-xl border border-retro-border">
-                        <PxlKitIcon icon={selectedIcon} size={56} colorful />
-                      </div>
-                      <div className="p-3 bg-white rounded-xl border border-gray-200">
+                      <PixelIconFrame
+                        size={80}
+                        icon={<PxlKitIcon icon={selectedIcon} size={56} colorful />}
+                      />
+                      <div className={`p-3 rounded-xl border ${LIGHT_SWATCH}`}>
                         <PxlKitIcon icon={selectedIcon} size={56} colorful />
                       </div>
                       <div className="hidden sm:flex flex-col gap-2">
@@ -443,7 +443,7 @@ export default function IconsPage() {
                           size="sm"
                           variant="ghost"
                           tone={animTrigger === t ? 'gold' : 'neutral'}
-                          className={`h-auto px-1.5 py-0.5 text-[9px] ${
+                          className={`h-auto px-1.5 py-0.5 text-[10px] ${
                             animTrigger === t
                               ? 'border-retro-gold/60 bg-retro-gold/15 text-retro-gold'
                               : 'border-retro-border/40 text-retro-muted hover:text-retro-text hover:border-retro-border'
@@ -472,11 +472,11 @@ export default function IconsPage() {
                         size="sm"
                         variant="ghost"
                         tone="green"
-                        className="h-auto px-2 py-0.5 text-[9px]"
+                        className="h-auto px-2 py-0.5 text-[10px]"
                       >
                         {animPlaying ? 'Pause' : 'Play'}
                       </PixelButton>
-                      <span className="font-mono text-[9px] text-retro-muted">
+                      <span className="font-mono text-[10px] text-retro-muted">
                         {selectedIcon.frames.length}f · {Math.round(1000 / (selectedIcon.frameDuration / animSpeed))} FPS
                       </span>
                     </div>

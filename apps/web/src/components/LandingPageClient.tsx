@@ -22,6 +22,7 @@ import { motion } from 'framer-motion';
 import { useState, useCallback, Suspense, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { ALL_ICONS } from './hero/iconPool';
+import { CodeBlock } from './CodeBlock';
 import { HeroCinematic, StatCardStrip } from './hero';
 import { useToast } from './ToastProvider';
 import type { ToastTone } from './ToastProvider';
@@ -47,14 +48,17 @@ import {
   PixelBento,
   PixelBentoCell,
   PixelButton,
+  PixelCard,
   PixelCluster,
   PixelContainer,
   PixelDataTable,
   PixelEqualHeightGrid,
   PixelFeatureCard,
+  PixelIconFrame,
   PixelInput,
   PixelMouseParallax,
   PixelParallaxLayer,
+  PixelPricingCard,
   PixelSectionHeader,
   PixelSegmented,
   PixelSelect,
@@ -281,14 +285,14 @@ function DemoCell({
     <PixelBentoCell tone={tone} variant="feature" span={span} bordered>
       <div className="w-full flex items-baseline justify-between gap-2 flex-wrap">
         <h3 className={`font-pixel text-[11px] ${DEMO_TONE_TEXT[tone]}`}>{title}</h3>
-        <span className="font-mono text-[9px] text-retro-muted/70">{components}</span>
+        <span className="font-mono text-[10px] text-retro-muted/70">{components}</span>
       </div>
       <div className="w-full flex-1 min-w-0">{children}</div>
       <div className="w-full pt-2 mt-auto flex items-center gap-4 font-mono text-[10px] border-t border-retro-border/20">
-        <Link href={`/ui-kit#${slug}`} className="text-retro-cyan hover:underline">
+        <Link href={`/ui-kit#${slug}`} className="py-1.5 -my-1.5 text-retro-cyan hover:underline">
           Live playground →
         </Link>
-        <Link href={`/docs#${slug}`} className="text-retro-muted hover:text-retro-text hover:underline">
+        <Link href={`/docs#${slug}`} className="py-1.5 -my-1.5 text-retro-muted hover:text-retro-text hover:underline">
           API reference
         </Link>
       </div>
@@ -375,7 +379,7 @@ function LiveKitDemo() {
               <PixelBarChart data={PLAN_REVENUE} tone="gold" showValues />
             </div>
             <div className="mt-3">
-              <span className="font-mono text-[9px] text-retro-muted block mb-1">
+              <span className="font-mono text-[10px] text-retro-muted block mb-1">
                 Checkout conversion — last 14 days
               </span>
               <div
@@ -498,17 +502,20 @@ function LiveKitDemo() {
 
 const STEP_INSTALL = `npm install @pxlkit/core @pxlkit/ui-kit tailwindcss`;
 
-const STEP_PROVIDER = `/* globals.css */
-@import "tailwindcss";
-@import "@pxlkit/ui-kit/styles.css";
-@source "../node_modules/@pxlkit/ui-kit";
+const STEP_PROVIDER = `import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+import '@pxlkit/ui-kit/styles.css';
 
-/* app/layout.tsx */
-import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
-
-<PxlKitLocaleProvider locale="en">
-  <App />
-</PxlKitLocaleProvider>`;
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <PxlKitSurfaceProvider surface="pixel">
+          {children}
+        </PxlKitSurfaceProvider>
+      </body>
+    </html>
+  );
+}`;
 
 const STEP_USE = `import {
   PixelButton, PixelInput, PixelStatCard,
@@ -520,10 +527,10 @@ const STEP_USE = `import {
   placeholder="you@studio.dev" />
 <PixelButton tone="green">Ship it</PixelButton>`;
 
-const HOW_IT_WORKS_STEPS: { step: string; title: string; code: string; tone: 'green' | 'cyan' | 'gold' }[] = [
-  { step: '01', title: 'Install', code: STEP_INSTALL, tone: 'green' },
-  { step: '02', title: 'Wire styles + provider', code: STEP_PROVIDER, tone: 'cyan' },
-  { step: '03', title: 'Use components', code: STEP_USE, tone: 'gold' },
+const HOW_IT_WORKS_STEPS: { step: string; title: string; code: string; language: string; tone: 'green' | 'cyan' | 'gold' }[] = [
+  { step: '01', title: 'Install', code: STEP_INSTALL, language: 'bash', tone: 'green' },
+  { step: '02', title: 'Wire styles + provider', code: STEP_PROVIDER, language: 'tsx', tone: 'cyan' },
+  { step: '03', title: 'Use components', code: STEP_USE, language: 'tsx', tone: 'gold' },
 ];
 
 function HowItWorks() {
@@ -531,48 +538,46 @@ function HowItWorks() {
   const { toast } = useToast();
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30">
-      <div className="max-w-6xl mx-auto">
-        <PixelSectionHeader
-          eyebrow="Adoption path"
-          title="From npm install to shipped UI in 3 steps."
-          description="Install once, wrap your app once, and every component — table to toast — is ready. The strip below is the exact output of step 3."
-          align="center"
-          titleTone="cyan"
-          size="md"
-        />
+    <PixelContainer as="section" maxWidth="xl" padding="md" className="border-t border-retro-border/30">
+      <PixelSectionHeader
+        eyebrow="Adoption path"
+        title="From npm install to shipped UI in 3 steps."
+        description="Install once, wrap your app once, and every component — table to toast — is ready. The strip below is the exact output of step 3."
+        align="center"
+        titleTone="cyan"
+        size="md"
+      />
 
-        <motion.div
-          className="mt-10 grid md:grid-cols-3 gap-5 sm:gap-6 items-start"
-          variants={staggerContainer}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true, margin: '-80px' }}
-        >
-          {HOW_IT_WORKS_STEPS.map((s) => (
-            <motion.div key={s.step} variants={fadeInUp}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className={`font-pixel text-xs ${DEMO_TONE_TEXT[s.tone]}`}>
-                  {s.step}
-                </span>
-                <span className="font-mono text-xs text-retro-muted">{s.title}</span>
-                <div className="flex-1 border-t border-retro-border/20" />
-              </div>
-              <pre className="code-block text-xs leading-relaxed overflow-x-auto">
-                <code className="text-retro-text/90">{s.code}</code>
-              </pre>
-            </motion.div>
-          ))}
-        </motion.div>
+      <motion.div
+        className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 items-start"
+        variants={staggerContainer}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true, margin: '-80px' }}
+      >
+        {HOW_IT_WORKS_STEPS.map((s) => (
+          <motion.div key={s.step} variants={fadeInUp}>
+            <div className="flex items-center gap-2 mb-3">
+              <span className={`font-pixel text-xs ${DEMO_TONE_TEXT[s.tone]}`}>
+                {s.step}
+              </span>
+              <span className="font-mono text-xs text-retro-muted">{s.title}</span>
+              <div className="flex-1 border-t border-retro-border/20" />
+            </div>
+            <CodeBlock code={s.code} language={s.language} />
+          </motion.div>
+        ))}
+      </motion.div>
 
-        <motion.div
-          className="mt-8 rounded-xl border border-retro-border bg-retro-surface p-5 sm:p-6"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <p className="font-mono text-[10px] text-retro-muted mb-4">
-            Step 3, rendered live — the exact code above:
+      <motion.div
+        className="mt-8"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
+        <PixelCard padding="lg">
+          <p className="font-mono text-xs text-retro-muted mb-4">
+            Step 3, rendered live — the exact code above
           </p>
           <div className="flex flex-wrap items-end gap-4 sm:gap-6">
             <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% this week" tone="green" size="sm" />
@@ -595,20 +600,20 @@ function HowItWorks() {
               Ship it
             </PixelButton>
           </div>
-        </motion.div>
+        </PixelCard>
+      </motion.div>
 
-        <div className="mt-8 flex justify-center">
-          <PixelCluster gap={3} justify="center">
-            <PixelButton tone="cyan" onClick={() => router.push('/docs#ui-kit')}>
-              Read the setup docs
-            </PixelButton>
-            <PixelButton tone="green" variant="ghost" onClick={() => router.push('/ui-kit')}>
-              Browse all {UI_COMPONENTS_COUNT} components
-            </PixelButton>
-          </PixelCluster>
-        </div>
+      <div className="mt-8 flex justify-center">
+        <PixelCluster gap={3} justify="center">
+          <PixelButton tone="cyan" onClick={() => router.push('/docs#ui-kit')}>
+            Read the setup docs
+          </PixelButton>
+          <PixelButton tone="green" variant="ghost" onClick={() => router.push('/ui-kit')}>
+            Browse all {UI_COMPONENTS_COUNT} components
+          </PixelButton>
+        </PixelCluster>
       </div>
-    </section>
+    </PixelContainer>
   );
 }
 
@@ -741,13 +746,6 @@ function TemplatesTeaser() {
 }
 
 /* ──────────────────── STATS STRIP (PixelStatGroup) ──────────────────── */
-const STAT_TONE_TEXT: Record<'green' | 'gold' | 'cyan' | 'purple', string> = {
-  green: 'text-retro-green',
-  gold: 'text-retro-gold',
-  cyan: 'text-retro-cyan',
-  purple: 'text-retro-purple',
-};
-
 function StatsStrip() {
   const stats: { label: string; value: string; tone: 'green' | 'gold' | 'cyan' | 'purple' }[] = [
     { label: 'Components', value: `${UI_COMPONENTS_COUNT}`, tone: 'green' },
@@ -760,23 +758,12 @@ function StatsStrip() {
     <PixelContainer as="section" maxWidth="xl" padding="sm">
       <PixelStatGroup
         layout="grid"
-        columns={2}
+        columns={4}
         tone="cyan"
         aria-label={`Pxlkit ${UI_KIT_VERSION_LABEL} by the numbers`}
-        className="!grid-cols-2 sm:!grid-cols-4 items-stretch"
       >
         {stats.map((s) => (
-          <div
-            key={s.label}
-            className="p-3 sm:p-4 md:p-6 h-full flex flex-col items-center justify-center text-center gap-1 min-w-0"
-          >
-            <span className={`font-pixel text-sm sm:text-lg md:text-xl ${STAT_TONE_TEXT[s.tone]} break-words text-center`}>
-              {s.value}
-            </span>
-            <span className="font-mono text-[10px] sm:text-xs text-retro-muted uppercase tracking-wider break-words text-center">
-              {s.label}
-            </span>
-          </div>
+          <PixelStatCard key={s.label} label={s.label} value={s.value} tone={s.tone} size="lg" valueTone align="center" />
         ))}
       </PixelStatGroup>
     </PixelContainer>
@@ -786,30 +773,38 @@ function StatsStrip() {
 /* ──────────────────── PARALLAX SHOWCASE ──────────────────── */
 function ParallaxShowcase() {
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 bg-retro-surface/20 relative overflow-hidden">
+    <PixelContainer
+      as="section"
+      maxWidth="xl"
+      padding="md"
+      className="relative overflow-hidden border-t border-retro-border/30 bg-retro-surface/20"
+    >
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-retro-gold/5 rounded-full blur-[150px] pointer-events-none" />
 
-      <div className="relative max-w-6xl mx-auto">
+      <div className="relative">
         <motion.div
-          className="text-center mb-4 sm:mb-6"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <div className="inline-flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 flex-wrap justify-center">
-            <PixelBadge tone="gold">NEW</PixelBadge>
-            <PixelBadge tone="purple">Interactive 3D</PixelBadge>
-            <PixelBadge tone="green">{ParallaxPack.length} Icons</PixelBadge>
-          </div>
-          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-gold mb-2 sm:mb-3">
-            ICONS THAT POP OFF THE SCREEN
-          </h2>
-          <p className="text-retro-muted max-w-2xl mx-auto text-xs sm:text-sm px-2">
-            Multi-layer 3D icons that tilt with your mouse and react on click — particles, layer explosions, color shifts. Move your cursor over them.
-          </p>
+          <PixelSectionHeader
+            title="ICONS THAT POP OFF THE SCREEN"
+            description="Multi-layer 3D icons that tilt with your mouse and react on click — particles, layer explosions, color shifts. Move your cursor over them."
+            align="center"
+            titleTone="gold"
+            size="md"
+            actions={
+              <>
+                <PixelBadge tone="gold">NEW</PixelBadge>
+                <PixelBadge tone="purple">Interactive 3D</PixelBadge>
+                <PixelBadge tone="green">{ParallaxPack.length} Icons</PixelBadge>
+              </>
+            }
+          />
         </motion.div>
 
         <motion.div
+          className="mt-10"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-50px' }}
@@ -827,16 +822,22 @@ function ParallaxShowcase() {
               <motion.div
                 key={icon.name}
                 whileHover={{ scale: 1.05 }}
-                className="relative flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 rounded-lg border border-retro-gold/20 bg-retro-surface/30 hover:bg-retro-card transition-colors group"
+                className="flex flex-col items-center gap-1.5 sm:gap-2 group"
               >
-                <ParallaxPxlKitIcon
-                  icon={icon}
-                  size={56}
-                  strength={16}
-                  interactive
-                  colorful
+                <PixelIconFrame
+                  tone="gold"
+                  size={80}
+                  icon={
+                    <ParallaxPxlKitIcon
+                      icon={icon}
+                      size={56}
+                      strength={16}
+                      interactive
+                      colorful
+                    />
+                  }
                 />
-                <span className="font-mono text-[9px] text-retro-muted truncate w-full text-center group-hover:text-retro-gold transition-colors">
+                <span className="font-mono text-[10px] text-retro-muted truncate w-full text-center group-hover:text-retro-gold transition-colors">
                   {icon.name}
                 </span>
               </motion.div>
@@ -844,7 +845,7 @@ function ParallaxShowcase() {
           </div>
         </motion.div>
       </div>
-    </section>
+    </PixelContainer>
   );
 }
 
@@ -853,100 +854,105 @@ const SHOWCASE_PACKS: {
   pack: { id: string; name: string; description: string; icons: AnyIcon[] };
   color: string;
   borderColor: string;
+  tone: 'green' | 'gold' | 'cyan' | 'purple' | 'pink' | 'neutral';
   limit: number;
 }[] = [
-  { pack: GamificationPack, color: 'text-retro-gold',   borderColor: 'border-retro-gold/30',   limit: 8 },
-  { pack: FeedbackPack,     color: 'text-retro-cyan',   borderColor: 'border-retro-cyan/30',   limit: 6 },
-  { pack: SocialPack,       color: 'text-retro-pink',   borderColor: 'border-retro-pink/30',   limit: 6 },
-  { pack: WeatherPack,      color: 'text-retro-purple', borderColor: 'border-retro-purple/30', limit: 6 },
-  { pack: UiPack,           color: 'text-retro-text',   borderColor: 'border-retro-border/50', limit: 5 },
-  { pack: EffectsPack,      color: 'text-retro-green',  borderColor: 'border-retro-green/30',  limit: 6 },
+  { pack: GamificationPack, color: 'text-retro-gold',   borderColor: 'border-retro-gold/30',   tone: 'gold',    limit: 8 },
+  { pack: FeedbackPack,     color: 'text-retro-cyan',   borderColor: 'border-retro-cyan/30',   tone: 'cyan',    limit: 6 },
+  { pack: SocialPack,       color: 'text-retro-pink',   borderColor: 'border-retro-pink/30',   tone: 'pink',    limit: 6 },
+  { pack: WeatherPack,      color: 'text-retro-purple', borderColor: 'border-retro-purple/30', tone: 'purple',  limit: 6 },
+  { pack: UiPack,           color: 'text-retro-text',   borderColor: 'border-retro-border/50', tone: 'neutral', limit: 5 },
+  { pack: EffectsPack,      color: 'text-retro-green',  borderColor: 'border-retro-green/30',  tone: 'green',   limit: 6 },
 ];
 
 function IconShowcase() {
   const router = useRouter();
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30">
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          className="text-center mb-8 sm:mb-14"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-gold mb-2 sm:mb-3">
-            {TOTAL_ICON_COUNT}+ HAND-CRAFTED PIXEL ART SVG ICONS
-          </h2>
-          <p className="text-retro-muted font-mono text-xs sm:text-sm max-w-lg mx-auto px-2">
-            Seven themed packs of 16×16 pixel art, crisp at any size — tree-shaking drops every icon you don&apos;t import.
-          </p>
-        </motion.div>
+    <PixelContainer as="section" maxWidth="xl" padding="md" className="border-t border-retro-border/30">
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <PixelSectionHeader
+          title={`${TOTAL_ICON_COUNT}+ HAND-CRAFTED PIXEL ART SVG ICONS`}
+          description="Seven themed packs of 16×16 pixel art, crisp at any size — tree-shaking drops every icon you don't import."
+          align="center"
+          titleTone="gold"
+          size="md"
+        />
+      </motion.div>
 
-        <div className="space-y-8 sm:space-y-12">
-          {SHOWCASE_PACKS.map(({ pack, color, borderColor, limit }) => (
-            <motion.div
-              key={pack.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-            >
-              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-5 min-w-0">
-                <h3 className={`font-pixel text-[10px] sm:text-[11px] shrink-0 ${color}`}>{pack.name}</h3>
-                <span className="font-mono text-[9px] sm:text-[10px] text-retro-muted/60 shrink-0">
-                  {pack.icons.length} icons
-                </span>
-                <div className="flex-1 border-t border-retro-border/20 min-w-[12px]" />
-                <span className="hidden sm:block font-mono text-[10px] text-retro-muted/40 truncate">
-                  @pxlkit/{pack.id}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-2.5">
-                {pack.icons.slice(0, limit).map((icon) => {
-                  const animated = isAnimatedIcon(icon);
-                  return (
-                    <div
-                      key={icon.name}
-                      className={`relative flex flex-col items-center gap-1 sm:gap-1.5 p-2 sm:p-3 rounded-lg border ${borderColor} bg-retro-surface/30 hover:bg-retro-card transition-colors group cursor-pointer`}
-                    >
-                      {animated ? (
-                        <AnimatedPxlKitIcon icon={icon} size={36} colorful className="group-hover:scale-110 transition-transform" />
-                      ) : (
-                        <PxlKitIcon icon={icon as PxlKitData} size={36} colorful className="group-hover:scale-110 transition-transform" />
-                      )}
-                      <span className="font-mono text-[9px] text-retro-muted truncate w-full text-center group-hover:text-retro-text transition-colors">
-                        {icon.name}
-                      </span>
-                    </div>
-                  );
-                })}
-
-                {pack.icons.length > limit && (
-                  <Link
-                    href="/icons"
-                    className={`flex flex-col items-center justify-center gap-1 p-2 sm:p-3 rounded-lg border border-dashed ${borderColor} hover:bg-retro-surface/50 transition-colors`}
-                  >
-                    <span className={`font-pixel text-[10px] sm:text-xs ${color}`}>+{pack.icons.length - limit}</span>
-                    <span className="font-mono text-[8px] sm:text-[9px] text-retro-muted">more</span>
-                  </Link>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="text-center mt-8 sm:mt-12">
-          <PixelButton
-            tone="green"
-            iconRight={<PxlKitIcon icon={ArrowRight} size={14} className="inline-block" />}
-            onClick={() => router.push('/icons')}
+      <div className="mt-10 space-y-8 sm:space-y-12">
+        {SHOWCASE_PACKS.map(({ pack, color, borderColor, tone, limit }) => (
+          <motion.div
+            key={pack.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
           >
-            Browse all {TOTAL_ICON_COUNT} icons
-          </PixelButton>
-        </div>
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-5 min-w-0">
+              <h3 className={`font-pixel text-[10px] sm:text-[11px] shrink-0 ${color}`}>{pack.name}</h3>
+              <span className="font-mono text-[10px] text-retro-muted/60 shrink-0">
+                {pack.icons.length} icons
+              </span>
+              <div className="flex-1 border-t border-retro-border/20 min-w-[12px]" />
+              <span className="hidden sm:block font-mono text-[10px] text-retro-muted/40 truncate">
+                @pxlkit/{pack.id}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 sm:gap-2.5">
+              {pack.icons.slice(0, limit).map((icon) => {
+                const animated = isAnimatedIcon(icon);
+                return (
+                  <div
+                    key={icon.name}
+                    className="flex flex-col items-center gap-1 sm:gap-1.5 group"
+                  >
+                    <PixelIconFrame
+                      tone={tone}
+                      size={64}
+                      icon={
+                        animated ? (
+                          <AnimatedPxlKitIcon icon={icon} size={36} colorful className="group-hover:scale-110 transition-transform" />
+                        ) : (
+                          <PxlKitIcon icon={icon as PxlKitData} size={36} colorful className="group-hover:scale-110 transition-transform" />
+                        )
+                      }
+                    />
+                    <span className="font-mono text-[10px] text-retro-muted truncate w-full text-center group-hover:text-retro-text transition-colors">
+                      {icon.name}
+                    </span>
+                  </div>
+                );
+              })}
+
+              {pack.icons.length > limit && (
+                <Link
+                  href="/icons"
+                  className={`mx-auto flex w-16 h-16 flex-col items-center justify-center gap-1 rounded-lg border border-dashed ${borderColor} hover:bg-retro-surface/50 transition-colors`}
+                >
+                  <span className={`font-pixel text-[10px] sm:text-xs ${color}`}>+{pack.icons.length - limit}</span>
+                  <span className="font-mono text-[10px] text-retro-muted">more</span>
+                </Link>
+              )}
+            </div>
+          </motion.div>
+        ))}
       </div>
-    </section>
+
+      <div className="text-center mt-8 sm:mt-12">
+        <PixelButton
+          tone="green"
+          iconRight={<PxlKitIcon icon={ArrowRight} size={14} className="inline-block" />}
+          onClick={() => router.push('/icons')}
+        >
+          Browse all {TOTAL_ICON_COUNT} icons
+        </PixelButton>
+      </div>
+    </PixelContainer>
   );
 }
 
@@ -1019,24 +1025,21 @@ function AISection() {
   const activePrompt = mode === 'static' ? staticPrompt : animatedPrompt;
 
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 bg-retro-surface/30">
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          className="text-center mb-8 sm:mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-purple mb-2 sm:mb-3">
-            DESCRIBE THE ICON — GET THE CODE
-          </h2>
-          <p className="text-retro-muted max-w-xl mx-auto text-xs sm:text-sm px-2">
-            The grid format reads like ASCII art with a legend, so any LLM can author one. Copy the prompt, paste the
-            output, preview before you commit.
-          </p>
-          <div className="mt-4 inline-flex justify-center">
+    <PixelContainer as="section" maxWidth="xl" padding="md" className="border-t border-retro-border/30 bg-retro-surface/30">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
+        <PixelSectionHeader
+          title="DESCRIBE THE ICON — GET THE CODE"
+          description="The grid format reads like ASCII art with a legend, so any LLM can author one. Copy the prompt, paste the output, preview before you commit."
+          align="center"
+          titleTone="purple"
+          size="md"
+          actions={
             <PixelSegmented
-              label=""
+              aria-label="Icon type"
               value={mode}
               onChange={(v) => setMode(v as 'static' | 'animated')}
               tone={mode === 'animated' ? 'purple' : 'green'}
@@ -1045,62 +1048,62 @@ function AISection() {
                 { value: 'animated', label: 'Animated Icon' },
               ]}
             />
+          }
+        />
+      </motion.div>
+
+      <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        <div>
+          <h3 className="font-mono text-sm text-retro-green mb-3 flex items-center gap-2">
+            <span className={`w-2 h-2 rounded-full ${mode === 'static' ? 'bg-retro-green' : 'bg-retro-purple'}`} />
+            {mode === 'static' ? 'Static' : 'Animated'} Prompt Template
+          </h3>
+          <CodeBlock code={activePrompt} language="json" />
+          <div className="mt-3">
+            <PixelButton
+              tone={mode === 'static' ? 'green' : 'purple'}
+              size="sm"
+              onClick={() => navigator.clipboard?.writeText(activePrompt)}
+            >
+              Copy Prompt
+            </PixelButton>
           </div>
-        </motion.div>
+        </div>
 
-        <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
-          <div>
-            <h3 className="font-mono text-sm text-retro-green mb-3 flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${mode === 'static' ? 'bg-retro-green' : 'bg-retro-purple'}`} />
-              {mode === 'static' ? 'Static' : 'Animated'} Prompt Template
-            </h3>
-            <pre className="code-block text-xs leading-relaxed h-[400px] overflow-y-auto">
-              <code className="text-retro-muted">{activePrompt}</code>
-            </pre>
-            <div className="mt-3">
-              <PixelButton
-                tone={mode === 'static' ? 'green' : 'purple'}
-                size="sm"
-                onClick={() => navigator.clipboard?.writeText(activePrompt)}
-              >
-                Copy Prompt
-              </PixelButton>
-            </div>
+        <div>
+          <h3 className="font-mono text-sm text-retro-cyan mb-3 flex items-center gap-2">
+            <span className="w-2 h-2 bg-retro-cyan rounded-full" />
+            Paste AI Output
+          </h3>
+          <PixelTextarea
+            label="AI Output"
+            value={code}
+            onChange={(e) => { setCode(e.target.value); setParseError(''); }}
+            placeholder={mode === 'static' ? 'Paste the AI-generated static icon JSON here...' : 'Paste the AI-generated animated icon JSON here...'}
+            tone="cyan"
+            className="h-[300px] text-base sm:text-xs"
+          />
+          <div className="flex flex-wrap gap-3 mt-3">
+            <PixelButton tone="cyan" size="sm" onClick={handlePreview}>
+              Preview Icon
+            </PixelButton>
+            <PixelButton
+              tone="gold"
+              size="sm"
+              variant="ghost"
+              onClick={handleOpenInBuilder}
+              disabled={!preview}
+            >
+              Open in Builder →
+            </PixelButton>
           </div>
+          {parseError && (
+            <p className="mt-2 text-xs font-mono text-retro-red">{parseError}</p>
+          )}
 
-          <div>
-            <h3 className="font-mono text-sm text-retro-cyan mb-3 flex items-center gap-2">
-              <span className="w-2 h-2 bg-retro-cyan rounded-full" />
-              Paste AI Output
-            </h3>
-            <PixelTextarea
-              label="AI Output"
-              value={code}
-              onChange={(e) => { setCode(e.target.value); setParseError(''); }}
-              placeholder={mode === 'static' ? 'Paste the AI-generated static icon JSON here...' : 'Paste the AI-generated animated icon JSON here...'}
-              tone="cyan"
-              className="h-[300px] text-base sm:text-xs"
-            />
-            <div className="flex flex-wrap gap-3 mt-3">
-              <PixelButton tone="cyan" size="sm" onClick={handlePreview}>
-                Preview Icon
-              </PixelButton>
-              <PixelButton
-                tone="gold"
-                size="sm"
-                variant="ghost"
-                onClick={handleOpenInBuilder}
-                disabled={!preview}
-              >
-                Open in Builder →
-              </PixelButton>
-            </div>
-            {parseError && (
-              <p className="mt-2 text-xs font-mono text-retro-red">{parseError}</p>
-            )}
-
-            {preview && (
-              <div className="mt-6 p-6 rounded-xl border border-retro-border bg-retro-surface flex flex-col items-center justify-center gap-3">
+          {preview && (
+            <PixelCard padding="lg" className="mt-6">
+              <div className="flex flex-col items-center justify-center gap-3">
                 {isAnimatedIcon(preview) ? (
                   <>
                     <AnimatedPxlKitIcon icon={preview} size={128} colorful />
@@ -1117,11 +1120,11 @@ function AISection() {
                   </>
                 )}
               </div>
-            )}
-          </div>
+            </PixelCard>
+          )}
         </div>
       </div>
-    </section>
+    </PixelContainer>
   );
 }
 
@@ -1156,111 +1159,87 @@ function PricingPreview() {
     },
   ];
 
-  const toneColors = {
-    green: { border: 'border-retro-green/30', text: 'text-retro-green', bg: 'bg-retro-green/5' },
-    gold: { border: 'border-retro-gold/30', text: 'text-retro-gold', bg: 'bg-retro-gold/5' },
-    cyan: { border: 'border-retro-cyan/30', text: 'text-retro-cyan', bg: 'bg-retro-cyan/5' },
-  };
-
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30">
-      <div className="max-w-5xl mx-auto">
-        <motion.div
-          className="text-center mb-8 sm:mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <div className="inline-flex items-center gap-2 mb-3 sm:mb-4">
+    <PixelContainer as="section" maxWidth="xl" padding="md" className="border-t border-retro-border/30">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
+        <PixelSectionHeader
+          title="ONE-TIME LICENSE. NO SUBSCRIPTION."
+          description="Code is MIT, icon packs are free with attribution. Shipping a client product and need to drop the credit? Grab a lifetime asset license at 50% off."
+          align="center"
+          titleTone="green"
+          size="md"
+          actions={
             <PixelBadge tone="red"><span aria-label="50% off launch price">🔥 50% OFF — Launch Price</span></PixelBadge>
-          </div>
-          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-green mb-2 sm:mb-3">
-            ONE-TIME LICENSE. NO SUBSCRIPTION.
-          </h2>
-          <p className="text-retro-muted max-w-lg mx-auto text-xs sm:text-sm px-2">
-            Code is MIT, icon packs are free with attribution. Shipping a client product and need to drop the credit?{' '}
-            <span className="text-retro-gold font-bold">Grab a lifetime asset license at 50% off.</span>
-          </p>
-        </motion.div>
+          }
+        />
+      </motion.div>
 
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 items-stretch"
-          variants={staggerContainer}
-          initial="initial"
-          whileInView="animate"
-          viewport={{ once: true, margin: '-80px' }}
-        >
-          {plans.map((plan) => {
-            const tc = toneColors[plan.color];
-            return (
-              <motion.div
-                key={plan.name}
-                variants={fadeInUp}
-                whileHover={{ scale: 1.02, transition: { type: 'spring', stiffness: 320, damping: 24 } }}
-                className={`relative h-full flex flex-col rounded-xl border ${tc.border} ${tc.bg} p-5 transition-colors ${
-                  plan.popular ? 'ring-1 ring-retro-gold/30' : ''
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2">
-                    <PixelBadge tone="gold">Most Popular</PixelBadge>
-                  </div>
-                )}
-                <h3 className={`font-pixel text-sm ${tc.text} mb-1`}>
-                  {plan.name}
-                </h3>
-                <div className="flex items-baseline gap-2 mb-1">
-                  <span className="font-pixel text-2xl text-retro-text">{plan.price}</span>
-                  {plan.originalPrice && (
-                    <span className="font-mono text-xs text-retro-muted line-through">{plan.originalPrice}</span>
-                  )}
-                </div>
-                <p className="font-mono text-[10px] text-retro-muted mb-4 break-words">{plan.suffix}</p>
-                <ul className="space-y-1.5 mb-5 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-retro-muted">
-                      <span className={`w-1.5 h-1.5 rounded-full ${tc.text} bg-current shrink-0`} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
+      <motion.div
+        className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 items-stretch"
+        variants={staggerContainer}
+        initial="initial"
+        whileInView="animate"
+        viewport={{ once: true, margin: '-80px' }}
+      >
+        {plans.map((plan) => (
+          <motion.div
+            key={plan.name}
+            variants={fadeInUp}
+            whileHover={{ scale: 1.02, transition: { type: 'spring', stiffness: 320, damping: 24 } }}
+            className="h-full"
+          >
+            <PixelPricingCard
+              tone={plan.color}
+              highlight
+              name={plan.name}
+              description={plan.suffix}
+              descriptionLines="none"
+              price={{ amount: plan.price, strikethrough: plan.originalPrice }}
+              popular={plan.popular ? { label: 'Most Popular', tone: 'gold' } : undefined}
+              features={plan.features.map((label) => ({ label }))}
+              className="h-full"
+              cta={
                 <PixelButton
                   tone={plan.color}
                   size="sm"
                   variant={plan.popular ? 'solid' : 'ghost'}
                   onClick={() => router.push('/pricing')}
-                  className="w-full mt-auto"
+                  className="w-full"
                 >
                   {plan.price === 'Free' ? 'Get Started' : 'View Details'}
                 </PixelButton>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </div>
-    </section>
+              }
+            />
+          </motion.div>
+        ))}
+      </motion.div>
+    </PixelContainer>
   );
 }
 
 /* ──────────────────── FAQ — data shared with the FAQPage JSON-LD in app/layout.tsx ──────────────────── */
 function FAQSection() {
   return (
-    <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 border-t border-retro-border/30 bg-retro-surface/20">
-      <div className="max-w-3xl mx-auto">
-        <motion.div
-          className="text-center mb-8 sm:mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="font-pixel text-sm sm:text-base md:text-lg text-retro-cyan mb-2 sm:mb-3">
-            BEFORE YOU INSTALL — THE COMMON QUESTIONS
-          </h2>
-          <p className="text-retro-muted text-xs sm:text-sm px-2">
-            License terms, framework fit, bundle impact, and how the icon licensing actually works.
-          </p>
-        </motion.div>
+    <PixelContainer as="section" maxWidth="xl" padding="md" className="border-t border-retro-border/30 bg-retro-surface/20">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
+        <PixelSectionHeader
+          title="BEFORE YOU INSTALL — THE COMMON QUESTIONS"
+          description="License terms, framework fit, bundle impact, and how the icon licensing actually works."
+          align="center"
+          titleTone="cyan"
+          size="md"
+        />
+      </motion.div>
 
+      <div className="mt-10 max-w-3xl mx-auto">
         <PixelAccordion
           items={LANDING_FAQS.map((faq, i) => ({
             id: `faq-${i}`,
@@ -1273,45 +1252,45 @@ function FAQSection() {
           }))}
         />
       </div>
-    </section>
+    </PixelContainer>
   );
 }
 
 /* ──────────────────── VOXEL COMING SOON ──────────────────── */
 function VoxelComingSoon() {
   return (
-    <section className="relative py-10 sm:py-14 px-4 sm:px-6 border-t border-retro-border/20 overflow-hidden">
+    <PixelContainer as="section" maxWidth="xl" padding="md" className="relative border-t border-retro-border/20 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-retro-purple/4 rounded-full blur-[140px]" />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto">
+      <div className="relative z-10">
         <motion.div
-          className="text-center mb-6 sm:mb-8"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 mb-3 sm:mb-4">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-retro-purple opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-retro-purple" />
-            </span>
-            <PixelBadge tone="purple">COMING SOON</PixelBadge>
-          </div>
-
-          <h2 className="font-pixel text-sm sm:text-base text-retro-purple mb-2">
-            WHAT&apos;S NEXT: @pxlkit/voxel
-          </h2>
-          <p className="text-retro-muted max-w-xl mx-auto text-xs sm:text-sm leading-relaxed px-2">
-            A <span className="text-retro-purple font-bold">3D voxel engine</span> for React is on the way.
-            Procedural worlds, biome generation, interactive scenes — the retro aesthetic in full 3D.
-          </p>
+          <PixelSectionHeader
+            title="WHAT'S NEXT: @pxlkit/voxel"
+            description="A 3D voxel engine for React is on the way. Procedural worlds, biome generation, interactive scenes — the retro aesthetic in full 3D."
+            align="center"
+            titleTone="purple"
+            size="md"
+            actions={
+              <span className="inline-flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-retro-purple opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-retro-purple" />
+                </span>
+                <PixelBadge tone="purple">COMING SOON</PixelBadge>
+              </span>
+            }
+          />
         </motion.div>
 
         <motion.div
-          className="relative mx-auto max-w-3xl"
+          className="relative mx-auto mt-10 max-w-3xl"
           initial={{ opacity: 0, scale: 0.96 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -1339,7 +1318,7 @@ function VoxelComingSoon() {
           <PixelBadge tone="cyan">MIT License</PixelBadge>
         </div>
       </div>
-    </section>
+    </PixelContainer>
   );
 }
 

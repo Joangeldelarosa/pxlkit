@@ -1,15 +1,17 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import Image from 'next/image';
 import {
   PixelButton,
   PixelCard,
+  PixelCenter,
   PixelChip,
   PixelChipGroup,
   PixelContainer,
   PixelGrid,
   PixelInput,
+  PixelNumberInput,
   PixelPagination,
   PixelRibbon,
   PixelSheet,
@@ -234,13 +236,6 @@ function ProductCard({
   );
 }
 
-function FilterChip({ value, label }: { value: string; label: string }) {
-  // PixelChipGroup reads `value` off the child element and wraps it in a radio/checkbox button.
-  // PixelChip is purely presentational here.
-  void value;
-  return <PixelChip label={label} tone="cyan" variant="soft" size="sm" />;
-}
-
 function FiltersSidebar({
   selectedCategories,
   onCategoriesChange,
@@ -265,7 +260,7 @@ function FiltersSidebar({
         <button
           type="button"
           onClick={onClearAll}
-          className="font-mono text-[11px] uppercase tracking-wider text-retro-muted hover:text-retro-cyan transition-colors"
+          className="py-1 -my-1 font-mono text-[11px] uppercase tracking-wider text-retro-muted hover:text-retro-cyan transition-colors"
         >
           Reset
         </button>
@@ -274,7 +269,7 @@ function FiltersSidebar({
       <section aria-labelledby="filter-categories-title">
         <h4
           id="filter-categories-title"
-          className="font-mono text-[11px] uppercase tracking-wider text-retro-muted mb-3"
+          className="font-pixel text-[11px] uppercase tracking-[0.18em] text-retro-muted mb-3"
         >
           Categories
         </h4>
@@ -285,7 +280,14 @@ function FiltersSidebar({
           aria-label="Filter by category"
         >
           {CATEGORIES.map((c) => (
-            <FilterChip key={c.value} value={c.value} label={c.label} />
+            <PixelChip
+              key={c.value}
+              value={c.value}
+              label={c.label}
+              tone="cyan"
+              variant="soft"
+              size="sm"
+            />
           ))}
         </PixelChipGroup>
       </section>
@@ -294,7 +296,7 @@ function FiltersSidebar({
         <div className="flex items-center justify-between mb-3">
           <h4
             id="filter-price-title"
-            className="font-mono text-[11px] uppercase tracking-wider text-retro-muted"
+            className="font-pixel text-[11px] uppercase tracking-[0.18em] text-retro-muted"
           >
             Price
           </h4>
@@ -317,7 +319,7 @@ function FiltersSidebar({
       <section aria-labelledby="filter-rating-title">
         <h4
           id="filter-rating-title"
-          className="font-mono text-[11px] uppercase tracking-wider text-retro-muted mb-3"
+          className="font-pixel text-[11px] uppercase tracking-[0.18em] text-retro-muted mb-3"
         >
           Minimum rating
         </h4>
@@ -338,80 +340,75 @@ function FiltersSidebar({
   );
 }
 
+function EmptyState({ children }: { children: ReactNode }) {
+  return (
+    <PixelCard padding="lg">
+      <p className="py-8 text-center font-mono text-sm text-retro-muted">{children}</p>
+    </PixelCard>
+  );
+}
+
 function CartSheetBody({
   lines,
-  onIncrement,
-  onDecrement,
+  onQtyChange,
   onRemove,
   total,
 }: {
   lines: CartLine[];
-  onIncrement: (id: string) => void;
-  onDecrement: (id: string) => void;
+  onQtyChange: (id: string, qty: number) => void;
   onRemove: (id: string) => void;
   total: number;
 }) {
   if (lines.length === 0) {
     return (
-      <div className="text-center py-10 text-retro-muted font-mono text-sm">
+      <EmptyState>
         Your cart is empty. Browse products and add a few to get started.
-      </div>
+      </EmptyState>
     );
   }
   return (
     <PixelStack gap={4}>
       {lines.map((line) => (
-        <div
-          key={line.product.id}
-          className="flex items-center gap-3 border border-retro-border/40 p-3 rounded-sm bg-retro-surface/30"
-        >
-          <Image
-            src={line.product.image}
-            alt={line.product.name}
-            width={56}
-            height={56}
-            sizes="56px"
-            className="h-14 w-14 object-cover rounded-sm border border-retro-border/40"
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm text-retro-text truncate">{line.product.name}</p>
-            <p className="font-mono text-xs text-retro-muted">
-              {formatPrice(line.product.price)} × {line.qty}
-            </p>
+        <PixelCard key={line.product.id} padding="md">
+          <div className="flex items-center gap-3">
+            <Image
+              src={line.product.image}
+              alt={line.product.name}
+              width={56}
+              height={56}
+              sizes="56px"
+              className="h-14 w-14 object-cover rounded-sm border border-retro-border/40"
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm text-retro-text truncate">{line.product.name}</p>
+              <p className="font-mono text-xs text-retro-muted">
+                {formatPrice(line.product.price)} × {line.qty}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <div className="w-24">
+                <PixelNumberInput
+                  size="sm"
+                  min={1}
+                  max={99}
+                  clampBehavior="strict"
+                  value={line.qty}
+                  onChange={(next) => onQtyChange(line.product.id, next)}
+                  aria-label={`Quantity for ${line.product.name}`}
+                />
+              </div>
+              <PixelButton
+                size="sm"
+                variant="ghost"
+                tone="red"
+                onClick={() => onRemove(line.product.id)}
+                aria-label={`Remove ${line.product.name}`}
+              >
+                ✕
+              </PixelButton>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <PixelButton
-              size="sm"
-              variant="outline"
-              tone="neutral"
-              onClick={() => onDecrement(line.product.id)}
-              aria-label={`Decrease ${line.product.name}`}
-            >
-              –
-            </PixelButton>
-            <span className="font-mono text-sm text-retro-text w-6 text-center">
-              {line.qty}
-            </span>
-            <PixelButton
-              size="sm"
-              variant="outline"
-              tone="neutral"
-              onClick={() => onIncrement(line.product.id)}
-              aria-label={`Increase ${line.product.name}`}
-            >
-              +
-            </PixelButton>
-            <PixelButton
-              size="sm"
-              variant="ghost"
-              tone="red"
-              onClick={() => onRemove(line.product.id)}
-              aria-label={`Remove ${line.product.name}`}
-            >
-              ✕
-            </PixelButton>
-          </div>
-        </div>
+        </PixelCard>
       ))}
       <div className="flex items-center justify-between border-t border-retro-border pt-4">
         <span className="font-mono text-xs uppercase tracking-wider text-retro-muted">
@@ -503,15 +500,10 @@ export function PixelEcommerceTemplate() {
     });
   };
 
-  const handleIncrement = (id: string) =>
-    setCart((prev) =>
-      prev.map((l) => (l.product.id === id ? { ...l, qty: l.qty + 1 } : l)),
-    );
-
-  const handleDecrement = (id: string) =>
+  const handleQtyChange = (id: string, qty: number) =>
     setCart((prev) =>
       prev
-        .map((l) => (l.product.id === id ? { ...l, qty: l.qty - 1 } : l))
+        .map((l) => (l.product.id === id ? { ...l, qty } : l))
         .filter((l) => l.qty > 0),
     );
 
@@ -529,38 +521,40 @@ export function PixelEcommerceTemplate() {
   return (
     <div className="min-h-screen bg-retro-bg text-retro-text">
       <header className="sticky top-0 z-40 border-b border-retro-border/60 bg-retro-bg/95 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-3">
-          <span className="font-pixel text-xs sm:text-sm text-retro-text shrink-0">
-            PXL/Shop
-          </span>
-          <div className="flex-1 max-w-xl">
-            <PixelInput
-              aria-label="Search products"
-              placeholder="Search the catalog…"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setPage(1);
-              }}
-              suffix={<SearchIcon />}
+        <PixelCenter maxWidth="3xl" gutter="lg" className="py-3">
+          <div className="flex items-center gap-3">
+            <span className="font-pixel text-xs sm:text-sm text-retro-text shrink-0">
+              PXL/Shop
+            </span>
+            <div className="min-w-0 flex-1 max-w-xl">
+              <PixelInput
+                aria-label="Search products"
+                placeholder="Search the catalog…"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setPage(1);
+                }}
+                suffix={<SearchIcon />}
+                size="md"
+              />
+            </div>
+            <PixelButton
+              tone="cyan"
+              variant="outline"
               size="md"
-            />
+              iconLeft={<CartIcon />}
+              onClick={() => setCartOpen(true)}
+              aria-label={`Open cart, ${cartCount} item${cartCount === 1 ? '' : 's'}`}
+            >
+              Cart ({cartCount})
+            </PixelButton>
           </div>
-          <PixelButton
-            tone="cyan"
-            variant="outline"
-            size="md"
-            iconLeft={<CartIcon />}
-            onClick={() => setCartOpen(true)}
-            aria-label={`Open cart, ${cartCount} item${cartCount === 1 ? '' : 's'}`}
-          >
-            Cart ({cartCount})
-          </PixelButton>
-        </div>
+        </PixelCenter>
       </header>
 
       <PixelContainer maxWidth="2xl" padding={{ x: 'lg', y: 'md' }}>
-        <div className="mb-6">
+        <div>
           <h1 className="font-pixel text-base sm:text-lg text-retro-text leading-loose">
             Featured Catalog
           </h1>
@@ -570,6 +564,7 @@ export function PixelEcommerceTemplate() {
         </div>
 
         <PixelTwoColumn
+          className="mt-10"
           ratio="30/70"
           stackBelow="md"
           gap={8}
@@ -597,9 +592,9 @@ export function PixelEcommerceTemplate() {
           right={
             <PixelStack gap={6}>
               {paginated.length === 0 ? (
-                <div className="border border-retro-border/40 rounded-sm py-16 text-center text-retro-muted font-mono text-sm">
+                <EmptyState>
                   No products match your filters. Loosen them up and try again.
-                </div>
+                </EmptyState>
               ) : (
                 <PixelGrid cols={{ base: 1, sm: 2, lg: 3 }} gap={6}>
                   {paginated.map((p) => (
@@ -638,8 +633,7 @@ export function PixelEcommerceTemplate() {
       >
         <CartSheetBody
           lines={cart}
-          onIncrement={handleIncrement}
-          onDecrement={handleDecrement}
+          onQtyChange={handleQtyChange}
           onRemove={handleRemove}
           total={cartTotal}
         />

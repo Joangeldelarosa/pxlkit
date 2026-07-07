@@ -29,6 +29,7 @@ import {
   PixelInputGroup,
   PixelCommand,
   PixelBadge,
+  PixelChip,
   PxlKitToastProvider,
   useToast,
   type ColumnDef,
@@ -139,10 +140,6 @@ function buildOrders(count: number): Order[] {
 }
 
 const ORDERS = buildOrders(100);
-
-const SEGMENTS = [
-  'cyan', 'gold', 'green', 'purple', 'pink', 'red', 'neutral',
-] as const;
 
 const STATUS_TONE: Record<OrderStatus, 'green' | 'gold' | 'cyan' | 'red' | 'neutral'> = {
   paid: 'green',
@@ -494,82 +491,73 @@ function DashboardInner() {
               padding={{ x: 'md', y: 'md' }}
               className="flex-1"
             >
-              <PixelStack gap={6}>
+              <PixelStack gap={6} className="pb-12">
                 {/* Row 1 — stats */}
                 <PixelStatGroup
                   layout="grid"
                   columns={4}
                   aria-label="Key metrics"
-                  className="!divide-x-0"
                 >
-                  <div className="p-2">
-                    <PixelStatCard
-                      label="Revenue (30d)"
-                      value="$184,210"
-                      tone="green"
-                      trend="+12.4% vs last period"
-                      iconPosition="bottom-left"
-                      icon={
-                        <PixelSparkline
-                          data={STAT_TREND_REVENUE.map((y, i) => ({ x: i, y }))}
-                          tone="green"
-                          size="sm"
-                          showArea
-                        />
-                      }
-                    />
-                  </div>
-                  <div className="p-2">
-                    <PixelStatCard
-                      label="Active users"
-                      value="4,812"
-                      tone="cyan"
-                      trend="+318 this week"
-                      iconPosition="bottom-left"
-                      icon={
-                        <PixelSparkline
-                          data={STAT_TREND_USERS.map((y, i) => ({ x: i, y }))}
-                          tone="cyan"
-                          size="sm"
-                          showArea
-                        />
-                      }
-                    />
-                  </div>
-                  <div className="p-2">
-                    <PixelStatCard
-                      label="Orders"
-                      value="1,204"
-                      tone="gold"
-                      trend="+86 last 24h"
-                      iconPosition="bottom-left"
-                      icon={
-                        <PixelSparkline
-                          data={STAT_TREND_ORDERS.map((y, i) => ({ x: i, y }))}
-                          tone="gold"
-                          size="sm"
-                          showArea
-                        />
-                      }
-                    />
-                  </div>
-                  <div className="p-2">
-                    <PixelStatCard
-                      label="Conversion"
-                      value="4.3%"
-                      tone="purple"
-                      trend="+0.4pp"
-                      iconPosition="bottom-left"
-                      icon={
-                        <PixelSparkline
-                          data={STAT_TREND_CONVERSION.map((y, i) => ({ x: i, y: y * 10 }))}
-                          tone="purple"
-                          size="sm"
-                          showArea
-                        />
-                      }
-                    />
-                  </div>
+                  <PixelStatCard
+                    label="Revenue (30d)"
+                    value="$184,210"
+                    tone="green"
+                    trend="+12.4% vs last period"
+                    iconPosition="bottom-left"
+                    icon={
+                      <PixelSparkline
+                        data={STAT_TREND_REVENUE.map((y, i) => ({ x: i, y }))}
+                        tone="green"
+                        size="sm"
+                        showArea
+                      />
+                    }
+                  />
+                  <PixelStatCard
+                    label="Active users"
+                    value="4,812"
+                    tone="cyan"
+                    trend="+318 this week"
+                    iconPosition="bottom-left"
+                    icon={
+                      <PixelSparkline
+                        data={STAT_TREND_USERS.map((y, i) => ({ x: i, y }))}
+                        tone="cyan"
+                        size="sm"
+                        showArea
+                      />
+                    }
+                  />
+                  <PixelStatCard
+                    label="Orders"
+                    value="1,204"
+                    tone="gold"
+                    trend="+86 last 24h"
+                    iconPosition="bottom-left"
+                    icon={
+                      <PixelSparkline
+                        data={STAT_TREND_ORDERS.map((y, i) => ({ x: i, y }))}
+                        tone="gold"
+                        size="sm"
+                        showArea
+                      />
+                    }
+                  />
+                  <PixelStatCard
+                    label="Conversion"
+                    value="4.3%"
+                    tone="purple"
+                    trend="+0.4pp"
+                    iconPosition="bottom-left"
+                    icon={
+                      <PixelSparkline
+                        data={STAT_TREND_CONVERSION.map((y, i) => ({ x: i, y: y * 10 }))}
+                        tone="purple"
+                        size="sm"
+                        showArea
+                      />
+                    }
+                  />
                 </PixelStatGroup>
 
                 {/* Row 2 — chart + activity */}
@@ -605,11 +593,15 @@ function DashboardInner() {
                             aria-label="Daily revenue area chart"
                           />
                         </div>
-                        <div className="flex flex-wrap gap-2 text-[11px] font-mono text-retro-muted tracking-wide">
+                        <div className="flex flex-wrap gap-2">
                           {REVENUE_SERIES.slice(-7).map((p, i) => (
-                            <span key={`${p.x}-${i}`} className="px-2 py-1 border border-retro-border/40 rounded-sm">
-                              {p.x}: ${p.y.toLocaleString()}
-                            </span>
+                            <PixelChip
+                              key={`${p.x}-${i}`}
+                              label={`${p.x}: $${p.y.toLocaleString()}`}
+                              tone="neutral"
+                              variant="outline"
+                              size="sm"
+                            />
                           ))}
                         </div>
                       </div>
@@ -813,10 +805,6 @@ function DashboardInner() {
           groups={commandGroups}
         />
 
-        {/* Hidden palette to keep tones live-imported (lint touch) */}
-        <span className="sr-only" aria-hidden>
-          {SEGMENTS.join(' ')}
-        </span>
       </div>
     </div>
   );

@@ -5,7 +5,17 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useToast } from '../../components/ToastProvider';
-import { PixelButton } from '@pxlkit/ui-kit';
+import {
+  PixelAccordion,
+  PixelBadge,
+  PixelButton,
+  PixelCard,
+  PixelCodeInline,
+  PixelInput,
+  PixelModal,
+  PixelPricingCard,
+  PixelTable,
+} from '@pxlkit/ui-kit';
 import { UI_COMPONENTS_COUNT, ICON_COUNT_LABEL, ICON_PACK_COUNT } from '@/lib/pxlkit-counts';
 
 /* ─── Animation helpers ─── */
@@ -135,40 +145,6 @@ const PLANS: Plan[] = [
   },
 ];
 
-/* ─── Color helpers ─── */
-function colorClasses(color: Plan['color']) {
-  const map = {
-    green: {
-      border: 'border-retro-green/30 hover:border-retro-green/60',
-      bg: 'bg-retro-green/5',
-      text: 'text-retro-green',
-      glow: 'shadow-[0_0_40px_rgba(var(--retro-green),0.08)]',
-      btn: 'border-retro-green text-retro-green hover:bg-retro-green/10',
-      badge: 'bg-retro-green/10 text-retro-green border-retro-green/30',
-      ring: 'ring-retro-green/20',
-    },
-    gold: {
-      border: 'border-retro-gold/30 hover:border-retro-gold/60',
-      bg: 'bg-retro-gold/5',
-      text: 'text-retro-gold',
-      glow: 'shadow-[0_0_40px_rgba(var(--retro-gold),0.12)]',
-      btn: 'border-retro-gold bg-retro-gold/10 text-retro-gold hover:bg-retro-gold/20',
-      badge: 'bg-retro-gold/10 text-retro-gold border-retro-gold/30',
-      ring: 'ring-retro-gold/20',
-    },
-    cyan: {
-      border: 'border-retro-cyan/30 hover:border-retro-cyan/60',
-      bg: 'bg-retro-cyan/5',
-      text: 'text-retro-cyan',
-      glow: 'shadow-[0_0_40px_rgba(var(--retro-cyan),0.08)]',
-      btn: 'border-retro-cyan text-retro-cyan hover:bg-retro-cyan/10',
-      badge: 'bg-retro-cyan/10 text-retro-cyan border-retro-cyan/30',
-      ring: 'ring-retro-cyan/20',
-    },
-  };
-  return map[color];
-}
-
 /* ─── FAQ ─── */
 const FAQ_ITEMS = [
   {
@@ -234,14 +210,18 @@ function HeroSection() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-retro-gold/6 rounded-full blur-[120px] pointer-events-none" />
 
       <motion.div className="relative z-10" {...fadeInUp}>
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-retro-red/40 bg-retro-red/10 backdrop-blur-sm text-retro-red font-mono text-xs mb-3 animate-pulse">
-          🔥 50% OFF — Launch Special
-        </span>
+        <PixelBadge tone="red" className="mb-3 animate-pulse">
+          <span aria-label="50% off launch special">🔥 50% OFF — Launch Special</span>
+        </PixelBadge>
         <br />
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-retro-gold/30 bg-retro-bg/80 backdrop-blur-sm text-retro-gold font-mono text-xs mb-6">
-          <span className="w-2 h-2 bg-retro-gold rounded-full animate-pulse" />
+        <PixelBadge
+          tone="gold"
+          variant="outline"
+          className="mb-6 backdrop-blur-sm"
+          iconLeft={<span className="w-2 h-2 bg-retro-gold rounded-full animate-pulse" />}
+        >
           MIT Code · Licensed Assets
-        </span>
+        </PixelBadge>
       </motion.div>
 
       <motion.h1
@@ -312,95 +292,41 @@ function PlansSection() {
 }
 
 function PlanCard({ plan }: { plan: Plan }) {
-  const c = colorClasses(plan.color);
-
   return (
-    <motion.div
-      variants={fadeInUp}
-      className={`relative rounded-xl border-2 ${c.border} ${c.bg} ${c.glow} p-6 sm:p-8 flex flex-col transition-all duration-300 ${
-        plan.popular ? `ring-2 ${c.ring}` : ''
-      }`}
-    >
-      {/* Popular badge */}
-      {plan.popular && (
-        <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full border text-[10px] font-pixel ${c.badge}`}>
-          MOST POPULAR
-        </div>
-      )}
-
-      {/* Header */}
-      <div className="mb-6">
-        <h3 className={`font-pixel text-sm sm:text-base ${c.text} mb-3`}>
-          {plan.name.toUpperCase()}
-        </h3>
-        <div className="flex items-baseline gap-2">
-          <span className={`text-4xl sm:text-5xl font-bold ${c.text} font-mono`}>
-            {plan.price}
-          </span>
-          {plan.originalPrice && (
-            <span className="text-lg font-mono text-retro-muted/50 line-through">
-              {plan.originalPrice}
-            </span>
-          )}
-        </div>
-        {plan.originalPrice && (
-          <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-mono font-bold rounded border border-retro-red/40 bg-retro-red/10 text-retro-red">
-            50% OFF — Launch Special
-          </span>
-        )}
-        <p className="text-retro-muted/60 text-xs font-mono mt-1">
-          {plan.priceSuffix}
-        </p>
-        <p className="text-retro-muted text-sm font-body mt-3 leading-relaxed">
-          {plan.description}
-        </p>
-      </div>
-
-      {/* Features */}
-      <ul className="space-y-3 mb-8 flex-1">
-        {plan.features.map((f) => (
-          <li key={f.text} className="flex items-start gap-2.5">
-            {f.included ? (
-              <PixelCheck className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${f.highlight ? c.text : 'text-retro-green/70'}`} />
-            ) : (
-              <PixelX className="w-3 h-3 mt-0.5 shrink-0 text-retro-muted/30" />
-            )}
-            <span
-              className={`text-sm font-mono ${
-                f.included
-                  ? f.highlight
-                    ? `${c.text} font-medium`
-                    : 'text-retro-text/80'
-                  : 'text-retro-muted/40 line-through'
-              }`}
-            >
-              {f.text}
-            </span>
-          </li>
-        ))}
-      </ul>
-
-      {/* CTA */}
-      {plan.price === 'Free' ? (
-        <a
-          href={plan.ctaHref}
-          className={`block w-full text-center btn-retro text-[10px] sm:text-xs ${c.btn} py-3`}
-        >
-          {plan.cta}
-        </a>
-      ) : (
-        <div className="mt-2 w-full relative z-20">
-          <PurchaseCheckout plan={plan} buttonClass={`block w-full text-center btn-retro text-[10px] sm:text-xs ${c.btn} py-3 cursor-pointer`} />
-        </div>
-      )}
+    <motion.div variants={fadeInUp} className="flex">
+      <PixelPricingCard
+        tone={plan.color}
+        highlight
+        popular={plan.popular ? { label: 'MOST POPULAR', tone: plan.color } : undefined}
+        name={plan.name}
+        description={plan.description}
+        descriptionLines="none"
+        price={{ amount: plan.price, period: plan.priceSuffix, strikethrough: plan.originalPrice }}
+        priceBadge={
+          plan.originalPrice ? (
+            <PixelBadge tone="red" size="sm">50% OFF — Launch Special</PixelBadge>
+          ) : undefined
+        }
+        features={plan.features.map((f) => ({ label: f.text, included: f.included, highlight: f.highlight }))}
+        cta={
+          plan.price === 'Free' ? (
+            <PixelButton asChild variant="outline" tone={plan.color} fullWidth>
+              <Link href={plan.ctaHref}>{plan.cta}</Link>
+            </PixelButton>
+          ) : (
+            <PurchaseCheckout plan={plan} />
+          )
+        }
+        className="w-full"
+      />
     </motion.div>
   );
 }
 
-function PurchaseCheckout({ plan, buttonClass }: { plan: Plan, buttonClass: string }) {
+function PurchaseCheckout({ plan }: { plan: Plan }) {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
-  
+
   // States: 'form' -> 'payment' -> 'success'
   const [step, setStep] = useState<'form' | 'payment' | 'success'>('form');
   const [buyerData, setBuyerData] = useState({ name: '', email: '', projectName: '' });
@@ -425,7 +351,7 @@ function PurchaseCheckout({ plan, buttonClass }: { plan: Plan, buttonClass: stri
         body: JSON.stringify({ orderID, planName: plan.name, buyerData })
       });
       const result = await response.json();
-      
+
       if (result.success) {
         setLicenseKey(result.license);
         setStep('success');
@@ -443,122 +369,147 @@ function PurchaseCheckout({ plan, buttonClass }: { plan: Plan, buttonClass: stri
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} className={buttonClass}>
+      <PixelButton
+        variant={plan.popular ? 'soft' : 'outline'}
+        tone={plan.color}
+        fullWidth
+        onClick={() => setIsOpen(true)}
+      >
         {plan.cta}
-      </button>
+      </PixelButton>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-retro-bg/90 backdrop-blur-sm" onClick={() => !isProcessing && setIsOpen(false)} />
-          
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="relative bg-retro-surface border-2 border-retro-border p-6 sm:p-8 rounded-xl w-full max-w-md shadow-2xl z-10 max-h-[90vh] flex flex-col"
-          >
-            {isProcessing && (
-              <div className="absolute inset-0 bg-retro-surface/80 backdrop-blur-sm z-30 flex items-center justify-center font-pixel text-retro-cyan rounded-xl">
-                PROCESSING...
+      <PixelModal
+        open={isOpen}
+        title={`${plan.name} Checkout`}
+        description="Complete your details to secure your license."
+        onClose={() => { if (!isProcessing) setIsOpen(false); }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative"
+        >
+          {isProcessing && (
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-retro-surface/80 backdrop-blur-sm font-pixel text-retro-cyan">
+              PROCESSING...
+            </div>
+          )}
+
+          <div className="max-h-[65vh] overflow-y-auto pr-2 custom-scrollbar">
+            {step === 'form' && (
+              <form onSubmit={handleFormSubmit} className="space-y-4">
+                <PixelInput
+                  required
+                  type="text"
+                  label="Full Name *"
+                  tone="cyan"
+                  value={buyerData.name}
+                  onChange={e => setBuyerData({...buyerData, name: e.target.value})}
+                  placeholder="John Doe"
+                />
+                <PixelInput
+                  required
+                  type="email"
+                  label="Email Address (for License) *"
+                  tone="cyan"
+                  value={buyerData.email}
+                  onChange={e => setBuyerData({...buyerData, email: e.target.value})}
+                  placeholder="you@company.com"
+                />
+                <PixelInput
+                  type="text"
+                  label="Project/Company Name (Optional)"
+                  tone="cyan"
+                  value={buyerData.projectName}
+                  onChange={e => setBuyerData({...buyerData, projectName: e.target.value})}
+                  placeholder="Acme Corp App"
+                />
+
+                <PixelButton type="submit" tone="cyan" variant="soft" fullWidth>
+                  CONTINUE TO PAYMENT
+                </PixelButton>
+              </form>
+            )}
+
+            {step === 'payment' && (
+              <div className="space-y-4 pb-2">
+                <div className="p-4 bg-retro-bg/50 border border-retro-border/30 rounded-md mb-6 font-mono text-xs text-retro-muted flex justify-between">
+                  <span>Total due:</span>
+                  <span className="font-bold text-retro-text">{plan.price} USD</span>
+                </div>
+
+                <PayPalButtons
+                  style={{ layout: "vertical", height: 45, tagline: false }}
+                  createOrder={(data, actions) => {
+                    return actions.order.create({
+                      intent: "CAPTURE",
+                      purchase_units: [{
+                        description: `Pxlkit ${plan.name} License`,
+                        amount: { currency_code: "USD", value: plan.price.replace('$', '') },
+                      }],
+                    });
+                  }}
+                  onApprove={async (data) => {
+                    await capturePayment(data.orderID);
+                  }}
+                  onError={(err) => {
+                    console.error("PayPal Error:", err);
+                    toast({ tone: 'error', title: 'PAYMENT ERROR', message: 'PayPal encountered an error. Please try again.', duration: 5000 });
+                  }}
+                />
+
+                {process.env.NODE_ENV === 'development' && (
+                  <PixelButton
+                    size="sm"
+                    tone="cyan"
+                    variant="outline"
+                    fullWidth
+                    onClick={() => capturePayment('DEV_ORDER_ID')}
+                  >
+                    [ DEV SIMULATE SUCCESS ]
+                  </PixelButton>
+                )}
+
+                <PixelButton size="sm" tone="neutral" variant="ghost" fullWidth onClick={() => setStep('form')}>
+                  ← Back to details
+                </PixelButton>
               </div>
             )}
 
-            {!isProcessing && <button onClick={() => setIsOpen(false)} className="absolute top-4 right-4 text-retro-muted hover:text-retro-text text-xl">&times;</button>}
-            
-            <div className="shrink-0">
-              <h3 className="font-pixel text-lg text-retro-text mb-2 tracking-wide uppercase">{plan.name} CHECKOUT</h3>
-              <p className="text-retro-muted font-mono text-xs mb-6">Complete your details to secure your license.</p>
-            </div>
-
-            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-              {step === 'form' && (
-                <form onSubmit={handleFormSubmit} className="space-y-4 font-mono text-sm">
-                  <div>
-                    <label className="block text-retro-muted/80 text-xs mb-1">Full Name *</label>
-                    <input required type="text" value={buyerData.name} onChange={e => setBuyerData({...buyerData, name: e.target.value})} className="w-full bg-retro-bg border border-retro-border/50 rounded-md px-3 py-2 text-retro-text focus:border-retro-cyan focus:outline-none" placeholder="John Doe" />
-                  </div>
-                  <div>
-                    <label className="block text-retro-muted/80 text-xs mb-1">Email Address (for License) *</label>
-                    <input required type="email" value={buyerData.email} onChange={e => setBuyerData({...buyerData, email: e.target.value})} className="w-full bg-retro-bg border border-retro-border/50 rounded-md px-3 py-2 text-retro-text focus:border-retro-cyan focus:outline-none" placeholder="you@company.com" />
-                  </div>
-                  <div>
-                    <label className="block text-retro-muted/80 text-xs mb-1">Project/Company Name (Optional)</label>
-                    <input type="text" value={buyerData.projectName} onChange={e => setBuyerData({...buyerData, projectName: e.target.value})} className="w-full bg-retro-bg border border-retro-border/50 rounded-md px-3 py-2 text-retro-text focus:border-retro-cyan focus:outline-none" placeholder="Acme Corp App" />
-                  </div>
-                  
-                  <button type="submit" className="w-full btn-retro border-retro-cyan bg-retro-cyan/10 text-retro-cyan hover:bg-retro-cyan/20 py-3 mt-4">
-                    CONTINUE TO PAYMENT
-                  </button>
-                </form>
-              )}
-
-              {step === 'payment' && (
-                <div className="space-y-4 pb-2">
-                  <div className="p-4 bg-retro-bg/50 border border-retro-border/30 rounded-md mb-6 font-mono text-xs text-retro-muted flex justify-between">
-                    <span>Total due:</span>
-                    <span className="font-bold text-retro-text">{plan.price} USD</span>
-                  </div>
-                  
-                  <PayPalButtons
-                    style={{ layout: "vertical", height: 45, tagline: false }}
-                    createOrder={(data, actions) => {
-                      return actions.order.create({
-                        intent: "CAPTURE",
-                        purchase_units: [{
-                          description: `Pxlkit ${plan.name} License`,
-                          amount: { currency_code: "USD", value: plan.price.replace('$', '') },
-                        }],
-                      });
-                    }}
-                    onApprove={async (data) => {
-                      await capturePayment(data.orderID);
-                    }}
-                    onError={(err) => {
-                      console.error("PayPal Error:", err);
-                      toast({ tone: 'error', title: 'PAYMENT ERROR', message: 'PayPal encountered an error. Please try again.', duration: 5000 });
-                    }}
-                  />
-
-                  {process.env.NODE_ENV === 'development' && (
-                    <button onClick={() => capturePayment('DEV_ORDER_ID')} className="w-full text-[10px] font-mono text-retro-cyan border border-retro-cyan/30 rounded py-2 mt-2 hover:bg-retro-cyan/10">
-                      [ DEV SIMULATE SUCCESS ]
-                    </button>
-                  )}
-
-                  <button onClick={() => setStep('form')} className="w-full text-xs font-mono text-retro-muted hover:text-retro-text mt-4 py-2">
-                    ← Back to details
-                  </button>
+            {step === 'success' && (
+              <div className="text-center py-4">
+                <div className="w-16 h-16 bg-retro-green/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-retro-green/50">
+                  <PixelCheck className="w-8 h-8 text-retro-green" />
                 </div>
-              )}
+                <h4 className="font-pixel text-retro-green text-lg mb-2">PAYMENT SUCCESSFUL!</h4>
+                <p className="text-retro-muted font-body text-sm mb-6">Your license key has been securely emailed to <strong>{buyerData.email}</strong>.</p>
 
-              {step === 'success' && (
-                <div className="text-center py-4">
-                  <div className="w-16 h-16 bg-retro-green/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-retro-green/50">
-                    <PixelCheck className="w-8 h-8 text-retro-green" />
-                  </div>
-                  <h4 className="font-pixel text-retro-green text-lg mb-2">PAYMENT SUCCESSFUL!</h4>
-                  <p className="text-retro-muted font-body text-sm mb-6">Your license key has been securely emailed to <strong>{buyerData.email}</strong>.</p>
-                  
-                  <div className="bg-retro-bg border border-retro-border/50 rounded-lg p-4 mb-8">
-                    <p className="text-retro-muted text-[10px] font-mono mb-1 uppercase tracking-wider">Your License Key</p>
-                    <p className="font-mono text-retro-text text-lg tracking-widest">{licenseKey}</p>
-                  </div>
+                <PixelCard title="Your License Key" className="mb-8 text-left">
+                  <p className="font-mono text-retro-text text-lg tracking-widest break-all">{licenseKey}</p>
+                </PixelCard>
 
-                  <Link href="/docs" className="inline-block w-full btn-retro border-retro-green text-retro-green hover:bg-retro-green/10 py-3">
-                    GET STARTED
-                  </Link>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        </div>
-      )}
+                <PixelButton asChild variant="outline" tone="green" fullWidth>
+                  <Link href="/docs">GET STARTED</Link>
+                </PixelButton>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      </PixelModal>
     </>
   );
 }
 
 /* ──────────────── COMPARISON TABLE ──────────────── */
+interface ComparisonRow {
+  feature: string;
+  community: boolean | string;
+  indie: boolean | string;
+  team: boolean | string;
+}
+
 function ComparisonTable() {
-  const rows = [
+  const rows: ComparisonRow[] = [
     { feature: `${ICON_COUNT_LABEL} pixel art icons`, community: true, indie: true, team: true },
     { feature: `${UI_COMPONENTS_COUNT} React components & SVG export`, community: true, indie: true, team: true },
     { feature: 'Visual Icon Builder', community: true, indie: true, team: true },
@@ -586,41 +537,39 @@ function ComparisonTable() {
         </motion.h2>
 
         <motion.div
-          className="overflow-x-auto rounded-xl border-2 border-retro-border/30"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1 }}
         >
-          <table className="w-full text-sm font-mono">
-            <thead>
-              <tr className="border-b-2 border-retro-border/30 bg-retro-surface/50">
-                <th className="text-left px-4 sm:px-6 py-4 text-retro-muted font-medium text-xs">Feature</th>
-                <th className="text-center px-3 sm:px-6 py-4 text-retro-green font-pixel text-[10px]">COMMUNITY</th>
-                <th className="text-center px-3 sm:px-6 py-4 text-retro-gold font-pixel text-[10px]">INDIE</th>
-                <th className="text-center px-3 sm:px-6 py-4 text-retro-cyan font-pixel text-[10px]">TEAM</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, i) => (
-                <tr
-                  key={row.feature}
-                  className={`border-b border-retro-border/15 ${i % 2 === 0 ? '' : 'bg-retro-surface/20'}`}
-                >
-                  <td className="px-4 sm:px-6 py-3 text-retro-text/80 text-xs sm:text-sm">{row.feature}</td>
-                  <td className="text-center px-3 sm:px-6 py-3">
-                    <CellValue value={row.community} row={row.feature} />
-                  </td>
-                  <td className="text-center px-3 sm:px-6 py-3">
-                    <CellValue value={row.indie} row={row.feature} />
-                  </td>
-                  <td className="text-center px-3 sm:px-6 py-3">
-                    <CellValue value={row.team} row={row.feature} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <PixelTable<ComparisonRow>
+            data={rows}
+            columns={[
+              {
+                key: 'feature',
+                header: 'Feature',
+                render: (row) => <span className="text-retro-text/80 text-xs sm:text-sm">{row.feature}</span>,
+              },
+              {
+                key: 'community',
+                header: <span className="font-pixel text-[10px] text-retro-green">COMMUNITY</span>,
+                align: 'center',
+                render: (row) => <CellValue value={row.community} row={row.feature} />,
+              },
+              {
+                key: 'indie',
+                header: <span className="font-pixel text-[10px] text-retro-gold">INDIE</span>,
+                align: 'center',
+                render: (row) => <CellValue value={row.indie} row={row.feature} />,
+              },
+              {
+                key: 'team',
+                header: <span className="font-pixel text-[10px] text-retro-cyan">TEAM</span>,
+                align: 'center',
+                render: (row) => <CellValue value={row.team} row={row.feature} />,
+              },
+            ]}
+          />
         </motion.div>
       </div>
     </section>
@@ -661,56 +610,31 @@ function FAQSection() {
         </motion.h2>
 
         <motion.div
-          className="space-y-4"
-          variants={staggerContainer}
-          initial="initial"
-          whileInView="animate"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-30px' }}
         >
-          {FAQ_ITEMS.map((item) => (
-            <FAQItem key={item.q} question={item.q} answer={item.a} />
-          ))}
+          <PixelAccordion
+            items={FAQ_ITEMS.map((item, i) => ({
+              id: `faq-${i}`,
+              title: item.q,
+              content: (
+                <p className="text-retro-muted text-xs sm:text-sm leading-relaxed">
+                  {item.a}
+                </p>
+              ),
+            }))}
+          />
         </motion.div>
       </div>
     </section>
   );
 }
 
-function FAQItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <motion.div
-      variants={fadeInUp}
-      className="border border-retro-border/30 rounded-lg overflow-hidden bg-retro-surface/20 hover:border-retro-border/50 transition-colors"
-    >
-      <PixelButton
-        onClick={() => setOpen(!open)}
-        tone="neutral"
-        variant="ghost"
-        size="sm"
-        className="h-auto w-full justify-between px-5 sm:px-6 py-4 text-left"
-      >
-        <span className="text-sm sm:text-base text-retro-text font-mono pr-4">{question}</span>
-        <span
-          className={`text-retro-muted font-pixel text-xs shrink-0 transition-transform duration-200 ${
-            open ? 'rotate-45' : ''
-          }`}
-        >
-          +
-        </span>
-      </PixelButton>
-      {open && (
-        <div className="px-5 sm:px-6 pb-4">
-          <p className="text-retro-muted text-sm font-body leading-relaxed">{answer}</p>
-        </div>
-      )}
-    </motion.div>
-  );
-}
-
 /* ──────────────── CTA ──────────────── */
 function CTASection() {
+  const [, indie, team] = PLANS;
+
   return (
     <section className="relative px-4 pb-20 sm:pb-28">
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -733,42 +657,56 @@ function CTASection() {
         </p>
 
         {/* Install command */}
-        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-lg border border-retro-border/30 bg-retro-bg/80 backdrop-blur-sm mb-8">
-          <span className="text-retro-green font-mono text-xs sm:text-sm">$</span>
-          <code className="text-retro-text font-mono text-xs sm:text-sm">
-            npm install @pxlkit/core @pxlkit/ui
-          </code>
+        <div className="mb-8">
+          <PixelCodeInline tone="green">
+            <span className="text-xs sm:text-sm">$ npm install @pxlkit/core @pxlkit/ui-kit</span>
+          </PixelCodeInline>
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link
-            href="/docs"
-            className="btn-retro border-retro-green text-retro-green hover:bg-retro-green/10 text-[10px] sm:text-xs px-8 py-3"
-          >
-            READ THE DOCS
-          </Link>
-          <Link
-            href="/icons"
-            className="btn-retro border-retro-cyan text-retro-cyan hover:bg-retro-cyan/10 text-[10px] sm:text-xs px-8 py-3"
-          >
-            BROWSE ICONS
-          </Link>
+          <PixelButton asChild variant="outline" tone="green" size="lg">
+            <Link href="/docs">READ THE DOCS</Link>
+          </PixelButton>
+          <PixelButton asChild variant="outline" tone="cyan" size="lg">
+            <Link href="/icons">BROWSE ICONS</Link>
+          </PixelButton>
         </div>
 
         {/* License summary */}
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
-          <div className="p-4 rounded-lg border border-retro-green/20 bg-retro-green/5">
-            <p className="font-pixel text-[10px] text-retro-green mb-1">COMMUNITY</p>
-            <p className="text-retro-muted text-xs font-mono">Icon packs free with attribution</p>
-          </div>
-          <div className="p-4 rounded-lg border border-retro-gold/20 bg-retro-gold/5">
-            <p className="font-pixel text-[10px] text-retro-gold mb-1">INDIE — $19</p>
-            <p className="text-retro-muted text-xs font-mono">1 product, no asset attribution</p>
-          </div>
-          <div className="p-4 rounded-lg border border-retro-cyan/20 bg-retro-cyan/5">
-            <p className="font-pixel text-[10px] text-retro-cyan mb-1">TEAM — $49</p>
-            <p className="text-retro-muted text-xs font-mono">Unlimited, no asset attribution</p>
-          </div>
+          <PixelCard title="COMMUNITY" tone="green">
+            <p className="text-xs font-mono">Icon packs free with attribution</p>
+          </PixelCard>
+          <PixelCard title={indie.name.toUpperCase()} tone={indie.color}>
+            <p className="text-xs font-mono">
+              <span className="font-bold text-retro-text">{indie.price}</span>
+              {indie.originalPrice && (
+                <>
+                  {' '}
+                  <s className="line-through text-retro-muted/50">
+                    <span className="sr-only">Previous price </span>
+                    {indie.originalPrice}
+                  </s>
+                </>
+              )}
+              {' · 1 product, no asset attribution'}
+            </p>
+          </PixelCard>
+          <PixelCard title={team.name.toUpperCase()} tone={team.color}>
+            <p className="text-xs font-mono">
+              <span className="font-bold text-retro-text">{team.price}</span>
+              {team.originalPrice && (
+                <>
+                  {' '}
+                  <s className="line-through text-retro-muted/50">
+                    <span className="sr-only">Previous price </span>
+                    {team.originalPrice}
+                  </s>
+                </>
+              )}
+              {' · Unlimited, no asset attribution'}
+            </p>
+          </PixelCard>
         </div>
       </motion.div>
     </section>

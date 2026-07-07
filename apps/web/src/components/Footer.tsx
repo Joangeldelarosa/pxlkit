@@ -29,32 +29,32 @@ export function Footer() {
             </h3>
             <ul className="space-y-2 font-mono text-sm">
               <li>
-                <Link href="/ui-kit" className="text-retro-muted hover:text-retro-green transition-colors">
+                <Link href="/ui-kit" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
                   UI Kit
                 </Link>
               </li>
               <li>
-                <Link href="/icons" className="text-retro-muted hover:text-retro-green transition-colors">
+                <Link href="/icons" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
                   Browse Icons
                 </Link>
               </li>
               <li>
-                <Link href="/builder" className="text-retro-muted hover:text-retro-green transition-colors">
+                <Link href="/builder" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
                   Icon Builder
                 </Link>
               </li>
               <li>
-                <Link href="/templates" className="text-retro-muted hover:text-retro-green transition-colors">
+                <Link href="/templates" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
                   Templates
                 </Link>
               </li>
               <li>
-                <Link href="/explore" className="text-retro-muted hover:text-retro-green transition-colors">
+                <Link href="/explore" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
                   Explore <span className="text-[10px] opacity-70">🚧</span>
                 </Link>
               </li>
               <li>
-                <Link href="/docs" className="text-retro-muted hover:text-retro-green transition-colors">
+                <Link href="/docs" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
                   Documentation
                 </Link>
               </li>
@@ -63,13 +63,13 @@ export function Footer() {
                   href="https://storybook.pxlkit.xyz"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-retro-muted hover:text-retro-green transition-colors inline-flex items-center gap-1"
+                  className="text-retro-muted hover:text-retro-green transition-colors inline-flex items-center gap-1 py-1 -my-1"
                 >
                   Storybook <span className="text-[10px] opacity-70">↗</span>
                 </a>
               </li>
               <li>
-                <Link href="/pricing" className="text-retro-muted hover:text-retro-green transition-colors">
+                <Link href="/pricing" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
                   Licensing &amp; Pricing
                 </Link>
               </li>
@@ -86,7 +86,7 @@ export function Footer() {
                   href="https://github.com/joangeldelarosa/pxlkit"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-retro-muted hover:text-retro-green transition-colors"
+                  className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors"
                 >
                   GitHub
                 </a>
@@ -96,7 +96,7 @@ export function Footer() {
                   href="https://github.com/joangeldelarosa/pxlkit/issues"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-retro-muted hover:text-retro-green transition-colors"
+                  className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors"
                 >
                   Report Issues
                 </a>
@@ -106,7 +106,7 @@ export function Footer() {
                   href="https://github.com/joangeldelarosa/pxlkit/blob/main/CONTRIBUTING.md"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-retro-muted hover:text-retro-green transition-colors"
+                  className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors"
                 >
                   Contribute
                 </a>
@@ -129,7 +129,7 @@ export function Footer() {
                 href="https://github.com/joangeldelarosa"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-retro-green/60 hover:text-retro-green transition-colors"
+                className="inline-block py-1.5 -my-1.5 text-retro-green/60 hover:text-retro-green transition-colors"
               >
                 Joangel De La Rosa
               </a>

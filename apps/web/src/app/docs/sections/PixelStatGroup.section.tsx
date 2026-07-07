@@ -101,6 +101,18 @@ export function Default() {
   );
 }`}</code></pre>
       </article>
+      <article className="docs-example" id="example-grid-with-gap">
+        <h4>Grid with gap</h4>
+        <pre className="docs-code"><code>{`export function GridWithGap() {
+  return (
+    <PixelStatGroup layout="grid" columns={3} gap={3} aria-label="Spaced grid metrics">
+      <PixelStatCard label="Users" value="1,284" />
+      <PixelStatCard label="Revenue" value="$12.4k" />
+      <PixelStatCard label="Active" value="312" />
+    </PixelStatGroup>
+  );
+}`}</code></pre>
+      </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
         <pre className="docs-code"><code>{`export function Tones() {

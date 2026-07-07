@@ -1065,7 +1065,7 @@ export default function VoxelPreview({ onTabChange, initialTab = 'island', showT
               key={t.id}
               onClick={() => handleTab(t.id)}
               className={`
-                font-pixel text-[7px] sm:text-[9px] md:text-[10px] px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded border transition-all duration-200 cursor-pointer
+                font-pixel text-[10px] px-2.5 py-1.5 rounded border transition-all duration-200 cursor-pointer
                 backdrop-blur-sm select-none whitespace-nowrap
                 ${tab === t.id
                   ? 'bg-retro-green/20 border-retro-green/60 text-retro-green shadow-[0_0_8px_rgba(74,222,128,0.15)]'

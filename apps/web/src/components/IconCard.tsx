@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import type { PxlKitData } from '@pxlkit/core';
 import { gridToPixels } from '@pxlkit/core';
+import { PixelBareButton, PixelCard } from '@pxlkit/ui-kit';
 
 interface IconCardProps {
   icon: PxlKitData;
@@ -60,13 +61,15 @@ export function IconCard({ icon, onSelect }: IconCardProps) {
   const importCode = `import { ${icon.name.split('-').map(p => p[0].toUpperCase() + p.slice(1)).join('')} } from '@pxlkit/${icon.category}';`;
 
   return (
-    <div
-      className="group relative border border-retro-border bg-retro-surface/50 hover:border-retro-green/40 hover:bg-retro-card transition-all duration-200 cursor-pointer"
+    <PixelCard
+      interactive
+      padding="lg"
+      className="group"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => onSelect?.(icon)}
     >
-      <div className="p-6 flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center gap-4">
         {/* Icon preview */}
         <div className="relative w-16 h-16 flex items-center justify-center">
           <svg
@@ -125,7 +128,7 @@ export function IconCard({ icon, onSelect }: IconCardProps) {
               ))}
             </div>
 
-            <button
+            <PixelBareButton
               onClick={(e) => {
                 e.stopPropagation();
                 setShowMono(!showMono);
@@ -133,7 +136,7 @@ export function IconCard({ icon, onSelect }: IconCardProps) {
               className="text-[10px] font-mono text-retro-cyan hover:text-retro-green transition-colors"
             >
               {showMono ? '● COLORFUL' : '○ MONO'}
-            </button>
+            </PixelBareButton>
 
             <code className="text-[9px] font-mono text-retro-green bg-retro-bg/50 px-2 py-1 max-w-full truncate">
               {importCode}
@@ -141,6 +144,6 @@ export function IconCard({ icon, onSelect }: IconCardProps) {
           </div>
         )}
       </div>
-    </div>
+    </PixelCard>
   );
 }

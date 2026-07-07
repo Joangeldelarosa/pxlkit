@@ -49,7 +49,7 @@ export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightG
 function Card({ title, body }: { title: string; body: string }) {
   return (
     <div className="border border-retro-border p-4">
-      <h3 className="text-sm font-semibold text-retro-fg">{title}</h3>
+      <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
       <p className="text-sm text-retro-muted">{body}</p>
       <div className="mt-2 text-xs text-retro-muted">Footer</div>
     </div>
@@ -58,7 +58,7 @@ function Card({ title, body }: { title: string; body: string }) {
 
 export function Default() {
   return (
-    <PixelEqualHeightGrid cols={3} gap={4}>
+    <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={4}>
       <Card title="One" body="Short copy." />
       <Card title="Two" body="A longer body that forces the row to grow taller than the first card." />
       <Card title="Three" body="Medium length copy here." />
@@ -73,7 +73,7 @@ export function Default() {
         <h4>Default</h4>
         <pre className="docs-code"><code>{`export function Default() {
   return (
-    <PixelEqualHeightGrid cols={3} gap={4}>
+    <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={4}>
       <Card title="One" body="Short copy." />
       <Card title="Two" body="A longer body that forces the row to grow taller than the first card." />
       <Card title="Three" body="Medium length copy here." />
@@ -85,7 +85,7 @@ export function Default() {
         <h4>Row Align Top</h4>
         <pre className="docs-code"><code>{`export function RowAlignTop() {
   return (
-    <PixelEqualHeightGrid cols={3} gap={4} rowAlign="top">
+    <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={4} rowAlign="top">
       <Card title="One" body="Short copy." />
       <Card title="Two" body="A longer body that would otherwise stretch siblings." />
       <Card title="Three" body="Medium length copy here." />

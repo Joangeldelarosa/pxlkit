@@ -3,7 +3,9 @@
 import {
   PixelBadge,
   PixelCollapsible,
+  PixelTable,
   PixelTextLink,
+  type PixelTableColumn,
 } from '@pxlkit/ui-kit';
 import { CodeBlock } from '../../components/CodeBlock';
 
@@ -23,30 +25,20 @@ export function CompLink({ id, children }: { id: string; children: React.ReactNo
   );
 }
 
+const PROPS_TABLE_COLUMNS: Array<PixelTableColumn<PropDef>> = [
+  { key: 'name', header: 'Prop', className: 'whitespace-nowrap', render: (p) => <span className="text-retro-cyan">{p.name}</span> },
+  { key: 'type', header: 'Type', className: 'whitespace-nowrap', render: (p) => <span className="text-retro-purple">{p.type}</span> },
+  { key: 'default', header: 'Default', className: 'whitespace-nowrap', render: (p) => <span className="text-retro-gold">{p.default || '—'}</span> },
+  { key: 'description', header: 'Description', render: (p) => <span className="text-retro-muted">{p.description}</span> },
+];
+
 export function PropsTable({ data }: { data: PropDef[] }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-retro-border/40">
-      <table className="w-full text-left text-xs">
-        <thead>
-          <tr className="border-b border-retro-border bg-retro-surface/40">
-            <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Prop</th>
-            <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Type</th>
-            <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Default</th>
-            <th className="whitespace-nowrap px-3 py-2.5 font-mono font-semibold text-retro-muted">Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((p) => (
-            <tr key={p.name} className="border-b border-retro-border/20">
-              <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-cyan">{p.name}</td>
-              <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-purple">{p.type}</td>
-              <td className="whitespace-nowrap px-3 py-2 font-mono text-retro-gold">{p.default || '—'}</td>
-              <td className="px-3 py-2 text-retro-muted">{p.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <PixelTable<PropDef>
+      columns={PROPS_TABLE_COLUMNS}
+      data={data}
+      getRowId={(p) => p.name}
+    />
   );
 }
 

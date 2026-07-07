@@ -57,7 +57,7 @@ export function WhatsNewStrip({
         <PixelCluster gap={3} align="center" justify="between" className="mb-3">
           <PixelCluster gap={3} align="center">
             <PixelBadge tone="cyan" variant="soft">{`v${version}`}</PixelBadge>
-            <span className="font-pixel text-xs uppercase tracking-wider text-retro-fg">
+            <span className="font-pixel text-xs uppercase tracking-wider text-retro-text">
               What&apos;s new
             </span>
             <span className="text-xs text-retro-muted">{date}</span>
@@ -77,14 +77,11 @@ export function WhatsNewStrip({
               const content = (
                 <span className="relative inline-flex items-center gap-2 rounded-md border border-retro-border/50 bg-retro-bg/60 px-3 py-1.5 transition-colors hover:border-retro-cyan/60 hover:bg-retro-surface/50">
                   {item.isNew && (
-                    <span
-                      aria-hidden
-                      className="inline-flex items-center rounded-sm border border-retro-cyan/60 bg-retro-cyan/15 px-1.5 py-0.5 font-pixel text-[11px] leading-none uppercase tracking-wider text-retro-cyan"
-                    >
+                    <PixelBadge tone="cyan" size="sm" aria-hidden className="uppercase">
                       New
-                    </span>
+                    </PixelBadge>
                   )}
-                  <span className="whitespace-nowrap font-mono text-xs text-retro-fg">{item.name}</span>
+                  <span className="whitespace-nowrap font-mono text-xs text-retro-text">{item.name}</span>
                   <PixelBadge tone={tone} size="sm">{item.category}</PixelBadge>
                 </span>
               );

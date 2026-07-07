@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
 import {
   PixelHeroSection,
@@ -156,234 +155,224 @@ export default function PixelPortfolioTemplate() {
         }
       />
 
-      <section id="selected-work" aria-labelledby="selected-work-title" className="py-16 sm:py-20">
-        <PixelContainer maxWidth="xl" padding="lg">
-          <PixelSectionHeader
-            id="selected-work-title"
-            eyebrow="What I ship"
-            title="Selected work"
-            description="Six projects that show how I think about systems, surface and shipping. Pick one to read the long version."
-            align="start"
-            size="md"
-            spacing="normal"
-          />
+      <PixelContainer as="section" id="selected-work" maxWidth="xl" padding="lg" aria-labelledby="selected-work-title">
+        <PixelSectionHeader
+          id="selected-work-title"
+          eyebrow="What I ship"
+          title="Selected work"
+          description="Six projects that show how I think about systems, surface and shipping. Pick one to read the long version."
+          align="start"
+          size="md"
+          spacing="normal"
+        />
 
-          <div className="mt-10">
-            <PixelBento columns={3} gap={5}>
-              {CASE_STUDIES.map((cs) => (
-                <PixelBentoCell key={cs.id} span="1x1" kind="media" tone="neutral">
-                  <div className="flex h-full flex-col">
-                    <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-retro-border/40 bg-retro-surface/40">
+        <div className="mt-10">
+          <PixelBento columns={3} gap={5}>
+            {CASE_STUDIES.map((cs) => (
+              <PixelBentoCell key={cs.id} span="1x1" kind="media" tone="neutral">
+                <div className="flex h-full flex-col">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-retro-border/40 bg-retro-surface/40">
+                    <Image
+                      src={cs.image}
+                      alt={`${cs.title} cover`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col gap-3 p-4">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <h3 className="font-pixel text-sm text-retro-text leading-snug">
+                        {cs.title}
+                      </h3>
+                      <span className="font-mono text-[11px] text-retro-muted tracking-wide">{cs.year}</span>
+                    </div>
+                    <p className="font-mono text-xs text-retro-muted leading-relaxed">
+                      {cs.summary}
+                    </p>
+                    <div className="mt-auto pt-2">
+                      <PixelBadgeGroup
+                        max={4}
+                        aria-label={`${cs.title} tags`}
+                      >
+                        {cs.tags.map((tag) => (
+                          <PixelBadge key={tag} tone="cyan" variant="soft" size="sm">
+                            {tag}
+                          </PixelBadge>
+                        ))}
+                      </PixelBadgeGroup>
+                    </div>
+                  </div>
+                </div>
+              </PixelBentoCell>
+            ))}
+          </PixelBento>
+        </div>
+      </PixelContainer>
+
+      <PixelDivider tone="neutral" spacing="none" />
+
+      <PixelContainer as="section" id="case-studies" maxWidth="xl" padding="lg" aria-labelledby="case-studies-title">
+        <PixelSectionHeader
+          id="case-studies-title"
+          eyebrow="In depth"
+          title="Case studies"
+          description="The full story behind each project: why it existed, what hurt, what shipped."
+          align="start"
+          size="md"
+          spacing="normal"
+        />
+
+        <div className="mt-10">
+          <PixelStack direction="col" gap={6}>
+            {CASE_STUDIES.map((cs) => (
+              <PixelCard key={cs.id} id={`case-${cs.id}`} title={cs.title} padding="lg">
+                <PixelCard.Header>
+                  <div className="flex w-full flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+                    <div className="flex flex-col gap-0.5">
+                      <h3 className="font-pixel text-sm text-retro-text leading-snug">
+                        {cs.title}
+                      </h3>
+                      <span className="font-mono text-[11px] text-retro-muted">
+                        {cs.role}
+                      </span>
+                    </div>
+                    <span className="font-mono text-xs text-retro-muted">{cs.year}</span>
+                  </div>
+                </PixelCard.Header>
+                <PixelCard.Body>
+                  <div className="grid gap-5 md:grid-cols-[1fr_minmax(0,260px)] md:items-start">
+                    <p className="font-mono text-xs leading-relaxed text-retro-muted sm:text-sm">
+                      {cs.body}
+                    </p>
+                    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm border border-retro-border/40 bg-retro-surface/40">
                       <Image
                         src={cs.image}
-                        alt={`${cs.title} cover`}
+                        alt={`${cs.title} screenshot`}
                         fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        sizes="(max-width: 768px) 100vw, 260px"
                         className="object-cover"
                       />
                     </div>
-                    <div className="flex flex-1 flex-col gap-3 p-4">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <h3 className="font-pixel text-sm text-retro-text leading-snug">
-                          {cs.title}
-                        </h3>
-                        <span className="font-mono text-[11px] text-retro-muted tracking-wide">{cs.year}</span>
-                      </div>
-                      <p className="font-mono text-xs text-retro-muted leading-relaxed">
-                        {cs.summary}
-                      </p>
-                      <div className="mt-auto pt-2">
-                        <PixelBadgeGroup
-                          max={4}
-                          aria-label={`${cs.title} tags`}
-                        >
-                          {cs.tags.map((tag) => (
-                            <PixelBadge key={tag} tone="cyan" variant="soft" size="sm">
-                              {tag}
-                            </PixelBadge>
-                          ))}
-                        </PixelBadgeGroup>
-                      </div>
-                    </div>
                   </div>
-                </PixelBentoCell>
+                </PixelCard.Body>
+                <PixelCard.Footer>
+                  <PixelTextLink href={cs.href} tone="cyan" className="inline-block py-1 -my-1">
+                    Read more →
+                  </PixelTextLink>
+                </PixelCard.Footer>
+              </PixelCard>
+            ))}
+          </PixelStack>
+        </div>
+      </PixelContainer>
+
+      <PixelDivider tone="neutral" spacing="none" />
+
+      <PixelContainer as="section" id="tech-stack" maxWidth="xl" padding="lg" aria-labelledby="tech-stack-title">
+        <PixelSectionHeader
+          id="tech-stack-title"
+          eyebrow="Day-to-day"
+          title="Tech stack"
+          description="The tools I reach for first. The rest, I learn when the project asks."
+          align="start"
+          size="md"
+          spacing="normal"
+        />
+
+        <div className="mt-10">
+          <PixelStack direction="col" gap={4}>
+            <PixelBadgeGroup max={20} aria-label="Tech stack">
+              {TECH_STACK.map((tech) => (
+                <PixelBadge key={tech} tone="green" variant="soft" size="md">
+                  {tech}
+                </PixelBadge>
               ))}
-            </PixelBento>
-          </div>
-        </PixelContainer>
-      </section>
+            </PixelBadgeGroup>
+          </PixelStack>
+        </div>
+      </PixelContainer>
 
       <PixelDivider tone="neutral" spacing="none" />
 
-      <section id="case-studies" aria-labelledby="case-studies-title" className="py-16 sm:py-20">
-        <PixelContainer maxWidth="xl" padding="lg">
-          <PixelSectionHeader
-            id="case-studies-title"
-            eyebrow="In depth"
-            title="Case studies"
-            description="The full story behind each project: why it existed, what hurt, what shipped."
-            align="start"
-            size="md"
-            spacing="normal"
-          />
+      <PixelContainer as="section" id="stats" maxWidth="xl" padding="lg" aria-labelledby="stats-title">
+        <PixelSectionHeader
+          id="stats-title"
+          eyebrow="Receipts"
+          title="By the numbers"
+          description="Ten years of shipping in one row."
+          align="start"
+          size="md"
+          spacing="normal"
+        />
 
-          <div className="mt-10">
-            <PixelStack direction="col" gap={6}>
-              {CASE_STUDIES.map((cs) => (
-                <PixelCard key={cs.id} id={`case-${cs.id}`} title={cs.title} padding="lg">
-                  <PixelCard.Header>
-                    <div className="flex w-full flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                      <div className="flex flex-col gap-0.5">
-                        <h3 className="font-pixel text-sm text-retro-text leading-snug">
-                          {cs.title}
-                        </h3>
-                        <span className="font-mono text-[11px] text-retro-muted">
-                          {cs.role}
-                        </span>
-                      </div>
-                      <span className="font-mono text-xs text-retro-muted">{cs.year}</span>
-                    </div>
-                  </PixelCard.Header>
-                  <PixelCard.Body>
-                    <div className="grid gap-5 md:grid-cols-[1fr_minmax(0,260px)] md:items-start">
-                      <p className="font-mono text-xs leading-relaxed text-retro-muted sm:text-sm">
-                        {cs.body}
-                      </p>
-                      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm border border-retro-border/40 bg-retro-surface/40">
-                        <Image
-                          src={cs.image}
-                          alt={`${cs.title} screenshot`}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 260px"
-                          className="object-cover"
-                        />
-                      </div>
-                    </div>
-                  </PixelCard.Body>
-                  <PixelCard.Footer>
-                    <PixelTextLink href={cs.href} tone="cyan">
-                      Read more →
-                    </PixelTextLink>
-                  </PixelCard.Footer>
-                </PixelCard>
-              ))}
-            </PixelStack>
-          </div>
-        </PixelContainer>
-      </section>
-
-      <PixelDivider tone="neutral" spacing="none" />
-
-      <section id="tech-stack" aria-labelledby="tech-stack-title" className="py-16 sm:py-20">
-        <PixelContainer maxWidth="xl" padding="lg">
-          <PixelSectionHeader
-            id="tech-stack-title"
-            eyebrow="Day-to-day"
-            title="Tech stack"
-            description="The tools I reach for first. The rest, I learn when the project asks."
-            align="start"
-            size="md"
-            spacing="normal"
-          />
-
-          <div className="mt-8">
-            <PixelStack direction="col" gap={4}>
-              <PixelBadgeGroup max={20} aria-label="Tech stack">
-                {TECH_STACK.map((tech) => (
-                  <PixelBadge key={tech} tone="green" variant="soft" size="md">
-                    {tech}
-                  </PixelBadge>
-                ))}
-              </PixelBadgeGroup>
-            </PixelStack>
-          </div>
-        </PixelContainer>
-      </section>
-
-      <PixelDivider tone="neutral" spacing="none" />
-
-      <section id="stats" aria-labelledby="stats-title" className="py-16 sm:py-20">
-        <PixelContainer maxWidth="xl" padding="lg">
-          <PixelSectionHeader
-            id="stats-title"
-            eyebrow="Receipts"
-            title="By the numbers"
-            description="Ten years of shipping in one row."
-            align="start"
-            size="md"
-            spacing="normal"
-          />
-
-          <div className="mt-8">
-            <PixelStatGroup
-              layout="grid"
-              columns={3}
+        <div className="mt-10">
+          <PixelStatGroup
+            layout="grid"
+            columns={3}
+            tone="cyan"
+            aria-label="Career stats"
+          >
+            <PixelStatCard
+              label="Years shipping"
+              value="10+"
               tone="cyan"
-              aria-label="Career stats"
-            >
-              <PixelStatCard
-                label="Years shipping"
-                value="10+"
-                tone="cyan"
-                trend="Senior since 2020"
-              />
-              <PixelStatCard
-                label="Projects shipped"
-                value="40+"
-                tone="green"
-                trend="Solo & with teams"
-              />
-              <PixelStatCard
-                label="OSS stars"
-                value="1.2k+"
-                tone="gold"
-                trend="Across pxlkit + tooling"
-              />
-            </PixelStatGroup>
-          </div>
-        </PixelContainer>
-      </section>
+              trend="Senior since 2020"
+            />
+            <PixelStatCard
+              label="Projects shipped"
+              value="40+"
+              tone="green"
+              trend="Solo & with teams"
+            />
+            <PixelStatCard
+              label="OSS stars"
+              value="1.2k+"
+              tone="gold"
+              trend="Across pxlkit + tooling"
+            />
+          </PixelStatGroup>
+        </div>
+      </PixelContainer>
 
       <PixelDivider tone="neutral" spacing="none" />
 
-      <section id="contact" aria-labelledby="contact-title" className="py-16 sm:py-20">
-        <PixelContainer maxWidth="lg" padding="lg">
-          <PixelSectionHeader
-            id="contact-title"
-            eyebrow="Let's talk"
-            title="Have a project in mind?"
-            description="Drop your email and a one-liner. I reply within a day, in plain language, with what's actually possible."
-            align="center"
-            size="md"
-            spacing="normal"
-          />
+      <PixelContainer as="section" id="contact" maxWidth="lg" padding="lg" aria-labelledby="contact-title">
+        <PixelSectionHeader
+          id="contact-title"
+          eyebrow="Let's talk"
+          title="Have a project in mind?"
+          description="Drop your email and a one-liner. I reply within a day, in plain language, with what's actually possible."
+          align="center"
+          size="md"
+          spacing="normal"
+        />
 
-          <div className="mt-10">
-            <form
-              className="mx-auto flex w-full max-w-xl flex-col gap-3 sm:flex-row"
-              action="mailto:hello@example.com"
-              method="post"
-              aria-label="Contact form"
-            >
-              <div className="flex-1">
-                <PixelInput
-                  type="email"
-                  name="email"
-                  label="Email"
-                  placeholder="you@company.com"
-                  required
-                  aria-label="Your email"
-                />
-              </div>
-              <div className="sm:pt-6">
-                <PixelButton type="submit" tone="green" variant="solid">
-                  Send message
-                </PixelButton>
-              </div>
-            </form>
-          </div>
-        </PixelContainer>
-      </section>
+        <div className="mt-10">
+          <form
+            className="mx-auto flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:items-end"
+            action="mailto:hello@example.com"
+            method="post"
+            aria-label="Contact form"
+          >
+            <div className="flex-1">
+              <PixelInput
+                type="email"
+                name="email"
+                label="Email"
+                placeholder="you@company.com"
+                required
+                aria-label="Your email"
+              />
+            </div>
+            <div>
+              <PixelButton type="submit" tone="green" variant="solid">
+                Send message
+              </PixelButton>
+            </div>
+          </form>
+        </div>
+      </PixelContainer>
     </div>
   );
 }

@@ -97,6 +97,16 @@ export function Default() {
   );
 }`}</code></pre>
       </article>
+      <article className="docs-example" id="example-headerless">
+        <h4>Headerless</h4>
+        <pre className="docs-code"><code>{`export function Headerless() {
+  return (
+    <PixelCard>
+      <p>Omit the title to get a plain well container — no header, no divider.</p>
+    </PixelCard>
+  );
+}`}</code></pre>
+      </article>
       <article className="docs-example" id="example-with-icon">
         <h4>With Icon</h4>
         <pre className="docs-code"><code>{`export function WithIcon() {

@@ -6,22 +6,25 @@ import type { FullPageTemplate } from '../types';
 const saasLanding = `\
 'use client';
 import '@pxlkit/ui-kit/styles.css';
-import { useState } from 'react';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
-import { ArrowRight, Check, Package, CloudSync } from '@pxlkit/ui';
-import { ShieldCheck, Sparkles, Bell } from '@pxlkit/feedback';
+import { ArrowRight, Package, CloudSync } from '@pxlkit/ui';
+import { ShieldCheck, Sparkles } from '@pxlkit/feedback';
 import { SparkleStar, Trophy, Coin } from '@pxlkit/gamification';
 import {
   PixelButton,
-  PixelCard,
+  PixelFeatureCard,
+  PixelPricingCard,
   PixelStatCard,
   PixelBadge,
   PixelAccordion,
   PixelFadeIn,
-  PixelSlideIn,
   PixelTypewriter,
-  PixelSection,
   PixelDivider,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelStack,
+  PixelCluster,
+  PixelEqualHeightGrid,
 } from '@pxlkit/ui-kit';
 
 const FEATURES = [
@@ -37,114 +40,136 @@ const PLANS = [
 ];
 
 const FAQ = [
-  { question: 'Is it free?', answer: 'Yes, MIT licensed and free for personal and commercial use.' },
-  { question: 'Next.js compatible?', answer: 'Fully compatible with Next.js App Router and Pages Router.' },
-  { question: 'TypeScript support?', answer: 'Full strict TypeScript support across all packages.' },
+  { id: 'free', title: 'Is it free?', content: 'Yes, MIT licensed and free for personal and commercial use.' },
+  { id: 'nextjs', title: 'Next.js compatible?', content: 'Fully compatible with Next.js App Router and Pages Router.' },
+  { id: 'typescript', title: 'TypeScript support?', content: 'Full strict TypeScript support across all packages.' },
 ];
 
 export default function SaasLandingPage() {
   return (
     <div className="min-h-screen bg-retro-bg text-retro-text">
       {/* Hero */}
-      <PixelSection className="py-24 text-center px-4">
+      <PixelContainer as="section" maxWidth="xl" padding="xl" className="text-center">
         <PixelFadeIn>
-          <PixelBadge tone="green" className="mb-6 inline-flex items-center gap-2">
-            <PxlKitIcon icon={Sparkles} size={12} />
-            v1.0 — Now open source
-          </PixelBadge>
-          <h1 className="font-pixel text-2xl sm:text-4xl leading-loose mb-4">
-            <PixelTypewriter text="Ship retro UIs faster" speed={55} />
-          </h1>
-          <p className="text-retro-muted font-mono text-sm max-w-lg mx-auto mb-8">
-            The complete pixel-art React ecosystem. Components, icons, animations, and 3D effects — all open source.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <PixelButton tone="green" size="lg">
-              Get Started Free <PxlKitIcon icon={ArrowRight} size={14} className="ml-2" />
-            </PixelButton>
-            <PixelButton tone="neutral" size="lg" variant="outline">Browse Docs</PixelButton>
-          </div>
+          <PixelStack gap={4} align="center">
+            <PixelBadge tone="green" iconLeft={<PxlKitIcon icon={Sparkles} size={12} />}>
+              v1.0 — Now open source
+            </PixelBadge>
+            <h1 className="font-pixel text-2xl sm:text-4xl leading-loose">
+              <PixelTypewriter label="Ship retro UIs faster" speed={55} />
+            </h1>
+            <p className="text-retro-muted font-mono text-sm max-w-lg mx-auto">
+              The complete pixel-art React ecosystem. Components, icons, animations, and 3D effects — all open source.
+            </p>
+            <PixelCluster gap={3} justify="center">
+              <PixelButton tone="green" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>
+                Get Started Free
+              </PixelButton>
+              <PixelButton tone="neutral" size="lg" variant="outline">Browse Docs</PixelButton>
+            </PixelCluster>
+          </PixelStack>
         </PixelFadeIn>
-        <PixelFadeIn delay={300} className="mt-12 flex justify-center gap-8">
-          <PixelStatCard label="Stars" value="4.2k" icon={<PxlKitIcon icon={Trophy} size={16} colorful />} compact />
-          <PixelStatCard label="Downloads" value="18k/mo" icon={<PxlKitIcon icon={Coin} size={16} colorful />} compact />
-          <PixelStatCard label="Icons" value="226+" icon={<AnimatedPxlKitIcon icon={SparkleStar} size={16} colorful />} compact />
+        <PixelFadeIn delay={300} className="mt-12">
+          <PixelCluster gap={4} justify="center">
+            <PixelStatCard label="Stars" value="4.2k" size="sm" icon={<PxlKitIcon icon={Trophy} size={16} colorful />} />
+            <PixelStatCard label="Downloads" value="18k/mo" size="sm" icon={<PxlKitIcon icon={Coin} size={16} colorful />} />
+            <PixelStatCard label="Icons" value="226+" size="sm" icon={<AnimatedPxlKitIcon icon={SparkleStar} size={16} colorful />} />
+          </PixelCluster>
         </PixelFadeIn>
-      </PixelSection>
+      </PixelContainer>
 
       <PixelDivider tone="neutral" />
 
       {/* Features */}
-      <PixelSection className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="font-pixel text-xl text-center leading-loose mb-12">Everything you need</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <PixelContainer as="section" maxWidth="2xl" padding="lg" aria-labelledby="saas-features-title">
+        <PixelSectionHeader
+          id="saas-features-title"
+          align="center"
+          size="md"
+          title="Everything you need"
+        />
+        <div className="mt-10">
+          <PixelEqualHeightGrid cols={{ base: 1, md: 3 }} gap={6}>
             {FEATURES.map((f, i) => (
-              <PixelFadeIn key={f.title} delay={i * 100}>
-                <PixelCard className="p-6">
-                  <PxlKitIcon icon={f.icon} size={24} colorful />
-                  <h3 className="font-pixel text-xs mt-4 mb-2 leading-relaxed">{f.title}</h3>
-                  <p className="text-retro-muted font-mono text-xs">{f.desc}</p>
-                </PixelCard>
+              <PixelFadeIn key={f.title} delay={i * 100} className="h-full">
+                <PixelFeatureCard
+                  className="h-full"
+                  icon={<PxlKitIcon icon={f.icon} size={24} colorful />}
+                  title={f.title}
+                  description={f.desc}
+                  descriptionLines={2}
+                />
               </PixelFadeIn>
             ))}
-          </div>
+          </PixelEqualHeightGrid>
         </div>
-      </PixelSection>
+      </PixelContainer>
 
       <PixelDivider tone="neutral" />
 
       {/* Pricing */}
-      <PixelSection className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="font-pixel text-xl text-center leading-loose mb-12">Simple pricing</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <PixelContainer as="section" maxWidth="2xl" padding="lg" aria-labelledby="saas-pricing-title">
+        <PixelSectionHeader
+          id="saas-pricing-title"
+          align="center"
+          size="md"
+          title="Simple pricing"
+        />
+        <div className="mt-10">
+          <PixelEqualHeightGrid cols={{ base: 1, md: 3 }} gap={6}>
             {PLANS.map((plan, i) => (
-              <PixelFadeIn key={plan.name} delay={i * 100}>
-                <PixelCard className={\`p-6 h-full flex flex-col \${plan.popular ? 'border-retro-green/40 bg-retro-green/5' : ''}\`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-pixel text-xs">{plan.name}</span>
-                    {plan.popular && <PixelBadge tone="green">Popular</PixelBadge>}
-                  </div>
-                  <div className="font-pixel text-xl mb-4">{plan.price}</div>
-                  <ul className="space-y-2 mb-6 flex-1">
-                    {plan.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 font-mono text-xs">
-                        <PxlKitIcon icon={Check} size={12} className="text-retro-green" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <PixelButton tone={plan.tone} size="md" variant={plan.popular ? 'solid' : 'outline'} className="w-full justify-center">
-                    Get {plan.name}
-                  </PixelButton>
-                </PixelCard>
+              <PixelFadeIn key={plan.name} delay={i * 100} className="h-full">
+                <PixelPricingCard
+                  className="h-full"
+                  tone={plan.tone}
+                  highlight={'popular' in plan && plan.popular}
+                  popular={'popular' in plan && plan.popular ? { label: 'Popular', tone: 'green' } : undefined}
+                  name={plan.name}
+                  descriptionLines="none"
+                  price={{ amount: plan.price }}
+                  features={plan.features.map((label) => ({ label }))}
+                  cta={
+                    <PixelButton
+                      tone={plan.tone}
+                      size="md"
+                      variant={'popular' in plan && plan.popular ? 'solid' : 'outline'}
+                      className="w-full justify-center"
+                    >
+                      Get {plan.name}
+                    </PixelButton>
+                  }
+                />
               </PixelFadeIn>
             ))}
-          </div>
+          </PixelEqualHeightGrid>
         </div>
-      </PixelSection>
+      </PixelContainer>
 
       <PixelDivider tone="neutral" />
 
       {/* FAQ */}
-      <PixelSection className="py-20 px-4">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-pixel text-xl text-center leading-loose mb-10">FAQ</h2>
+      <PixelContainer as="section" maxWidth="md" padding="lg" aria-labelledby="saas-faq-title">
+        <PixelSectionHeader id="saas-faq-title" align="center" size="md" title="FAQ" />
+        <div className="mt-10">
           <PixelAccordion items={FAQ} />
         </div>
-      </PixelSection>
+      </PixelContainer>
 
       {/* Final CTA */}
-      <PixelSection className="py-20 px-4 bg-retro-green/5 border-t border-retro-green/20">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="font-pixel text-xl leading-loose mb-4">Ready to ship?</h2>
-          <p className="text-retro-muted font-mono text-sm mb-6">Free forever. Open source. No credit card required.</p>
-          <PixelButton tone="green" size="lg">
-            Start Building <PxlKitIcon icon={ArrowRight} size={14} className="ml-2" />
+      <PixelContainer
+        as="section"
+        maxWidth="sm"
+        padding="lg"
+        className="bg-retro-green/5 border-t border-retro-green/20"
+      >
+        <PixelStack gap={4} align="center" className="text-center">
+          <h2 className="font-pixel text-xl leading-loose">Ready to ship?</h2>
+          <p className="text-retro-muted font-mono text-sm">Free forever. Open source. No credit card required.</p>
+          <PixelButton tone="green" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>
+            Start Building
           </PixelButton>
-        </div>
-      </PixelSection>
+        </PixelStack>
+      </PixelContainer>
     </div>
   );
 }
@@ -157,8 +182,8 @@ const devPortfolio = `\
 'use client';
 import '@pxlkit/ui-kit/styles.css';
 import { ParallaxPxlKitIcon, PxlKitIcon } from '@pxlkit/core';
-import { ArrowRight, ExternalLink, AtSign } from '@pxlkit/ui';
-import { Globe } from '@pxlkit/social';
+import { ArrowRight, ExternalLink } from '@pxlkit/ui';
+import { AtSign } from '@pxlkit/social';
 import { PixelRocket, CoolEmoji, MagicOrb } from '@pxlkit/parallax';
 import {
   PixelButton,
@@ -169,10 +194,12 @@ import {
   PixelTextarea,
   PixelFadeIn,
   PixelMouseParallax,
-  PixelParallaxGroup,
-  PixelParallaxLayer,
-  PixelSection,
   PixelDivider,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelGrid,
+  PixelStack,
+  PixelCluster,
 } from '@pxlkit/ui-kit';
 
 const PROJECTS = [
@@ -193,100 +220,120 @@ export default function DeveloperPortfolio() {
   return (
     <div className="min-h-screen bg-retro-bg text-retro-text">
       {/* Hero with parallax */}
-      <PixelSection className="relative min-h-screen flex items-center px-4 overflow-hidden">
-        <PixelMouseParallax className="absolute inset-0 pointer-events-none">
-          <PixelParallaxGroup>
-            <PixelParallaxLayer depth={0.2} className="absolute top-20 left-10">
-              <ParallaxPxlKitIcon icon={PixelRocket} size={64} />
-            </PixelParallaxLayer>
-            <PixelParallaxLayer depth={0.35} className="absolute top-28 right-16">
-              <ParallaxPxlKitIcon icon={MagicOrb} size={56} />
-            </PixelParallaxLayer>
-            <PixelParallaxLayer depth={0.15} className="absolute bottom-24 right-20">
-              <ParallaxPxlKitIcon icon={CoolEmoji} size={48} />
-            </PixelParallaxLayer>
-          </PixelParallaxGroup>
-        </PixelMouseParallax>
-        <div className="max-w-7xl mx-auto w-full relative z-10">
-          <PixelFadeIn>
-            <PixelBadge tone="cyan" className="mb-4">Available for work</PixelBadge>
-            <h1 className="font-pixel text-2xl sm:text-4xl leading-loose mb-4">
-              Hi, I&apos;m <span className="text-retro-green">Alex</span>
-            </h1>
-            <p className="text-retro-muted font-mono text-sm max-w-md mb-8">
-              Full-stack developer building beautiful, performant web apps. Passionate about
-              pixel art, game dev, and open source.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <PixelButton tone="green" size="lg">
-                View Projects <PxlKitIcon icon={ArrowRight} size={14} className="ml-2" />
-              </PixelButton>
-              <PixelButton tone="neutral" size="lg" variant="outline">
-                Download CV
-              </PixelButton>
-            </div>
-          </PixelFadeIn>
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <PixelMouseParallax strength={14} className="absolute top-20 left-10">
+            <ParallaxPxlKitIcon icon={PixelRocket} size={64} />
+          </PixelMouseParallax>
+          <PixelMouseParallax strength={24} className="absolute top-28 right-16">
+            <ParallaxPxlKitIcon icon={MagicOrb} size={56} />
+          </PixelMouseParallax>
+          <PixelMouseParallax strength={10} className="absolute bottom-24 right-20">
+            <ParallaxPxlKitIcon icon={CoolEmoji} size={48} />
+          </PixelMouseParallax>
         </div>
-      </PixelSection>
+        <PixelContainer as="div" maxWidth="3xl" padding="lg" className="relative z-10">
+          <PixelFadeIn>
+            <PixelStack gap={4} align="start">
+              <PixelBadge tone="cyan">Available for work</PixelBadge>
+              <h1 className="font-pixel text-2xl sm:text-4xl leading-loose">
+                Hi, I&apos;m <span className="text-retro-green">Alex</span>
+              </h1>
+              <p className="text-retro-muted font-mono text-sm max-w-md">
+                Full-stack developer building beautiful, performant web apps. Passionate about
+                pixel art, game dev, and open source.
+              </p>
+              <PixelCluster gap={3}>
+                <PixelButton tone="green" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>
+                  View Projects
+                </PixelButton>
+                <PixelButton tone="neutral" size="lg" variant="outline">
+                  Download CV
+                </PixelButton>
+              </PixelCluster>
+            </PixelStack>
+          </PixelFadeIn>
+        </PixelContainer>
+      </section>
 
       <PixelDivider tone="neutral" />
 
       {/* Projects */}
-      <PixelSection className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="font-pixel text-xl leading-loose mb-10">Projects</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <PixelContainer as="section" maxWidth="2xl" padding="lg" aria-labelledby="projects-title">
+        <PixelSectionHeader id="projects-title" size="md" title="Projects" />
+        <div className="mt-10">
+          <PixelGrid cols={{ base: 1, md: 3 }} gap={6}>
             {PROJECTS.map((p, i) => (
               <PixelFadeIn key={p.title} delay={i * 100}>
-                <PixelCard className="p-6 h-full flex flex-col">
-                  <h3 className="font-pixel text-xs mb-2 leading-relaxed">{p.title}</h3>
-                  <p className="text-retro-muted font-mono text-xs mb-4 flex-1">{p.desc}</p>
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {p.tags.map((t) => <PixelBadge key={t} tone={p.tone} className="text-[9px]">{t}</PixelBadge>)}
-                  </div>
-                  <PixelButton tone={p.tone} size="sm" variant="outline">
-                    View <PxlKitIcon icon={ExternalLink} size={12} className="ml-1" />
-                  </PixelButton>
+                <PixelCard
+                  className="h-full"
+                  title={p.title}
+                  description={p.desc}
+                  descriptionLines={2}
+                  footer={
+                    <PixelButton
+                      tone={p.tone}
+                      size="sm"
+                      variant="outline"
+                      iconRight={<PxlKitIcon icon={ExternalLink} size={12} />}
+                    >
+                      View
+                    </PixelButton>
+                  }
+                >
+                  <PixelCluster gap={1}>
+                    {p.tags.map((t) => (
+                      <PixelBadge key={t} tone={p.tone} size="sm">{t}</PixelBadge>
+                    ))}
+                  </PixelCluster>
                 </PixelCard>
               </PixelFadeIn>
             ))}
-          </div>
+          </PixelGrid>
         </div>
-      </PixelSection>
+      </PixelContainer>
 
       <PixelDivider tone="neutral" />
 
       {/* Skills */}
-      <PixelSection className="py-20 px-4">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="font-pixel text-xl leading-loose mb-10">Skills</h2>
-          <div className="space-y-4">
-            {SKILLS.map((s, i) => (
-              <PixelFadeIn key={s.name} delay={i * 60}>
-                <PixelProgress value={s.level} label={s.name} tone="green" />
-              </PixelFadeIn>
-            ))}
-          </div>
-        </div>
-      </PixelSection>
+      <PixelContainer as="section" maxWidth="sm" padding="lg" aria-labelledby="skills-title">
+        <PixelSectionHeader id="skills-title" size="md" title="Skills" />
+        <PixelStack gap={4} className="mt-10">
+          {SKILLS.map((s, i) => (
+            <PixelFadeIn key={s.name} delay={i * 60}>
+              <PixelProgress value={s.level} label={s.name} tone="green" />
+            </PixelFadeIn>
+          ))}
+        </PixelStack>
+      </PixelContainer>
 
       <PixelDivider tone="neutral" />
 
       {/* Contact */}
-      <PixelSection className="py-20 px-4">
-        <div className="max-w-xl mx-auto">
-          <h2 className="font-pixel text-xl leading-loose mb-3 text-center">Get in touch</h2>
-          <p className="text-retro-muted font-mono text-sm text-center mb-8">Available for freelance and full-time roles.</p>
-          <PixelCard className="p-6 space-y-4">
+      <PixelContainer as="section" maxWidth="sm" padding="lg" aria-labelledby="contact-title">
+        <PixelSectionHeader
+          id="contact-title"
+          align="center"
+          size="md"
+          title="Get in touch"
+          description="Available for freelance and full-time roles."
+        />
+        <PixelCard padding="lg" className="mt-8">
+          <PixelStack gap={4}>
             <PixelInput label="Name" placeholder="Your name" />
             <PixelInput label="Email" placeholder="your@email.com" type="email" />
             <PixelTextarea label="Message" placeholder="Tell me about your project..." rows={4} />
-            <PixelButton tone="green" size="md" className="w-full justify-center">
-              Send Message <PxlKitIcon icon={AtSign} size={14} className="ml-2" />
+            <PixelButton
+              tone="green"
+              size="md"
+              className="w-full justify-center"
+              iconRight={<PxlKitIcon icon={AtSign} size={14} />}
+            >
+              Send Message
             </PixelButton>
-          </PixelCard>
-        </div>
-      </PixelSection>
+          </PixelStack>
+        </PixelCard>
+      </PixelContainer>
     </div>
   );
 }
@@ -312,7 +359,11 @@ import {
   PixelBounce,
   PixelFloat,
   PixelGlitch,
-  PixelSection,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelStack,
+  PixelCluster,
+  PixelGrid,
 } from '@pxlkit/ui-kit';
 
 const LEADERBOARD = [
@@ -333,54 +384,56 @@ export default function IndieGameLanding() {
   return (
     <div className="min-h-screen bg-retro-bg text-retro-text">
       {/* Hero */}
-      <PixelSection className="py-24 text-center px-4 bg-retro-purple/5">
+      <PixelContainer as="section" maxWidth="xl" padding="xl" className="bg-retro-purple/5 text-center">
         <PixelFadeIn>
-          <div className="flex justify-center gap-4 mb-8">
-            <PixelFloat>
-              <AnimatedPxlKitIcon icon={FireSword} size={64} colorful />
-            </PixelFloat>
-            <PixelBounce>
-              <AnimatedPxlKitIcon icon={FloatingSkull} size={48} colorful />
-            </PixelBounce>
-          </div>
-          <PixelBadge tone="red" className="mb-4">Now in Early Access</PixelBadge>
-          <PixelGlitch active>
-            <h1 className="font-pixel text-2xl sm:text-4xl leading-loose mb-4">
-              DUNGEON<br />
-              <span className="text-retro-red">CRAWLER X</span>
-            </h1>
-          </PixelGlitch>
-          <p className="text-retro-muted font-mono text-sm max-w-md mx-auto mb-8">
-            A hardcore retro roguelike with procedural dungeons, brutal boss fights,
-            and hundreds of items to collect.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <PixelButton tone="red" size="lg">
-              Play Now — Free
-              <PxlKitIcon icon={ArrowRight} size={14} className="ml-2" />
-            </PixelButton>
-            <PixelButton tone="neutral" size="lg" variant="outline">
-              Download Demo
-              <PxlKitIcon icon={Download} size={14} className="ml-2" />
-            </PixelButton>
-          </div>
+          <PixelStack gap={4} align="center">
+            <PixelCluster gap={4} justify="center">
+              <PixelFloat>
+                <AnimatedPxlKitIcon icon={FireSword} size={64} colorful />
+              </PixelFloat>
+              <PixelBounce>
+                <AnimatedPxlKitIcon icon={FloatingSkull} size={48} colorful />
+              </PixelBounce>
+            </PixelCluster>
+            <PixelBadge tone="red">Now in Early Access</PixelBadge>
+            <PixelGlitch>
+              <h1 className="font-pixel text-2xl sm:text-4xl leading-loose">
+                DUNGEON<br />
+                <span className="text-retro-red">CRAWLER X</span>
+              </h1>
+            </PixelGlitch>
+            <p className="text-retro-muted font-mono text-sm max-w-md mx-auto">
+              A hardcore retro roguelike with procedural dungeons, brutal boss fights,
+              and hundreds of items to collect.
+            </p>
+            <PixelCluster gap={3} justify="center">
+              <PixelButton tone="red" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>
+                Play Now — Free
+              </PixelButton>
+              <PixelButton tone="neutral" size="lg" variant="outline" iconRight={<PxlKitIcon icon={Download} size={14} />}>
+                Download Demo
+              </PixelButton>
+            </PixelCluster>
+          </PixelStack>
         </PixelFadeIn>
 
-        <PixelFadeIn delay={200} className="mt-12 flex justify-center gap-6 flex-wrap">
-          <PixelStatCard label="Players" value="24k+" icon={<PxlKitIcon icon={Trophy} size={16} colorful />} compact />
-          <PixelStatCard label="Items" value="500+" icon={<PxlKitIcon icon={Coin} size={16} colorful />} compact />
-          <PixelStatCard label="Dungeons" value="∞" icon={<AnimatedPxlKitIcon icon={SparkleStar} size={16} colorful />} compact />
+        <PixelFadeIn delay={200} className="mt-12">
+          <PixelCluster gap={4} justify="center">
+            <PixelStatCard label="Players" value="24k+" size="sm" icon={<PxlKitIcon icon={Trophy} size={16} colorful />} />
+            <PixelStatCard label="Items" value="500+" size="sm" icon={<PxlKitIcon icon={Coin} size={16} colorful />} />
+            <PixelStatCard label="Dungeons" value="∞" size="sm" icon={<AnimatedPxlKitIcon icon={SparkleStar} size={16} colorful />} />
+          </PixelCluster>
         </PixelFadeIn>
-      </PixelSection>
+      </PixelContainer>
 
       {/* Features */}
-      <PixelSection className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="font-pixel text-xl text-center leading-loose mb-12">Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <PixelContainer as="section" maxWidth="2xl" padding="lg" aria-labelledby="game-features-title">
+        <PixelSectionHeader id="game-features-title" align="center" size="md" title="Features" />
+        <div className="mt-10">
+          <PixelGrid cols={{ base: 1, md: 3 }} gap={6}>
             {FEATURES.map((f, i) => (
               <PixelFadeIn key={f.title} delay={i * 100}>
-                <PixelCard className="p-6 text-center">
+                <PixelCard padding="lg" className="h-full text-center">
                   <div className="flex justify-center mb-4">
                     <PxlKitIcon icon={f.icon} size={32} colorful />
                   </div>
@@ -389,43 +442,46 @@ export default function IndieGameLanding() {
                 </PixelCard>
               </PixelFadeIn>
             ))}
-          </div>
+          </PixelGrid>
         </div>
-      </PixelSection>
+      </PixelContainer>
 
       {/* Leaderboard */}
-      <PixelSection className="py-20 px-4 bg-retro-surface/20">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="font-pixel text-xl text-center leading-loose mb-10">
-            <AnimatedPxlKitIcon icon={CoinSpin} size={24} colorful className="inline mr-3" />
-            Leaderboard
-          </h2>
-          <PixelTable
-            columns={[
-              { key: 'rank', label: '#', width: '60px' },
-              { key: 'player', label: 'Player' },
-              { key: 'score', label: 'Score' },
-              { key: 'level', label: 'Level', width: '80px' },
-            ]}
-            rows={LEADERBOARD}
-          />
-        </div>
-      </PixelSection>
+      <PixelContainer as="section" maxWidth="sm" padding="lg" className="bg-retro-surface/20">
+        <h2 className="font-pixel text-xl text-center leading-loose mb-10">
+          <AnimatedPxlKitIcon icon={CoinSpin} size={24} colorful className="inline mr-3" />
+          Leaderboard
+        </h2>
+        <PixelTable
+          columns={[
+            { key: 'rank', header: '#', width: '60px' },
+            { key: 'player', header: 'Player' },
+            { key: 'score', header: 'Score' },
+            { key: 'level', header: 'Level', width: '80px' },
+          ]}
+          data={LEADERBOARD}
+        />
+      </PixelContainer>
 
       {/* Download CTA */}
-      <PixelSection className="py-20 px-4 text-center bg-retro-red/5 border-t border-retro-red/20">
-        <div className="max-w-xl mx-auto">
-          <div className="flex justify-center gap-3 mb-6">
+      <PixelContainer
+        as="section"
+        maxWidth="sm"
+        padding="lg"
+        className="text-center bg-retro-red/5 border-t border-retro-red/20"
+      >
+        <PixelStack gap={4} align="center">
+          <PixelCluster gap={3} justify="center">
             <AnimatedPxlKitIcon icon={ExplosionBurst} size={40} colorful />
             <AnimatedPxlKitIcon icon={GlowPulse} size={40} colorful />
-          </div>
-          <h2 className="font-pixel text-xl leading-loose mb-4">Ready to explore?</h2>
-          <p className="text-retro-muted font-mono text-sm mb-6">Free to play. Cross-platform. No ads.</p>
-          <PixelButton tone="red" size="lg">
-            Download Free <PxlKitIcon icon={Download} size={14} className="ml-2" />
+          </PixelCluster>
+          <h2 className="font-pixel text-xl leading-loose">Ready to explore?</h2>
+          <p className="text-retro-muted font-mono text-sm">Free to play. Cross-platform. No ads.</p>
+          <PixelButton tone="red" size="lg" iconRight={<PxlKitIcon icon={Download} size={14} />}>
+            Download Free
           </PixelButton>
-        </div>
-      </PixelSection>
+        </PixelStack>
+      </PixelContainer>
     </div>
   );
 }
@@ -439,8 +495,8 @@ const adminDashboard = `\
 import '@pxlkit/ui-kit/styles.css';
 import { useState } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
-import { Home, Settings, Grid, List, Search, Bell, Upload } from '@pxlkit/ui';
-import { CheckCircle, WarningTriangle, InfoCircle } from '@pxlkit/feedback';
+import { Home, Settings, Grid, List, Search, Upload } from '@pxlkit/ui';
+import { Bell, InfoCircle } from '@pxlkit/feedback';
 import {
   PixelButton,
   PixelCard,
@@ -450,14 +506,15 @@ import {
   PixelProgress,
   PixelBadge,
   PixelInput,
-  PixelSection,
+  PixelStack,
+  PixelGrid,
 } from '@pxlkit/ui-kit';
 
 const STATS = [
-  { label: 'Total Users', value: '12,480', delta: '+8%', icon: Home, tone: 'green' as const },
-  { label: 'Revenue', value: '$48,200', delta: '+12%', icon: Upload, tone: 'cyan' as const },
-  { label: 'Active Projects', value: '234', delta: '-3%', icon: Grid, tone: 'gold' as const },
-  { label: 'Support Tickets', value: '18', delta: '-22%', icon: Bell, tone: 'red' as const },
+  { label: 'Total Users', value: '12,480', trend: '+8%', icon: Home, tone: 'green' as const },
+  { label: 'Revenue', value: '$48,200', trend: '+12%', icon: Upload, tone: 'cyan' as const },
+  { label: 'Active Projects', value: '234', trend: '-3%', icon: Grid, tone: 'gold' as const },
+  { label: 'Support Tickets', value: '18', trend: '-22%', icon: Bell, tone: 'red' as const },
 ];
 
 const RECENT_USERS = [
@@ -510,79 +567,80 @@ export default function AdminDashboard() {
       <main className="flex-1 overflow-auto">
         {/* Top bar */}
         <header className="sticky top-0 z-10 border-b border-retro-border/50 bg-retro-bg/90 backdrop-blur-md px-6 h-14 flex items-center justify-between">
-          <PixelInput
-            size="sm"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-64"
-            prefix={<PxlKitIcon icon={Search} size={14} className="text-retro-muted" />}
-          />
+          <div className="w-64">
+            <PixelInput
+              size="sm"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              prefix={<PxlKitIcon icon={Search} size={14} className="text-retro-muted" />}
+            />
+          </div>
           <div className="flex items-center gap-2">
-            <button className="relative p-2 text-retro-muted hover:text-retro-text border border-retro-border/50 rounded transition-all">
+            <button className="relative p-2 text-retro-muted hover:text-retro-text border border-retro-border/50 rounded transition-all" aria-label="Notifications">
               <PxlKitIcon icon={Bell} size={16} />
-              <PixelBadge tone="red" className="absolute -top-1 -right-1 text-[8px] px-1">3</PixelBadge>
+              <PixelBadge tone="red" size="sm" className="absolute -top-1 -right-1 px-1">3</PixelBadge>
             </button>
             <PixelButton tone="green" size="sm">+ New Project</PixelButton>
           </div>
         </header>
 
-        <PixelSection className="p-6 space-y-6">
+        <PixelStack as="section" gap={6} className="p-6">
           {/* Alerts */}
-          <PixelAlert tone="info" icon={<PxlKitIcon icon={InfoCircle} size={16} />}>
-            System maintenance scheduled for Sunday 02:00–04:00 UTC.
-          </PixelAlert>
+          <PixelAlert
+            tone="cyan"
+            icon={<PxlKitIcon icon={InfoCircle} size={16} />}
+            message="System maintenance scheduled for Sunday 02:00–04:00 UTC."
+          />
 
           {/* Stat cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <PixelGrid cols={{ base: 2, lg: 4 }} gap={4}>
             {STATS.map((s) => (
               <PixelStatCard
                 key={s.label}
                 label={s.label}
                 value={s.value}
-                delta={s.delta}
+                trend={s.trend}
+                tone={s.tone}
                 icon={<PxlKitIcon icon={s.icon} size={18} colorful />}
               />
             ))}
-          </div>
+          </PixelGrid>
 
           {/* Usage stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <PixelCard className="p-4">
-              <h3 className="font-pixel text-xs mb-4 leading-relaxed">Resource Usage</h3>
-              <div className="space-y-3">
+          <PixelGrid cols={{ base: 1, md: 2 }} gap={4}>
+            <PixelCard title="Resource Usage">
+              <PixelStack gap={3}>
                 <PixelProgress value={72} label="CPU" tone="green" />
                 <PixelProgress value={48} label="Memory" tone="cyan" />
                 <PixelProgress value={61} label="Storage" tone="gold" />
                 <PixelProgress value={23} label="Bandwidth" tone="purple" />
-              </div>
+              </PixelStack>
             </PixelCard>
-            <PixelCard className="p-4">
-              <h3 className="font-pixel text-xs mb-4 leading-relaxed">Plan Distribution</h3>
-              <div className="space-y-3">
+            <PixelCard title="Plan Distribution">
+              <PixelStack gap={3}>
                 <PixelProgress value={55} label="Free (55%)" tone="neutral" />
                 <PixelProgress value={32} label="Pro (32%)" tone="green" />
                 <PixelProgress value={13} label="Team (13%)" tone="cyan" />
-              </div>
+              </PixelStack>
             </PixelCard>
-          </div>
+          </PixelGrid>
 
           {/* Recent users table */}
-          <PixelCard className="p-4">
-            <h3 className="font-pixel text-xs mb-4 leading-relaxed">Recent Users</h3>
+          <PixelCard title="Recent Users">
             <PixelTable
               columns={[
-                { key: 'name', label: 'Name' },
-                { key: 'email', label: 'Email' },
-                { key: 'plan', label: 'Plan', width: '100px' },
-                { key: 'status', label: 'Status', width: '100px' },
+                { key: 'name', header: 'Name' },
+                { key: 'email', header: 'Email' },
+                { key: 'plan', header: 'Plan', width: '100px' },
+                { key: 'status', header: 'Status', width: '100px' },
               ]}
-              rows={RECENT_USERS.map((u) => ({
+              data={RECENT_USERS.map((u) => ({
                 ...u,
                 status: (
                   <PixelBadge
                     tone={u.status === 'Active' ? 'green' : u.status === 'Pending' ? 'gold' : 'neutral'}
-                    className="text-[9px]"
+                    size="sm"
                   >
                     {u.status}
                   </PixelBadge>
@@ -590,7 +648,7 @@ export default function AdminDashboard() {
               }))}
             />
           </PixelCard>
-        </PixelSection>
+        </PixelStack>
       </main>
     </div>
   );
@@ -615,15 +673,19 @@ import {
   PixelAvatar,
   PixelInput,
   PixelFadeIn,
-  PixelSection,
   PixelDivider,
+  PixelContainer,
+  PixelCenter,
+  PixelSectionHeader,
+  PixelStack,
+  PixelGrid,
+  PixelTwoColumn,
 } from '@pxlkit/ui-kit';
 
 const FEATURED = {
   title: 'Building Pixel-Art UIs in 2025: The Complete Guide',
   excerpt: 'Everything you need to know about creating retro pixel-art web interfaces using React, Tailwind CSS, and the Pxlkit ecosystem.',
   author: 'Alex Rivers',
-  initials: 'AR',
   date: 'Apr 12, 2025',
   tag: 'Tutorial',
   readTime: '8 min read',
@@ -636,7 +698,6 @@ const POSTS = [
     title: 'Getting Started with @pxlkit/gamification',
     excerpt: 'Add trophies, swords, coins, and 50+ game icons to your project in minutes.',
     author: 'Sam Chen',
-    initials: 'SC',
     date: 'Apr 8, 2025',
     tag: 'Icons',
     readTime: '4 min read',
@@ -646,7 +707,6 @@ const POSTS = [
     title: 'PixelParallax: Mouse-Tracking 3D Icons',
     excerpt: 'Use ParallaxPxlKitIcon and PixelMouseParallax to add depth to your landing page.',
     author: 'Morgan Blake',
-    initials: 'MB',
     date: 'Apr 3, 2025',
     tag: '3D',
     readTime: '6 min read',
@@ -656,7 +716,6 @@ const POSTS = [
     title: 'Dark Mode with Pxlkit Design Tokens',
     excerpt: 'How the retro-* CSS variable system makes theme switching effortless.',
     author: 'Jordan Lee',
-    initials: 'JL',
     date: 'Mar 28, 2025',
     tag: 'Styling',
     readTime: '5 min read',
@@ -669,28 +728,34 @@ export default function BlogSite() {
     <div className="min-h-screen bg-retro-bg text-retro-text">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-retro-border/50 bg-retro-bg/90 backdrop-blur-md">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-          <Link href="/" className="font-pixel text-[10px] text-retro-green">PIXELBLOG</Link>
-          <div className="hidden md:flex items-center gap-1">
-            {['Articles', 'Tutorials', 'Changelog', 'About'].map((l) => (
-              <Link key={l} href="#" className="px-4 py-2 text-sm font-mono text-retro-muted hover:text-retro-text hover:bg-retro-surface rounded transition-all">{l}</Link>
-            ))}
+        <PixelCenter as="nav" maxWidth="3xl" gutter="lg" aria-label="Main">
+          <div className="h-14 flex items-center justify-between">
+            <Link href="/" className="font-pixel text-[10px] text-retro-green">PIXELBLOG</Link>
+            <div className="hidden md:flex items-center gap-1">
+              {['Articles', 'Tutorials', 'Changelog', 'About'].map((l) => (
+                <Link key={l} href="#" className="px-4 py-2 text-sm font-mono text-retro-muted hover:text-retro-text hover:bg-retro-surface rounded transition-all">{l}</Link>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <button className="p-2 text-retro-muted hover:text-retro-text border border-retro-border/50 rounded transition-all" aria-label="Search">
+                <PxlKitIcon icon={Search} size={16} />
+              </button>
+              <PixelButton tone="green" size="sm">Subscribe</PixelButton>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button className="p-2 text-retro-muted hover:text-retro-text border border-retro-border/50 rounded transition-all" aria-label="Search">
-              <PxlKitIcon icon={Search} size={16} />
-            </button>
-            <PixelButton tone="green" size="sm">Subscribe</PixelButton>
-          </div>
-        </nav>
+        </PixelCenter>
       </header>
 
       {/* Featured post */}
-      <PixelSection className="py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <PixelFadeIn>
-            <PixelCard className="p-8 bg-retro-green/5 border-retro-green/20">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <PixelContainer as="section" maxWidth="3xl" padding="md">
+        <PixelFadeIn>
+          <PixelCard tone="green" padding="lg">
+            <PixelTwoColumn
+              ratio="50/50"
+              gap={8}
+              stackBelow="lg"
+              align="center"
+              left={
                 <div>
                   <div className="flex items-center gap-2 mb-4">
                     <PixelBadge tone="green">{FEATURED.tag}</PixelBadge>
@@ -700,7 +765,7 @@ export default function BlogSite() {
                   <p className="text-retro-muted font-mono text-sm leading-relaxed mb-6">{FEATURED.excerpt}</p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <PixelAvatar initials={FEATURED.initials} size="sm" />
+                      <PixelAvatar name={FEATURED.author} size="sm" />
                       <div>
                         <div className="font-mono text-xs text-retro-text">{FEATURED.author}</div>
                         <div className="flex items-center gap-1 font-mono text-[10px] text-retro-muted">
@@ -709,11 +774,13 @@ export default function BlogSite() {
                         </div>
                       </div>
                     </div>
-                    <PixelButton tone="green" size="sm">
-                      Read More <PxlKitIcon icon={ArrowRight} size={12} className="ml-1" />
+                    <PixelButton tone="green" size="sm" iconRight={<PxlKitIcon icon={ArrowRight} size={12} />}>
+                      Read More
                     </PixelButton>
                   </div>
                 </div>
+              }
+              right={
                 <div className="hidden lg:flex items-center justify-center gap-4 text-retro-muted font-mono text-xs">
                   <span className="flex items-center gap-1.5">
                     <PxlKitIcon icon={Heart} size={14} colorful /> {FEATURED.likes}
@@ -725,74 +792,80 @@ export default function BlogSite() {
                     <PxlKitIcon icon={Comment} size={14} /> 24
                   </span>
                 </div>
-              </div>
-            </PixelCard>
-          </PixelFadeIn>
-        </div>
-      </PixelSection>
+              }
+            />
+          </PixelCard>
+        </PixelFadeIn>
+      </PixelContainer>
 
       <PixelDivider tone="neutral" />
 
       {/* Post grid */}
-      <PixelSection className="py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="font-pixel text-base leading-loose mb-8">Latest Articles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <PixelContainer as="section" maxWidth="3xl" padding="md" aria-labelledby="latest-title">
+        <PixelSectionHeader id="latest-title" size="sm" title="Latest Articles" />
+        <div className="mt-8">
+          <PixelGrid cols={{ base: 1, md: 3 }} gap={6}>
             {POSTS.map((p, i) => (
               <PixelFadeIn key={p.title} delay={i * 100}>
-                <PixelCard className="p-6 h-full flex flex-col">
-                  <div className="flex items-center gap-2 mb-3">
-                    <PixelBadge tone={p.tone} className="text-[9px]">{p.tag}</PixelBadge>
-                    <span className="text-retro-muted font-mono text-[10px]">{p.readTime}</span>
-                  </div>
-                  <h3 className="font-pixel text-[10px] leading-relaxed mb-2">{p.title}</h3>
-                  <p className="text-retro-muted font-mono text-xs leading-relaxed flex-1 mb-4">{p.excerpt}</p>
-                  <div className="flex items-center gap-2 pt-3 border-t border-retro-border/40">
-                    <PixelAvatar initials={p.initials} size="xs" />
-                    <div>
-                      <div className="font-mono text-[10px] text-retro-text">{p.author}</div>
-                      <div className="font-mono text-[9px] text-retro-muted">{p.date}</div>
+                <PixelCard padding="lg" className="h-full">
+                  <div className="flex h-full flex-col">
+                    <div className="flex items-center gap-2 mb-3">
+                      <PixelBadge tone={p.tone} size="sm">{p.tag}</PixelBadge>
+                      <span className="text-retro-muted font-mono text-[10px]">{p.readTime}</span>
+                    </div>
+                    <h3 className="font-pixel text-[10px] leading-relaxed mb-2">{p.title}</h3>
+                    <p className="text-retro-muted font-mono text-xs leading-relaxed flex-1 mb-4">{p.excerpt}</p>
+                    <div className="flex items-center gap-2 pt-3 border-t border-retro-border/40">
+                      <PixelAvatar name={p.author} size="xs" />
+                      <div>
+                        <div className="font-mono text-[10px] text-retro-text">{p.author}</div>
+                        <div className="font-mono text-[9px] text-retro-muted">{p.date}</div>
+                      </div>
                     </div>
                   </div>
                 </PixelCard>
               </PixelFadeIn>
             ))}
-          </div>
+          </PixelGrid>
         </div>
-      </PixelSection>
+      </PixelContainer>
 
       <PixelDivider tone="neutral" />
 
       {/* Newsletter */}
-      <PixelSection className="py-16 px-4 bg-retro-surface/20">
-        <div className="max-w-lg mx-auto text-center">
-          <h2 className="font-pixel text-base leading-loose mb-3">Stay in the loop</h2>
-          <p className="text-retro-muted font-mono text-sm mb-6">
+      <PixelContainer as="section" maxWidth="sm" padding="lg" className="bg-retro-surface/20">
+        <PixelStack gap={3} align="center" className="text-center">
+          <h2 className="font-pixel text-base leading-loose">Stay in the loop</h2>
+          <p className="text-retro-muted font-mono text-sm">
             Get the latest articles and Pxlkit updates delivered to your inbox.
           </p>
-          <div className="flex gap-2">
-            <PixelInput placeholder="your@email.com" className="flex-1" aria-label="Email for newsletter" />
-            <PixelButton tone="green" size="md">
+          <div className="flex w-full gap-2">
+            <div className="flex-1">
+              <PixelInput placeholder="your@email.com" aria-label="Email for newsletter" />
+            </div>
+            <PixelButton tone="green" size="md" aria-label="Subscribe">
               <PxlKitIcon icon={Mail} size={16} />
             </PixelButton>
           </div>
-        </div>
-      </PixelSection>
+        </PixelStack>
+      </PixelContainer>
 
       {/* Footer */}
-      <footer className="border-t border-retro-border/50 py-8 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-mono text-retro-muted">
-          <span className="font-pixel text-[9px] text-retro-green">PIXELBLOG</span>
-          <span>© {new Date().getFullYear()} PixelBlog. All rights reserved.</span>
-          <div className="flex items-center gap-3">
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-retro-cyan transition-colors">
-              <PxlKitIcon icon={AtSign} size={16} />
-            </a>
-            <a href="https://myblog.com" target="_blank" rel="noopener noreferrer" className="hover:text-retro-green transition-colors">
-              <PxlKitIcon icon={Globe} size={16} />
-            </a>
+      <footer className="border-t border-retro-border/50">
+        <PixelCenter as="div" maxWidth="3xl" gutter="lg" className="py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-mono text-retro-muted">
+            <span className="font-pixel text-[9px] text-retro-green">PIXELBLOG</span>
+            <span>© {new Date().getFullYear()} PixelBlog. All rights reserved.</span>
+            <div className="flex items-center gap-3">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-retro-cyan transition-colors" aria-label="Twitter">
+                <PxlKitIcon icon={AtSign} size={16} />
+              </a>
+              <a href="https://myblog.com" target="_blank" rel="noopener noreferrer" className="hover:text-retro-green transition-colors" aria-label="Website">
+                <PxlKitIcon icon={Globe} size={16} />
+              </a>
+            </div>
           </div>
-        </div>
+        </PixelCenter>
       </footer>
     </div>
   );

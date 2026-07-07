@@ -6,13 +6,14 @@ const iconGrid = `\
 'use client';
 import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon } from '@pxlkit/core';
-import { Package, Palette, CloudSync, Settings } from '@pxlkit/ui';
+import { Package, Palette, CloudSync } from '@pxlkit/ui';
 import { ShieldCheck, Sparkles, Bell } from '@pxlkit/feedback';
 import {
-  PixelCard,
+  PixelFeatureCard,
   PixelFadeIn,
-  PixelSection,
-  PixelDivider,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelGrid,
 } from '@pxlkit/ui-kit';
 
 const FEATURES = [
@@ -56,36 +57,31 @@ const FEATURES = [
 
 export function IconFeatureGrid() {
   return (
-    <PixelSection className="py-16 sm:py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="font-pixel text-xl sm:text-2xl text-retro-text leading-loose mb-3">
-            Everything you need
-          </h2>
-          <p className="text-retro-muted font-mono text-sm max-w-xl mx-auto">
-            A complete ecosystem for building beautiful retro React interfaces.
-          </p>
-        </div>
-        <PixelDivider tone="neutral" spacing="md" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <PixelContainer as="section" maxWidth="3xl" padding="lg" aria-labelledby="features-grid-title">
+      <PixelSectionHeader
+        id="features-grid-title"
+        align="center"
+        size="md"
+        title="Everything you need"
+        description="A complete ecosystem for building beautiful retro React interfaces."
+      />
+      <div className="mt-10">
+        <PixelGrid cols={{ base: 1, sm: 2, lg: 3 }} gap={4}>
           {FEATURES.map((f, i) => (
             <PixelFadeIn key={f.title} delay={i * 80}>
-              <PixelCard className="p-6 h-full">
-                <div className="mb-4">
-                  <PxlKitIcon icon={f.icon} size={24} colorful />
-                </div>
-                <h3 className="font-pixel text-xs text-retro-text mb-2 leading-relaxed">
-                  {f.title}
-                </h3>
-                <p className="text-retro-muted font-mono text-xs leading-relaxed">
-                  {f.description}
-                </p>
-              </PixelCard>
+              <PixelFeatureCard
+                className="h-full"
+                tone={f.tone}
+                icon={<PxlKitIcon icon={f.icon} size={24} colorful />}
+                title={f.title}
+                description={f.description}
+                descriptionLines={3}
+              />
             </PixelFadeIn>
           ))}
-        </div>
+        </PixelGrid>
       </div>
-    </PixelSection>
+    </PixelContainer>
   );
 }
 `;
@@ -97,9 +93,11 @@ import { AnimatedPxlKitIcon } from '@pxlkit/core';
 import { SparkleStar, CoinSpin, GlowingSword } from '@pxlkit/gamification';
 import {
   PixelSlideIn,
-  PixelFadeIn,
   PixelBadge,
-  PixelSection,
+  PixelContainer,
+  PixelStack,
+  PixelTwoColumn,
+  PixelHeroMedia,
 } from '@pxlkit/ui-kit';
 
 const FEATURES = [
@@ -128,36 +126,42 @@ const FEATURES = [
 
 export function AlternatingFeatures() {
   return (
-    <PixelSection className="py-16 sm:py-24">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+    <PixelContainer as="section" maxWidth="2xl" padding="lg">
+      <div className="space-y-24">
         {FEATURES.map((f, i) => (
-          <div
+          <PixelTwoColumn
             key={f.title}
-            className={\`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center \${i % 2 === 1 ? 'lg:flex-row-reverse' : ''}\`}
-          >
-            {/* Text side */}
-            <PixelSlideIn direction={i % 2 === 0 ? 'left' : 'right'}>
-              <PixelBadge tone={f.tone} className="mb-4 inline-block">
-                {f.badge}
-              </PixelBadge>
-              <h3 className="font-pixel text-base sm:text-xl text-retro-text leading-loose mb-4">
-                {f.title}
-              </h3>
-              <p className="text-retro-muted font-mono text-sm leading-relaxed">
-                {f.description}
-              </p>
-            </PixelSlideIn>
-
-            {/* Icon side */}
-            <PixelSlideIn direction={i % 2 === 0 ? 'right' : 'left'}>
-              <div className={\`flex items-center justify-center h-48 rounded-sm border border-retro-border bg-retro-surface/30 \${i % 2 === 1 ? 'lg:order-first' : ''}\`}>
-                <AnimatedPxlKitIcon icon={f.icon} size={80} colorful />
-              </div>
-            </PixelSlideIn>
-          </div>
+            ratio="50/50"
+            gap={12}
+            stackBelow="lg"
+            align="center"
+            reverse={i % 2 === 1}
+            left={
+              <PixelSlideIn from={i % 2 === 0 ? 'left' : 'right'}>
+                <PixelStack gap={4} align="start">
+                  <PixelBadge tone={f.tone}>{f.badge}</PixelBadge>
+                  <h3 className="font-pixel text-base sm:text-xl text-retro-text leading-loose">
+                    {f.title}
+                  </h3>
+                  <p className="text-retro-muted font-mono text-sm leading-relaxed">
+                    {f.description}
+                  </p>
+                </PixelStack>
+              </PixelSlideIn>
+            }
+            right={
+              <PixelSlideIn from={i % 2 === 0 ? 'right' : 'left'}>
+                <PixelHeroMedia ratio="16/10" framed tone={f.tone}>
+                  <div className="flex h-full w-full items-center justify-center bg-retro-surface/30">
+                    <AnimatedPxlKitIcon icon={f.icon} size={80} colorful />
+                  </div>
+                </PixelHeroMedia>
+              </PixelSlideIn>
+            }
+          />
         ))}
       </div>
-    </PixelSection>
+    </PixelContainer>
   );
 }
 `;
@@ -166,82 +170,73 @@ const bentoGrid = `\
 'use client';
 import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
-import { Package, Palette } from '@pxlkit/ui';
-import { ShieldCheck, Sparkles } from '@pxlkit/feedback';
+import { Palette } from '@pxlkit/ui';
+import { ShieldCheck } from '@pxlkit/feedback';
 import { SparkleStar, Trophy } from '@pxlkit/gamification';
 import {
-  PixelCard,
+  PixelBento,
+  PixelBentoCell,
   PixelStatCard,
   PixelProgress,
   PixelFadeIn,
-  PixelSection,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelCluster,
+  PixelStack,
 } from '@pxlkit/ui-kit';
 
 export function BentoFeatureGrid() {
   return (
-    <PixelSection className="py-16 sm:py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="font-pixel text-xl sm:text-2xl text-retro-text leading-loose mb-3">
-            Feature Bento
-          </h2>
-          <p className="text-retro-muted font-mono text-sm max-w-lg mx-auto">
-            Mix and match the grid layout to highlight your key features.
-          </p>
-        </div>
+    <PixelContainer as="section" maxWidth="3xl" padding="lg" aria-labelledby="bento-title">
+      <PixelSectionHeader
+        id="bento-title"
+        align="center"
+        size="md"
+        title="Feature Bento"
+        description="Mix and match the grid layout to highlight your key features."
+      />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-fr">
+      <PixelFadeIn className="mt-10">
+        <PixelBento columns={3} gap={4}>
           {/* Large card spanning 2 cols */}
-          <PixelFadeIn className="md:col-span-2" delay={0}>
-            <PixelCard className="h-full p-8 flex flex-col justify-between bg-retro-green/5 border-retro-green/20 min-h-48">
-              <div>
-                <AnimatedPxlKitIcon icon={SparkleStar} size={40} colorful />
-                <h3 className="font-pixel text-sm text-retro-text mt-4 mb-2 leading-relaxed">Pixel-perfect icons</h3>
-                <p className="text-retro-muted font-mono text-xs leading-relaxed">226+ SVG icons hand-crafted on a pixel grid. Crisp at any resolution.</p>
-              </div>
-              <div className="mt-6 flex gap-3">
-                <PixelStatCard label="Icons" value="226+" compact />
-                <PixelStatCard label="Packs" value="7" compact />
-              </div>
-            </PixelCard>
-          </PixelFadeIn>
+          <PixelBentoCell span="2x1" variant="feature" tone="green">
+            <AnimatedPxlKitIcon icon={SparkleStar} size={40} colorful />
+            <h3 className="font-pixel text-sm text-retro-text leading-relaxed">Pixel-perfect icons</h3>
+            <p className="text-retro-muted font-mono text-xs leading-relaxed">226+ SVG icons hand-crafted on a pixel grid. Crisp at any resolution.</p>
+            <PixelCluster gap={3} className="mt-auto">
+              <PixelStatCard label="Icons" value="226+" size="sm" />
+              <PixelStatCard label="Packs" value="7" size="sm" />
+            </PixelCluster>
+          </PixelBentoCell>
 
           {/* Tall card */}
-          <PixelFadeIn className="md:row-span-2" delay={100}>
-            <PixelCard className="h-full p-6 flex flex-col gap-6 min-h-96">
-              <div>
-                <PxlKitIcon icon={Palette} size={24} colorful />
-                <h3 className="font-pixel text-xs text-retro-text mt-3 mb-2 leading-relaxed">Design tokens</h3>
-                <p className="text-retro-muted font-mono text-xs">Complete CSS variable system.</p>
-              </div>
-              <div className="space-y-3">
-                <PixelProgress value={100} label="Dark mode" tone="green" />
-                <PixelProgress value={100} label="Light mode" tone="cyan" />
-                <PixelProgress value={90} label="Mobile" tone="gold" />
-                <PixelProgress value={85} label="Accessibility" tone="purple" />
-              </div>
-            </PixelCard>
-          </PixelFadeIn>
+          <PixelBentoCell span="1x2" variant="feature">
+            <PxlKitIcon icon={Palette} size={24} colorful />
+            <h3 className="font-pixel text-xs text-retro-text leading-relaxed">Design tokens</h3>
+            <p className="text-retro-muted font-mono text-xs">Complete CSS variable system.</p>
+            <PixelStack gap={3} className="w-full">
+              <PixelProgress value={100} label="Dark mode" tone="green" />
+              <PixelProgress value={100} label="Light mode" tone="cyan" />
+              <PixelProgress value={90} label="Mobile" tone="gold" />
+              <PixelProgress value={85} label="Accessibility" tone="purple" />
+            </PixelStack>
+          </PixelBentoCell>
 
           {/* Small cards */}
-          <PixelFadeIn delay={150}>
-            <PixelCard className="p-5 h-full min-h-36">
-              <PxlKitIcon icon={ShieldCheck} size={24} colorful />
-              <h3 className="font-pixel text-[10px] text-retro-text mt-3 mb-1 leading-relaxed">Type-safe</h3>
-              <p className="text-retro-muted font-mono text-xs">Full TypeScript support.</p>
-            </PixelCard>
-          </PixelFadeIn>
+          <PixelBentoCell span="1x1" variant="feature">
+            <PxlKitIcon icon={ShieldCheck} size={24} colorful />
+            <h3 className="font-pixel text-[10px] text-retro-text leading-relaxed">Type-safe</h3>
+            <p className="text-retro-muted font-mono text-xs">Full TypeScript support.</p>
+          </PixelBentoCell>
 
-          <PixelFadeIn delay={200}>
-            <PixelCard className="p-5 h-full bg-retro-gold/5 border-retro-gold/20 min-h-36">
-              <PxlKitIcon icon={Trophy} size={24} colorful />
-              <h3 className="font-pixel text-[10px] text-retro-text mt-3 mb-1 leading-relaxed">MIT License</h3>
-              <p className="text-retro-muted font-mono text-xs">Free forever, open-source.</p>
-            </PixelCard>
-          </PixelFadeIn>
-        </div>
-      </div>
-    </PixelSection>
+          <PixelBentoCell span="1x1" variant="feature" tone="gold">
+            <PxlKitIcon icon={Trophy} size={24} colorful />
+            <h3 className="font-pixel text-[10px] text-retro-text leading-relaxed">MIT License</h3>
+            <p className="text-retro-muted font-mono text-xs">Free forever, open-source.</p>
+          </PixelBentoCell>
+        </PixelBento>
+      </PixelFadeIn>
+    </PixelContainer>
   );
 }
 `;

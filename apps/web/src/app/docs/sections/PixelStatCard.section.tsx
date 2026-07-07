@@ -128,6 +128,17 @@ export function Default() {
   return <PixelStatCard label="Total users" value="12,480" tone="cyan" />
 }`}</code></pre>
       </article>
+      <article className="docs-example" id="example-toned-value-centered">
+        <h4>Toned value (centered)</h4>
+        <pre className="docs-code"><code>{`export function TonedValueCentered() {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <PixelStatCard label="Uptime" value="99.98%" tone="green" valueTone align="center" />
+      <PixelStatCard label="Error rate" value="0.02%" tone="red" valueTone align="center" />
+    </div>
+  )
+}`}</code></pre>
+      </article>
     </section>
     <section aria-label="Related components">
       <h3>Related</h3>

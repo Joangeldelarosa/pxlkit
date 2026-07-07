@@ -274,30 +274,30 @@ function App() {
     </div>
   );
 }`}</CodeBlock>
-            <div className="flex items-end gap-4 p-4 bg-retro-surface rounded-lg border border-retro-border/30 mt-4">
+            <div className="flex flex-wrap items-end gap-4 p-4 bg-retro-surface rounded-lg border border-retro-border/30 mt-4">
               <div className="text-center">
                 <PxlKitIcon icon={Trophy} size={32} />
-                <span className="block font-mono text-[9px] text-retro-muted mt-1">gamification</span>
+                <span className="block font-mono text-[10px] text-retro-muted mt-1">gamification</span>
               </div>
               <div className="text-center">
                 <PxlKitIcon icon={CheckCircle} size={32} />
-                <span className="block font-mono text-[9px] text-retro-muted mt-1">feedback</span>
+                <span className="block font-mono text-[10px] text-retro-muted mt-1">feedback</span>
               </div>
               <div className="text-center">
                 <PxlKitIcon icon={Heart} size={32} />
-                <span className="block font-mono text-[9px] text-retro-muted mt-1">social</span>
+                <span className="block font-mono text-[10px] text-retro-muted mt-1">social</span>
               </div>
               <div className="text-center">
                 <PxlKitIcon icon={Sun} size={32} />
-                <span className="block font-mono text-[9px] text-retro-muted mt-1">weather</span>
+                <span className="block font-mono text-[10px] text-retro-muted mt-1">weather</span>
               </div>
               <div className="text-center">
                 <PxlKitIcon icon={Trophy} size={32} appearance="solid" color="#00FF88" />
-                <span className="block font-mono text-[9px] text-retro-muted mt-1">solid</span>
+                <span className="block font-mono text-[10px] text-retro-muted mt-1">solid</span>
               </div>
               <div className="text-center">
                 <PxlKitIcon icon={Heart} size={48} appearance="tinted" color="#FFD700" />
-                <span className="block font-mono text-[9px] text-retro-muted mt-1">tinted</span>
+                <span className="block font-mono text-[10px] text-retro-muted mt-1">tinted</span>
               </div>
             </div>
           </Section>
@@ -321,10 +321,10 @@ function App() {
                       )}
                     </div>
                     <div>
-                      <p className="font-pixel text-[9px] text-retro-text mb-1">
+                      <p className="font-pixel text-[10px] text-retro-text mb-1">
                         @pxlkit/{pack.id}
                         {pack.icons.some(isAnimatedIcon) && (
-                          <span className="ml-1.5 px-1.5 py-0.5 text-[8px] bg-retro-gold/10 text-retro-gold border border-retro-gold/30 rounded">
+                          <span className="ml-1.5 px-1.5 py-0.5 font-mono text-[10px] bg-retro-gold/10 text-retro-gold border border-retro-gold/30 rounded">
                             +ANIMATED
                           </span>
                         )}
@@ -480,7 +480,7 @@ const solid = encodeHexColor('#FF0000');
 // Solid — every pixel becomes one colour
 <PxlKitIcon icon={Trophy} size={32} appearance="solid" color="#FF0000" />`}</CodeBlock>
             <div className="rounded-lg border border-retro-border/30 bg-retro-surface p-4 mt-2">
-              <p className="font-pixel text-[9px] text-retro-gold mb-3">MIGRATION FROM v1.2.x</p>
+              <p className="font-pixel text-[10px] text-retro-gold mb-3">MIGRATION FROM v1.2.x</p>
               <ul className="space-y-1.5 text-xs font-mono text-retro-muted">
                 <li>
                   <Code>{'<PxlKitIcon icon={X} colorful />'}</Code> → omit the prop
@@ -603,21 +603,21 @@ const monoSvg = generateAnimatedSvg(FireSword, {
   colorful: false,
   monoColor: '#00FF88',
 });`}</CodeBlock>
-            <div className="flex items-end gap-6 p-4 bg-retro-surface rounded-lg border border-retro-gold/30 mt-4">
+            <div className="flex flex-wrap items-end gap-6 p-4 bg-retro-surface rounded-lg border border-retro-gold/30 mt-4">
               <div className="text-center">
                 <AnimatedPxlKitIcon icon={FireSword} size={48} />
-                <p className="font-mono text-[9px] text-retro-muted mt-1">loop</p>
+                <p className="font-mono text-[10px] text-retro-muted mt-1">loop</p>
               </div>
               <div className="text-center">
                 <AnimatedPxlKitIcon icon={FireSword} size={48} trigger="hover" />
-                <p className="font-mono text-[9px] text-retro-muted mt-1">hover</p>
+                <p className="font-mono text-[10px] text-retro-muted mt-1">hover</p>
               </div>
               <div className="text-center">
                 <AnimatedPxlKitIcon icon={FireSword} size={48} trigger="ping-pong" />
-                <p className="font-mono text-[9px] text-retro-muted mt-1">ping-pong</p>
+                <p className="font-mono text-[10px] text-retro-muted mt-1">ping-pong</p>
               </div>
               <div className="ml-auto text-right">
-                <p className="font-pixel text-[9px] text-retro-gold mb-1">LIVE PREVIEW</p>
+                <p className="font-pixel text-[10px] text-retro-gold mb-1">LIVE PREVIEW</p>
                 <p className="font-mono text-[10px] text-retro-muted">FireSword &mdash; 4 frames &middot; 150ms</p>
                 <p className="font-mono text-[10px] text-retro-muted/50 mt-0.5">hover center icon to trigger it</p>
               </div>
@@ -742,21 +742,21 @@ import {
             <div className="flex flex-wrap items-end gap-6 p-4 bg-retro-surface rounded-lg border border-retro-gold/30 mt-4">
               <div className="text-center">
                 <ParallaxPxlKitIcon icon={GhostFriend} size={72} strength={16} interactive />
-                <p className="font-mono text-[9px] text-retro-muted mt-2">GhostFriend</p>
+                <p className="font-mono text-[10px] text-retro-muted mt-2">GhostFriend</p>
               </div>
               <div className="text-center">
                 <ParallaxPxlKitIcon icon={CoolEmoji} size={72} strength={16} interactive />
-                <p className="font-mono text-[9px] text-retro-muted mt-2">CoolEmoji</p>
+                <p className="font-mono text-[10px] text-retro-muted mt-2">CoolEmoji</p>
               </div>
               <div className="ml-auto text-right">
-                <p className="font-pixel text-[9px] text-retro-gold mb-1">LIVE 3D PREVIEW</p>
+                <p className="font-pixel text-[10px] text-retro-gold mb-1">LIVE 3D PREVIEW</p>
                 <p className="font-mono text-[10px] text-retro-muted">{ParallaxPack.length} parallax icons</p>
                 <p className="font-mono text-[10px] text-retro-muted/50 mt-0.5">move mouse to rotate · click to interact</p>
               </div>
             </div>
 
             <div className="p-4 bg-retro-surface rounded-lg border border-retro-gold/20 mt-4">
-              <p className="font-pixel text-[8px] text-retro-gold mb-2">UI KIT PARALLAX COMPONENTS</p>
+              <p className="font-pixel text-[10px] text-retro-gold mb-2">UI KIT PARALLAX COMPONENTS</p>
               <P>
                 The UI Kit also includes scroll-based and cursor-tracking parallax wrapper components:
                 <Code>PixelParallaxLayer</Code> (scroll-based), <Code>PixelParallaxGroup</Code> (clipped container),
@@ -808,7 +808,7 @@ function App() {
               with any Pxlkit icon — including animated ones.
             </P>
             <div className="p-4 bg-retro-surface rounded-lg border border-retro-cyan/20 mt-4">
-              <p className="font-pixel text-[8px] text-retro-cyan mb-2">DETAILED UI KIT DOCS</p>
+              <p className="font-pixel text-[10px] text-retro-cyan mb-2">DETAILED UI KIT DOCS</p>
               <p className="text-xs text-retro-muted">
                 Open the dedicated UI Kit section for interactive controls and full prop details:
               </p>
@@ -963,12 +963,12 @@ import { Trophy } from '@pxlkit/gamification';
               for each element. Use the sidebar to browse everything by category, including
               <Code>PixelToast</Code> and animation utilities.
             </P>
-            <a
+            <PixelTextLink
               href="/ui-kit"
-              className="inline-block mt-2 px-4 py-2 font-mono text-xs text-retro-cyan border border-retro-cyan/40 rounded hover:bg-retro-cyan/10 transition-colors"
+              className="inline-block mt-2 px-4 py-2 font-mono text-xs border border-retro-cyan/40 rounded hover:bg-retro-cyan/10 transition-colors no-underline"
             >
               Open Full UI Kit Documentation →
-            </a>
+            </PixelTextLink>
           </Section>
 
           {/* Component Reference — SSOT-generated per-component docs.
@@ -987,12 +987,12 @@ import { Trophy } from '@pxlkit/gamification';
               the <PixelTextLink href="/ui-kit">UI Kit showcase</PixelTextLink>.
             </P>
             <div className="space-y-1.5">
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">ACTIONS (4)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">ACTIONS (4)</h3>
               <section id="pixel-bare-button" className="scroll-mt-24"><ComponentDocs slug="pixel-bare-button" /></section>
               <section id="pixel-button" className="scroll-mt-24"><ComponentDocs slug="pixel-button" /></section>
               <section id="pixel-split-button" className="scroll-mt-24"><ComponentDocs slug="pixel-split-button" /></section>
               <section id="pxl-kit-button" className="scroll-mt-24"><ComponentDocs slug="pxl-kit-button" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">FORMS (24)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">FORMS (24)</h3>
               <section id="pixel-bare-input" className="scroll-mt-24"><ComponentDocs slug="pixel-bare-input" /></section>
               <section id="pixel-bare-textarea" className="scroll-mt-24"><ComponentDocs slug="pixel-bare-textarea" /></section>
               <section id="pixel-calendar-grid" className="scroll-mt-24"><ComponentDocs slug="pixel-calendar-grid" /></section>
@@ -1017,7 +1017,7 @@ import { Trophy } from '@pxlkit/gamification';
               <section id="pixel-textarea" className="scroll-mt-24"><ComponentDocs slug="pixel-textarea" /></section>
               <section id="pixel-toggle" className="scroll-mt-24"><ComponentDocs slug="pixel-toggle" /></section>
               <section id="pixel-toggle-group" className="scroll-mt-24"><ComponentDocs slug="pixel-toggle-group" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">DATA DISPLAY (19)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">DATA DISPLAY (19)</h3>
               <section id="pixel-area-chart" className="scroll-mt-24"><ComponentDocs slug="pixel-area-chart" /></section>
               <section id="pixel-avatar" className="scroll-mt-24"><ComponentDocs slug="pixel-avatar" /></section>
               <section id="pixel-avatar-group" className="scroll-mt-24"><ComponentDocs slug="pixel-avatar-group" /></section>
@@ -1037,7 +1037,7 @@ import { Trophy } from '@pxlkit/gamification';
               <section id="pixel-table" className="scroll-mt-24"><ComponentDocs slug="pixel-table" /></section>
               <section id="pixel-text-link" className="scroll-mt-24"><ComponentDocs slug="pixel-text-link" /></section>
               <section id="pixel-timeline" className="scroll-mt-24"><ComponentDocs slug="pixel-timeline" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">CARDS (8)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">CARDS (8)</h3>
               <section id="pixel-card" className="scroll-mt-24"><ComponentDocs slug="pixel-card" /></section>
               <section id="pixel-feature-card" className="scroll-mt-24"><ComponentDocs slug="pixel-feature-card" /></section>
               <section id="pixel-icon-frame" className="scroll-mt-24"><ComponentDocs slug="pixel-icon-frame" /></section>
@@ -1046,10 +1046,10 @@ import { Trophy } from '@pxlkit/gamification';
               <section id="pixel-star-rating" className="scroll-mt-24"><ComponentDocs slug="pixel-star-rating" /></section>
               <section id="pixel-stat-card" className="scroll-mt-24"><ComponentDocs slug="pixel-stat-card" /></section>
               <section id="pixel-testimonial-card" className="scroll-mt-24"><ComponentDocs slug="pixel-testimonial-card" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">HERO (2)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">HERO (2)</h3>
               <section id="pixel-hero-media" className="scroll-mt-24"><ComponentDocs slug="pixel-hero-media" /></section>
               <section id="pixel-hero-section" className="scroll-mt-24"><ComponentDocs slug="pixel-hero-section" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">FEEDBACK (7)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">FEEDBACK (7)</h3>
               <section id="pixel-alert" className="scroll-mt-24"><ComponentDocs slug="pixel-alert" /></section>
               <section id="pixel-empty-state" className="scroll-mt-24"><ComponentDocs slug="pixel-empty-state" /></section>
               <section id="pixel-progress" className="scroll-mt-24"><ComponentDocs slug="pixel-progress" /></section>
@@ -1057,7 +1057,7 @@ import { Trophy } from '@pxlkit/gamification';
               <section id="pixel-spinner" className="scroll-mt-24"><ComponentDocs slug="pixel-spinner" /></section>
               <section id="pixel-toast" className="scroll-mt-24"><ComponentDocs slug="pixel-toast" /></section>
               <section id="pxl-kit-toast-provider" className="scroll-mt-24"><ComponentDocs slug="pxl-kit-toast-provider" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">NAVIGATION (8)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">NAVIGATION (8)</h3>
               <section id="pixel-accordion" className="scroll-mt-24"><ComponentDocs slug="pixel-accordion" /></section>
               <section id="pixel-breadcrumb" className="scroll-mt-24"><ComponentDocs slug="pixel-breadcrumb" /></section>
               <section id="pixel-menubar" className="scroll-mt-24"><ComponentDocs slug="pixel-menubar" /></section>
@@ -1066,7 +1066,7 @@ import { Trophy } from '@pxlkit/gamification';
               <section id="pixel-sidebar" className="scroll-mt-24"><ComponentDocs slug="pixel-sidebar" /></section>
               <section id="pixel-stepper" className="scroll-mt-24"><ComponentDocs slug="pixel-stepper" /></section>
               <section id="pixel-tabs" className="scroll-mt-24"><ComponentDocs slug="pixel-tabs" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">OVERLAYS (7)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">OVERLAYS (7)</h3>
               <section id="pixel-alert-dialog" className="scroll-mt-24"><ComponentDocs slug="pixel-alert-dialog" /></section>
               <section id="pixel-command" className="scroll-mt-24"><ComponentDocs slug="pixel-command" /></section>
               <section id="pixel-drawer" className="scroll-mt-24"><ComponentDocs slug="pixel-drawer" /></section>
@@ -1074,12 +1074,12 @@ import { Trophy } from '@pxlkit/gamification';
               <section id="pixel-modal" className="scroll-mt-24"><ComponentDocs slug="pixel-modal" /></section>
               <section id="pixel-sheet" className="scroll-mt-24"><ComponentDocs slug="pixel-sheet" /></section>
               <section id="pixel-tooltip" className="scroll-mt-24"><ComponentDocs slug="pixel-tooltip" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">OVERLAY FOUNDATION (4)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">OVERLAY FOUNDATION (4)</h3>
               <section id="pixel-popover" className="scroll-mt-24"><ComponentDocs slug="pixel-popover" /></section>
               <section id="pixel-portal" className="scroll-mt-24"><ComponentDocs slug="pixel-portal" /></section>
               <section id="pxl-kit-locale-provider" className="scroll-mt-24"><ComponentDocs slug="pxl-kit-locale-provider" /></section>
               <section id="pxl-kit-surface-provider" className="scroll-mt-24"><ComponentDocs slug="pxl-kit-surface-provider" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">LAYOUT (14)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">LAYOUT (14)</h3>
               <section id="pixel-bento" className="scroll-mt-24"><ComponentDocs slug="pixel-bento" /></section>
               <section id="pixel-bento-cell" className="scroll-mt-24"><ComponentDocs slug="pixel-bento-cell" /></section>
               <section id="pixel-box" className="scroll-mt-24"><ComponentDocs slug="pixel-box" /></section>
@@ -1094,7 +1094,7 @@ import { Trophy } from '@pxlkit/gamification';
               <section id="pixel-section-header" className="scroll-mt-24"><ComponentDocs slug="pixel-section-header" /></section>
               <section id="pixel-stack" className="scroll-mt-24"><ComponentDocs slug="pixel-stack" /></section>
               <section id="pixel-two-column" className="scroll-mt-24"><ComponentDocs slug="pixel-two-column" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">ANIMATIONS (11)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">ANIMATIONS (11)</h3>
               <section id="pixel-bounce" className="scroll-mt-24"><ComponentDocs slug="pixel-bounce" /></section>
               <section id="pixel-fade-in" className="scroll-mt-24"><ComponentDocs slug="pixel-fade-in" /></section>
               <section id="pixel-flicker" className="scroll-mt-24"><ComponentDocs slug="pixel-flicker" /></section>
@@ -1106,7 +1106,7 @@ import { Trophy } from '@pxlkit/gamification';
               <section id="pixel-slide-in" className="scroll-mt-24"><ComponentDocs slug="pixel-slide-in" /></section>
               <section id="pixel-typewriter" className="scroll-mt-24"><ComponentDocs slug="pixel-typewriter" /></section>
               <section id="pixel-zoom-in" className="scroll-mt-24"><ComponentDocs slug="pixel-zoom-in" /></section>
-              <h3 className="font-pixel text-[9px] text-retro-cyan pt-4">PARALLAX (3)</h3>
+              <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">PARALLAX (3)</h3>
               <section id="pixel-mouse-parallax" className="scroll-mt-24"><ComponentDocs slug="pixel-mouse-parallax" /></section>
               <section id="pixel-parallax-group" className="scroll-mt-24"><ComponentDocs slug="pixel-parallax-group" /></section>
               <section id="pixel-parallax-layer" className="scroll-mt-24"><ComponentDocs slug="pixel-parallax-layer" /></section>
@@ -1141,7 +1141,7 @@ import { Trophy } from '@pxlkit/gamification';
               </li>
             </ul>
             <div className="p-4 bg-retro-surface rounded-lg border border-retro-green/20 mt-4">
-              <p className="font-pixel text-[8px] text-retro-green mb-2">NAMING CONVENTIONS</p>
+              <p className="font-pixel text-[10px] text-retro-green mb-2">NAMING CONVENTIONS</p>
               <ul className="text-xs font-mono text-retro-muted space-y-1">
                 <li>Icon names: <Code>kebab-case</Code> (e.g., fire-sword)</li>
                 <li>Export names: <Code>PascalCase</Code> (e.g., FireSword)</li>

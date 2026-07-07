@@ -243,24 +243,6 @@ const CATEGORY_FILTER: { label: string; value: ChangeCategory | 'all' }[] = [
   { label: 'Deps', value: 'Deps' },
 ];
 
-/**
- * Thin wrapper that carries the `value` prop PixelChipGroup reads off children
- * for selection wiring. PixelChip itself is purely presentational and doesn't
- * declare `value` in its TS surface, so we declare it here.
- */
-function FilterChip({
-  label,
-  tone,
-  variant,
-}: {
-  value: string;
-  label: string;
-  tone: 'cyan' | 'gold' | 'green' | 'red';
-  variant: 'solid' | 'soft';
-}) {
-  return <PixelChip label={label} tone={tone} variant={variant} />;
-}
-
 function formatDate(iso: string): string {
   const d = new Date(`${iso}T00:00:00Z`);
   return d.toLocaleDateString('en-US', {
@@ -380,7 +362,7 @@ export function PixelChangelogTemplate({
         size="lg"
       />
 
-      <div className="mt-12">
+      <div className="mt-10">
         <PixelTwoColumn
           ratio="70/30"
           gap={8}
@@ -423,7 +405,7 @@ export function PixelChangelogTemplate({
                     aria-label="Filter changelog entries by category"
                   >
                     {CATEGORY_FILTER.map((c) => (
-                      <FilterChip
+                      <PixelChip
                         key={c.value}
                         value={c.value}
                         label={c.label}
@@ -453,7 +435,7 @@ export function PixelChangelogTemplate({
                     aria-label="Filter changelog entries by version"
                   >
                     {releases.map((r) => (
-                      <FilterChip
+                      <PixelChip
                         key={r.version}
                         value={r.version}
                         label={`v${r.version}`}

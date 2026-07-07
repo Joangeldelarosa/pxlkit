@@ -83,7 +83,7 @@ export function HeroCinematic() {
           </div>
 
           {/* Install command */}
-          <div className="max-w-[calc(100vw-2rem)] inline-block rounded-lg border border-retro-border/60 bg-retro-bg/80 backdrop-blur-sm px-3 sm:px-5 py-2 sm:py-2.5 font-mono text-[11px] sm:text-sm text-retro-fg break-words">
+          <div className="max-w-[calc(100vw-2rem)] inline-block rounded-lg border border-retro-border/60 bg-retro-bg/80 backdrop-blur-sm px-3 sm:px-5 py-2 sm:py-2.5 font-mono text-[11px] sm:text-sm text-retro-text break-words">
             <span className="text-retro-green mr-2">$</span>
             npm i @pxlkit/core @pxlkit/ui-kit @pxlkit/ui
             <span className="text-retro-muted ml-2">— ready in seconds</span>

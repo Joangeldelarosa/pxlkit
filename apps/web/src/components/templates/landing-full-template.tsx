@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/core';
 import { ArrowRight, Check, Package, Grid, ExternalLink } from '@pxlkit/ui';
 import {
@@ -19,6 +18,7 @@ import { ShieldCheck, Sparkles, CheckCircle, Mail, Bell } from '@pxlkit/feedback
 import {
   PixelButton,
   PixelBadge,
+  PixelCard,
   PixelChip,
   PixelContainer,
   PixelCluster,
@@ -355,7 +355,7 @@ const FOOTER_COLUMNS: { heading: string; links: string[] }[] = [
 function StickyNav() {
   return (
     <header
-      className="sticky top-0 z-30 w-full border-b border-retro-border/60 bg-retro-bg/85 backdrop-blur supports-[backdrop-filter]:bg-retro-bg/70"
+      className="sticky top-0 z-40 w-full border-b border-retro-border/60 bg-retro-bg/85 backdrop-blur supports-[backdrop-filter]:bg-retro-bg/70"
     >
       <PixelContainer as="div" maxWidth="xl" padding={{ x: 'lg', y: 'none' }}>
         <PixelCluster gap={4} align="center" justify="between" className="py-3">
@@ -428,10 +428,13 @@ function HeroSection() {
 
         <div className="absolute bottom-5 right-5 flex flex-col items-end gap-3">
           <PixelFloat duration={2800} distance={6}>
-            <span className="inline-flex items-center gap-1.5 rounded-md border border-retro-cyan/40 bg-retro-cyan/10 px-2 py-1 font-mono text-[11px] text-retro-cyan tracking-wide">
-              <AnimatedPxlKitIcon icon={SparkleStar} size={12} colorful />
+            <PixelBadge
+              tone="cyan"
+              size="sm"
+              iconLeft={<AnimatedPxlKitIcon icon={SparkleStar} size={12} colorful />}
+            >
               AI suggested
-            </span>
+            </PixelBadge>
           </PixelFloat>
           <PixelFloat duration={3200} distance={8}>
             <PxlKitIcon icon={Lightning} size={28} colorful />
@@ -498,7 +501,7 @@ function TrustedBySection() {
         eyebrow="Trusted by 6,000+ teams"
         title="Engineering orgs that ship every day run on Pixelpad"
       />
-      <div className="mt-8">
+      <div className="mt-10">
         <PixelCluster gap={4} align="center" justify="center">
           {TRUSTED_BY.map((logo) => (
             <PixelBadge key={logo} tone="neutral" variant="soft" size="md">
@@ -599,7 +602,7 @@ function FeatureGridSection() {
         description="Every feature ships behind the same product principle: respect the developer's flow, kill the busywork, and never charge per integration."
       />
 
-      <div className="mt-12">
+      <div className="mt-10">
         <PixelEqualHeightGrid cols={{ base: 1, sm: 2, lg: 3 }} gap={5}>
           {FEATURES.map((f) => (
             <PixelFeatureCard
@@ -634,7 +637,7 @@ function DeepDiveSection() {
         title="Three loops Pixelpad makes obviously better"
       />
 
-      <div className="mt-12 space-y-12">
+      <div className="mt-10 space-y-12">
         {DEEP_FEATURES.map((f, i) => {
           const left = (
             <PixelStack gap={4} align="start">
@@ -743,7 +746,7 @@ function PricingSection() {
         description="Free forever for solo work. Pay only when you add teammates or unlock the security primitives your CISO asks for."
       />
 
-      <div className="mt-12">
+      <div className="mt-10">
         <PixelEqualHeightGrid cols={{ base: 1, sm: 2, lg: 4 }} gap={5}>
           {PLANS.map((plan) => (
             <div key={plan.name} className="relative">
@@ -806,7 +809,7 @@ function TestimonialsSection() {
         description="Six unedited quotes from teams shipping on Pixelpad today."
       />
 
-      <div className="mt-12">
+      <div className="mt-10">
         <PixelCarousel
           aria-label="Customer testimonials"
           opts={{ loop: true, align: 'start' }}
@@ -877,7 +880,7 @@ function FaqSection() {
 function CtaSection() {
   return (
     <PixelContainer as="section" id="cta" maxWidth="lg" padding="xl" aria-labelledby="cta-title">
-      <div className="rounded-xl border border-retro-green/40 bg-retro-green/5 px-6 py-12 sm:px-10 sm:py-16">
+      <PixelCard tone="green" padding="lg" className="py-12 sm:px-10 sm:py-16">
         <PixelStack gap={5} align="center" className="text-center">
           <PixelBadge tone="green" variant="soft" size="md">
             <span className="inline-flex items-center gap-1.5">
@@ -922,7 +925,7 @@ function CtaSection() {
             </span>
           </PixelCluster>
         </PixelStack>
-      </div>
+      </PixelCard>
     </PixelContainer>
   );
 }

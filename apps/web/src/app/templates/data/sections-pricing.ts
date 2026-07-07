@@ -6,14 +6,14 @@ const simplePricingCards = `\
 'use client';
 import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon } from '@pxlkit/core';
-import { Check, ArrowRight } from '@pxlkit/ui';
+import { ArrowRight } from '@pxlkit/ui';
 import {
-  PixelCard,
+  PixelPricingCard,
   PixelButton,
-  PixelBadge,
-  PixelDivider,
   PixelFadeIn,
-  PixelSection,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelEqualHeightGrid,
 } from '@pxlkit/ui-kit';
 
 const PLANS = [
@@ -51,60 +51,45 @@ const PLANS = [
 
 export function SimplePricingCards() {
   return (
-    <PixelSection className="py-16 sm:py-24">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="font-pixel text-xl sm:text-2xl text-retro-text leading-loose mb-3">
-            Simple pricing
-          </h2>
-          <p className="text-retro-muted font-mono text-sm">
-            No hidden fees. Cancel anytime.
-          </p>
-        </div>
+    <PixelContainer as="section" maxWidth="2xl" padding="lg" aria-labelledby="pricing-title">
+      <PixelSectionHeader
+        id="pricing-title"
+        align="center"
+        size="md"
+        title="Simple pricing"
+        description="No hidden fees. Cancel anytime."
+      />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="mt-10">
+        <PixelEqualHeightGrid cols={{ base: 1, md: 3 }} gap={6}>
           {PLANS.map((plan, i) => (
-            <PixelFadeIn key={plan.name} delay={i * 100}>
-              <PixelCard
-                className={\`p-6 h-full flex flex-col \${plan.highlight ? 'border-retro-green/50 bg-retro-green/5' : ''}\`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-pixel text-xs text-retro-text">{plan.name}</span>
-                  {plan.highlight && <PixelBadge tone="green">Popular</PixelBadge>}
-                </div>
-
-                <div className="mb-4">
-                  <span className="font-pixel text-2xl text-retro-text">{plan.price}</span>
-                  <span className="text-retro-muted font-mono text-xs ml-1">{plan.period}</span>
-                </div>
-
-                <p className="text-retro-muted font-mono text-xs mb-4">{plan.description}</p>
-                <PixelDivider tone="neutral" spacing="sm" />
-
-                <ul className="space-y-2 mb-6 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 font-mono text-xs text-retro-text">
-                      <PxlKitIcon icon={Check} size={12} className="text-retro-green flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <PixelButton
-                  tone={plan.tone}
-                  size="md"
-                  variant={plan.highlight ? 'solid' : 'outline'}
-                  className="w-full justify-center"
-                >
-                  {plan.cta}
-                  <PxlKitIcon icon={ArrowRight} size={12} className="ml-1.5" />
-                </PixelButton>
-              </PixelCard>
+            <PixelFadeIn key={plan.name} delay={i * 100} className="h-full">
+              <PixelPricingCard
+                className="h-full"
+                tone={plan.tone}
+                highlight={plan.highlight}
+                popular={plan.highlight ? { label: 'Popular', tone: 'green' } : undefined}
+                name={plan.name}
+                description={plan.description}
+                price={{ amount: plan.price, period: plan.period }}
+                features={plan.features.map((label) => ({ label }))}
+                cta={
+                  <PixelButton
+                    tone={plan.tone}
+                    size="md"
+                    variant={plan.highlight ? 'solid' : 'outline'}
+                    className="w-full justify-center"
+                    iconRight={<PxlKitIcon icon={ArrowRight} size={12} />}
+                  >
+                    {plan.cta}
+                  </PixelButton>
+                }
+              />
             </PixelFadeIn>
           ))}
-        </div>
+        </PixelEqualHeightGrid>
       </div>
-    </PixelSection>
+    </PixelContainer>
   );
 }
 `;
@@ -118,7 +103,9 @@ import {
   PixelTable,
   PixelBadge,
   PixelButton,
-  PixelSection,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelGrid,
 } from '@pxlkit/ui-kit';
 
 const ROWS = [
@@ -138,53 +125,55 @@ function Val({ val }: { val: string | boolean }) {
 
 export function ComparisonTable() {
   return (
-    <PixelSection className="py-16 sm:py-24">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="font-pixel text-xl sm:text-2xl text-retro-text leading-loose mb-3">
-            Compare plans
-          </h2>
-        </div>
+    <PixelContainer as="section" maxWidth="lg" padding="lg" aria-labelledby="compare-title">
+      <PixelSectionHeader
+        id="compare-title"
+        align="center"
+        size="md"
+        title="Compare plans"
+      />
 
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse font-mono text-sm">
-            <thead>
-              <tr className="border-b border-retro-border">
-                <th className="text-left py-3 px-4 text-retro-muted text-xs">Feature</th>
-                <th className="py-3 px-4 text-center">
-                  <span className="text-retro-text text-xs font-pixel">Free</span>
-                </th>
-                <th className="py-3 px-4 text-center">
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-retro-green text-xs font-pixel">Pro</span>
-                    <PixelBadge tone="green" className="text-[8px]">Popular</PixelBadge>
-                  </div>
-                </th>
-                <th className="py-3 px-4 text-center">
-                  <span className="text-retro-cyan text-xs font-pixel">Team</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {ROWS.map((row) => (
-                <tr key={row.feature} className="border-b border-retro-border/50 hover:bg-retro-surface/30 transition-colors">
-                  <td className="py-3 px-4 text-retro-muted text-xs">{row.feature}</td>
-                  <td className="py-3 px-4 text-center"><Val val={row.free} /></td>
-                  <td className="py-3 px-4 text-center bg-retro-green/5"><Val val={row.pro} /></td>
-                  <td className="py-3 px-4 text-center"><Val val={row.team} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-3">
-          <PixelButton tone="neutral" size="md" variant="outline" className="justify-center">Free — $0/mo</PixelButton>
-          <PixelButton tone="green" size="md" className="justify-center">Pro — $12/mo</PixelButton>
-          <PixelButton tone="cyan" size="md" variant="outline" className="justify-center">Team — $39/mo</PixelButton>
-        </div>
+      <div className="mt-10">
+        <PixelTable
+          columns={[
+            { key: 'feature', header: 'Feature' },
+            {
+              key: 'free',
+              align: 'center',
+              header: <span className="text-retro-text text-xs font-pixel">Free</span>,
+            },
+            {
+              key: 'pro',
+              align: 'center',
+              className: 'bg-retro-green/5',
+              header: (
+                <span className="inline-flex flex-col items-center gap-1">
+                  <span className="text-retro-green text-xs font-pixel">Pro</span>
+                  <PixelBadge tone="green" size="sm">Popular</PixelBadge>
+                </span>
+              ),
+            },
+            {
+              key: 'team',
+              align: 'center',
+              header: <span className="text-retro-cyan text-xs font-pixel">Team</span>,
+            },
+          ]}
+          data={ROWS.map((row) => ({
+            feature: row.feature,
+            free: <Val val={row.free} />,
+            pro: <Val val={row.pro} />,
+            team: <Val val={row.team} />,
+          }))}
+        />
       </div>
-    </PixelSection>
+
+      <PixelGrid cols={{ base: 1, md: 3 }} gap={3} className="mt-8">
+        <PixelButton tone="neutral" size="md" variant="outline" className="justify-center">Free — $0/mo</PixelButton>
+        <PixelButton tone="green" size="md" className="justify-center">Pro — $12/mo</PixelButton>
+        <PixelButton tone="cyan" size="md" variant="outline" className="justify-center">Team — $39/mo</PixelButton>
+      </PixelGrid>
+    </PixelContainer>
   );
 }
 `;
@@ -194,14 +183,16 @@ const togglePricing = `\
 import '@pxlkit/ui-kit/styles.css';
 import { useState } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
-import { Check, ArrowRight } from '@pxlkit/ui';
+import { ArrowRight } from '@pxlkit/ui';
 import {
-  PixelCard,
+  PixelPricingCard,
   PixelButton,
   PixelBadge,
   PixelSegmented,
   PixelSlideIn,
-  PixelSection,
+  PixelContainer,
+  PixelSectionHeader,
+  PixelEqualHeightGrid,
 } from '@pxlkit/ui-kit';
 
 const PLANS = [
@@ -214,66 +205,58 @@ export function TogglePricing() {
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly');
 
   return (
-    <PixelSection className="py-16 sm:py-24">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <h2 className="font-pixel text-xl sm:text-2xl text-retro-text leading-loose mb-6">
-            Choose your plan
-          </h2>
-          <div className="flex items-center justify-center gap-4">
-            <PixelSegmented
-              options={[
-                { value: 'monthly', label: 'Monthly' },
-                { value: 'yearly', label: 'Yearly' },
-              ]}
-              value={billing}
-              onChange={(v) => setBilling(v as 'monthly' | 'yearly')}
-            />
-            {billing === 'yearly' && (
-              <PixelBadge tone="green" className="text-xs">Save 20%</PixelBadge>
-            )}
-          </div>
-        </div>
+    <PixelContainer as="section" maxWidth="2xl" padding="lg" aria-labelledby="toggle-pricing-title">
+      <PixelSectionHeader
+        id="toggle-pricing-title"
+        align="center"
+        size="md"
+        title="Choose your plan"
+        actions={
+          <PixelSegmented
+            label=""
+            options={[
+              { value: 'monthly', label: 'Monthly' },
+              { value: 'yearly', label: 'Yearly' },
+            ]}
+            value={billing}
+            onChange={(v) => setBilling(v as 'monthly' | 'yearly')}
+          />
+        }
+      />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="mt-10">
+        <PixelEqualHeightGrid cols={{ base: 1, md: 3 }} gap={6}>
           {PLANS.map((plan, i) => (
-            <PixelSlideIn key={plan.name} direction="up" delay={i * 80}>
-              <PixelCard
-                className={\`p-6 h-full flex flex-col \${'highlight' in plan && plan.highlight ? 'border-retro-green/40 bg-retro-green/5' : ''}\`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="font-pixel text-xs text-retro-text">{plan.name}</span>
-                  {'highlight' in plan && plan.highlight && <PixelBadge tone="green">Best value</PixelBadge>}
-                </div>
-                <div className="mb-6">
-                  <span className="font-pixel text-2xl text-retro-text">
-                    \${billing === 'monthly' ? plan.monthly : plan.yearly}
-                  </span>
-                  <span className="text-retro-muted font-mono text-xs ml-1">/mo</span>
-                </div>
-                <ul className="space-y-2 mb-6 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 font-mono text-xs text-retro-text">
-                      <PxlKitIcon icon={Check} size={12} className="text-retro-green flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <PixelButton
-                  tone={plan.tone}
-                  size="md"
-                  variant={'highlight' in plan && plan.highlight ? 'solid' : 'outline'}
-                  className="w-full justify-center"
-                >
-                  Get {plan.name}
-                  <PxlKitIcon icon={ArrowRight} size={12} className="ml-1.5" />
-                </PixelButton>
-              </PixelCard>
+            <PixelSlideIn key={plan.name} from="up" delay={i * 80} className="h-full">
+              <PixelPricingCard
+                className="h-full"
+                tone={plan.tone}
+                highlight={'highlight' in plan && plan.highlight}
+                popular={'highlight' in plan && plan.highlight ? { label: 'Best value', tone: 'green' } : undefined}
+                name={plan.name}
+                descriptionLines="none"
+                price={{ amount: \`$\${billing === 'monthly' ? plan.monthly : plan.yearly}\`, period: '/mo' }}
+                priceBadge={
+                  billing === 'yearly' ? <PixelBadge tone="green" size="sm">Save 20%</PixelBadge> : undefined
+                }
+                features={plan.features.map((label) => ({ label }))}
+                cta={
+                  <PixelButton
+                    tone={plan.tone}
+                    size="md"
+                    variant={'highlight' in plan && plan.highlight ? 'solid' : 'outline'}
+                    className="w-full justify-center"
+                    iconRight={<PxlKitIcon icon={ArrowRight} size={12} />}
+                  >
+                    Get {plan.name}
+                  </PixelButton>
+                }
+              />
             </PixelSlideIn>
           ))}
-        </div>
+        </PixelEqualHeightGrid>
       </div>
-    </PixelSection>
+    </PixelContainer>
   );
 }
 `;

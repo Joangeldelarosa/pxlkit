@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { PixelBareButton } from '@pxlkit/ui-kit';
 import { useTheme } from './ThemeProvider';
 import { BrandMark } from './Logo';
 
@@ -136,8 +137,7 @@ export function Navbar() {
           })}
 
           {/* Theme toggle */}
-          <button
-            type="button"
+          <PixelBareButton
             onClick={toggleTheme}
             className="ml-2 p-2 rounded border border-retro-border/50 text-retro-muted hover:text-retro-gold hover:border-retro-gold/40 hover:bg-retro-gold/10 transition-all"
             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
@@ -148,7 +148,7 @@ export function Navbar() {
             ) : (
               <MoonIcon className="w-4 h-4" />
             )}
-          </button>
+          </PixelBareButton>
 
           {/* Star on GitHub */}
           <a
@@ -167,8 +167,7 @@ export function Navbar() {
 
         {/* Mobile: theme toggle + hamburger */}
         <div className="flex lg:hidden items-center gap-1">
-          <button
-            type="button"
+          <PixelBareButton
             onClick={toggleTheme}
             className="p-2 rounded border border-retro-border/50 text-retro-muted hover:text-retro-gold hover:border-retro-gold/40 transition-all"
             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
@@ -178,9 +177,8 @@ export function Navbar() {
             ) : (
               <MoonIcon className="w-4 h-4" />
             )}
-          </button>
-          <button
-            type="button"
+          </PixelBareButton>
+          <PixelBareButton
             onClick={() => setMenuOpen(!menuOpen)}
             className="p-2 rounded border border-retro-border/50 text-retro-muted hover:text-retro-green hover:border-retro-green/40 transition-all"
             aria-label="Toggle menu"
@@ -207,7 +205,7 @@ export function Navbar() {
                 </>
               )}
             </svg>
-          </button>
+          </PixelBareButton>
         </div>
       </nav>
 
