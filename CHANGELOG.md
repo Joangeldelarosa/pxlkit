@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [ui-kit 2.1.1] - 2026-08-08 — Bordered surface-token fix
+
+A patch release: `bordered` emitted a border width with no border color, so the
+border took whatever color it inherited instead of the kit's surface token.
+
+### Fixed — `@pxlkit/ui-kit` v2.1.1
+
+- `PixelCenter`, `PixelTwoColumn`, `PixelScrollArea`, `PixelCollapsible`,
+  `PixelSparkline`, `PixelBarChart` and `PixelAreaChart` now emit
+  `border-retro-border` alongside the border-width utility whenever `bordered`
+  is set. Each gains a mirrored test asserting both classes, so the pairing
+  cannot silently regress.
+
 ## [ui-kit 2.1.0 / core 1.3.4] - 2026-07-06 — Responsive hardening + dogfooding pass
 
 A full mobile-responsiveness audit of the kit (320–430px, statically audited and

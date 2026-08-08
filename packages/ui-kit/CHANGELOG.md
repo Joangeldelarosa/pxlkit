@@ -1,6 +1,6 @@
 # @pxlkit/ui-kit — Changelog
 
-## Unreleased
+## 2.1.1 — 2026-08-08
 
 ### Fixed
 - `bordered` now pairs the border width with the kit's border color token. `PixelCenter`, `PixelTwoColumn`, `PixelScrollArea`, `PixelCollapsible`, `PixelSparkline`, `PixelBarChart` and `PixelAreaChart` applied the border-width utility without `border-retro-border`, so the rendered border fell back to the ambient/inherited color instead of the surface token. Each component now has a mirrored test asserting both classes are present.
