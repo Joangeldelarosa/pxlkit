@@ -29,4 +29,11 @@ describe('PixelCenter', () => {
     const el = getByTestId('center');
     expect(el.className).toContain('text-center');
   });
+
+  it('bordered pairs the border width with a border color', () => {
+    const { getByTestId } = render(<PixelCenter data-testid="center" bordered />);
+    const el = getByTestId('center');
+    expect(el.className).toContain('border-2');
+    expect(el.className).toContain('border-retro-border');
+  });
 });

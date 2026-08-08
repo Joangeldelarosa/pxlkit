@@ -47,6 +47,17 @@ describe('PixelScrollArea', () => {
     expect(el.className).toContain('pxl-scroll-always');
   });
 
+  it('bordered pairs the border width with a border color', () => {
+    const { getByTestId } = render(
+      <PixelScrollArea data-testid="sa" bordered aria-label="Scrollable content">
+        <div>x</div>
+      </PixelScrollArea>,
+    );
+    const el = getByTestId('sa');
+    expect(el.className).toContain('border-2');
+    expect(el.className).toContain('border-retro-border');
+  });
+
   it('forwards className', () => {
     const { getByTestId } = render(
       <PixelScrollArea data-testid="sa" className="custom-cls">

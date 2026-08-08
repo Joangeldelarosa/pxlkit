@@ -106,6 +106,7 @@ export const PixelScrollArea = forwardRef<HTMLDivElement, PixelScrollAreaProps>(
         typeClass[resolvedVariant],
         bordered && s.border,
         bordered && s.radius,
+        bordered && 'border-retro-border',
         s.font,
         surface === 'pixel' ? 'pxl-scroll-pixel' : 'pxl-scroll-linear',
         className,

@@ -35,6 +35,14 @@ describe('PixelAreaChart', () => {
     expect(svg.tagName.toLowerCase()).toBe('svg');
   });
 
+  it('bordered pairs the border width with a border color', () => {
+    const { container } = render(
+      <PixelAreaChart data={sampleData} bordered aria-label="bordered" />,
+    );
+    const svg = container.querySelector('svg');
+    expect(svg?.getAttribute('class') ?? '').toContain('border-retro-border');
+  });
+
   it('tone="cyan" applies cyan stroke and fill', () => {
     const { container } = render(
       <PixelAreaChart data={sampleData} tone="cyan" aria-label="cyan" />,

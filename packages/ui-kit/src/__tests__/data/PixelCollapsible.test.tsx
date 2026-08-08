@@ -120,6 +120,7 @@ describe('PixelCollapsible — chrome props', () => {
     // pixel surface default: border-2 + staircase corner
     expect(root.className).toContain('border-2');
     expect(root.className).toContain('pxl-corner-sm');
+    expect(root.className).toContain('border-retro-border');
   });
 
   it('no chrome by default', () => {

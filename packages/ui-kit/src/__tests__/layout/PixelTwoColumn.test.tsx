@@ -63,4 +63,13 @@ describe('PixelTwoColumn', () => {
     expect(left.className).toContain('order-2');
     expect(right.className).toContain('order-1');
   });
+
+  it('bordered pairs the border width with a border color', () => {
+    const { getByTestId } = render(
+      <PixelTwoColumn data-testid="tc" bordered left={<div>L</div>} right={<div>R</div>} />,
+    );
+    const el = getByTestId('tc');
+    expect(el.className).toContain('border-2');
+    expect(el.className).toContain('border-retro-border');
+  });
 });

@@ -55,7 +55,7 @@ export const PixelCenter = forwardRef<HTMLDivElement, PixelCenterProps>(function
         containerWidth[maxWidth],
         pageGutter[gutter],
         resolvedAlign && textMap[resolvedAlign],
-        bordered && s.border, bordered && s.radius,
+        bordered && s.border, bordered && s.radius, bordered && 'border-retro-border',
         s.transition,
         className,
       )}

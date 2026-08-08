@@ -43,7 +43,7 @@ export function PixelCollapsible({
   const triggerId = `${baseId}-trigger`;
   const contentId = `${baseId}-content`;
   return (
-    <div className={cn(bordered && s.border, bordered && s.radius)}>
+    <div className={cn(bordered && s.border, bordered && s.radius, bordered && 'border-retro-border')}>
       <PixelButton
         id={triggerId}
         type="button"

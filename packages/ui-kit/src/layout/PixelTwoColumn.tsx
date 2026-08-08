@@ -100,7 +100,7 @@ export const PixelTwoColumn = forwardRef<HTMLDivElement, PixelTwoColumnProps>(fu
         stackedTemplate,
         stackGap[gap],
         align && alignMap[align],
-        bordered && s.border, bordered && s.radius,
+        bordered && s.border, bordered && s.radius, bordered && 'border-retro-border',
         s.transition,
         className,
       )}
