@@ -57,6 +57,7 @@ import { GenerateRootReadmeGenerator } from "./generate-root-readme.js";
 import { ChangelogGenerator } from "./generate-changelog.js";
 import { GenerateOgImagesGenerator } from "./generate-og-images.js";
 import { GenerateMetadataGenerator } from "./generate-metadata.js";
+import { GenerateSkillRefsGenerator } from "./generate-skill-refs.js";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -145,6 +146,16 @@ export function defaultPipelineSteps(repoRoot: string): StepDescriptor[] {
       required: false,
     },
     { name: "generate-registry", factory: () => new GenerateRegistryGenerator() },
+    // generate-skill-refs renders the pxlkit plugin's reference corpus from the
+    // manifests + ui-kit sources. Runs after generate-registry (it digests the
+    // freshly generated registry) and is optional: the references feed the
+    // Claude Code skills, not the published package, so a failure here must not
+    // abort a release build.
+    {
+      name: "generate-skill-refs",
+      factory: () => new GenerateSkillRefsGenerator(),
+      required: false,
+    },
     { name: "generate-stories", factory: () => new GenerateStoriesGenerator() },
     { name: "generate-showcase", factory: () => new GenerateShowcaseGenerator() },
     { name: "generate-docs-page", factory: () => new GenerateDocsPageGenerator(out.docsPage) },
@@ -177,6 +188,8 @@ const STEP_ALIASES: Record<string, string> = {
   bundle: "extract-bundle",
   "extract-bundle-size": "extract-bundle",
   registry: "generate-registry",
+  "skill-refs": "generate-skill-refs",
+  skills: "generate-skill-refs",
   stories: "generate-stories",
   showcase: "generate-showcase",
   "docs-page": "generate-docs-page",
@@ -548,8 +561,8 @@ function printHelp(): void {
       "",
       "Options:",
       "  --only=a,b,c    Run only the named steps (scan always runs).",
-      "                  Aliases: registry, stories, showcase, docs, readme,",
-      "                  readme-root, changelog, og, metadata.",
+      "                  Aliases: registry, skill-refs, stories, showcase, docs,",
+      "                  readme, readme-root, changelog, og, metadata.",
       "  --watch         Re-run the pipeline on manifest/example changes.",
       "  --quiet, -q     Suppress info logs.",
       "  --json          Print a JSON report to stdout.",

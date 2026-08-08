@@ -410,6 +410,9 @@ describe("PIPELINE_STEPS", () => {
       "scan",
       "extract-bundle",
       "generate-registry",
+      // generate-skill-refs digests the freshly generated registry, so it must
+      // stay pinned immediately after generate-registry.
+      "generate-skill-refs",
       "generate-stories",
       "generate-showcase",
       "generate-docs-page",
@@ -421,9 +424,13 @@ describe("PIPELINE_STEPS", () => {
     ]);
   });
 
-  it("marks the environment-dependent steps (extract-bundle, generate-og-images) as optional", () => {
+  it("marks the environment-dependent steps (extract-bundle, generate-skill-refs, generate-og-images) as optional", () => {
     const optional = PIPELINE_STEPS.filter((s) => s.required === false).map((s) => s.name);
-    expect(optional).toEqual(["extract-bundle", "generate-og-images"]);
+    expect(optional).toEqual([
+      "extract-bundle",
+      "generate-skill-refs",
+      "generate-og-images",
+    ]);
   });
 });
 
