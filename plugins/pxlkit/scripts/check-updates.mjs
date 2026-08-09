@@ -64,20 +64,33 @@ export function shouldNotify(current, latest) {
   return compareSemver(latest, current) > 0;
 }
 
-/** Reads the plugin's own version from its manifest. */
+/**
+ * Reads *this plugin's* version from its manifest.
+ *
+ * The name check is not paranoia. `CLAUDE_PLUGIN_ROOT` describes whichever plugin
+ * owns the current execution context, which is not necessarily this one — running
+ * this script while another plugin's environment is set reads that plugin's
+ * manifest and compares a completely unrelated version number against pxlkit's
+ * releases. Observed in practice: it reported context-mode's 1.0.169 as "current"
+ * and cheerfully announced an update to 2.1.1.
+ *
+ * The path next to this script is the reliable answer, so it is tried first; the
+ * environment variable is a fallback and is only trusted if the manifest it points
+ * at actually says `pxlkit`.
+ */
 function readCurrentVersion() {
-  const candidates = [];
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const candidates = [path.join(here, '..', '.claude-plugin', 'plugin.json')];
   if (process.env.CLAUDE_PLUGIN_ROOT) {
     candidates.push(path.join(process.env.CLAUDE_PLUGIN_ROOT, '.claude-plugin', 'plugin.json'));
   }
-  // Fallback for running from a checkout: scripts/ sits next to .claude-plugin/.
-  const here = path.dirname(fileURLToPath(import.meta.url));
-  candidates.push(path.join(here, '..', '.claude-plugin', 'plugin.json'));
 
   for (const file of candidates) {
     try {
       const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
-      if (typeof manifest.version === 'string') return manifest.version;
+      if (manifest.name === 'pxlkit' && typeof manifest.version === 'string') {
+        return manifest.version;
+      }
     } catch {
       // Try the next candidate.
     }

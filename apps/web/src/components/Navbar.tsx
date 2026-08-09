@@ -15,6 +15,7 @@ const NAV_ITEMS: { href: string; label: string; badge?: string; external?: boole
   { href: '/templates', label: 'Templates' },
   { href: '/explore', label: 'Explore', badge: '🚧' },
   { href: '/docs', label: 'Docs' },
+  { href: '/skills', label: 'Skills' },
   // Storybook lives on a separate Vercel deploy — see STORYBOOK_DEPLOY.md.
   // Falls back to a placeholder until the subdomain is wired up; the badge
   // signals the entry is external.
