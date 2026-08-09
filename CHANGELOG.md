@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- **Claude Code plugin v1.0.0.** A `pxlkit` plugin ships from this repo, installable with
+  `claude plugin marketplace add Joangeldelarosa/pxlkit && claude plugin install pxlkit@pxlkit`.
+  Five skills: `/pxlkit:start` (compatibility check and setup), `/pxlkit:imagine`
+  (compose a page), `/pxlkit:pixelate` (convert existing React), `/pxlkit:icon`
+  (author a `PxlKitData` icon), `/pxlkit:audit` (the gate suite the others run on
+  their own output). Documented at `/skills`, with a plain-text summary at
+  `/skills/llms.txt` for agents.
+- **Skill references generated from the kit.** A new `docs:build` step derives the
+  plugin's reference corpus — 19 files covering all 111 components, both tone
+  scales, the setup recipes and occupancy signatures for all 226 icons — from the
+  registry, manifests, `tokens.ts`, `styles.css` and `core/types.ts`. Nothing in it
+  is written by hand.
+- **Coherence gate 36 (`skill-refs-fresh`).** Fails the build when the generated
+  references drift from the kit, when `plugin.json`, the marketplace entry and
+  `VERSION.json` disagree on a version, or when `pixelate-map.md` cites a component
+  that does not exist.
+- `npm run release:bump-plugin -- --version X.Y.Z`, which keeps the plugin manifest
+  and marketplace entry in step with the kit during a release.
+
+### Fixed
+
+- `docs/runbooks/ship-a-release.md` documented two commands that do not exist
+  (`release:bump` and `registry:build`) and used `pnpm` in an npm repository. The
+  runbook now describes what the release actually does.
+
 ## [ui-kit 2.1.1] - 2026-08-08 — Bordered surface-token fix
 
 A patch release: `bordered` emitted a border width with no border color, so the

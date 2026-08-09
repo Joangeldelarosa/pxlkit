@@ -1,0 +1,20 @@
+{
+  "name": "pxlkit",
+  "description": "Build pixel-perfect retro interfaces with @pxlkit/ui-kit — imagine new frontends, pixelate existing sites, author icons, and audit for canonical usage.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Joangel De La Rosa",
+    "url": "https://github.com/joangeldelarosa"
+  },
+  "homepage": "https://pxlkit.xyz/skills",
+  "repository": "https://github.com/Joangeldelarosa/pxlkit",
+  "license": "MIT",
+  "keywords": [
+    "pixel-art",
+    "ui",
+    "react",
+    "design-system",
+    "pxlkit",
+    "retro"
+  ]
+}

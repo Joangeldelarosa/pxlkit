@@ -34,6 +34,13 @@ jobs:
       - name: Build all packages
         run: npm run build
 
+      # Schema-validates the plugin and marketplace manifests. Done with node rather
+      # than the `claude` CLI because the CLI is not available on the runner, and a
+      # plugin whose manifest only gets validated on a maintainer's laptop is a
+      # plugin that will eventually ship broken.
+      - name: Validate the Claude Code plugin manifests
+        run: node scripts/release/validate-plugin.mjs
+
       - name: Run coherence audit (JSON mode)
         id: audit
         run: npm run --silent audit:coherence:json --workspace=@pxlkit/ui-kit -- > coherence-report.json

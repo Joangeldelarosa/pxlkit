@@ -59,6 +59,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/skills" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
+                  Claude Code Skills
+                </Link>
+              </li>
+              <li>
                 <a
                   href="https://storybook.pxlkit.xyz"
                   target="_blank"

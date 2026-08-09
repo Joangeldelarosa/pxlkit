@@ -1,0 +1,3111 @@
+[
+  {
+    "name": "explosion-burst",
+    "pack": "effects",
+    "tags": [
+      "explosion",
+      "burst",
+      "blast",
+      "boom",
+      "animated",
+      "effect"
+    ],
+    "signature": "000000000000000000000000018003c003c00180000000000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "flame",
+    "pack": "effects",
+    "tags": [
+      "flame",
+      "fire",
+      "burn",
+      "campfire",
+      "animated",
+      "effect"
+    ],
+    "signature": "0000000001000300070007800f800fc00fc01fc01fc01fe00fc00fc007800000",
+    "kind": "animated"
+  },
+  {
+    "name": "glow-pulse",
+    "pack": "effects",
+    "tags": [
+      "glow",
+      "pulse",
+      "orb",
+      "aura",
+      "animated",
+      "effect"
+    ],
+    "signature": "0000000000000000000003c007e007e007e007e003c000000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "neon-strobe",
+    "pack": "effects",
+    "tags": [
+      "neon",
+      "strobe",
+      "sci-fi",
+      "energy",
+      "fx",
+      "animated"
+    ],
+    "signature": "0000000007e00ff01ff81ff81ff83ffc3ffc1ff81ff81ff80ff007e000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "pixel-rain",
+    "pack": "effects",
+    "tags": [
+      "rain",
+      "drops",
+      "water",
+      "falling",
+      "animated",
+      "effect"
+    ],
+    "signature": "2220000000440800002044000002008010000020040000024008008008000020",
+    "kind": "animated"
+  },
+  {
+    "name": "portal-spin",
+    "pack": "effects",
+    "tags": [
+      "portal",
+      "spin",
+      "warp",
+      "teleport",
+      "magic",
+      "animated"
+    ],
+    "signature": "0000000003c00ff01ff81ff83ffc3ffc3ffc3ffc1ff81ff80ff003c000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "radar-ping",
+    "pack": "effects",
+    "tags": [
+      "radar",
+      "ping",
+      "scan",
+      "search",
+      "animated",
+      "signal"
+    ],
+    "signature": "000007c01930210841044104410441844384400440042008183007c000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "ripple",
+    "pack": "effects",
+    "tags": [
+      "ripple",
+      "wave",
+      "water",
+      "pulse",
+      "shock",
+      "effect"
+    ],
+    "signature": "00000000000000000000000033302f5033300000000000000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "scan-sweep",
+    "pack": "effects",
+    "tags": [
+      "scan",
+      "sweep",
+      "laser",
+      "line",
+      "hud",
+      "effect"
+    ],
+    "signature": "0000000000000000000000000000ffffffff0000000000000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "shockwave",
+    "pack": "effects",
+    "tags": [
+      "shockwave",
+      "ring",
+      "wave",
+      "expand",
+      "animated",
+      "effect"
+    ],
+    "signature": "0000000000000000000007e00ff01c381c380ff007e000000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "spark-burst",
+    "pack": "effects",
+    "tags": [
+      "spark",
+      "burst",
+      "impact",
+      "shine",
+      "effect",
+      "fx"
+    ],
+    "signature": "0000000000000000000001000380010003800100000000000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "twinkle",
+    "pack": "effects",
+    "tags": [
+      "twinkle",
+      "sparkle",
+      "shine",
+      "glint",
+      "magic",
+      "effect"
+    ],
+    "signature": "0000000008000000000000000000010000000000000000000010000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "badge",
+    "pack": "feedback",
+    "tags": [
+      "badge",
+      "achievement",
+      "award",
+      "certified",
+      "medal",
+      "feedback"
+    ],
+    "signature": "000007e01ff83ffc3ffc7ffe7ffe7ffe3ffc3ffc1ff807e003c0024003c00000",
+    "kind": "static"
+  },
+  {
+    "name": "bell",
+    "pack": "feedback",
+    "tags": [
+      "bell",
+      "notification",
+      "alert",
+      "ring",
+      "toast",
+      "status"
+    ],
+    "signature": "00000000018003c007e007e00ff00ff00ff00ff01ff83ffc1ff8018000000000",
+    "kind": "static"
+  },
+  {
+    "name": "bug",
+    "pack": "feedback",
+    "tags": [
+      "bug",
+      "error",
+      "issue",
+      "defect",
+      "debug",
+      "feedback"
+    ],
+    "signature": "0000183038380fe01ff81ff0dff6dff6dff61ff01ff80fe03838301800000000",
+    "kind": "static"
+  },
+  {
+    "name": "bug-fixed",
+    "pack": "feedback",
+    "tags": [
+      "bug",
+      "fixed",
+      "resolved",
+      "solved",
+      "done",
+      "feedback"
+    ],
+    "signature": "0000303070381fe03ff03ff4bff8bff8bff83ff83ff01fc0719c308c30180000",
+    "kind": "static"
+  },
+  {
+    "name": "caution",
+    "pack": "feedback",
+    "tags": [
+      "caution",
+      "hazard",
+      "danger",
+      "warning",
+      "stripe",
+      "feedback"
+    ],
+    "signature": "00000000018003c003c007e007e00ff00ff01ff81ff83ffc3ffc7ffe00000000",
+    "kind": "static"
+  },
+  {
+    "name": "chat-dots",
+    "pack": "feedback",
+    "tags": [
+      "chat",
+      "typing",
+      "conversation",
+      "message",
+      "toast",
+      "ui"
+    ],
+    "signature": "0000000000003ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc0c000800000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "check-circle",
+    "pack": "feedback",
+    "tags": [
+      "check",
+      "success",
+      "done",
+      "confirm",
+      "toast",
+      "status"
+    ],
+    "signature": "000007e01ff83c3c381c700e6016602668266446728e391c3c3c1ff807e00000",
+    "kind": "static"
+  },
+  {
+    "name": "clock",
+    "pack": "feedback",
+    "tags": [
+      "clock",
+      "time",
+      "timer",
+      "schedule",
+      "toast",
+      "ui"
+    ],
+    "signature": "000007e01ff83c3c389c708e6086608660c66036700e381c3c3c1ff807e00000",
+    "kind": "static"
+  },
+  {
+    "name": "double-check",
+    "pack": "feedback",
+    "tags": [
+      "double-check",
+      "read",
+      "confirmed",
+      "done",
+      "tick",
+      "feedback"
+    ],
+    "signature": "0000000004100c301c70bdf0fdf07df038f01070006000200000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "error-octagon",
+    "pack": "feedback",
+    "tags": [
+      "error",
+      "stop",
+      "danger",
+      "critical",
+      "toast",
+      "status"
+    ],
+    "signature": "0000000007e00ff01ff83ffc3ffc3ffc3ffc3ffc3ffc1ff80ff007e000000000",
+    "kind": "static"
+  },
+  {
+    "name": "feedback-target",
+    "pack": "feedback",
+    "tags": [
+      "target",
+      "aim",
+      "goal",
+      "objective",
+      "focus",
+      "feedback"
+    ],
+    "signature": "000007c01ff03ff87c3c781c718c73cc718c781c7c3c3ff81ff007c000000000",
+    "kind": "static"
+  },
+  {
+    "name": "hourglass",
+    "pack": "feedback",
+    "tags": [
+      "hourglass",
+      "time",
+      "timer",
+      "wait",
+      "animated",
+      "sand"
+    ],
+    "signature": "3ff03ff01ff01ff00fc00780030003000480084010201020201020103ff00000",
+    "kind": "animated"
+  },
+  {
+    "name": "info-circle",
+    "pack": "feedback",
+    "tags": [
+      "info",
+      "help",
+      "about",
+      "details",
+      "toast",
+      "status"
+    ],
+    "signature": "000007e01ff83c3c389c700e6186618661866186718e381c3c3c1ff807e00000",
+    "kind": "static"
+  },
+  {
+    "name": "link",
+    "pack": "feedback",
+    "tags": [
+      "link",
+      "chain",
+      "url",
+      "attach",
+      "toast",
+      "ui"
+    ],
+    "signature": "000000000000000006301ffc39ce31c633e633e639ce1ffc0630000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "loading-circle",
+    "pack": "feedback",
+    "tags": [
+      "loading",
+      "spinner",
+      "progress",
+      "wait",
+      "animated",
+      "ui"
+    ],
+    "signature": "000007c00c601010200820084004400440042008200810100c6007c000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "lock",
+    "pack": "feedback",
+    "tags": [
+      "lock",
+      "secure",
+      "private",
+      "auth",
+      "toast",
+      "ui"
+    ],
+    "signature": "000003c007e00e700c300c300c300ff00ff00ff00ff00ff00ff0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "mail",
+    "pack": "feedback",
+    "tags": [
+      "mail",
+      "email",
+      "inbox",
+      "message",
+      "toast",
+      "ui"
+    ],
+    "signature": "00000000000000003ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "megaphone",
+    "pack": "feedback",
+    "tags": [
+      "megaphone",
+      "announce",
+      "broadcast",
+      "notice",
+      "toast",
+      "ui"
+    ],
+    "signature": "0000000038003e003f80bfc03ff03ff8bff83ff0bfc03f803e003b0003000300",
+    "kind": "static"
+  },
+  {
+    "name": "message-square",
+    "pack": "feedback",
+    "tags": [
+      "message",
+      "chat",
+      "comment",
+      "support",
+      "toast",
+      "ui"
+    ],
+    "signature": "0000000000003ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc0c000800000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "notification-dot",
+    "pack": "feedback",
+    "tags": [
+      "notification",
+      "badge",
+      "dot",
+      "unread",
+      "indicator",
+      "toast"
+    ],
+    "signature": "00000008003e003e007f3ffe3ffe3fe83fe03fe03fe03fe03fe03fe000000000",
+    "kind": "static"
+  },
+  {
+    "name": "ribbon",
+    "pack": "feedback",
+    "tags": [
+      "ribbon",
+      "award",
+      "prize",
+      "first-place",
+      "winner",
+      "medal",
+      "feedback"
+    ],
+    "signature": "018003c0024006600c301ff83ffc3ffc3ffc3ffc3ffc3ffc1ff80ff000000000",
+    "kind": "static"
+  },
+  {
+    "name": "send",
+    "pack": "feedback",
+    "tags": [
+      "send",
+      "paper-plane",
+      "message",
+      "forward",
+      "toast",
+      "ui"
+    ],
+    "signature": "00000000000018001c000f0007e003f801fe03f807e00f001c00180000000000",
+    "kind": "static"
+  },
+  {
+    "name": "shield-alert",
+    "pack": "feedback",
+    "tags": [
+      "shield",
+      "alert",
+      "warning",
+      "security",
+      "toast",
+      "risk"
+    ],
+    "signature": "000000001ff81ff81ff81ff81ff81ff81ff80ff00ff007e003c0018000000000",
+    "kind": "static"
+  },
+  {
+    "name": "shield-check",
+    "pack": "feedback",
+    "tags": [
+      "shield",
+      "check",
+      "safe",
+      "trusted",
+      "toast",
+      "security"
+    ],
+    "signature": "000000001ff81ff81ff81ff81ff81ff81ff80ff00ff007e003c0018000000000",
+    "kind": "static"
+  },
+  {
+    "name": "shield-cross",
+    "pack": "feedback",
+    "tags": [
+      "shield",
+      "cross",
+      "block",
+      "deny",
+      "fail",
+      "security",
+      "feedback"
+    ],
+    "signature": "000000001ff81ff81ff81ff81ff81ff81ff80ff00ff007e003c0018000000000",
+    "kind": "static"
+  },
+  {
+    "name": "shield-exclamation",
+    "pack": "feedback",
+    "tags": [
+      "shield",
+      "exclamation",
+      "warning",
+      "alert",
+      "critical",
+      "security",
+      "feedback"
+    ],
+    "signature": "000000001ff81ff81ff81ff81ff81ff81ff80ff00ff007e003c0018000000000",
+    "kind": "static"
+  },
+  {
+    "name": "sparkles",
+    "pack": "feedback",
+    "tags": [
+      "sparkles",
+      "shine",
+      "magic",
+      "highlight",
+      "toast",
+      "ui"
+    ],
+    "signature": "000000000000018c03cc07e00ff007e003c00180000018001800000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "target-hit",
+    "pack": "feedback",
+    "tags": [
+      "target",
+      "hit",
+      "goal",
+      "success",
+      "bullseye",
+      "feedback"
+    ],
+    "signature": "000007c01ff03ff87c3c781c700c718c73cc7bf87ff03fe01fc0060002000000",
+    "kind": "static"
+  },
+  {
+    "name": "typing-dots",
+    "pack": "feedback",
+    "tags": [
+      "typing",
+      "dots",
+      "chat",
+      "message",
+      "animated",
+      "ui"
+    ],
+    "signature": "000000001ff83ffc3ffc3ffc3ffc3ffc3ffc3ffc1ff81c003000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "unlink",
+    "pack": "feedback",
+    "tags": [
+      "unlink",
+      "broken-link",
+      "detach",
+      "remove",
+      "toast",
+      "ui"
+    ],
+    "signature": "000000000000000006381ffc39ee31c631c633c63fce1ffc0e30000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "unlock",
+    "pack": "feedback",
+    "tags": [
+      "unlock",
+      "open",
+      "access",
+      "auth",
+      "toast",
+      "ui"
+    ],
+    "signature": "0000000000000f800840084008000ff00ff00ff00ff00ff00ff0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "warning-triangle",
+    "pack": "feedback",
+    "tags": [
+      "warning",
+      "alert",
+      "caution",
+      "risk",
+      "toast",
+      "status"
+    ],
+    "signature": "00000000018003c003c007e007e00ff00ff01ff81ff83ffc3ffc7ffe00000000",
+    "kind": "static"
+  },
+  {
+    "name": "x-circle",
+    "pack": "feedback",
+    "tags": [
+      "close",
+      "error",
+      "cancel",
+      "dismiss",
+      "toast",
+      "status"
+    ],
+    "signature": "000007e01ff83c3c381c741e6226614660866146722e3c1c3c3c1ff807e00000",
+    "kind": "static"
+  },
+  {
+    "name": "amulet",
+    "pack": "gamification",
+    "tags": [
+      "amulet",
+      "pendant",
+      "gem",
+      "accessory",
+      "necklace",
+      "rpg"
+    ],
+    "signature": "000000000180024004200240018003c007e00ff01ff00fe007e003c000000000",
+    "kind": "static"
+  },
+  {
+    "name": "armor",
+    "pack": "gamification",
+    "tags": [
+      "armor",
+      "breastplate",
+      "defense",
+      "chest",
+      "plate",
+      "rpg"
+    ],
+    "signature": "0000381c7c3e7ffe7ffe7ffe7ffe3ffc1ff80ff007e000000000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "arrow",
+    "pack": "gamification",
+    "tags": [
+      "arrow",
+      "projectile",
+      "direction",
+      "quest",
+      "ranged",
+      "bow"
+    ],
+    "signature": "00000000000000000020603030381ffe1ffe3038603000200000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "axe",
+    "pack": "gamification",
+    "tags": [
+      "axe",
+      "weapon",
+      "battle",
+      "hack",
+      "warrior",
+      "rpg"
+    ],
+    "signature": "00001fc03fc07fc0ffc07fc03fc01fc000c000c000c000c000c000c000c00000",
+    "kind": "static"
+  },
+  {
+    "name": "bomb",
+    "pack": "gamification",
+    "tags": [
+      "bomb",
+      "explosive",
+      "attack",
+      "power",
+      "special",
+      "blast"
+    ],
+    "signature": "00000030006000c0018003c007e00ff80ffc1ff81ffc1ffc0ff80ff807f00000",
+    "kind": "static"
+  },
+  {
+    "name": "boots",
+    "pack": "gamification",
+    "tags": [
+      "boots",
+      "shoes",
+      "leather",
+      "speed",
+      "equipment",
+      "rpg"
+    ],
+    "signature": "0000000007800780078007800780078007c007f007fc0ffc0000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "bouncing-ball",
+    "pack": "gamification",
+    "tags": [
+      "ball",
+      "bounce",
+      "physics",
+      "game",
+      "animated",
+      "motion"
+    ],
+    "signature": "000007800fc01fe01fe01fe01ff00fe007c00000000000000000000001800000",
+    "kind": "animated"
+  },
+  {
+    "name": "bow",
+    "pack": "gamification",
+    "tags": [
+      "bow",
+      "weapon",
+      "archery",
+      "ranged",
+      "hunter",
+      "rpg"
+    ],
+    "signature": "0000004001c0034006400c4008401040104008400c400640034001c000400000",
+    "kind": "static"
+  },
+  {
+    "name": "card-draw",
+    "pack": "gamification",
+    "tags": [
+      "card",
+      "draw",
+      "flip",
+      "gacha",
+      "play",
+      "game"
+    ],
+    "signature": "00001ff03ff83ff83ff83ff83ff83ff83ff83ff83ff83ff81ff0000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "chest",
+    "pack": "gamification",
+    "tags": [
+      "chest",
+      "treasure",
+      "loot",
+      "reward",
+      "box",
+      "storage"
+    ],
+    "signature": "000000003ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc0000",
+    "kind": "static"
+  },
+  {
+    "name": "coin",
+    "pack": "gamification",
+    "tags": [
+      "coin",
+      "money",
+      "currency",
+      "gold",
+      "reward",
+      "payment"
+    ],
+    "signature": "000003c00ff01ff81ffc3ffc3ffc3ffc3ffc3ffc3ff41ff81ff80ff007c00000",
+    "kind": "static"
+  },
+  {
+    "name": "coin-flip",
+    "pack": "gamification",
+    "tags": [
+      "coin",
+      "flip",
+      "gold",
+      "luck",
+      "animated",
+      "rpg"
+    ],
+    "signature": "000000000000000030003e003f003fc03fe03fe01fc00f800700000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "coin-spin",
+    "pack": "gamification",
+    "tags": [
+      "coin",
+      "spin",
+      "gold",
+      "money",
+      "animated",
+      "reward"
+    ],
+    "signature": "000007c01ff03ff83ff87ffc7ff87ffc7ffc7ffc7ffc3ff83ff81ff007c00000",
+    "kind": "animated"
+  },
+  {
+    "name": "crown",
+    "pack": "gamification",
+    "tags": [
+      "crown",
+      "king",
+      "royal",
+      "vip",
+      "rank",
+      "premium"
+    ],
+    "signature": "000000004210673077707ff87ff87ff87ff87ff83ff83ff80000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "dagger",
+    "pack": "gamification",
+    "tags": [
+      "dagger",
+      "knife",
+      "blade",
+      "rogue",
+      "stealth",
+      "rpg"
+    ],
+    "signature": "0000018003c003c003c003c003c003c00ff001800180018003c0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "dice",
+    "pack": "gamification",
+    "tags": [
+      "dice",
+      "d6",
+      "random",
+      "chance",
+      "luck",
+      "rng",
+      "board-game"
+    ],
+    "signature": "00001ff83ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc1ff800000000",
+    "kind": "static"
+  },
+  {
+    "name": "elixir",
+    "pack": "gamification",
+    "tags": [
+      "elixir",
+      "potion",
+      "buff",
+      "golden",
+      "ultimate",
+      "consumable",
+      "rpg"
+    ],
+    "signature": "000000800180018003c007e00ff80ff81ff81ffc1ffc0ff80ff807f003e00000",
+    "kind": "static"
+  },
+  {
+    "name": "fire",
+    "pack": "gamification",
+    "tags": [
+      "fire",
+      "flame",
+      "hot",
+      "streak",
+      "combo",
+      "burn"
+    ],
+    "signature": "00000100030007000f200fb01ff01ff03ff83ff83ff83ff83ff81ff81ff00000",
+    "kind": "static"
+  },
+  {
+    "name": "fire-sword",
+    "pack": "gamification",
+    "tags": [
+      "sword",
+      "fire",
+      "weapon",
+      "flame",
+      "animated",
+      "rpg"
+    ],
+    "signature": "00020006000e00180030006000c00180030006000c001c003800300020000000",
+    "kind": "animated"
+  },
+  {
+    "name": "flag",
+    "pack": "gamification",
+    "tags": [
+      "flag",
+      "checkpoint",
+      "milestone",
+      "goal",
+      "finish",
+      "marker"
+    ],
+    "signature": "000020003fc03fe03fe03ff03fe03fc03f802000200020002000700070000000",
+    "kind": "static"
+  },
+  {
+    "name": "floating-gem",
+    "pack": "gamification",
+    "tags": [
+      "gem",
+      "diamond",
+      "float",
+      "sparkle",
+      "animated",
+      "rpg"
+    ],
+    "signature": "0000008001c007f00ff80ff80ff807f007f003e001c000800000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "floating-skull",
+    "pack": "gamification",
+    "tags": [
+      "skull",
+      "ghost",
+      "float",
+      "undead",
+      "death",
+      "animated",
+      "rpg"
+    ],
+    "signature": "000007e00ff01ff81ff81ff81ff81ffc0ff807f007f005a00000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "gem",
+    "pack": "gamification",
+    "tags": [
+      "gem",
+      "diamond",
+      "jewel",
+      "crystal",
+      "premium",
+      "rare"
+    ],
+    "signature": "000000000ff01ff83ffc3ffc3ff81ff80fe007c0038001000000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "glowing-sword",
+    "pack": "gamification",
+    "tags": [
+      "sword",
+      "glow",
+      "magic",
+      "enchanted",
+      "animated",
+      "rpg"
+    ],
+    "signature": "00030007000f001e003c007800f001e003c007801f802e0047000e001c001800",
+    "kind": "animated"
+  },
+  {
+    "name": "health-potion",
+    "pack": "gamification",
+    "tags": [
+      "potion",
+      "health",
+      "heal",
+      "hp",
+      "red",
+      "consumable",
+      "rpg"
+    ],
+    "signature": "00000180018003c007e00ff00ff00ff00ff00ff00ff007e003c0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "heart",
+    "pack": "gamification",
+    "tags": [
+      "heart",
+      "health",
+      "life",
+      "love",
+      "hp",
+      "vitality"
+    ],
+    "signature": "00003c3c7e7e7e7e7ffe7ffe7ffe3ffc1ff80ff007e003c00180000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "heart-pulse",
+    "pack": "gamification",
+    "tags": [
+      "heart",
+      "life",
+      "health",
+      "gold",
+      "pulse",
+      "animated",
+      "rpg"
+    ],
+    "signature": "000000000c301e783ffc3ffe1ffc0ff807f003e0018000000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "helmet",
+    "pack": "gamification",
+    "tags": [
+      "helmet",
+      "helm",
+      "knight",
+      "defense",
+      "head",
+      "rpg"
+    ],
+    "signature": "000003c00ff01ff83ffc3ffc3ffc3ffc3ffc3ffc1ff80ff003c0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "key",
+    "pack": "gamification",
+    "tags": [
+      "key",
+      "unlock",
+      "access",
+      "secret",
+      "lock",
+      "open"
+    ],
+    "signature": "000000000f801fc018c018c01fc00f800300030003c003c0030003c003c00000",
+    "kind": "static"
+  },
+  {
+    "name": "level-up",
+    "pack": "gamification",
+    "tags": [
+      "level-up",
+      "xp",
+      "experience",
+      "upgrade",
+      "progress",
+      "rank-up"
+    ],
+    "signature": "00000100038007c00fe01ff03ff803c003c003c003c003c000001ff81ff80000",
+    "kind": "static"
+  },
+  {
+    "name": "lightning",
+    "pack": "gamification",
+    "tags": [
+      "lightning",
+      "bolt",
+      "power",
+      "energy",
+      "speed",
+      "electric"
+    ],
+    "signature": "0000007000e001c003c007e00fe000e001c0038007000e001c00180000000000",
+    "kind": "static"
+  },
+  {
+    "name": "loot-chest",
+    "pack": "gamification",
+    "tags": [
+      "loot",
+      "chest",
+      "treasure",
+      "reward",
+      "open",
+      "rpg"
+    ],
+    "signature": "00001ff81ff81bd80ff01ff81ff81ff81ff81ff81ff80ff00000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "magic-wand",
+    "pack": "gamification",
+    "tags": [
+      "wand",
+      "magic",
+      "spell",
+      "wizard",
+      "enchant",
+      "rpg"
+    ],
+    "signature": "0100038007c00380010001000100010001000100010001000180018001800000",
+    "kind": "static"
+  },
+  {
+    "name": "mana-potion",
+    "pack": "gamification",
+    "tags": [
+      "potion",
+      "mana",
+      "mp",
+      "blue",
+      "magic",
+      "consumable",
+      "rpg"
+    ],
+    "signature": "00000180018003c003c007e007e007e007e007e007e003c003c0018000000000",
+    "kind": "static"
+  },
+  {
+    "name": "medal",
+    "pack": "gamification",
+    "tags": [
+      "medal",
+      "award",
+      "badge",
+      "achievement",
+      "honor",
+      "ribbon"
+    ],
+    "signature": "00000c601c700ff007f003c00ff01ff83ffc3ffc3ffc3ffc3ffc1ff80ff00000",
+    "kind": "static"
+  },
+  {
+    "name": "poison-vial",
+    "pack": "gamification",
+    "tags": [
+      "poison",
+      "vial",
+      "toxic",
+      "green",
+      "status",
+      "consumable",
+      "rpg"
+    ],
+    "signature": "0000010003800380038007c007c00fe00fe01ff01ff00fe00fe007c000000000",
+    "kind": "static"
+  },
+  {
+    "name": "potion",
+    "pack": "gamification",
+    "tags": [
+      "potion",
+      "magic",
+      "buff",
+      "heal",
+      "powerup",
+      "alchemy"
+    ],
+    "signature": "000003c003c003c007e00ff01bf81ff81ff81ffc1ffc1ff80ff807f000000000",
+    "kind": "static"
+  },
+  {
+    "name": "quest-compass",
+    "pack": "gamification",
+    "tags": [
+      "compass",
+      "navigation",
+      "direction",
+      "quest",
+      "map",
+      "rpg"
+    ],
+    "signature": "000007e018182004218443c247e247e247e247e223c42184181807e000000000",
+    "kind": "static"
+  },
+  {
+    "name": "quest-map",
+    "pack": "gamification",
+    "tags": [
+      "map",
+      "quest",
+      "parchment",
+      "navigation",
+      "adventure",
+      "rpg"
+    ],
+    "signature": "1ff03ff83ff83ff83ff83ff83ff83ff83ff83ff83ff83ff81ff0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "ring",
+    "pack": "gamification",
+    "tags": [
+      "ring",
+      "gem",
+      "ruby",
+      "accessory",
+      "jewelry",
+      "rpg"
+    ],
+    "signature": "000003c007e00c301818300c300c300c300c18180c3007e003c0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "scroll",
+    "pack": "gamification",
+    "tags": [
+      "scroll",
+      "quest",
+      "spell",
+      "knowledge",
+      "parchment",
+      "mission"
+    ],
+    "signature": "00001fe03ff03ff03ff03ff03ff03ff03ff03ff03ff03ff03ff01fe000000000",
+    "kind": "static"
+  },
+  {
+    "name": "shield",
+    "pack": "gamification",
+    "tags": [
+      "shield",
+      "defense",
+      "protect",
+      "armor",
+      "guard",
+      "rpg"
+    ],
+    "signature": "00001ff83ffc3ffc3ffc3ffc3ffc3ffc3ffc1ff81ff80ff00ff007e003c00000",
+    "kind": "static"
+  },
+  {
+    "name": "skull",
+    "pack": "gamification",
+    "tags": [
+      "skull",
+      "danger",
+      "death",
+      "hardcore",
+      "skeleton",
+      "warning"
+    ],
+    "signature": "000003e00ff81ffc1ffc1ffc1ffc1ffc1ffc0ff80ff807f807f007f000000000",
+    "kind": "static"
+  },
+  {
+    "name": "sparkle-star",
+    "pack": "gamification",
+    "tags": [
+      "star",
+      "sparkle",
+      "shine",
+      "magic",
+      "animated",
+      "effect"
+    ],
+    "signature": "0180218073c023c0ffff7ffe3ffc1ff81ff83e7c381c700e0000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "spell-book",
+    "pack": "gamification",
+    "tags": [
+      "spell-book",
+      "tome",
+      "magic",
+      "book",
+      "wizard",
+      "knowledge",
+      "rpg"
+    ],
+    "signature": "1ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc1ffc000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "staff",
+    "pack": "gamification",
+    "tags": [
+      "staff",
+      "wizard",
+      "magic",
+      "orb",
+      "mage",
+      "rpg"
+    ],
+    "signature": "000003c007e007e007e003c00180018001800180018001800180018003c00000",
+    "kind": "static"
+  },
+  {
+    "name": "star",
+    "pack": "gamification",
+    "tags": [
+      "star",
+      "rating",
+      "favorite",
+      "bookmark",
+      "reward",
+      "achievement"
+    ],
+    "signature": "0180018003c003c0ffff7ffe3ffc1ff81ff83e7c381c700e0000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "sword",
+    "pack": "gamification",
+    "tags": [
+      "sword",
+      "weapon",
+      "attack",
+      "combat",
+      "blade",
+      "rpg"
+    ],
+    "signature": "000100030007000e001c0038007000e001c003801f802e0047000e001c001800",
+    "kind": "static"
+  },
+  {
+    "name": "target",
+    "pack": "gamification",
+    "tags": [
+      "target",
+      "bullseye",
+      "goal",
+      "objective",
+      "aim",
+      "accuracy"
+    ],
+    "signature": "000007e01ff83ffc3ffc7ffe7ffe7ffe7ffe7ffe7ffe3ffc3ffc1ff807e00000",
+    "kind": "static"
+  },
+  {
+    "name": "trophy",
+    "pack": "gamification",
+    "tags": [
+      "trophy",
+      "achievement",
+      "winner",
+      "reward",
+      "cup",
+      "prize"
+    ],
+    "signature": "00003ffc6ff64ff24ff26ff63ffc0ff007e003c003c007e00ff00ff01ff80000",
+    "kind": "static"
+  },
+  {
+    "name": "xp-bar",
+    "pack": "gamification",
+    "tags": [
+      "xp",
+      "experience",
+      "progress",
+      "bar",
+      "level",
+      "rpg"
+    ],
+    "signature": "000000007800780000007ffe7ffe7ffe7ffe7ffe7ffe00000000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "cool-emoji",
+    "pack": "parallax",
+    "tags": [
+      "emoji",
+      "cool",
+      "sunglasses",
+      "3d",
+      "parallax"
+    ],
+    "signature": "0000000007800fc01fe03ff03ff03ff03ff01fe01fe00fe017d00aa000000000",
+    "kind": "parallax"
+  },
+  {
+    "name": "cyber-eye",
+    "pack": "parallax",
+    "tags": [
+      "eye",
+      "cyber",
+      "iris",
+      "glow",
+      "3d",
+      "parallax"
+    ],
+    "signature": "02000000200407800fc01fe09fe11fe01fe00fc0078000002004000002000000",
+    "kind": "parallax"
+  },
+  {
+    "name": "ghost-friend",
+    "pack": "parallax",
+    "tags": [
+      "ghost",
+      "cute",
+      "friendly",
+      "3d",
+      "parallax"
+    ],
+    "signature": "00000000000007800fc01fe01fe01fe01fe01fe01b60020005000fc01fe00fc0",
+    "kind": "parallax"
+  },
+  {
+    "name": "magic-orb",
+    "pack": "parallax",
+    "tags": [
+      "orb",
+      "crystal",
+      "magic",
+      "3d",
+      "parallax"
+    ],
+    "signature": "20000020000047800fc21fe01fe01fe01fe00fc0078043000788000010000002",
+    "kind": "parallax"
+  },
+  {
+    "name": "neon-skull",
+    "pack": "parallax",
+    "tags": [
+      "skull",
+      "neon",
+      "glow",
+      "3d",
+      "parallax"
+    ],
+    "signature": "000000000fc017a02fd03ff03ff03ff01fe00fc0078003000000000000000000",
+    "kind": "parallax"
+  },
+  {
+    "name": "pixel-crown",
+    "pack": "parallax",
+    "tags": [
+      "crown",
+      "royal",
+      "gold",
+      "3d",
+      "parallax"
+    ],
+    "signature": "200000200000492009201b601fe21fe01fe01fe00fc01fe03ff03ff01fe00000",
+    "kind": "parallax"
+  },
+  {
+    "name": "pixel-heart",
+    "pack": "parallax",
+    "tags": [
+      "heart",
+      "love",
+      "beat",
+      "3d",
+      "parallax"
+    ],
+    "signature": "20002000002031a07bc07fc03f881f000e000400100000004002000000500000",
+    "kind": "parallax"
+  },
+  {
+    "name": "pixel-rocket",
+    "pack": "parallax",
+    "tags": [
+      "rocket",
+      "space",
+      "ship",
+      "3d",
+      "parallax"
+    ],
+    "signature": "8000018011000382038047c007d007c007c00fe00fe00ba0038007c003908000",
+    "kind": "parallax"
+  },
+  {
+    "name": "retro-joystick",
+    "pack": "parallax",
+    "tags": [
+      "joystick",
+      "retro",
+      "gaming",
+      "3d",
+      "parallax"
+    ],
+    "signature": "00000000000000000180018001801fe03ff03ff03ff01fe03ff01fe004000800",
+    "kind": "parallax"
+  },
+  {
+    "name": "retro-tv",
+    "pack": "parallax",
+    "tags": [
+      "tv",
+      "retro",
+      "crt",
+      "television",
+      "3d",
+      "parallax"
+    ],
+    "signature": "030004c0086010203ff020102fd02df02d702bf02fd020163ff63ff000000000",
+    "kind": "parallax"
+  },
+  {
+    "name": "add-user",
+    "pack": "social",
+    "tags": [
+      "add-user",
+      "follow",
+      "friend",
+      "invite",
+      "join",
+      "social"
+    ],
+    "signature": "000007000f8007000f801fc00f800f8000021fc01fc71fc71fc71fc01ff00000",
+    "kind": "static"
+  },
+  {
+    "name": "angry",
+    "pack": "social",
+    "tags": [
+      "angry",
+      "rage",
+      "mad",
+      "emoji",
+      "face",
+      "social"
+    ],
+    "signature": "000007e01ff83ffc3ffc7ffe7ffe7ffe7ffe7ffe3ffc3ffc1ff8000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "at-sign",
+    "pack": "social",
+    "tags": [
+      "at",
+      "email",
+      "mention",
+      "address",
+      "social"
+    ],
+    "signature": "00001fe020102fd028502b502b5028502fd8200c101c0fe00000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "blinking-eye",
+    "pack": "social",
+    "tags": [
+      "eye",
+      "blink",
+      "watch",
+      "look",
+      "animated",
+      "face"
+    ],
+    "signature": "0000000000000ff01ff83ffc3ffc3ffc3ffc1ff80ff000000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "block-user",
+    "pack": "social",
+    "tags": [
+      "block",
+      "ban",
+      "restrict",
+      "user",
+      "social"
+    ],
+    "signature": "000007000f8007000f801fc00f800f801fc01fc71fc71fc71fc01ff000000000",
+    "kind": "static"
+  },
+  {
+    "name": "bookmark",
+    "pack": "social",
+    "tags": [
+      "bookmark",
+      "save",
+      "read-later",
+      "flag",
+      "social"
+    ],
+    "signature": "000000000ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff00ff000000000",
+    "kind": "static"
+  },
+  {
+    "name": "bouncing-message",
+    "pack": "social",
+    "tags": [
+      "message",
+      "chat",
+      "bounce",
+      "typing",
+      "animated",
+      "social"
+    ],
+    "signature": "00003ffc7fff7ffe7ffc7ffc7ffe7ffe3ffe1ff00fe007c00100000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "camera",
+    "pack": "social",
+    "tags": [
+      "camera",
+      "photo",
+      "snapshot",
+      "image",
+      "social"
+    ],
+    "signature": "00000000000003c003c03ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "chat-bubble",
+    "pack": "social",
+    "tags": [
+      "chat",
+      "bubble",
+      "message",
+      "comment",
+      "speech",
+      "social"
+    ],
+    "signature": "00001ff03ff87ffc7ffc7ffc7ffc7ffc7ffc3ff81ff007000300010000000000",
+    "kind": "static"
+  },
+  {
+    "name": "comment",
+    "pack": "social",
+    "tags": [
+      "comment",
+      "reply",
+      "discussion",
+      "feedback",
+      "social"
+    ],
+    "signature": "0000000000003ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc1f001600110000000000",
+    "kind": "static"
+  },
+  {
+    "name": "community",
+    "pack": "social",
+    "tags": [
+      "community",
+      "group",
+      "team",
+      "people",
+      "users",
+      "social"
+    ],
+    "signature": "00000c601ef00c601ef03f707e783c786030e0386318e79c6fd86fd87ff80000",
+    "kind": "static"
+  },
+  {
+    "name": "eye",
+    "pack": "social",
+    "tags": [
+      "eye",
+      "view",
+      "watch",
+      "visible",
+      "social"
+    ],
+    "signature": "0000000000000000018007e00ff03ffc7ffe3ffc0ff007e00180000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "eye-off",
+    "pack": "social",
+    "tags": [
+      "eye-off",
+      "hidden",
+      "invisible",
+      "private",
+      "social"
+    ],
+    "signature": "00000000000018000c00078007e01ff824e41ef807e001b00018000c00000000",
+    "kind": "static"
+  },
+  {
+    "name": "floating-hearts",
+    "pack": "social",
+    "tags": [
+      "hearts",
+      "love",
+      "like",
+      "float",
+      "animated",
+      "social"
+    ],
+    "signature": "000000000000000000000c001e003f001e000c000030007800fc007800300000",
+    "kind": "animated"
+  },
+  {
+    "name": "friends",
+    "pack": "social",
+    "tags": [
+      "friends",
+      "couple",
+      "together",
+      "pair",
+      "social"
+    ],
+    "signature": "000000001c703ef81c703ef87ff83cf03cf03cf07ef87ef80000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "globe",
+    "pack": "social",
+    "tags": [
+      "globe",
+      "world",
+      "web",
+      "international",
+      "social"
+    ],
+    "signature": "000007e01ff83cbc3c9c769e6f8e6a8e7ffe68fe78fe3c9c3cbc1ff807e00000",
+    "kind": "static"
+  },
+  {
+    "name": "hashtag",
+    "pack": "social",
+    "tags": [
+      "hashtag",
+      "tag",
+      "trending",
+      "topic",
+      "social"
+    ],
+    "signature": "000000000420042004203ffc04200420084008403ffc08400840084000000000",
+    "kind": "static"
+  },
+  {
+    "name": "heart",
+    "pack": "social",
+    "tags": [
+      "heart",
+      "love",
+      "like",
+      "favorite",
+      "social"
+    ],
+    "signature": "0000000000000e701ff83ffc3ffc3ffc1ffc0ff807f003e001c0008000000000",
+    "kind": "static"
+  },
+  {
+    "name": "heart-broken",
+    "pack": "social",
+    "tags": [
+      "heart",
+      "broken",
+      "sad",
+      "breakup",
+      "social"
+    ],
+    "signature": "0000000000000e701ff83ffc3ffc3ffc1ffc0ff807f003e001c0008000000000",
+    "kind": "static"
+  },
+  {
+    "name": "laugh",
+    "pack": "social",
+    "tags": [
+      "laugh",
+      "lol",
+      "funny",
+      "haha",
+      "emoji",
+      "face",
+      "social"
+    ],
+    "signature": "000003c00ff01ff83ffc3ffc7ffe7ffe7ffe7ffe3ffc1ff80ff0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "laughing-face",
+    "pack": "social",
+    "tags": [
+      "laugh",
+      "lol",
+      "funny",
+      "animated",
+      "emoji",
+      "social"
+    ],
+    "signature": "000007e01ff03ff83ff87ffe7ffc7efc7efe7f7e7ff83ff00ff0000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "message",
+    "pack": "social",
+    "tags": [
+      "message",
+      "chat",
+      "dm",
+      "text",
+      "bubble",
+      "social"
+    ],
+    "signature": "00003ffc7fff7ffe7ffc7ffc7ffc7ffe7ffe3ffe1ff00fe007c0010000000000",
+    "kind": "static"
+  },
+  {
+    "name": "notification",
+    "pack": "social",
+    "tags": [
+      "notification",
+      "alert",
+      "badge",
+      "count",
+      "social"
+    ],
+    "signature": "000003c00e701ff83ffc3ffc7ffe5ffa5ffa7ffe3ffc3ffc1ff80e7003c00000",
+    "kind": "static"
+  },
+  {
+    "name": "pin",
+    "pack": "social",
+    "tags": [
+      "pin",
+      "location",
+      "map",
+      "place",
+      "social"
+    ],
+    "signature": "00000000008003e007f007f00ff807f007f007f007f003e001c001c000800000",
+    "kind": "static"
+  },
+  {
+    "name": "pulse-heart",
+    "pack": "social",
+    "tags": [
+      "heart",
+      "pulse",
+      "beat",
+      "love",
+      "animated",
+      "health"
+    ],
+    "signature": "00000000000038703cf83ff83ff81ff00fe007c0038001000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "remove-user",
+    "pack": "social",
+    "tags": [
+      "remove-user",
+      "unfollow",
+      "unfriend",
+      "leave",
+      "social"
+    ],
+    "signature": "000007000f8007000f801fc00f800f801fc01fc71fc71fc71fc01ff000000000",
+    "kind": "static"
+  },
+  {
+    "name": "repost",
+    "pack": "social",
+    "tags": [
+      "repost",
+      "retweet",
+      "recycle",
+      "repeat",
+      "social"
+    ],
+    "signature": "00000000002000101ff800180028080808080a000c000ffc0400020000000000",
+    "kind": "static"
+  },
+  {
+    "name": "ringing-phone",
+    "pack": "social",
+    "tags": [
+      "phone",
+      "ring",
+      "call",
+      "notify",
+      "vibrate",
+      "animated",
+      "social"
+    ],
+    "signature": "00001fe01ff01ff01ff01ff01ff01ff01ff01ff01ff01ff00f80000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "sad",
+    "pack": "social",
+    "tags": [
+      "sad",
+      "cry",
+      "unhappy",
+      "emoji",
+      "face",
+      "social"
+    ],
+    "signature": "000007e01ff83ffc7ffe7ffe7ffe7ffe7ffe7ffe3ffc3ffa1ffa07e000000000",
+    "kind": "static"
+  },
+  {
+    "name": "share",
+    "pack": "social",
+    "tags": [
+      "share",
+      "forward",
+      "send",
+      "repost",
+      "social"
+    ],
+    "signature": "000000100038007c0078019012003c007c003c00120001900078007c00380010",
+    "kind": "static"
+  },
+  {
+    "name": "smile",
+    "pack": "social",
+    "tags": [
+      "smile",
+      "happy",
+      "emoji",
+      "face",
+      "joy",
+      "social"
+    ],
+    "signature": "000007e01ff83ffc3ffc7ffe7ffe7ffe7ffe7ffe3ffc3ffc1ff8000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "social-fire",
+    "pack": "social",
+    "tags": [
+      "fire",
+      "hot",
+      "trending",
+      "popular",
+      "social"
+    ],
+    "signature": "000000000080018001c003c007e007e00ff00ff00ff007e007e003c000000000",
+    "kind": "static"
+  },
+  {
+    "name": "social-star",
+    "pack": "social",
+    "tags": [
+      "star",
+      "rating",
+      "favorite",
+      "featured",
+      "social"
+    ],
+    "signature": "000000000180018003c007e03ffc1ff80ff00ff01ff81ff83c3c300c00000000",
+    "kind": "static"
+  },
+  {
+    "name": "star-face",
+    "pack": "social",
+    "tags": [
+      "star",
+      "eyes",
+      "amazed",
+      "fan",
+      "starstruck",
+      "emoji",
+      "social"
+    ],
+    "signature": "000007e01ff83ffc3ffc7ffe7ffe7ffe7ffe7ffe3ffc3ffc1ff8000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "surprise",
+    "pack": "social",
+    "tags": [
+      "surprise",
+      "shocked",
+      "amazed",
+      "oh",
+      "emoji",
+      "face",
+      "social"
+    ],
+    "signature": "000007e01ff83ffc3ffc7ffe7ffe7ffe7ffe7ffe3ffc3ffc1ff8000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "thumbs-down",
+    "pack": "social",
+    "tags": [
+      "thumbs-down",
+      "dislike",
+      "reject",
+      "negative",
+      "social"
+    ],
+    "signature": "000000003ff03ff03ff03ff03ff03ff03ff03ff03ff00e000e000e000e000000",
+    "kind": "static"
+  },
+  {
+    "name": "thumbs-up",
+    "pack": "social",
+    "tags": [
+      "thumbs-up",
+      "like",
+      "approve",
+      "positive",
+      "social"
+    ],
+    "signature": "00000e000e000e000e003ff03ff03ff03ff03ff03ff03ff03ff03ff000000000",
+    "kind": "static"
+  },
+  {
+    "name": "user",
+    "pack": "social",
+    "tags": [
+      "user",
+      "person",
+      "profile",
+      "account",
+      "social"
+    ],
+    "signature": "0000000003c007e007e00ff007e007e003c000000ff00ff00ff00ff000000000",
+    "kind": "static"
+  },
+  {
+    "name": "user-group",
+    "pack": "social",
+    "tags": [
+      "users",
+      "group",
+      "team",
+      "community",
+      "social"
+    ],
+    "signature": "0000000007000fb81ffc1ffc1ffc0fb80700007c1ffc1ffc1fc01fc000000000",
+    "kind": "static"
+  },
+  {
+    "name": "verified",
+    "pack": "social",
+    "tags": [
+      "verified",
+      "check",
+      "badge",
+      "authentic",
+      "social"
+    ],
+    "signature": "008007e01ef83ffc3ffc7ffe7ffe5ffaffff7ffe7ffe3ffc3ffc1ef807e00080",
+    "kind": "static"
+  },
+  {
+    "name": "waving-flag",
+    "pack": "social",
+    "tags": [
+      "flag",
+      "wave",
+      "wind",
+      "banner",
+      "animated",
+      "country"
+    ],
+    "signature": "000020003fe03ff03ff03ff03ff03fe03f802000200020002000200030000000",
+    "kind": "animated"
+  },
+  {
+    "name": "wink",
+    "pack": "social",
+    "tags": [
+      "wink",
+      "flirt",
+      "playful",
+      "emoji",
+      "face",
+      "social"
+    ],
+    "signature": "000007e01ff83ffc3ffc7ffe7ffe7ffe7ffe7ffe3ffc1ff807e0001000300000",
+    "kind": "static"
+  },
+  {
+    "name": "winking-face",
+    "pack": "social",
+    "tags": [
+      "wink",
+      "playful",
+      "flirt",
+      "animated",
+      "emoji",
+      "social"
+    ],
+    "signature": "000007e01ff03ff83ffc7ffe7f7c7dfc7ffc7ffe3ff83ff00ff0000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "arrow-right",
+    "pack": "ui",
+    "tags": [
+      "arrow",
+      "right",
+      "forward",
+      "next",
+      "direction"
+    ],
+    "signature": "0000000000000060003000187ffc7ffe7ffc0018003000600000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "bouncing-arrow",
+    "pack": "ui",
+    "tags": [
+      "arrow",
+      "down",
+      "scroll",
+      "bounce",
+      "chevron",
+      "animated",
+      "ui"
+    ],
+    "signature": "0000000040026006700e381c1c380e7007e003c0018000000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "calendar",
+    "pack": "ui",
+    "tags": [
+      "calendar",
+      "date",
+      "schedule",
+      "event",
+      "booking",
+      "ui"
+    ],
+    "signature": "00003ffc3ff83ff83ffc3ff83ff83ff83ff83ff83ff83ff83ffc3ffc00000000",
+    "kind": "static"
+  },
+  {
+    "name": "chain-link",
+    "pack": "ui",
+    "tags": [
+      "link",
+      "chain",
+      "url",
+      "hyperlink",
+      "connect",
+      "ui"
+    ],
+    "signature": "00001e003f00618061f033f81e0c000c300c3e0c619861f033001e0000000000",
+    "kind": "static"
+  },
+  {
+    "name": "check",
+    "pack": "ui",
+    "tags": [
+      "check",
+      "checkmark",
+      "confirm",
+      "done",
+      "valid",
+      "tick"
+    ],
+    "signature": "000000000007000e001c0038007000e071c03b801f000e000400000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "clock",
+    "pack": "ui",
+    "tags": [
+      "clock",
+      "time",
+      "schedule",
+      "duration",
+      "ui"
+    ],
+    "signature": "000007c01ff03ff87ffc7ffc7ffc7ffc7ffc7ffc3ff81ff007c0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "close",
+    "pack": "ui",
+    "tags": [
+      "close",
+      "dismiss",
+      "cancel",
+      "remove",
+      "x"
+    ],
+    "signature": "00000000300c18180c30066003c0018003c006600c301818300c000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "cloud-sync",
+    "pack": "ui",
+    "tags": [
+      "cloud",
+      "sync",
+      "backup",
+      "storage",
+      "upload",
+      "ui"
+    ],
+    "signature": "00000f001f803fc07ff87ff87ff83ff000000fc01ce03b7038701ce00fc00000",
+    "kind": "static"
+  },
+  {
+    "name": "copy",
+    "pack": "ui",
+    "tags": [
+      "copy",
+      "clipboard",
+      "duplicate",
+      "paste",
+      "ui"
+    ],
+    "signature": "00003fc03fc03ff83ff83ff83ff80ff80ff80ff80ff80ff80000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "dots-menu",
+    "pack": "ui",
+    "tags": [
+      "more",
+      "options",
+      "overflow",
+      "kebab",
+      "dots",
+      "menu",
+      "ui"
+    ],
+    "signature": "0000018003c003c001800000018003c003c001800000018003c003c001800000",
+    "kind": "static"
+  },
+  {
+    "name": "download",
+    "pack": "ui",
+    "tags": [
+      "download",
+      "save",
+      "import",
+      "fetch",
+      "ui"
+    ],
+    "signature": "0000018001800180018001800ff007e003c0018000003ffc3ffc3ffc3ffc0000",
+    "kind": "static"
+  },
+  {
+    "name": "edit",
+    "pack": "ui",
+    "tags": [
+      "edit",
+      "pencil",
+      "write",
+      "modify",
+      "compose",
+      "ui"
+    ],
+    "signature": "0000003c007c00fc01fc03fc07fc0ffc1ff83ff03ff03fe03fc01f00fffc0000",
+    "kind": "static"
+  },
+  {
+    "name": "eraser",
+    "pack": "ui",
+    "tags": [
+      "eraser",
+      "delete",
+      "remove",
+      "clear",
+      "tool"
+    ],
+    "signature": "0000000000001ff83ffc3ffc3ffc3ffc3ffc3ffc3ffc3ffc1ff8000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "external-link",
+    "pack": "ui",
+    "tags": [
+      "external",
+      "link",
+      "open",
+      "new-tab",
+      "navigate",
+      "ui"
+    ],
+    "signature": "000000fe01fc03f007f079e07cc07e807f007f807fc07fe07ff0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "eyedropper",
+    "pack": "ui",
+    "tags": [
+      "eyedropper",
+      "color-picker",
+      "sample",
+      "tool",
+      "pipette"
+    ],
+    "signature": "0000001c003c003c007c00f801e003c007800f001e003c003c00380010000000",
+    "kind": "static"
+  },
+  {
+    "name": "gear",
+    "pack": "ui",
+    "tags": [
+      "gear",
+      "cog",
+      "engine",
+      "process",
+      "system",
+      "ui"
+    ],
+    "signature": "000003c01bd87ffe6006c003c183c3c3c3c3c183c00360067ffe1bd803c00000",
+    "kind": "static"
+  },
+  {
+    "name": "grid",
+    "pack": "ui",
+    "tags": [
+      "grid",
+      "gallery",
+      "layout",
+      "tiles",
+      "ui"
+    ],
+    "signature": "000000003ff83ff83ff83ff83ff83ff83ff83ff83ff83ff83ff8000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "history",
+    "pack": "ui",
+    "tags": [
+      "history",
+      "undo",
+      "back",
+      "time",
+      "past",
+      "ui"
+    ],
+    "signature": "0000000007e01ff8381c300c6006600660066006300c381c7ff0fc0070000000",
+    "kind": "static"
+  },
+  {
+    "name": "home",
+    "pack": "ui",
+    "tags": [
+      "home",
+      "house",
+      "start",
+      "main",
+      "ui"
+    ],
+    "signature": "0000008001c003e007f00ffc1ffc3ffe1ff81ff81ff81ff81ff81ff81ff00000",
+    "kind": "static"
+  },
+  {
+    "name": "list",
+    "pack": "ui",
+    "tags": [
+      "list",
+      "items",
+      "feed",
+      "rows",
+      "ui"
+    ],
+    "signature": "0000000033fc33fc000033fc33fc000033fc33fc000033fc33fc000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "loading-spinner",
+    "pack": "ui",
+    "tags": [
+      "loading",
+      "spinner",
+      "progress",
+      "wait",
+      "animated",
+      "ui"
+    ],
+    "signature": "000007c01ff0381c700e700e700e700e700e700e700e381c1ff007c000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "lock",
+    "pack": "ui",
+    "tags": [
+      "lock",
+      "secure",
+      "private",
+      "security",
+      "closed",
+      "ui"
+    ],
+    "signature": "00000f801fc01fc01fc01fc0fffcfffcfffcfffcfffcfffcfffc000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "lock-open",
+    "pack": "ui",
+    "tags": [
+      "lock",
+      "open",
+      "unlock",
+      "access",
+      "security",
+      "ui"
+    ],
+    "signature": "00000f801f80398030803000300033ff37fe07fe07fe07fe07fe07fe00000000",
+    "kind": "static"
+  },
+  {
+    "name": "menu",
+    "pack": "ui",
+    "tags": [
+      "menu",
+      "hamburger",
+      "nav",
+      "sidebar",
+      "toggle",
+      "ui"
+    ],
+    "signature": "000000007ffe7ffe7ffe7ffe00007ffe7ffe7ffe7ffe00007ffe7ffe7ffe7ffe",
+    "kind": "static"
+  },
+  {
+    "name": "package",
+    "pack": "ui",
+    "tags": [
+      "package",
+      "box",
+      "module",
+      "pack",
+      "npm",
+      "ship"
+    ],
+    "signature": "000001800ff03ffc7ffe7ffe7ffe7ffe7ffe7ffe7ffc7ff87ff07fe000000000",
+    "kind": "static"
+  },
+  {
+    "name": "paint-bucket",
+    "pack": "ui",
+    "tags": [
+      "bucket",
+      "fill",
+      "paint",
+      "tool",
+      "pour"
+    ],
+    "signature": "0000381c47e240027ffe3ffc3ffc3ffc1ff81ffc0ff60ff207e007e000000000",
+    "kind": "static"
+  },
+  {
+    "name": "palette",
+    "pack": "ui",
+    "tags": [
+      "palette",
+      "color",
+      "paint",
+      "art",
+      "design",
+      "brush"
+    ],
+    "signature": "00000fc03ff07ff87ffcfffefffefffafff2ffe47fe87ff03fe01fe00f000000",
+    "kind": "static"
+  },
+  {
+    "name": "pause",
+    "pack": "ui",
+    "tags": [
+      "pause",
+      "stop",
+      "hold",
+      "media"
+    ],
+    "signature": "000000001ce01ce01ce01ce01ce01ce01ce01ce01ce01ce01ce01ce000000000",
+    "kind": "static"
+  },
+  {
+    "name": "pencil",
+    "pack": "ui",
+    "tags": [
+      "pencil",
+      "draw",
+      "edit",
+      "tool",
+      "write"
+    ],
+    "signature": "00030007000f001e003c007800f001e003c007800f001e003c00780070002000",
+    "kind": "static"
+  },
+  {
+    "name": "play",
+    "pack": "ui",
+    "tags": [
+      "play",
+      "start",
+      "begin",
+      "resume",
+      "media"
+    ],
+    "signature": "00000000300038003c003e003f003f803f803f003e003c003800300000000000",
+    "kind": "static"
+  },
+  {
+    "name": "pulsing-dot",
+    "pack": "ui",
+    "tags": [
+      "dot",
+      "pulse",
+      "live",
+      "online",
+      "notification",
+      "animated",
+      "ui"
+    ],
+    "signature": "0000000003c007c00ff00ff00ff00ff007c003c0000000000000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "redo",
+    "pack": "ui",
+    "tags": [
+      "redo",
+      "forward",
+      "repeat",
+      "history"
+    ],
+    "signature": "000000000010001807fc1ff83c103c003c003c001e000f0003e0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "robot",
+    "pack": "ui",
+    "tags": [
+      "robot",
+      "ai",
+      "bot",
+      "automation",
+      "artificial-intelligence"
+    ],
+    "signature": "018001800ff01ff83ffc3ffc3ffc3ffc3ffc3ffc1ff8dffbcff303c003c00000",
+    "kind": "static"
+  },
+  {
+    "name": "search",
+    "pack": "ui",
+    "tags": [
+      "search",
+      "find",
+      "query",
+      "magnify",
+      "ui"
+    ],
+    "signature": "00000f801fc03ff03ff03ff03ff01fc00fa0006000300018000c000400000000",
+    "kind": "static"
+  },
+  {
+    "name": "settings",
+    "pack": "ui",
+    "tags": [
+      "settings",
+      "sliders",
+      "preferences",
+      "adjust",
+      "filter",
+      "ui"
+    ],
+    "signature": "0000000000007ffe7ffe000000007ffe7ffe000000007ffe7ffe000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "shaking-bell",
+    "pack": "ui",
+    "tags": [
+      "bell",
+      "notification",
+      "alert",
+      "ring",
+      "shake",
+      "animated",
+      "ui"
+    ],
+    "signature": "0000018003c007e00ff00ff60ff60ffc0ffc0ffc07f803c00180000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "sparkle-small",
+    "pack": "ui",
+    "tags": [
+      "sparkle",
+      "star",
+      "special",
+      "indicator",
+      "diamond"
+    ],
+    "signature": "0000000001000100038007c00fe01ff00fe007c0038001000100000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "spinning-gear",
+    "pack": "ui",
+    "tags": [
+      "gear",
+      "spin",
+      "loading",
+      "process",
+      "config",
+      "animated",
+      "ui"
+    ],
+    "signature": "000002800ff03ffc7ffe7ffc7ffe7ffc7ffe7ffc3ff80ff00280000010400000",
+    "kind": "animated"
+  },
+  {
+    "name": "trash",
+    "pack": "ui",
+    "tags": [
+      "trash",
+      "delete",
+      "remove",
+      "bin",
+      "discard",
+      "ui"
+    ],
+    "signature": "000007c01ff07ffc7ff83ff03fe03fe03fe03fe03fe03ff03fe01fc000000000",
+    "kind": "static"
+  },
+  {
+    "name": "undo",
+    "pack": "ui",
+    "tags": [
+      "undo",
+      "back",
+      "reverse",
+      "history",
+      "revert"
+    ],
+    "signature": "00000000080018003fe01ff8083c003c003c003c007800f007c0000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "upload",
+    "pack": "ui",
+    "tags": [
+      "upload",
+      "send",
+      "export",
+      "push",
+      "ui"
+    ],
+    "signature": "00003ffc3ffc3ffc3ffc0000018003c007e00ff0018001800180018001800000",
+    "kind": "static"
+  },
+  {
+    "name": "clear-night",
+    "pack": "weather",
+    "tags": [
+      "night",
+      "clear",
+      "moon",
+      "stars",
+      "calm",
+      "weather"
+    ],
+    "signature": "000040e001f00390038000200380039001f000e0200000000004000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "cloud",
+    "pack": "weather",
+    "tags": [
+      "cloud",
+      "cloudy",
+      "overcast",
+      "sky",
+      "weather"
+    ],
+    "signature": "00000000000001c007e00ff01ff81ff81ff80ff80ff800000000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "cloud-sun",
+    "pack": "weather",
+    "tags": [
+      "cloud",
+      "sun",
+      "partly-cloudy",
+      "daytime",
+      "weather"
+    ],
+    "signature": "00000010003c007c01fe07fc0ff81ff81ff81ff80ff80ff80000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "cloudy-night",
+    "pack": "weather",
+    "tags": [
+      "night",
+      "cloudy",
+      "moon",
+      "overcast",
+      "weather"
+    ],
+    "signature": "00000000003c007e00ff1dff3ffe7ffc7ffc3ffc1ff80ff00000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "cold-temp",
+    "pack": "weather",
+    "tags": [
+      "cold",
+      "freeze",
+      "temperature",
+      "thermometer",
+      "winter",
+      "weather"
+    ],
+    "signature": "07c007c007c007c007c807dc07dc07c807c007c00fff1fff1fff0ffe07c00000",
+    "kind": "static"
+  },
+  {
+    "name": "compass",
+    "pack": "weather",
+    "tags": [
+      "compass",
+      "direction",
+      "navigation",
+      "north",
+      "weather"
+    ],
+    "signature": "000003c00c3010082104238447c243824382438247c22384210410080c3003c0",
+    "kind": "static"
+  },
+  {
+    "name": "crescent-moon",
+    "pack": "weather",
+    "tags": [
+      "moon",
+      "crescent",
+      "night",
+      "sleep",
+      "nocturnal",
+      "weather"
+    ],
+    "signature": "000007801fe03ff0387078107800780078007800781038703ff01fe007800000",
+    "kind": "static"
+  },
+  {
+    "name": "drifting-fog",
+    "pack": "weather",
+    "tags": [
+      "fog",
+      "mist",
+      "haze",
+      "drift",
+      "animated",
+      "weather"
+    ],
+    "signature": "000000007ffcfffefffe7ffc00007ffcfffefffe7ffc00007ffcfffe00000000",
+    "kind": "animated"
+  },
+  {
+    "name": "drizzle",
+    "pack": "weather",
+    "tags": [
+      "drizzle",
+      "rain",
+      "light-rain",
+      "weather",
+      "cloud"
+    ],
+    "signature": "0000000003800fe01ff03ff83ff81ff004800240040000100020000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "droplet",
+    "pack": "weather",
+    "tags": [
+      "droplet",
+      "water",
+      "humidity",
+      "rain",
+      "weather"
+    ],
+    "signature": "00000000008001c001c003e003e007f007f007f007f007f003e001c000000000",
+    "kind": "static"
+  },
+  {
+    "name": "eclipse",
+    "pack": "weather",
+    "tags": [
+      "eclipse",
+      "solar",
+      "moon",
+      "sun",
+      "rare",
+      "weather"
+    ],
+    "signature": "000007f81ffc3fff7ffe7ffe7ffe7ffe7ffe7ffe3fff1ffc07f8000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "falling-snow",
+    "pack": "weather",
+    "tags": [
+      "snow",
+      "fall",
+      "winter",
+      "blizzard",
+      "animated",
+      "weather"
+    ],
+    "signature": "08081c1c08080000008001c00080000008081c1c08080000008001c000800000",
+    "kind": "animated"
+  },
+  {
+    "name": "fog",
+    "pack": "weather",
+    "tags": [
+      "fog",
+      "mist",
+      "haze",
+      "visibility",
+      "weather"
+    ],
+    "signature": "0000000000003ffc00001ff800003ffc00000ff000001ff8000007e000000000",
+    "kind": "static"
+  },
+  {
+    "name": "full-moon",
+    "pack": "weather",
+    "tags": [
+      "moon",
+      "full",
+      "night",
+      "cycle",
+      "bright",
+      "weather"
+    ],
+    "signature": "000003c00ff81ffc3ffe3fff3fff3fff3ffe1ffc0ff803c00000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "hail",
+    "pack": "weather",
+    "tags": [
+      "hail",
+      "ice",
+      "storm",
+      "pellets",
+      "weather"
+    ],
+    "signature": "01c003e00ff00ff81ff80ff80ff8020004100eb805d002800720027000200000",
+    "kind": "static"
+  },
+  {
+    "name": "hot-temp",
+    "pack": "weather",
+    "tags": [
+      "hot",
+      "heat",
+      "temperature",
+      "thermometer",
+      "warm",
+      "weather"
+    ],
+    "signature": "07c007c007c007c007ce07df07df07ce07c007c00fe01ff01ff00fe007c00000",
+    "kind": "static"
+  },
+  {
+    "name": "lightning-strike",
+    "pack": "weather",
+    "tags": [
+      "lightning",
+      "thunder",
+      "storm",
+      "strike",
+      "electric",
+      "animated",
+      "weather"
+    ],
+    "signature": "00001fe03ff03ff81ff80ff00180038007800380018000800000000000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "moon",
+    "pack": "weather",
+    "tags": [
+      "moon",
+      "night",
+      "crescent",
+      "dark",
+      "weather"
+    ],
+    "signature": "00000000000006000c081c003c003c003c043e003f001ff00fe007c000000000",
+    "kind": "static"
+  },
+  {
+    "name": "pulsing-sun",
+    "pack": "weather",
+    "tags": [
+      "sun",
+      "pulse",
+      "glow",
+      "bright",
+      "rays",
+      "animated",
+      "weather"
+    ],
+    "signature": "000002a002a023e227f21ff81ff83ffc1ff81ff80ff027d223c402a000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "rain",
+    "pack": "weather",
+    "tags": [
+      "rain",
+      "rainy",
+      "shower",
+      "wet",
+      "weather"
+    ],
+    "signature": "000001c003e00ff00ff81ff80ff80ff802000490049000800220022000000000",
+    "kind": "static"
+  },
+  {
+    "name": "rain-night",
+    "pack": "weather",
+    "tags": [
+      "rain",
+      "night",
+      "storm",
+      "shower",
+      "weather"
+    ],
+    "signature": "0003000f1d8e3fde7ff07ff03ff01fe0088008a0111011100000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "rainbow",
+    "pack": "weather",
+    "tags": [
+      "rainbow",
+      "colorful",
+      "arc",
+      "hope",
+      "weather"
+    ],
+    "signature": "00000000000007e01ff87ffe7ffefffffffffc3ff81ff81ff81ff81ff81ffc3f",
+    "kind": "static"
+  },
+  {
+    "name": "snow",
+    "pack": "weather",
+    "tags": [
+      "snow",
+      "snowy",
+      "winter",
+      "cold",
+      "weather"
+    ],
+    "signature": "000001c003e00ff00ff81ff80ff80ff802000408014002100820008000000000",
+    "kind": "static"
+  },
+  {
+    "name": "snow-night",
+    "pack": "weather",
+    "tags": [
+      "snow",
+      "night",
+      "winter",
+      "cold",
+      "weather"
+    ],
+    "signature": "0003000f1d8e3fde7ff07ff03ff01fe00880154008a015400000000000000000",
+    "kind": "static"
+  },
+  {
+    "name": "snowflake",
+    "pack": "weather",
+    "tags": [
+      "snowflake",
+      "ice",
+      "frozen",
+      "crystal",
+      "weather"
+    ],
+    "signature": "00000000008002a00888049012a401c03ffe01c012a40490088802a000800000",
+    "kind": "static"
+  },
+  {
+    "name": "spinning-tornado",
+    "pack": "weather",
+    "tags": [
+      "tornado",
+      "spin",
+      "storm",
+      "funnel",
+      "animated",
+      "weather"
+    ],
+    "signature": "ffffffffffff7ffe3ff81ff80ff00ff00fe007e007e003c003c0018000000000",
+    "kind": "animated"
+  },
+  {
+    "name": "starry-night",
+    "pack": "weather",
+    "tags": [
+      "stars",
+      "night",
+      "sky",
+      "space",
+      "galaxy",
+      "weather"
+    ],
+    "signature": "0100010010101010018001802000200000200020200000000808080800000000",
+    "kind": "static"
+  },
+  {
+    "name": "sun",
+    "pack": "weather",
+    "tags": [
+      "sun",
+      "sunny",
+      "day",
+      "bright",
+      "weather"
+    ],
+    "signature": "00000080008010080bd007e00ff00ff06ff60ff007e00bd01008008000800000",
+    "kind": "static"
+  },
+  {
+    "name": "sunrise",
+    "pack": "weather",
+    "tags": [
+      "sunrise",
+      "dawn",
+      "morning",
+      "horizon",
+      "weather"
+    ],
+    "signature": "000000000000000000800080080805d003e017f407f07ffe0000008003600000",
+    "kind": "static"
+  },
+  {
+    "name": "sunset",
+    "pack": "weather",
+    "tags": [
+      "sunset",
+      "dusk",
+      "evening",
+      "horizon",
+      "weather"
+    ],
+    "signature": "000000000000000000800080080801c003e017f407f07ffe0000036000800000",
+    "kind": "static"
+  },
+  {
+    "name": "thermometer",
+    "pack": "weather",
+    "tags": [
+      "thermometer",
+      "temperature",
+      "hot",
+      "cold",
+      "weather"
+    ],
+    "signature": "00000000018003c001a0018001a0018001a0018003c007e007e007e003c00000",
+    "kind": "static"
+  },
+  {
+    "name": "thunder",
+    "pack": "weather",
+    "tags": [
+      "thunder",
+      "lightning",
+      "storm",
+      "electric",
+      "weather"
+    ],
+    "signature": "01c003e00ff00ff81ff80ff80ff802c00180018003e000c00180018003000000",
+    "kind": "static"
+  },
+  {
+    "name": "tornado",
+    "pack": "weather",
+    "tags": [
+      "tornado",
+      "twister",
+      "storm",
+      "disaster",
+      "weather"
+    ],
+    "signature": "0000000000003ffc3ffc1ff81ff80ff00ff007e007e003c003c0018000000000",
+    "kind": "static"
+  },
+  {
+    "name": "umbrella",
+    "pack": "weather",
+    "tags": [
+      "umbrella",
+      "rain",
+      "protection",
+      "shelter",
+      "weather"
+    ],
+    "signature": "0000000003e007f00ff81ffc1ffc1ffc00800080008000800280030000000000",
+    "kind": "static"
+  },
+  {
+    "name": "wind",
+    "pack": "weather",
+    "tags": [
+      "wind",
+      "windy",
+      "breeze",
+      "air",
+      "weather"
+    ],
+    "signature": "00000000000c7ffa0006000c000007fe000c001800003ff80004000800000000",
+    "kind": "static"
+  },
+  {
+    "name": "wind-gust",
+    "pack": "weather",
+    "tags": [
+      "wind",
+      "gust",
+      "breeze",
+      "air",
+      "weather",
+      "animated"
+    ],
+    "signature": "0000000000003f001f00070000000fc003c000c000003c000e00020000000000",
+    "kind": "animated"
+  }
+]

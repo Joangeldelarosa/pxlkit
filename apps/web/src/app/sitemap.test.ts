@@ -39,6 +39,7 @@ describe('sitemap()', () => {
       'https://pxlkit.xyz/explore',
       'https://pxlkit.xyz/icons',
       'https://pxlkit.xyz/builder',
+      'https://pxlkit.xyz/skills',
     ];
     for (const url of required) {
       expect(urls).toContain(url);

@@ -1,9 +1,16 @@
 /**
  * Coherence Audit Runner
  *
- * Loads the AuditContext, instantiates all 30 gates in `./gates/*.ts`, runs them
+ * Loads the AuditContext, instantiates every gate in `./gates/*.ts`, runs them
  * in parallel, aggregates findings, and writes `coherence-report.md` at the repo
  * root. Supports `--json` for CI consumption.
+ *
+ * Registration is by discovery, not by list: a gate joins the audit the moment
+ * a `gates/NN-name.ts` file default-exports a Gate (or a functional gate wrapped
+ * in `adaptFunctionalGate`). `NN` only orders the report. Gates currently
+ * registered run 01…36, including `36-skill-refs-fresh`, which verifies that
+ * the generated `plugins/pxlkit/references/` corpus is still in sync with the
+ * ui-kit SSOT.
  *
  * Programmatic API:
  *   const result = await runAudit({ repoRoot: '/path/to/repo' });

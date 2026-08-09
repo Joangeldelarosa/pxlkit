@@ -15,6 +15,7 @@ const NAV_ITEMS: { href: string; label: string; badge?: string; external?: boole
   { href: '/templates', label: 'Templates' },
   { href: '/explore', label: 'Explore', badge: '🚧' },
   { href: '/docs', label: 'Docs' },
+  { href: '/skills', label: 'Skills' },
   // Storybook lives on a separate Vercel deploy — see STORYBOOK_DEPLOY.md.
   // Falls back to a placeholder until the subdomain is wired up; the badge
   // signals the entry is external.
@@ -100,11 +101,19 @@ export function Navbar() {
           <BrandMark size={26} className="group-hover:opacity-95 transition-opacity" />
         </Link>
 
-        {/* Desktop nav links + actions */}
-        <div className="hidden lg:flex items-center gap-1">
+        {/* Desktop nav links + actions
+         *
+         * Breakpoint is `xl`, not `lg`. Ten items plus the logo, theme toggle and
+         * GitHub pill need ~1180px; below that the row either wraps onto a second
+         * line or squeezes labels until "UI Kit" breaks across two lines. The
+         * hamburger already works and reads better than a cramped row.
+         *
+         * `whitespace-nowrap` and `shrink-0` are what stop a two-word label from
+         * folding onto itself when space gets tight. */}
+        <div className="hidden xl:flex items-center gap-1">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
-            const className = `px-4 py-2 text-sm font-mono transition-all rounded relative ${
+            const className = `shrink-0 whitespace-nowrap px-2.5 py-2 text-sm font-mono transition-all rounded relative ${
               isActive
                 ? 'text-retro-green bg-retro-green/10'
                 : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
@@ -155,18 +164,18 @@ export function Navbar() {
             href="https://github.com/joangeldelarosa/pxlkit"
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-1 flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded border border-retro-gold/30 text-retro-gold/80 hover:text-retro-gold hover:border-retro-gold/60 hover:bg-retro-gold/10 transition-all"
+            className="ml-1 shrink-0 whitespace-nowrap flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono rounded border border-retro-gold/30 text-retro-gold/80 hover:text-retro-gold hover:border-retro-gold/60 hover:bg-retro-gold/10 transition-all"
             aria-label="Star on GitHub"
             title="Star on GitHub"
           >
             <StarIcon className="w-3.5 h-3.5" />
-            <span className="hidden lg:inline">Star on GitHub</span>
-            <span className="lg:hidden">Star</span>
+            <span className="hidden 2xl:inline">Star on GitHub</span>
+            <span className="2xl:hidden">Star</span>
           </a>
         </div>
 
         {/* Mobile: theme toggle + hamburger */}
-        <div className="flex lg:hidden items-center gap-1">
+        <div className="flex xl:hidden items-center gap-1">
           <PixelBareButton
             onClick={toggleTheme}
             className="p-2 rounded border border-retro-border/50 text-retro-muted hover:text-retro-gold hover:border-retro-gold/40 transition-all"
@@ -211,7 +220,7 @@ export function Navbar() {
 
       {/* Mobile menu dropdown */}
       {menuOpen && (
-        <div className="lg:hidden border-t border-retro-border/50 bg-retro-bg/95 backdrop-blur-md animate-in slide-in-from-top duration-200">
+        <div className="xl:hidden border-t border-retro-border/50 bg-retro-bg/95 backdrop-blur-md animate-in slide-in-from-top duration-200">
           <div className="px-4 py-3 space-y-1">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
