@@ -15,7 +15,6 @@ import {
   PixelFloat,
   PixelHeroSection,
   PixelHeroMedia,
-  PixelIconFrame,
   PixelKbd,
   PixelSectionHeader,
   PixelStack,
@@ -91,10 +90,11 @@ export default function SkillsPage() {
     <div className="bg-retro-bg">
       <PixelHeroSection
         eyebrow={`Claude Code plugin v${PLUGIN_VERSION} · built for ui-kit ${UI_KIT_VERSION_LABEL}`}
-        headline="Describe it. Ship it pixel-perfect."
+        headline="Describe it. Ship it."
         headlineEffect="glitch"
         subline="Five skills that give Claude the real pxlkit API, canonical composition recipes, and scripts that check its own output before you see it."
         tone="green"
+        density="compact"
         install={
           <PixelCluster gap={2} align="center">
             <PixelChip tone="cyan" label="claude plugin install pxlkit@pxlkit" />
@@ -120,16 +120,75 @@ export default function SkillsPage() {
           </PixelCluster>
         }
         media={
-          <PixelHeroMedia framed tone="green">
-            <div className="flex h-full w-full items-center justify-center">
+          <PixelHeroMedia framed tone="green" ratio="16/10">
+            {/* A single icon in this frame reads as an empty box — the frame is
+                large and an icon is not. A transcript fills it with the thing the
+                page is actually selling, and every number in it is from the run
+                written up in docs/skills/real-world-demos.md. */}
+            {/* `framed` enforces an aspect ratio, which is right for an image and
+                wrong for a transcript: the text is shorter than the box, so the
+                leftover space pools at the bottom and the frame reads as cut off.
+                Centring makes it symmetric, so it reads as padding. */}
+            <div className="flex h-full w-full flex-col justify-center overflow-x-auto p-4 font-mono text-[11px] leading-relaxed sm:p-5 sm:text-xs">
+              <div className="flex items-center gap-1.5 pb-3">
+                <span className="h-2 w-2 rounded-full bg-retro-red" />
+                <span className="h-2 w-2 rounded-full bg-retro-gold" />
+                <span className="h-2 w-2 rounded-full bg-retro-green" />
+                <span className="ml-2 text-retro-muted">claude</span>
+              </div>
+
+              <p className="whitespace-nowrap">
+                <span className="text-retro-green">$</span>{' '}
+                <span className="text-retro-text">claude plugin install pxlkit@pxlkit</span>
+              </p>
+              <p className="whitespace-nowrap text-retro-muted">
+                <span className="text-retro-green">✔</span> installed · 5 skills
+              </p>
+
+              <p className="whitespace-nowrap pt-3">
+                <span className="text-retro-cyan">&gt;</span>{' '}
+                <span className="text-retro-text">/pxlkit:imagine a pricing page, cyan</span>
+              </p>
+
               <PixelFloat>
-                <PixelIconFrame
-                  tone="green"
-                  size={112}
-                  icon={<PxlKitIcon icon={Robot} size={72} />}
-                  accent={{ icon: <PxlKitIcon icon={Sparkles} size={24} />, position: 'top-right' }}
-                />
+                <div className="pt-2 text-retro-muted">
+                  <p className="whitespace-nowrap">
+                    <span className="text-retro-green">✔</span> preflight — vite · npm · ready
+                  </p>
+                  <p className="whitespace-nowrap">
+                    <span className="text-retro-green">✔</span> 6 sections planned
+                  </p>
+                  <p className="whitespace-nowrap">
+                    <span className="text-retro-green">✔</span> 30 components · 8 categories
+                  </p>
+                  <p className="whitespace-nowrap">
+                    <span className="text-retro-green">✔</span> tsc 0 · build 0 · axe 0
+                  </p>
+                </div>
               </PixelFloat>
+
+              <p className="whitespace-nowrap pt-3">
+                <span className="text-retro-cyan">&gt;</span>{' '}
+                <span className="text-retro-text">/pxlkit:audit --fix --visual</span>
+              </p>
+              <div className="pt-2 text-retro-muted">
+                <p className="whitespace-nowrap">
+                  <span className="text-retro-green">✔</span> types · build · runtime
+                </p>
+                <p className="whitespace-nowrap">
+                  <span className="text-retro-green">✔</span> token purity — 0 raw palette classes
+                </p>
+                <p className="whitespace-nowrap">
+                  <span className="text-retro-green">✔</span> a11y — 0 serious, 0 critical
+                </p>
+                <p className="whitespace-nowrap">
+                  <span className="text-retro-gold">⚠</span> 1 fix applied — card href wrapped a button
+                </p>
+              </div>
+
+              <p className="flex items-center gap-1.5 whitespace-nowrap pt-3 text-retro-gold">
+                <PxlKitIcon icon={Sparkles} size={12} /> pixel-perfect
+              </p>
             </div>
           </PixelHeroMedia>
         }

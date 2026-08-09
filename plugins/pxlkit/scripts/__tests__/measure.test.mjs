@@ -119,6 +119,32 @@ test('parses the generated diversity menu into categories and tiers', () => {
   assert.equal(menu.get('PixelFeatureCard').category, 'cards');
 });
 
+test('an imported but unrendered component does not count', async () => {
+  // Otherwise the cheapest possible edit — one more line in the import block —
+  // raises the score without changing a pixel. Caught on this repo's own /skills
+  // page, which claimed PixelIconFrame after it stopped rendering it.
+  const fs = await import('node:fs');
+  const os = await import('node:os');
+  const path = await import('node:path');
+  const { countDiversity } = await import('../count-diversity.mjs');
+
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pxl-div-'));
+  const file = path.join(dir, 'Page.tsx');
+  fs.writeFileSync(
+    file,
+    `import { PixelButton, PixelCard, PixelGhost } from '@pxlkit/ui-kit';
+export default function Page() {
+  return <PixelCard><PixelButton>hi</PixelButton></PixelCard>;
+}`,
+  );
+
+  const result = countDiversity([file], null);
+  assert.ok(result.distinct.includes('PixelButton'));
+  assert.ok(result.distinct.includes('PixelCard'));
+  assert.ok(!result.distinct.includes('PixelGhost'), 'unused import must not count');
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
 test('thresholds are ordered so a landing demands more than a simple page', () => {
   assert.ok(THRESHOLDS.landing.distinct > THRESHOLDS.dashboard.distinct);
   assert.ok(THRESHOLDS.dashboard.distinct > THRESHOLDS.page.distinct);

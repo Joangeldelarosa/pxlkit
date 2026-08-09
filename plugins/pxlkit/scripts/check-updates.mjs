@@ -143,9 +143,16 @@ async function fetchLatest() {
   if (site && (typeof site.plugin === 'string' || typeof site.uiKit === 'string')) {
     return { plugin: site.plugin ?? null, uiKit: site.uiKit ?? null, source: 'site' };
   }
+  // npm deliberately does NOT fall back into `plugin`.
+  //
+  // The registry publishes @pxlkit/ui-kit, which since the plugin/kit version split
+  // is a different line entirely. Treating it as the plugin's latest compares 1.0.0
+  // against 2.1.1 and announces an update to a version that does not exist — to
+  // every user, every day. The kit number is still worth having, so it is kept
+  // under `uiKit` and left out of the plugin decision.
   const npm = await fetchJson(NPM_FALLBACK_URL);
   if (npm && typeof npm.version === 'string') {
-    return { plugin: npm.version, uiKit: npm.version, source: 'npm' };
+    return { plugin: null, uiKit: npm.version, source: 'npm' };
   }
   return null;
 }
@@ -177,12 +184,21 @@ async function main() {
     return;
   }
 
-  const latestPlugin = latest.plugin ?? latest.uiKit;
+  // No `?? latest.uiKit` here. The kit version is not the plugin's, and falling back
+  // to it is exactly how this reported an update to a version that does not exist.
+  const latestPlugin = latest.plugin ?? null;
   const updateAvailable = shouldNotify(current, latestPlugin);
 
   if (asJson) {
     console.log(
-      JSON.stringify({ current, latest: latestPlugin, updateAvailable, source: latest.source ?? 'cache', cached }),
+      JSON.stringify({
+        current,
+        latest: latestPlugin,
+        uiKit: latest.uiKit ?? null,
+        updateAvailable,
+        source: latest.source ?? 'cache',
+        cached,
+      }),
     );
     return;
   }

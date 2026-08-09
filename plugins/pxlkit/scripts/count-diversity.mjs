@@ -126,11 +126,30 @@ function collectFiles(target, acc = []) {
   return acc;
 }
 
+/**
+ * Does `name` actually appear in the file body, not just its import statement?
+ *
+ * Counting imports alone makes the metric gameable by the cheapest possible edit —
+ * add a line to the import block and the score goes up without a pixel changing.
+ * Observed on this repo's own /skills page, which claimed a component it had
+ * stopped rendering. A component earns its count by being used.
+ */
+function isRendered(source, name) {
+  const withoutImports = source.replace(
+    /import\s+(?:type\s+)?\{[^{}]*?\}\s*from\s*['"][^'"]+['"];?/g,
+    '',
+  );
+  return new RegExp(`\\b${name}\\b`).test(withoutImports);
+}
+
 /** Counts distinct components, categories touched, and underused picks. */
 export function countDiversity(files, menu) {
   const used = new Set();
   for (const file of files) {
-    for (const name of extractUiKitImports(fs.readFileSync(file, 'utf8'))) used.add(name);
+    const source = fs.readFileSync(file, 'utf8');
+    for (const name of extractUiKitImports(source)) {
+      if (isRendered(source, name)) used.add(name);
+    }
   }
 
   const categories = new Set();
