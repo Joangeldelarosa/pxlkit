@@ -34,7 +34,7 @@
  * Safety: read-only. The gate never writes.
  */
 
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import type { DriftItem, Gate, GateResult } from '../types';
@@ -117,8 +117,12 @@ export interface SkillRefsVersionFile {
  * docblock carries the same warning from the other side.
  */
 export async function computeExpectedDigest(repoRoot: string): Promise<string> {
-  const [registry, tokens, common, styles, coreTypes] = await Promise.all([
-    readOrEmpty(join(repoRoot, 'packages/ui-kit/src/registry.generated.ts')),
+  // `registry.generated.ts` is not an input. It is gitignored, so on a clean
+  // checkout it does not exist and the recomputed hash would never match the
+  // committed one — the gate would fail on CI and pass on the machine that
+  // happened to have generated it. The manifests it is derived from are tracked
+  // and hashed below, so nothing is lost by leaving it out.
+  const [tokens, common, styles, coreTypes] = await Promise.all([
     readOrEmpty(join(repoRoot, 'packages/ui-kit/src/tokens.ts')),
     readOrEmpty(join(repoRoot, 'packages/ui-kit/src/common.tsx')),
     readOrEmpty(join(repoRoot, 'packages/ui-kit/styles.css')),
@@ -131,7 +135,6 @@ export async function computeExpectedDigest(repoRoot: string): Promise<string> {
   });
 
   return computeDigestHash({
-    registry,
     tokens,
     common,
     styles,
@@ -202,12 +205,55 @@ const PXL_SYMBOL_RE = /\b(?:Pixel|PxlKit)[A-Z][A-Za-z0-9]*/g;
  * The gate's job is catching references to components that do not exist, not
  * policing which package a real one lives in.
  */
+/** Component names taken from the source filenames under `dir`, recursively. */
+async function componentFileNames(dir: string): Promise<string[]> {
+  const names: string[] = [];
+
+  async function walk(current: string, depth: number): Promise<void> {
+    if (depth > 4) return;
+    let entries: Awaited<ReturnType<typeof readdir>>;
+    try {
+      entries = await readdir(current, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      const full = join(current, entry.name);
+      if (entry.isDirectory()) {
+        // `__tests__` and `_internal` hold no public component.
+        if (entry.name.startsWith('_') || entry.name === 'node_modules') continue;
+        await walk(full, depth + 1);
+        continue;
+      }
+      const match = /^((?:Pixel|PxlKit)[A-Z][A-Za-z0-9]*)\.tsx?$/.exec(entry.name);
+      if (match) names.push(match[1]);
+    }
+  }
+
+  await walk(dir, 0);
+  return names;
+}
+
 export async function readKnownSymbols(repoRoot: string): Promise<Set<string>> {
   const known = new Set<string>();
 
+  // The component source files are the oracle: one file per component, tracked in
+  // git, and complete by construction.
+  //
+  // Two narrower sources were tried and both under-report. The generated registry is
+  // gitignored, so on a clean checkout it is absent and every component vanishes from
+  // the oracle. The manifests miss components that do not have one — `PixelIconButton`
+  // is real, registered and exported, and has no manifest. Either mistake turns a
+  // correct `pixelate-map.md` row into a CI failure that cannot be reproduced locally.
+  for (const dir of ['packages/ui-kit/src', 'packages/core/src']) {
+    for (const name of await componentFileNames(join(repoRoot, dir))) {
+      known.add(name);
+    }
+  }
+
+  // Providers, contexts and helper types are public exports that are not files of
+  // their own, so the entry points still matter.
   const sources = [
-    (await tryRead(join(repoRoot, 'packages/ui-kit/src/registry.generated.ts'))) ??
-      (await tryRead(join(repoRoot, 'packages/ui-kit/src/registry.ts'))),
     await tryRead(join(repoRoot, 'packages/ui-kit/src/index.tsx')),
     (await tryRead(join(repoRoot, 'packages/core/src/index.ts'))) ??
       (await tryRead(join(repoRoot, 'packages/core/src/index.tsx'))),
@@ -259,7 +305,7 @@ export const skillRefsFreshGate: Gate = async ({ repoRoot }): Promise<GateResult
     if (expected !== versionFile.digestHash) {
       drift.push({
         artifact: VERSION_JSON,
-        expected: `digestHash ${expected} (recomputed from registry, tokens, common, styles, core types and manifests)`,
+        expected: `digestHash ${expected} (recomputed from tokens, common, styles, core types and manifests)`,
         actual: `digestHash ${versionFile.digestHash} — the committed references are stale: ${REGENERATE_HINT}`,
         severity: 'major',
       });

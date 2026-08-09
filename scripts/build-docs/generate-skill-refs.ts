@@ -319,8 +319,13 @@ export async function generateSkillRefs(ctx: GeneratorContext): Promise<Generato
   }
 
   // --- VERSION.json -------------------------------------------------------
+  // `registry.generated.ts` is deliberately NOT a digest input, even though the
+  // corpus is built from it. It is gitignored, so it does not exist in a clean
+  // checkout — including it made the hash depend on whether the machine happened to
+  // have run `docs:build` before, which meant the committed digest could never be
+  // reproduced on CI. It also adds no information: the registry is generated from
+  // the manifests, which are tracked and hashed below.
   const digestHash = computeDigestHash({
-    registry: registryTs,
     tokens: tokensTs,
     common: commonTsx,
     styles: stylesCss,

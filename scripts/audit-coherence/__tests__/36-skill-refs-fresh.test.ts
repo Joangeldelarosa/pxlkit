@@ -36,7 +36,6 @@ const INDEX_TSX = 'export { PxlKitSurfaceProvider } from "./common";\n';
 /** The digest the gate must arrive at for a fixture with no manifests. */
 function expectedDigest(): string {
   return computeDigestHash({
-    registry: REGISTRY_TS,
     tokens: TOKENS_TS,
     common: COMMON_TSX,
     styles: STYLES_CSS,
@@ -70,6 +69,15 @@ async function createFixture(opts: FixtureOptions = {}): Promise<string> {
   await mkdir(join(root, '.claude-plugin'), { recursive: true });
 
   await writeFile(join(root, 'packages/ui-kit/src/registry.generated.ts'), REGISTRY_TS);
+
+  // The oracle reads component *files*, so the fixture needs them. PixelIconButton
+  // is deliberately included without a manifest and without an index.tsx export:
+  // that is the real shape that broke CI, and it must stay covered.
+  await mkdir(join(root, 'packages/ui-kit/src/actions'), { recursive: true });
+  await mkdir(join(root, 'packages/ui-kit/src/cards'), { recursive: true });
+  await writeFile(join(root, 'packages/ui-kit/src/actions/PixelButton.tsx'), 'export const PixelButton = () => null;\n');
+  await writeFile(join(root, 'packages/ui-kit/src/actions/PixelIconButton.tsx'), 'export const PixelIconButton = () => null;\n');
+  await writeFile(join(root, 'packages/ui-kit/src/cards/PixelCard.tsx'), 'export const PixelCard = () => null;\n');
   await writeFile(join(root, 'packages/ui-kit/src/tokens.ts'), TOKENS_TS);
   await writeFile(join(root, 'packages/ui-kit/src/common.tsx'), COMMON_TSX);
   await writeFile(join(root, 'packages/ui-kit/src/index.tsx'), INDEX_TSX);
