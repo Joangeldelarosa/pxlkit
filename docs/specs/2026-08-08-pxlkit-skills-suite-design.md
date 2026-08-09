@@ -89,6 +89,13 @@ Salidas en `plugins/pxlkit/references/`, todas con cabecera `<!-- GENERATED from
 
 ### 4.3 Versionado del plugin
 
+> **Corregido durante la implementación.** El diseño original acoplaba la versión del plugin a la del kit, y el gate 36 lo imponía comparando `plugin.json` contra `VERSION.json.uiKit`. Estaba mal, y lo demostró el propio trabajo: comprimir las descripciones de los skills fue un cambio real del plugin, valioso para el usuario, sin tocar el kit — y bajo el acoplamiento se habría publicado sin número de versión nuevo, es decir, sin señal de actualización. Justo el fallo que §4.4 existe para evitar.
+>
+> Ahora son **dos cadenas independientes**. La del plugin (`plugin.json` = entrada del marketplace = `VERSION.json.plugin`) es lo que el usuario instala y actualiza. La del kit (`VERSION.json.uiKit` = versión real del ui-kit) registra de qué versión se generó el digest, para que un skill pueda saber si su mapa sigue correspondiendo al territorio. El gate 36 verifica cada una por separado.
+>
+> Consecuencia práctica: el plugin arranca en **1.0.0**, que es lo honesto para un artefacto nuevo en su primera publicación. Que el kit vaya por 2.1.1 es información distinta, y se muestra como tal.
+
+
 El repo **no tiene** el script `release:bump` que su propio runbook cita (`docs/runbooks/ship-a-release.md:64` menciona `pnpm run release:bump`, y el repo usa npm). Esto se resuelve dentro de este trabajo: se añade `scripts/release/bump-plugin.mjs`, invocado desde la cascada, que sincroniza `plugin.json`, la entrada de `marketplace.json` y `VERSION.json` con la versión del ui-kit. El gate 36 verifica la tripleta.
 
 Política de tags: `claude plugin tag` crea `pxlkit--v<X.Y.Z>` junto al `v<X.Y.Z>` que crea el workflow de publish. Se documenta en el runbook para que nadie interprete la divergencia como un error.

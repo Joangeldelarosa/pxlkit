@@ -5,6 +5,7 @@ import {
   REPO_SLUG,
   REQUIREMENTS,
   SKILLS,
+  PLUGIN_VERSION,
   UPDATE_COMMAND,
 } from '@/lib/skills-data';
 import { UI_COMPONENTS_COUNT, ICON_COUNT_LABEL } from '@/lib/pxlkit-counts';
@@ -41,7 +42,10 @@ ${args}
 
   const body = `# pxlkit — Claude Code skills
 
-Five skills for building pixel-art interfaces with @pxlkit/ui-kit (v${UI_KIT_VERSION}):
+Plugin v${PLUGIN_VERSION}, built against @pxlkit/ui-kit v${UI_KIT_VERSION}.
+The two version independently; the skills read whichever kit version your project has.
+
+Five skills for building pixel-art interfaces with @pxlkit/ui-kit:
 ${UI_COMPONENTS_COUNT} React components, ${ICON_COUNT_LABEL} pixel-art icons, a switchable
 pixel/linear surface, and seven tones.
 

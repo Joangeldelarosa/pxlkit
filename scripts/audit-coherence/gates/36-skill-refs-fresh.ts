@@ -101,6 +101,9 @@ const SILENT_LOGGER: Logger = {
 // ---------------------------------------------------------------------------
 
 export interface SkillRefsVersionFile {
+  /** The plugin's own version. Optional so a corpus predating the split still parses. */
+  plugin?: string;
+  /** The ui-kit version the corpus was generated from. */
   uiKit?: string;
   date?: string;
   digestHash?: string;
@@ -268,19 +271,41 @@ export const skillRefsFreshGate: Gate = async ({ repoRoot }): Promise<GateResult
   const marketplace = await tryReadJson<MarketplaceFile>(join(repoRoot, MARKETPLACE_JSON));
   const entry = findMarketplaceEntry(marketplace, plugin?.name ?? 'pxlkit');
 
-  const declared: Array<{ label: string; version: string | undefined }> = [
+  // Two independent chains, because the plugin and the kit release separately.
+  //
+  // The plugin chain is the version users install and update to. The kit chain
+  // records which version of the kit the digest was generated from. Collapsing them
+  // into one comparison — as this gate originally did — makes a plugin-only release
+  // impossible to express, which silently disables the update notice for exactly the
+  // changes that need it most: a fix to a SKILL.md or a validation script.
+  const pluginChain: Array<{ label: string; version: string | undefined }> = [
     { label: PLUGIN_JSON, version: plugin?.version },
     { label: `${MARKETPLACE_JSON} (plugins[${entry?.name ?? 'pxlkit'}])`, version: entry?.version },
-    { label: VERSION_JSON, version: versionFile?.uiKit },
+    { label: `${VERSION_JSON} (plugin)`, version: versionFile?.plugin },
   ];
-  const present = declared.filter((d) => typeof d.version === 'string' && d.version.length > 0);
-  const distinct = new Set(present.map((d) => d.version));
+  const presentPlugin = pluginChain.filter(
+    (d) => typeof d.version === 'string' && d.version.length > 0,
+  );
 
-  if (present.length >= 2 && distinct.size > 1) {
+  if (presentPlugin.length >= 2 && new Set(presentPlugin.map((d) => d.version)).size > 1) {
     drift.push({
       artifact: PLUGIN_JSON,
-      expected: `plugin.json, ${MARKETPLACE_JSON} and ${VERSION_JSON} all declare the same version`,
-      actual: present.map((d) => `${d.label}=${d.version}`).join(', '),
+      expected: `plugin.json, ${MARKETPLACE_JSON} and ${VERSION_JSON}#plugin all declare the same plugin version`,
+      actual: presentPlugin.map((d) => `${d.label}=${d.version}`).join(', '),
+      severity: 'major',
+    });
+  }
+
+  // Kit chain: the digest must say which kit it came from, and be right about it.
+  const kitVersion = (
+    await tryReadJson<{ version?: string }>(join(repoRoot, 'packages/ui-kit/package.json'))
+  )?.version;
+
+  if (kitVersion && versionFile?.uiKit && kitVersion !== versionFile.uiKit) {
+    drift.push({
+      artifact: VERSION_JSON,
+      expected: `uiKit ${kitVersion} (the version the references were generated from)`,
+      actual: `uiKit ${versionFile.uiKit} — ${REGENERATE_HINT}`,
       severity: 'major',
     });
   }

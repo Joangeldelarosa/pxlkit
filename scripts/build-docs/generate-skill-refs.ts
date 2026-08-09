@@ -53,8 +53,22 @@ import { renderSetupReference } from "./skill-refs/setup.js";
 // Public types
 // ---------------------------------------------------------------------------
 
-/** Shape of the emitted VERSION.json. */
+/**
+ * Shape of the emitted VERSION.json.
+ *
+ * `plugin` and `uiKit` are deliberately separate. The plugin is its own artifact
+ * with its own release cycle: a change to a SKILL.md or a validation script is a
+ * real change users should be offered, and it happens without the kit moving at
+ * all. Pinning the two together would make those releases invisible to the update
+ * check, which is the one thing that check exists to prevent.
+ *
+ * `uiKit` records which version of the kit this digest was generated from, so a
+ * consuming skill can tell whether its map still matches the territory.
+ */
 export interface SkillRefsVersionFile {
+  /** The plugin's own version, mirrored from `.claude-plugin/plugin.json`. */
+  plugin: string;
+  /** The ui-kit version this reference corpus was generated from. */
   uiKit: string;
   date: string;
   digestHash: string;
@@ -314,7 +328,29 @@ export async function generateSkillRefs(ctx: GeneratorContext): Promise<Generato
     manifests: manifestsJson,
   });
 
-  const versionFile: SkillRefsVersionFile = { uiKit: version, date, digestHash };
+  // The plugin's own version is mirrored from its manifest rather than derived from
+  // the kit: the two move independently, and gate 36 checks each chain separately.
+  const pluginManifestRaw = await readIfPresent(
+    path.join(repoRoot, "plugins/pxlkit/.claude-plugin/plugin.json"),
+  );
+  let pluginVersion = version;
+  if (pluginManifestRaw) {
+    try {
+      const parsed = JSON.parse(pluginManifestRaw) as { version?: string };
+      if (typeof parsed.version === "string") pluginVersion = parsed.version;
+    } catch {
+      logger.warn(
+        "generate-skill-refs: plugin.json is not valid JSON — falling back to the ui-kit version",
+      );
+    }
+  }
+
+  const versionFile: SkillRefsVersionFile = {
+    plugin: pluginVersion,
+    uiKit: version,
+    date,
+    digestHash,
+  };
   add("VERSION.json", `${JSON.stringify(versionFile, null, 2)}\n`);
 
   logger.info(

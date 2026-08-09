@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Use when reviewing or fixing an existing UI built with pxlkit (@pxlkit/ui-kit) for canonical API usage, accessibility and pixel-perfect visual quality. Also the validation subroutine the pxlkit imagine and pixelate skills run on their own output. Triggers - "audit my pxlkit UI", "is this pxlkit code correct", "fix my pxlkit styling", "check my pixel art page".
+description: Use when reviewing or fixing a UI built with pxlkit (@pxlkit/ui-kit) for canonical API usage, accessibility and pixel-perfect quality. Also the validation subroutine the other pxlkit skills run.
 allowed-tools: [Read, Edit, Glob, Grep, Bash]
 argument-hint: "[path] [--fix] [--visual]"
 ---

@@ -10,7 +10,7 @@
     {
       "name": "pxlkit",
       "description": "Build pixel-perfect retro interfaces with @pxlkit/ui-kit.",
-      "version": "2.1.1",
+      "version": "1.0.0",
       "source": "./plugins/pxlkit",
       "author": {
         "name": "Joangel De La Rosa"

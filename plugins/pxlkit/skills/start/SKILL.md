@@ -1,6 +1,6 @@
 ---
 name: start
-description: Use when setting up a project to use pxlkit (@pxlkit/ui-kit) for the first time, or when the user asks what the pxlkit skills can do. Verifies React and Tailwind v4 compatibility, applies the setup recipe for the detected framework, and introduces the suite. Triggers - "set up pxlkit", "install pxlkit", "start with pxlkit", "what can pxlkit do", "add pxlkit to this project".
+description: Use when setting up a project to use pxlkit (@pxlkit/ui-kit), or when asked what the pxlkit skills do. Checks React and Tailwind v4 compatibility, then applies the setup for the detected framework.
 allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 argument-hint: "[project directory]"
 ---

@@ -77,19 +77,40 @@ Because this is manual, the coherence auditor in step 6 is the only thing standi
 and a broken publish. Do not skip it, and do not bump a package you are not actually shipping —
 the publish workflow decides what to push by comparing each local `version` against npm.
 
-### 3b. Sync the Claude Code plugin version
+### 3b. Decide whether the Claude Code plugin ships too
 
-The plugin manifests are **not** part of the package bump above and will silently drift if you
-forget them. Run:
+**The plugin versions independently of the packages.** It is not part of the cascade above, and
+that is deliberate rather than an oversight: a change to a `SKILL.md` or a validation script is a
+real release users should be offered, and it happens without the kit moving at all. Locking the two
+together would make those releases invisible to the plugin's own update check — the one thing that
+check exists to prevent.
+
+So there are two questions, not one:
+
+| Did the kit change? | Did the plugin change? | Do this |
+| --- | --- | --- |
+| yes | no | bump packages only; leave the plugin version alone |
+| no | yes | bump the plugin only; the packages stay put |
+| yes | yes | bump both, with independent version numbers |
+
+To bump the plugin:
 
 ```bash
 npm run release:bump-plugin -- --version <X.Y.Z>
 ```
 
-This rewrites exactly two files — `plugins/pxlkit/.claude-plugin/plugin.json` and the `pxlkit`
-entry in `.claude-plugin/marketplace.json` — and nothing else. It validates the version as strict
-semver (`X.Y.Z`, no prerelease suffix) and refuses to run otherwise. Run it **before** `docs:build`,
-so any generated artifact that embeds the plugin version picks up the new number.
+It rewrites exactly two files — `plugins/pxlkit/.claude-plugin/plugin.json` and the `pxlkit` entry
+in `.claude-plugin/marketplace.json` — validates the version as strict semver (`X.Y.Z`, no
+prerelease suffix), and refuses to run otherwise. Run it **before** `docs:build`, which regenerates
+`plugins/pxlkit/references/VERSION.json` and copies the new plugin version into it.
+
+Coherence gate 36 checks two chains separately and will tell you which one is wrong:
+
+- **plugin chain** — `plugin.json` = the marketplace entry = `VERSION.json#plugin`
+- **kit chain** — `VERSION.json#uiKit` = `packages/ui-kit/package.json#version`
+
+A mismatch in the kit chain means the reference corpus describes an API that is no longer the one
+shipping: run `npm run docs:build` and commit the result.
 
 ### 4. Regenerate downstream artifacts
 

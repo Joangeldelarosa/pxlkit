@@ -1,6 +1,6 @@
 ---
 name: imagine
-description: Use when the user wants to build a new pixel-art or retro frontend, page, or app with pxlkit (@pxlkit/ui-kit) - landings, dashboards, portfolios, game UI, marketing pages. Composes from the real component API instead of freehand JSX. Triggers - "pixel art landing", "retro dashboard with pxlkit", "build a page with pxlkit", "imagine a pxlkit frontend", "make a game UI with pxlkit".
+description: Use when building a new pixel-art or retro frontend with pxlkit (@pxlkit/ui-kit) — landing, dashboard, portfolio, game UI. Composes from the real component API instead of freehand JSX.
 allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 argument-hint: "[description] [--from landing|dashboard|ecommerce|portfolio|docs] [--surface pixel|linear]"
 ---

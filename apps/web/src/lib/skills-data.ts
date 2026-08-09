@@ -9,9 +9,19 @@
  */
 
 import type { Tone } from '@pxlkit/ui-kit';
+import pluginManifest from '../../../../plugins/pxlkit/.claude-plugin/plugin.json';
 
 /** GitHub owner/repo, with the capitalisation the remote actually uses. */
 export const REPO_SLUG = 'Joangeldelarosa/pxlkit';
+
+/**
+ * The plugin's own version — deliberately not the kit's.
+ *
+ * The two release independently: a fix to a skill ships without the kit moving.
+ * Showing the kit version here would tell a user their plugin is up to date when
+ * it is a release behind.
+ */
+export const PLUGIN_VERSION: string = pluginManifest.version;
 
 /**
  * The one command a user copies. Both halves matter: `marketplace add` registers

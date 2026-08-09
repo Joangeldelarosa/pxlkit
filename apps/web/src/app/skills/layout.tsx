@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { INSTALL_COMMAND, SKILLS } from '@/lib/skills-data';
-import { UI_KIT_VERSION } from '@/lib/pxlkit-version';
+import { INSTALL_COMMAND, PLUGIN_VERSION, SKILLS } from '@/lib/skills-data';
 
 /**
  * No " | Pxlkit" suffix here: the root layout applies a `%s | Pxlkit` title
@@ -74,7 +73,7 @@ function JsonLd() {
         name: 'pxlkit Claude Code plugin',
         applicationCategory: 'DeveloperApplication',
         operatingSystem: 'macOS, Linux, Windows',
-        softwareVersion: UI_KIT_VERSION,
+        softwareVersion: PLUGIN_VERSION,
         description: DESCRIPTION,
         url: 'https://pxlkit.xyz/skills',
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },

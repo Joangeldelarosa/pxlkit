@@ -39,6 +39,7 @@ import {
   REPO_SLUG,
   REQUIREMENTS,
   SKILLS,
+  PLUGIN_VERSION,
   UPDATE_COMMAND,
 } from '@/lib/skills-data';
 import { UI_COMPONENTS_COUNT, ICON_COUNT_LABEL } from '@/lib/pxlkit-counts';
@@ -89,7 +90,7 @@ export default function SkillsPage() {
   return (
     <div className="bg-retro-bg">
       <PixelHeroSection
-        eyebrow={`Claude Code plugin · ${UI_KIT_VERSION_LABEL}`}
+        eyebrow={`Claude Code plugin v${PLUGIN_VERSION} · built for ui-kit ${UI_KIT_VERSION_LABEL}`}
         headline="Describe it. Ship it pixel-perfect."
         headlineEffect="glitch"
         subline="Five skills that give Claude the real pxlkit API, canonical composition recipes, and scripts that check its own output before you see it."

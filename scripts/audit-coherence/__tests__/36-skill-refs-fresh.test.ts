@@ -48,9 +48,14 @@ function expectedDigest(): string {
 interface FixtureOptions {
   /** digestHash written into VERSION.json. Defaults to the correct one. */
   digestHash?: string;
+  /** Version written into packages/ui-kit/package.json AND VERSION.json#uiKit. */
   uiKitVersion?: string;
+  /** Overrides VERSION.json#uiKit alone, to simulate a stale corpus. */
+  versionFileUiKit?: string;
   pluginVersion?: string;
   marketplaceVersion?: string;
+  /** Overrides VERSION.json#plugin alone. Defaults to `pluginVersion`. */
+  versionFilePlugin?: string;
   /** Contents of references/pixelate-map.md. Omit to leave the file absent. */
   pixelateMap?: string;
 }
@@ -72,11 +77,20 @@ async function createFixture(opts: FixtureOptions = {}): Promise<string> {
   await writeFile(join(root, 'packages/core/src/types.ts'), CORE_TYPES_TS);
 
   const uiKit = opts.uiKitVersion ?? '2.1.1';
+  const pluginVersion = opts.pluginVersion ?? '1.0.0';
+
+  // The kit's own manifest is the oracle for the digest-provenance check.
+  await writeFile(
+    join(root, 'packages/ui-kit/package.json'),
+    `${JSON.stringify({ name: '@pxlkit/ui-kit', version: uiKit }, null, 2)}\n`,
+  );
+
   await writeFile(
     join(root, 'plugins/pxlkit/references/VERSION.json'),
     `${JSON.stringify(
       {
-        uiKit,
+        plugin: opts.versionFilePlugin ?? pluginVersion,
+        uiKit: opts.versionFileUiKit ?? uiKit,
         date: '2026-08-08',
         digestHash: opts.digestHash ?? expectedDigest(),
       },
@@ -87,7 +101,7 @@ async function createFixture(opts: FixtureOptions = {}): Promise<string> {
 
   await writeFile(
     join(root, 'plugins/pxlkit/.claude-plugin/plugin.json'),
-    `${JSON.stringify({ name: 'pxlkit', version: opts.pluginVersion ?? '2.1.1' }, null, 2)}\n`,
+    `${JSON.stringify({ name: 'pxlkit', version: pluginVersion }, null, 2)}\n`,
   );
 
   await writeFile(
@@ -99,7 +113,7 @@ async function createFixture(opts: FixtureOptions = {}): Promise<string> {
           {
             name: 'pxlkit',
             source: './plugins/pxlkit',
-            version: opts.marketplaceVersion ?? '2.1.1',
+            version: opts.marketplaceVersion ?? pluginVersion,
           },
         ],
       },
@@ -155,15 +169,48 @@ describe('gate 36: skill-refs-fresh', () => {
     );
   });
 
-  it('(c) flags a plugin.json version that lags the ui-kit version', async () => {
-    const repoRoot = await fixture({ pluginVersion: '2.1.0' });
+  it('(c) flags a marketplace entry that lags plugin.json', async () => {
+    // A marketplace advertising an older version than the plugin ships is a
+    // silently wrong install: users get 1.0.0 while the catalogue says 0.9.0.
+    const repoRoot = await fixture({ pluginVersion: '1.0.0', marketplaceVersion: '0.9.0' });
     const result = await skillRefsFreshGate({ repoRoot });
 
     expect(result.drift).toHaveLength(1);
     const [item] = result.drift;
     expect(item.severity).toBe('major');
-    expect(item.actual).toContain('2.1.0');
-    expect(item.actual).toContain('2.1.1');
+    expect(item.actual).toContain('1.0.0');
+    expect(item.actual).toContain('0.9.0');
+  });
+
+  it('(c2) flags VERSION.json#plugin drifting from the manifest', async () => {
+    const repoRoot = await fixture({ pluginVersion: '1.1.0', versionFilePlugin: '1.0.0' });
+    const result = await skillRefsFreshGate({ repoRoot });
+
+    expect(result.drift).toHaveLength(1);
+    expect(result.drift[0].actual).toContain('VERSION.json (plugin)=1.0.0');
+  });
+
+  it('(c3) accepts a plugin version that differs from the kit version', async () => {
+    // The whole point of splitting the two chains. A plugin at 1.0.0 built against
+    // kit 2.1.1 is the normal state, not drift — the previous single-chain check
+    // made this combination impossible to express.
+    const repoRoot = await fixture({ pluginVersion: '1.0.0', uiKitVersion: '2.1.1' });
+    const result = await skillRefsFreshGate({ repoRoot });
+
+    expect(result.drift).toEqual([]);
+  });
+
+  it('(c4) flags a corpus that records the wrong kit version', async () => {
+    // The digest says it came from 2.0.0 while the kit is 2.1.1: the references
+    // describe an API that is no longer the one shipping.
+    const repoRoot = await fixture({ uiKitVersion: '2.1.1', versionFileUiKit: '2.0.0' });
+    const result = await skillRefsFreshGate({ repoRoot });
+
+    expect(result.drift).toHaveLength(1);
+    const [item] = result.drift;
+    expect(item.severity).toBe('major');
+    expect(item.expected).toContain('2.1.1');
+    expect(item.actual).toContain('2.0.0');
   });
 
   it('(d) stays silent when pixelate-map.md does not exist yet', async () => {

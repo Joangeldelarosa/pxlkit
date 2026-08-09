@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Claude Code plugin.** A `pxlkit` plugin ships from this repo, installable with
+- **Claude Code plugin v1.0.0.** A `pxlkit` plugin ships from this repo, installable with
   `claude plugin marketplace add Joangeldelarosa/pxlkit && claude plugin install pxlkit@pxlkit`.
   Five skills: `/pxlkit:start` (compatibility check and setup), `/pxlkit:imagine`
   (compose a page), `/pxlkit:pixelate` (convert existing React), `/pxlkit:icon`

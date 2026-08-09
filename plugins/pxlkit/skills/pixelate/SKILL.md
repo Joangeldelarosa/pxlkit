@@ -1,6 +1,6 @@
 ---
 name: pixelate
-description: Use when converting an existing React site or component to the pxlkit pixel-art design system (@pxlkit/ui-kit), replacing the presentation layer while preserving routes, state, handlers and tests. Triggers - "pixelate this site", "convert my UI to pxlkit", "make this retro with pxlkit", "migrate this page to pxlkit".
+description: Use when converting existing React code to the pxlkit design system (@pxlkit/ui-kit), replacing the presentation layer while preserving routes, state, handlers and tests.
 allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 argument-hint: "[path] [--scope page|component|app]"
 ---

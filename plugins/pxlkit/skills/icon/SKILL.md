@@ -1,6 +1,6 @@
 ---
 name: icon
-description: Use when creating a new pixel-art icon in the pxlkit PxlKitData format (a 16x16 character grid plus a palette) - static, animated or parallax. Validates against both pxlkit icon validators before writing anything. Triggers - "create a pxlkit icon", "make a pixel icon", "add an icon to my pxlkit project", "design a pixel art icon".
+description: Use when creating a pixel-art icon in pxlkit's PxlKitData format (16x16 grid plus palette), static or animated. Validates against both pxlkit icon validators before writing.
 allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 argument-hint: "[name] [description] [--pack ui|feedback|social|weather|gamification|effects|parallax] [--animated]"
 ---
