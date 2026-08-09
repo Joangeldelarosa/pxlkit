@@ -17,7 +17,8 @@
  *       all declare the same version. A marketplace that advertises 2.1.0
  *       while shipping 2.1.1 references is a silently wrong install.
  *   (c) Pixelate map — every `Pixel*` / `PxlKit*` symbol cited in
- *       `references/pixelate-map.md` must actually be exported by the ui-kit.
+ *       `references/pixelate-map.md` must actually be exported by pxlkit, from
+ *       either the ui-kit or core (the map spans both; see `readKnownSymbols`).
  *
  * `computeDigestHash` and `serializeManifests` are imported from the generator
  * rather than reimplemented: two copies of a hashing convention drift, and the
@@ -47,7 +48,7 @@ import type { Logger } from '../../build-docs/_lib/logger.js';
 
 const GATE_ID = '36-skill-refs-fresh';
 const DESCRIPTION =
-  'plugins/pxlkit/references must be regenerated from the ui-kit SSOT (digest match), plugin.json / marketplace.json / VERSION.json must declare the same version, and every component cited in pixelate-map.md must exist in the ui-kit.';
+  'plugins/pxlkit/references must be regenerated from the ui-kit SSOT (digest match), plugin.json / marketplace.json / VERSION.json must declare the same version, and every component cited in pixelate-map.md must exist in the ui-kit or core.';
 
 /** Exact remediation, appended verbatim to the stale-digest finding. */
 export const REGENERATE_HINT =
@@ -182,26 +183,36 @@ export function findMarketplaceEntry(
 const PXL_SYMBOL_RE = /\b(?:Pixel|PxlKit)[A-Z][A-Za-z0-9]*/g;
 
 /**
- * Every `Pixel*` / `PxlKit*` symbol the ui-kit legitimately exposes.
+ * Every `Pixel*` / `PxlKit*` symbol the pxlkit packages legitimately expose.
  *
- * The registry alone is too narrow: providers, contexts and helper types
- * (`PxlKitLocaleProvider`, `PxlKitSurfaceProvider`, …) are real public exports
- * that never appear in the component registry, and a map citing them is
- * correct. The union of the registry and `index.tsx` is the honest oracle.
+ * Three sources, each added because the narrower set produced false positives:
+ *
+ *  - The **registry** alone misses providers, contexts and helper types
+ *    (`PxlKitLocaleProvider`, `PxlKitSurfaceProvider`) — real public exports that
+ *    are not registry entries.
+ *  - Adding **`index.tsx`** covers those, but still misses the rendering
+ *    primitives that live in `@pxlkit/core`. `pixelate-map.md` has to name
+ *    `PxlKitIcon`: it is how every icon in the ecosystem is drawn, and telling a
+ *    skill to convert lucide icons without naming it would be useless advice.
+ *  - So **core's entry point** joins the union.
+ *
+ * The gate's job is catching references to components that do not exist, not
+ * policing which package a real one lives in.
  */
 export async function readKnownSymbols(repoRoot: string): Promise<Set<string>> {
   const known = new Set<string>();
 
-  const registry =
+  const sources = [
     (await tryRead(join(repoRoot, 'packages/ui-kit/src/registry.generated.ts'))) ??
-    (await tryRead(join(repoRoot, 'packages/ui-kit/src/registry.ts')));
-  if (registry) {
-    for (const m of registry.matchAll(PXL_SYMBOL_RE)) known.add(m[0]);
-  }
+      (await tryRead(join(repoRoot, 'packages/ui-kit/src/registry.ts'))),
+    await tryRead(join(repoRoot, 'packages/ui-kit/src/index.tsx')),
+    (await tryRead(join(repoRoot, 'packages/core/src/index.ts'))) ??
+      (await tryRead(join(repoRoot, 'packages/core/src/index.tsx'))),
+  ];
 
-  const index = await tryRead(join(repoRoot, 'packages/ui-kit/src/index.tsx'));
-  if (index) {
-    for (const m of index.matchAll(PXL_SYMBOL_RE)) known.add(m[0]);
+  for (const source of sources) {
+    if (!source) continue;
+    for (const m of source.matchAll(PXL_SYMBOL_RE)) known.add(m[0]);
   }
 
   return known;
