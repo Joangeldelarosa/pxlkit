@@ -108,6 +108,28 @@ The procedural city engine you can fly through at **[pxlkit.xyz/explore](https:/
 - Sound engine with spatial audio.
 - Modular entity-component system.
 
+## Build it with Claude Code
+
+Pxlkit ships a Claude Code plugin. Five skills that know the real component API, the
+composition recipes, and the icon format — plus scripts that check the generated
+output before you see it.
+
+```bash
+claude plugin marketplace add Joangeldelarosa/pxlkit && claude plugin install pxlkit@pxlkit
+```
+
+| Command | What it does |
+| --- | --- |
+| `/pxlkit:start` | Checks whether a project can run pxlkit, then wires it up |
+| `/pxlkit:imagine` | Builds a page from the real component API |
+| `/pxlkit:pixelate` | Converts existing React, preserving state, routes and tests |
+| `/pxlkit:icon` | Authors a `PxlKitData` icon that passes both validators |
+| `/pxlkit:audit` | Types, build, runtime, diversity, tokens, screenshots, a11y |
+
+Full documentation at [pxlkit.xyz/skills](https://pxlkit.xyz/skills). A real run
+across four project archetypes — including what the gates rejected — is written up in
+`docs/skills/real-world-demos.md`.
+
 ## Quick Start
 
 ### Install
