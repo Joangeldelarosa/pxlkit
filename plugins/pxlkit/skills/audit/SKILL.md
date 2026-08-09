@@ -54,6 +54,14 @@ These are the mistakes that compile, render, and are still wrong. Grep for each;
 
 **`useToast()` outside `PxlKitToastProvider`.** Throws at runtime, not build time, so it survives every check that is not this one.
 
+**`const toast = useToast()`.** The hook returns an object; the toast function is a property of it. It is `const { toast } = useToast()`. The wrong form type-errors on first use, but it is the single most common way to get this API wrong.
+
+**`PixelRibbon` wrapped around a grid child.** The ribbon is positioned decoration, so wrapping a grid or flex child pulls it out of flow — the child lands somewhere else on the page entirely, and the layout silently loses an item. For "mark this card", the canonical route is `PixelCard`'s own `badge={{ label, tone }}` prop.
+
+**A `2x2` bento cell beside cells with minimal content.** The small cells stretch to the tall row's height and leave dead space. Bento hierarchy is for blocks of comparable weight; one large block plus several minimal ones belongs in a `PixelStatGroup` under the feature card, not in the same bento.
+
+**A looping `PixelGlitch` or `PixelFlicker` on text that must be read.** Names, headings and numbers spend part of every cycle illegible. Use `trigger="hover"` so the effect is on demand.
+
 **`toast.loading` with no resolution.** A spinner that never ends. Every loading toast needs an `update` or a `promise`.
 
 **`PixelForm.Field` with `label` or `error` also on the input.** The field renders them; passing them again duplicates the label and breaks the `htmlFor` association.

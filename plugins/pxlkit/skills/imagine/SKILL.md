@@ -50,6 +50,14 @@ Also: adjacent sections should not share a primary component, at least four tone
 
 Load only the `references/components/<category>.generated.md` files for the categories you are actually using. Loading all twelve wastes context you need for the work.
 
+**The digest tells you what exists; it does not tell you the prop shapes.** It carries names, descriptions, highlights and relationships, but not signatures — so guessing props from the name is how a page accumulates thirty type errors. The authoritative source is the installed package:
+
+```bash
+grep -A 25 "interface PixelCardProps" node_modules/@pxlkit/ui-kit/dist/index.d.ts
+```
+
+Read it for every component you have not used before. A sample of what guessing gets wrong, all observed in a real run: `gap` is numeric (`gap={4}`), not `"md"`; `PixelChip` and `PixelIconButton` take `label` rather than children; `PixelIconButton` and `PixelIconFrame` take `icon` rather than children; `PixelContainer` takes `maxWidth`, not `size`; `PixelGrid` takes `cols`, not `columns`; `PixelSlider` requires `label`; `PixelDrawer` takes `onOpenChange`, not `onClose`; `useToast()` returns `{ toast }`.
+
 Follow the shape the real templates use: data in `const` arrays at the top, JSX that maps over them. It reads better and it makes the content editable without touching markup.
 
 Rules that are not stylistic preferences — each one is a bug that compiles:

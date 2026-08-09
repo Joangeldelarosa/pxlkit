@@ -415,6 +415,17 @@ yarn add     @pxlkit/ui-kit@${version}
 Peer dependencies: \`react\` and \`react-dom\` at \`^18.2.0 || ^19.0.0\`. Tailwind CSS
 v4 is required — v3 will not resolve the \`@theme\` tokens in \`styles.css\`.
 
+On a TypeScript project, install the React types too:
+
+\`\`\`bash
+npm install -D @types/react @types/react-dom
+\`\`\`
+
+Easy to skip, and the failure is loud but misleading: without them the first
+\`tsc\` run buries every real error under dozens of
+\`TS7016: Could not find a declaration file for module 'react'\` and
+\`TS7026: JSX element implicitly has type 'any'\`.
+
 Icon packs are separate packages, installed only when used:
 \`@pxlkit/ui\`, \`@pxlkit/gamification\`, \`@pxlkit/social\`, \`@pxlkit/weather\`,
 \`@pxlkit/feedback\`, \`@pxlkit/effects\`, \`@pxlkit/parallax\`. \`@pxlkit/core\` (the
