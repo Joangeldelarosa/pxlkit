@@ -56,6 +56,19 @@ describe('PixelPortal', () => {
     }
   });
 
+  it('portals content mounted on the client from its first render', () => {
+    const parents: Array<Node | null> = [];
+    render(
+      <div data-testid="inline-parent">
+        <PixelPortal>
+          <div ref={(node) => { if (node) parents.push(node.parentNode); }}>hello</div>
+        </PixelPortal>
+      </div>,
+    );
+    // Created once, directly in <body>: no inline pass to tear down.
+    expect(parents).toEqual([document.body]);
+  });
+
   it('renders inline when disabled=true', () => {
     const { getByTestId } = render(
       <div data-testid="inline-parent">

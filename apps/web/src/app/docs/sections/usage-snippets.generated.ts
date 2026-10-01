@@ -1526,7 +1526,7 @@ const ITEMS: TabItem[] = [
 ];
 
 export function Default() {
-  return <PixelTabs items={ITEMS} defaultTab="overview" />;
+  return <PixelTabs items={ITEMS} defaultValue="overview" />;
 }
 `,
   'pixel-testimonial-card': `import { PixelTestimonialCard } from '@pxlkit/ui-kit';
@@ -1700,12 +1700,16 @@ export function Default() {
   );
 }
 `,
-  'pxl-kit-surface-provider': `import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+  'pxl-kit-surface-provider': `import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
     <PxlKitSurfaceProvider surface="pixel">
-      <p>Nested PxlKit components default to the pixel surface.</p>
+      <div className="flex flex-wrap gap-2">
+        <PixelButton>Pixel</PixelButton>
+        <PixelButton variant="outline" tone="cyan">Pixel outline</PixelButton>
+      </div>
     </PxlKitSurfaceProvider>
   );
 }

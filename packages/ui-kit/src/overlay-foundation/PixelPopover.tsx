@@ -6,29 +6,28 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { autoUpdate, useFloating } from '@floating-ui/react-dom';
 import {
-  autoUpdate,
-  flip,
-  offset as floatingOffset,
-  shift,
-  useFloating,
-  type Placement,
-} from '@floating-ui/react-dom';
-import {
-  Surface,
-  cn,
-  surfaceClasses,
-  useEffectiveSurface,
-} from '../common';
+  POPOVER_Z_INDEX,
+  anchoredMiddleware,
+  popoverArrowClasses,
+  popoverContentClasses,
+  returnFocusOnRemoval,
+  toPlacement,
+  type FloatingAlign,
+  type FloatingSide,
+} from '@pxlkit/ui-kit-core';
+import { Surface, cn, useEffectiveSurface } from '../common';
 import { useEscape } from '../hooks/useEscape';
 
-type PopoverSide = 'top' | 'bottom' | 'left' | 'right';
-type PopoverAlign = 'start' | 'center' | 'end';
+type PopoverSide = FloatingSide;
+type PopoverAlign = FloatingAlign;
 type PopoverHasPopup = 'dialog' | 'listbox' | 'menu' | 'tree' | 'grid';
 type PopoverRole = 'dialog' | 'none' | 'listbox' | 'menu';
 
@@ -42,6 +41,8 @@ interface PopoverContextValue {
   surface: Surface;
   contentRef: React.MutableRefObject<HTMLDivElement | null>;
   triggerRef: React.MutableRefObject<HTMLElement | null>;
+  /** True while a press outside is closing the popover: focus then follows the pointer. */
+  pressOutsideRef: React.MutableRefObject<boolean>;
   haspopup: PopoverHasPopup;
   role: PopoverRole;
 }
@@ -56,11 +57,6 @@ function usePopoverContext(component: string): PopoverContextValue {
     );
   }
   return ctx;
-}
-
-function toPlacement(side: PopoverSide, align: PopoverAlign): Placement {
-  if (align === 'center') return side;
-  return `${side}-${align}` as Placement;
 }
 
 export interface PixelPopoverProps {
@@ -108,6 +104,7 @@ function PixelPopoverRoot({
   const surface = useEffectiveSurface(surfaceProp);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const pressOutsideRef = useRef(false);
 
   const placement = toPlacement(side, align);
 
@@ -115,7 +112,7 @@ function PixelPopoverRoot({
     open,
     placement,
     whileElementsMounted: autoUpdate,
-    middleware: [floatingOffset(sideOffset), flip(), shift({ padding: 8 })],
+    middleware: anchoredMiddleware(sideOffset),
   });
 
   const setOpen = useCallback(
@@ -138,11 +135,28 @@ function PixelPopoverRoot({
       if (!target) return;
       if (contentRef.current?.contains(target)) return;
       if (triggerRef.current?.contains(target)) return;
+      pressOutsideRef.current = true;
       setOpen(false);
     };
     document.addEventListener('pointerdown', listener);
     return () => document.removeEventListener('pointerdown', listener);
   }, [open, closeOnOutsideClick, setOpen]);
+
+  // A press outside that did not close the popover (the parent kept it
+  // open) ends with the pointer release; a new open starts clean.
+  useEffect(() => {
+    if (!open) return;
+    pressOutsideRef.current = false;
+    const release = () => {
+      pressOutsideRef.current = false;
+    };
+    document.addEventListener('pointerup', release);
+    document.addEventListener('pointercancel', release);
+    return () => {
+      document.removeEventListener('pointerup', release);
+      document.removeEventListener('pointercancel', release);
+    };
+  }, [open]);
 
   const ctx = useMemo<PopoverContextValue>(
     () => ({
@@ -155,6 +169,7 @@ function PixelPopoverRoot({
       surface,
       contentRef,
       triggerRef,
+      pressOutsideRef,
       haspopup,
       role,
     }),
@@ -230,10 +245,7 @@ export interface PixelPopoverContentProps
 }
 
 const PixelPopoverContent = forwardRef<HTMLDivElement, PixelPopoverContentProps>(
-  function PixelPopoverContent(
-    { className, children, surface: surfaceProp, style, ...rest },
-    forwardedRef,
-  ) {
+  function PixelPopoverContent(props, forwardedRef) {
     const ctx = usePopoverContext('PixelPopover.Content');
     const [mounted, setMounted] = useState(false);
 
@@ -244,43 +256,69 @@ const PixelPopoverContent = forwardRef<HTMLDivElement, PixelPopoverContentProps>
     if (!ctx.open) return null;
     if (!mounted || typeof document === 'undefined') return null;
 
-    const surface = surfaceProp ?? ctx.surface;
-    const s = surfaceClasses(surface);
-
-    const setRefs = (node: HTMLDivElement | null) => {
-      ctx.contentRef.current = node;
-      ctx.refs.setFloating(node);
-      if (typeof forwardedRef === 'function') forwardedRef(node);
-      else if (forwardedRef && typeof forwardedRef === 'object') {
-        (forwardedRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-      }
-    };
-
-    // role="none" => omit role attribute entirely so AT does not see a
-    // spurious dialog/group layer when the inner widget owns semantics.
-    const contentRole = ctx.role === 'none' ? undefined : ctx.role;
-
-    return createPortal(
-      <div
-        ref={setRefs}
-        role={contentRole}
-        style={{ ...ctx.floatingStyles, zIndex: 70, ...style }}
-        className={cn(
-          'bg-retro-bg shadow-xl p-3 outline-none',
-          s.border,
-          s.radiusLg,
-          'border-retro-border',
-          className,
-        )}
-        {...rest}
-      >
-        {children}
-      </div>,
-      document.body,
-    );
+    return <PopoverContentPortal {...props} ctx={ctx} forwardedRef={forwardedRef} />;
   },
 );
 PixelPopoverContent.displayName = 'PixelPopover.Content';
+
+/* The open content, portaled to <body>. A component of its own so its
+   unmount marks the moment the content closes. */
+interface PopoverContentPortalProps extends PixelPopoverContentProps {
+  ctx: PopoverContextValue;
+  forwardedRef: React.ForwardedRef<HTMLDivElement>;
+}
+
+function PopoverContentPortal({
+  ctx,
+  forwardedRef,
+  className,
+  children,
+  surface: surfaceProp,
+  style,
+  ...rest
+}: PopoverContentPortalProps) {
+  const { contentRef, triggerRef, pressOutsideRef } = ctx;
+
+  // Focus return: content that closes while holding focus hands it back to
+  // the trigger — unless a press outside closed it, then focus follows the
+  // pointer. Layout cleanup runs before React removes the content's DOM.
+  useLayoutEffect(
+    () => () => {
+      if (!pressOutsideRef.current) {
+        returnFocusOnRemoval(contentRef.current, () => triggerRef.current);
+      }
+    },
+    [contentRef, triggerRef, pressOutsideRef],
+  );
+
+  const surface = surfaceProp ?? ctx.surface;
+
+  const setRefs = (node: HTMLDivElement | null) => {
+    contentRef.current = node;
+    ctx.refs.setFloating(node);
+    if (typeof forwardedRef === 'function') forwardedRef(node);
+    else if (forwardedRef && typeof forwardedRef === 'object') {
+      (forwardedRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    }
+  };
+
+  // role="none" => omit role attribute entirely so AT does not see a
+  // spurious dialog/group layer when the inner widget owns semantics.
+  const contentRole = ctx.role === 'none' ? undefined : ctx.role;
+
+  return createPortal(
+    <div
+      ref={setRefs}
+      role={contentRole}
+      style={{ ...ctx.floatingStyles, zIndex: POPOVER_Z_INDEX, ...style }}
+      className={cn(popoverContentClasses(surface), className)}
+      {...rest}
+    >
+      {children}
+    </div>,
+    document.body,
+  );
+}
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelPopover.Arrow — purely decorative pointer aligned to the side.
@@ -292,24 +330,11 @@ export interface PixelPopoverArrowProps
 const PixelPopoverArrow = forwardRef<HTMLSpanElement, PixelPopoverArrowProps>(
   function PixelPopoverArrow({ className, ...rest }, ref) {
     const ctx = usePopoverContext('PixelPopover.Arrow');
-    const s = surfaceClasses(ctx.surface);
-    const sidePos: Record<PopoverSide, string> = {
-      top: 'bottom-[-5px] left-1/2 -translate-x-1/2',
-      bottom: 'top-[-5px] left-1/2 -translate-x-1/2',
-      left: 'right-[-5px] top-1/2 -translate-y-1/2',
-      right: 'left-[-5px] top-1/2 -translate-y-1/2',
-    };
     return (
       <span
         ref={ref}
         aria-hidden
-        className={cn(
-          'absolute h-2 w-2 rotate-45 bg-retro-bg',
-          s.border,
-          'border-retro-border',
-          sidePos[ctx.side],
-          className,
-        )}
+        className={cn(popoverArrowClasses(ctx.surface, ctx.side), className)}
         {...rest}
       />
     );

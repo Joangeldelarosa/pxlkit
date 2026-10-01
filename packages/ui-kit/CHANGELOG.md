@@ -6,6 +6,10 @@
 - The kit now runs on `@pxlkit/ui-kit-core`, a new framework-neutral package holding the design tokens, the Tailwind CSS theme, the class recipes, the pixel glyphs, the locale data and the DOM behaviour (focus trap, stacking scroll lock, dark mode, media queries, storage) that every framework's kit shares. Zero public API change: `@pxlkit/ui-kit` re-exports everything it exported before.
 - `styles.css` imports the core theme and registers the kit's compiled classes with Tailwind CSS v4 (`@source`), so the one `@import "@pxlkit/ui-kit/styles.css";` after `@import "tailwindcss";` is the whole setup — a separate `@source` line pointing into `node_modules` is no longer needed.
 
+### Fixed
+- `PixelModal`, `PixelDrawer` and `PixelSheet` now move focus into the dialog when they open. `PixelPortal` rendered its content inline for one client render and then re-mounted it into `<body>`, dropping the focus the trap had just set. Content mounted after hydration is now portaled from its first render; server rendering and hydration still render it inline.
+- `PixelPopover` returns focus to the trigger when its content closes while holding focus — on Escape, on an action inside it, or when the parent closes it — instead of letting focus fall to `<body>`; after a press outside, focus follows the pointer. This fixes focus in the components built on it: `PixelDatePicker`, `PixelDateRangePicker`, `PixelCombobox`, `PixelMultiSelect`, `PixelColorInput` and `PixelBadgeGroup`. The popover docs gain an "Interactive content" example.
+
 ## 2.1.1 — 2026-08-08
 
 ### Fixed

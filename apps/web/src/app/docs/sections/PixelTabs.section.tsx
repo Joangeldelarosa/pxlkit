@@ -116,7 +116,7 @@ const ITEMS: TabItem[] = [
 ];
 
 export function Default() {
-  return <PixelTabs items={ITEMS} defaultTab="overview" />;
+  return <PixelTabs items={ITEMS} defaultValue="overview" />;
 }
 `}</code></pre>
     </section>
@@ -125,7 +125,7 @@ export function Default() {
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
         <pre className="docs-code"><code>{`export function Default() {
-  return <PixelTabs items={ITEMS} defaultTab="overview" />;
+  return <PixelTabs items={ITEMS} defaultValue="overview" />;
 }`}</code></pre>
       </article>
       <article className="docs-example" id="example-controlled">
@@ -143,7 +143,7 @@ export function Default() {
       <article className="docs-example" id="example-vertical">
         <h4>Vertical</h4>
         <pre className="docs-code"><code>{`export function Vertical() {
-  return <PixelTabs items={ITEMS} defaultTab="overview" orientation="vertical" />;
+  return <PixelTabs items={ITEMS} defaultValue="overview" orientation="vertical" />;
 }`}</code></pre>
       </article>
       <article className="docs-example" id="example-manual-activation">
@@ -152,7 +152,7 @@ export function Default() {
   return (
     <PixelTabs
       items={ITEMS}
-      defaultTab="overview"
+      defaultValue="overview"
       activationMode="manual"
       ariaLabel="Manual activation tabs"
     />
@@ -164,8 +164,8 @@ export function Default() {
         <pre className="docs-code"><code>{`export function Surfaces() {
   return (
     <div className="grid grid-cols-1 gap-6">
-      <PixelTabs items={ITEMS} defaultTab="overview" surface="pixel" ariaLabel="Pixel tabs" />
-      <PixelTabs items={ITEMS} defaultTab="overview" surface="linear" ariaLabel="Linear tabs" />
+      <PixelTabs items={ITEMS} defaultValue="overview" surface="pixel" ariaLabel="Pixel tabs" />
+      <PixelTabs items={ITEMS} defaultValue="overview" surface="linear" ariaLabel="Linear tabs" />
     </div>
   );
 }`}</code></pre>
@@ -175,7 +175,7 @@ export function Default() {
         <pre className="docs-code"><code>{`export function Scrollable() {
   return (
     <div className="max-w-sm">
-      <PixelTabs items={MANY} defaultTab="tab-1" scrollable ariaLabel="Scrollable tabs" />
+      <PixelTabs items={MANY} defaultValue="tab-1" scrollable ariaLabel="Scrollable tabs" />
     </div>
   );
 }`}</code></pre>
@@ -186,7 +186,7 @@ export function Default() {
   return (
     <PixelTabs
       items={ITEMS}
-      defaultTab="overview"
+      defaultValue="overview"
       keepMounted
       ariaLabel="Persistent panels"
     />
@@ -197,7 +197,7 @@ export function Default() {
         <h4>Compositional</h4>
         <pre className="docs-code"><code>{`export function Compositional() {
   return (
-    <PixelTabs defaultTab="one">
+    <PixelTabs defaultValue="one">
       <PixelTabs.List ariaLabel="Compositional tabs">
         <PixelTabs.Trigger value="one">One</PixelTabs.Trigger>
         <PixelTabs.Trigger value="two">Two</PixelTabs.Trigger>

@@ -21,12 +21,12 @@ export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfacePro
   return (
     <section aria-labelledby={'pxl-kit-surface-provider-heading'} className={className} data-status='stable'>
       <h2 id='pxl-kit-surface-provider-heading'>PxlKitSurfaceProvider</h2>
-      <p className="docs-lead">Sets the default surface (pixel | linear) for every nested PxlKit component via React context.</p>
+      <p className="docs-lead">Sets the default surface (pixel | linear) for every nested PxlKit component — React context, Vue provide/inject or Angular dependency injection.</p>
       <ul className="docs-highlights">
         <li>Switches the entire subtree between the pixel and linear aesthetics in one line</li>
         <li>Per-component surface prop still overrides the provider for one-off variants</li>
         <li>Defaults to &quot;pixel&quot; so consumers without a provider keep the brand look</li>
-        <li>SSR-safe context provider with zero runtime cost when value is unchanged</li>
+        <li>Renders no element of its own and is safe for server rendering</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -47,12 +47,16 @@ export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfacePro
     </section>
     <section aria-labelledby="pxl-kit-surface-provider-usage">
       <h3 id="pxl-kit-surface-provider-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+      <pre className="docs-code"><code>{`import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
     <PxlKitSurfaceProvider surface="pixel">
-      <p>Nested PxlKit components default to the pixel surface.</p>
+      <div className="flex flex-wrap gap-2">
+        <PixelButton>Pixel</PixelButton>
+        <PixelButton variant="outline" tone="cyan">Pixel outline</PixelButton>
+      </div>
     </PxlKitSurfaceProvider>
   );
 }
@@ -65,7 +69,10 @@ export function Default() {
         <pre className="docs-code"><code>{`export function Default() {
   return (
     <PxlKitSurfaceProvider surface="pixel">
-      <p>Nested PxlKit components default to the pixel surface.</p>
+      <div className="flex flex-wrap gap-2">
+        <PixelButton>Pixel</PixelButton>
+        <PixelButton variant="outline" tone="cyan">Pixel outline</PixelButton>
+      </div>
     </PxlKitSurfaceProvider>
   );
 }`}</code></pre>
@@ -75,7 +82,23 @@ export function Default() {
         <pre className="docs-code"><code>{`export function Linear() {
   return (
     <PxlKitSurfaceProvider surface="linear">
-      <p>Nested PxlKit components default to the linear surface.</p>
+      <div className="flex flex-wrap gap-2">
+        <PixelButton>Linear</PixelButton>
+        <PixelButton variant="outline" tone="cyan">Linear outline</PixelButton>
+      </div>
+    </PxlKitSurfaceProvider>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-override">
+        <h4>Per-component override</h4>
+        <pre className="docs-code"><code>{`export function Override() {
+  return (
+    <PxlKitSurfaceProvider surface="linear">
+      <div className="flex flex-wrap gap-2">
+        <PixelButton>From the provider</PixelButton>
+        <PixelButton surface="pixel">Own surface prop</PixelButton>
+      </div>
     </PxlKitSurfaceProvider>
   );
 }`}</code></pre>

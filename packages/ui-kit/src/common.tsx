@@ -6,7 +6,8 @@ import {
   PIXEL_GLYPH_STYLE,
   PIXEL_GLYPH_VIEWBOX,
   cn,
-  surfaceClasses,
+  fieldShellClasses,
+  fieldShellTextClasses,
   type PixelGlyphName,
   type Surface,
 } from '@pxlkit/ui-kit-core';
@@ -125,28 +126,27 @@ export function FieldShell({
   // that omit the prop — every in-kit caller passes it explicitly, so this
   // only makes standalone usage more correct.)
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
+  const text = fieldShellTextClasses(surface);
   // NOT a wrapping <label>: native label activation forwards clicks to the
   // contained control, which DOUBLE-fired fields whose children also
   // trigger it programmatically (PixelFileUpload's dropzone opened the OS
   // file dialog twice and dropped the first selection). Explicit htmlFor
   // keeps a single, correct association instead.
-  const labelClass = cn('text-xs text-retro-muted', s.font);
   return (
-    <div className="block space-y-1.5">
+    <div className={fieldShellClasses}>
       {label &&
         (htmlFor ? (
-          <label htmlFor={htmlFor} className={labelClass}>
+          <label htmlFor={htmlFor} className={text.label}>
             {label}
           </label>
         ) : (
-          <span className={labelClass}>{label}</span>
+          <span className={text.label}>{label}</span>
         ))}
       {children}
       {error ? (
-        <span className={cn('text-xs text-retro-red', s.font)}>{error}</span>
+        <span className={text.error}>{error}</span>
       ) : hint ? (
-        <span className={cn('text-xs text-retro-muted', s.font)}>{hint}</span>
+        <span className={text.hint}>{hint}</span>
       ) : null}
     </div>
   );

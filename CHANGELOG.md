@@ -22,9 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`@pxlkit/ui-kit-core`.** The framework-neutral core of the UI kit, shared by the
   React kit and the upcoming Vue and Angular kits: design tokens, the surface system
   and control scale, the Tailwind CSS v4 theme, class recipes, the pixel glyphs as
-  data, locale data, DOM behaviour (`trapFocus`, the stacking `lockScroll`) and
-  preference helpers (dark mode, media queries, failure-tolerant `localStorage`).
-  Zero dependencies, safe on the server.
+  data, locale data, DOM behaviour (`trapFocus`, the stacking `lockScroll`, focus
+  return, Floating UI positioning) and preference helpers (dark mode, media queries,
+  failure-tolerant `localStorage`). Safe on the server; its one dependency is
+  `@floating-ui/dom`.
 - **`@pxlkit/core/vanilla` and the shared rendering engine.** A React-free entry point
   exports the icon data model, every utility and the engine the three frameworks build on:
   `renderIconSvg` / `renderIconDataUri`, `createAnimatedIconPlayer`,

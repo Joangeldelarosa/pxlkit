@@ -58,3 +58,30 @@ export function SidePlacement() {
     </PixelPopover>
   );
 }
+
+export function InteractiveContent() {
+  const [open, setOpen] = useState(false);
+  return (
+    <PixelPopover open={open} onOpenChange={setOpen} align="start">
+      <PixelPopover.Trigger>
+        <button type="button">Rename layer</button>
+      </PixelPopover.Trigger>
+      <PixelPopover.Content aria-labelledby="popover-form-title" className="w-64">
+        <h3 id="popover-form-title" className="font-bold mb-2">
+          Rename layer
+        </h3>
+        <label htmlFor="popover-form-name" className="block text-sm mb-1">
+          Name
+        </label>
+        <input
+          id="popover-form-name"
+          defaultValue="Background"
+          className="w-full mb-3 px-2 py-1 text-sm bg-retro-surface border border-retro-border text-retro-text"
+        />
+        <button type="button" onClick={() => setOpen(false)}>
+          Save
+        </button>
+      </PixelPopover.Content>
+    </PixelPopover>
+  );
+}

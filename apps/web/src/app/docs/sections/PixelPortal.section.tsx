@@ -21,11 +21,11 @@ export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProp
   return (
     <section aria-labelledby={'pixel-portal-heading'} className={className} data-status='stable'>
       <h2 id='pixel-portal-heading'>PixelPortal</h2>
-      <p className="docs-lead">SSR-safe portal primitive that renders children inline during SSR and first hydration, then swaps to a real createPortal after mount.</p>
+      <p className="docs-lead">SSR-safe portal primitive: renders children inline on the server and while hydrating, then portals them into document.body or a container. Content mounted later on the client is portaled from its first render.</p>
       <ul className="docs-highlights">
-        <li>SSR-safe: renders inline on the server and on first client paint to avoid hydration mismatches</li>
-        <li>Swaps to React.createPortal after mount, targeting document.body by default</li>
-        <li>Accepts a custom container element via the container prop</li>
+        <li>SSR-safe: renders inline on the server and during hydration to avoid hydration mismatches</li>
+        <li>Content mounted after hydration is portaled from its first render, so focus set inside it stays put</li>
+        <li>Targets document.body by default; the container prop picks another element</li>
         <li>Can be disabled to keep children inline (useful for testing or conditional portaling)</li>
         <li>Preserves React tree context so focus, events, and providers flow normally</li>
       </ul>

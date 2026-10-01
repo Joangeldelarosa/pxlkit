@@ -97,3 +97,25 @@ export const SidePlacement: Story = {
     return <ExampleComponent />;
   },
 };
+
+/** Interactive content */
+export const InteractiveContent: Story = {
+  name: 'Interactive content',
+  tags: ["example-interactive-content"],
+  parameters: {
+    docs: { description: { story: undefined } },
+  },
+  render: () => {
+    const ExampleComponent =
+      ((examples as any).InteractiveContent ?? (examples as any)['interactive-content']) ??
+      ((manifest as any)?.examples?.find?.((e: any) => e?.id === 'interactive-content')?.Component);
+    if (!ExampleComponent) {
+      return (
+        <pre style={{ color: 'crimson' }}>
+          {"Missing example 'interactive-content' for PixelPopover."}
+        </pre>
+      );
+    }
+    return <ExampleComponent />;
+  },
+};

@@ -2,7 +2,7 @@
  * Badge-like primitives (PixelBadge, PixelChip): the shared variant axis and
  * size scale.
  */
-import { cn, toneMap, type Size, type Tone } from '../common';
+import { cn, toneMap, type Size, type Tone } from '../../common';
 
 /** Variant axis shared by PixelBadge + PixelChip. */
 export type PixelBadgeVariant = 'soft' | 'solid' | 'outline' | 'ghost';

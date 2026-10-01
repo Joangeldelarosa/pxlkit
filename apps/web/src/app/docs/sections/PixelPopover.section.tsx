@@ -44,7 +44,7 @@ export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>dialog</code></li>
       </ul>
-      <p className="docs-aria-notes">Content renders with role=&quot;dialog&quot; by default; pair with aria-labelledby on Content. Set role=&quot;none&quot; when an inner widget owns semantics.</p>
+      <p className="docs-aria-notes">Content renders with role=&quot;dialog&quot; by default; pair with aria-labelledby on Content. Set role=&quot;none&quot; when an inner widget owns semantics. When the content closes while it holds focus, focus returns to the trigger; after a press outside, focus follows the pointer instead.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -57,7 +57,7 @@ export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionPr
         <tbody>
           <tr>
             <td><kbd>Escape</kbd></td>
-            <td>Closes the popover when closeOnEscape is true</td>
+            <td>Closes the popover when closeOnEscape is true and returns focus to the trigger</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
         </tbody>
@@ -147,6 +147,35 @@ export function Default() {
           Side placement
         </h3>
         <p className="text-sm">Anchored to the right of the trigger.</p>
+      </PixelPopover.Content>
+    </PixelPopover>
+  );
+}`}</code></pre>
+      </article>
+      <article className="docs-example" id="example-interactive-content">
+        <h4>Interactive content</h4>
+        <pre className="docs-code"><code>{`export function InteractiveContent() {
+  const [open, setOpen] = useState(false);
+  return (
+    <PixelPopover open={open} onOpenChange={setOpen} align="start">
+      <PixelPopover.Trigger>
+        <button type="button">Rename layer</button>
+      </PixelPopover.Trigger>
+      <PixelPopover.Content aria-labelledby="popover-form-title" className="w-64">
+        <h3 id="popover-form-title" className="font-bold mb-2">
+          Rename layer
+        </h3>
+        <label htmlFor="popover-form-name" className="block text-sm mb-1">
+          Name
+        </label>
+        <input
+          id="popover-form-name"
+          defaultValue="Background"
+          className="w-full mb-3 px-2 py-1 text-sm bg-retro-surface border border-retro-border text-retro-text"
+        />
+        <button type="button" onClick={() => setOpen(false)}>
+          Save
+        </button>
       </PixelPopover.Content>
     </PixelPopover>
   );

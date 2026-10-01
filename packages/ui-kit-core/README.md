@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.npmjs.com/package/@pxlkit/ui-kit-core"><img src="https://img.shields.io/npm/v/@pxlkit/ui-kit-core?color=blue" alt="npm version" /></a>
   <a href="https://github.com/joangeldelarosa/pxlkit/blob/main/LICENSE-CODE"><img src="https://img.shields.io/badge/license-MIT-22c55e.svg" alt="MIT License" /></a>
-  <img src="https://img.shields.io/badge/dependencies-0-22c55e" alt="Zero dependencies" />
+  <img src="https://img.shields.io/badge/dependencies-1-22c55e" alt="One dependency" />
   <img src="https://img.shields.io/badge/typescript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict" />
 </p>
 
@@ -47,10 +47,11 @@ npm install @pxlkit/ui-kit-core
 | Class recipes | Per-component class tables shared by the three kits (for example `badgeVariantClasses`, `badgeSizeClasses`) |
 | Pixel glyphs | `PIXEL_GLYPHS`, `PIXEL_GLYPH_VIEWBOX`, `PIXEL_GLYPH_STYLE` — the chevron, check and close glyphs as data |
 | Locale | `PxlKitLocale`, `PXLKIT_FONTS`, `buildGoogleFontsUrl`, `toLocaleUpper`, `toLocaleLower`, `TURKISH_CHARACTERS`, `createLocaleContextValue` |
-| DOM behaviour | `trapFocus`, `getFocusableElements`, `lockScroll` |
+| DOM behaviour | `trapFocus`, `getFocusableElements`, `lockScroll`, `returnFocusOnRemoval` |
+| Floating content | `toPlacement`, `anchoredMiddleware`, `anchorFloating`, `floatingStyles` — popovers anchored with [Floating UI](https://floating-ui.com) |
 | Preferences | `readStoredMode`, `writeStoredMode`, `resolveMode`, `applyResolvedMode` (dark mode), `matchesMediaQuery`, `subscribeMediaQuery`, `readStorage`, `writeStorage`, `removeStorage` |
 
-Everything is plain TypeScript with no runtime dependencies, safe to import on the server: DOM helpers check for `window` / `document` and degrade to no-ops.
+Everything is plain TypeScript, safe to import on the server: DOM helpers check for `window` / `document` and degrade to no-ops. The one runtime dependency is `@floating-ui/dom`, which positions floating content.
 
 ## Examples
 

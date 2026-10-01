@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
 import { PixelPopover } from '../../overlay-foundation/PixelPopover';
@@ -133,5 +133,103 @@ describe('PixelPopover', () => {
       outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     });
     expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  describe('focus return', () => {
+    // Settles React's update, then the focus-return microtask.
+    const settle = () => act(async () => {
+      await new Promise((done) => setTimeout(done, 0));
+    });
+
+    function Harness({ keepOpenOnOutside = false }: { keepOpenOnOutside?: boolean }) {
+      const [open, setOpen] = useState(true);
+      return (
+        <div>
+          <PixelPopover
+            open={open}
+            onOpenChange={(next) => {
+              if (!next && keepOpenOnOutside) return;
+              setOpen(next);
+            }}
+          >
+            <PixelPopover.Trigger>
+              <button data-testid="trigger">open</button>
+            </PixelPopover.Trigger>
+            <PixelPopover.Content data-testid="content">
+              <input data-testid="field" aria-label="Field" />
+              <button data-testid="done" onClick={() => setOpen(false)}>
+                Done
+              </button>
+            </PixelPopover.Content>
+          </PixelPopover>
+          <button data-testid="outside">outside</button>
+        </div>
+      );
+    }
+
+    it('returns focus to the trigger when Escape closes focused content', async () => {
+      const { getByTestId, queryByTestId } = render(<Harness />);
+      await settle();
+      getByTestId('field').focus();
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      });
+      await settle();
+      expect(queryByTestId('content')).toBeNull();
+      expect(document.activeElement).toBe(getByTestId('trigger'));
+    });
+
+    it('returns focus to the trigger when the parent closes focused content', async () => {
+      const { getByTestId, queryByTestId } = render(<Harness />);
+      await settle();
+      const done = getByTestId('done');
+      done.focus();
+      fireEvent.click(done);
+      await settle();
+      expect(queryByTestId('content')).toBeNull();
+      expect(document.activeElement).toBe(getByTestId('trigger'));
+    });
+
+    it('lets focus follow the pointer when a press outside closes the content', async () => {
+      const { getByTestId, queryByTestId } = render(<Harness />);
+      await settle();
+      getByTestId('field').focus();
+      act(() => {
+        getByTestId('outside').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+      });
+      await settle();
+      expect(queryByTestId('content')).toBeNull();
+      expect(document.activeElement).not.toBe(getByTestId('trigger'));
+    });
+
+    it('still returns focus after a press outside the parent declined', async () => {
+      const { getByTestId, queryByTestId } = render(<Harness keepOpenOnOutside />);
+      await settle();
+      const outside = getByTestId('outside');
+      act(() => {
+        outside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+        outside.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+      });
+      await settle();
+      const done = getByTestId('done');
+      done.focus();
+      fireEvent.click(done);
+      await settle();
+      expect(queryByTestId('content')).toBeNull();
+      expect(document.activeElement).toBe(getByTestId('trigger'));
+    });
+
+    it('leaves focus alone when the content did not hold it', async () => {
+      const { getByTestId, queryByTestId } = render(<Harness />);
+      await settle();
+      const outside = getByTestId('outside');
+      outside.focus();
+      act(() => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      });
+      await settle();
+      expect(queryByTestId('content')).toBeNull();
+      expect(document.activeElement).toBe(outside);
+    });
   });
 });
