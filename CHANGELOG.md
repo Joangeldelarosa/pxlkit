@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     server rendering and hydration.
   React ↔ Vue and React ↔ Angular parity suites compare the rendered DOM on the server,
   on mount, after input changes and frame by frame while animating.
+- **`@pxlkit/ui-kit-core`.** The framework-neutral core of the UI kit, shared by the
+  React kit and the upcoming Vue and Angular kits: design tokens, the surface system
+  and control scale, the Tailwind CSS v4 theme, class recipes, the pixel glyphs as
+  data, locale data, DOM behaviour (`trapFocus`, the stacking `lockScroll`) and
+  preference helpers (dark mode, media queries, failure-tolerant `localStorage`).
+  Zero dependencies, safe on the server.
 - **`@pxlkit/core/vanilla` and the shared rendering engine.** A React-free entry point
   exports the icon data model, every utility and the engine the three frameworks build on:
   `renderIconSvg` / `renderIconDataUri`, `createAnimatedIconPlayer`,
@@ -47,6 +53,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `@pxlkit/core`: `react` and `react-dom` are optional peer dependencies — only the
   React components need them.
+- `@pxlkit/ui-kit`: tokens, class maps, the theme stylesheet, locale data and the focus
+  trap, scroll lock, dark mode, media query and storage logic now come from
+  `@pxlkit/ui-kit-core` — the public API is unchanged. `styles.css` imports the shared
+  theme and registers the kit's compiled classes with Tailwind (`@source`), so the
+  utilities the components use are generated without any `@source` line of your own.
+- `@pxlkit/ui-kit` examples: `PxlKitSurfaceProvider` now demonstrates buttons inheriting
+  the provider's surface and a per-component override.
 - Coherence tooling: gate 08 (`consistency-pkgjson`) requires the `@pxlkit/vue` and
   `@pxlkit/angular` descriptions to name their framework, and gate 36's digest also
   covers the React component props, which moved to `packages/core/src/components/types.ts`.

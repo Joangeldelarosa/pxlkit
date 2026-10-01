@@ -3,8 +3,9 @@
  *
  * Renders the tokens & theming reference consumed by the pxlkit Claude Code
  * skills. Every table here is *parsed from the shipped sources* — the palette
- * out of `packages/ui-kit/styles.css`, the tone / surface / size scales out of
- * `packages/ui-kit/src/tokens.ts` and `packages/ui-kit/src/common.tsx` — so a
+ * out of `packages/ui-kit-core/styles.css`, the tone / surface / size scales out
+ * of `packages/ui-kit-core/src/tokens.ts` and `packages/ui-kit-core/src/common.ts`
+ * (the framework-neutral core every kit shares) — so a
  * palette tweak or a new tone can never silently rot the reference. Only the
  * prose (why the two tone scales differ, the re-skin gotchas) is authored.
  *
@@ -25,11 +26,11 @@
 
 /** Raw sources the renderer parses. Empty strings are tolerated. */
 export interface TokenSources {
-  /** `packages/ui-kit/src/tokens.ts` — surface-scale `tone` map. */
+  /** `packages/ui-kit-core/src/tokens.ts` — surface-scale `tone` map. */
   tokensTs: string;
-  /** `packages/ui-kit/src/common.tsx` — `toneMap`, `SURFACE_TOKENS`, size scales. */
+  /** `packages/ui-kit-core/src/common.ts` — `toneMap`, `SURFACE_TOKENS`, size scales. */
   commonTsx: string;
-  /** `packages/ui-kit/styles.css` — the `--retro-*` palette. */
+  /** `packages/ui-kit-core/styles.css` — the `--retro-*` palette. */
   stylesCss: string;
 }
 
@@ -384,7 +385,7 @@ function paletteSection(rows: CssVarRow[]): string {
   return [
     '## Palette variables',
     '',
-    `Parsed from \`packages/ui-kit/styles.css\` — ${rows.length} variable(s). Light is the`,
+    `Parsed from \`packages/ui-kit-core/styles.css\` — ${rows.length} variable(s). Light is the`,
     '`:root, :host` block (a variable declared only in the explicit `.light` block is',
     'shown from there); dark is the `.dark` class block. Dark mode is a **class on',
     '`<html>`**, never a media query.',
@@ -409,8 +410,8 @@ function toneSection(tokensTs: string, commonTsx: string): string {
     '`Record<Tone, …>` maps with overlapping field names. They type-check against',
     'each other, so a mix-up produces no error — only wrong pixels.',
     '',
-    `- \`toneMap\` — from \`packages/ui-kit/src/common.tsx\` — **CONTROLS** (button, input, badge, chip, toast) — keys: ${joinCode(controls.keys)}`,
-    `- \`tone\` — from \`packages/ui-kit/src/tokens.ts\` — **SURFACES** (card, hero, bento, charts, sidebar) — keys: ${joinCode(surfaces.keys)}`,
+    `- \`toneMap\` — from \`packages/ui-kit-core/src/common.ts\` — **CONTROLS** (button, input, badge, chip, toast) — keys: ${joinCode(controls.keys)}`,
+    `- \`tone\` — from \`packages/ui-kit-core/src/tokens.ts\` — **SURFACES** (card, hero, bento, charts, sidebar) — keys: ${joinCode(surfaces.keys)}`,
     '',
     'Which one to reach for:',
     '',

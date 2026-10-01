@@ -256,9 +256,11 @@ export async function generateSkillRefs(ctx: GeneratorContext): Promise<Generato
 
   // --- read sources -------------------------------------------------------
   const registryPath = toPosix(path.join(repoRoot, "packages/ui-kit/src/registry.generated.ts"));
-  const tokensPath = path.join(repoRoot, "packages/ui-kit/src/tokens.ts");
-  const commonPath = path.join(repoRoot, "packages/ui-kit/src/common.tsx");
-  const stylesPath = path.join(repoRoot, "packages/ui-kit/styles.css");
+  // Tokens, class maps and the theme stylesheet live in the framework-neutral
+  // core shared by the React, Vue and Angular kits.
+  const tokensPath = path.join(repoRoot, "packages/ui-kit-core/src/tokens.ts");
+  const commonPath = path.join(repoRoot, "packages/ui-kit-core/src/common.ts");
+  const stylesPath = path.join(repoRoot, "packages/ui-kit-core/styles.css");
   const coreTypesPath = path.join(repoRoot, "packages/core/src/types.ts");
   // The React props moved out of types.ts when the icon data model became
   // framework-agnostic; the corpus documents both, so both are hashed.

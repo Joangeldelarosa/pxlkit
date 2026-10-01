@@ -22,5 +22,5 @@
 
 ### PxlKitSurfaceProvider
 - stable · since 1.6.0
-- Sets the default surface (pixel | linear) for every nested PxlKit component via React context.
-- Switches the entire subtree between the pixel and linear aesthetics in one line · Per-component surface prop still overrides the provider for one-off variants · Defaults to "pixel" so consumers without a provider keep the brand look · SSR-safe context provider with zero runtime cost when value is unchanged
+- Sets the default surface (pixel | linear) for every nested PxlKit component — React context, Vue provide/inject or Angular dependency injection.
+- Switches the entire subtree between the pixel and linear aesthetics in one line · Per-component surface prop still overrides the provider for one-off variants · Defaults to "pixel" so consumers without a provider keep the brand look · Renders no element of its own and is safe for server rendering

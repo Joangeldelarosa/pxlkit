@@ -123,9 +123,9 @@ export async function computeExpectedDigest(repoRoot: string): Promise<string> {
   // happened to have generated it. The manifests it is derived from are tracked
   // and hashed below, so nothing is lost by leaving it out.
   const [tokens, common, styles, coreTypes, coreProps] = await Promise.all([
-    readOrEmpty(join(repoRoot, 'packages/ui-kit/src/tokens.ts')),
-    readOrEmpty(join(repoRoot, 'packages/ui-kit/src/common.tsx')),
-    readOrEmpty(join(repoRoot, 'packages/ui-kit/styles.css')),
+    readOrEmpty(join(repoRoot, 'packages/ui-kit-core/src/tokens.ts')),
+    readOrEmpty(join(repoRoot, 'packages/ui-kit-core/src/common.ts')),
+    readOrEmpty(join(repoRoot, 'packages/ui-kit-core/styles.css')),
     readOrEmpty(join(repoRoot, 'packages/core/src/types.ts')),
     readOrEmpty(join(repoRoot, 'packages/core/src/components/types.ts')),
   ]);

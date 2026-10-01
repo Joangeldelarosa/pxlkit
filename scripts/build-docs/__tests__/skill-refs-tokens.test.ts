@@ -2,7 +2,7 @@
  * Unit tests for the tokens & theming skill reference renderer.
  *
  * Strategy: feed synthetic (but shape-accurate) slices of `styles.css`,
- * `tokens.ts` and `common.tsx` so the tests never depend on the current
+ * `tokens.ts` and `common.ts` so the tests never depend on the current
  * palette values, and assert on the guarantees a consuming skill relies on:
  * light/dark pairing, the two-tone-scale warning, the surface table, the
  * size scales and the re-skin recipe.
@@ -14,7 +14,7 @@ import { renderTokensReference } from '../skill-refs/tokens';
 const stylesCss = `:root { --retro-bg: #FFFFFF; --retro-green: #00A862; }
 .dark { --retro-bg: #0A0A0F; --retro-green: #00FF88; }`;
 
-/** Shape-accurate slice of packages/ui-kit/styles.css (comments + @layer + .light). */
+/** Shape-accurate slice of packages/ui-kit-core/styles.css (comments + @layer + .light). */
 const realisticCss = `@layer base {
   :root, :host {
     /* --retro-bg: #DECOY; a commented-out value must never win */
@@ -137,8 +137,8 @@ describe('renderTokensReference', () => {
   it('labels toneMap as the control scale and tokens tone as the surface scale', () => {
     const out = renderTokensReference(realisticSources, '2.1.1');
     expect(out).toContain('toneMap');
-    expect(out).toContain('common.tsx');
-    expect(out).toContain('tokens.ts');
+    expect(out).toContain('packages/ui-kit-core/src/common.ts');
+    expect(out).toContain('packages/ui-kit-core/src/tokens.ts');
     expect(out).toMatch(/CONTROLS/);
     expect(out).toMatch(/SURFACES/);
   });

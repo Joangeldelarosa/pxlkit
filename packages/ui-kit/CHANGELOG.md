@@ -1,5 +1,11 @@
 # @pxlkit/ui-kit — Changelog
 
+## Unreleased
+
+### Changed
+- The kit now runs on `@pxlkit/ui-kit-core`, a new framework-neutral package holding the design tokens, the Tailwind CSS theme, the class recipes, the pixel glyphs, the locale data and the DOM behaviour (focus trap, stacking scroll lock, dark mode, media queries, storage) that every framework's kit shares. Zero public API change: `@pxlkit/ui-kit` re-exports everything it exported before.
+- `styles.css` imports the core theme and registers the kit's compiled classes with Tailwind CSS v4 (`@source`), so the one `@import "@pxlkit/ui-kit/styles.css";` after `@import "tailwindcss";` is the whole setup — a separate `@source` line pointing into `node_modules` is no longer needed.
+
 ## 2.1.1 — 2026-08-08
 
 ### Fixed

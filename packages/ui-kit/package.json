@@ -51,6 +51,7 @@
     "@pxlkit/core": "^1.2.3",
     "@pxlkit/gamification": "*",
     "@pxlkit/ui": "^1.2.3",
+    "@pxlkit/ui-kit-core": "^2.2.0",
     "@tanstack/react-table": "^8.21.3",
     "clsx": "^2.1.0",
     "embla-carousel": "^8.6.0",

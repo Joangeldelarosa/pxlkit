@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { matchesMediaQuery, subscribeMediaQuery } from '@pxlkit/ui-kit-core';
 
 /**
  * Subscribe to a CSS media query.
@@ -14,33 +15,14 @@ import { useEffect, useState } from 'react';
  * const isDesktop = useMediaQuery('(min-width: 768px)');
  */
 export function useMediaQuery(query: string, defaultValue: boolean = false): boolean {
-  const [matches, setMatches] = useState<boolean>(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      return defaultValue;
-    }
-    return window.matchMedia(query).matches;
-  });
+  const [matches, setMatches] = useState<boolean>(() => matchesMediaQuery(query, defaultValue));
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
       return;
     }
-
-    const mql = window.matchMedia(query);
-    setMatches(mql.matches);
-
-    const handler = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
-
-    if (typeof mql.addEventListener === 'function') {
-      mql.addEventListener('change', handler);
-      return () => mql.removeEventListener('change', handler);
-    }
-
-    // Legacy Safari fallback
-    mql.addListener(handler);
-    return () => mql.removeListener(handler);
+    setMatches(window.matchMedia(query).matches);
+    return subscribeMediaQuery(query, setMatches);
   }, [query]);
 
   return matches;

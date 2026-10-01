@@ -75,3 +75,25 @@ export const Linear: Story = {
     return <ExampleComponent />;
   },
 };
+
+/** Per-component override */
+export const Override: Story = {
+  name: 'Per-component override',
+  tags: ["example-override"],
+  parameters: {
+    docs: { description: { story: undefined } },
+  },
+  render: () => {
+    const ExampleComponent =
+      ((examples as any).Override ?? (examples as any)['override']) ??
+      ((manifest as any)?.examples?.find?.((e: any) => e?.id === 'override')?.Component);
+    if (!ExampleComponent) {
+      return (
+        <pre style={{ color: 'crimson' }}>
+          {"Missing example 'override' for PxlKitSurfaceProvider."}
+        </pre>
+      );
+    }
+    return <ExampleComponent />;
+  },
+};

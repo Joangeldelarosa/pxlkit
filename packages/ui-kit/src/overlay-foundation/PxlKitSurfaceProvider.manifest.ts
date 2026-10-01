@@ -1,6 +1,6 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema';
 import { PxlKitSurfaceProvider } from './PxlKitSurfaceProvider';
-import { Default, Linear } from './PxlKitSurfaceProvider.examples';
+import { Default, Linear, Override } from './PxlKitSurfaceProvider.examples';
 
 void PxlKitSurfaceProvider;
 
@@ -10,16 +10,17 @@ export default defineManifest({
   since: '1.6.0',
   status: 'stable',
   description:
-    'Sets the default surface (pixel | linear) for every nested PxlKit component via React context.',
+    'Sets the default surface (pixel | linear) for every nested PxlKit component — React context, Vue provide/inject or Angular dependency injection.',
   highlights: [
     'Switches the entire subtree between the pixel and linear aesthetics in one line',
     'Per-component surface prop still overrides the provider for one-off variants',
     'Defaults to "pixel" so consumers without a provider keep the brand look',
-    'SSR-safe context provider with zero runtime cost when value is unchanged',
+    'Renders no element of its own and is safe for server rendering',
   ],
   examples: [
     { id: 'default', label: 'Default (Pixel)', Component: Default },
     { id: 'linear', label: 'Linear', Component: Linear },
+    { id: 'override', label: 'Per-component override', Component: Override },
   ],
   props: 'auto',
   a11y: {

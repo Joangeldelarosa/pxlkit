@@ -2,7 +2,7 @@
  * Gate 20 — theme-token-usage.
  *
  * Mission: every visual class in `packages/ui-kit/src/**\/*.tsx` must come
- * from the design-system tokens defined in `packages/ui-kit/src/tokens.ts`
+ * from the design-system tokens defined in `packages/ui-kit-core/src/tokens.ts`
  * (the `tone` map: `bg-retro-*`, `border-retro-*`, `text-retro-*`,
  * `fill-retro-*`, plus the alpha-modulated `bg-retro-*\/NN` variants).
  *
@@ -60,7 +60,7 @@ import {
 } from '../_lib/gate-base.js';
 
 // ---------------------------------------------------------------------------
-// Token catalog — kept in sync with packages/ui-kit/src/tokens.ts.
+// Token catalog — kept in sync with packages/ui-kit-core/src/tokens.ts.
 // We list the retro color slugs the design system exposes. Anything outside
 // this set that matches `(bg|text|border|fill)-retro-*` is still treated as
 // OK (it's a retro token by namespace), but the SUGGESTION engine uses this

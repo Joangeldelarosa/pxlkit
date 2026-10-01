@@ -10,7 +10,7 @@ error.
 
 ## Palette variables
 
-Parsed from `packages/ui-kit/styles.css` — 20 variable(s). Light is the
+Parsed from `packages/ui-kit-core/styles.css` — 20 variable(s). Light is the
 `:root, :host` block (a variable declared only in the explicit `.light` block is
 shown from there); dark is the `.dark` class block. Dark mode is a **class on
 `<html>`**, never a media query.
@@ -49,8 +49,8 @@ classes: `bg-retro-shadow-green` does not exist and silently renders nothing.
 `Record<Tone, …>` maps with overlapping field names. They type-check against
 each other, so a mix-up produces no error — only wrong pixels.
 
-- `toneMap` — from `packages/ui-kit/src/common.tsx` — **CONTROLS** (button, input, badge, chip, toast) — keys: `green`, `cyan`, `gold`, `red`, `purple`, `pink`, `neutral`
-- `tone` — from `packages/ui-kit/src/tokens.ts` — **SURFACES** (card, hero, bento, charts, sidebar) — keys: `neutral`, `green`, `cyan`, `gold`, `red`, `purple`, `pink`
+- `toneMap` — from `packages/ui-kit-core/src/common.ts` — **CONTROLS** (button, input, badge, chip, toast) — keys: `green`, `cyan`, `gold`, `red`, `purple`, `pink`, `neutral`
+- `tone` — from `packages/ui-kit-core/src/tokens.ts` — **SURFACES** (card, hero, bento, charts, sidebar) — keys: `neutral`, `green`, `cyan`, `gold`, `red`, `purple`, `pink`
 
 Which one to reach for:
 

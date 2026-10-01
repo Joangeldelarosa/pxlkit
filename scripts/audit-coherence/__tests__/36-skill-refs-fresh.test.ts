@@ -80,10 +80,11 @@ async function createFixture(opts: FixtureOptions = {}): Promise<string> {
   await writeFile(join(root, 'packages/ui-kit/src/actions/PixelButton.tsx'), 'export const PixelButton = () => null;\n');
   await writeFile(join(root, 'packages/ui-kit/src/actions/PixelIconButton.tsx'), 'export const PixelIconButton = () => null;\n');
   await writeFile(join(root, 'packages/ui-kit/src/cards/PixelCard.tsx'), 'export const PixelCard = () => null;\n');
-  await writeFile(join(root, 'packages/ui-kit/src/tokens.ts'), TOKENS_TS);
-  await writeFile(join(root, 'packages/ui-kit/src/common.tsx'), COMMON_TSX);
+  await mkdir(join(root, 'packages/ui-kit-core/src'), { recursive: true });
+  await writeFile(join(root, 'packages/ui-kit-core/src/tokens.ts'), TOKENS_TS);
+  await writeFile(join(root, 'packages/ui-kit-core/src/common.ts'), COMMON_TSX);
   await writeFile(join(root, 'packages/ui-kit/src/index.tsx'), INDEX_TSX);
-  await writeFile(join(root, 'packages/ui-kit/styles.css'), STYLES_CSS);
+  await writeFile(join(root, 'packages/ui-kit-core/styles.css'), STYLES_CSS);
   await writeFile(join(root, 'packages/core/src/types.ts'), CORE_TYPES_TS);
   await mkdir(join(root, 'packages/core/src/components'), { recursive: true });
   await writeFile(join(root, 'packages/core/src/components/types.ts'), CORE_PROPS_TS);

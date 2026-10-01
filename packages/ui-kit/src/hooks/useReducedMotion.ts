@@ -1,5 +1,6 @@
 'use client';
 
+import { REDUCED_MOTION_QUERY } from '@pxlkit/ui-kit-core';
 import { useMediaQuery } from './useMediaQuery';
 
 /**
@@ -14,5 +15,5 @@ import { useMediaQuery } from './useMediaQuery';
  * <div className={reduced ? '' : 'animate-pulse'}>...</div>
  */
 export function useReducedMotion(): boolean {
-  return useMediaQuery('(prefers-reduced-motion: reduce)');
+  return useMediaQuery(REDUCED_MOTION_QUERY);
 }

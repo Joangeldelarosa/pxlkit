@@ -1,0 +1,70 @@
+{
+  "name": "@pxlkit/ui-kit-core",
+  "version": "2.2.0",
+  "description": "Framework-agnostic core of the Pxlkit retro UI kit: design tokens, Tailwind theme, class recipes and DOM behaviour for React, Vue and Angular components",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./styles.css": "./styles.css",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist",
+    "styles.css"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.2",
+    "jsdom": "^29.0.1",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.2"
+  },
+  "keywords": [
+    "pxlkit",
+    "ui-kit",
+    "design-system",
+    "design-tokens",
+    "framework-agnostic",
+    "headless",
+    "tailwind-css",
+    "pixel-art",
+    "retro",
+    "8bit",
+    "react",
+    "vue",
+    "angular",
+    "typescript",
+    "mit-license"
+  ],
+  "homepage": "https://pxlkit.xyz",
+  "repository": "https://github.com/Joangeldelarosa/pxlkit",
+  "author": {
+    "name": "Joangel De La Rosa",
+    "url": "https://github.com/joangeldelarosa"
+  }
+}
