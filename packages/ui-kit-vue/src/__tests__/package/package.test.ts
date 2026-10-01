@@ -33,7 +33,9 @@ function filesUnder(dir: string): string[] {
   });
 }
 
-describe('@pxlkit/ui-kit-vue package', () => {
+// Loads and server-renders the built bundle: seconds of work on a busy CI
+// runner, past the 5 s default.
+describe('@pxlkit/ui-kit-vue package', { timeout: 30_000 }, () => {
   it('is an ES module package with Vue 3.5+ as its only peer', () => {
     expect(manifest.type).toBe('module');
     expect(manifest.peerDependencies).toEqual({ vue: '^3.5.0' });
