@@ -34,6 +34,7 @@
  * Safety: read-only. The gate never writes.
  */
 
+import type { Dirent } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
@@ -213,7 +214,7 @@ async function componentFileNames(dir: string): Promise<string[]> {
 
   async function walk(current: string, depth: number): Promise<void> {
     if (depth > 4) return;
-    let entries: Awaited<ReturnType<typeof readdir>>;
+    let entries: Dirent[];
     try {
       entries = await readdir(current, { withFileTypes: true });
     } catch {

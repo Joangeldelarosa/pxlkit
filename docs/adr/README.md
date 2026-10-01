@@ -23,6 +23,7 @@ This directory contains Architecture Decision Records (ADRs) for pxlkit. Each AD
 | [0003](./0003-deprecation-policy.md) | Deprecation Policy — One-Minor Warning, Removal in Next Major | Accepted | 2026-05-30 |
 | [0004](./0004-carry-forward-pxlkitbutton-removal.md) | Carry Forward PxlKitButton Removal to v3.0.0 | Accepted | 2026-06-11 |
 | [0005](./0005-framework-agnostic-engine.md) | Framework-Agnostic Rendering Engine with React, Vue and Angular Bindings | Accepted | 2026-10-01 |
+| [0006](./0006-multi-framework-ui-kit.md) | One UI Kit for React, Vue and Angular | Accepted | 2026-10-01 |
 
 ## Status values
 

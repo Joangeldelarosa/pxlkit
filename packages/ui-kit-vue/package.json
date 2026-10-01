@@ -1,0 +1,76 @@
+{
+  "name": "@pxlkit/ui-kit-vue",
+  "version": "2.2.0",
+  "description": "Vue 3 retro UI kit: the Pxlkit components with the same markup, theme and behaviour as the React kit, built on @pxlkit/ui-kit-core",
+  "license": "MIT",
+  "type": "module",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./styles.css",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist",
+    "styles.css"
+  ],
+  "scripts": {
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist",
+    "lint": "vue-tsc --noEmit -p tsconfig.json && vue-tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "dependencies": {
+    "@pxlkit/ui-kit-core": "^2.2.0"
+  },
+  "devDependencies": {
+    "@pxlkit/ui-kit": "*",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "@vitest/coverage-v8": "^4.1.2",
+    "@vue/test-utils": "~2.4.6",
+    "jsdom": "^29.0.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.0",
+    "vite": "^6.4.0",
+    "vitest": "^4.1.2",
+    "vue": "^3.5.0",
+    "vue-tsc": "^3.0.0"
+  },
+  "keywords": [
+    "pxlkit",
+    "vue",
+    "vue3",
+    "vue-components",
+    "nuxt",
+    "ui-kit",
+    "component-library",
+    "design-system",
+    "tailwind-css",
+    "pixel-art",
+    "retro",
+    "8bit",
+    "dark-mode",
+    "accessible-ui",
+    "typescript",
+    "mit-license"
+  ],
+  "homepage": "https://pxlkit.xyz",
+  "repository": "https://github.com/Joangeldelarosa/pxlkit",
+  "author": {
+    "name": "Joangel De La Rosa",
+    "url": "https://github.com/joangeldelarosa"
+  }
+}

@@ -20,12 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   React ↔ Vue and React ↔ Angular parity suites compare the rendered DOM on the server,
   on mount, after input changes and frame by frame while animating.
 - **`@pxlkit/ui-kit-core`.** The framework-neutral core of the UI kit, shared by the
-  React kit and the upcoming Vue and Angular kits: design tokens, the surface system
-  and control scale, the Tailwind CSS v4 theme, class recipes, the pixel glyphs as
-  data, locale data, DOM behaviour (`trapFocus`, the stacking `lockScroll`, focus
-  return, Floating UI positioning) and preference helpers (dark mode, media queries,
-  failure-tolerant `localStorage`). Safe on the server; its one dependency is
-  `@floating-ui/dom`.
+  React, Vue and Angular kits: design tokens, the surface system and control scale,
+  the Tailwind CSS v4 theme, class recipes, the pixel glyphs as data, locale data, DOM
+  behaviour (`trapFocus`, the stacking `lockScroll`, focus return, Floating UI
+  positioning) and preference helpers (dark mode, media queries, failure-tolerant
+  `localStorage`). Safe on the server; its one dependency is `@floating-ui/dom`.
+- **The UI kit for Vue and Angular.** `@pxlkit/ui-kit-vue` (Vue 3 single-file
+  components) and `@pxlkit/ui-kit-angular` (standalone, signal-based Angular 20–22
+  components) render the React kit's markup and classes and behave the same way. A
+  parity harness (`scripts/parity`) renders every manifest example in React and in the
+  port and compares a canonical DOM — on mount, on the server and after every step of
+  scripted interactions, focus and scroll lock included. The porting rules are in
+  `docs/ui-kit-porting.md` (ADR-0006).
 - **`@pxlkit/core/vanilla` and the shared rendering engine.** A React-free entry point
   exports the icon data model, every utility and the engine the three frameworks build on:
   `renderIconSvg` / `renderIconDataUri`, `createAnimatedIconPlayer`,

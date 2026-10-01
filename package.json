@@ -36,10 +36,11 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint",
+    "lint": "turbo lint && npm run lint:scripts",
+    "lint:scripts": "tsc --noEmit -p scripts/tsconfig.json",
     "clean": "turbo clean",
     "test": "turbo test && npm run test:scripts",
-    "test:scripts": "vitest run --root scripts/audit-coherence && vitest run --root scripts/build-docs",
+    "test:scripts": "vitest run --root scripts/audit-coherence && vitest run --root scripts/build-docs && vitest run --root scripts/parity",
     "test:coverage": "turbo test:coverage",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

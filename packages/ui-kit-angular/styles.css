@@ -1,0 +1,13 @@
+/*
+ * @pxlkit/ui-kit-angular — styles for the Angular components.
+ *
+ * The theme (design tokens, pixel utilities, light/dark palettes) lives in
+ * @pxlkit/ui-kit-core and is shared with the React and Vue kits:
+ *
+ *   @import "tailwindcss";
+ *   @import "@pxlkit/ui-kit-angular/styles.css";
+ */
+@import "@pxlkit/ui-kit-core/styles.css";
+
+/* Class names used by the Angular components. */
+@source "./dist";

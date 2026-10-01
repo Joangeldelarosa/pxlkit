@@ -12,7 +12,8 @@
   },
   "include": [
     "audit-coherence/**/*.ts",
-    "build-docs/**/*.ts"
+    "build-docs/**/*.ts",
+    "parity/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

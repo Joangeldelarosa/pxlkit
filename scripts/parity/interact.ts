@@ -1,0 +1,132 @@
+/**
+ * Scripted interactions, performed identically on every framework's
+ * rendering. Events are dispatched the way a browser does for a real user,
+ * so React's delegated listeners, Vue's and Angular's element listeners all
+ * see them.
+ */
+
+export type ParityStep =
+  | { action: 'click' | 'pointerdown' | 'hover' | 'unhover' | 'focus' | 'blur'; target: string; nth?: number }
+  | {
+      action: 'keydown';
+      key: string;
+      /** Defaults to the focused element. */
+      target?: string;
+      nth?: number;
+      shiftKey?: boolean;
+      ctrlKey?: boolean;
+      metaKey?: boolean;
+      altKey?: boolean;
+    }
+  | { action: 'input'; target: string; value: string; nth?: number }
+  | { action: 'select'; target: string; value: string; nth?: number }
+  | { action: 'wait'; ms: number };
+
+export interface ParityScenario {
+  /** Component name, as in its manifest. */
+  component: string;
+  /** Export name of the example the scenario starts from. */
+  example: string;
+  /** What the scenario checks. */
+  name: string;
+  steps: ParityStep[];
+}
+
+function resolve(target: string, nth = 0): HTMLElement {
+  const found = document.querySelectorAll<HTMLElement>(target)[nth];
+  if (!found) throw new Error(`Parity step target not found: ${target}${nth ? ` [${nth}]` : ''}`);
+  return found;
+}
+
+function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
+  const Ctor = (globalThis.PointerEvent ?? MouseEvent) as typeof MouseEvent;
+  return new Ctor(type, { bubbles: true, cancelable: true, composed: true, button: 0, ...init });
+}
+
+function mouse(type: string, init: MouseEventInit = {}): MouseEvent {
+  return new MouseEvent(type, { bubbles: true, cancelable: true, composed: true, button: 0, ...init });
+}
+
+function setNativeValue(element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, value: string): void {
+  const proto = Object.getPrototypeOf(element) as object;
+  const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+  if (setter) setter.call(element, value);
+  else element.value = value;
+}
+
+/** Perform one step, then let the framework settle. */
+export async function perform(step: ParityStep, flush: () => Promise<void>): Promise<void> {
+  switch (step.action) {
+    case 'click': {
+      const el = resolve(step.target, step.nth);
+      el.dispatchEvent(pointer('pointerdown'));
+      el.dispatchEvent(mouse('mousedown'));
+      if (typeof el.focus === 'function') el.focus();
+      el.dispatchEvent(pointer('pointerup'));
+      el.dispatchEvent(mouse('mouseup'));
+      el.dispatchEvent(mouse('click', { detail: 1 }));
+      break;
+    }
+    case 'pointerdown': {
+      const el = resolve(step.target, step.nth);
+      el.dispatchEvent(pointer('pointerdown'));
+      el.dispatchEvent(mouse('mousedown'));
+      break;
+    }
+    case 'hover': {
+      const el = resolve(step.target, step.nth);
+      el.dispatchEvent(pointer('pointerover'));
+      el.dispatchEvent(pointer('pointerenter', { bubbles: false }));
+      el.dispatchEvent(mouse('mouseover'));
+      el.dispatchEvent(mouse('mouseenter', { bubbles: false }));
+      break;
+    }
+    case 'unhover': {
+      const el = resolve(step.target, step.nth);
+      el.dispatchEvent(pointer('pointerout'));
+      el.dispatchEvent(pointer('pointerleave', { bubbles: false }));
+      el.dispatchEvent(mouse('mouseout'));
+      el.dispatchEvent(mouse('mouseleave', { bubbles: false }));
+      break;
+    }
+    case 'focus':
+      resolve(step.target, step.nth).focus();
+      break;
+    case 'blur':
+      resolve(step.target, step.nth).blur();
+      break;
+    case 'keydown': {
+      const el = step.target ? resolve(step.target, step.nth) : ((document.activeElement as HTMLElement | null) ?? document.body);
+      const init: KeyboardEventInit = {
+        key: step.key,
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        shiftKey: step.shiftKey,
+        ctrlKey: step.ctrlKey,
+        metaKey: step.metaKey,
+        altKey: step.altKey,
+      };
+      el.dispatchEvent(new KeyboardEvent('keydown', init));
+      el.dispatchEvent(new KeyboardEvent('keyup', init));
+      break;
+    }
+    case 'input': {
+      const el = resolve(step.target, step.nth) as HTMLInputElement | HTMLTextAreaElement;
+      setNativeValue(el, step.value);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      break;
+    }
+    case 'select': {
+      const el = resolve(step.target, step.nth) as HTMLSelectElement;
+      setNativeValue(el, step.value);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      break;
+    }
+    case 'wait':
+      await new Promise((done) => setTimeout(done, step.ms));
+      break;
+  }
+  await flush();
+}

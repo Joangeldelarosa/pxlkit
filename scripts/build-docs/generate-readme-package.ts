@@ -36,6 +36,7 @@ import {
   writeOutput,
 } from "./_lib/generator-base.js";
 import { createLogger, defaultLogger, type Logger } from "./_lib/logger.js";
+import { KIT_PORTS, portedManifests } from "./_lib/ports.js";
 import { findComponentDirs } from "./_lib/scan-fs.js";
 
 // ---------------------------------------------------------------------------
@@ -456,7 +457,11 @@ export async function generateReadmePackage(
       failedPackages.push(toPosix(packageDir));
       continue;
     }
-    const pkgManifests = grouped.get(pkgJson.name) ?? [];
+    // A Vue or Angular port lists the React manifests it implements in full.
+    const port = KIT_PORTS.find((candidate) => candidate.package === pkgJson.name);
+    const pkgManifests = port
+      ? await portedManifests(repoRoot, port, manifests)
+      : (grouped.get(pkgJson.name) ?? []);
     if (pkgManifests.length === 0) {
       skippedPackages.push(pkgJson.name);
       continue;
