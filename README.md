@@ -483,6 +483,7 @@ Sidebar categories:
 | [`packages/ui`](./packages/ui) | [`@pxlkit/ui`](https://www.npmjs.com/package/@pxlkit/ui) | `1.2.5` | UI & interface pixel art icon pack — 41 icons for tools, controls, navigation, editor elements, home, search, settings, menus, and layout |
 | [`packages/ui-kit`](./packages/ui-kit) | [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | `2.1.1` | Production-grade React UI kit with retro-future aesthetic: 111 production-ready components, WCAG 2.1 AA, surface system (pixel/linear), dark mode, 30-gate coherence audit, full SSOT documentation. |
 | [`packages/voxel`](./packages/voxel) | [`@pxlkit/voxel`](https://www.npmjs.com/package/@pxlkit/voxel) | `0.1.4` | MIT-licensed 3D voxel toolkit for React — voxel utility primitives (pxlToVoxels, upscaleGrid) plus types. The full procedural-world engine (biomes, chunks, day/night cycles, highways, tunnels) lives in the showcase app at pxlkit.xyz/explore and ships in the v1 package. |
+| [`packages/vue`](./packages/vue) | [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) | `0.1.0` | Vue 3 components for Pxlkit pixel art icons: static, animated and 3D parallax icons plus pixel toasts, on the shared framework-agnostic engine |
 | [`packages/weather`](./packages/weather) | [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | `1.2.4` | Weather and nature pixel art icon pack — 36 icons for sun, rain, clouds, moon phases, temperature, storms, snow, and climate UI |
 <!-- WORKSPACES:END -->
 
