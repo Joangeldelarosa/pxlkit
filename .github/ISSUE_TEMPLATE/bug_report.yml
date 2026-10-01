@@ -54,6 +54,8 @@ body:
       description: Which pxlkit package is affected?
       options:
         - "@pxlkit/core"
+        - "@pxlkit/vue"
+        - "@pxlkit/angular"
         - "@pxlkit/ui-kit"
         - "@pxlkit/ui"
         - "@pxlkit/effects"
@@ -90,8 +92,8 @@ body:
     id: framework
     attributes:
       label: Framework / Environment
-      description: React version, Next.js version, Vite version, etc.
-      placeholder: e.g. React 19, Next.js 15, Vite 6
+      description: React, Vue or Angular version, plus your meta-framework or bundler (Next.js, Nuxt, Angular CLI, Vite, …).
+      placeholder: e.g. React 19 + Next.js 15, Vue 3.5 + Nuxt 4, Angular 21
 
   - type: textarea
     id: additional

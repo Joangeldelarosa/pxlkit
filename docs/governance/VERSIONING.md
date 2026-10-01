@@ -40,7 +40,7 @@ A breaking change is **any change that requires a consumer of a `stable` API to 
 - Changing the DOM structure of a component in a way that breaks documented CSS hooks (e.g. `data-*` attributes, BEM class names, ref targets).
 - Changing the order or semantics of callback arguments.
 - Changing peer dependency ranges to exclude a previously supported version.
-- Raising the minimum Node, React, or TypeScript version.
+- Raising the minimum Node, React, Vue, Angular, or TypeScript version.
 
 ### Not breaking changes
 

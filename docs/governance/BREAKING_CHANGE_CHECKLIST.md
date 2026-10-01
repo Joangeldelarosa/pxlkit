@@ -12,7 +12,7 @@ A change is breaking if it can cause a downstream consumer's existing, correct c
 - Changing the type signature of a public API in a way that is not strictly more permissive.
 - Changing default values, default variants, or default styling.
 - Changing peer-dependency ranges to exclude previously supported versions.
-- Changing the minimum supported Node, React, or TypeScript version.
+- Changing the minimum supported Node, React, Vue, Angular, or TypeScript version.
 - Changing the package's `exports` map in a way that breaks existing import paths.
 
 If unsure, assume it is breaking and run the checklist. Cost of a false positive is one extra ADR; cost of a false negative is a broken downstream.

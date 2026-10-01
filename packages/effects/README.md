@@ -25,23 +25,63 @@ This pack focuses on VFX and particle-style effects — explosions, radar pings,
 
 ## Installation
 
+Install the pack next to the components for your framework:
+
 ```bash
-npm install @pxlkit/core @pxlkit/effects
+npm install @pxlkit/core @pxlkit/effects      # React
+npm install @pxlkit/vue @pxlkit/effects       # Vue 3
+npm install @pxlkit/angular @pxlkit/effects   # Angular
 ```
 
-> `@pxlkit/core` is required as a dependency for rendering components.
+> The pack is plain data (`PxlKitData` objects typed by `@pxlkit/core`); the React components in `@pxlkit/core`, [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) or [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) render it.
 
 ## Quick Start
+
+### React
 
 ```tsx
 import { AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ExplosionBurst } from '@pxlkit/effects';
 
 // Auto-playing animated effect
-<AnimatedPxlKitIcon icon={ExplosionBurst} size={48} colorful />
+<AnimatedPxlKitIcon icon={ExplosionBurst} size={48} />
 
 // Play on hover only
-<AnimatedPxlKitIcon icon={ExplosionBurst} size={48} colorful trigger="hover" />
+<AnimatedPxlKitIcon icon={ExplosionBurst} size={48} trigger="hover" />
+```
+
+### Vue
+
+```vue
+<script setup lang="ts">
+import { AnimatedPxlKitIcon } from '@pxlkit/vue';
+import { ExplosionBurst } from '@pxlkit/effects';
+</script>
+
+<template>
+  <AnimatedPxlKitIcon :icon="ExplosionBurst" :size="48" />
+  <AnimatedPxlKitIcon :icon="ExplosionBurst" :size="48" trigger="hover" />
+</template>
+```
+
+### Angular
+
+```ts
+import { Component } from '@angular/core';
+import { AnimatedPxlKitIcon } from '@pxlkit/angular';
+import { ExplosionBurst } from '@pxlkit/effects';
+
+@Component({
+  selector: 'app-effects',
+  imports: [AnimatedPxlKitIcon],
+  template: `
+    <pxl-animated-icon [icon]="explosionBurst" [size]="48" />
+    <pxl-animated-icon [icon]="explosionBurst" [size]="48" trigger="hover" />
+  `,
+})
+export class Effects {
+  protected readonly explosionBurst = ExplosionBurst;
+}
 ```
 
 ## Icons
@@ -65,37 +105,58 @@ All icons in this pack are **animated** with multi-frame playback:
 
 ## Using the Icon Pack
 
+Every effect is animated, so `EffectsPack.icons` maps straight onto the animated component:
+
 ```tsx
+// React
 import { AnimatedPxlKitIcon } from '@pxlkit/core';
 import { EffectsPack } from '@pxlkit/effects';
 
-// Browse all effects
 {EffectsPack.icons.map((icon) => (
-  <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} colorful />
+  <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} />
 ))}
+```
+
+```vue
+<!-- Vue -->
+<AnimatedPxlKitIcon v-for="icon in EffectsPack.icons" :key="icon.name" :icon="icon" :size="32" />
+```
+
+```html
+<!-- Angular: the component exposes `effects = EffectsPack.icons` -->
+@for (icon of effects; track icon.name) {
+  <pxl-animated-icon [icon]="icon" [size]="32" />
+}
 ```
 
 ## Animation Controls
 
+The same options exist in every framework (`trigger`, `speed`, `fps`, `playing`):
+
 ```tsx
-// Loop continuously (default)
-<AnimatedPxlKitIcon icon={Flame} size={48} colorful />
+// Loop continuously (the icon's own trigger)
+<AnimatedPxlKitIcon icon={Flame} size={48} />
 
 // Play once
-<AnimatedPxlKitIcon icon={Flame} size={48} colorful trigger="once" />
+<AnimatedPxlKitIcon icon={Flame} size={48} trigger="once" />
 
 // Play on hover
-<AnimatedPxlKitIcon icon={Flame} size={48} colorful trigger="hover" />
+<AnimatedPxlKitIcon icon={Flame} size={48} trigger="hover" />
 
-// Custom speed (0.5 = half speed)
-<AnimatedPxlKitIcon icon={Flame} size={48} colorful speed={0.5} />
+// Custom speed (0.5 = half speed) or a fixed frame rate
+<AnimatedPxlKitIcon icon={Flame} size={48} speed={0.5} />
+<AnimatedPxlKitIcon icon={Flame} size={48} fps={12} />
 ```
+
+In Vue: `<AnimatedPxlKitIcon :icon="Flame" :size="48" trigger="hover" :speed="0.5" />`. In Angular: `<pxl-animated-icon [icon]="flame" [size]="48" trigger="hover" [speed]="0.5" />`.
 
 ## Related Packages
 
 | Package | Description |
 | --- | --- |
-| [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Core rendering engine (required) |
+| [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Rendering engine and React components |
+| [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) | Vue 3 components |
+| [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) | Angular standalone components |
 | [`@pxlkit/gamification`](https://www.npmjs.com/package/@pxlkit/gamification) | 51 icons — RPG, achievements, rewards |
 | [`@pxlkit/feedback`](https://www.npmjs.com/package/@pxlkit/feedback) | 33 icons — alerts, status, notifications |
 | [`@pxlkit/social`](https://www.npmjs.com/package/@pxlkit/social) | 43 icons — community, emojis, messaging |

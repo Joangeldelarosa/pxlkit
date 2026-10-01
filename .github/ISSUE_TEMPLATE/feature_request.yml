@@ -50,6 +50,8 @@ body:
       description: Which pxlkit package should this feature be added to?
       options:
         - "@pxlkit/core"
+        - "@pxlkit/vue"
+        - "@pxlkit/angular"
         - "@pxlkit/ui-kit"
         - "@pxlkit/ui"
         - "@pxlkit/effects"

@@ -23,23 +23,64 @@
 
 ## Installation
 
+Install the pack next to the components for your framework:
+
 ```bash
-npm install @pxlkit/core @pxlkit/weather
+npm install @pxlkit/core @pxlkit/weather      # React
+npm install @pxlkit/vue @pxlkit/weather       # Vue 3
+npm install @pxlkit/angular @pxlkit/weather   # Angular
 ```
 
-> `@pxlkit/core` is required as a dependency for rendering components.
+> The pack is plain data (`PxlKitData` objects typed by `@pxlkit/core`); the React components in `@pxlkit/core`, [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) or [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) render it.
 
 ## Quick Start
+
+### React
 
 ```tsx
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { Sun, SpinningTornado } from '@pxlkit/weather';
 
 // Static weather icon
-<PxlKitIcon icon={Sun} size={32} colorful />
+<PxlKitIcon icon={Sun} size={32} />
 
 // Animated tornado
-<AnimatedPxlKitIcon icon={SpinningTornado} size={48} colorful />
+<AnimatedPxlKitIcon icon={SpinningTornado} size={48} />
+```
+
+### Vue
+
+```vue
+<script setup lang="ts">
+import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/vue';
+import { Sun, SpinningTornado } from '@pxlkit/weather';
+</script>
+
+<template>
+  <PxlKitIcon :icon="Sun" :size="32" />
+  <AnimatedPxlKitIcon :icon="SpinningTornado" :size="48" />
+</template>
+```
+
+### Angular
+
+```ts
+import { Component } from '@angular/core';
+import { AnimatedPxlKitIcon, PxlKitIcon } from '@pxlkit/angular';
+import { SpinningTornado, Sun } from '@pxlkit/weather';
+
+@Component({
+  selector: 'app-forecast',
+  imports: [PxlKitIcon, AnimatedPxlKitIcon],
+  template: `
+    <pxl-icon [icon]="sun" [size]="32" />
+    <pxl-animated-icon [icon]="spinningTornado" [size]="48" />
+  `,
+})
+export class Forecast {
+  protected readonly sun = Sun;
+  protected readonly spinningTornado = SpinningTornado;
+}
 ```
 
 ## Icons
@@ -92,25 +133,55 @@ import { Sun, SpinningTornado } from '@pxlkit/weather';
 
 ## Using the Icon Pack
 
+`WeatherPack.icons` holds every icon of the pack, static and animated; `isAnimatedIcon` tells them apart.
+
 ```tsx
+// React
 import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/core';
 import { WeatherPack } from '@pxlkit/weather';
 
-// Render all weather icons
 {WeatherPack.icons.map((icon) =>
   isAnimatedIcon(icon) ? (
-    <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} colorful />
+    <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} />
   ) : (
-    <PxlKitIcon key={icon.name} icon={icon} size={32} colorful />
-  )
+    <PxlKitIcon key={icon.name} icon={icon} size={32} />
+  ),
 )}
+```
+
+```vue
+<!-- Vue -->
+<script setup lang="ts">
+import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/vue';
+import { WeatherPack } from '@pxlkit/weather';
+</script>
+
+<template>
+  <template v-for="icon in WeatherPack.icons" :key="icon.name">
+    <AnimatedPxlKitIcon v-if="isAnimatedIcon(icon)" :icon="icon" :size="32" />
+    <PxlKitIcon v-else :icon="icon" :size="32" />
+  </template>
+</template>
+```
+
+```html
+<!-- Angular: the component exposes `icons = WeatherPack.icons` and `isAnimated = isAnimatedIcon` -->
+@for (icon of icons; track icon.name) {
+  @if (isAnimated(icon)) {
+    <pxl-animated-icon [icon]="icon" [size]="32" />
+  } @else {
+    <pxl-icon [icon]="icon" [size]="32" />
+  }
+}
 ```
 
 ## Related Packages
 
 | Package | Description |
 | --- | --- |
-| [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Core rendering engine (required) |
+| [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Rendering engine and React components |
+| [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) | Vue 3 components |
+| [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) | Angular standalone components |
 | [`@pxlkit/gamification`](https://www.npmjs.com/package/@pxlkit/gamification) | 51 icons — RPG, achievements, rewards |
 | [`@pxlkit/feedback`](https://www.npmjs.com/package/@pxlkit/feedback) | 33 icons — alerts, status, notifications |
 | [`@pxlkit/social`](https://www.npmjs.com/package/@pxlkit/social) | 43 icons — community, emojis, messaging |

@@ -4,7 +4,7 @@ Pxlkit Licensing Overview
 Pxlkit uses a split licensing model so that software code, icon/art assets, and trademarks are governed separately.
 
 1. Code license — see `LICENSE-CODE`
-   Applies to the source code for `@pxlkit/core`, `@pxlkit/ui-kit`, `@pxlkit/voxel`, the Next.js app source, repo scripts, and documentation text unless a file is clearly identified as an asset or third-party material.
+   Applies to the source code for `@pxlkit/core`, `@pxlkit/vue`, `@pxlkit/angular`, `@pxlkit/ui-kit`, `@pxlkit/voxel`, the Next.js app source, repo scripts, and documentation text unless a file is clearly identified as an asset or third-party material.
 
 2. Asset license — see `LICENSE-ASSETS`
    Applies to the icon-pack packages (`@pxlkit/gamification`, `@pxlkit/feedback`, `@pxlkit/social`, `@pxlkit/weather`, `@pxlkit/ui`, `@pxlkit/effects`, `@pxlkit/parallax`), exported icon data, artwork, illustrations, screenshots, marketing images, and other visual assets unless another notice says otherwise.

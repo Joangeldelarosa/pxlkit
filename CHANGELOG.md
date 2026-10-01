@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Vue and Angular support.** Two new MIT packages render the icons with the same
+  markup and behaviour as the React components:
+  - `@pxlkit/vue` (0.1.0) — Vue 3.3+ components `PxlKitIcon`, `AnimatedPxlKitIcon`,
+    `ParallaxPxlKitIcon` and `PixelToast`; SSR- and hydration-safe (Nuxt, Vite SSR).
+  - `@pxlkit/angular` (0.1.0) — Angular 20–22 standalone, signal-based components
+    `<pxl-icon>`, `<pxl-animated-icon>`, `<pxl-parallax-icon>` and `<pxl-toast>`,
+    published in the Angular Package Format; zoneless and zone.js applications,
+    server rendering and hydration.
+  React ↔ Vue and React ↔ Angular parity suites compare the rendered DOM on the server,
+  on mount, after input changes and frame by frame while animating.
+- **`@pxlkit/core/vanilla` and the shared rendering engine.** A React-free entry point
+  exports the icon data model, every utility and the engine the three frameworks build on:
+  `renderIconSvg` / `renderIconDataUri`, `createAnimatedIconPlayer`,
+  `createParallaxController` and `resolvePixelToastView`. The icon packs and
+  `@pxlkit/voxel` now import their types from it, so non-React installs never pull React.
 - **Claude Code plugin v1.0.0.** A `pxlkit` plugin ships from this repo, installable with
   `claude plugin marketplace add Joangeldelarosa/pxlkit && claude plugin install pxlkit@pxlkit`.
   Five skills: `/pxlkit:start` (compatibility check and setup), `/pxlkit:imagine`
@@ -28,8 +43,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `npm run release:bump-plugin -- --version X.Y.Z`, which keeps the plugin manifest
   and marketplace entry in step with the kit during a release.
 
+### Changed
+
+- `@pxlkit/core`: `react` and `react-dom` are optional peer dependencies — only the
+  React components need them.
+- Coherence tooling: gate 08 (`consistency-pkgjson`) requires the `@pxlkit/vue` and
+  `@pxlkit/angular` descriptions to name their framework, and gate 36's digest also
+  covers the React component props, which moved to `packages/core/src/components/types.ts`.
+
 ### Fixed
 
+- `@pxlkit/core` `ParallaxPxlKitIcon`: after a click burst the layers now spring back
+  to their resting spread instead of staying exploded until the next re-render.
+- `@pxlkit/core` `AnimatedPxlKitIcon`: `ping-pong` playback no longer stalls on its
+  first frame under load, switching icons commits the new first frame before paint,
+  and `NaN` `speed` / `fps` values are ignored.
 - `docs/runbooks/ship-a-release.md` documented two commands that do not exist
   (`release:bump` and `registry:build`) and used `pnpm` in an npm repository. The
   runbook now describes what the release actually does.

@@ -6,7 +6,7 @@
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
-  "description": "Source-available retro React toolkit — MIT-licensed UI and voxel engine packages, 226+ pixel art SVG icons under a commercial-friendly asset license, 40+ UI components, 3D parallax effects, animated icons, visual builder, toast notifications, and procedural voxel worlds powered by Three.js & React Three Fiber",
+  "description": "Source-available retro toolkit for React, Vue and Angular — MIT-licensed rendering engine, UI kit and voxel packages, 226+ pixel art SVG icons under a commercial-friendly asset license, 111 React UI components, 3D parallax effects, animated icons, visual builder, toast notifications, and procedural voxel worlds powered by Three.js & React Three Fiber",
   "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "homepage": "https://pxlkit.xyz",
   "license": "SEE LICENSE IN LICENSE",
@@ -14,6 +14,8 @@
     "pxlkit",
     "pixel-art",
     "react",
+    "vue",
+    "angular",
     "ui-kit",
     "icons",
     "svg",

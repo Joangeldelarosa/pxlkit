@@ -73,13 +73,18 @@ chore: update tsup to v8.4
 
 ```
 packages/
-  core/           → Types, React components, SVG utilities
+  core/           → Rendering engine, types, utilities + React components
+  vue/            → Vue 3 components on the engine
+  angular/        → Angular standalone components on the engine
+  ui-kit/         → Retro React UI kit (111 components)
   gamification/   → RPG, achievements, rewards icons
   feedback/       → Alerts, status, notification icons
   social/         → Community, emojis, messaging icons
   weather/        → Climate, moon, temperature icons
   ui/             → Interface controls, navigation icons
   effects/        → Animated VFX, particle icons
+  parallax/       → Multi-layer 3D parallax icons
+  voxel/          → 3D voxel toolkit (Three.js + React Three Fiber)
 apps/
   web/            → Next.js showcase & documentation site
 ```

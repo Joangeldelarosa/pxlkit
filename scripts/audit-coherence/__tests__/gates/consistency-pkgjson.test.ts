@@ -88,6 +88,15 @@ describe('keywordsForPackage', () => {
     );
   });
 
+  it('requires the framework name for the framework bindings', () => {
+    expect(findMatchingKeyword('Vue 3 components for Pxlkit', keywordsForPackage('@pxlkit/vue'))).toBe('vue');
+    expect(findMatchingKeyword('Pixel art icons', keywordsForPackage('@pxlkit/vue'))).toBeNull();
+    expect(findMatchingKeyword('Angular standalone components', keywordsForPackage('@pxlkit/angular'))).toBe(
+      'angular',
+    );
+    expect(findMatchingKeyword('Pixel art icons', keywordsForPackage('@pxlkit/angular'))).toBeNull();
+  });
+
   it('falls back to the default brand bank otherwise', () => {
     const result = keywordsForPackage('@pxlkit/brand-new');
     expect(result).toContain('pixel');

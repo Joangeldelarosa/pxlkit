@@ -5,8 +5,8 @@
 <h1 align="center">Pxlkit</h1>
 
 <p align="center">
-  <strong>Bring retro aesthetics to the modern web — and build 3D voxel games with React.</strong><br/>
-  Pxlkit is a comprehensive source-available React toolkit featuring 226+ pixel art SVG icons across 7 themed packs (10 npm packages total including the code packages), 111 retro UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel toolkit on Three.js &amp; React Three Fiber. The showcase app at <a href="https://pxlkit.xyz/explore">pxlkit.xyz/explore</a> ships procedural world generation, biomes, day/night cycles, and chunk-based terrain streaming.
+  <strong>Bring retro aesthetics to the modern web — in React, Vue and Angular — and build 3D voxel games with React.</strong><br/>
+  Pxlkit is a comprehensive source-available toolkit featuring 226+ pixel art SVG icons across 7 themed packs that render natively in React, Vue and Angular (12 npm packages total including the code packages), 111 retro React UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel toolkit on Three.js &amp; React Three Fiber. The showcase app at <a href="https://pxlkit.xyz/explore">pxlkit.xyz/explore</a> ships procedural world generation, biomes, day/night cycles, and chunk-based terrain streaming.
 </p>
 
 <p align="center">
@@ -15,6 +15,8 @@
   <img src="https://img.shields.io/badge/icons-226%2B-FFD700?style=flat" alt="226+ icons" />
   <img src="https://img.shields.io/badge/components-111-4ECDC4?style=flat" alt="111 components" />
   <img src="https://img.shields.io/badge/react-%E2%89%A518-61DAFB?logo=react&logoColor=white" alt="React ≥18" />
+  <img src="https://img.shields.io/badge/vue-%E2%89%A53.3-42B883?logo=vuedotjs&logoColor=white" alt="Vue ≥3.3" />
+  <img src="https://img.shields.io/badge/angular-20%20%7C%2021%20%7C%2022-DD0031?logo=angular&logoColor=white" alt="Angular 20 | 21 | 22" />
   <img src="https://img.shields.io/badge/typescript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript strict" />
   <img src="https://img.shields.io/badge/voxel%20engine-Three.js%20%2B%20R3F-black?logo=threedotjs&logoColor=white" alt="Voxel Engine: Three.js + React Three Fiber" />
 </p>
@@ -23,12 +25,14 @@
 
 ## Overview
 
-**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into 7 themed packs, a retro React UI kit with **111 components**, a core rendering engine, a **3D voxel toolkit** (with a procedural world engine running live at `/explore`), and a Next.js 15 showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. Browse and visually edit them at the [official website](https://pxlkit.xyz).
+**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into 7 themed packs, a framework-agnostic rendering engine with **React, Vue and Angular** components, a retro React UI kit with **111 components**, a **3D voxel toolkit** (with a procedural world engine running live at `/explore`), and a Next.js 15 showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. Browse and visually edit them at the [official website](https://pxlkit.xyz).
 
 ```
 pxlkit/
 ├── packages/
-│   ├── core/           → Types, React components, SVG utilities
+│   ├── core/           → Rendering engine, types, utilities + React components
+│   ├── vue/            → Vue 3 components on the same engine
+│   ├── angular/        → Angular standalone components on the same engine
 │   ├── ui-kit/         → 111 retro pixel art React UI components
 │   ├── gamification/   → 51 icons — RPG, achievements, rewards
 │   ├── feedback/       → 33 icons — alerts, status, notifications
@@ -56,7 +60,7 @@ See [`CHANGELOG.md`](./CHANGELOG.md) for the full release history.
 
 ## Licensing Model
 
-- `@pxlkit/core`, `@pxlkit/ui-kit`, and `@pxlkit/voxel` are MIT-licensed code packages.
+- `@pxlkit/core`, `@pxlkit/vue`, `@pxlkit/angular`, `@pxlkit/ui-kit`, and `@pxlkit/voxel` are MIT-licensed code packages.
 - The icon-pack packages and visual assets are source-available under [`LICENSE-ASSETS`](./LICENSE-ASSETS): free with attribution, with paid no-attribution terms in [`COMMERCIAL_TERMS`](./COMMERCIAL_TERMS).
 - The `Pxlkit` name, logos, and brand presentation are covered by [`TRADEMARK_POLICY`](./TRADEMARK_POLICY).
 - Third-party software and hosted fonts are listed in [`THIRD_PARTY_NOTICES`](./THIRD_PARTY_NOTICES).
@@ -134,21 +138,15 @@ across four project archetypes — including what the gates rejected — is writ
 
 ### Install
 
-```bash
-npm install @pxlkit/core @pxlkit/gamification
-```
-
-Install only the packs you need:
+Pick the package for your framework, then add only the icon packs you need:
 
 ```bash
-npm install @pxlkit/core @pxlkit/feedback @pxlkit/social
+npm install @pxlkit/core @pxlkit/gamification      # React
+npm install @pxlkit/vue @pxlkit/gamification       # Vue 3
+npm install @pxlkit/angular @pxlkit/gamification   # Angular 20+
 ```
 
-For parallax 3D icons:
-
-```bash
-npm install @pxlkit/core @pxlkit/parallax
-```
+Icon packs (`@pxlkit/gamification`, `@pxlkit/feedback`, `@pxlkit/social`, `@pxlkit/weather`, `@pxlkit/ui`, `@pxlkit/effects`, `@pxlkit/parallax`) are plain data: the same packages work in every framework. `@pxlkit/vue` and `@pxlkit/angular` never install React.
 
 ### Use in React
 
@@ -167,6 +165,45 @@ import { Trophy } from '@pxlkit/gamification';
 ```
 
 Icons are rendered as `<img>` elements backed by an inline SVG data URI with `image-rendering: pixelated` — every source pixel is preserved at every visual size, no edge dropouts at non-integer scales.
+
+### Use in Vue
+
+```vue
+<script setup lang="ts">
+import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/vue';
+import { Trophy, FireSword } from '@pxlkit/gamification';
+</script>
+
+<template>
+  <PxlKitIcon :icon="Trophy" :size="32" />
+  <PxlKitIcon :icon="Trophy" :size="32" appearance="tinted" color="#FF4D4D" />
+  <AnimatedPxlKitIcon :icon="FireSword" :size="48" trigger="hover" />
+</template>
+```
+
+### Use in Angular
+
+```ts
+import { Component } from '@angular/core';
+import { AnimatedPxlKitIcon, PxlKitIcon } from '@pxlkit/angular';
+import { FireSword, Trophy } from '@pxlkit/gamification';
+
+@Component({
+  selector: 'app-badges',
+  imports: [PxlKitIcon, AnimatedPxlKitIcon],
+  template: `
+    <pxl-icon [icon]="trophy" [size]="32" />
+    <pxl-icon [icon]="trophy" [size]="32" appearance="tinted" color="#FF4D4D" />
+    <pxl-animated-icon [icon]="fireSword" [size]="48" trigger="hover" />
+  `,
+})
+export class Badges {
+  protected readonly trophy = Trophy;
+  protected readonly fireSword = FireSword;
+}
+```
+
+All three render the same markup from the same engine (`@pxlkit/core/vanilla`) — the React ↔ Vue and React ↔ Angular parity suites compare the output on the server, on mount and frame by frame. The examples below use React; the Vue and Angular components take the same props as inputs (see the [`@pxlkit/vue`](./packages/vue/README.md) and [`@pxlkit/angular`](./packages/angular/README.md) READMEs).
 
 ### Animated Icons
 
@@ -219,6 +256,8 @@ import { CheckCircle } from "@pxlkit/feedback";
   duration={3000}
 />;
 ```
+
+`PixelToast` is styled with Tailwind CSS utilities that ship inside `@pxlkit/core` (in every framework). With Tailwind v4, add `@source "../node_modules/@pxlkit/core/dist";` to your stylesheet so they are generated.
 
 ### Browse Full Pack
 
@@ -312,14 +351,25 @@ export const FireSword: AnimatedPxlKitData = {
 
 ## Core API
 
-### React Components
+### Components
 
-| Component                | Description                                            |
-| ------------------------ | ------------------------------------------------------ |
-| `<PxlKitIcon>`           | Renders a static icon as crisp inline SVG              |
-| `<AnimatedPxlKitIcon>`   | Renders an animated icon with frame playback           |
-| `<ParallaxPxlKitIcon>`   | Renders a multi-layer 3D parallax icon with mouse tracking |
-| `<PixelToast>`           | Pixel-art styled toast notification                    |
+| Component | React (`@pxlkit/core`) | Vue (`@pxlkit/vue`) | Angular (`@pxlkit/angular`) | Description |
+| --- | --- | --- | --- | --- |
+| Static icon | `<PxlKitIcon>` | `<PxlKitIcon>` | `<pxl-icon>` | Crisp SVG icon rendered through an `<img>` |
+| Animated icon | `<AnimatedPxlKitIcon>` | `<AnimatedPxlKitIcon>` | `<pxl-animated-icon>` | Frame playback with five triggers, paused off-screen |
+| Parallax icon | `<ParallaxPxlKitIcon>` | `<ParallaxPxlKitIcon>` | `<pxl-parallax-icon>` | Multi-layer 3D icon with mouse tracking and click burst |
+| Toast | `<PixelToast>` | `<PixelToast>` | `<pxl-toast>` | Pixel-art styled toast notification |
+
+### Rendering engine (`@pxlkit/core/vanilla`)
+
+The components of every framework are thin bindings over a framework-agnostic engine, exported from the React-free `@pxlkit/core/vanilla` entry (and re-exported by `@pxlkit/core`, `@pxlkit/vue` and `@pxlkit/angular`):
+
+| Export | Description |
+| --- | --- |
+| `renderIconSvg(icon, options)` / `renderIconDataUri(icon, options)` | The exact SVG / `<img>` source every `PxlKitIcon` renders |
+| `createAnimatedIconPlayer(options)` | Frame clock: triggers, speed / fps, hover, off-screen pausing |
+| `createParallaxController(options)` | Mouse tilt, peel-apart intro, click burst and particles |
+| `resolvePixelToastView(options)` / `resolveToastAutoClose(visible, duration)` | Toast markup classes, colours and auto-close |
 
 ### Utilities
 
@@ -347,7 +397,7 @@ export const FireSword: AnimatedPxlKitData = {
 | `loop`      | Plays continuously in an infinite loop  |
 | `once`      | Plays one time, stops on the last frame |
 | `hover`     | Plays only while the user hovers        |
-| `appear`    | Plays once when the icon mounts/appears |
+| `appear`    | Plays once when 30 % of the icon first enters the viewport |
 | `ping-pong` | Loops forward and backward alternating  |
 
 ## Development
@@ -372,6 +422,7 @@ npm install
 | `npm run dev`   | Start all packages + web app in dev mode |
 | `npm run build` | Build all packages and the web app       |
 | `npm run lint`  | Type-check all packages                  |
+| `npm test`      | Run every package's tests and the tooling tests |
 | `npm run clean` | Remove all `dist/` and `.next/` outputs  |
 
 The web app runs on **http://localhost:3333**.
@@ -383,8 +434,12 @@ packages/
   core/                 → @pxlkit/core
     src/
       types.ts          → PxlKitData, AnimatedPxlKitData, ParallaxPxlKitData, IconPack, etc.
-      components/       → PxlKitIcon, AnimatedPxlKitIcon, ParallaxPxlKitIcon, PixelToast
+      engine/           → Framework-agnostic renderer, animation player, parallax controller, toast view
+      vanilla.ts        → React-free entry point (@pxlkit/core/vanilla)
+      components/       → React PxlKitIcon, AnimatedPxlKitIcon, ParallaxPxlKitIcon, PixelToast
       utils/            → gridToPixels, gridToSvg, colorUtils, validateIconData
+  vue/                  → @pxlkit/vue — Vue 3 components on the engine
+  angular/              → @pxlkit/angular — Angular standalone components on the engine (ng-packagr)
   gamification/         → @pxlkit/gamification
     src/icons/          → One .ts file per icon (trophy.ts, sword.ts, ...)
     src/index.ts        → Re-exports + GamificationPack
@@ -459,9 +514,9 @@ Sidebar categories:
 | Layer          | Technology                                                   |
 | -------------- | ------------------------------------------------------------ |
 | **Monorepo**   | npm workspaces + Turborepo                                   |
-| **Build**      | tsup (ESM + CJS)                                             |
+| **Build**      | tsup (ESM + CJS) · ng-packagr (Angular Package Format)       |
 | **Language**   | TypeScript 5.7 (strict)                                      |
-| **Components** | React ≥ 18                                                   |
+| **Components** | React ≥ 18 · Vue ≥ 3.3 · Angular 20–22                       |
 | **Web App**    | Next.js 15 · React 19 · Tailwind CSS 3.4 · Framer Motion 11 |
 | **3D Engine**  | Three.js · React Three Fiber · @react-three/drei             |
 | **Engine**     | Node.js ≥ 20                                                 |
@@ -546,6 +601,8 @@ git push origin main --follow-tags
 | Package | Workspace path |
 | --- | --- |
 | `@pxlkit/core` | `packages/core` |
+| `@pxlkit/vue` | `packages/vue` |
+| `@pxlkit/angular` | `packages/angular` |
 | `@pxlkit/ui-kit` | `packages/ui-kit` |
 | `@pxlkit/voxel` | `packages/voxel` |
 | `@pxlkit/gamification` | `packages/gamification` |
@@ -597,7 +654,7 @@ Contributions are welcome! Whether it's new icons, bug fixes, or documentation i
 Pxlkit now uses a split licensing model:
 
 - [LICENSE](./LICENSE) — repo-wide licensing overview
-- [LICENSE-CODE](./LICENSE-CODE) — MIT license for code packages like `@pxlkit/core`, `@pxlkit/ui-kit`, and `@pxlkit/voxel`
+- [LICENSE-CODE](./LICENSE-CODE) — MIT license for code packages like `@pxlkit/core`, `@pxlkit/vue`, `@pxlkit/angular`, `@pxlkit/ui-kit`, and `@pxlkit/voxel`
 - [LICENSE-ASSETS](./LICENSE-ASSETS) — source-available terms for icon packs and visual assets
 - [COMMERCIAL_TERMS](./COMMERCIAL_TERMS) — paid no-attribution terms for icon/assets usage
 - [TRADEMARK_POLICY](./TRADEMARK_POLICY) — rules for the Pxlkit name, logo, and branding

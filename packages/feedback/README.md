@@ -23,23 +23,64 @@
 
 ## Installation
 
+Install the pack next to the components for your framework:
+
 ```bash
-npm install @pxlkit/core @pxlkit/feedback
+npm install @pxlkit/core @pxlkit/feedback      # React
+npm install @pxlkit/vue @pxlkit/feedback       # Vue 3
+npm install @pxlkit/angular @pxlkit/feedback   # Angular
 ```
 
-> `@pxlkit/core` is required as a dependency for rendering components.
+> The pack is plain data (`PxlKitData` objects typed by `@pxlkit/core`); the React components in `@pxlkit/core`, [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) or [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) render it.
 
 ## Quick Start
 
+### React
+
 ```tsx
-import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/core';
+import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { CheckCircle, LoadingCircle } from '@pxlkit/feedback';
 
 // Static feedback icon
-<PxlKitIcon icon={CheckCircle} size={32} colorful />
+<PxlKitIcon icon={CheckCircle} size={32} />
 
 // Animated loading indicator
-<AnimatedPxlKitIcon icon={LoadingCircle} size={32} colorful />
+<AnimatedPxlKitIcon icon={LoadingCircle} size={32} />
+```
+
+### Vue
+
+```vue
+<script setup lang="ts">
+import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/vue';
+import { CheckCircle, LoadingCircle } from '@pxlkit/feedback';
+</script>
+
+<template>
+  <PxlKitIcon :icon="CheckCircle" :size="32" />
+  <AnimatedPxlKitIcon :icon="LoadingCircle" :size="32" />
+</template>
+```
+
+### Angular
+
+```ts
+import { Component } from '@angular/core';
+import { AnimatedPxlKitIcon, PxlKitIcon } from '@pxlkit/angular';
+import { CheckCircle, LoadingCircle } from '@pxlkit/feedback';
+
+@Component({
+  selector: 'app-save-status',
+  imports: [PxlKitIcon, AnimatedPxlKitIcon],
+  template: `
+    <pxl-icon [icon]="checkCircle" [size]="32" />
+    <pxl-animated-icon [icon]="loadingCircle" [size]="32" />
+  `,
+})
+export class SaveStatus {
+  protected readonly checkCircle = CheckCircle;
+  protected readonly loadingCircle = LoadingCircle;
+}
 ```
 
 ## Icons
@@ -89,43 +130,84 @@ import { CheckCircle, LoadingCircle } from '@pxlkit/feedback';
 
 ## Using the Icon Pack
 
+`FeedbackPack.icons` holds every icon of the pack, static and animated; `isAnimatedIcon` tells them apart.
+
 ```tsx
+// React
 import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/core';
 import { FeedbackPack } from '@pxlkit/feedback';
 
-// Render all feedback icons
 {FeedbackPack.icons.map((icon) =>
   isAnimatedIcon(icon) ? (
-    <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} colorful />
+    <AnimatedPxlKitIcon key={icon.name} icon={icon} size={32} />
   ) : (
-    <PxlKitIcon key={icon.name} icon={icon} size={32} colorful />
-  )
+    <PxlKitIcon key={icon.name} icon={icon} size={32} />
+  ),
 )}
+```
+
+```vue
+<!-- Vue -->
+<script setup lang="ts">
+import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from '@pxlkit/vue';
+import { FeedbackPack } from '@pxlkit/feedback';
+</script>
+
+<template>
+  <template v-for="icon in FeedbackPack.icons" :key="icon.name">
+    <AnimatedPxlKitIcon v-if="isAnimatedIcon(icon)" :icon="icon" :size="32" />
+    <PxlKitIcon v-else :icon="icon" :size="32" />
+  </template>
+</template>
+```
+
+```html
+<!-- Angular: the component exposes `icons = FeedbackPack.icons` and `isAnimated = isAnimatedIcon` -->
+@for (icon of icons; track icon.name) {
+  @if (isAnimated(icon)) {
+    <pxl-animated-icon [icon]="icon" [size]="32" />
+  } @else {
+    <pxl-icon [icon]="icon" [size]="32" />
+  }
+}
 ```
 
 ## Toast Notifications
 
-The feedback icons pair perfectly with the `PixelToast` component from `@pxlkit/core`:
+The feedback icons pair perfectly with the pixel toast (`PixelToast` in React and Vue, `<pxl-toast>` in Angular):
 
 ```tsx
+// React
 import { PixelToast } from '@pxlkit/core';
-import { CheckCircle, WarningTriangle, ErrorOctagon, InfoCircle } from '@pxlkit/feedback';
+import { CheckCircle, ErrorOctagon, WarningTriangle } from '@pxlkit/feedback';
 
 // Success toast
-<PixelToast visible title="Saved!" message="Your changes have been saved." icon={CheckCircle} colorfulIcon position="bottom-right" duration={3000} />
+<PixelToast visible title="Saved!" message="Your changes have been saved." icon={CheckCircle} position="bottom-right" duration={3000} />
 
 // Error toast
-<PixelToast visible title="Error" message="Something went wrong." icon={ErrorOctagon} colorfulIcon position="bottom-right" />
+<PixelToast visible title="Error" message="Something went wrong." icon={ErrorOctagon} position="bottom-right" />
 
 // Warning toast
-<PixelToast visible title="Warning" message="Please check your input." icon={WarningTriangle} colorfulIcon position="top-center" />
+<PixelToast visible title="Warning" message="Please check your input." icon={WarningTriangle} position="top-right" />
+```
+
+```vue
+<!-- Vue -->
+<PixelToast :visible="saved" title="Saved!" message="Your changes have been saved." :icon="CheckCircle" @close="saved = false" />
+```
+
+```html
+<!-- Angular -->
+<pxl-toast [visible]="saved()" title="Saved!" message="Your changes have been saved." [icon]="checkCircle" (closed)="saved.set(false)" />
 ```
 
 ## Related Packages
 
 | Package | Description |
 | --- | --- |
-| [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Core rendering engine (required) |
+| [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | Rendering engine and React components |
+| [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) | Vue 3 components |
+| [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) | Angular standalone components |
 | [`@pxlkit/gamification`](https://www.npmjs.com/package/@pxlkit/gamification) | 51 icons — RPG, achievements, rewards |
 | [`@pxlkit/social`](https://www.npmjs.com/package/@pxlkit/social) | 43 icons — community, emojis, messaging |
 | [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | 36 icons — climate, moon, temperature |
