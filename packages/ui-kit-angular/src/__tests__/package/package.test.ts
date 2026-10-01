@@ -62,8 +62,8 @@ describe('@pxlkit/ui-kit-angular package', () => {
     expect(Math.max(...minVersions)).toBeLessThanOrEqual(20);
   });
 
-  it('imports Angular and its own dependencies only', () => {
-    const allowed = new Set(['@angular/common', '@angular/core', ...Object.keys(manifest.dependencies)]);
+  it('imports its Angular peers and its own dependencies only', () => {
+    const allowed = new Set([...Object.keys(manifest.peerDependencies), ...Object.keys(manifest.dependencies)]);
     for (const specifier of [...specifiers(bundle), ...specifiers(typings)]) {
       expect(allowed, specifier).toContain(specifier);
     }
