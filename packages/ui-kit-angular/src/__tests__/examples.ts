@@ -23,6 +23,15 @@ export interface AngularExample {
   load: () => Promise<Type<unknown>>;
 }
 
+/**
+ * Compiles the kit the examples import. Suites that load examples run it in
+ * `beforeAll`, so the first example to load does not pay, inside its own test
+ * timeout, for compiling every component (seconds with coverage on).
+ */
+export async function loadKit(): Promise<void> {
+  await import('@pxlkit/ui-kit-angular');
+}
+
 export const angularExamples: ReadonlyMap<string, AngularExample> = new Map(
   Object.entries(loaders).flatMap(([path, loader]) => {
     const [, category, file] = /examples\/([^/]+)\/([^/]+)\.examples\.ts$/.exec(path)!;

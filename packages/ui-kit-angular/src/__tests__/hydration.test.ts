@@ -5,9 +5,11 @@
 import { provideZonelessChangeDetection, type ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { bootstrapApplication, provideClientHydration } from '@angular/platform-browser';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { angularExamples } from './examples';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { angularExamples, loadKit } from './examples';
 import { ROOT_TAG, angularServerPage, rootFor } from './server';
+
+beforeAll(loadKit, 60_000);
 
 describe('Angular examples hydrate cleanly', () => {
   let appRef: ApplicationRef | undefined;

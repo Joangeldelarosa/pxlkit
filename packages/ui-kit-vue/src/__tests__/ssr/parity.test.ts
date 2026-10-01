@@ -5,14 +5,16 @@
  * pages look the same before hydration.
  */
 import { JSDOM } from 'jsdom';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { reactExamples } from '../../../../../scripts/parity/catalog';
 import { canonicalHtml } from '../../../../../scripts/parity/canonical';
 import { reactServerHtml } from '../../../../../scripts/parity/react';
-import { vueExamples } from '../examples';
+import { loadKit, vueExamples } from '../examples';
 import { vueServerHtml } from '../vue';
 
 const { document } = new JSDOM('').window;
+
+beforeAll(loadKit, 60_000);
 
 describe('React ↔ Vue parity — server rendering', () => {
   for (const example of reactExamples()) {

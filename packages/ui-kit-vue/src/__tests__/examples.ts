@@ -14,6 +14,15 @@ export interface VueExample {
   load: () => Promise<Component>;
 }
 
+/**
+ * Compiles the kit the examples import. Suites that load examples run it in
+ * `beforeAll`, so the first example to load does not pay, inside its own test
+ * timeout, for compiling every component (seconds with coverage on).
+ */
+export async function loadKit(): Promise<void> {
+  await import('@pxlkit/ui-kit-vue');
+}
+
 export const vueExamples: ReadonlyMap<string, VueExample> = new Map(
   Object.entries(loaders).map(([path, loader]) => {
     const [, category, component, file] = /examples\/([^/]+)\/([^/]+)\/([^/]+)\.vue$/.exec(path)!;

@@ -3,13 +3,13 @@
  * frameworks once mounted, and every interaction scenario leaves the same DOM
  * after each step. React is the reference implementation.
  */
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { reactExamples } from '../../../../scripts/parity/catalog';
 import { canonicalPage } from '../../../../scripts/parity/canonical';
 import { perform } from '../../../../scripts/parity/interact';
 import { mountReact, type Mounted } from '../../../../scripts/parity/react';
 import { scenarios } from '../../../../scripts/parity/scenarios';
-import { vueExamples } from './examples';
+import { loadKit, vueExamples } from './examples';
 import { mountVue } from './vue';
 
 const unwrap = (element: Element) => element.hasAttribute('data-parity-root');
@@ -30,6 +30,8 @@ async function record(mount: () => Promise<Mounted>, steps: Parameters<typeof pe
 }
 
 const examples = reactExamples();
+
+beforeAll(loadKit, 60_000);
 
 describe('React ↔ Vue parity — mounted examples', () => {
   for (const example of examples) {

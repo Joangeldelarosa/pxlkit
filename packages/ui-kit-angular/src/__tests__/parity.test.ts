@@ -3,14 +3,14 @@
  * frameworks once mounted, and every interaction scenario leaves the same DOM
  * after each step. React is the reference implementation.
  */
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { reactExamples } from '../../../../scripts/parity/catalog';
 import { canonicalPage } from '../../../../scripts/parity/canonical';
 import { perform, type ParityStep } from '../../../../scripts/parity/interact';
 import { mountReact, type Mounted } from '../../../../scripts/parity/react';
 import { scenarios } from '../../../../scripts/parity/scenarios';
 import { mountAngular } from './angular';
-import { angularExamples } from './examples';
+import { angularExamples, loadKit } from './examples';
 import { angularDomRules } from './dom-rules';
 
 const unwrap = (element: Element) => element.hasAttribute('data-parity-root');
@@ -31,6 +31,8 @@ async function record(mount: () => Promise<Mounted>, steps: ParityStep[] = []): 
 }
 
 const examples = reactExamples();
+
+beforeAll(loadKit, 60_000);
 
 describe('React ↔ Angular parity — mounted examples', () => {
   for (const example of examples) {

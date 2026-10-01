@@ -4,15 +4,17 @@
  * server-rendered pages look the same before hydration.
  */
 import { JSDOM } from 'jsdom';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { reactExamples } from '../../../../../scripts/parity/catalog';
 import { canonicalDom, canonicalHtml } from '../../../../../scripts/parity/canonical';
 import { reactServerHtml } from '../../../../../scripts/parity/react';
 import { angularDomRules } from '../dom-rules';
-import { angularExamples } from '../examples';
+import { angularExamples, loadKit } from '../examples';
 import { ROOT_TAG, angularServerPage } from '../server';
 
 const parser = new JSDOM('').window.document;
+
+beforeAll(loadKit, 60_000);
 
 describe('React ↔ Angular parity — server rendering', () => {
   for (const example of reactExamples()) {

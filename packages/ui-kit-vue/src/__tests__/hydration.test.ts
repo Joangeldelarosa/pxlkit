@@ -2,14 +2,16 @@
  * Every Vue example hydrates its own server-rendered markup without a
  * mismatch: no warnings, and every server-rendered element is kept.
  */
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createSSRApp, nextTick } from 'vue';
-import { vueExamples } from './examples';
+import { loadKit, vueExamples } from './examples';
 import { vueServerHtml } from './vue';
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
+
+beforeAll(loadKit, 60_000);
 
 describe('Vue examples hydrate cleanly', () => {
   for (const [key, example] of vueExamples) {
