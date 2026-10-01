@@ -52,8 +52,9 @@ Importing it from your entry module instead (`import '@pxlkit/ui-kit/styles.css'
 
 ## Quick Start
 
+With the stylesheet in place:
+
 ```tsx
-import '@pxlkit/ui-kit/styles.css';
 import { PixelButton, PixelCard, PixelInput } from '@pxlkit/ui-kit';
 
 function App() {
