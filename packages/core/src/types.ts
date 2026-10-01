@@ -235,32 +235,39 @@ export interface AnimatedPxlKitData {
 // ─── Parallax Layer Types ────────────────────
 
 /**
- * A single layer in a parallax multi-layer icon.
- * Each layer is a separate PxlKitData or AnimatedPxlKitData
- * positioned at a specific depth for 3D parallax effects.
+ * A single layer in a parallax multi-layer icon: a complete static or
+ * animated icon. The renderers place the layers by their order in
+ * {@link ParallaxPxlKitData.layers}, evenly spaced along the Z axis with the
+ * first at the back, and tilt the whole stack toward the pointer.
  */
 export interface ParallaxLayer {
   /** The icon data for this layer (static or animated) */
   icon: PxlKitData | AnimatedPxlKitData;
   /**
-   * Depth multiplier controlling parallax movement intensity.
-   * - `0`  = no movement (anchor layer)
-   * - `>0` = moves with mouse (higher = more movement, farther back)
-   * - `<0` = moves opposite to mouse (foreground pop-out feel)
+   * The layer's place in the stack as the author intends it: `0` for the
+   * anchor layer, positive behind it, negative in front of it. Authoring
+   * metadata — the renderers place layers by their order in `layers`, so
+   * keep the two consistent, deepest first.
    */
   depth: number;
-  /** Optional horizontal offset in grid units (default: 0) */
+  /**
+   * @deprecated Never applied by the renderers, which centre every layer.
+   * Kept so existing icon data still type-checks; removed in the next major.
+   */
   offsetX?: number;
-  /** Optional vertical offset in grid units (default: 0) */
+  /**
+   * @deprecated Never applied by the renderers, which centre every layer.
+   * Kept so existing icon data still type-checks; removed in the next major.
+   */
   offsetY?: number;
 }
 
 /**
  * A multi-layer parallax icon composed of stacked pixel art layers.
  *
- * When rendered with the ParallaxPxlKitIcon component, each layer
- * translates based on mouse position multiplied by its depth value,
- * creating a 3D parallax effect.
+ * When rendered with the ParallaxPxlKitIcon component, the layers are
+ * spaced evenly along the Z axis in array order and the whole stack tilts
+ * toward the pointer, creating a 3D parallax effect.
  *
  * @example
  * ```ts

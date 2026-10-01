@@ -27,8 +27,11 @@ plus `frameDuration` (ms) and `trigger?: 'loop' | 'once' | 'hover' | 'appear' | 
 A per-frame palette merges over the base one. The legacy `loop: boolean` is deprecated
 and ignored when `trigger` is set.
 
-Parallax icons replace the grid with `layers: Array<{ icon, depth, offsetX?, offsetY? }>`
-ordered back to front. `depth: 0` anchors, `> 0` sits behind, `< 0` pops out.
+Parallax icons replace the grid with `layers: Array<{ icon, depth }>`, ordered back to
+front: the renderers space the layers evenly along the Z axis in array order and tilt the
+stack toward the pointer. `depth` records the intended place (`0` the anchor, `> 0`
+behind, `< 0` in front) but does not move anything, so keep it consistent with the
+order. `offsetX` / `offsetY` are deprecated: no renderer applies them.
 
 ## 2. What the validators enforce
 

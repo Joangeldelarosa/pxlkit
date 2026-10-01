@@ -74,6 +74,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `@pxlkit/angular` descriptions to name their framework, and gate 36's digest also
   covers the React component props, which moved to `packages/core/src/components/types.ts`.
 
+### Deprecated
+
+- `@pxlkit/core` `ParallaxLayer.offsetX` / `offsetY`: no renderer has ever applied them.
+  They stay in the type until the next major so existing icon data keeps type-checking.
+
 ### Fixed
 
 - `@pxlkit/core` `ParallaxPxlKitIcon`: after a click burst the layers now spring back
@@ -92,6 +97,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `@source` line, and flags `tailwindcss` imported next to the kit's stylesheet, which
   loads Tailwind's base styles twice. `check-updates.mjs` no longer runs its update
   check when imported, which ended its test process before the tests reported.
+- `@pxlkit/core`: the `ParallaxLayer` docs said each layer moves by its `depth`; the
+  renderers place layers by their order in `layers` and tilt the whole stack, and the docs
+  and the plugin's icon spec now say so.
 - `docs/runbooks/ship-a-release.md` documented two commands that do not exist
   (`release:bump` and `registry:build`) and used `pnpm` in an npm repository. The
   runbook now describes what the release actually does.

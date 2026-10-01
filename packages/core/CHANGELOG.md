@@ -24,6 +24,11 @@
 - `AnimatedPxlKitIcon` ignores `NaN` `speed` / `fps` values instead of starting a zero-delay interval.
 - `PxlKitIcon`: colour values are XML-escaped inside the generated SVG, so a malformed `color` string can no longer break the image markup.
 - `PixelToast`: the root element's class list no longer ends with a stray space when `className` is not set.
+- The `ParallaxLayer` and `ParallaxPxlKitData` docs said each layer moves by its `depth`. The renderers place layers by their order in `layers` and tilt the whole stack; the docs now say so, and that `depth` is authoring metadata.
+
+### Deprecated
+
+- `ParallaxLayer.offsetX` and `ParallaxLayer.offsetY`: no renderer has ever applied them. They stay in the type until the next major so existing icon data keeps type-checking.
 
 ## 1.3.4 — 2026-07-06
 
