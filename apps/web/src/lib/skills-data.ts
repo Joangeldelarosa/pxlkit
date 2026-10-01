@@ -69,7 +69,7 @@ export const SKILLS: SkillEntry[] = [
     steps: [
       'Classifies the project as ready, repairable or incompatible',
       'Detects the framework and package manager, because the setup genuinely differs',
-      'Applies the matching recipe: stylesheet, @source directive, providers, fonts, dark mode',
+      'Applies the matching recipe: stylesheet, providers, fonts, dark mode',
       'Introduces the other four commands',
     ],
     args: [{ flag: '[project directory]', description: 'Defaults to the working directory.' }],

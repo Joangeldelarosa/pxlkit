@@ -210,5 +210,8 @@ async function main() {
   }
 }
 
-// Never let this script be the reason a skill fails.
-main().catch(() => {}).finally(() => process.exit(0));
+// Only run when invoked directly, so the pure functions stay importable from tests;
+// and never let this script be the reason a skill fails.
+const invokedDirectly =
+  process.argv[1] && import.meta.url === new URL(`file://${path.resolve(process.argv[1])}`).href;
+if (invokedDirectly) main().catch(() => {}).finally(() => process.exit(0));

@@ -33,7 +33,7 @@ This makes one network request at most once a day, caches the result, times out 
 
 ## Step 1 — The three blocking cases, and why they block
 
-**Tailwind v3.** The kit's `styles.css` is not self-contained: it opens with `@import "tailwindcss"` and defines an `@theme`, so it needs a v4 pipeline. Migrating v3 to v4 changes how every existing style in the project compiles. That is a project-wide decision with a real chance of breaking things the user cares about, and it is not something to do as a side effect of adding a component library. Say that plainly, offer to plan the migration as separate work, and stop. **Never migrate inline.**
+**Tailwind v3.** The kit's `styles.css` is not self-contained: it imports `tailwindcss` and defines an `@theme`, so it needs a v4 pipeline. Migrating v3 to v4 changes how every existing style in the project compiles. That is a project-wide decision with a real chance of breaking things the user cares about, and it is not something to do as a side effect of adding a component library. Say that plainly, offer to plan the migration as separate work, and stop. **Never migrate inline.**
 
 **No Tailwind at all.** Same root cause, simpler conversation: the kit needs a Tailwind v4 build. Offer to add it as its own step.
 
@@ -41,20 +41,19 @@ This makes one network request at most once a day, caches the result, times out 
 
 ## Step 2 — Apply the setup for *this* project
 
-Load `${CLAUDE_PLUGIN_ROOT}/references/setup.generated.md` and apply **only** the variant matching what preflight detected. It covers three frameworks (Next App Router, Next Pages Router, Vite/CRA) and three package managers, because the details genuinely differ:
+Load `${CLAUDE_PLUGIN_ROOT}/references/setup.generated.md` and apply **only** the variant matching what preflight detected. It covers three frameworks (Next App Router, Next Pages Router, Vite/CRA), because the details genuinely differ:
 
-- The `@source` directive that lets Tailwind see the kit's classes resolves differently under pnpm, where the package is symlinked beneath `.pnpm/`, and does not apply at all under Yarn PnP.
 - In the App Router, the providers are client components, so they need a `'use client'` boundary; under Pages Router they go in `_app`; under Vite neither applies.
+- The package manager matters only under Yarn Plug'n'Play, whose zip archives Tailwind cannot scan: the reference unplugs the kit or switches to the `node_modules` linker.
 
 Propose the install command rather than running it. Show the diff for each file you touch.
 
 The pieces that must end up present, in this order:
 
-1. `import '@pxlkit/ui-kit/styles.css'` in the app's entry stylesheet or root layout. **Without this the pixel surface degrades silently** — components still render, they just look like plain boxes, and nothing in the console says why. It is the single most common cause of "pxlkit looks broken".
-2. The `@source` directive pointing at the installed package.
-3. `PxlKitSurfaceProvider`, then `PxlKitLocaleProvider`, then `PxlKitToastProvider` at the root. The toast provider is not optional if anything calls `useToast()` — it throws without it.
-4. The fonts, via `buildGoogleFontsUrl(locale)`.
-5. Dark mode by `.dark` class. The kit ships no theme provider, so include the inline anti-FOUC script from the reference; without it the page flashes light before hydration.
+1. `@import "@pxlkit/ui-kit/styles.css";` in the stylesheet Tailwind processes, **in place of** `@import "tailwindcss"` — the kit's stylesheet brings Tailwind and tells it where the kit's classes are, so importing both loads Tailwind's base styles twice. **Without it the pixel surface degrades silently** — components still render, they just look like plain boxes, and nothing in the console says why. It is the single most common cause of "pxlkit looks broken". (Kits before 2.2 also need an `@source` line pointing at the package; preflight says when.)
+2. `PxlKitLocaleProvider`, then `PxlKitSurfaceProvider`, then `PxlKitToastProvider` at the root. The toast provider is not optional if anything calls `useToast()` — it throws without it.
+3. The fonts, via `buildGoogleFontsUrl(locale)`.
+4. Dark mode by `.dark` class. The kit ships no theme provider, so include the inline anti-FOUC script from the reference; without it the page flashes light before hydration.
 
 Re-run preflight afterwards and show the result. If it does not reach exit 0, say which item is still missing instead of declaring success.
 

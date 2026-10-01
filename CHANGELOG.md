@@ -88,6 +88,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined
   `--font-mono`, so monospace text fell back to the system stack although the kit's
   fonts URL loads JetBrains Mono.
+- `pxlkit` plugin: the `/pxlkit:start` preflight no longer asks kits from 2.2 for an
+  `@source` line, and flags `tailwindcss` imported next to the kit's stylesheet, which
+  loads Tailwind's base styles twice. `check-updates.mjs` no longer runs its update
+  check when imported, which ended its test process before the tests reported.
 - `docs/runbooks/ship-a-release.md` documented two commands that do not exist
   (`release:bump` and `registry:build`) and used `pnpm` in an npm repository. The
   runbook now describes what the release actually does.
