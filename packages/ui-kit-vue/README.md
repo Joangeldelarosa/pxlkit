@@ -32,14 +32,13 @@ npm install @pxlkit/ui-kit-vue
 
 ### Styles
 
-In the stylesheet Tailwind CSS processes (for example `src/style.css`):
+The kit's stylesheet brings Tailwind CSS v4, the Pxlkit theme and the kit's class names, so it takes the place of `@import "tailwindcss"` in the stylesheet Tailwind processes (for example `src/style.css`):
 
 ```css
-@import "tailwindcss";
 @import "@pxlkit/ui-kit-vue/styles.css";
 ```
 
-The kit's stylesheet brings the Pxlkit theme and registers the kit's class names with Tailwind, so there is nothing else to configure.
+There is nothing else to configure. Do not import `tailwindcss` separately as well — it would load Tailwind's base styles twice.
 
 ## Quick start
 

@@ -17,7 +17,7 @@
 
 ### PxlKitLocaleProvider
 - stable · since 1.6.0
-- Provides locale-aware font loading and text utilities (upper/lower) to all PxlKit components via context.
+- Sets the locale for every nested PxlKit component: lang on a layout-neutral wrapper, locale-aware upper/lower helpers and the matching Google Fonts URL.
 - Sets lang on a wrapper so CSS text-transform handles Turkish i → İ correctly · Builds Google Fonts URL with the correct subsets (latin-ext for Turkish) · Exposes locale-aware upper() and lower() helpers via usePxlKitLocale() · Supports BCP 47 locales en and tr out of the box
 
 ### PxlKitSurfaceProvider

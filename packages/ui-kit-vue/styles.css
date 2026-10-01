@@ -2,9 +2,10 @@
  * @pxlkit/ui-kit-vue — styles for the Vue components.
  *
  * The theme (design tokens, pixel utilities, light/dark palettes) lives in
- * @pxlkit/ui-kit-core and is shared with the React and Angular kits:
+ * @pxlkit/ui-kit-core and is shared with the React and Angular kits. This file
+ * brings Tailwind CSS v4 itself, so it takes the place of
+ * `@import "tailwindcss"` in the stylesheet Tailwind processes:
  *
- *   @import "tailwindcss";
  *   @import "@pxlkit/ui-kit-vue/styles.css";
  */
 @import "@pxlkit/ui-kit-core/styles.css";

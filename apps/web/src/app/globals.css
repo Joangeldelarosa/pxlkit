@@ -1,9 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&subset=latin,latin-ext&display=swap');
 
-@import "tailwindcss";
+/* The kit's stylesheet brings Tailwind CSS, the theme and the kit's compiled classes. */
 @import "@pxlkit/ui-kit/styles.css";
 
-/* Tell Tailwind to scan the package for its utility classes */
+/* The site renders the kit and its examples from source (tsconfig paths), so
+   Tailwind scans the whole package — an installed kit needs no @source line. */
 @source "../../../../packages/ui-kit";
 
 @layer base {

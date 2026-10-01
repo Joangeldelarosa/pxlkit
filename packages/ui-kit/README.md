@@ -42,11 +42,13 @@ npm install @pxlkit/ui-kit
 
 ### Import Styles
 
-Add the stylesheet to your app entry point:
+The kit's stylesheet brings Tailwind CSS v4, the Pxlkit theme and the kit's class names, so it takes the place of `@import "tailwindcss"` in the stylesheet Tailwind processes (for example `app/globals.css`):
 
-```tsx
-import '@pxlkit/ui-kit/styles.css';
+```css
+@import "@pxlkit/ui-kit/styles.css";
 ```
+
+Importing it from your entry module instead (`import '@pxlkit/ui-kit/styles.css';`) works the same when your build runs Tailwind CSS on it. Do not import `tailwindcss` separately as well — it would load Tailwind's base styles twice.
 
 ## Quick Start
 

@@ -65,6 +65,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `@pxlkit/ui-kit-core` — the public API is unchanged. `styles.css` imports the shared
   theme and registers the kit's compiled classes with Tailwind (`@source`), so the
   utilities the components use are generated without any `@source` line of your own.
+  It brings Tailwind itself, so `@import "@pxlkit/ui-kit/styles.css";` replaces
+  `@import "tailwindcss";` instead of following it — the READMEs, the site and the
+  plugin's setup reference now say so, and drop the per-package-manager `@source` recipes.
 - `@pxlkit/ui-kit` examples: `PxlKitSurfaceProvider` now demonstrates buttons inheriting
   the provider's surface and a per-component override.
 - Coherence tooling: gate 08 (`consistency-pkgjson`) requires the `@pxlkit/vue` and
@@ -78,6 +81,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@pxlkit/core` `AnimatedPxlKitIcon`: `ping-pong` playback no longer stalls on its
   first frame under load, switching icons commits the new first frame before paint,
   and `NaN` `speed` / `fps` values are ignored.
+- `@pxlkit/ui-kit`: `PixelModal`, `PixelDrawer` and `PixelSheet` move focus into the
+  dialog when they open — `PixelPortal` re-mounted its content after the first client
+  render, dropping the focus the trap had set — and `PixelPopover` returns focus to its
+  trigger when its content closes while holding focus.
+- `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined
+  `--font-mono`, so monospace text fell back to the system stack although the kit's
+  fonts URL loads JetBrains Mono.
 - `docs/runbooks/ship-a-release.md` documented two commands that do not exist
   (`release:bump` and `registry:build`) and used `pnpm` in an npm repository. The
   runbook now describes what the release actually does.

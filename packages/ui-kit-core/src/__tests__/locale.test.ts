@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   PXLKIT_FONTS,
@@ -64,5 +67,12 @@ describe('PXLKIT_FONTS', () => {
     expect(PXLKIT_FONTS.pixel.cssVar).toBe('--font-pixel');
     expect(PXLKIT_FONTS.sans.cssVar).toBe('--font-sans');
     expect(PXLKIT_FONTS.mono.cssVar).toBe('--font-mono');
+  });
+
+  it('declares each font in the theme, so the families the fonts URL loads are applied', () => {
+    const theme = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../styles.css'), 'utf8');
+    for (const font of Object.values(PXLKIT_FONTS)) {
+      expect(theme).toContain(`${font.cssVar}: ${font.family};`);
+    }
   });
 });

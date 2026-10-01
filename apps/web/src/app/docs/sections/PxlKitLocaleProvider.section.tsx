@@ -21,7 +21,7 @@ export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProvi
   return (
     <section aria-labelledby={'pxl-kit-locale-provider-heading'} className={className} data-status='stable'>
       <h2 id='pxl-kit-locale-provider-heading'>PxlKitLocaleProvider</h2>
-      <p className="docs-lead">Provides locale-aware font loading and text utilities (upper/lower) to all PxlKit components via context.</p>
+      <p className="docs-lead">Sets the locale for every nested PxlKit component: lang on a layout-neutral wrapper, locale-aware upper/lower helpers and the matching Google Fonts URL.</p>
       <ul className="docs-highlights">
         <li>Sets lang on a wrapper so CSS text-transform handles Turkish i → İ correctly</li>
         <li>Builds Google Fonts URL with the correct subsets (latin-ext for Turkish)</li>

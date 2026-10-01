@@ -28,7 +28,7 @@ Usually not directly — it comes with your framework's kit:
 | Vue 3 | [`@pxlkit/ui-kit-vue`](https://www.npmjs.com/package/@pxlkit/ui-kit-vue) | `@import "@pxlkit/ui-kit-vue/styles.css";` |
 | Angular | [`@pxlkit/ui-kit-angular`](https://www.npmjs.com/package/@pxlkit/ui-kit-angular) | `@import "@pxlkit/ui-kit-angular/styles.css";` |
 
-Each kit's stylesheet imports this package's theme and points Tailwind CSS v4 at the class names both packages use, so one `@import` after `@import "tailwindcss";` is all the setup there is.
+Each kit's stylesheet brings Tailwind CSS v4 and this package's theme, and points Tailwind at the class names both packages use, so one `@import` of it — in place of `@import "tailwindcss";` — is all the setup there is.
 
 Install it yourself when you build your own components on the same design system, in any framework or none:
 
@@ -82,7 +82,6 @@ releaseScroll(); // scroll locks stack across every kit on the page
 The stylesheet defines the `--retro-*` palette for the light theme (`:root`) and the dark theme (`.dark` on `<html>` or any ancestor), maps it onto Tailwind utilities (`bg-retro-bg`, `text-retro-cyan`, …) and adds the pixel utilities (`pxl-corner-*`, `pxl-shadow*`). Override any variable after importing your kit's stylesheet:
 
 ```css
-@import "tailwindcss";
 @import "@pxlkit/ui-kit/styles.css";
 
 :root { --retro-green: #22c55e; }

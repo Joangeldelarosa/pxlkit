@@ -949,7 +949,7 @@ export default function UIKitPage() {
               <h2 className="font-pixel text-xs text-retro-green">GETTING STARTED</h2>
               <p className="text-sm text-retro-muted">
                 Three steps and you&apos;re rendering. Install <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>, import
-                its stylesheet alongside Tailwind, and pull components from the same package. Every primitive accepts the
+                its stylesheet — it brings Tailwind with it — and pull components from the same package. Every primitive accepts the
                 shared <CompLink id="design-tokens"><PixelCodeInline>tone</PixelCodeInline></CompLink>,{' '}
                 <PixelCodeInline>size</PixelCodeInline>, and <PixelCodeInline>surface</PixelCodeInline> contract — so
                 what you learn on <CompLink id="pixel-button">PixelButton</CompLink> applies to{' '}
@@ -957,10 +957,8 @@ export default function UIKitPage() {
                 <CompLink id="pixel-select">PixelSelect</CompLink>, and the other {UI_COMPONENTS_COUNT - 3}.
               </p>
               <CodeBlock
-                code={`// 1. Setup your Tailwind CSS file (e.g., index.css)
-// @import "tailwindcss";
+                code={`// 1. In your Tailwind CSS file (e.g., index.css), in place of @import "tailwindcss":
 // @import "@pxlkit/ui-kit/styles.css";
-// @source "../node_modules/@pxlkit/ui-kit";
 
 // 2. Import components in your React app
 import { PixelButton, PixelCard, PixelInput } from '@pxlkit/ui-kit';

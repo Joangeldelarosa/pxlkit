@@ -51,15 +51,18 @@ export interface PxlKitLocaleProviderProps {
 }
 
 /**
- * Provides locale-aware font loading and text utilities to all PxlKit components.
+ * Provides the locale and locale-aware text utilities to all PxlKit components.
  *
  * ### What it does
- * 1. Sets `lang` on the nearest parent (via a wrapper `<div lang={locale}>`) so
- *    that CSS `text-transform: uppercase` handles Turkish `i → İ` correctly.
- * 2. Injects a `<link>` tag to load Google Fonts with the appropriate subsets
- *    (`latin-ext` for Turkish).
- * 3. Exposes `upper()` / `lower()` helpers via context so components can do
+ * 1. Sets `lang` on a layout-neutral wrapper (`<div lang={locale}>` with
+ *    `display: contents`) so that CSS `text-transform: uppercase` handles
+ *    Turkish `i → İ` correctly.
+ * 2. Exposes `upper()` / `lower()` helpers via context so components can do
  *    locale-aware string transforms in JavaScript.
+ * 3. Exposes `fontsUrl`, the Google Fonts URL with the subsets the locale needs
+ *    (`latin-ext` for Turkish). The provider loads no fonts itself — add the
+ *    URL as a stylesheet `<link>` (or self-host the fonts) where your app loads
+ *    its fonts.
  *
  * ### Usage
  * ```tsx

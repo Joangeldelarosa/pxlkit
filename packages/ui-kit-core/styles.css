@@ -3,7 +3,8 @@
  * ║  @pxlkit/ui-kit-core — Theme & Design Tokens                 ║
  * ║                                                              ║
  * ║  Tailwind CSS v4 (CSS-first configuration), shared by the    ║
- * ║  React, Vue and Angular kits. Import it through your kit:    ║
+ * ║  React, Vue and Angular kits. Import it through your kit, in ║
+ * ║  place of @import "tailwindcss" (it brings Tailwind itself): ║
  * ║    @import "@pxlkit/ui-kit/styles.css";          (React)     ║
  * ║    @import "@pxlkit/ui-kit-vue/styles.css";      (Vue)       ║
  * ║    @import "@pxlkit/ui-kit-angular/styles.css";  (Angular)   ║
@@ -63,6 +64,7 @@
   /* ── Typography ── */
   --font-pixel: "Press Start 2P", monospace;
   --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
   /* ── Shadows (theme-aware via CSS variables) ── */
   --shadow-retro: 4px 4px 0px 0px currentColor;

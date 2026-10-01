@@ -20,7 +20,7 @@ Unlike an icon, a UI component is mostly markup and interaction — slots and ch
 3. **Parity is tested, not assumed.** Every manifest example exists in all three frameworks. A shared harness (`scripts/parity`) renders each example in React and in Vue or Angular and compares a canonical DOM — on mount (portals and focus included), on the server, and after every step of scripted interactions; each kit also hydrates every example from its own server-rendered markup. React is the reference implementation; any difference is a port bug.
 4. **The examples are the documentation.** Each manifest example is a React function, a Vue SFC (`examples/<category>/<Component>/<Example>.vue`) and an Angular component (`examples/<category>/<component>.examples.ts`), all importing the published package name. The parity suites prove the three render the same thing, and the docs show all three.
 5. **Lockstep versions.** The core and the three kits share their version. A given version has the same components and the same features in every framework.
-6. **Tailwind sees every class.** Each package's stylesheet registers its compiled output with `@source`, so `@import "<kit>/styles.css"` after `@import "tailwindcss"` is the whole setup in every framework.
+6. **Tailwind sees every class.** Each package's stylesheet registers its compiled output with `@source`, so `@import "<kit>/styles.css"` — in place of `@import "tailwindcss"`, which it includes — is the whole setup in every framework.
 
 ## Consequences
 
