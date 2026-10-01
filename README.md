@@ -474,6 +474,7 @@ Sidebar categories:
 | Workspace | Package | Version | Description |
 | --- | --- | --- | --- |
 | [`apps/web`](./apps/web) | `@pxlkit/web` _(private)_ | `1.3.0` | _(no description)_ |
+| [`packages/angular`](./packages/angular) | [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) | `0.1.0` | Angular standalone components for Pxlkit pixel art icons: static, animated and 3D parallax icons plus pixel toasts, on the shared rendering engine |
 | [`packages/core`](./packages/core) | [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | `1.3.4` | Pixel art rendering engine for Pxlkit: framework-agnostic core (SVG renderer, animation player, 3D parallax) plus React components, utilities and types |
 | [`packages/effects`](./packages/effects) | [`@pxlkit/effects`](https://www.npmjs.com/package/@pxlkit/effects) | `1.2.3` | Animated visual effect pixel art icons — 12 icons for explosions, radar ping, flame, shockwave, signals, particles, glows, and VFX animations |
 | [`packages/feedback`](./packages/feedback) | [`@pxlkit/feedback`](https://www.npmjs.com/package/@pxlkit/feedback) | `1.2.5` | Feedback and notification pixel art icon pack — 33 icons for alerts, status indicators, checkmarks, shields, bugs, badges, and toast notifications |
