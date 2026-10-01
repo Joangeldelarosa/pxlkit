@@ -2,7 +2,7 @@
 // @pxlkit/voxel — Type Definitions
 // ─────────────────────────────────────────────
 
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * Represents a single voxel position with its color.

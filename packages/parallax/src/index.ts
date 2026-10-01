@@ -11,7 +11,7 @@ export { PixelCrown } from './icons/pixel-crown';
 export { RetroJoystick } from './icons/retro-joystick';
 export { CyberEye } from './icons/cyber-eye';
 
-import type { ParallaxPxlKitData } from '@pxlkit/core';
+import type { ParallaxPxlKitData } from '@pxlkit/core/vanilla';
 import { CoolEmoji } from './icons/cool-emoji';
 import { PixelHeart } from './icons/pixel-heart';
 import { RetroTV } from './icons/retro-tv';

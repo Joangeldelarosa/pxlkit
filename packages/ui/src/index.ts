@@ -44,7 +44,7 @@ export { BouncingArrow } from './icons/bouncing-arrow';
 export { ShakingBell } from './icons/shaking-bell';
 export { SpinningGear } from './icons/spinning-gear';
 
-import type { IconPack } from '@pxlkit/core';
+import type { IconPack } from '@pxlkit/core/vanilla';
 import { Pencil } from './icons/pencil';
 import { Eraser } from './icons/eraser';
 import { PaintBucket } from './icons/paint-bucket';

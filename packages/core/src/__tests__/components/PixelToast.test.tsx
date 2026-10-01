@@ -122,4 +122,41 @@ describe('PixelToast', () => {
     expect(wrapper?.className).toContain('bottom-4');
     expect(wrapper?.className).toContain('right-4');
   });
+
+  it('pins the root without stray whitespace and appends className', () => {
+    const { container, rerender } = render(<PixelToast visible={true} title="Title" />);
+    expect((container.firstChild as HTMLElement).className).toBe('fixed z-[80] top-4 right-4');
+    rerender(<PixelToast visible={true} title="Title" className="mt-12" />);
+    expect((container.firstChild as HTMLElement).className).toBe('fixed z-[80] top-4 right-4 mt-12');
+  });
+
+  it('renders the icon flat in the accent colour when colorfulIcon is false', () => {
+    const { container } = render(
+      <PixelToast visible={true} title="Title" icon={testIcon} colorfulIcon={false} accentColor="#FF00FF" iconSize={40} />,
+    );
+    const img = container.querySelector('img')!;
+    expect(img.getAttribute('width')).toBe('40');
+    const svg = decodeURIComponent(img.getAttribute('src')!.replace(/^data:image\/svg\+xml,/, ''));
+    expect(svg).toContain('fill="#FF00FF"');
+    expect(svg).not.toContain('fill="#FF0000"');
+  });
+
+  it('shows the accent status dot when there is no icon', () => {
+    const { container } = render(<PixelToast visible={true} title="Title" accentColor="#123456" />);
+    expect(container.querySelector('img')).toBeNull();
+    const dot = container.querySelector('.rounded-full') as HTMLElement;
+    expect(dot.style.boxShadow).toBe('0 0 8px #123456');
+  });
+
+  it('re-arms the auto-close timer when it becomes visible again', () => {
+    const onClose = vi.fn();
+    const { rerender } = render(<PixelToast visible={false} title="T" duration={1000} onClose={onClose} />);
+    vi.advanceTimersByTime(5000);
+    expect(onClose).not.toHaveBeenCalled();
+    rerender(<PixelToast visible={true} title="T" duration={1000} onClose={onClose} />);
+    vi.advanceTimersByTime(999);
+    expect(onClose).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(onClose).toHaveBeenCalledOnce();
+  });
 });

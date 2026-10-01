@@ -1,4 +1,4 @@
-import type { PxlKitData } from '@pxlkit/core';
+import type { PxlKitData } from '@pxlkit/core/vanilla';
 
 /**
  * 🥇 Ribbon — an award medal hanging from a folded ribbon. The ribbon meets at

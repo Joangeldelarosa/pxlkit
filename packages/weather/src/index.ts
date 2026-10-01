@@ -1,4 +1,4 @@
-import type { IconPack } from '@pxlkit/core';
+import type { IconPack } from '@pxlkit/core/vanilla';
 
 export {
   Sun,

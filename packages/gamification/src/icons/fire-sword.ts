@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData } from '@pxlkit/core/vanilla';
 
 // ─── Fire Sword (6 frames) ──────────────────
 // A silver sword with flickering fire along the blade.

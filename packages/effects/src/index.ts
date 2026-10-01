@@ -13,7 +13,7 @@ export { Ripple } from './icons/ripple';
 export { NeonStrobe } from './icons/neon-strobe';
 export { PortalSpin } from './icons/portal-spin';
 
-import type { IconPack } from '@pxlkit/core';
+import type { IconPack } from '@pxlkit/core/vanilla';
 import { ExplosionBurst } from './icons/explosion-burst';
 import { RadarPing } from './icons/radar-ping';
 import { Flame } from './icons/flame';

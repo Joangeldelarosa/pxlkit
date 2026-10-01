@@ -31,6 +31,7 @@ const TOKENS_TS = 'export const tokens = { space: 4 };\n';
 const COMMON_TSX = 'export const PxlKitSurfaceProvider = () => null;\n';
 const STYLES_CSS = ':root { --pxl-space: 4px; }\n';
 const CORE_TYPES_TS = 'export type Tone = "neutral";\n';
+const CORE_PROPS_TS = 'export interface PxlKitProps { size?: number }\n';
 const INDEX_TSX = 'export { PxlKitSurfaceProvider } from "./common";\n';
 
 /** The digest the gate must arrive at for a fixture with no manifests. */
@@ -40,6 +41,7 @@ function expectedDigest(): string {
     common: COMMON_TSX,
     styles: STYLES_CSS,
     coreTypes: CORE_TYPES_TS,
+    coreProps: CORE_PROPS_TS,
     manifests: serializeManifests([]),
   });
 }
@@ -83,6 +85,8 @@ async function createFixture(opts: FixtureOptions = {}): Promise<string> {
   await writeFile(join(root, 'packages/ui-kit/src/index.tsx'), INDEX_TSX);
   await writeFile(join(root, 'packages/ui-kit/styles.css'), STYLES_CSS);
   await writeFile(join(root, 'packages/core/src/types.ts'), CORE_TYPES_TS);
+  await mkdir(join(root, 'packages/core/src/components'), { recursive: true });
+  await writeFile(join(root, 'packages/core/src/components/types.ts'), CORE_PROPS_TS);
 
   const uiKit = opts.uiKitVersion ?? '2.1.1';
   const pluginVersion = opts.pluginVersion ?? '1.0.0';

@@ -1,7 +1,7 @@
 {
   "name": "@pxlkit/core",
   "version": "1.3.4",
-  "description": "Core rendering engine, React components, SVG utilities, and TypeScript types for the Pxlkit pixel art toolkit — tree-shakeable icon renderer, animated icon player, 3D parallax icons, toast notifications, and color utilities",
+  "description": "Pixel art rendering engine for Pxlkit: framework-agnostic core (SVG renderer, animation player, 3D parallax) plus React components, utilities and types",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -9,9 +9,32 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./vanilla": {
+      "import": {
+        "types": "./dist/vanilla.d.ts",
+        "default": "./dist/vanilla.js"
+      },
+      "require": {
+        "types": "./dist/vanilla.d.cts",
+        "default": "./dist/vanilla.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "vanilla": [
+        "./dist/vanilla.d.ts"
+      ]
     }
   },
   "files": [
@@ -29,6 +52,14 @@
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
@@ -68,7 +99,12 @@
     "retro-ui",
     "design-system",
     "icon-toolkit",
-    "mit-license"
+    "mit-license",
+    "vue",
+    "angular",
+    "framework-agnostic",
+    "vanilla-js",
+    "headless"
   ],
   "homepage": "https://pxlkit.xyz",
   "repository": "https://github.com/Joangeldelarosa/pxlkit",

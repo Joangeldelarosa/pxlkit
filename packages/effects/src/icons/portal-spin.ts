@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData } from '@pxlkit/core/vanilla';
 
 export const PortalSpin: AnimatedPxlKitData = {
   name: 'portal-spin',

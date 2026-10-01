@@ -122,11 +122,12 @@ export async function computeExpectedDigest(repoRoot: string): Promise<string> {
   // committed one — the gate would fail on CI and pass on the machine that
   // happened to have generated it. The manifests it is derived from are tracked
   // and hashed below, so nothing is lost by leaving it out.
-  const [tokens, common, styles, coreTypes] = await Promise.all([
+  const [tokens, common, styles, coreTypes, coreProps] = await Promise.all([
     readOrEmpty(join(repoRoot, 'packages/ui-kit/src/tokens.ts')),
     readOrEmpty(join(repoRoot, 'packages/ui-kit/src/common.tsx')),
     readOrEmpty(join(repoRoot, 'packages/ui-kit/styles.css')),
     readOrEmpty(join(repoRoot, 'packages/core/src/types.ts')),
+    readOrEmpty(join(repoRoot, 'packages/core/src/components/types.ts')),
   ]);
 
   const records = await scanManifests(repoRoot, {
@@ -139,6 +140,7 @@ export async function computeExpectedDigest(repoRoot: string): Promise<string> {
     common,
     styles,
     coreTypes,
+    coreProps,
     manifests: serializeManifests(records),
   });
 }
@@ -305,7 +307,7 @@ export const skillRefsFreshGate: Gate = async ({ repoRoot }): Promise<GateResult
     if (expected !== versionFile.digestHash) {
       drift.push({
         artifact: VERSION_JSON,
-        expected: `digestHash ${expected} (recomputed from tokens, common, styles, core types and manifests)`,
+        expected: `digestHash ${expected} (recomputed from tokens, common, styles, core types, core props and manifests)`,
         actual: `digestHash ${versionFile.digestHash} — the committed references are stale: ${REGENERATE_HINT}`,
         severity: 'major',
       });

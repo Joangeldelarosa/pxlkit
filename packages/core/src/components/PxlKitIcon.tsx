@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
-import type { IconAppearance, PxlKitProps } from '../types';
-import { gridToPixels } from '../utils/gridToPixels';
+import { useMemo, type CSSProperties } from 'react';
+import type { PxlKitProps } from './types';
+import { ICON_IMAGE_STYLE, renderIconDataUri, resolveIconLabel } from '../engine/icon';
+import { resolveColorProps } from './_internal/resolveColorProps';
 
 /**
  * Renders a pixel art icon as an `<img>` element whose `src` is an inline
@@ -29,6 +30,10 @@ import { gridToPixels } from '../utils/gridToPixels';
  * beyond. The source format is unchanged — what changes is where in the
  * pipeline the rasteriser sits.
  *
+ * The markup comes from the framework-agnostic engine
+ * (`renderIconDataUri` in `@pxlkit/core/vanilla`), so `@pxlkit/vue` and
+ * `@pxlkit/angular` render byte-identical icons.
+ *
  * **Colour modes** (see {@link IconAppearance}):
  * - `appearance="palette"` (default) — original artwork colours.
  * - `appearance="tinted"`            — palette + colour overlay via SVG
@@ -46,119 +51,32 @@ export function PxlKitIcon({
   style,
   'aria-label': ariaLabel,
   // Deprecated legacy props — resolved into `appearance` below.
-  colorful: colorfulProp,
-  solid: solidProp,
-  tint: tintProp,
+  colorful,
+  solid,
+  tint,
 }: PxlKitProps) {
-  // Resolve effective appearance + colour with backward-compat fallbacks.
-  // Priority: explicit `appearance` > `solid` > `tint` > `colorful=false`
-  // > default `'palette'`.
-  const appearance: IconAppearance =
-    appearanceProp ??
-    (solidProp ? 'solid' :
-     tintProp ? 'tinted' :
-     colorfulProp === false ? 'solid' :
-     'palette');
-  const color = colorProp ?? tintProp;
+  const { appearance, color } = resolveColorProps({
+    appearance: appearanceProp,
+    color: colorProp,
+    colorful,
+    solid,
+    tint,
+  });
 
-  // Build a complete SVG string at the icon's native pixel grid (e.g. 16×16).
-  // Encode as data URI and feed to <img>, which gives us guaranteed
-  // nearest-neighbour scaling via CSS `image-rendering: pixelated`.
-  const dataUri = useMemo(() => {
-    const pixels = gridToPixels(icon);
-
-    // Group by row for horizontal merging into wider rects.
-    const rowMap = new Map<number, typeof pixels>();
-    for (const p of pixels) {
-      const row = rowMap.get(p.y) || [];
-      row.push(p);
-      rowMap.set(p.y, row);
-    }
-
-    const usePalette = appearance !== 'solid';
-    // currentColor is not honoured inside <img> — fall back to a sensible default.
-    const solidFill = color || '#FFFFFF';
-
-    const rectStrings: string[] = [];
-    for (const [y, rowPixels] of rowMap) {
-      const sorted = rowPixels.sort((a, b) => a.x - b.x);
-      let i = 0;
-      while (i < sorted.length) {
-        const start = sorted[i];
-        const fill = usePalette ? start.color : solidFill;
-        const startOpacity = start.opacity ?? 1;
-        let width = 1;
-        while (
-          i + width < sorted.length &&
-          sorted[i + width].x === start.x + width &&
-          (!usePalette || sorted[i + width].color === start.color) &&
-          (sorted[i + width].opacity ?? 1) === startOpacity
-        ) {
-          width++;
-        }
-        const opAttr = startOpacity < 1 ? ` fill-opacity="${startOpacity}"` : '';
-        rectStrings.push(
-          `<rect x="${start.x}" y="${y}" width="${width}" height="1" fill="${fill}"${opAttr}/>`,
-        );
-        i += width;
-      }
-    }
-
-    const tintActive = appearance === 'tinted';
-    const tintColor = color || '#FFFFFF';
-
-    // Tint pipeline (when appearance === 'tinted'):
-    //
-    //   1. feFlood produces a solid-colour rectangle of `tintColor`.
-    //   2. feComposite operator="in" crops that flood to the source's
-    //      alpha — yielding a flat-tinted silhouette ("tinted").
-    //   3. feBlend mode="color" composites the flat-tinted layer (as the
-    //      *top* layer) over the original SourceGraphic (as the *bottom*
-    //      layer). SVG compositing for mode="color" defines the result as:
-    //
-    //          result.hue + result.saturation = top.HSL
-    //          result.luminosity             = bottom.HSL
-    //
-    //      So putting the flat tint on top means every pixel adopts the
-    //      tint's hue+saturation, while the per-pixel luminance variation
-    //      from the original artwork is preserved. That's the "colored
-    //      lighting" effect — pixel-art shading intact, palette hue shifted.
-    //
-    //      Earlier revisions had `in` and `in2` swapped, which produced the
-    //      opposite (uniform luminance from the flat tint, original hues
-    //      retained from the source). That looked broken — barely tinted
-    //      and lost shading detail. Fixed in v1.3.2.
-    const filterDef = tintActive
-      ? `<defs><filter id="pxk-tint"><feFlood flood-color="${tintColor}" flood-opacity="1" result="flood"/><feComposite in="flood" in2="SourceGraphic" operator="in" result="tinted"/><feBlend in="tinted" in2="SourceGraphic" mode="color"/></filter></defs>`
-      : '';
-
-    const bodyOpen = tintActive ? '<g filter="url(#pxk-tint)">' : '';
-    const bodyClose = tintActive ? '</g>' : '';
-
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${icon.size} ${icon.size}" shape-rendering="crispEdges">${filterDef}${bodyOpen}${rectStrings.join('')}${bodyClose}</svg>`;
-
-    // `encodeURIComponent` is safer than base64 for SVGs — produces shorter
-    // URIs and avoids encoding errors with Unicode in the markup.
-    return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-  }, [icon, appearance, color]);
+  const src = useMemo(
+    () => renderIconDataUri(icon, { appearance, color }),
+    [icon, appearance, color],
+  );
 
   return (
     <img
-      src={dataUri}
+      src={src}
       width={size}
       height={size}
-      alt={ariaLabel || icon.name}
+      alt={resolveIconLabel(icon, ariaLabel)}
       className={className}
       draggable={false}
-      style={{
-        display: 'inline-block',
-        verticalAlign: 'middle',
-        flexShrink: 0,
-        // Nearest-neighbour scaling — the secret to pixel-perfect rendering
-        // at every size. Supported in every modern browser.
-        imageRendering: 'pixelated',
-        ...style,
-      }}
+      style={{ ...(ICON_IMAGE_STYLE as CSSProperties), ...style }}
     />
   );
 }

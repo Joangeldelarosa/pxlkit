@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { StrictMode } from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { AnimatedPxlKitIcon } from '../../components/AnimatedPxlKitIcon';
 import { testAnimatedIcon } from '../fixtures';
@@ -388,5 +389,98 @@ describe('AnimatedPxlKitIcon — off-screen pausing (shared visibility observer)
       </>
     );
     expect(observed.length).toBe(2);
+  });
+});
+
+describe('AnimatedPxlKitIcon — lifecycle (shared animation player)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('keeps animating under React StrictMode (mount → unmount → remount effects)', () => {
+    const { container } = render(
+      <StrictMode>
+        <AnimatedPxlKitIcon icon={testAnimatedIcon} />
+      </StrictMode>,
+    );
+    const first = getInnerImg(container).getAttribute('src');
+    act(() => {
+      vi.advanceTimersByTime(testAnimatedIcon.frameDuration + 10);
+    });
+    expect(getInnerImg(container).getAttribute('src')).not.toBe(first);
+  });
+
+  it('stops its clock when unmounted', () => {
+    const { unmount } = render(<AnimatedPxlKitIcon icon={testAnimatedIcon} />);
+    expect(vi.getTimerCount()).toBe(1);
+    unmount();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('never shows a stale frame when the icon switches', () => {
+    const threeFrames: AnimatedPxlKitData = {
+      ...testAnimatedIcon,
+      frames: [...testAnimatedIcon.frames, testAnimatedIcon.frames[0]],
+    };
+    const other: AnimatedPxlKitData = { ...threeFrames, name: 'other-icon' };
+    const { container, rerender } = render(<AnimatedPxlKitIcon icon={threeFrames} />);
+    act(() => {
+      vi.advanceTimersByTime(testAnimatedIcon.frameDuration * 2 + 10); // frame 2
+    });
+    rerender(<AnimatedPxlKitIcon icon={other} />);
+    // Frame 0 of the new icon, committed before paint.
+    const expected = render(<AnimatedPxlKitIcon icon={other} />).container;
+    expect(getInnerImg(container).getAttribute('src')).toBe(getInnerImg(expected).getAttribute('src'));
+  });
+});
+
+describe("AnimatedPxlKitIcon — trigger='appear'", () => {
+  type IOCallback = (entries: Array<{ target: Element; isIntersecting: boolean }>) => void;
+  const observers: Array<{ cb: IOCallback; options?: IntersectionObserverInit }> = [];
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    observers.length = 0;
+    (globalThis as Record<string, unknown>).IntersectionObserver = class {
+      constructor(cb: IOCallback, options?: IntersectionObserverInit) {
+        observers.push({ cb, options });
+      }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    delete (globalThis as Record<string, unknown>).IntersectionObserver;
+  });
+
+  it('waits until 30% of the icon is visible, then plays a single pass', () => {
+    const { container } = render(<AnimatedPxlKitIcon icon={testAnimatedIcon} trigger="appear" />);
+    const wrapper = container.firstElementChild as Element;
+    const first = getInnerImg(container).getAttribute('src');
+
+    act(() => {
+      vi.advanceTimersByTime(testAnimatedIcon.frameDuration * 3);
+    });
+    expect(getInnerImg(container).getAttribute('src')).toBe(first);
+
+    const appear = observers.find((o) => o.options?.threshold === 0.3)!;
+    act(() => appear.cb([{ target: wrapper, isIntersecting: true }]));
+    act(() => {
+      vi.advanceTimersByTime(testAnimatedIcon.frameDuration + 10);
+    });
+    const last = getInnerImg(container).getAttribute('src');
+    expect(last).not.toBe(first);
+
+    act(() => {
+      vi.advanceTimersByTime(testAnimatedIcon.frameDuration * 5);
+    });
+    expect(getInnerImg(container).getAttribute('src')).toBe(last);
   });
 });

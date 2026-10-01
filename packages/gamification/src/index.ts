@@ -56,7 +56,7 @@ export { CoinFlip } from './icons/coin-flip';
 export { FloatingSkull } from './icons/floating-skull';
 export { CardDraw } from './icons/card-draw';
 
-import type { IconPack } from '@pxlkit/core';
+import type { IconPack } from '@pxlkit/core/vanilla';
 import { Trophy } from './icons/trophy';
 import { Star } from './icons/star';
 import { Sword } from './icons/sword';

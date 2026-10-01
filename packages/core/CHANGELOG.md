@@ -3,6 +3,28 @@
 <!-- Seeded from git history by scripts/build-docs/generate-changelog.ts (initial generation). -->
 <!-- This file is hand-maintained from this point on — add an entry at the top for each release. -->
 
+## Unreleased
+
+### Added
+
+- `@pxlkit/core/vanilla` — a React-free entry point with the icon data types, every utility and the new framework-agnostic rendering engine. Nothing in its module graph (runtime or type declarations) references a UI framework; it is what `@pxlkit/vue`, `@pxlkit/angular` and the icon packs build on. The root entry re-exports all of it, so `@pxlkit/core` stays a superset.
+- Rendering engine, shared by the React, Vue and Angular components: `renderIconSvg` / `renderIconDataUri` (the exact `<img>` markup of `PxlKitIcon`), `createAnimatedIconPlayer` (frame clock, all five triggers, off-screen pausing), `createParallaxController` (mouse tilt, peel-apart intro, click burst, particles), `resolvePixelToastView` / `resolveToastAutoClose`, plus their style helpers (`ICON_IMAGE_STYLE`, `animatedIconWrapperStyle`, `parallax*Style`, `PARALLAX_CANVAS_STYLE`) and supporting resolvers (`resolveIconLabel`, `resolveAnimationTrigger`, `resolveFrameDuration`, `getAnimationFrame`, `resolveParallaxGeometry`, `parallaxParticleColors`).
+
+### Changed
+
+- `react` and `react-dom` are now optional peer dependencies: only the root entry's components need them, so Vue, Angular and vanilla installs no longer pull React in.
+- The package `exports` map declares separate ESM (`.d.ts`) and CommonJS (`.d.cts`) type declarations per condition, and `typesVersions` resolves the `vanilla` subpath under `moduleResolution: "node"`.
+- The React component props (`PxlKitProps`, `AnimatedPxlKitProps`, `ParallaxPxlKitProps`, `PixelToastProps`) moved from `src/types.ts` to the React layer (`src/components/types.ts`); `types.ts` is now the framework-agnostic icon data model. Both are still exported from `@pxlkit/core` under the same names.
+- `PxlKitIcon`, `AnimatedPxlKitIcon`, `ParallaxPxlKitIcon` and `PixelToast` render through the shared engine. Their markup is unchanged; `ParallaxPxlKitIcon` no longer re-renders on every frame of its intro animation, and touches its particle canvas only while particles are on screen (it used to call `getContext('2d')` and clear the canvas on every animation frame).
+
+### Fixed
+
+- `ParallaxPxlKitIcon`: after a click burst the layers now spring back to their resting spread. The burst decayed in a ref that never triggered a render, so the stack stayed exploded until something else re-rendered the component.
+- `AnimatedPxlKitIcon` with `trigger="ping-pong"`: playback no longer stalls on the first frame when several frame ticks are processed in one React render (high `fps`, a busy main thread), and switching to another icon commits its first frame before paint.
+- `AnimatedPxlKitIcon` ignores `NaN` `speed` / `fps` values instead of starting a zero-delay interval.
+- `PxlKitIcon`: colour values are XML-escaped inside the generated SVG, so a malformed `color` string can no longer break the image markup.
+- `PixelToast`: the root element's class list no longer ends with a stray space when `className` is not set.
+
 ## 1.3.4 — 2026-07-06
 
 ### Fixed

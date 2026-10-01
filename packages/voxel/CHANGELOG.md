@@ -3,6 +3,12 @@
 <!-- Seeded from git history by scripts/build-docs/generate-changelog.ts (initial generation). -->
 <!-- This file is hand-maintained from this point on — add an entry at the top for each release. -->
 
+## Unreleased
+
+### Fixed
+
+- `PxlKitData` (the input of `pxlToVoxels`) now resolves from the React-free `@pxlkit/core/vanilla` entry instead of the root entry, so projects without React type-check this package without React's type declarations — even with `skipLibCheck: false`. Runtime output is unchanged.
+
 ## 0.1.4 — 2026-05-12
 
 ### Added

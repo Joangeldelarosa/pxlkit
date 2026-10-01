@@ -1,4 +1,4 @@
-import type { AnimatedPxlKitData } from '@pxlkit/core';
+import type { AnimatedPxlKitData } from '@pxlkit/core/vanilla';
 
 // ─── Pulse Heart (4 frames) ────────────────
 // A red heart that beats — grows and shrinks cyclically.
