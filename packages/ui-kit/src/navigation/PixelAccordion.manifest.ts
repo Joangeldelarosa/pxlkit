@@ -16,7 +16,7 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Vertical list of expandable disclosure items with wired aria-controls / aria-expanded / labelled regions.',
+    'Vertical list of expandable disclosure items, each header wired to its panel with aria-expanded / aria-controls.',
   highlights: [
     'Single-open by default; opt into multi-open via `allowMultiple`',
     'First item auto-expanded unless `collapsedByDefault` is set',
@@ -41,7 +41,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus between item headers' },
     ],
     notes:
-      'Each header is a native <button> with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels are plain containers labelled by their header via aria-labelledby — no role="region", which would proliferate landmarks (and collide when several accordions share titles) — matching the WAI-ARIA disclosure pattern stacked into an accordion.',
+      'Each header is a native <button> with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels are plain containers that follow their header in reading order — no role="region", which would proliferate landmarks (and collide when several accordions share titles), and so no name, which ARIA does not allow on an element without a role — matching the WAI-ARIA disclosure pattern stacked into an accordion.',
   },
   related: ['PixelTabs', 'PixelCollapsible'],
   apiStability: 'stable',

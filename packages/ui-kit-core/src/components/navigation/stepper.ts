@@ -49,9 +49,20 @@ const STATE_SUFFIX: Record<StepState, string> = {
   pending: '',
 };
 
-/** The accessible name of a step: its position, its label and its state. */
+/**
+ * What a step says around its label: its position before, its state after
+ * (nothing while pending). A step that is not clickable reads them as
+ * visually hidden text, because ARIA does not let an element without a role
+ * take a name.
+ */
+export function stepHiddenText(index: number, total: number, state: StepState): { before: string; after: string } {
+  return { before: `Step ${index + 1} of ${total}: `, after: STATE_SUFFIX[state] };
+}
+
+/** The accessible name of a clickable step (`role="button"`): its position, its label and its state. */
 export function stepAriaLabel(index: number, total: number, label: string, state: StepState): string {
-  return `Step ${index + 1} of ${total}: ${label}${STATE_SUFFIX[state]}`;
+  const { before, after } = stepHiddenText(index, total, state);
+  return `${before}${label}${after}`;
 }
 
 /**
@@ -191,6 +202,8 @@ export interface StepClasses {
   body: string;
   label: string;
   description: string;
+  /** The position and state read around the label of a step that is not clickable. */
+  hidden: string;
 }
 
 /** Classes of every part of a step. */
@@ -222,6 +235,7 @@ export function stepClasses(surface: Surface, { orientation, size, state, clicka
     body: cn('flex flex-col', vertical ? 'items-start pt-0.5' : 'items-center'),
     label: cn(stepLabelSizeClasses[size], s.font, 'font-semibold leading-tight', state === 'pending' ? 'text-retro-muted' : t.text),
     description: cn(stepDescriptionSizeClasses[size], s.font, 'mt-0.5 text-retro-muted leading-snug'),
+    hidden: 'sr-only',
   };
 }
 

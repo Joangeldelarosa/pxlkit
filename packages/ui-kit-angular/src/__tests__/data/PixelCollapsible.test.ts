@@ -43,7 +43,7 @@ describe('PixelCollapsible', () => {
     for (const [trigger, text] of [[one!, 'first'], [two!, 'second']] as const) {
       const body = root.querySelector(`#${trigger.getAttribute('aria-controls')}`)!;
       expect(body.textContent).toBe(text);
-      expect(body.getAttribute('aria-labelledby')).toBe(trigger.id);
+      expect(body.hasAttribute('aria-labelledby')).toBe(false);
     }
   });
 

@@ -31,11 +31,12 @@ describe('PixelStepper', () => {
     const fixture = TestBed.createComponent(Host);
     await fixture.whenStable();
     const root = fixture.nativeElement as HTMLElement;
-    expect(stepsOf(root).map((step) => step.getAttribute('tabindex'))).toEqual(['-1', '-1', '-1']);
+    expect(stepsOf(root).map((step) => step.getAttribute('tabindex'))).toEqual([null, null, null]);
     stepsOf(root)[0]!.click();
     fixture.componentInstance.clickable.set(true);
     await fixture.whenStable();
-    expect(stepsOf(root).map((step) => step.getAttribute('tabindex'))).toEqual(['0', '0', '-1']);
+    expect(stepsOf(root).map((step) => step.getAttribute('tabindex'))).toEqual(['0', '0', null]);
+    expect(stepsOf(root).map((step) => step.getAttribute('role'))).toEqual(['button', 'button', null]);
     stepsOf(root)[0]!.click();
     stepsOf(root)[2]!.click();
     key(stepsOf(root)[1]!, 'Enter');
@@ -109,10 +110,12 @@ describe('PixelStepper', () => {
     const root = fixture.nativeElement as HTMLElement;
     fixture.componentInstance.labels.set(['One', 'Two', 'Three']);
     await fixture.whenStable();
-    expect(stepsOf(root).map((step) => step.getAttribute('aria-label'))).toEqual([
-      'Step 1 of 3: One (current)',
-      'Step 2 of 3: Two',
-      'Step 3 of 3: Three',
+    // Not clickable: the position and state are visually hidden text, not a name.
+    const hiddenText = (step: HTMLElement) => Array.from(step.querySelectorAll('.sr-only'), (text) => text.textContent);
+    expect(stepsOf(root).map(hiddenText)).toEqual([
+      ['Step 1 of 3: ', ' (current)'],
+      ['Step 2 of 3: '],
+      ['Step 3 of 3: '],
     ]);
     expect(root.querySelectorAll('hr')).toHaveLength(2);
   });

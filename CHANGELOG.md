@@ -117,6 +117,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dismisses the toast.
 - `@pxlkit/ui-kit`: `PixelSpinner` spins and toasts animate in — the stylesheet defined neither
   the spinner's keyframes nor the toast's entrance utilities.
+- `@pxlkit/ui-kit`: `PixelStepper` steps get valid roles and names (clickable steps are buttons,
+  the others read their position and state as hidden text), and `PixelAccordion` /
+  `PixelCollapsible` panels drop an `aria-labelledby` that ARIA does not allow without a role.
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined

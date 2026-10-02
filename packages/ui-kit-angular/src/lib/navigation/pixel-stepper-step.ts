@@ -5,6 +5,7 @@ import {
   stepClasses,
   stepConnectorClasses,
   stepConnectorCompleted,
+  stepHiddenText,
   stepIndicator,
   stepSpinner,
   stepState,
@@ -12,6 +13,7 @@ import {
   stepperSlotClasses,
 } from '@pxlkit/ui-kit-core';
 import { booleanOr } from '../_internal/coercion';
+import { injectId } from '../_internal/ids';
 import { PxlOutlet, type PxlContent } from '../_internal/outlet';
 import { PixelGlyph } from '../_internal/pixel-glyph';
 import { injectStepperContext, type StepperStepEntry } from './stepper-context';
@@ -19,9 +21,10 @@ import { injectStepperContext, type StepperStepEntry } from './stepper-context';
 /**
  * One step of a `<pxl-stepper>`: an indicator (its number, a check mark once
  * completed, a cross on error, a custom `icon`, or a spinner while loading)
- * and its label, named for assistive technology by its position, label and
- * state. It also draws the connector to the next step. The host is
- * layout-neutral (`display: contents`).
+ * and its label. A clickable step is a button named by its position, label
+ * and state and described by its description; any other step reads them as
+ * visually hidden text. It also draws the connector to the next step. The
+ * host is layout-neutral (`display: contents`).
  *
  * @example
  * <pxl-stepper-step label="Account" description="Create your account" completed />
@@ -61,9 +64,11 @@ import { injectStepperContext, type StepperStepEntry } from './stepper-context';
         data-pxl-step="true"
         [attr.data-pxl-step-index]="index()"
         [attr.data-pxl-step-state]="state()"
+        [attr.role]="clickable() ? 'button' : null"
         [attr.aria-current]="index() === context.active() ? 'step' : null"
-        [attr.aria-label]="ariaLabel()"
-        [attr.tabindex]="clickable() ? 0 : -1"
+        [attr.aria-label]="clickable() ? ariaLabel() : null"
+        [attr.aria-describedby]="clickable() && description() ? descriptionId : null"
+        [attr.tabindex]="clickable() ? 0 : null"
         [class]="classes().root"
         (click)="onClick()"
         (keydown)="onKeydown($event)"
@@ -108,9 +113,19 @@ import { injectStepperContext, type StepperStepEntry } from './stepper-context';
           }
         </span>
         <div [class]="classes().body">
+          @if (!clickable()) {
+            <span [class]="classes().hidden">{{ hidden().before }}</span>
+          }
           <span data-pxl-step-label="true" [class]="classes().label">{{ label() }}</span>
+          @if (!clickable() && hidden().after) {
+            <span [class]="classes().hidden">{{ hidden().after }}</span>
+          }
           @if (description()) {
-            <span data-pxl-step-description="true" [class]="classes().description">{{ description() }}</span>
+            <span
+              [attr.id]="clickable() ? descriptionId : null"
+              data-pxl-step-description="true"
+              [class]="classes().description"
+            >{{ description() }}</span>
           }
         </div>
       </div>
@@ -152,6 +167,10 @@ export class PixelStepperStep implements StepperStepEntry {
   protected readonly ariaLabel = computed(() =>
     stepAriaLabel(this.index(), this.context.steps().length, this.label(), this.state()),
   );
+  /** @internal */
+  protected readonly hidden = computed(() => stepHiddenText(this.index(), this.context.steps().length, this.state()));
+  /** @internal */
+  protected readonly descriptionId = injectId();
   /** @internal */
   protected readonly classes = computed(() =>
     stepClasses(this.context.surface(), {

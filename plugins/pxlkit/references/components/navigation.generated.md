@@ -6,7 +6,7 @@
 
 ### PixelAccordion
 - stable · since 1.0.0
-- Vertical list of expandable disclosure items with wired aria-controls / aria-expanded / labelled regions.
+- Vertical list of expandable disclosure items, each header wired to its panel with aria-expanded / aria-controls.
 - Single-open by default; opt into multi-open via `allowMultiple` · First item auto-expanded unless `collapsedByDefault` is set · Surface-aware typography and borders (pixel vs linear) · aria-expanded + aria-controls wired per header for assistive tech · SSR-safe and tree-shakable; unopened panels are not rendered
 - related: PixelTabs, PixelCollapsible
 

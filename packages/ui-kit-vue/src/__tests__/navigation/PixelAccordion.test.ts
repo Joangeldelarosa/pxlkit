@@ -25,12 +25,12 @@ describe('PixelAccordion', () => {
     expect(wrapper.find('em').text()).toBe('Rendered');
   });
 
-  it('wires each header to its panel, which refers back to it', () => {
+  it('wires each header to its panel, which takes no name', () => {
     const wrapper = mount(PixelAccordion, { props: { items: ITEMS } });
     const header = wrapper.find('button');
     const panel = wrapper.find(`#${header.attributes('aria-controls')}`);
     expect(panel.text()).toBe('Plain text');
-    expect(panel.attributes('aria-labelledby')).toBe(header.attributes('id'));
+    expect(panel.attributes('aria-labelledby')).toBeUndefined();
   });
 
   it('reads the items open on first render once, and follows allow-multiple as it changes', async () => {

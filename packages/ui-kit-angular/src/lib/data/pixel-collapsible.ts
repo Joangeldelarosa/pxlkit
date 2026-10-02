@@ -40,7 +40,7 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
     >{{ label() }}</button>
     <ng-template #chevron><svg pxlGlyph="chevronDown" [class]="classes().chevron"></svg></ng-template>
     @if (isOpen()) {
-      <div [id]="ids.content" [attr.aria-labelledby]="ids.trigger" [class]="classes().content"><ng-content /></div>
+      <div [id]="ids.content" [class]="classes().content"><ng-content /></div>
     }
   `,
 })

@@ -23,7 +23,7 @@ describe('PixelAccordion', () => {
     expect((fixture.nativeElement as HTMLElement).querySelector('em')!.textContent).toBe('FAQ answers');
   });
 
-  it('wires each header to its panel, which refers back to it', async () => {
+  it('wires each header to its panel, which takes no name', async () => {
     @Component({
       imports: [PixelAccordion],
       template: `<pxl-accordion [items]="[{ id: 'one', title: 'One', content: 'First' }]" />`,
@@ -35,7 +35,7 @@ describe('PixelAccordion', () => {
     const header = root.querySelector('button')!;
     const panel = root.querySelector(`#${header.getAttribute('aria-controls')}`)!;
     expect(panel.textContent!.trim()).toBe('First');
-    expect(panel.getAttribute('aria-labelledby')).toBe(header.id);
+    expect(panel.hasAttribute('aria-labelledby')).toBe(false);
   });
 
   it('reads the items open on first render once, and follows allowMultiple as it changes', async () => {

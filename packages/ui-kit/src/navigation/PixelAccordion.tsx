@@ -64,8 +64,9 @@ export const PixelAccordion = forwardRef<HTMLDivElement, PixelAccordionProps>(fu
               // No role="region": the component cannot guarantee unique panel
               // names across instances, and duplicate region landmarks trip
               // axe's landmark-unique rule (APG also discourages region here
-              // to avoid landmark proliferation).
-              <div id={ids.panel} aria-labelledby={ids.header} className={classes.panel}>
+              // to avoid landmark proliferation). Without a role the panel
+              // takes no name either: ARIA prohibits aria-labelledby on it.
+              <div id={ids.panel} className={classes.panel}>
                 {item.content}
               </div>
             )}

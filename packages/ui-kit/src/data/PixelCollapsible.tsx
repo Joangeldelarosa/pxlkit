@@ -38,8 +38,9 @@ export function PixelCollapsible({
   const [open, setOpen] = useState(defaultOpen);
   const classes = collapsibleClasses(surface, { bordered, open });
   /* Stable trigger/content ids for the disclosure aria wiring — same
-     pattern as PixelAccordion (aria-expanded + aria-controls on the
-     trigger, aria-labelledby back-reference on the content region). */
+     pattern as PixelAccordion: aria-expanded + aria-controls on the
+     trigger, and a content container without a role, which ARIA does not
+     let take a name (no aria-labelledby). */
   const baseId = useId();
   const { trigger: triggerId, content: contentId } = collapsibleIds(baseId);
   return (
@@ -60,7 +61,7 @@ export function PixelCollapsible({
         {label}
       </PixelButton>
       {open && (
-        <div id={contentId} aria-labelledby={triggerId} className={classes.content}>
+        <div id={contentId} className={classes.content}>
           {children}
         </div>
       )}

@@ -44,7 +44,7 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>progress-steps</code></li>
       </ul>
-      <p className="docs-aria-notes">The root renders role=&quot;group&quot; with a configurable ariaLabel (defaults to &quot;Progress steps&quot;). Each step carries an aria-label combining its position (&quot;Step N of M&quot;), its label, and its state (current/completed/error). The active step is marked with aria-current=&quot;step&quot;. Steps that are not clickable (no onStepClick, or future steps when allowNextStepsSelect is false) are removed from the tab sequence via tabIndex=-1. Indicators and connectors are aria-hidden so screen readers announce only the step label and state.</p>
+      <p className="docs-aria-notes">The root renders role=&quot;group&quot; with a configurable ariaLabel (defaults to &quot;Progress steps&quot;). A clickable step is role=&quot;button&quot;, named by its position (&quot;Step N of M&quot;), its label and its state (current/completed/error) and described by its description. A step that is not clickable (no onStepClick, or a future step when allowNextStepsSelect is false) has no role and stays out of the tab sequence; since ARIA does not let an element without a role take a name, it reads its position and state as visually hidden text around its label. The active step is marked with aria-current=&quot;step&quot;. Indicators and connectors are aria-hidden so screen readers announce only the step label and state.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

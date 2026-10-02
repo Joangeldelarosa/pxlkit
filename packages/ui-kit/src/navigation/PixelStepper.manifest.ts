@@ -51,7 +51,7 @@ export default defineManifest({
       { key: 'Space', does: 'Activates the focused step (when clickable).' },
     ],
     notes:
-      'The root renders role="group" with a configurable ariaLabel (defaults to "Progress steps"). Each step carries an aria-label combining its position ("Step N of M"), its label, and its state (current/completed/error). The active step is marked with aria-current="step". Steps that are not clickable (no onStepClick, or future steps when allowNextStepsSelect is false) are removed from the tab sequence via tabIndex=-1. Indicators and connectors are aria-hidden so screen readers announce only the step label and state.',
+      'The root renders role="group" with a configurable ariaLabel (defaults to "Progress steps"). A clickable step is role="button", named by its position ("Step N of M"), its label and its state (current/completed/error) and described by its description. A step that is not clickable (no onStepClick, or a future step when allowNextStepsSelect is false) has no role and stays out of the tab sequence; since ARIA does not let an element without a role take a name, it reads its position and state as visually hidden text around its label. The active step is marked with aria-current="step". Indicators and connectors are aria-hidden so screen readers announce only the step label and state.',
   },
   related: ['PixelTabs', 'PixelProgress', 'PixelBreadcrumb'],
   apiStability: 'stable',

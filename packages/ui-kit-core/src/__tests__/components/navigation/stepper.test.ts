@@ -5,6 +5,7 @@ import {
   stepClickable,
   stepConnectorClasses,
   stepConnectorCompleted,
+  stepHiddenText,
   stepIndicator,
   stepSpinner,
   stepState,
@@ -47,6 +48,12 @@ describe('stepper state', () => {
       'Step 2 of 4: Billing (error)',
       'Step 2 of 4: Billing',
     ]);
+  });
+
+  it('says the same around the label of a step that is not clickable, in visually hidden text', () => {
+    expect(stepHiddenText(1, 4, 'active')).toEqual({ before: 'Step 2 of 4: ', after: ' (current)' });
+    expect(stepHiddenText(3, 4, 'pending')).toEqual({ before: 'Step 4 of 4: ', after: '' });
+    expect(stepClasses('pixel', BASE).hidden).toBe('sr-only');
   });
 
   it('makes steps clickable only with a handler, up to the active one unless later steps are allowed', () => {

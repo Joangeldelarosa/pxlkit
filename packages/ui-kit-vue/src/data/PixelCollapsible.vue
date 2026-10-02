@@ -57,6 +57,6 @@ const classes = computed(() => collapsibleClasses(effectiveSurface.value, { bord
       {{ label }}
       <template #icon-right><PixelGlyph name="chevronDown" :class="classes.chevron" /></template>
     </PixelButton>
-    <div v-if="open" :id="ids.content" :aria-labelledby="ids.trigger" :class="classes.content"><slot /></div>
+    <div v-if="open" :id="ids.content" :class="classes.content"><slot /></div>
   </div>
 </template>

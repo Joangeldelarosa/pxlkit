@@ -52,7 +52,7 @@ export interface AccordionItem {
           <svg pxlGlyph="chevronDown" [class]="row.classes.chevron"></svg>
         </button>
         @if (row.open) {
-          <div [id]="row.ids.panel" [attr.aria-labelledby]="row.ids.header" [class]="row.classes.panel">
+          <div [id]="row.ids.panel" [class]="row.classes.panel">
             <ng-container *pxlOutlet="row.item.content; context: { $implicit: row.item }; let text">{{ text }}</ng-container>
           </div>
         }

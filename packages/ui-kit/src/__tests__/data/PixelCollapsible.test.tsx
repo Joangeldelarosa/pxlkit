@@ -91,7 +91,9 @@ describe('PixelCollapsible — aria wiring (disclosure pattern)', () => {
     const content = document.getElementById(controls!);
     expect(content).not.toBeNull();
     expect(content!.textContent).toContain('linked body');
-    expect(content!.getAttribute('aria-labelledby')).toBe(trigger.id);
+    // A container without a role takes no name: ARIA prohibits aria-labelledby on it.
+    expect(content!.getAttribute('role')).toBeNull();
+    expect(content!.hasAttribute('aria-labelledby')).toBe(false);
     expect(trigger.id).toBeTruthy();
   });
 

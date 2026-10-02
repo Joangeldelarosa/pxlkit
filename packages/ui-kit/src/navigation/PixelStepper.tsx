@@ -1,12 +1,13 @@
 'use client';
 
-import React, { forwardRef, useCallback, useMemo, useRef } from 'react';
+import React, { forwardRef, useCallback, useId, useMemo, useRef } from 'react';
 import {
   stepAriaLabel,
   stepClasses,
   stepClickable,
   stepConnectorClasses,
   stepConnectorCompleted,
+  stepHiddenText,
   stepIndicator,
   stepSpinner,
   stepState,
@@ -155,7 +156,8 @@ export const PixelStepperStep = forwardRef<HTMLDivElement, PixelStepperStepProps
       }
     })();
 
-    const ariaLabel = stepAriaLabel(index, ctx.total, label, state);
+    const hidden = stepHiddenText(index, ctx.total, state);
+    const descriptionId = useId();
 
     const setRefs = useCallback(
       (node: HTMLDivElement | null) => {
@@ -172,9 +174,14 @@ export const PixelStepperStep = forwardRef<HTMLDivElement, PixelStepperStepProps
         data-pxl-step="true"
         data-pxl-step-index={index}
         data-pxl-step-state={state}
+        // A clickable step is a button named by its position, label and
+        // state; any other step reads them as visually hidden text, since an
+        // element without a role cannot take a name.
+        role={clickable ? 'button' : undefined}
         aria-current={isActive ? 'step' : undefined}
-        aria-label={ariaLabel}
-        tabIndex={clickable ? 0 : -1}
+        aria-label={clickable ? stepAriaLabel(index, ctx.total, label, state) : undefined}
+        aria-describedby={clickable && description ? descriptionId : undefined}
+        tabIndex={clickable ? 0 : undefined}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         className={cn(classes.root, className)}
@@ -188,14 +195,17 @@ export const PixelStepperStep = forwardRef<HTMLDivElement, PixelStepperStepProps
           {indicatorContent}
         </span>
         <div className={classes.body}>
+          {!clickable && <span className={classes.hidden}>{hidden.before}</span>}
           <span
             data-pxl-step-label="true"
             className={classes.label}
           >
             {label}
           </span>
+          {!clickable && hidden.after && <span className={classes.hidden}>{hidden.after}</span>}
           {description ? (
             <span
+              id={clickable ? descriptionId : undefined}
               data-pxl-step-description="true"
               className={classes.description}
             >

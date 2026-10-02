@@ -21,7 +21,7 @@ export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSecti
   return (
     <section aria-labelledby={'pixel-accordion-heading'} className={className} data-status='stable'>
       <h2 id='pixel-accordion-heading'>PixelAccordion</h2>
-      <p className="docs-lead">Vertical list of expandable disclosure items with wired aria-controls / aria-expanded / labelled regions.</p>
+      <p className="docs-lead">Vertical list of expandable disclosure items, each header wired to its panel with aria-expanded / aria-controls.</p>
       <ul className="docs-highlights">
         <li>Single-open by default; opt into multi-open via `allowMultiple`</li>
         <li>First item auto-expanded unless `collapsedByDefault` is set</li>
@@ -44,7 +44,7 @@ export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSecti
       <ul className="docs-aria-patterns">
         <li><code>disclosure</code></li>
       </ul>
-      <p className="docs-aria-notes">Each header is a native &lt;button&gt; with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels are plain containers labelled by their header via aria-labelledby — no role=&quot;region&quot;, which would proliferate landmarks (and collide when several accordions share titles) — matching the WAI-ARIA disclosure pattern stacked into an accordion.</p>
+      <p className="docs-aria-notes">Each header is a native &lt;button&gt; with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels are plain containers that follow their header in reading order — no role=&quot;region&quot;, which would proliferate landmarks (and collide when several accordions share titles), and so no name, which ARIA does not allow on an element without a role — matching the WAI-ARIA disclosure pattern stacked into an accordion.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

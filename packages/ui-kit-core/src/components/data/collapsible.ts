@@ -25,8 +25,8 @@ export function collapsibleClasses(surface: Surface, { bordered, open }: { borde
 
 /**
  * Ids of the header button and the body, from one generated base id: the
- * button controls the body (`aria-controls`), which it labels
- * (`aria-labelledby`).
+ * button controls the body (`aria-controls`). The body has no role, so it
+ * takes no name (ARIA prohibits `aria-labelledby` on it).
  */
 export function collapsibleIds(baseId: string): { trigger: string; content: string } {
   return { trigger: `${baseId}-trigger`, content: `${baseId}-content` };

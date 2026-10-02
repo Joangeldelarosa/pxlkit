@@ -77,7 +77,7 @@ function toggle(id: string) {
         <span>{{ row.item.title }}</span>
         <PixelGlyph name="chevronDown" :class="row.classes.chevron" />
       </button>
-      <div v-if="row.open" :id="row.ids.panel" :aria-labelledby="row.ids.header" :class="row.classes.panel">
+      <div v-if="row.open" :id="row.ids.panel" :class="row.classes.panel">
         <RenderNode :node="row.item.content" />
       </div>
     </div>

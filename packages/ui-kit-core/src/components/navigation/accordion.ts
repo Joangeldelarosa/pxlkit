@@ -23,8 +23,8 @@ export function toggleAccordionItem(open: readonly string[], id: string, allowMu
 
 /**
  * Ids of an item's header and panel, from the accordion's generated base id:
- * the header controls the panel (`aria-controls`), which points back at the
- * header (`aria-labelledby`).
+ * the header controls the panel (`aria-controls`). The panel has no role, so
+ * it takes no name (ARIA prohibits `aria-labelledby` on it).
  */
 export function accordionIds(baseId: string, itemId: string): { header: string; panel: string } {
   return { header: `${baseId}-h-${itemId}`, panel: `${baseId}-p-${itemId}` };

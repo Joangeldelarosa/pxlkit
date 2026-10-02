@@ -63,7 +63,7 @@ describe('PixelAccordion', () => {
     expect(queryByText('Third body')).toBeTruthy();
   });
 
-  it('wires aria-controls on the header to the panel id, and aria-labelledby back', () => {
+  it('wires aria-controls on the header to the panel id, and leaves the panel unnamed', () => {
     const { getByRole, getByText } = render(<PixelAccordion items={ITEMS} />);
     const header = getByRole('button', { name: 'First' });
     const panelId = header.getAttribute('aria-controls');
@@ -71,9 +71,10 @@ describe('PixelAccordion', () => {
     const panel = document.getElementById(panelId!)!;
     expect(panel).toBeTruthy();
     expect(panel.textContent).toContain('First body');
-    expect(panel.getAttribute('aria-labelledby')).toBe(header.id);
-    // No role="region" on the panel (intentional — avoids landmark proliferation).
+    // No role="region" on the panel (intentional — avoids landmark proliferation),
+    // so no name either: ARIA prohibits aria-labelledby on an element without a role.
     expect(panel.getAttribute('role')).toBeNull();
+    expect(panel.hasAttribute('aria-labelledby')).toBe(false);
     expect(getByText('First body')).toBeTruthy();
   });
 

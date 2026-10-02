@@ -1,14 +1,24 @@
 <script setup lang="ts">
-import { computed, useTemplateRef, watch, type VNode } from 'vue';
-import { stepAriaLabel, stepClasses, stepIndicator, stepSpinner, stepState, stepperKeyAction } from '@pxlkit/ui-kit-core';
+import { computed, useId, useTemplateRef, watch, type VNode } from 'vue';
+import {
+  stepAriaLabel,
+  stepClasses,
+  stepHiddenText,
+  stepIndicator,
+  stepSpinner,
+  stepState,
+  stepperKeyAction,
+} from '@pxlkit/ui-kit-core';
 import PixelGlyph from '../_internal/PixelGlyph.vue';
 import { useStepPosition, useStepperContext } from './_internal/stepper-context.js';
 
 /**
  * One step of a `PixelStepper`: an indicator (its number, a check mark once
  * completed, a cross on error, the `#icon` slot, or a spinner while loading)
- * and its label, named for assistive technology by its position, label and
- * state. Attributes and listeners fall through to the step element.
+ * and its label. A clickable step is a button named by its position, label
+ * and state and described by its description; any other step reads them as
+ * visually hidden text. Attributes and listeners fall through to the step
+ * element.
  */
 export interface PixelStepperStepProps {
   /** Label under (or beside) the indicator. */
@@ -37,11 +47,13 @@ const slots = defineSlots<{
 const context = useStepperContext();
 const position = useStepPosition();
 const step = useTemplateRef<HTMLElement>('step');
+const descriptionId = useId();
 // Read while rendering: slots are not reactive.
 const indicator = () => stepIndicator(state.value, { loading: props.loading, icon: !!slots.icon });
 
 const state = computed(() => stepState(position.index, context.active.value, props));
 const clickable = computed(() => context.clickable(position.index));
+const hidden = computed(() => stepHiddenText(position.index, position.total, state.value));
 const classes = computed(() =>
   stepClasses(context.surface.value, {
     orientation: context.orientation.value,
@@ -83,9 +95,11 @@ function onKeydown(event: KeyboardEvent) {
     data-pxl-step="true"
     :data-pxl-step-index="position.index"
     :data-pxl-step-state="state"
+    :role="clickable ? 'button' : undefined"
     :aria-current="position.index === context.active.value ? 'step' : undefined"
-    :aria-label="stepAriaLabel(position.index, position.total, label, state)"
-    :tabindex="clickable ? 0 : -1"
+    :aria-label="clickable ? stepAriaLabel(position.index, position.total, label, state) : undefined"
+    :aria-describedby="clickable && description ? descriptionId : undefined"
+    :tabindex="clickable ? 0 : undefined"
     :class="classes.root"
     @click="onClick"
     @keydown="onKeydown"
@@ -119,8 +133,15 @@ function onKeydown(event: KeyboardEvent) {
       <span v-else :class="classes.number">{{ position.index + 1 }}</span>
     </span>
     <div :class="classes.body">
+      <span v-if="!clickable" :class="classes.hidden">{{ hidden.before }}</span>
       <span data-pxl-step-label="true" :class="classes.label">{{ label }}</span>
-      <span v-if="description" data-pxl-step-description="true" :class="classes.description">{{ description }}</span>
+      <span v-if="!clickable && hidden.after" :class="classes.hidden">{{ hidden.after }}</span>
+      <span
+        v-if="description"
+        :id="clickable ? descriptionId : undefined"
+        data-pxl-step-description="true"
+        :class="classes.description"
+      >{{ description }}</span>
     </div>
   </div>
 </template>

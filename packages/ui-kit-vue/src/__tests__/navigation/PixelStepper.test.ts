@@ -16,7 +16,8 @@ describe('PixelStepper', () => {
   it('reports clicked steps up to the active one through @step-click, without moving the active step', async () => {
     const onStepClick = vi.fn();
     const wrapper = mount(PixelStepper, { props: { active: 1, onStepClick }, slots: { default: () => steps(3) } });
-    expect(stepsOf(wrapper).map((step) => step.attributes('tabindex'))).toEqual(['0', '0', '-1']);
+    expect(stepsOf(wrapper).map((step) => step.attributes('tabindex'))).toEqual(['0', '0', undefined]);
+    expect(stepsOf(wrapper).map((step) => step.attributes('role'))).toEqual(['button', 'button', undefined]);
     await stepsOf(wrapper)[0]!.trigger('click');
     await stepsOf(wrapper)[2]!.trigger('click');
     expect(onStepClick.mock.calls).toEqual([[0]]);
@@ -25,7 +26,7 @@ describe('PixelStepper', () => {
 
   it('keeps every step out of the tab order without a step handler', () => {
     const wrapper = mount(PixelStepper, { props: { active: 0 }, slots: { default: () => steps(2) } });
-    expect(stepsOf(wrapper).map((step) => step.attributes('tabindex'))).toEqual(['-1', '-1']);
+    expect(stepsOf(wrapper).map((step) => step.attributes('tabindex'))).toEqual([undefined, undefined]);
   });
 
   it('moves focus with the up and down arrows when vertical', async () => {
@@ -59,7 +60,7 @@ describe('PixelStepper', () => {
     expect(wrapper.find('[data-pxl-step-icon="check"]').exists()).toBe(true);
   });
 
-  it('places steps wrapped in a component of their own, and names them by position', () => {
+  it('places steps wrapped in a component of their own, which read their position', () => {
     const Wrapped = defineComponent({
       props: { label: { type: String, required: true } },
       setup: (props) => () => h(PixelStepperStep, { label: props.label }),
@@ -68,9 +69,10 @@ describe('PixelStepper', () => {
       props: { active: 1 },
       slots: { default: () => [h(Wrapped, { label: 'One' }), 'text is not a step', h(Wrapped, { label: 'Two' })] },
     });
-    expect(stepsOf(wrapper).map((step) => step.attributes('aria-label'))).toEqual([
-      'Step 1 of 2: One',
-      'Step 2 of 2: Two (current)',
+    // Not clickable: the position and state are visually hidden text, not a name.
+    expect(stepsOf(wrapper).map((step) => step.findAll('.sr-only').map((text) => text.element.textContent))).toEqual([
+      ['Step 1 of 2: '],
+      ['Step 2 of 2: ', ' (current)'],
     ]);
     expect(wrapper.findAll('hr')).toHaveLength(1);
   });
