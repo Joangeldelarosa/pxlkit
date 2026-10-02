@@ -1,8 +1,8 @@
 /**
  * PixelTooltip: v-model:open and the uncontrolled default, the delays of each
- * trigger, click dismissal, the content slot and the exposed wrapper.
- * Rendering and the shared interactions are covered against React by the
- * parity suite.
+ * trigger, dismissal, the element it describes, the content slot and the
+ * exposed wrapper. Rendering and the shared interactions are covered against
+ * React by the parity suite.
  */
 import { enableAutoUnmount, mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -51,14 +51,14 @@ describe('PixelTooltip', () => {
     await advance(100);
     expect(open.value).toBe(true);
     expect(tooltip()!.textContent).toBe('Tip');
-    expect(wrapperOf().getAttribute('aria-describedby')).toBe(tooltip()!.id);
+    expect(wrapperOf().querySelector('button')!.getAttribute('aria-describedby')).toBe(tooltip()!.id);
     wrapperOf().dispatchEvent(new MouseEvent('mouseleave'));
     await advance(50);
     expect(open.value).toBe(true);
     await advance(100);
     expect(open.value).toBe(false);
     expect(tooltip()).toBeNull();
-    expect(wrapperOf().hasAttribute('aria-describedby')).toBe(false);
+    expect(wrapperOf().querySelector('button')!.hasAttribute('aria-describedby')).toBe(false);
   });
 
   it('asks to open without opening while its parent holds it closed', async () => {
@@ -119,14 +119,61 @@ describe('PixelTooltip', () => {
     expect(open.value).toBe(false);
   });
 
-  it('leaves a hover tooltip open on Escape and on a press outside', async () => {
+  it('leaves a hover tooltip open on a press outside, and closes it on Escape until the pointer comes back', async () => {
     const { open } = harness({ delay: 0 });
     wrapperOf().dispatchEvent(new MouseEvent('mouseenter'));
     await nextTick();
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     await nextTick();
     expect(open.value).toBe(true);
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await nextTick();
+    expect(open.value).toBe(false);
+    wrapperOf().dispatchEvent(new MouseEvent('mouseenter'));
+    await nextTick();
+    expect(open.value).toBe(false);
+    wrapperOf().dispatchEvent(new MouseEvent('mouseleave'));
+    wrapperOf().dispatchEvent(new MouseEvent('mouseenter'));
+    await nextTick();
+    expect(open.value).toBe(true);
+  });
+
+  it('drops a pending open on Escape, reporting no change, and ignores Escape while closed', async () => {
+    const wrapper = mount(PixelTooltip, {
+      props: { label: 'Tip' },
+      slots: { default: () => h('button', { type: 'button' }, 'trigger') },
+      attachTo: document.body,
+    });
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    wrapperOf().dispatchEvent(new MouseEvent('mouseenter'));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await advance(300);
+    expect(tooltip()).toBeNull();
+    expect(wrapper.emitted('update:open')).toBeUndefined();
+  });
+
+  it('describes the trigger along with its own references, or the wrapper when nothing inside takes focus', async () => {
+    const open = ref(true);
+    mount(
+      defineComponent({
+        setup: () => () => [
+          h(PixelTooltip, { open: open.value, label: 'Tip' }, () => h('button', { type: 'button', 'aria-describedby': 'hint' }, 'a')),
+          h(PixelTooltip, { open: open.value, label: 'Plain' }, () => h('span', 'text')),
+        ],
+      }),
+      { attachTo: document.body },
+    );
+    await nextTick();
+    const [tip, plainTip] = Array.from(document.querySelectorAll('[role="tooltip"]'));
+    const [buttonWrapper, textWrapper] = Array.from(document.querySelectorAll<HTMLElement>('span.relative'));
+    const button = buttonWrapper!.querySelector('button')!;
+    expect(button.getAttribute('aria-describedby')).toBe(`hint ${tip!.id}`);
+    expect(buttonWrapper!.hasAttribute('aria-describedby')).toBe(false);
+    expect(textWrapper!.getAttribute('aria-describedby')).toBe(plainTip!.id);
+    open.value = false;
+    await nextTick();
+    expect(button.getAttribute('aria-describedby')).toBe('hint');
+    expect(textWrapper!.hasAttribute('aria-describedby')).toBe(false);
   });
 
   it('renders the content slot in place of the label, and nothing without either', async () => {

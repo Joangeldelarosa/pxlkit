@@ -44,7 +44,7 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>tooltip</code></li>
       </ul>
-      <p className="docs-aria-notes">Floating panel has role=&quot;tooltip&quot; and is wired to the trigger via aria-describedby when open. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers listen for clicks bubbling from the anchor child — the wrapper itself stays non-interactive so an interactive child (the common case) is not nested inside another control; anchor click tooltips to a button or link for keyboard support. Outside pointerdown and Escape close a click tooltip. Use focus or click trigger when the tooltip must be reachable without a pointer device.</p>
+      <p className="docs-aria-notes">Floating panel has role=&quot;tooltip&quot;. While it is open, its id joins the aria-describedby of the first focusable element inside the anchor — the element a screen reader announces on focus — next to that element&#39;s own references; with nothing focusable inside, the wrapper carries it. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers listen for clicks bubbling from the anchor child — the wrapper itself stays non-interactive so an interactive child (the common case) is not nested inside another control; anchor click tooltips to a button or link for keyboard support. Escape dismisses the tooltip in every trigger mode without moving the pointer or focus (WCAG 1.4.13); outside pointerdown also closes a click tooltip. Use focus or click trigger when the tooltip must be reachable without a pointer device.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -72,8 +72,8 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
           </tr>
           <tr>
             <td><kbd>Escape</kbd></td>
-            <td>Closes the tooltip</td>
-            <td>trigger=&quot;click&quot; and open</td>
+            <td>Closes the tooltip, or cancels one about to open; with the hover and focus triggers it then stays closed until the pointer leaves and re-enters or focus leaves and returns</td>
+            <td>open or opening, any trigger</td>
           </tr>
         </tbody>
       </table>

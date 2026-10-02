@@ -4,6 +4,8 @@ import type { Surface, Tone } from '@pxlkit/ui-kit-core';
 /** An item of the menu, as the root sees it. */
 export interface DropdownItemEntry {
   value(): string;
+  /** Id of the item's element, which the menu's `aria-activedescendant` points at. */
+  id(): string;
   disabled(): boolean;
   /** Text typeahead matches; items with markup in their label have none. */
   label(): string | undefined;
@@ -11,17 +13,40 @@ export interface DropdownItemEntry {
   select(): void;
 }
 
+/** The trigger, as the root sees it. */
+export interface DropdownTriggerEntry {
+  /** Its own id, if it has one. */
+  id(): string | undefined;
+  /** The button, which focus returns to. */
+  element(): HTMLElement | null;
+}
+
 export interface PixelDropdownContext {
   open: Readonly<Ref<boolean>>;
   setOpen(open: boolean): void;
   surface: ComputedRef<Surface>;
   menuId: string;
+  /** Id of the trigger, which names the menu: its own, or a generated one. */
+  triggerId: ComputedRef<string>;
+  /** Id of the highlighted item's element, for the menu's `aria-activedescendant`. */
+  activeId: ComputedRef<string | undefined>;
   /** The root element, which the menu is anchored to. */
   root: Readonly<Ref<HTMLElement | null>>;
   highlighted: Readonly<Ref<string | null>>;
   highlight(value: string): void;
   /** Lists an item while it is rendered, in render order; returns the function that removes it. */
   registerItem(item: DropdownItemEntry): () => void;
+  /** Lists the trigger while it is rendered; returns the function that removes it. */
+  registerTrigger(trigger: DropdownTriggerEntry): () => void;
+  /**
+   * The menu panel while it is on the page — `null` right before it leaves:
+   * focus moves into it as it opens and back to the trigger as it closes.
+   */
+  setMenu(menu: HTMLElement | null): void;
+  /** Keyboard handling of the trigger. */
+  onTriggerKeydown(event: KeyboardEvent): void;
+  /** Keyboard handling of the open menu, which holds focus. */
+  onMenuKeydown(event: KeyboardEvent): void;
 }
 
 export const PIXEL_DROPDOWN: InjectionKey<PixelDropdownContext> = Symbol('pixel-dropdown');

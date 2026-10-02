@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, useId, useTemplateRef, type VNode } from 'vue';
+import { computed, onBeforeUnmount, useAttrs, useId, useTemplateRef, type VNode } from 'vue';
 import {
   dropdownItemClasses,
   dropdownItemIconClasses,
   dropdownItemLabelClasses,
+  dropdownItemRoles,
   dropdownShortcutClasses,
 } from '@pxlkit/ui-kit-core';
 import { labelText, useDropdownContext, type PixelDropdownItemProps } from './_internal/dropdown-context.js';
 
 /**
  * An action of the menu (`role="menuitem"`), on a `<button>` that every
- * other attribute and listener falls through to. Clicking it, or Enter /
- * Space while it is highlighted, emits `select` and closes the menu; the
- * pointer highlights it. A disabled item is skipped by the keyboard.
+ * other attribute and listener falls through to; the menu's
+ * `aria-activedescendant` points at its `id` (generated when left out) while
+ * it is highlighted. Clicking it, or Enter / Space while it is highlighted,
+ * emits `select` and closes the menu; the pointer highlights it. A disabled
+ * item is skipped by the keyboard.
  */
 const props = withDefaults(defineProps<PixelDropdownItemProps>(), {
   value: undefined,
@@ -33,8 +36,11 @@ defineSlots<{
 }>();
 
 const context = useDropdownContext('PixelDropdownItem');
+const attrs = useAttrs();
 const generatedValue = useId();
 const value = () => props.value ?? generatedValue;
+// The element id the menu's `aria-activedescendant` points at.
+const id = () => (attrs.id as string | undefined) ?? generatedValue;
 const label = useTemplateRef<HTMLElement>('label');
 const highlighted = computed(() => context.highlighted.value === value());
 const classes = computed(() =>
@@ -50,7 +56,7 @@ function select() {
 }
 
 onBeforeUnmount(
-  context.registerItem({ value, disabled: () => props.disabled, label: () => labelText(label.value), select }),
+  context.registerItem({ value, id, disabled: () => props.disabled, label: () => labelText(label.value), select }),
 );
 
 // A disabled button gets no pointer events in a browser; synthetic ones are ignored too.
@@ -67,8 +73,9 @@ function onClick() {
 
 <template>
   <button
+    :id="id()"
     type="button"
-    role="menuitem"
+    :role="dropdownItemRoles.item"
     tabindex="-1"
     :aria-disabled="disabled || undefined"
     :data-highlighted="highlighted || undefined"

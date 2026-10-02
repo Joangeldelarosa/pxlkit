@@ -1,8 +1,9 @@
 /**
  * PixelDropdown — a button that opens a menu of actions below it. The
- * menu's placement, its class recipes and the keyboard logic every kit
- * shares: the arrows move a highlight that stops at the ends, and typing
- * jumps to an item by its label.
+ * menu's placement, its class recipes, the roles of its items and the
+ * keyboard logic every kit shares: focus moves into the open menu, whose
+ * `aria-activedescendant` follows a highlight that the arrows move and that
+ * stops at the ends, and typing jumps to an item by its label.
  */
 import { offset, shift, type Middleware, type Placement } from '@floating-ui/dom';
 import { cn, surfaceClasses, type Surface, type Tone } from '../../common';
@@ -93,14 +94,29 @@ export function dropdownMark(kind: 'checkbox' | 'radio', checked: boolean | unde
   return kind === 'checkbox' ? '✓' : '●';
 }
 
+/** The role of a plain item, and of the checkbox and radio items, which also carry `aria-checked`. */
+export const dropdownItemRoles = {
+  item: 'menuitem',
+  checkbox: 'menuitemcheckbox',
+  radio: 'menuitemradio',
+} as const;
+
+/** The first or the last enabled item. */
+export type DropdownEdge = 'first' | 'last';
+
+/** Where a key moves the highlight: to the next or previous item, or to the first or last one. */
+export type DropdownMove = 1 | -1 | DropdownEdge;
+
 /**
- * The item the arrows move the highlight to among the enabled `values`: the
- * next (`1`) or previous (`-1`) one, staying on the last or first — the first
- * when nothing listed is highlighted.
+ * The item a move highlights among the enabled `values`: the next (`1`) or
+ * previous (`-1`) one, staying on the last or first — the first when nothing
+ * listed is highlighted — or the first or last one.
  */
-export function nextDropdownHighlight(values: readonly string[], current: string | null, step: 1 | -1): string | undefined {
+export function nextDropdownHighlight(values: readonly string[], current: string | null, move: DropdownMove): string | undefined {
+  if (move === 'first') return values[0];
+  if (move === 'last') return values[values.length - 1];
   const index = current ? values.indexOf(current) : -1;
-  return values[step === 1 ? Math.min(index + 1, values.length - 1) : Math.max(index - 1, 0)];
+  return values[move === 1 ? Math.min(index + 1, values.length - 1) : Math.max(index - 1, 0)];
 }
 
 /** Typing starts a new search after this long without a key, in ms. */
@@ -109,6 +125,45 @@ export const DROPDOWN_TYPEAHEAD_RESET_MS = 600;
 /** Whether a key types a character the typeahead searches for (one visible character). */
 export function isTypeaheadKey(key: string): boolean {
   return key.length === 1 && /\S/.test(key);
+}
+
+/**
+ * Where an arrow key on the trigger opens the menu: ArrowDown on its first
+ * enabled item, ArrowUp on its last, as the WAI-ARIA menu button pattern
+ * has it. `undefined` for any other key.
+ */
+export function dropdownTriggerKeyAction(key: string): DropdownEdge | undefined {
+  if (key === 'ArrowDown') return 'first';
+  if (key === 'ArrowUp') return 'last';
+  return undefined;
+}
+
+/** What a key pressed in the open menu does. */
+export type DropdownMenuKeyAction = DropdownMove | 'select' | 'leave' | 'typeahead';
+
+/**
+ * What a key pressed in the open menu does: the arrows, Home and End move the
+ * highlight, Enter and Space choose the highlighted item, Tab leaves the menu
+ * and a visible character types ahead. `undefined` for any other key.
+ */
+export function dropdownMenuKeyAction(key: string): DropdownMenuKeyAction | undefined {
+  switch (key) {
+    case 'ArrowDown':
+      return 1;
+    case 'ArrowUp':
+      return -1;
+    case 'Home':
+      return 'first';
+    case 'End':
+      return 'last';
+    case 'Enter':
+    case ' ':
+      return 'select';
+    case 'Tab':
+      return 'leave';
+    default:
+      return isTypeaheadKey(key) ? 'typeahead' : undefined;
+  }
 }
 
 /**

@@ -14,6 +14,7 @@ import {
   dropdownItemClasses,
   dropdownItemIconClasses,
   dropdownItemLabelClasses,
+  dropdownItemRoles,
   dropdownMark,
   dropdownMarkClasses,
   dropdownShortcutClasses,
@@ -27,10 +28,13 @@ import { injectDropdownContext, labelText } from './dropdown-context';
 /**
  * An action of a dropdown menu (`role="menuitem"`) on a `<button>`: clicking
  * it, or Enter / Space while it is highlighted, emits `(selected)` and closes
- * the menu; the pointer highlights it. A disabled item is skipped by the
- * keyboard. As `pxlDropdownCheckboxItem` or `pxlDropdownRadioItem` it shows
- * a check mark or a dot while `checked` (display only — update it from
- * `(selected)`), in place of an icon.
+ * the menu; the pointer highlights it. The menu's `aria-activedescendant`
+ * points at its `id` (generated when left out) while it is highlighted. A
+ * disabled item is skipped by the keyboard. As `pxlDropdownCheckboxItem`
+ * (`role="menuitemcheckbox"`) or `pxlDropdownRadioItem`
+ * (`role="menuitemradio"`) it shows a check mark or a dot while `checked`,
+ * with `aria-checked` (display only — update it from `(selected)`), in place
+ * of an icon.
  *
  * @example
  * <button pxlDropdownItem value="share" shortcut="Ctrl+E" (selected)="share()">Share</button>
@@ -42,7 +46,9 @@ import { injectDropdownContext, labelText } from './dropdown-context';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     type: 'button',
-    role: 'menuitem',
+    '[attr.id]': 'itemId',
+    '[attr.role]': 'role',
+    '[attr.aria-checked]': 'ariaChecked()',
     tabindex: '-1',
     '[attr.aria-disabled]': 'disabled() || null',
     '[attr.data-highlighted]': 'highlighted() || null',
@@ -93,6 +99,13 @@ export class PixelDropdownItem {
   private readonly label = viewChild.required<ElementRef<HTMLElement>>('label');
   private readonly itemValue = () => this.value() ?? this.generatedValue;
 
+  /** @internal The element id the menu's `aria-activedescendant` points at. */
+  protected readonly itemId = inject(new HostAttributeToken('id'), { optional: true }) ?? this.generatedValue;
+  /** @internal */
+  protected readonly role = dropdownItemRoles[this.kind ?? 'item'];
+  /** @internal */
+  protected readonly ariaChecked = computed(() => (this.kind ? this.checked() : null));
+
   /** @internal */
   protected readonly highlighted = computed(() => this.context.highlighted() === this.itemValue());
   /** @internal */
@@ -117,6 +130,7 @@ export class PixelDropdownItem {
   constructor() {
     const unregister = this.context.registerItem({
       value: this.itemValue,
+      id: () => this.itemId,
       disabled: () => this.disabled(),
       label: () => labelText(this.label().nativeElement),
       select: () => this.select(),

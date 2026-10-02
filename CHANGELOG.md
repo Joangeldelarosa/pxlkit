@@ -101,6 +101,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@pxlkit/ui-kit`: clearing an uncontrolled `PixelInput` empties the field, `PixelNumberInput`
   shows arrow-key steps while focused, and `PixelSelect` exposes the highlighted option to
   screen readers (`aria-controls`, `aria-activedescendant`).
+- `@pxlkit/ui-kit`: `PixelDropdown` follows the ARIA menu button pattern (focus in the menu
+  with `aria-activedescendant`, focus returned to the trigger, `menuitemcheckbox` /
+  `menuitemradio` with `aria-checked`, a named menu), and `PixelTooltip` closes on Escape in
+  every mode (WCAG 1.4.13) and describes the focused element.
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined

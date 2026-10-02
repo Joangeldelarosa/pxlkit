@@ -3,6 +3,7 @@ import {
   POPOVER_Z_INDEX,
   TOOLTIP_DEFAULT_DELAYS,
   TOOLTIP_Z_INDEX,
+  describeTooltipTrigger,
   resolveTooltipDelays,
   surfaceClasses,
   tooltipClasses,
@@ -45,5 +46,46 @@ describe('tooltip recipes', () => {
       expect(click).toContain(`${s.border} ${s.radius} ${s.font} border-retro-border`);
       expect(click.startsWith('w-max max-w-[calc(100vw-16px)] break-words')).toBe(true);
     }
+  });
+});
+
+describe('tooltip description', () => {
+  const wrapperWith = (html: string) => {
+    const wrapper = document.createElement('span');
+    wrapper.innerHTML = html;
+    document.body.appendChild(wrapper);
+    return wrapper;
+  };
+
+  it('describes the first focusable element inside the wrapper, and takes the reference out again', () => {
+    const wrapper = wrapperWith('<span>icon</span><button disabled>off</button><button>on</button><a href="#">link</a>');
+    const [, on] = Array.from(wrapper.querySelectorAll('button'));
+    const release = describeTooltipTrigger(wrapper, 'tip');
+    expect(on!.getAttribute('aria-describedby')).toBe('tip');
+    expect(wrapper.hasAttribute('aria-describedby')).toBe(false);
+    expect(wrapper.querySelector('a')!.hasAttribute('aria-describedby')).toBe(false);
+    release();
+    expect(on!.hasAttribute('aria-describedby')).toBe(false);
+    wrapper.remove();
+  });
+
+  it("joins the element's own references and leaves them as they were", () => {
+    const wrapper = wrapperWith('<input aria-describedby="hint  rules" />');
+    const input = wrapper.querySelector('input')!;
+    const release = describeTooltipTrigger(wrapper, 'tip');
+    expect(input.getAttribute('aria-describedby')).toBe('hint rules tip');
+    release();
+    expect(input.getAttribute('aria-describedby')).toBe('hint rules');
+    wrapper.remove();
+  });
+
+  it('describes the wrapper itself when nothing inside takes focus', () => {
+    const wrapper = wrapperWith('<span>plain text</span><button disabled>off</button>');
+    const release = describeTooltipTrigger(wrapper, 'tip');
+    expect(wrapper.getAttribute('aria-describedby')).toBe('tip');
+    expect(wrapper.querySelector('button')!.hasAttribute('aria-describedby')).toBe(false);
+    release();
+    expect(wrapper.hasAttribute('aria-describedby')).toBe(false);
+    wrapper.remove();
   });
 });

@@ -5,6 +5,7 @@ import {
   DestroyRef,
   ElementRef,
   PLATFORM_ID,
+  afterRenderEffect,
   computed,
   effect,
   inject,
@@ -18,6 +19,7 @@ import {
   TOOLTIP_Z_INDEX,
   anchorFloating,
   anchoredMiddleware,
+  describeTooltipTrigger,
   floatingStyles,
   resolveTooltipDelays,
   tooltipClasses,
@@ -37,9 +39,11 @@ import { injectEscape, injectEventListener } from '../utilities/dom';
 /**
  * Floating hint anchored to the projected trigger, rendered into `<body>`
  * and kept in view (it flips and shifts away from the edges). It opens on
- * hover and focus, on focus only, or on click — a click tooltip closes on
- * Escape and on a press outside. Bind `[(open)]` to control it, or leave it
- * uncontrolled with `defaultOpen`.
+ * hover and focus, on focus only, or on click, and describes the trigger
+ * (`aria-describedby`) while open. Escape closes any tooltip — one that opens
+ * on hover or focus stays closed until the pointer or focus has left the
+ * trigger — and a click tooltip also closes on a press outside. Bind
+ * `[(open)]` to control it, or leave it uncontrolled with `defaultOpen`.
  *
  * The host is layout-neutral (`display: contents`).
  *
@@ -57,7 +61,6 @@ import { injectEscape, injectEventListener } from '../utilities/dom';
     <span
       #wrapper
       [class]="triggerClasses"
-      [attr.aria-describedby]="isOpen() ? tipId : null"
       (mouseenter)="onHover(true)"
       (mouseleave)="onHover(false)"
       (focusin)="onFocusChange(true)"
@@ -111,6 +114,9 @@ export class PixelTooltip {
   private seed: boolean | undefined;
   private openTimer: ReturnType<typeof setTimeout> | undefined;
   private closeTimer: ReturnType<typeof setTimeout> | undefined;
+  // Set when Escape dismisses the tooltip: hover and focus leave it closed
+  // until the pointer or focus has left the trigger.
+  private dismissed = false;
 
   /** @internal */
   protected readonly tipId = injectId();
@@ -132,22 +138,27 @@ export class PixelTooltip {
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.clearTimers());
-    // A click tooltip needs explicit dismissal: a press outside or Escape.
-    const clickOpen = () => this.trigger() === 'click' && this.isOpen();
+    // Escape dismisses the tooltip in every mode (WCAG 1.4.13), a pending
+    // open included.
+    injectEscape(
+      () => {
+        this.clearTimers();
+        if (this.trigger() !== 'click') this.dismissed = true;
+        if (this.isOpen()) this.open.set(false);
+      },
+      () => this.isOpen() || this.openTimer !== undefined,
+    );
+    // A click tooltip also closes on a press outside it.
     const document = inject(DOCUMENT);
     injectEventListener(
       'pointerdown',
       (event) => {
         const target = event.target as Node | null;
-        if (!clickOpen() || !target) return;
+        if (this.trigger() !== 'click' || !this.isOpen() || !target) return;
         if (this.wrapper().nativeElement.contains(target) || this.tip()?.nativeElement.contains(target)) return;
         this.open.set(false);
       },
       () => document,
-    );
-    injectEscape(
-      () => this.open.set(false),
-      clickOpen,
     );
     if (!this.browser) return;
     // Keep the tooltip anchored to the trigger while it is on the page.
@@ -162,16 +173,26 @@ export class PixelTooltip {
         ),
       );
     });
+    // While shown, the tooltip describes the element that takes focus — the
+    // first focusable one inside the wrapper, else the wrapper itself.
+    afterRenderEffect((onCleanup) => {
+      if (!this.tip()) return;
+      onCleanup(describeTooltipTrigger(this.wrapper().nativeElement, this.tipId));
+    });
   }
 
   /** @internal */
   protected onHover(entered: boolean): void {
-    if (this.trigger() === 'hover') this.schedule(entered);
+    if (this.trigger() !== 'hover') return;
+    if (entered) this.enter();
+    else this.leave();
   }
 
   /** @internal */
   protected onFocusChange(focused: boolean): void {
-    if (this.trigger() !== 'click') this.schedule(focused);
+    if (this.trigger() === 'click') return;
+    if (focused) this.enter();
+    else this.leave();
   }
 
   // The wrapper stays non-interactive: clicks bubble up from the trigger,
@@ -183,6 +204,15 @@ export class PixelTooltip {
     this.open.set(!this.isOpen());
   }
 
+  private enter(): void {
+    if (!this.dismissed) this.schedule(true);
+  }
+
+  private leave(): void {
+    this.dismissed = false;
+    this.schedule(false);
+  }
+
   private schedule(open: boolean): void {
     this.clearTimers();
     const delays = resolveTooltipDelays(this.delay());
@@ -191,7 +221,10 @@ export class PixelTooltip {
       this.open.set(open);
       return;
     }
-    const timer = setTimeout(() => this.open.set(open), wait);
+    const timer = setTimeout(() => {
+      this.openTimer = this.closeTimer = undefined;
+      this.open.set(open);
+    }, wait);
     if (open) this.openTimer = timer;
     else this.closeTimer = timer;
   }

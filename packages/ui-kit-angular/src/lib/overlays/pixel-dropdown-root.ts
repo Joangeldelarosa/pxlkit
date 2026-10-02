@@ -6,11 +6,14 @@ import { PIXEL_DROPDOWN, createDropdownRoot } from './dropdown-context';
 
 /**
  * Root of a compositional dropdown menu: put a `<pxl-dropdown-trigger>` and a
- * `*pxlDropdownContent` panel of items inside. The arrows move a highlight
- * over the enabled items (and open the closed menu on the first one), Home /
- * End jump to the ends, Enter or Space activates the highlighted item, typing
- * jumps to an item by its label, and Escape or a press outside closes the
- * menu. Bind `[(open)]` to control it, or leave it uncontrolled with
+ * `*pxlDropdownContent` panel of items inside. The open menu takes focus, is
+ * named by the trigger and points `aria-activedescendant` at a highlight the
+ * arrows move over the enabled items (ArrowDown on the trigger opens the
+ * closed menu on the first one, ArrowUp on the last); Home / End jump to the
+ * ends, Enter or Space activates the highlighted item and typing jumps to an
+ * item by its label. Escape, choosing an item and Tab close the menu with
+ * focus back on the trigger; a press outside closes it too, and focus follows
+ * the pointer. Bind `[(open)]` to control it, or leave it uncontrolled with
  * `defaultOpen`.
  *
  * @example
@@ -25,10 +28,7 @@ import { PIXEL_DROPDOWN, createDropdownRoot } from './dropdown-context';
   selector: 'pxl-dropdown-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: PIXEL_DROPDOWN, useFactory: () => inject(PixelDropdownRoot).context }],
-  host: {
-    '[class]': 'rootClasses',
-    '(keydown)': 'context.onKeydown($event)',
-  },
+  host: { '[class]': 'rootClasses' },
   template: '<ng-content />',
 })
 export class PixelDropdownRoot {

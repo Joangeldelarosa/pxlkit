@@ -39,10 +39,7 @@ export interface DropdownOption {
   imports: [PixelDropdownTrigger, PixelDropdownContent, PixelDropdownItem, PixelDropdownSeparator, PixelDropdownHeader],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: PIXEL_DROPDOWN, useFactory: () => inject(PixelDropdown).context }],
-  host: {
-    '[class]': 'rootClasses',
-    '(keydown)': 'context.onKeydown($event)',
-  },
+  host: { '[class]': 'rootClasses' },
   template: `
     <div class="contents">
       @if (composed()) {

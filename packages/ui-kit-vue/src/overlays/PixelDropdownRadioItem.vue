@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, type VNode } from 'vue';
-import { dropdownMark, dropdownMarkClasses } from '@pxlkit/ui-kit-core';
+import { dropdownItemRoles, dropdownMark, dropdownMarkClasses } from '@pxlkit/ui-kit-core';
 import type { PixelDropdownItemProps } from './_internal/dropdown-context.js';
 import PixelDropdownItem from './PixelDropdownItem.vue';
 
 /**
- * A `PixelDropdownItem` that shows a dot while `checked`, one of a set. The state
- * is display-only: update it from `select`.
+ * A `PixelDropdownItem` (`role="menuitemradio"`) that shows a dot while
+ * `checked`, one of a set. The state is display-only: update it from `select`.
  */
 export interface PixelDropdownRadioItemProps extends PixelDropdownItemProps {
-  /** Shows the dot. */
+  /** Shows the dot, and sets `aria-checked`. */
   checked?: boolean;
 }
 
@@ -34,7 +34,7 @@ const itemProps = computed(() => {
 </script>
 
 <template>
-  <PixelDropdownItem v-bind="itemProps" @select="emit('select')">
+  <PixelDropdownItem v-bind="itemProps" :role="dropdownItemRoles.radio" :aria-checked="checked" @select="emit('select')">
     <template #icon>
       <span aria-hidden="true" :class="dropdownMarkClasses">{{ dropdownMark('radio', checked) }}</span>
     </template>

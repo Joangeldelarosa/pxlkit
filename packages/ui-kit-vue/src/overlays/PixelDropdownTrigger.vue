@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { VNode } from 'vue';
+import { onBeforeUnmount, useTemplateRef, type ComponentPublicInstance, type VNode } from 'vue';
 import { dropdownChevronClasses, type Tone } from '@pxlkit/ui-kit-core';
 import PixelGlyph from '../_internal/PixelGlyph.vue';
 import PixelButton from '../actions/PixelButton.vue';
@@ -8,7 +8,8 @@ import { useDropdownContext } from './_internal/dropdown-context.js';
 /**
  * The button that opens and closes the menu of a `PixelDropdownRoot`: a
  * `PixelButton` that advertises the menu (`aria-haspopup`, `aria-expanded`,
- * `aria-controls`) and ends with a chevron.
+ * `aria-controls`), names it, and ends with a chevron. ArrowDown opens the
+ * menu on its first item, ArrowUp on its last.
  */
 const props = withDefaults(
   defineProps<{
@@ -18,8 +19,10 @@ const props = withDefaults(
     disabled?: boolean;
     /** Accessible label, for a label that is only decorative. */
     ariaLabel?: string;
+    /** Id of the button, which names the menu; generated when left out. */
+    id?: string;
   }>(),
-  { tone: 'neutral', disabled: false, ariaLabel: undefined },
+  { tone: 'neutral', disabled: false, ariaLabel: undefined, id: undefined },
 );
 defineSlots<{
   /** Button label. */
@@ -29,6 +32,13 @@ defineSlots<{
 }>();
 
 const context = useDropdownContext('PixelDropdownTrigger');
+const button = useTemplateRef<ComponentPublicInstance>('button');
+onBeforeUnmount(
+  context.registerTrigger({
+    id: () => props.id,
+    element: () => (button.value?.$el as HTMLElement | undefined) ?? null,
+  }),
+);
 
 // A disabled button gets no clicks in a browser; synthetic ones are ignored too.
 function toggle() {
@@ -38,6 +48,8 @@ function toggle() {
 
 <template>
   <PixelButton
+    ref="button"
+    :id="context.triggerId.value"
     :tone="tone"
     :surface="context.surface.value"
     :disabled="disabled"
@@ -46,6 +58,7 @@ function toggle() {
     :aria-controls="context.open.value ? context.menuId : undefined"
     :aria-label="ariaLabel"
     @click="toggle"
+    @keydown="context.onTriggerKeydown"
   >
     <slot />
     <template #icon-right>

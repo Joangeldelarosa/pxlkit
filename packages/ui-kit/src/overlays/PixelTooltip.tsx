@@ -8,6 +8,7 @@ import { autoUpdate, useFloating } from '@floating-ui/react-dom';
 import {
   TOOLTIP_Z_INDEX,
   anchoredMiddleware,
+  describeTooltipTrigger,
   resolveTooltipDelays,
   tooltipClasses,
   tooltipTriggerClasses,
@@ -69,6 +70,9 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapperRef = useRef<HTMLSpanElement | null>(null);
   const floatingNodeRef = useRef<HTMLSpanElement | null>(null);
+  // Set when Escape dismisses the tooltip: hover and focus leave it closed
+  // until the pointer or focus has left the trigger.
+  const dismissedRef = useRef(false);
 
   const [open, setOpen] = useControllableState<boolean>({
     value: openProp,
@@ -89,9 +93,13 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
   }, []);
 
   const scheduleOpen = useCallback(() => {
+    if (dismissedRef.current) return;
     clearTimers();
     if (delays.open <= 0) { setOpen(true); return; }
-    openTimer.current = setTimeout(() => setOpen(true), delays.open);
+    openTimer.current = setTimeout(() => {
+      openTimer.current = null;
+      setOpen(true);
+    }, delays.open);
   }, [clearTimers, delays.open, setOpen]);
 
   const scheduleClose = useCallback(() => {
@@ -100,9 +108,23 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
     closeTimer.current = setTimeout(() => setOpen(false), delays.close);
   }, [clearTimers, delays.close, setOpen]);
 
+  const leave = useCallback(() => {
+    dismissedRef.current = false;
+    scheduleClose();
+  }, [scheduleClose]);
+
   useEffect(() => () => clearTimers(), [clearTimers]);
 
-  // Click-trigger needs explicit dismissal: outside-pointerdown + Escape.
+  // Escape dismisses the tooltip in every mode (WCAG 1.4.13), a pending
+  // open included.
+  useEscape(() => {
+    if (!open && !openTimer.current) return;
+    clearTimers();
+    if (trigger !== 'click') dismissedRef.current = true;
+    if (open) setOpen(false);
+  });
+
+  // A click tooltip also closes on a press outside it.
   useEffect(() => {
     if (trigger !== 'click' || !open) return;
     const handler = (e: PointerEvent) => {
@@ -115,17 +137,16 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
     document.addEventListener('pointerdown', handler);
     return () => document.removeEventListener('pointerdown', handler);
   }, [trigger, open, setOpen]);
-  useEscape(() => setOpen(false), trigger === 'click' && open);
 
   const triggerProps: React.HTMLAttributes<HTMLSpanElement> = {};
   if (trigger === 'hover') {
     triggerProps.onMouseEnter = scheduleOpen;
-    triggerProps.onMouseLeave = scheduleClose;
+    triggerProps.onMouseLeave = leave;
     triggerProps.onFocus = scheduleOpen;
-    triggerProps.onBlur = scheduleClose;
+    triggerProps.onBlur = leave;
   } else if (trigger === 'focus') {
     triggerProps.onFocus = scheduleOpen;
-    triggerProps.onBlur = scheduleClose;
+    triggerProps.onBlur = leave;
   } else if (trigger === 'click') {
     // The wrapper stays non-interactive: role="button" + tabIndex here nests
     // interactive controls when the anchor child is a button/link — the
@@ -151,18 +172,26 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
   };
 
   const body = content ?? label;
+  const shown = open && body != null;
+
+  // While shown, the tooltip describes the element that takes focus — the
+  // first focusable one inside the wrapper, else the wrapper itself.
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!shown || !wrapper) return;
+    return describeTooltipTrigger(wrapper, tipId);
+  }, [shown, tipId]);
 
   return (
     <>
       <span
         ref={setWrapperRef}
         className={tooltipTriggerClasses}
-        aria-describedby={open ? tipId : undefined}
         {...triggerProps}
       >
         {children}
       </span>
-      {open && body != null && (
+      {shown && (
         <PixelPortal>
           <span
             ref={setFloatingRef}

@@ -45,7 +45,7 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
         <li><code>menu</code></li>
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Trigger exposes `aria-haspopup=&quot;menu&quot;`, `aria-expanded`, and `aria-controls` wired to the menu id. Items use `role=&quot;menuitem&quot;` with `aria-disabled` for skipped rows. Separators use `role=&quot;separator&quot;`; headers are `role=&quot;presentation&quot;`. Click-outside and Escape both dismiss.</p>
+      <p className="docs-aria-notes">Trigger exposes `aria-haspopup=&quot;menu&quot;`, `aria-expanded`, and `aria-controls` wired to the menu id while the menu is open, and names the menu through `aria-labelledby` (its own `id`, or a generated one). The open menu takes focus (`tabindex=&quot;-1&quot;`) and points `aria-activedescendant` at the highlighted item, so assistive technology follows the arrows, Home/End and typeahead. Items use `role=&quot;menuitem&quot;` — `menuitemcheckbox` and `menuitemradio` with `aria-checked` for checkbox and radio rows — with `aria-disabled` for skipped rows. Separators use `role=&quot;separator&quot;`; headers are `role=&quot;presentation&quot;`. Escape, choosing an item and Tab return focus to the trigger; a press outside closes the menu and leaves focus where the pointer put it.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -57,14 +57,29 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
         </thead>
         <tbody>
           <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Open the menu and move focus into it.</td>
+            <td>trigger focused</td>
+          </tr>
+          <tr>
             <td><kbd>ArrowDown</kbd></td>
-            <td>Open the menu (if closed) and move highlight to the next enabled item.</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Open the menu with focus in it, highlighting the first enabled item.</td>
+            <td>trigger focused</td>
           </tr>
           <tr>
             <td><kbd>ArrowUp</kbd></td>
-            <td>Open the menu (if closed) and move highlight to the previous enabled item.</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Open the menu with focus in it, highlighting the last enabled item.</td>
+            <td>trigger focused</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowDown</kbd></td>
+            <td>Highlight the next enabled item; stops at the last.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowUp</kbd></td>
+            <td>Highlight the previous enabled item; stops at the first.</td>
+            <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Home</kbd></td>
@@ -78,17 +93,27 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
           </tr>
           <tr>
             <td><kbd>Enter</kbd></td>
-            <td>Activate the highlighted item and close the menu.</td>
+            <td>Activate the highlighted item, close the menu and return focus to the trigger.</td>
             <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Space</kbd></td>
-            <td>Activate the highlighted item and close the menu.</td>
+            <td>Activate the highlighted item, close the menu and return focus to the trigger.</td>
             <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Escape</kbd></td>
-            <td>Close the menu and clear the highlight.</td>
+            <td>Close the menu, clear the highlight and return focus to the trigger.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Close the menu and move focus on from the trigger to the next focusable element.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+Tab</kbd></td>
+            <td>Close the menu and move focus back from the trigger to the previous focusable element.</td>
             <td>menu open</td>
           </tr>
           <tr>

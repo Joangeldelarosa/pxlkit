@@ -6,12 +6,15 @@ import {
   dropdownContentClasses,
   dropdownHeaderClasses,
   dropdownItemClasses,
+  dropdownItemRoles,
   dropdownMark,
+  dropdownMenuKeyAction,
   dropdownMiddleware,
   dropdownRootClasses,
   dropdownSeparatorClasses,
   dropdownShortcutClasses,
   dropdownToneTextClasses,
+  dropdownTriggerKeyAction,
   dropdownTypeaheadMatch,
   isTypeaheadKey,
   nextDropdownHighlight,
@@ -70,6 +73,10 @@ describe('dropdown recipes', () => {
     expect(dropdownMark('checkbox', false)).toBe('');
     expect(dropdownMark('radio', undefined)).toBe('');
   });
+
+  it('gives checkbox and radio items the roles that carry a checked state', () => {
+    expect(dropdownItemRoles).toEqual({ item: 'menuitem', checkbox: 'menuitemcheckbox', radio: 'menuitemradio' });
+  });
 });
 
 describe('dropdown keyboard', () => {
@@ -85,6 +92,33 @@ describe('dropdown keyboard', () => {
     // A highlight that is no longer listed (disabled meanwhile) restarts from the top.
     expect(nextDropdownHighlight(values, 'gone', 1)).toBe('a');
     expect(nextDropdownHighlight([], null, 1)).toBeUndefined();
+  });
+
+  it('jumps to the first or last item', () => {
+    expect(nextDropdownHighlight(values, 'b', 'first')).toBe('a');
+    expect(nextDropdownHighlight(values, null, 'last')).toBe('c');
+    expect(nextDropdownHighlight([], null, 'first')).toBeUndefined();
+    expect(nextDropdownHighlight([], null, 'last')).toBeUndefined();
+  });
+
+  it('opens the menu from the trigger on its first item with ArrowDown and on its last with ArrowUp', () => {
+    expect(dropdownTriggerKeyAction('ArrowDown')).toBe('first');
+    expect(dropdownTriggerKeyAction('ArrowUp')).toBe('last');
+    expect(dropdownTriggerKeyAction('Enter')).toBeUndefined();
+    expect(dropdownTriggerKeyAction('Home')).toBeUndefined();
+  });
+
+  it('maps the keys of the open menu to moves, choosing, leaving and typeahead', () => {
+    expect(dropdownMenuKeyAction('ArrowDown')).toBe(1);
+    expect(dropdownMenuKeyAction('ArrowUp')).toBe(-1);
+    expect(dropdownMenuKeyAction('Home')).toBe('first');
+    expect(dropdownMenuKeyAction('End')).toBe('last');
+    expect(dropdownMenuKeyAction('Enter')).toBe('select');
+    expect(dropdownMenuKeyAction(' ')).toBe('select');
+    expect(dropdownMenuKeyAction('Tab')).toBe('leave');
+    expect(dropdownMenuKeyAction('k')).toBe('typeahead');
+    expect(dropdownMenuKeyAction('Escape')).toBeUndefined();
+    expect(dropdownMenuKeyAction('Shift')).toBeUndefined();
   });
 
   it('searches for single visible characters only', () => {

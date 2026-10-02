@@ -27,7 +27,8 @@ const cssProperty = (key: string) => key.replace(/[A-Z]/g, (letter) => `-${lette
 /**
  * The menu of a dropdown: the element it is placed on is rendered while the
  * menu is open, anchored below the root, and becomes the `role="menu"` panel
- * — it keeps its own classes. Put the items, headers and separators inside.
+ * — it keeps its own classes. It takes focus as it opens and handles the
+ * keys while open. Put the items, headers and separators inside.
  *
  * @example
  * <div *pxlDropdownContent>
@@ -44,6 +45,7 @@ export class PixelDropdownContent {
   private readonly panel = signal<HTMLElement | null>(null);
   private readonly coords = signal({ x: 0, y: 0 });
   private view: EmbeddedViewRef<unknown> | null = null;
+  private unlisten: (() => void) | null = null;
   /** Classes the panel declares itself, and the ones applied to it. */
   private own = new Set<string>();
   private applied = { classes: [] as string[], style: [] as string[] };
@@ -59,6 +61,14 @@ export class PixelDropdownContent {
       const { x, y } = this.coords();
       // Only positioned in the browser: the server renders the initial styles.
       this.decorate(panel, dropdownContentClasses(this.context.surface()), floatingStyles(this.browser ? panel : null, x, y));
+    });
+    effect(() => {
+      const panel = this.panel();
+      if (!panel) return;
+      this.renderer.setAttribute(panel, 'aria-labelledby', this.context.triggerId());
+      const active = this.context.activeId();
+      if (active) this.renderer.setAttribute(panel, 'aria-activedescendant', active);
+      else this.renderer.removeAttribute(panel, 'aria-activedescendant');
     });
     if (this.browser) {
       // Keep the menu anchored to the root while it is open.
@@ -81,16 +91,23 @@ export class PixelDropdownContent {
       this.applied = { classes: [], style: [] };
       this.renderer.setAttribute(panel, 'id', this.context.menuId);
       this.renderer.setAttribute(panel, 'role', 'menu');
+      this.renderer.setAttribute(panel, 'tabindex', '-1');
       this.renderer.setAttribute(panel, 'aria-orientation', 'vertical');
+      this.unlisten = this.renderer.listen(panel, 'keydown', (event: KeyboardEvent) => this.context.onMenuKeydown(event));
     }
     this.panel.set(panel);
+    this.context.setMenu(panel);
   }
 
   private hide(): void {
     const view = this.view;
     if (!view) return;
     this.view = null;
+    this.unlisten?.();
+    this.unlisten = null;
     this.panel.set(null);
+    // Still on the page here, so focus can be handed back once it is gone.
+    this.context.setMenu(null);
     view.destroy();
   }
 

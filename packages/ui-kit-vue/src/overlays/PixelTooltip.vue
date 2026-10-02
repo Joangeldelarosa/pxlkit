@@ -4,6 +4,7 @@ import {
   TOOLTIP_Z_INDEX,
   anchorFloating,
   anchoredMiddleware,
+  describeTooltipTrigger,
   floatingStyles,
   resolveTooltipDelays,
   tooltipClasses,
@@ -22,9 +23,12 @@ import PixelPortal from '../overlay-foundation/PixelPortal.vue';
 /**
  * Floating hint anchored to the element in the default slot, rendered into
  * `<body>` and kept in view (it flips and shifts away from the edges). It
- * opens on hover and focus, on focus only, or on click — a click tooltip
- * closes on Escape and on a press outside. Bind `v-model:open` to control
- * it, or leave it uncontrolled with `default-open`.
+ * opens on hover and focus, on focus only, or on click, and describes the
+ * trigger (`aria-describedby`) while open. Escape closes any tooltip — one
+ * that opens on hover or focus stays closed until the pointer or focus has
+ * left the trigger — and a click tooltip also closes on a press outside.
+ * Bind `v-model:open` to control it, or leave it uncontrolled with
+ * `default-open`.
  *
  * @example
  * <PixelTooltip label="Save your changes" :delay="{ open: 0 }">
@@ -101,8 +105,17 @@ watch(
   },
 );
 
+// While shown, the tooltip describes the element that takes focus — the
+// first focusable one inside the wrapper, else the wrapper itself.
+watch([wrapper, tip], ([reference, floating], _previous, onCleanup) => {
+  if (reference && floating) onCleanup(describeTooltipTrigger(reference, tipId));
+});
+
 let openTimer: ReturnType<typeof setTimeout> | undefined;
 let closeTimer: ReturnType<typeof setTimeout> | undefined;
+// Set when Escape dismisses the tooltip: hover and focus leave it closed
+// until the pointer or focus has left the trigger.
+let dismissed = false;
 
 function clearTimers() {
   clearTimeout(openTimer);
@@ -118,19 +131,35 @@ function schedule(open: boolean) {
     setOpen(open);
     return;
   }
-  const timer = setTimeout(() => setOpen(open), wait);
+  const timer = setTimeout(() => {
+    openTimer = closeTimer = undefined;
+    setOpen(open);
+  }, wait);
   if (open) openTimer = timer;
   else closeTimer = timer;
 }
 
 onScopeDispose(clearTimers);
 
+function enter() {
+  if (!dismissed) schedule(true);
+}
+
+function leave() {
+  dismissed = false;
+  schedule(false);
+}
+
 function onHover(entered: boolean) {
-  if (props.trigger === 'hover') schedule(entered);
+  if (props.trigger !== 'hover') return;
+  if (entered) enter();
+  else leave();
 }
 
 function onFocusChange(focused: boolean) {
-  if (props.trigger !== 'click') schedule(focused);
+  if (props.trigger === 'click') return;
+  if (focused) enter();
+  else leave();
 }
 
 // The wrapper stays non-interactive: clicks bubble up from the trigger, whose
@@ -141,8 +170,18 @@ function onClick() {
   setOpen(!isOpen.value);
 }
 
-// A click tooltip needs explicit dismissal: a press outside or Escape.
-const clickOpen = () => props.trigger === 'click' && isOpen.value;
+// Escape dismisses the tooltip in every mode (WCAG 1.4.13), a pending open
+// included.
+useEscape(
+  () => {
+    clearTimers();
+    if (props.trigger !== 'click') dismissed = true;
+    if (isOpen.value) setOpen(false);
+  },
+  () => isOpen.value || openTimer !== undefined,
+);
+
+// A click tooltip also closes on a press outside it.
 useEventListener(
   'pointerdown',
   (event) => {
@@ -151,9 +190,8 @@ useEventListener(
     if (wrapper.value?.contains(target) || tip.value?.contains(target)) return;
     setOpen(false);
   },
-  () => (clickOpen() && typeof document !== 'undefined' ? document : null),
+  () => (props.trigger === 'click' && isOpen.value && typeof document !== 'undefined' ? document : null),
 );
-useEscape(() => setOpen(false), clickOpen);
 
 defineExpose({
   /** The wrapper around the trigger. */
@@ -165,7 +203,6 @@ defineExpose({
   <span
     ref="wrapper"
     :class="tooltipTriggerClasses"
-    :aria-describedby="isOpen ? tipId : undefined"
     @mouseenter="onHover(true)"
     @mouseleave="onHover(false)"
     @focusin="onFocusChange(true)"

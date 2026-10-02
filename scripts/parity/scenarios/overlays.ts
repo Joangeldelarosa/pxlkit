@@ -11,7 +11,8 @@ const option = '[role="option"]';
 const anchor = '[data-parity-root] span.relative';
 const anchorButton = '[data-parity-root] button';
 const menuTrigger = '[data-parity-root] button[aria-haspopup="menu"]';
-const menuItem = '[role="menuitem"]';
+// Any item of a menu: plain, checkbox or radio.
+const menuItem = '[role^="menuitem"]';
 
 export const scenarios: ParityScenario[] = [
   {
@@ -342,6 +343,45 @@ export const scenarios: ParityScenario[] = [
   },
   {
     component: 'PixelTooltip',
+    example: 'Default',
+    name: 'closes on Escape and stays closed until the pointer leaves and comes back',
+    steps: [
+      { action: 'hover', target: anchor },
+      { action: 'wait', ms: 300 },
+      { action: 'keydown', key: 'Escape' },
+      { action: 'hover', target: anchor },
+      { action: 'wait', ms: 300 },
+      { action: 'unhover', target: anchor },
+      { action: 'hover', target: anchor },
+      { action: 'wait', ms: 300 },
+    ],
+  },
+  {
+    component: 'PixelTooltip',
+    example: 'Default',
+    name: 'drops a pending open on Escape',
+    steps: [
+      { action: 'hover', target: anchor },
+      { action: 'keydown', key: 'Escape' },
+      { action: 'wait', ms: 300 },
+    ],
+  },
+  {
+    component: 'PixelTooltip',
+    example: 'Default',
+    name: 'describes the focused trigger while open, and closes on Escape until focus leaves and comes back',
+    steps: [
+      { action: 'focus', target: anchorButton },
+      { action: 'wait', ms: 300 },
+      { action: 'keydown', key: 'Escape' },
+      { action: 'wait', ms: 300 },
+      { action: 'blur', target: anchorButton },
+      { action: 'focus', target: anchorButton },
+      { action: 'wait', ms: 300 },
+    ],
+  },
+  {
+    component: 'PixelTooltip',
     example: 'Positions',
     name: 'opens on the side it asks for',
     steps: [
@@ -367,6 +407,20 @@ export const scenarios: ParityScenario[] = [
       { action: 'click', target: anchorButton, nth: 2 },
       { action: 'click', target: anchorButton, nth: 2 },
       { action: 'pointerdown', target: 'body' },
+    ],
+  },
+  {
+    component: 'PixelTooltip',
+    example: 'Triggers',
+    name: 'closes the focus tooltip on Escape until focus leaves and comes back',
+    steps: [
+      { action: 'focus', target: anchorButton, nth: 1 },
+      { action: 'wait', ms: 300 },
+      { action: 'keydown', key: 'Escape' },
+      { action: 'wait', ms: 300 },
+      { action: 'blur', target: anchorButton, nth: 1 },
+      { action: 'focus', target: anchorButton, nth: 1 },
+      { action: 'wait', ms: 300 },
     ],
   },
   {
@@ -440,7 +494,7 @@ export const scenarios: ParityScenario[] = [
   {
     component: 'PixelDropdown',
     example: 'Default',
-    name: 'opens from the trigger and moves the highlight with the arrows, Home and End, then activates it with Enter',
+    name: 'opens from the trigger with focus in the menu, whose active descendant follows the arrows, Home and End, then activates it with Enter, focusing the trigger again',
     steps: [
       { action: 'click', target: menuTrigger },
       { action: 'keydown', key: 'ArrowDown' },
@@ -456,7 +510,7 @@ export const scenarios: ParityScenario[] = [
   {
     component: 'PixelDropdown',
     example: 'Default',
-    name: 'opens on its first item from an arrow key, closes on Escape and activates with Space',
+    name: 'opens on its first item from ArrowDown and on its last from ArrowUp on the trigger, closes on Escape and activates with Space, focusing the trigger again each time',
     steps: [
       { action: 'focus', target: menuTrigger },
       { action: 'keydown', key: 'ArrowDown' },
@@ -470,13 +524,38 @@ export const scenarios: ParityScenario[] = [
   {
     component: 'PixelDropdown',
     example: 'Default',
-    name: 'highlights an item on hover, activates one on click and closes on a press outside',
+    name: 'highlights an item on hover, activates one on click focusing the trigger again, and closes on a press outside, focus following the pointer',
     steps: [
       { action: 'click', target: menuTrigger },
       { action: 'hover', target: menuItem, nth: 2 },
       { action: 'click', target: menuItem, nth: 1 },
       { action: 'click', target: menuTrigger },
       { action: 'pointerdown', target: 'body' },
+    ],
+  },
+  {
+    component: 'PixelDropdown',
+    example: 'Default',
+    name: 'closes on Tab and Shift+Tab with focus back on the trigger',
+    steps: [
+      { action: 'click', target: menuTrigger },
+      { action: 'keydown', key: 'ArrowDown' },
+      { action: 'keydown', key: 'Tab' },
+      { action: 'click', target: menuTrigger },
+      { action: 'keydown', key: 'Tab', shiftKey: true },
+    ],
+  },
+  {
+    component: 'PixelDropdown',
+    example: 'Default',
+    name: 'moves into the open menu from its trigger with an arrow key',
+    steps: [
+      { action: 'click', target: menuTrigger },
+      { action: 'focus', target: menuTrigger },
+      { action: 'keydown', key: 'ArrowDown' },
+      { action: 'keydown', key: 'ArrowDown' },
+      { action: 'focus', target: menuTrigger },
+      { action: 'keydown', key: 'ArrowUp' },
     ],
   },
   {
@@ -506,8 +585,19 @@ export const scenarios: ParityScenario[] = [
       { action: 'keydown', key: 'End' },
       { action: 'hover', target: menuItem, nth: 4 },
       { action: 'click', target: menuItem, nth: 1 },
-      { action: 'keydown', key: 'p', target: menuTrigger },
+      { action: 'keydown', key: 'p' },
       { action: 'keydown', key: 'Escape' },
+    ],
+  },
+  {
+    component: 'PixelDropdown',
+    example: 'DisabledItems',
+    name: 'opens from the trigger on its first and last enabled items, past disabled ones',
+    steps: [
+      { action: 'focus', target: menuTrigger },
+      { action: 'keydown', key: 'ArrowUp' },
+      { action: 'keydown', key: 'Escape' },
+      { action: 'keydown', key: 'ArrowDown' },
     ],
   },
   {
@@ -526,7 +616,7 @@ export const scenarios: ParityScenario[] = [
   {
     component: 'PixelDropdown',
     example: 'CheckboxAndRadio',
-    name: 'marks checked checkbox and radio items and activates one',
+    name: 'marks checked checkbox and radio items, exposed with their roles and checked state, and activates one',
     steps: [
       { action: 'click', target: menuTrigger },
       { action: 'keydown', key: 'End' },

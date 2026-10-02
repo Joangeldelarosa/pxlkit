@@ -1,8 +1,10 @@
 /**
  * PixelTooltip — a floating hint anchored to its trigger: the open and close
- * delays every kit applies, the wrapper around the trigger and the panel.
+ * delays every kit applies, the wrapper around the trigger, the panel, and
+ * the `aria-describedby` reference to it.
  */
 import { cn, surfaceClasses, type Surface } from '../../common';
+import { getFocusableElements } from '../../dom/focus-trap';
 import { POPOVER_Z_INDEX } from '../overlay-foundation/popover';
 
 export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
@@ -43,4 +45,25 @@ export function tooltipClasses(surface: Surface, trigger: TooltipTrigger): strin
     s.font,
     'border-retro-border',
   );
+}
+
+const DESCRIBED_BY = 'aria-describedby';
+
+const idList = (element: Element) => (element.getAttribute(DESCRIBED_BY) ?? '').split(/\s+/).filter(Boolean);
+
+/**
+ * Describe the trigger by the open tooltip `tooltipId`: its id joins the
+ * `aria-describedby` of the first focusable element inside `wrapper` — the
+ * one a screen reader announces on focus — or of the wrapper itself when
+ * nothing inside takes focus. Returns the function that takes it out again,
+ * leaving the element's own references as they were.
+ */
+export function describeTooltipTrigger(wrapper: HTMLElement, tooltipId: string): () => void {
+  const target = getFocusableElements(wrapper)[0] ?? wrapper;
+  target.setAttribute(DESCRIBED_BY, [...idList(target), tooltipId].join(' '));
+  return () => {
+    const rest = idList(target).filter((id) => id !== tooltipId);
+    if (rest.length) target.setAttribute(DESCRIBED_BY, rest.join(' '));
+    else target.removeAttribute(DESCRIBED_BY);
+  };
 }

@@ -1,7 +1,8 @@
 /**
  * <pxl-tooltip>: [(open)] and the uncontrolled default, the delays of each
- * trigger, click dismissal and content templates. Rendering and the shared
- * interactions are covered against React by the parity suite.
+ * trigger, dismissal, the element it describes and content templates.
+ * Rendering and the shared interactions are covered against React by the
+ * parity suite.
  */
 import { Component, signal, type Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -54,7 +55,8 @@ describe('PixelTooltip', () => {
     await settle();
     expect(host.open()).toBe(true);
     expect(tooltip()!.textContent!.trim()).toBe('Tip');
-    expect(wrapper().getAttribute('aria-describedby')).toBe(tooltip()!.id);
+    expect(button().getAttribute('aria-describedby')).toBe(tooltip()!.id);
+    expect(wrapper().hasAttribute('aria-describedby')).toBe(false);
     wrapper().dispatchEvent(new MouseEvent('mouseleave'));
     await settle();
     expect(host.open()).toBe(true);
@@ -62,6 +64,7 @@ describe('PixelTooltip', () => {
     await settle();
     expect(host.open()).toBe(false);
     expect(tooltip()).toBeNull();
+    expect(button().hasAttribute('aria-describedby')).toBe(false);
     fixture.destroy();
   });
 
@@ -112,16 +115,74 @@ describe('PixelTooltip', () => {
     await settle();
     expect(host.open()).toBe(false);
 
-    // A hover tooltip ignores both.
+    // A hover tooltip ignores a press outside, and stays closed after Escape
+    // until the pointer leaves and comes back.
     host.trigger.set('hover');
     host.delay.set(0);
     await settle();
     wrapper().dispatchEvent(new MouseEvent('mouseenter'));
     await settle();
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     await settle();
     expect(host.open()).toBe(true);
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await settle();
+    expect(host.open()).toBe(false);
+    wrapper().dispatchEvent(new MouseEvent('mouseenter'));
+    await settle();
+    expect(host.open()).toBe(false);
+    wrapper().dispatchEvent(new MouseEvent('mouseleave'));
+    wrapper().dispatchEvent(new MouseEvent('mouseenter'));
+    await settle();
+    expect(host.open()).toBe(true);
+    fixture.destroy();
+  });
+
+  it('drops a pending open on Escape, reporting no change, and ignores Escape while closed', async () => {
+    @Component({
+      imports: [PixelTooltip],
+      template: `
+        <pxl-tooltip label="Tip" [delay]="{ open: 40 }" (openChange)="changes.push($event)">
+          <button type="button">trigger</button>
+        </pxl-tooltip>
+      `,
+    })
+    class Host {
+      readonly changes: Array<boolean | undefined> = [];
+    }
+    const { fixture, host, settle } = await render(Host);
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    wrapper().dispatchEvent(new MouseEvent('mouseenter'));
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await wait(60);
+    await settle();
+    expect(tooltip()).toBeNull();
+    expect(host.changes).toEqual([]);
+    fixture.destroy();
+  });
+
+  it('describes the trigger along with its own references, or the wrapper when nothing inside takes focus', async () => {
+    @Component({
+      imports: [PixelTooltip],
+      template: `
+        <pxl-tooltip [open]="open()" label="Tip"><button type="button" aria-describedby="hint">a</button></pxl-tooltip>
+        <pxl-tooltip [open]="open()" label="Plain"><span>text</span></pxl-tooltip>
+      `,
+    })
+    class Host {
+      readonly open = signal(true);
+    }
+    const { fixture, host, settle } = await render(Host);
+    const [tip, plainTip] = Array.from(document.querySelectorAll('[role="tooltip"]'));
+    const [buttonWrapper, textWrapper] = Array.from(document.querySelectorAll<HTMLElement>('span.relative'));
+    const described = buttonWrapper!.querySelector('button')!;
+    expect(described.getAttribute('aria-describedby')).toBe(`hint ${tip!.id}`);
+    expect(buttonWrapper!.hasAttribute('aria-describedby')).toBe(false);
+    expect(textWrapper!.getAttribute('aria-describedby')).toBe(plainTip!.id);
+    host.open.set(false);
+    await settle();
+    expect(described.getAttribute('aria-describedby')).toBe('hint');
+    expect(textWrapper!.hasAttribute('aria-describedby')).toBe(false);
     fixture.destroy();
   });
 

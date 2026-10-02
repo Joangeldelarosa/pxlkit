@@ -23,6 +23,8 @@
 - `PixelInput`: the clear button on an uncontrolled input emptied the field's counter but left the typed text in it; it now empties the field.
 - `PixelNumberInput` shows each ArrowUp / ArrowDown step while focused, formatted with its precision and separator — the value changed but the text only caught up on blur.
 - `PixelSelect` points its trigger at the open listbox (`aria-controls`) and at the highlighted option (`aria-activedescendant`), so screen readers announce the option the arrow keys reach.
+- `PixelDropdown` follows the ARIA menu button pattern: the open menu takes focus and points `aria-activedescendant` at the highlighted item, so screen readers follow the arrows and typeahead (the highlight was visual only). Escape, choosing an item and Tab return focus to the trigger; ArrowUp on the closed trigger opens on the last item; checkbox and radio items are `menuitemcheckbox` / `menuitemradio` with `aria-checked`; and the menu is named after its trigger.
+- `PixelTooltip` closes on Escape in every trigger mode, as WCAG 1.4.13 requires — hover and focus tooltips could not be dismissed without moving the pointer or focus — and describes the element that takes focus (`aria-describedby` was on a wrapper that never does).
 - `PixelScrollArea` draws its styled scrollbar. The stylesheet never defined the `.pxl-scroll-*` classes the component sets, so the browser's default scrollbar showed, `variant="hover"` behaved like `auto` and `scrollbarSize` had no effect.
 
 ## 2.1.1 — 2026-08-08

@@ -20,9 +20,13 @@
 
    Typeahead: while open, typing a printable character jumps highlight to the
    first item whose label starts with the typed prefix (resets after 600ms).
+
+   Focus: the open menu takes focus and points `aria-activedescendant` at the
+   highlighted item. Escape, choosing an item and Tab hand focus back to the
+   trigger; after a press outside it follows the pointer.
    ───────────────────────────────────────────────────────────────────────── */
 
-import React, { forwardRef, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { autoUpdate, useFloating } from '@floating-ui/react-dom';
 import {
   DROPDOWN_PLACEMENT,
@@ -33,16 +37,21 @@ import {
   dropdownItemClasses,
   dropdownItemIconClasses,
   dropdownItemLabelClasses,
+  dropdownItemRoles,
   dropdownMark,
   dropdownMarkClasses,
+  dropdownMenuKeyAction,
   dropdownMiddleware,
   dropdownRootClasses,
   dropdownSeparatorClasses,
   dropdownShortcutClasses,
+  dropdownTriggerKeyAction,
   dropdownTypeaheadMatch,
-  isTypeaheadKey,
   nextDropdownHighlight,
+  returnFocusOnRemoval,
+  type DropdownEdge,
   type DropdownItemKind,
+  type DropdownMove,
 } from '@pxlkit/ui-kit-core';
 import {
   Tone, Surface, Option, cn, useClickOutside,
@@ -97,16 +106,27 @@ interface DropdownContextValue {
   setOpen: (v: boolean) => void;
   surface: Surface;
   menuId: string;
+  /** Id of the trigger, which names the menu: its own, or a generated one. */
+  triggerId: string;
+  setOwnTriggerId: (id: string | undefined) => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
+  triggerRef: React.MutableRefObject<HTMLButtonElement | null>;
+  menuRef: React.MutableRefObject<HTMLDivElement | null>;
+  /** True while a press outside is closing the menu: focus then follows the pointer. */
+  pressOutsideRef: React.MutableRefObject<boolean>;
   highlightedValue: string | null;
   setHighlightedValue: (v: string | null) => void;
-  registerItem: (value: string, disabled: boolean) => void;
+  /** Element id of an item, for the menu's `aria-activedescendant`. */
+  itemId: (value: string | null) => string | undefined;
+  registerItem: (value: string, disabled: boolean, id: string) => void;
   unregisterItem: (value: string) => void;
   getOrderedValues: () => string[];
   typeaheadJump: (char: string) => void;
   labelMap: Map<string, string>;
   registerItemHandler: (value: string, onSelect: (() => void) | undefined) => void;
   selectHighlighted: () => void;
+  onTriggerKeyDown: (e: React.KeyboardEvent) => void;
+  onMenuKeyDown: (e: React.KeyboardEvent) => void;
 }
 
 const DropdownContext = React.createContext<DropdownContextValue | null>(null);
@@ -135,8 +155,14 @@ function DropdownRoot({ open: openProp, defaultOpen = false, onOpenChange, surfa
     onChange: onOpenChange,
   });
   const menuId = useId();
+  const generatedTriggerId = useId();
+  const [ownTriggerId, setOwnTriggerId] = useState<string | undefined>(undefined);
+  const triggerId = ownTriggerId ?? generatedTriggerId;
   const containerRef = useRef<HTMLDivElement>(null);
-  const itemsRef = useRef<{ value: string; disabled: boolean }[]>([]);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const pressOutsideRef = useRef(false);
+  const itemsRef = useRef<{ value: string; disabled: boolean; id: string }[]>([]);
   const labelMapRef = useRef<Map<string, string>>(new Map());
   const onSelectMapRef = useRef<Map<string, (() => void) | undefined>>(new Map());
   const highlightedValueRef = useRef<string | null>(null);
@@ -148,11 +174,12 @@ function DropdownRoot({ open: openProp, defaultOpen = false, onOpenChange, surfa
   const typeaheadBuf = useRef<string>('');
   const typeaheadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const registerItem = useCallback((value: string, disabled: boolean) => {
+  const registerItem = useCallback((value: string, disabled: boolean, id: string) => {
     const existing = itemsRef.current.findIndex((i) => i.value === value);
-    if (existing >= 0) itemsRef.current[existing] = { value, disabled };
-    else itemsRef.current.push({ value, disabled });
+    if (existing >= 0) itemsRef.current[existing] = { value, disabled, id };
+    else itemsRef.current.push({ value, disabled, id });
   }, []);
+  const itemId = useCallback((value: string | null) => itemsRef.current.find((i) => i.value === value)?.id, []);
   const unregisterItem = useCallback((value: string) => {
     itemsRef.current = itemsRef.current.filter((i) => i.value !== value);
     labelMapRef.current.delete(value);
@@ -162,14 +189,17 @@ function DropdownRoot({ open: openProp, defaultOpen = false, onOpenChange, surfa
     onSelectMapRef.current.set(value, onSelect);
   }, []);
   const getOrderedValues = useCallback(() => itemsRef.current.filter((i) => !i.disabled).map((i) => i.value), []);
+  const close = useCallback(() => {
+    setOpen(false);
+    setHighlightedValue(null);
+  }, [setHighlightedValue, setOpen]);
   const selectHighlighted = useCallback(() => {
     const v = highlightedValueRef.current;
     if (!v) return;
     const handler = onSelectMapRef.current.get(v);
     handler?.();
-    setOpen(false);
-    setHighlightedValue(null);
-  }, [setHighlightedValue, setOpen]);
+    close();
+  }, [close]);
 
   const typeaheadJump = useCallback((char: string) => {
     if (typeaheadTimer.current) clearTimeout(typeaheadTimer.current);
@@ -179,67 +209,84 @@ function DropdownRoot({ open: openProp, defaultOpen = false, onOpenChange, surfa
     typeaheadTimer.current = setTimeout(() => { typeaheadBuf.current = ''; }, DROPDOWN_TYPEAHEAD_RESET_MS);
   }, [getOrderedValues, setHighlightedValue]);
 
-  useClickOutside(containerRef, () => { setOpen(false); setHighlightedValue(null); });
-  useEscape(() => { setOpen(false); setHighlightedValue(null); }, open);
+  useClickOutside(containerRef, () => { pressOutsideRef.current = true; close(); });
+  useEscape(close, open);
   useEffect(() => { if (!open) setHighlightedValue(null); }, [open, setHighlightedValue]);
   useEffect(() => () => { if (typeaheadTimer.current) clearTimeout(typeaheadTimer.current); }, []);
 
-  // An arrow key on the closed menu opens it on its first item. Items
-  // register once the menu renders, so the highlight waits for them; a
-  // parent that keeps the menu closed drops the request.
-  const [highlightFirstOnOpen, setHighlightFirstOnOpen] = useState(false);
+  // A press outside that did not close the menu (the parent kept it open)
+  // ends with the pointer release; a new open starts clean.
   useEffect(() => {
-    if (!highlightFirstOnOpen) return;
-    setHighlightFirstOnOpen(false);
     if (!open) return;
-    const ordered = getOrderedValues();
-    if (ordered.length) setHighlightedValue(ordered[0]);
-  }, [highlightFirstOnOpen, open, getOrderedValues, setHighlightedValue]);
+    pressOutsideRef.current = false;
+    const release = () => { pressOutsideRef.current = false; };
+    document.addEventListener('pointerup', release);
+    document.addEventListener('pointercancel', release);
+    return () => {
+      document.removeEventListener('pointerup', release);
+      document.removeEventListener('pointercancel', release);
+    };
+  }, [open]);
+
+  const moveHighlight = useCallback((move: DropdownMove) => {
+    const next = nextDropdownHighlight(getOrderedValues(), highlightedValueRef.current, move);
+    if (next) setHighlightedValue(next);
+  }, [getOrderedValues, setHighlightedValue]);
+
+  // An arrow key on the closed menu opens it on its first or last item.
+  // Items register once the menu renders, so the highlight waits for them;
+  // a parent that keeps the menu closed drops the request.
+  const [highlightOnOpen, setHighlightOnOpen] = useState<DropdownEdge | null>(null);
+  useEffect(() => {
+    if (!highlightOnOpen) return;
+    setHighlightOnOpen(null);
+    if (open) moveHighlight(highlightOnOpen);
+  }, [highlightOnOpen, open, moveHighlight]);
+
+  // ArrowDown on the trigger opens the menu on its first item and ArrowUp on
+  // its last; either moves into the menu when it is already open. Enter and
+  // Space stay the button's own click, which toggles the menu.
+  const onTriggerKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const edge = dropdownTriggerKeyAction(e.key);
+    if (!edge) return;
+    e.preventDefault();
+    if (!open) { setHighlightOnOpen(edge); setOpen(true); return; }
+    menuRef.current?.focus({ preventScroll: true });
+    moveHighlight(e.key === 'ArrowDown' ? 1 : -1);
+  }, [open, setOpen, moveHighlight]);
+
+  // The menu holds focus while open; Escape closes it from anywhere.
+  const onMenuKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const action = dropdownMenuKeyAction(e.key);
+    if (action === undefined) return;
+    if (action === 'typeahead') { typeaheadJump(e.key); return; }
+    if (action === 'leave') {
+      // Focus is back on the trigger before the browser's own Tab, which
+      // then moves on from there.
+      triggerRef.current?.focus();
+      close();
+      return;
+    }
+    e.preventDefault();
+    if (action === 'select') selectHighlighted();
+    else moveHighlight(action);
+  }, [typeaheadJump, close, selectHighlighted, moveHighlight]);
 
   const labelMap = labelMapRef.current;
   const ctx: DropdownContextValue = useMemo(() => ({
-    open, setOpen, surface, menuId, containerRef,
-    highlightedValue, setHighlightedValue,
+    open, setOpen, surface, menuId, triggerId, setOwnTriggerId,
+    containerRef, triggerRef, menuRef, pressOutsideRef,
+    highlightedValue, setHighlightedValue, itemId,
     registerItem, unregisterItem, getOrderedValues, typeaheadJump,
     labelMap,
     registerItemHandler,
     selectHighlighted,
-  }), [open, setOpen, surface, menuId, highlightedValue, setHighlightedValue, registerItem, unregisterItem, getOrderedValues, typeaheadJump, labelMap, registerItemHandler, selectHighlighted]);
-
-  const onKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      if (!open) { setHighlightFirstOnOpen(true); setOpen(true); return; }
-      const ordered = getOrderedValues();
-      if (ordered.length === 0) return;
-      setHighlightedValue(nextDropdownHighlight(ordered, highlightedValue, e.key === 'ArrowDown' ? 1 : -1) ?? null);
-      return;
-    }
-    if (e.key === 'Home') {
-      e.preventDefault();
-      const ordered = getOrderedValues();
-      if (ordered.length) { setOpen(true); setHighlightedValue(ordered[0]); }
-      return;
-    }
-    if (e.key === 'End') {
-      e.preventDefault();
-      const ordered = getOrderedValues();
-      if (ordered.length) { setOpen(true); setHighlightedValue(ordered[ordered.length - 1]); }
-      return;
-    }
-    if ((e.key === 'Enter' || e.key === ' ') && open && highlightedValueRef.current) {
-      e.preventDefault();
-      selectHighlighted();
-      return;
-    }
-    if (open && isTypeaheadKey(e.key)) {
-      typeaheadJump(e.key);
-    }
-  };
+    onTriggerKeyDown, onMenuKeyDown,
+  }), [open, setOpen, surface, menuId, triggerId, highlightedValue, setHighlightedValue, itemId, registerItem, unregisterItem, getOrderedValues, typeaheadJump, labelMap, registerItemHandler, selectHighlighted, onTriggerKeyDown, onMenuKeyDown]);
 
   return (
     <DropdownContext.Provider value={ctx}>
-      <div ref={containerRef} className={dropdownRootClasses} onKeyDown={onKey}>
+      <div ref={containerRef} className={dropdownRootClasses}>
         {children}
       </div>
     </DropdownContext.Provider>
@@ -252,21 +299,35 @@ interface DropdownTriggerProps {
   icon?: React.ReactNode;
   disabled?: boolean;
   ariaLabel?: string;
+  /** Id of the button, which names the menu; generated when left out. */
+  id?: string;
 }
 
 const DropdownTrigger = forwardRef<HTMLButtonElement, DropdownTriggerProps>(function DropdownTrigger(
-  { children, tone = 'neutral', icon, disabled = false, ariaLabel },
+  { children, tone = 'neutral', icon, disabled = false, ariaLabel, id },
   ref,
 ) {
-  const { open, setOpen, surface, menuId } = useDropdownContext('PixelDropdown.Trigger');
+  const { open, setOpen, surface, menuId, triggerId, setOwnTriggerId, triggerRef, onTriggerKeyDown } = useDropdownContext('PixelDropdown.Trigger');
+  // The menu is named after the trigger, by its own id when it has one.
+  useLayoutEffect(() => {
+    setOwnTriggerId(id);
+    return () => setOwnTriggerId(undefined);
+  }, [id, setOwnTriggerId]);
+  const setRefs = (node: HTMLButtonElement | null) => {
+    triggerRef.current = node;
+    if (typeof ref === 'function') ref(node);
+    else if (ref) ref.current = node;
+  };
   return (
     <PixelButton
-      ref={ref}
+      ref={setRefs}
+      id={id ?? triggerId}
       tone={tone}
       surface={surface}
       disabled={disabled}
       iconRight={icon ?? <ChevronDownIcon className={dropdownChevronClasses(open)} />}
       onClick={() => setOpen(!open)}
+      onKeyDown={onTriggerKeyDown}
       aria-haspopup="menu"
       aria-expanded={open}
       aria-controls={open ? menuId : undefined}
@@ -287,34 +348,66 @@ const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(functio
   { children, className },
   ref,
 ) {
-  const { open, surface, menuId, containerRef } = useDropdownContext('PixelDropdown.Content');
+  const ctx = useDropdownContext('PixelDropdown.Content');
+  if (!ctx.open) return null;
+  return (
+    <DropdownMenu ctx={ctx} forwardedRef={ref} className={className}>
+      {children}
+    </DropdownMenu>
+  );
+});
+DropdownContent.displayName = 'PixelDropdown.Content';
+
+interface DropdownMenuProps extends DropdownContentProps {
+  ctx: DropdownContextValue;
+  forwardedRef: React.ForwardedRef<HTMLDivElement>;
+}
+
+/** The open menu, mounted for as long as it is open. */
+function DropdownMenu({ ctx, forwardedRef, children, className }: DropdownMenuProps) {
+  const { surface, menuId, triggerId, containerRef, triggerRef, menuRef, pressOutsideRef, highlightedValue, itemId, onMenuKeyDown } = ctx;
   const { refs, floatingStyles } = useFloating({
-    open,
+    open: true,
     placement: DROPDOWN_PLACEMENT,
     whileElementsMounted: autoUpdate,
     elements: { reference: containerRef.current },
     middleware: dropdownMiddleware(),
   });
+
+  // Focus moves into the menu as it opens, and back to the trigger as it
+  // closes — unless a press outside closed it, then focus follows the
+  // pointer. Layout cleanup runs before React removes the menu's DOM.
+  useLayoutEffect(() => {
+    const menu = menuRef.current;
+    menu?.focus({ preventScroll: true });
+    return () => {
+      if (!pressOutsideRef.current) returnFocusOnRemoval(menu, () => triggerRef.current);
+    };
+  }, [menuRef, triggerRef, pressOutsideRef]);
+
   const setRefs = (node: HTMLDivElement | null) => {
+    menuRef.current = node;
     refs.setFloating(node);
-    if (typeof ref === 'function') ref(node);
-    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+    if (typeof forwardedRef === 'function') forwardedRef(node);
+    else if (forwardedRef) forwardedRef.current = node;
   };
-  if (!open) return null;
   return (
     <div
       ref={setRefs}
       id={menuId}
       role="menu"
+      tabIndex={-1}
       aria-orientation="vertical"
+      aria-labelledby={triggerId}
+      aria-activedescendant={itemId(highlightedValue)}
       style={floatingStyles}
       className={cn(dropdownContentClasses(surface), className)}
+      onKeyDown={onMenuKeyDown}
     >
       {children}
     </div>
   );
-});
-DropdownContent.displayName = 'PixelDropdown.Content';
+}
 
 interface DropdownItemProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'onSelect'> {
@@ -333,7 +426,7 @@ interface DropdownItemProps
 
 const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(function DropdownItem(
   {
-    value, children, onSelect, disabled = false, destructive = false, tone, icon, shortcut,
+    value, id, children, onSelect, disabled = false, destructive = false, tone, icon, shortcut,
     className, onClick, onMouseEnter, ...rest
   },
   ref,
@@ -341,16 +434,18 @@ const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(function D
   const { setOpen, surface, highlightedValue, setHighlightedValue, registerItem, unregisterItem, labelMap, registerItemHandler } = useDropdownContext('PixelDropdown.Item');
   const autoIdRaw = useId();
   const itemValue = value ?? autoIdRaw;
+  // The element id the menu's `aria-activedescendant` points at.
+  const itemId = id ?? autoIdRaw;
   const effectiveTone: Tone | undefined = destructive ? 'red' : tone;
 
   // Registered while mounted; later changes update the registration in
   // place, so the item keeps its position in the keyboard order.
   useEffect(() => () => unregisterItem(itemValue), [itemValue, unregisterItem]);
   useEffect(() => {
-    registerItem(itemValue, disabled);
+    registerItem(itemValue, disabled, itemId);
     if (typeof children === 'string') labelMap.set(itemValue, children);
     else labelMap.delete(itemValue);
-  }, [itemValue, disabled, registerItem, labelMap, children]);
+  }, [itemValue, disabled, itemId, registerItem, labelMap, children]);
 
   // Keep the latest onSelect handler registered for keyboard activation.
   useEffect(() => {
@@ -362,8 +457,9 @@ const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(function D
   return (
     <button
       ref={ref}
+      id={itemId}
       type="button"
-      role="menuitem"
+      role={dropdownItemRoles.item}
       tabIndex={-1}
       aria-disabled={disabled || undefined}
       data-highlighted={isHighlighted || undefined}
@@ -425,6 +521,8 @@ const DropdownCheckboxItem = forwardRef<HTMLButtonElement, DropdownCheckboxItemP
   return (
     <DropdownItem
       ref={ref}
+      role={dropdownItemRoles.checkbox}
+      aria-checked={!!checked}
       {...rest}
       icon={<span aria-hidden className={dropdownMarkClasses}>{dropdownMark('checkbox', checked)}</span>}
     >
@@ -445,6 +543,8 @@ const DropdownRadioItem = forwardRef<HTMLButtonElement, DropdownRadioItemProps>(
   return (
     <DropdownItem
       ref={ref}
+      role={dropdownItemRoles.radio}
+      aria-checked={!!checked}
       {...rest}
       icon={<span aria-hidden className={dropdownMarkClasses}>{dropdownMark('radio', checked)}</span>}
     >

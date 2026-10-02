@@ -1,8 +1,8 @@
 /**
  * PixelDropdown: v-model:open on the root, the select events of items and of
- * the shorthand, attributes and listeners on items, slots, and typeahead
- * labels. Rendering and the shared interactions are covered against React by
- * the parity suite.
+ * the shorthand, attributes and listeners on items, own ids, slots, typeahead
+ * labels, and focus around a parent that overrules the menu. Rendering and
+ * the shared interactions are covered against React by the parity suite.
  */
 import { enableAutoUnmount, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -19,9 +19,12 @@ import {
 
 const trigger = () => document.querySelector<HTMLButtonElement>('button[aria-haspopup="menu"]')!;
 const menu = () => document.querySelector<HTMLElement>('[role="menu"]');
-const items = () => Array.from(document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'));
+const items = () => Array.from(document.querySelectorAll<HTMLButtonElement>('[role^="menuitem"]'));
 const highlighted = () => document.querySelector<HTMLElement>('[data-highlighted="true"]');
-const key = (key: string) => trigger().dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+const keydown = (key: string) => new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+const key = (key: string) => trigger().dispatchEvent(keydown(key));
+// A key pressed where focus is: in the open menu.
+const press = (key: string) => document.activeElement!.dispatchEvent(keydown(key));
 
 const parts = (onSelect: (value: string) => void = () => {}) => [
   h(PixelDropdownTrigger, () => 'Menu'),
@@ -57,7 +60,7 @@ describe('PixelDropdown', () => {
     expect(menu()).toBeNull();
   });
 
-  it('opens the closed menu on its first enabled item from an arrow key', async () => {
+  it('opens the closed menu from an arrow key: ArrowDown on its first enabled item, ArrowUp on its last', async () => {
     const open = ref(false);
     mount(
       defineComponent({
@@ -67,16 +70,27 @@ describe('PixelDropdown', () => {
             h(PixelDropdownContent, () => [
               h(PixelDropdownItem, { value: 'a', disabled: true }, () => 'Alpha'),
               h(PixelDropdownItem, { value: 'b' }, () => 'Bravo'),
+              h(PixelDropdownItem, { value: 'c' }, () => 'Charlie'),
+              h(PixelDropdownItem, { value: 'd', disabled: true }, () => 'Delta'),
             ]),
           ]),
       }),
       { attachTo: document.body },
     );
-    key('ArrowUp');
+    key('ArrowDown');
     await nextTick();
     await nextTick();
     expect(open.value).toBe(true);
     expect(highlighted()!.textContent).toBe('Bravo');
+    expect(document.activeElement).toBe(menu());
+    expect(menu()!.getAttribute('aria-activedescendant')).toBe(highlighted()!.id);
+    open.value = false;
+    await nextTick();
+    key('ArrowUp');
+    await nextTick();
+    await nextTick();
+    expect(highlighted()!.textContent).toBe('Charlie');
+    expect(menu()!.getAttribute('aria-activedescendant')).toBe(highlighted()!.id);
   });
 
   it('asks to open without opening while its parent holds it closed, and drops the arrow request', async () => {
@@ -122,14 +136,15 @@ describe('PixelDropdown', () => {
     key('ArrowDown');
     await nextTick();
     await nextTick();
+    press('ArrowDown');
+    await nextTick();
+    press(' ');
+    await nextTick();
+    expect(document.activeElement).toBe(trigger());
     key('ArrowDown');
     await nextTick();
-    key(' ');
     await nextTick();
-    key('ArrowDown');
-    await nextTick();
-    await nextTick();
-    key('Enter');
+    press('Enter');
     await nextTick();
     expect(selected).toEqual(['copy', 'paste', 'copy']);
   });
@@ -161,6 +176,13 @@ describe('PixelDropdown', () => {
     expect(item!.classList).toContain('extra');
     expect(item!.classList).toContain('items-center');
     expect(check!.getAttribute('data-testid')).toBe('check');
+    expect([item, check, cozy, compact].map((each) => each!.getAttribute('role'))).toEqual([
+      'menuitem',
+      'menuitemcheckbox',
+      'menuitemradio',
+      'menuitemradio',
+    ]);
+    expect([item, check, cozy, compact].map((each) => each!.getAttribute('aria-checked'))).toEqual([null, 'true', 'true', 'false']);
     expect(check!.querySelector('[aria-hidden="true"]')!.textContent).toBe('✓');
     expect(cozy!.querySelector('[aria-hidden="true"]')!.textContent).toBe('●');
     expect(compact!.querySelector('[aria-hidden="true"]')!.textContent).toBe('');
@@ -182,9 +204,59 @@ describe('PixelDropdown', () => {
       },
       attachTo: document.body,
     });
-    key('b');
+    await nextTick();
+    press('b');
     await nextTick();
     expect(highlighted()!.textContent).toBe('Bright');
+  });
+
+  it('names the menu by the trigger and points it at the highlighted item, by their own ids when they have them', async () => {
+    mount(PixelDropdownRoot, {
+      slots: {
+        default: () => [
+          h(PixelDropdownTrigger, { id: 'file-menu' }, () => 'File'),
+          h(PixelDropdownContent, () => [h(PixelDropdownItem, { id: 'file-new' }, () => 'New'), h(PixelDropdownItem, () => 'Open')]),
+        ],
+      },
+      attachTo: document.body,
+    });
+    expect(trigger().id).toBe('file-menu');
+    trigger().click();
+    await nextTick();
+    expect(document.activeElement).toBe(menu());
+    expect(menu()!.getAttribute('aria-labelledby')).toBe('file-menu');
+    expect(menu()!.hasAttribute('aria-activedescendant')).toBe(false);
+    press('ArrowDown');
+    await nextTick();
+    expect(menu()!.getAttribute('aria-activedescendant')).toBe('file-new');
+    press('ArrowDown');
+    await nextTick();
+    expect(menu()!.getAttribute('aria-activedescendant')).toBe(items()[1]!.id);
+    expect(items()[1]!.id).not.toBe('');
+  });
+
+  it('closes on Tab with focus back on the trigger, leaving the default to the browser', async () => {
+    mount(PixelDropdownRoot, { slots: { default: () => parts() }, attachTo: document.body });
+    trigger().click();
+    await nextTick();
+    const tab = keydown('Tab');
+    menu()!.dispatchEvent(tab);
+    await nextTick();
+    expect(tab.defaultPrevented).toBe(false);
+    expect(menu()).toBeNull();
+    expect(document.activeElement).toBe(trigger());
+  });
+
+  it('hands focus back once its parent closes it after overruling a press outside', async () => {
+    const wrapper = mount(PixelDropdownRoot, { props: { open: true }, slots: { default: () => parts() }, attachTo: document.body });
+    await nextTick();
+    expect(document.activeElement).toBe(menu());
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    document.body.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    await nextTick();
+    expect(wrapper.emitted('update:open')).toEqual([[false]]);
+    await wrapper.setProps({ open: false });
+    expect(document.activeElement).toBe(trigger());
   });
 
   it('emits the value of a row of the shorthand and takes a trigger icon and item icons', async () => {

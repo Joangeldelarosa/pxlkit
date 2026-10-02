@@ -1,8 +1,8 @@
 /**
  * The dropdown parts: [(open)] on the root, the (selected) outputs of items
- * and of the shorthand, attributes and listeners on items, icon templates,
- * and typeahead labels. Rendering and the shared interactions are covered
- * against React by the parity suite.
+ * and of the shorthand, attributes and listeners on items, own ids, icon
+ * templates, typeahead labels and the Tab default. Rendering and the shared
+ * interactions are covered against React by the parity suite.
  */
 import { Component, signal, type Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -20,9 +20,12 @@ const PARTS = [PixelDropdownRoot, PixelDropdownTrigger, PixelDropdownContent, Pi
 
 const trigger = () => document.querySelector<HTMLButtonElement>('button[aria-haspopup="menu"]')!;
 const menu = () => document.querySelector<HTMLElement>('[role="menu"]');
-const items = () => Array.from(document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'));
+const items = () => Array.from(document.querySelectorAll<HTMLButtonElement>('[role^="menuitem"]'));
 const highlighted = () => document.querySelector<HTMLElement>('[data-highlighted="true"]');
-const key = (key: string) => trigger().dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+const keydown = (key: string) => new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+const key = (key: string) => trigger().dispatchEvent(keydown(key));
+// A key pressed where focus is: in the open menu.
+const press = (key: string) => document.activeElement!.dispatchEvent(keydown(key));
 
 async function render<T>(Host: Type<T>) {
   const fixture = TestBed.createComponent(Host);
@@ -37,7 +40,7 @@ async function render<T>(Host: Type<T>) {
 }
 
 describe('PixelDropdown', () => {
-  it('toggles an [(open)] binding from the trigger, advertising the menu, and opens on the first item from an arrow key', async () => {
+  it('toggles an [(open)] binding from the trigger, advertising the menu, and opens on the first item from ArrowDown and on the last from ArrowUp', async () => {
     @Component({
       imports: PARTS,
       template: `
@@ -46,6 +49,8 @@ describe('PixelDropdown', () => {
           <div *pxlDropdownContent>
             <button pxlDropdownItem value="a" disabled>Alpha</button>
             <button pxlDropdownItem value="b">Bravo</button>
+            <button pxlDropdownItem value="c">Charlie</button>
+            <button pxlDropdownItem value="d" disabled>Delta</button>
           </div>
         </pxl-dropdown-root>
       `,
@@ -67,6 +72,14 @@ describe('PixelDropdown', () => {
     await settle();
     expect(host.open()).toBe(true);
     expect(highlighted()!.textContent!.trim()).toBe('Bravo');
+    expect(document.activeElement).toBe(menu());
+    expect(menu()!.getAttribute('aria-activedescendant')).toBe(highlighted()!.id);
+    host.open.set(false);
+    await settle();
+    key('ArrowUp');
+    await settle();
+    expect(highlighted()!.textContent!.trim()).toBe('Charlie');
+    expect(menu()!.getAttribute('aria-activedescendant')).toBe(highlighted()!.id);
     fixture.destroy();
   });
 
@@ -127,13 +140,14 @@ describe('PixelDropdown', () => {
     expect(menu()).toBeNull();
     key('ArrowDown');
     await settle();
+    press('ArrowDown');
+    await settle();
+    press(' ');
+    await settle();
+    expect(document.activeElement).toBe(trigger());
     key('ArrowDown');
     await settle();
-    key(' ');
-    await settle();
-    key('ArrowDown');
-    await settle();
-    key('Enter');
+    press('Enter');
     await settle();
     expect(host.selected).toEqual(['copy', 'paste', 'copy']);
     fixture.destroy();
@@ -171,6 +185,13 @@ describe('PixelDropdown', () => {
     expect(item!.classList).toContain('extra');
     expect(item!.classList).toContain('items-center');
     expect(item!.querySelector('[data-testid="flag"]')).not.toBeNull();
+    expect([item, check, cozy, compact].map((each) => each!.getAttribute('role'))).toEqual([
+      'menuitem',
+      'menuitemcheckbox',
+      'menuitemradio',
+      'menuitemradio',
+    ]);
+    expect([item, check, cozy, compact].map((each) => each!.getAttribute('aria-checked'))).toEqual([null, 'true', 'true', 'false']);
     expect(check!.querySelector('[aria-hidden="true"]')!.textContent).toBe('✓');
     expect(cozy!.querySelector('[aria-hidden="true"]')!.textContent).toBe('●');
     expect(compact!.querySelector('[aria-hidden="true"]')!.textContent).toBe('');
@@ -194,9 +215,64 @@ describe('PixelDropdown', () => {
     })
     class Host {}
     const { fixture, settle } = await render(Host);
-    key('b');
+    press('b');
     await settle();
     expect(highlighted()!.textContent!.trim()).toBe('Bright');
+    fixture.destroy();
+  });
+
+  it('names the menu by the trigger and points it at the highlighted item, by their own ids when they have them', async () => {
+    @Component({
+      imports: PARTS,
+      template: `
+        <pxl-dropdown-root>
+          <pxl-dropdown-trigger id="file-menu">File</pxl-dropdown-trigger>
+          <div *pxlDropdownContent>
+            <button pxlDropdownItem id="file-new">New</button>
+            <button pxlDropdownItem>Open</button>
+          </div>
+        </pxl-dropdown-root>
+      `,
+    })
+    class Host {}
+    const { fixture, settle } = await render(Host);
+    expect(trigger().id).toBe('file-menu');
+    expect(document.querySelector('pxl-dropdown-trigger')!.hasAttribute('id')).toBe(false);
+    trigger().click();
+    await settle();
+    expect(document.activeElement).toBe(menu());
+    expect(menu()!.getAttribute('aria-labelledby')).toBe('file-menu');
+    expect(menu()!.hasAttribute('aria-activedescendant')).toBe(false);
+    press('ArrowDown');
+    await settle();
+    expect(menu()!.getAttribute('aria-activedescendant')).toBe('file-new');
+    press('ArrowDown');
+    await settle();
+    expect(menu()!.getAttribute('aria-activedescendant')).toBe(items()[1]!.id);
+    expect(items()[1]!.id).not.toBe('');
+    fixture.destroy();
+  });
+
+  it('closes on Tab with focus back on the trigger, leaving the default to the browser', async () => {
+    @Component({
+      imports: PARTS,
+      template: `
+        <pxl-dropdown-root>
+          <pxl-dropdown-trigger>Menu</pxl-dropdown-trigger>
+          <div *pxlDropdownContent><button pxlDropdownItem>Copy</button></div>
+        </pxl-dropdown-root>
+      `,
+    })
+    class Host {}
+    const { fixture, settle } = await render(Host);
+    trigger().click();
+    await settle();
+    const tab = keydown('Tab');
+    menu()!.dispatchEvent(tab);
+    await settle();
+    expect(tab.defaultPrevented).toBe(false);
+    expect(menu()).toBeNull();
+    expect(document.activeElement).toBe(trigger());
     fixture.destroy();
   });
 
