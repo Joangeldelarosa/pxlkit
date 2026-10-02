@@ -60,6 +60,27 @@ export function Default() {
     </PixelBounce>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelBounce } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBounce>
+    <span>Bounce</span>
+  </PixelBounce>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBounce } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBounce],
+  template: \`
+    <pxl-bounce>
+      <span>Bounce</span>
+    </pxl-bounce>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -78,6 +99,27 @@ export function Default() {
     </PixelBounce>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBounce } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBounce>
+    <span>Bounce</span>
+  </PixelBounce>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBounce } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBounce],
+  template: \`
+    <pxl-bounce>
+      <span>Bounce</span>
+    </pxl-bounce>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-taller-bounce">
@@ -94,6 +136,27 @@ export function TallerBounce() {
     </PixelBounce>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBounce } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBounce :height="16" :duration="1000">
+    <span>Higher Jump</span>
+  </PixelBounce>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBounce } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBounce],
+  template: \`
+    <pxl-bounce [height]="16" [duration]="1000">
+      <span>Higher Jump</span>
+    </pxl-bounce>
+  \`,
+})
+export class TallerBounce {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
@@ -110,6 +173,27 @@ export function HoverTrigger() {
     </PixelBounce>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBounce } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBounce trigger="hover" :repeat="1">
+    <span>Hover me</span>
+  </PixelBounce>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBounce } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBounce],
+  template: \`
+    <pxl-bounce trigger="hover" [repeat]="1">
+      <span>Hover me</span>
+    </pxl-bounce>
+  \`,
+})
+export class HoverTrigger {}`}
         />
       </article>
     </section>

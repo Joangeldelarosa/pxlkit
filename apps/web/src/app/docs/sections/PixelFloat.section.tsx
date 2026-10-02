@@ -60,6 +60,27 @@ export function Default() {
     </PixelFloat>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelFloat } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFloat>
+    <span>Float</span>
+  </PixelFloat>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelFloat } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFloat],
+  template: \`
+    <pxl-float>
+      <span>Float</span>
+    </pxl-float>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -78,6 +99,27 @@ export function Default() {
     </PixelFloat>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFloat } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFloat>
+    <span>Float</span>
+  </PixelFloat>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFloat } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFloat],
+  template: \`
+    <pxl-float>
+      <span>Float</span>
+    </pxl-float>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-farther-travel">
@@ -94,6 +136,27 @@ export function FartherTravel() {
     </PixelFloat>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFloat } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFloat :distance="14" :duration="2800">
+    <span>Drifting Higher</span>
+  </PixelFloat>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFloat } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFloat],
+  template: \`
+    <pxl-float [distance]="14" [duration]="2800">
+      <span>Drifting Higher</span>
+    </pxl-float>
+  \`,
+})
+export class FartherTravel {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
@@ -110,6 +173,27 @@ export function HoverTrigger() {
     </PixelFloat>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFloat } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFloat trigger="hover" :repeat="3">
+    <span>Hover me</span>
+  </PixelFloat>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFloat } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFloat],
+  template: \`
+    <pxl-float trigger="hover" [repeat]="3">
+      <span>Hover me</span>
+    </pxl-float>
+  \`,
+})
+export class HoverTrigger {}`}
         />
       </article>
     </section>

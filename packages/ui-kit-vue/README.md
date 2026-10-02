@@ -111,6 +111,7 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | `PixelBareTextarea` | stable | forms |
 | `PixelBento` | stable | layout |
 | `PixelBentoCell` | stable | layout |
+| `PixelBounce` | stable | animations |
 | `PixelBox` | stable | layout |
 | `PixelBreadcrumb` | stable | navigation |
 | `PixelButton` | stable | actions |
@@ -129,6 +130,10 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | `PixelDropdown` | stable | overlays |
 | `PixelEmptyState` | stable | feedback |
 | `PixelEqualHeightGrid` | stable | layout |
+| `PixelFadeIn` | stable | animations |
+| `PixelFlicker` | stable | animations |
+| `PixelFloat` | stable | animations |
+| `PixelGlitch` | stable | animations |
 | `PixelGrid` | stable | layout |
 | `PixelInput` | stable | forms |
 | `PixelInputGroup` | stable | forms |
@@ -142,15 +147,19 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | `PixelPopover` | stable | overlay-foundation |
 | `PixelPortal` | stable | overlay-foundation |
 | `PixelProgress` | stable | feedback |
+| `PixelPulse` | stable | animations |
 | `PixelRadioGroup` | stable | forms |
+| `PixelRotate` | stable | animations |
 | `PixelScrollArea` | stable | layout |
 | `PixelSection` | stable | layout |
 | `PixelSectionHeader` | stable | layout |
 | `PixelSegmented` | stable | forms |
 | `PixelSelect` | stable | forms |
+| `PixelShake` | stable | animations |
 | `PixelSheet` | stable | overlays |
 | `PixelSidebar` | stable | navigation |
 | `PixelSkeleton` | stable | feedback |
+| `PixelSlideIn` | stable | animations |
 | `PixelSpinner` | stable | feedback |
 | `PixelStack` | stable | layout |
 | `PixelStepper` | stable | navigation |
@@ -163,6 +172,8 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | `PixelToggle` | stable | forms |
 | `PixelTooltip` | stable | overlays |
 | `PixelTwoColumn` | stable | layout |
+| `PixelTypewriter` | stable | animations |
+| `PixelZoomIn` | stable | animations |
 | `PxlKitLocaleProvider` | stable | overlay-foundation |
 | `PxlKitSurfaceProvider` | stable | overlay-foundation |
 | `PxlKitToastProvider` | stable | feedback |

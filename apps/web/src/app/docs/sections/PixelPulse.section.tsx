@@ -60,6 +60,27 @@ export function Default() {
     </PixelPulse>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelPulse } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPulse>
+    <span>Pulse</span>
+  </PixelPulse>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelPulse } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPulse],
+  template: \`
+    <pxl-pulse>
+      <span>Pulse</span>
+    </pxl-pulse>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -78,6 +99,27 @@ export function Default() {
     </PixelPulse>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelPulse } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPulse>
+    <span>Pulse</span>
+  </PixelPulse>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPulse } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPulse],
+  template: \`
+    <pxl-pulse>
+      <span>Pulse</span>
+    </pxl-pulse>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-faster-pulse">
@@ -94,6 +136,27 @@ export function FasterPulse() {
     </PixelPulse>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelPulse } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPulse :duration="1000">
+    <span>Quick Pulse</span>
+  </PixelPulse>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPulse } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPulse],
+  template: \`
+    <pxl-pulse [duration]="1000">
+      <span>Quick Pulse</span>
+    </pxl-pulse>
+  \`,
+})
+export class FasterPulse {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
@@ -110,6 +173,27 @@ export function HoverTrigger() {
     </PixelPulse>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelPulse } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPulse trigger="hover" :repeat="1">
+    <span>Hover me</span>
+  </PixelPulse>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPulse } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPulse],
+  template: \`
+    <pxl-pulse trigger="hover" [repeat]="1">
+      <span>Hover me</span>
+    </pxl-pulse>
+  \`,
+})
+export class HoverTrigger {}`}
         />
       </article>
     </section>

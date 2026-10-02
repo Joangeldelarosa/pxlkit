@@ -62,6 +62,27 @@ export function Default() {
     </PixelGlitch>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelGlitch>
+    <span class="text-2xl font-bold">SYSTEM ONLINE</span>
+  </PixelGlitch>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch, PixelGlitchContent],
+  template: \`
+    <pxl-glitch>
+      <span *pxlGlitchContent class="text-2xl font-bold">SYSTEM ONLINE</span>
+    </pxl-glitch>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -80,6 +101,27 @@ export function Default() {
     </PixelGlitch>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelGlitch>
+    <span class="text-2xl font-bold">SYSTEM ONLINE</span>
+  </PixelGlitch>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch, PixelGlitchContent],
+  template: \`
+    <pxl-glitch>
+      <span *pxlGlitchContent class="text-2xl font-bold">SYSTEM ONLINE</span>
+    </pxl-glitch>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-high-intensity">
@@ -96,6 +138,27 @@ export function HighIntensity() {
     </PixelGlitch>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelGlitch :intensity="8" :duration="2000">
+    <span class="text-2xl font-bold">CRITICAL ERROR</span>
+  </PixelGlitch>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch, PixelGlitchContent],
+  template: \`
+    <pxl-glitch [intensity]="8" [duration]="2000">
+      <span *pxlGlitchContent class="text-2xl font-bold">CRITICAL ERROR</span>
+    </pxl-glitch>
+  \`,
+})
+export class HighIntensity {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
@@ -112,6 +175,27 @@ export function HoverTrigger() {
     </PixelGlitch>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelGlitch trigger="hover">
+    <span class="text-2xl font-bold">HOVER ME</span>
+  </PixelGlitch>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch, PixelGlitchContent],
+  template: \`
+    <pxl-glitch trigger="hover">
+      <span *pxlGlitchContent class="text-2xl font-bold">HOVER ME</span>
+    </pxl-glitch>
+  \`,
+})
+export class HoverTrigger {}`}
         />
       </article>
     </section>

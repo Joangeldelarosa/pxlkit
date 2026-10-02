@@ -61,6 +61,27 @@ export function Default() {
     </PixelFlicker>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelFlicker } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFlicker>
+    <span>OPEN 24/7</span>
+  </PixelFlicker>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelFlicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFlicker],
+  template: \`
+    <pxl-flicker>
+      <span>OPEN 24/7</span>
+    </pxl-flicker>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -79,6 +100,27 @@ export function Default() {
     </PixelFlicker>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFlicker } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFlicker>
+    <span>OPEN 24/7</span>
+  </PixelFlicker>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFlicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFlicker],
+  template: \`
+    <pxl-flicker>
+      <span>OPEN 24/7</span>
+    </pxl-flicker>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-faster-flicker">
@@ -95,6 +137,27 @@ export function FasterFlicker() {
     </PixelFlicker>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFlicker } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFlicker :duration="900">
+    <span>NEON</span>
+  </PixelFlicker>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFlicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFlicker],
+  template: \`
+    <pxl-flicker [duration]="900">
+      <span>NEON</span>
+    </pxl-flicker>
+  \`,
+})
+export class FasterFlicker {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
@@ -111,6 +174,27 @@ export function HoverTrigger() {
     </PixelFlicker>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFlicker } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFlicker trigger="hover" :repeat="1">
+    <span>Hover me</span>
+  </PixelFlicker>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFlicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFlicker],
+  template: \`
+    <pxl-flicker trigger="hover" [repeat]="1">
+      <span>Hover me</span>
+    </pxl-flicker>
+  \`,
+})
+export class HoverTrigger {}`}
         />
       </article>
     </section>

@@ -1,8 +1,9 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { pulseStyle } from '@pxlkit/ui-kit-core';
 import type { AnimationRepeat, AnimationTrigger } from './types';
-import { mergeRefs, repeatToCss, useAnimationTrigger, usePixelAnimations } from './_internal/animation-hooks';
+import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelPulse — gently scales + dims children to draw attention.
@@ -37,17 +38,12 @@ export const PixelPulse = forwardRef<HTMLDivElement, PixelPulseProps>(function P
   },
   forwardedRef,
 ) {
-  usePixelAnimations();
   const { ref, active, handlers, handleAnimEnd } = useAnimationTrigger(trigger, onComplete);
   return (
     <div
       ref={mergeRefs(ref, forwardedRef)}
       className={className}
-      style={
-        active
-          ? { animation: `pxl-pulse ${duration}ms ${easing} 0ms ${repeatToCss(repeat)} both` }
-          : undefined
-      }
+      style={active ? pulseStyle({ duration, repeat, easing }) : undefined}
       {...handlers}
       onAnimationEnd={handleAnimEnd}
     >

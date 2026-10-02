@@ -60,6 +60,27 @@ export function Default() {
     </PixelRotate>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelRotate } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelRotate>
+    <span>Rotate</span>
+  </PixelRotate>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelRotate } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRotate],
+  template: \`
+    <pxl-rotate>
+      <span>Rotate</span>
+    </pxl-rotate>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -78,6 +99,27 @@ export function Default() {
     </PixelRotate>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelRotate } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelRotate>
+    <span>Rotate</span>
+  </PixelRotate>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRotate } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRotate],
+  template: \`
+    <pxl-rotate>
+      <span>Rotate</span>
+    </pxl-rotate>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-reverse-direction">
@@ -94,6 +136,27 @@ export function ReverseDirection() {
     </PixelRotate>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelRotate } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelRotate direction="reverse" :duration="2400">
+    <span>Reverse</span>
+  </PixelRotate>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRotate } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRotate],
+  template: \`
+    <pxl-rotate direction="reverse" [duration]="2400">
+      <span>Reverse</span>
+    </pxl-rotate>
+  \`,
+})
+export class ReverseDirection {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
@@ -110,6 +173,27 @@ export function HoverTrigger() {
     </PixelRotate>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelRotate } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelRotate trigger="hover" :repeat="1" :duration="900">
+    <span>Hover me</span>
+  </PixelRotate>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRotate } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRotate],
+  template: \`
+    <pxl-rotate trigger="hover" [repeat]="1" [duration]="900">
+      <span>Hover me</span>
+    </pxl-rotate>
+  \`,
+})
+export class HoverTrigger {}`}
         />
       </article>
     </section>

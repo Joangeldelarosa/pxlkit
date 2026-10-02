@@ -137,6 +137,15 @@ import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit-vue';
     </PixelBentoCell>
   </PixelBento>
 </template>`,
+  'pixel-bounce': `<script setup lang="ts">
+import { PixelBounce } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBounce>
+    <span>Bounce</span>
+  </PixelBounce>
+</template>`,
   'pixel-box': `<script setup lang="ts">
 import { PixelBox } from '@pxlkit/ui-kit-vue';
 </script>
@@ -358,6 +367,42 @@ const cards = [
     </div>
   </PixelEqualHeightGrid>
 </template>`,
+  'pixel-fade-in': `<script setup lang="ts">
+import { PixelFadeIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFadeIn>
+    <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
+  </PixelFadeIn>
+</template>`,
+  'pixel-flicker': `<script setup lang="ts">
+import { PixelFlicker } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFlicker>
+    <span>OPEN 24/7</span>
+  </PixelFlicker>
+</template>`,
+  'pixel-float': `<script setup lang="ts">
+import { PixelFloat } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFloat>
+    <span>Float</span>
+  </PixelFloat>
+</template>`,
+  'pixel-glitch': `<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelGlitch>
+    <span class="text-2xl font-bold">SYSTEM ONLINE</span>
+  </PixelGlitch>
+</template>`,
   'pixel-grid': `<script setup lang="ts">
 import { PixelGrid } from '@pxlkit/ui-kit-vue';
 
@@ -540,6 +585,15 @@ import { PixelProgress } from '@pxlkit/ui-kit-vue';
 <template>
   <PixelProgress :value="60" label="HP" />
 </template>`,
+  'pixel-pulse': `<script setup lang="ts">
+import { PixelPulse } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPulse>
+    <span>Pulse</span>
+  </PixelPulse>
+</template>`,
   'pixel-radio-group': `<script setup lang="ts">
 import { ref } from 'vue';
 import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';
@@ -554,6 +608,15 @@ const value = ref('free');
 
 <template>
   <PixelRadioGroup v-model="value" label="Plan" :options="PLANS" />
+</template>`,
+  'pixel-rotate': `<script setup lang="ts">
+import { PixelRotate } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelRotate>
+    <span>Rotate</span>
+  </PixelRotate>
 </template>`,
   'pixel-scroll-area': `<script setup lang="ts">
 import { PixelScrollArea } from '@pxlkit/ui-kit-vue';
@@ -617,6 +680,15 @@ const FRUITS = [
 <template>
   <PixelSelect label="Fruit" :options="FRUITS" placeholder="Pick a fruit" hint="Choose your favorite" />
 </template>`,
+  'pixel-shake': `<script setup lang="ts">
+import { PixelShake } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelShake>
+    <span>Shake on mount</span>
+  </PixelShake>
+</template>`,
   'pixel-sheet': `<script setup lang="ts">
 import { ref } from 'vue';
 import { PixelSheet } from '@pxlkit/ui-kit-vue';
@@ -666,6 +738,15 @@ import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
 
 <template>
   <PixelSkeleton width="12rem" height="1rem" />
+</template>`,
+  'pixel-slide-in': `<script setup lang="ts">
+import { PixelSlideIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSlideIn>
+    <div style="padding: 16px; background: #111; color: #fff">Slides in from below on mount</div>
+  </PixelSlideIn>
 </template>`,
   'pixel-spinner': `<script setup lang="ts">
 import { PixelSpinner } from '@pxlkit/ui-kit-vue';
@@ -788,6 +869,22 @@ import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
     <template #left><div class="text-sm text-retro-muted">Left column</div></template>
     <template #right><div class="text-sm text-retro-muted">Right column</div></template>
   </PixelTwoColumn>
+</template>`,
+  'pixel-typewriter': `<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="Hello, pxlkit." />
+</template>`,
+  'pixel-zoom-in': `<script setup lang="ts">
+import { PixelZoomIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelZoomIn>
+    <div style="padding: 16px; background: #0EA5E9; color: #fff; border-radius: 8px">Zoom in content</div>
+  </PixelZoomIn>
 </template>`,
   'pxl-kit-locale-provider': `<script setup lang="ts">
 import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';

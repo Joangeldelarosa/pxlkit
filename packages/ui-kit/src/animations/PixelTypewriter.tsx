@@ -1,7 +1,8 @@
 'use client';
 
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
-import { cn, Tone, toneMap } from '../common';
+import { TYPEWRITER_CARET, typeText, typewriterClasses } from '@pxlkit/ui-kit-core';
+import { cn, Tone } from '../common';
 import type { AnimationTrigger } from './types';
 import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
 
@@ -52,6 +53,7 @@ export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
   const reducedCompleteRef = useRef(false);
+  const classes = typewriterClasses(tone);
 
   useEffect(() => {
     if (reducedMotion) {
@@ -67,37 +69,20 @@ export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>
       }
       return;
     }
-    if (!active) {
-      setDisplayed('');
-      setDone(false);
-      return;
-    }
     setDisplayed('');
     setDone(false);
-    let i = 0;
-    let intervalId: ReturnType<typeof setInterval> | undefined;
-    const timeoutId = setTimeout(() => {
-      intervalId = setInterval(() => {
-        i++;
-        setDisplayed(resolvedText.slice(0, i));
-        if (i >= resolvedText.length) {
-          clearInterval(intervalId);
-          setDone(true);
-          endAnimation();
-        }
-      }, speed);
-    }, delay);
-    return () => {
-      clearTimeout(timeoutId);
-      if (intervalId) clearInterval(intervalId);
-    };
+    if (!active) return;
+    return typeText(resolvedText, { speed, delay }, setDisplayed, () => {
+      setDone(true);
+      endAnimation();
+    });
   }, [active, reducedMotion, resolvedText, speed, delay, endAnimation]);
 
   return (
     <span
       ref={mergeRefs(ref as unknown as React.Ref<HTMLSpanElement>, forwardedRef)}
       {...(handlers as React.DOMAttributes<HTMLSpanElement>)}
-      className={cn('font-mono', toneMap[tone].text, className)}
+      className={cn(classes.root, className)}
     >
       {/* Screen readers get the complete string from the first render; the
           character-by-character churn below is purely visual (announcing
@@ -105,7 +90,7 @@ export const PixelTypewriter = forwardRef<HTMLSpanElement, PixelTypewriterProps>
       <span className="sr-only">{resolvedText}</span>
       <span aria-hidden="true">
         {displayed}
-        {cursor && !done && active && <span className="animate-pulse">▌</span>}
+        {cursor && !done && active && <span className={classes.caret}>{TYPEWRITER_CARET}</span>}
       </span>
     </span>
   );

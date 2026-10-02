@@ -72,10 +72,10 @@ describe('PixelFadeIn', () => {
     }
   });
 
-  it('forwards className and injects the shared keyframes stylesheet once', () => {
+  it('forwards className and injects no stylesheet: the keyframes are in the theme', () => {
     const { container } = render(<PixelFadeIn className="custom">x</PixelFadeIn>);
     const el = container.firstElementChild as HTMLElement;
     expect(el.className).toContain('custom');
-    expect(document.querySelectorAll('#pxl-anims')).toHaveLength(1);
+    expect(document.head.querySelectorAll('style')).toHaveLength(0);
   });
 });

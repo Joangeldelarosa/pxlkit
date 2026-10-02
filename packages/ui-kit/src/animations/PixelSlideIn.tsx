@@ -1,8 +1,9 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { slideInStyle } from '@pxlkit/ui-kit-core';
 import type { AnimationRepeat, AnimationTrigger } from './types';
-import { mergeRefs, repeatToCss, useAnimationTrigger, usePixelAnimations } from './_internal/animation-hooks';
+import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelSlideIn — translates children in from one of four edges.
@@ -49,20 +50,12 @@ export const PixelSlideIn = forwardRef<HTMLDivElement, PixelSlideInProps>(functi
   },
   forwardedRef,
 ) {
-  usePixelAnimations();
   const { ref, active, handlers, handleAnimEnd } = useAnimationTrigger(trigger, onComplete);
   return (
     <div
       ref={mergeRefs(ref, forwardedRef)}
       className={className}
-      style={
-        active
-          ? {
-              animation: `pxl-slide-${from} ${duration}ms ${easing} ${delay}ms ${repeatToCss(repeat)} ${fillMode}`,
-              ['--pxl-slide-distance' as string]: `${distance}px`,
-            }
-          : undefined
-      }
+      style={active ? slideInStyle({ from, duration, delay, distance, repeat, easing, fillMode }) : undefined}
       {...handlers}
       onAnimationEnd={handleAnimEnd}
     >

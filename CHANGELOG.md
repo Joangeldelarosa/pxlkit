@@ -73,6 +73,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   It brings Tailwind itself, so `@import "@pxlkit/ui-kit/styles.css";` replaces
   `@import "tailwindcss";` instead of following it — the READMEs, the site and the
   plugin's setup reference now say so, and drop the per-package-manager `@source` recipes.
+- `@pxlkit/ui-kit`: the animation components' keyframes ship in the theme stylesheet
+  (`styles.css`) instead of a `<style id="pxl-anims">` element they added to the page after
+  mounting, so server-rendered animations have their keyframes from the first paint and a
+  Content Security Policy needs no inline styles for them.
 - `@pxlkit/ui-kit` examples: `PxlKitSurfaceProvider` now demonstrates buttons inheriting
   the provider's surface and a per-component override.
 - Coherence tooling: gate 08 (`consistency-pkgjson`) requires the `@pxlkit/vue` and
@@ -125,6 +129,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@pxlkit/ui-kit`: `PixelStepper` steps get valid roles and names (clickable steps are buttons,
   the others read their position and state as hidden text), and `PixelAccordion` /
   `PixelCollapsible` panels drop an `aria-labelledby` that ARIA does not allow without a role.
+- `@pxlkit/ui-kit`: `trigger="inView"` animations play where `IntersectionObserver` is
+  missing instead of throwing, and follow the latest of several intersection changes; a
+  second click on a `trigger="click"` animation no longer throws where the Web Animations
+  API is missing; and `PixelTypewriter` types its text once while the parent re-renders with
+  a new `onComplete` function — it started over on every render, so
+  `onComplete={() => setState(…)}` typed forever.
 - `@pxlkit/ui-kit`: the legacy `.pixel-border` utility draws its outer border, and on the site
   the builder grid's cell borders and the text selection highlight show: all three read theme
   variables that were never defined (`--color-retro-border-base`, `--color-retro-green-base`).

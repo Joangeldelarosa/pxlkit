@@ -63,6 +63,27 @@ export function Default() {
     </PixelFadeIn>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelFadeIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFadeIn>
+    <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
+  </PixelFadeIn>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelFadeIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFadeIn],
+  template: \`
+    <pxl-fade-in>
+      <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
+    </pxl-fade-in>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -83,6 +104,27 @@ export function Default() {
     </PixelFadeIn>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFadeIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFadeIn>
+    <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
+  </PixelFadeIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFadeIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFadeIn],
+  template: \`
+    <pxl-fade-in>
+      <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
+    </pxl-fade-in>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-delayed">
@@ -101,6 +143,27 @@ export function Delayed() {
     </PixelFadeIn>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFadeIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFadeIn :duration="600" :delay="200" easing="ease-out">
+    <div style="padding: 16px; background: #0EA5E9; color: #000">Delayed fade-in</div>
+  </PixelFadeIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFadeIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFadeIn],
+  template: \`
+    <pxl-fade-in [duration]="600" [delay]="200" easing="ease-out">
+      <div style="padding: 16px; background: #0EA5E9; color: #000">Delayed fade-in</div>
+    </pxl-fade-in>
+  \`,
+})
+export class Delayed {}`}
         />
       </article>
       <article className="docs-example" id="example-on-hover">
@@ -119,6 +182,27 @@ export function OnHover() {
     </PixelFadeIn>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFadeIn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFadeIn trigger="hover" :duration="300">
+    <div style="padding: 16px; background: #222; color: #0EA5E9">Hover to fade in</div>
+  </PixelFadeIn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFadeIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFadeIn],
+  template: \`
+    <pxl-fade-in trigger="hover" [duration]="300">
+      <div style="padding: 16px; background: #222; color: #0EA5E9">Hover to fade in</div>
+    </pxl-fade-in>
+  \`,
+})
+export class OnHover {}`}
         />
       </article>
     </section>

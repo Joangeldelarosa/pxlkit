@@ -56,6 +56,21 @@ export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSec
 export function Default() {
   return <PixelTypewriter text="Hello, pxlkit." />;
 }`}
+        vue={`<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="Hello, pxlkit." />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="Hello, pxlkit." />\`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -70,6 +85,21 @@ export function Default() {
 export function Default() {
   return <PixelTypewriter text="Hello, pxlkit." />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="Hello, pxlkit." />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="Hello, pxlkit." />\`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-fast-cyan">
@@ -82,6 +112,21 @@ export function Default() {
 export function FastCyan() {
   return <PixelTypewriter text="Typing fast in cyan..." speed={30} tone="cyan" />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="Typing fast in cyan..." :speed="30" tone="cyan" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="Typing fast in cyan..." [speed]="30" tone="cyan" />\`,
+})
+export class FastCyan {}`}
         />
       </article>
       <article className="docs-example" id="example-no-cursor">
@@ -94,6 +139,21 @@ export function FastCyan() {
 export function NoCursor() {
   return <PixelTypewriter text="No blinking caret here." cursor={false} tone="gold" />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="No blinking caret here." :cursor="false" tone="gold" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="No blinking caret here." [cursor]="false" tone="gold" />\`,
+})
+export class NoCursor {}`}
         />
       </article>
       <article className="docs-example" id="example-on-view">
@@ -106,6 +166,21 @@ export function NoCursor() {
 export function OnView() {
   return <PixelTypewriter text="Types when scrolled into view." trigger="inView" tone="purple" />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelTypewriter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTypewriter text="Types when scrolled into view." trigger="inView" tone="purple" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="Types when scrolled into view." trigger="inView" tone="purple" />\`,
+})
+export class OnView {}`}
         />
       </article>
     </section>

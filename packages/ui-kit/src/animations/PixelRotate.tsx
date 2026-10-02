@@ -1,9 +1,10 @@
 'use client';
 
 import React, { forwardRef } from 'react';
+import { animationInlineClasses, rotateStyle } from '@pxlkit/ui-kit-core';
 import { cn } from '../common';
 import type { AnimationRepeat, AnimationTrigger } from './types';
-import { mergeRefs, repeatToCss, useAnimationTrigger, usePixelAnimations } from './_internal/animation-hooks';
+import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelRotate — full 360° rotation loop, configurable direction.
@@ -41,20 +42,12 @@ export const PixelRotate = forwardRef<HTMLDivElement, PixelRotateProps>(function
   },
   forwardedRef,
 ) {
-  usePixelAnimations();
   const { ref, active, handlers, handleAnimEnd } = useAnimationTrigger(trigger, onComplete);
   return (
     <div
       ref={mergeRefs(ref, forwardedRef)}
-      className={cn('inline-block', className)}
-      style={
-        active
-          ? {
-              animation: `pxl-rotate ${duration}ms ${easing} 0ms ${repeatToCss(repeat)} both`,
-              animationDirection: direction,
-            }
-          : undefined
-      }
+      className={cn(animationInlineClasses, className)}
+      style={active ? rotateStyle({ duration, repeat, direction, easing }) : undefined}
       {...handlers}
       onAnimationEnd={handleAnimEnd}
     >

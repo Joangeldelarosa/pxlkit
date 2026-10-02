@@ -160,6 +160,18 @@ import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class Default {}`,
+  'pixel-bounce': `import { Component } from '@angular/core';
+import { PixelBounce } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBounce],
+  template: \`
+    <pxl-bounce>
+      <span>Bounce</span>
+    </pxl-bounce>
+  \`,
+})
+export class Default {}`,
   'pixel-box': `import { Component } from '@angular/core';
 import { PixelBox } from '@pxlkit/ui-kit-angular';
 
@@ -425,6 +437,54 @@ export class Default {
     { title: 'Three', body: 'Medium length copy here.' },
   ];
 }`,
+  'pixel-fade-in': `import { Component } from '@angular/core';
+import { PixelFadeIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFadeIn],
+  template: \`
+    <pxl-fade-in>
+      <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
+    </pxl-fade-in>
+  \`,
+})
+export class Default {}`,
+  'pixel-flicker': `import { Component } from '@angular/core';
+import { PixelFlicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFlicker],
+  template: \`
+    <pxl-flicker>
+      <span>OPEN 24/7</span>
+    </pxl-flicker>
+  \`,
+})
+export class Default {}`,
+  'pixel-float': `import { Component } from '@angular/core';
+import { PixelFloat } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFloat],
+  template: \`
+    <pxl-float>
+      <span>Float</span>
+    </pxl-float>
+  \`,
+})
+export class Default {}`,
+  'pixel-glitch': `import { Component } from '@angular/core';
+import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch, PixelGlitchContent],
+  template: \`
+    <pxl-glitch>
+      <span *pxlGlitchContent class="text-2xl font-bold">SYSTEM ONLINE</span>
+    </pxl-glitch>
+  \`,
+})
+export class Default {}`,
   'pixel-grid': `import { Component } from '@angular/core';
 import { PixelGrid } from '@pxlkit/ui-kit-angular';
 
@@ -621,6 +681,18 @@ import { PixelProgress } from '@pxlkit/ui-kit-angular';
   template: \`<pxl-progress [value]="60" label="HP" />\`,
 })
 export class Default {}`,
+  'pixel-pulse': `import { Component } from '@angular/core';
+import { PixelPulse } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPulse],
+  template: \`
+    <pxl-pulse>
+      <span>Pulse</span>
+    </pxl-pulse>
+  \`,
+})
+export class Default {}`,
   'pixel-radio-group': `import { Component, signal } from '@angular/core';
 import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';
 
@@ -638,6 +710,18 @@ export class Default {
   readonly plans = PLANS;
   readonly value = signal('free');
 }`,
+  'pixel-rotate': `import { Component } from '@angular/core';
+import { PixelRotate } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRotate],
+  template: \`
+    <pxl-rotate>
+      <span>Rotate</span>
+    </pxl-rotate>
+  \`,
+})
+export class Default {}`,
   'pixel-scroll-area': `import { Component } from '@angular/core';
 import { PixelScrollArea } from '@pxlkit/ui-kit-angular';
 
@@ -720,6 +804,18 @@ const FRUITS = [
 export class Default {
   readonly fruits = FRUITS;
 }`,
+  'pixel-shake': `import { Component } from '@angular/core';
+import { PixelShake } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelShake],
+  template: \`
+    <pxl-shake>
+      <span>Shake on mount</span>
+    </pxl-shake>
+  \`,
+})
+export class Default {}`,
   'pixel-sheet': `import { Component, signal } from '@angular/core';
 import { PixelSheet } from '@pxlkit/ui-kit-angular';
 
@@ -775,6 +871,18 @@ import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
 @Component({
   imports: [PixelSkeleton],
   template: \`<pxl-skeleton width="12rem" height="1rem" />\`,
+})
+export class Default {}`,
+  'pixel-slide-in': `import { Component } from '@angular/core';
+import { PixelSlideIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlideIn],
+  template: \`
+    <pxl-slide-in>
+      <div style="padding: 16px; background: #111; color: #fff">Slides in from below on mount</div>
+    </pxl-slide-in>
+  \`,
 })
 export class Default {}`,
   'pixel-spinner': `import { Component } from '@angular/core';
@@ -922,6 +1030,26 @@ import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
     <div pxlTwoColumn [left]="left" [right]="right"></div>
     <ng-template #left><div class="text-sm text-retro-muted">Left column</div></ng-template>
     <ng-template #right><div class="text-sm text-retro-muted">Right column</div></ng-template>
+  \`,
+})
+export class Default {}`,
+  'pixel-typewriter': `import { Component } from '@angular/core';
+import { PixelTypewriter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTypewriter],
+  template: \`<pxl-typewriter text="Hello, pxlkit." />\`,
+})
+export class Default {}`,
+  'pixel-zoom-in': `import { Component } from '@angular/core';
+import { PixelZoomIn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelZoomIn],
+  template: \`
+    <pxl-zoom-in>
+      <div style="padding: 16px; background: #0EA5E9; color: #fff; border-radius: 8px">Zoom in content</div>
+    </pxl-zoom-in>
   \`,
 })
 export class Default {}`,
