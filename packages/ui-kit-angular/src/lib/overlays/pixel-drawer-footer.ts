@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { drawerFooterClasses, type Surface } from '@pxlkit/ui-kit-core';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 
@@ -6,6 +6,10 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
 @Component({
   selector: 'pxl-drawer-footer',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-drawer-footer { display: block; } }',
   host: { '[class]': 'classes()' },
   template: '<ng-content />',
 })

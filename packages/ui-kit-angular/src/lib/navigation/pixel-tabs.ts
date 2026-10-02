@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, model, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  model,
+  signal,
+  ViewEncapsulation,
+} from '@angular/core';
 import { cn, type Surface } from '@pxlkit/ui-kit-core';
 import { booleanOr, withDefault } from '../_internal/coercion';
 import { injectId } from '../_internal/ids';
@@ -32,6 +41,10 @@ export interface TabItem {
   selector: 'pxl-tabs',
   imports: [PixelTabsList, PixelTabsTrigger, PixelTabsPanel, PxlOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-tabs { display: block; } }',
   providers: [{ provide: PIXEL_TABS, useFactory: () => inject(PixelTabs).context }],
   host: {
     '[class]': 'orientation() === "horizontal" ? "space-y-3" : "flex gap-3"',

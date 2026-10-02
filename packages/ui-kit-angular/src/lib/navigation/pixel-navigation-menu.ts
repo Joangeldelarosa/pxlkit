@@ -6,6 +6,7 @@ import {
   input,
   signal,
   viewChildren,
+  ViewEncapsulation,
 } from '@angular/core';
 import {
   navigationMenuClasses,
@@ -74,6 +75,10 @@ export interface PixelNavigationMenuItem {
   selector: 'pxl-navigation-menu',
   imports: [PxlOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <nav>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-navigation-menu { display: block; } }',
   host: {
     role: 'navigation',
     '[attr.aria-label]': 'ariaLabel()',

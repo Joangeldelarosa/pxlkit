@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { colorSwatchClasses, colorSwatchFill, type Surface } from '@pxlkit/ui-kit-core';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 
@@ -12,6 +12,10 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
 @Component({
   selector: 'pxl-color-swatch',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-color-swatch { display: block; } }',
   host: { '[class]': 'classes().root' },
   template: `
     <div [class]="classes().sample" [style.background-color]="fill()"></div>

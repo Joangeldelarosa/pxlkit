@@ -8,6 +8,7 @@ import {
   inject,
   input,
   isDevMode,
+  ViewEncapsulation,
 } from '@angular/core';
 import {
   scrollAreaClasses,
@@ -32,6 +33,10 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
 @Component({
   selector: 'pxl-scroll-area',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-scroll-area { display: block; } }',
   host: {
     // Defaults: the element's own attributes win over them.
     role: 'region',

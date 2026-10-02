@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, model, ViewEncapsulation } from '@angular/core';
 import type { ControlValueAccessor } from '@angular/forms';
 import { segmentClasses, segmentedClasses, segmentedGroupName, type Surface, type Tone } from '@pxlkit/ui-kit-core';
 import { booleanOr, withDefault } from '../_internal/coercion';
@@ -19,6 +19,10 @@ import type { Option } from './option';
 @Component({
   selector: 'pxl-segmented',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-segmented { display: block; } }',
   providers: [provideValueAccessor(() => PixelSegmented)],
   host: {
     '[class]': 'classes().root',

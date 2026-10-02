@@ -10,6 +10,7 @@ import {
   signal,
   viewChild,
   viewChildren,
+  ViewEncapsulation,
 } from '@angular/core';
 import {
   MENUBAR_SUBMENU_ARROW,
@@ -84,6 +85,10 @@ export interface PixelMenubarMenu {
   selector: 'pxl-menubar',
   imports: [PxlOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-menubar { display: block; } }',
   host: {
     role: 'menubar',
     'aria-orientation': 'horizontal',

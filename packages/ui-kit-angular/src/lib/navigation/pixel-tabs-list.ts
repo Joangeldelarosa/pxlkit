@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { cn } from '@pxlkit/ui-kit-core';
 import { booleanOr, withDefault } from '../_internal/coercion';
 import { injectTabsContext } from './tabs-context';
@@ -12,6 +12,10 @@ const FADE_MASK = 'linear-gradient(to right, transparent 0, #000 16px, #000 calc
 @Component({
   selector: 'pxl-tabs-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-tabs-list { display: block; } }',
   host: { '[class]': 'wrapperClasses()' },
   template: `
     <div

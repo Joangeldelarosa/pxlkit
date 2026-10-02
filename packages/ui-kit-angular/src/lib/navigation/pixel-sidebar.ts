@@ -8,6 +8,7 @@ import {
   model,
   signal,
   type OnInit,
+  ViewEncapsulation,
 } from '@angular/core';
 import {
   sidebarBodyClasses,
@@ -73,6 +74,10 @@ export interface PixelSidebarSectionProps {
   selector: 'pxl-sidebar',
   imports: [PxlOutlet, PixelSidebarItem],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <nav>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-sidebar { display: block; } }',
   host: {
     role: 'navigation',
     '[attr.aria-label]': 'ariaLabel',

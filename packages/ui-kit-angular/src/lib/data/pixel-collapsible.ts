@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal, ViewEncapsulation } from '@angular/core';
 import { collapsibleClasses, collapsibleIds, type Surface, type Tone } from '@pxlkit/ui-kit-core';
 import { booleanOr, withDefault } from '../_internal/coercion';
 import { injectId } from '../_internal/ids';
@@ -22,6 +22,10 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
   selector: 'pxl-collapsible',
   imports: [PixelButton, PixelGlyph],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-collapsible { display: block; } }',
   host: { '[class]': 'classes().root' },
   template: `
     <button

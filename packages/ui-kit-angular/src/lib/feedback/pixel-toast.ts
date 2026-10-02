@@ -13,6 +13,7 @@ import {
   linkedSignal,
   output,
   viewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
@@ -56,6 +57,10 @@ import type { ToastItem } from './toast-context';
   selector: 'pxl-toast-card',
   imports: [PxlOutlet, PixelGlyph],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-toast-card { display: block; } }',
   host: {
     'data-pxl-toast': 'true',
     '[attr.data-tone]': 'tone()',

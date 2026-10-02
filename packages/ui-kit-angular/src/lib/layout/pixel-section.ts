@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import {
   sectionClasses,
   type ContainerWidth,
@@ -25,6 +25,10 @@ import { PixelCenter } from './pixel-center';
   selector: 'pxl-section',
   imports: [NgTemplateOutlet, PixelCenter],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <section>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-section { display: block; } }',
   host: {
     '[class]': 'classes().section',
     // `title` heads the section; on the host it would show a native tooltip.

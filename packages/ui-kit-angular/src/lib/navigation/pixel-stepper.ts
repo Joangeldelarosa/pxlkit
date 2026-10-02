@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, contentChildren, inject, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  contentChildren,
+  inject,
+  input,
+  output,
+  ViewEncapsulation,
+} from '@angular/core';
 import {
   stepClickable,
   stepperClasses,
@@ -30,6 +39,10 @@ import { PIXEL_STEPPER, type PixelStepperContext } from './stepper-context';
 @Component({
   selector: 'pxl-stepper',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-stepper { display: block; } }',
   providers: [{ provide: PIXEL_STEPPER, useFactory: () => inject(PixelStepper).context }],
   host: {
     'data-pxl-stepper': 'true',

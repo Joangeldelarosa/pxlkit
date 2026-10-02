@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { SKELETON_DEFAULT_HEIGHT, SKELETON_DEFAULT_LABEL, skeletonClasses, type Surface } from '@pxlkit/ui-kit-core';
 import { booleanOr, withDefault } from '../_internal/coercion';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
@@ -15,6 +15,10 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
 @Component({
   selector: 'pxl-skeleton',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-skeleton { display: block; } }',
   host: {
     role: 'status',
     '[attr.aria-label]': 'ariaLabel()',

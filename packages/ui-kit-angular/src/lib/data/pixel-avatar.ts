@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, signal, ViewEncapsulation } from '@angular/core';
 import {
   avatarAccessibleName,
   avatarClasses,
@@ -28,6 +28,10 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
 @Component({
   selector: 'pxl-avatar',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-avatar { display: block; } }',
   host: { '[class]': 'classes().root' },
   template: `
     <div

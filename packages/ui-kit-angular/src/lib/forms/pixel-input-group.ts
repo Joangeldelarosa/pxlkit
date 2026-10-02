@@ -8,6 +8,7 @@ import {
   inject,
   input,
   isDevMode,
+  ViewEncapsulation,
 } from '@angular/core';
 import {
   INPUT_GROUP_UNNAMED_WARNING,
@@ -54,6 +55,10 @@ export class PixelInputGroupItem {
 @Component({
   selector: 'pxl-input-group',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-input-group { display: block; } }',
   host: {
     '[attr.role]': 'groupRole() ?? null',
     '[attr.aria-label]': 'ariaLabel() ?? null',

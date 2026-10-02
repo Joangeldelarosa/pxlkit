@@ -12,6 +12,7 @@ import {
   input,
   model,
   viewChildren,
+  ViewEncapsulation,
 } from '@angular/core';
 import type { ControlValueAccessor } from '@angular/forms';
 import {
@@ -63,6 +64,10 @@ export class PixelChipGroupItem {
   selector: 'pxl-chip-group',
   imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-chip-group { display: block; } }',
   providers: [provideValueAccessor(() => PixelChipGroup)],
   host: {
     '[attr.role]': 'role()',

@@ -10,6 +10,7 @@ import {
   inject,
   input,
   signal,
+  ViewEncapsulation,
 } from '@angular/core';
 import {
   badgeGroupClasses,
@@ -56,6 +57,10 @@ export class PixelBadgeGroupItem {
   selector: 'pxl-badge-group',
   imports: [NgTemplateOutlet, PixelPopover, PixelPopoverTrigger, PixelPopoverContent],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-badge-group { display: block; } }',
   host: {
     '[attr.role]': 'role',
     '[class]': 'classes',

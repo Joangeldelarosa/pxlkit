@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import {
   breadcrumbChevron,
   breadcrumbClasses,
@@ -38,6 +38,10 @@ export interface PixelBreadcrumbItem {
 @Component({
   selector: 'pxl-breadcrumb',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <nav>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-breadcrumb { display: block; } }',
   host: {
     role: 'navigation',
     '[attr.aria-label]': 'ariaLabel()',

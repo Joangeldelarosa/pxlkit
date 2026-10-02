@@ -9,6 +9,7 @@ import {
   contentChildren,
   inject,
   input,
+  ViewEncapsulation,
 } from '@angular/core';
 import {
   avatarGroupClasses,
@@ -53,6 +54,10 @@ export class PixelAvatarGroupItem {
   selector: 'pxl-avatar-group',
   imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-avatar-group { display: block; } }',
   host: {
     '[attr.role]': 'role',
     '[class]': 'classes',

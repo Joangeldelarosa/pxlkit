@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { alertClasses, alertLive, type AlertLive, type Surface, type Tone } from '@pxlkit/ui-kit-core';
 import { withDefault } from '../_internal/coercion';
 import { PxlOutlet, type PxlContent } from '../_internal/outlet';
@@ -19,6 +19,10 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
   selector: 'pxl-alert',
   imports: [PxlOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-alert { display: block; } }',
   host: {
     role: 'alert',
     '[attr.aria-live]': 'ariaLive()',

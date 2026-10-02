@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, model, ViewEncapsulation } from '@angular/core';
 import { dropdownRootClasses, type Surface } from '@pxlkit/ui-kit-core';
 import { booleanOr } from '../_internal/coercion';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
@@ -27,6 +27,10 @@ import { PIXEL_DROPDOWN, createDropdownRoot } from './dropdown-context';
 @Component({
   selector: 'pxl-dropdown-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-dropdown-root { display: block; } }',
   providers: [{ provide: PIXEL_DROPDOWN, useFactory: () => inject(PixelDropdownRoot).context }],
   host: { '[class]': 'rootClasses' },
   template: '<ng-content />',

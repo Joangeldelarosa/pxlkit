@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { BENTO_AUTO_ROWS, bentoClasses, type BentoColumns, type StackGapKey } from '@pxlkit/ui-kit-core';
 
 /**
@@ -13,6 +13,10 @@ import { BENTO_AUTO_ROWS, bentoClasses, type BentoColumns, type StackGapKey } fr
 @Component({
   selector: 'pxl-bento',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-bento { display: block; } }',
   host: {
     '[class]': 'classes()',
     '[attr.data-columns]': 'columns()',

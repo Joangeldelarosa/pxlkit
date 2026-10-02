@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { fieldShellClasses, fieldShellTextClasses, type Surface } from '@pxlkit/ui-kit-core';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 
@@ -10,6 +10,10 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
 @Component({
   selector: 'pxl-field-shell',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-field-shell { display: block; } }',
   host: {
     '[class]': 'rootClasses',
   },

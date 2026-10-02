@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import { emptyStateClasses, type Surface } from '@pxlkit/ui-kit-core';
 import { PxlOutlet, type PxlContent } from '../_internal/outlet';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
@@ -17,6 +17,10 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
   selector: 'pxl-empty-state',
   imports: [PxlOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-empty-state { display: block; } }',
   host: {
     '[class]': 'classes().root',
     // `title` is the heading; on the host it would show a native tooltip.

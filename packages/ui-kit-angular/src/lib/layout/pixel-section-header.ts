@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 import {
   sectionHeaderClasses,
   type SectionHeaderAlign,
@@ -27,6 +27,10 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
   selector: 'pxl-section-header',
   imports: [NgTemplateOutlet, PxlOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <header>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-section-header { display: block; } }',
   host: {
     '[class]': 'classes().header',
     // `title` is the heading; on the host it would show a native tooltip.

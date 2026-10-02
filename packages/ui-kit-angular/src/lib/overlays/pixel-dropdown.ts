@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, contentChild, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  contentChild,
+  inject,
+  input,
+  output,
+  signal,
+  ViewEncapsulation,
+} from '@angular/core';
 import { dropdownRootClasses, type DropdownItemKind, type Surface, type Tone } from '@pxlkit/ui-kit-core';
 import { booleanOr, withDefault } from '../_internal/coercion';
 import type { PxlContent } from '../_internal/outlet';
@@ -38,6 +48,10 @@ export interface DropdownOption {
   selector: 'pxl-dropdown',
   imports: [PixelDropdownTrigger, PixelDropdownContent, PixelDropdownItem, PixelDropdownSeparator, PixelDropdownHeader],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // The host stands for React's <div>: a block box, in the base layer, so
+  // display utilities set on it still win.
+  encapsulation: ViewEncapsulation.None,
+  styles: '@layer base { pxl-dropdown { display: block; } }',
   providers: [{ provide: PIXEL_DROPDOWN, useFactory: () => inject(PixelDropdown).context }],
   host: { '[class]': 'rootClasses' },
   template: `
