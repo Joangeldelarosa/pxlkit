@@ -5,5 +5,11 @@
   "lib": {
     "entryFile": "src/public-api.ts"
   },
-  "allowedNonPeerDependencies": ["@pxlkit/ui-kit-core"]
+  "allowedNonPeerDependencies": [
+    "@pxlkit/ui-kit-core",
+    "@pxlkit/angular",
+    "@pxlkit/gamification",
+    "@tanstack/angular-table",
+    "embla-carousel"
+  ]
 }

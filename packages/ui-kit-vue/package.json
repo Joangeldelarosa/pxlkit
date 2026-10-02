@@ -33,7 +33,12 @@
     "vue": "^3.5.0"
   },
   "dependencies": {
-    "@pxlkit/ui-kit-core": "^2.2.0"
+    "@pxlkit/gamification": "^1.2.4",
+    "@pxlkit/ui-kit-core": "^2.2.0",
+    "@pxlkit/vue": "^0.1.0",
+    "@tanstack/vue-table": "^8.21.3",
+    "embla-carousel": "^8.6.0",
+    "vee-validate": "^4.15.1"
   },
   "devDependencies": {
     "@pxlkit/ui-kit": "*",
