@@ -58,27 +58,33 @@ describe('paginationWindow', () => {
   });
 
   it('always shows the ends, the current page and its siblings, with a gap exactly where pages are missing', () => {
+    // Thousands of windows: collect what is wrong and assert once, which
+    // also names every failing window.
+    const problems: string[] = [];
     for (let total = 8; total <= 30; total++) {
       for (let page = -1; page <= total + 2; page++) {
         for (let siblings = 0; siblings <= 4; siblings++) {
           const entries = paginationWindow(page, total, siblings);
-          expect(entries[0]).toBe(1);
-          expect(entries[entries.length - 1]).toBe(total);
-          const pages = entries.filter((entry): entry is number => entry !== GAP);
-          for (let i = Math.max(1, page - siblings); i <= Math.min(total, page + siblings); i++) expect(pages).toContain(i);
+          const where = `page ${page} of ${total}, ${siblings} siblings → ${entries.join(' ')}`;
+          if (entries[0] !== 1 || entries[entries.length - 1] !== total) problems.push(`${where}: not from 1 to ${total}`);
+          const pages = new Set(entries.filter((entry): entry is number => entry !== GAP));
+          for (let i = Math.max(1, page - siblings); i <= Math.min(total, page + siblings); i++) {
+            if (!pages.has(i)) problems.push(`${where}: page ${i} missing`);
+          }
           for (let i = 1; i < entries.length; i++) {
-            const before = entries[i - 1];
-            const entry = entries[i];
+            const before = entries[i - 1]!;
+            const entry = entries[i]!;
             if (entry === GAP) {
-              expect(before).not.toBe(GAP);
-              expect((entries[i + 1] as number) - (before as number)).toBeGreaterThan(1);
-            } else if (before !== GAP) {
-              expect(entry - before).toBe(1);
+              const after = entries[i + 1];
+              if (before === GAP || after === GAP || (after as number) - before <= 1) problems.push(`${where}: gap at ${i} hides no page`);
+            } else if (before !== GAP && entry - before !== 1) {
+              problems.push(`${where}: ${before} then ${entry} with no gap`);
             }
           }
         }
       }
     }
+    expect(problems).toEqual([]);
   });
 });
 
