@@ -189,6 +189,22 @@ export function PixelWhirl({ surface: surfaceProp }: PixelWhirlProps) {
 }
 `;
 
+// Recipe delegation: the resolved surface goes straight into a class
+// recipe from @pxlkit/ui-kit-core. PixelEmptyState is the in-repo example.
+const RECIPE_ON_SURFACE_SOURCE = `
+import { emptyStateClasses } from "@pxlkit/ui-kit-core";
+import { Surface, useEffectiveSurface } from "../common";
+
+export interface PixelHushProps {
+  surface?: Surface;
+}
+
+export function PixelHush({ surface: surfaceProp }: PixelHushProps) {
+  const classes = emptyStateClasses(useEffectiveSurface(surfaceProp));
+  return <div className={classes.root} />;
+}
+`;
+
 // Context delegation: the component resolves the effective surface and
 // publishes it through a context value for child parts (triggers / panels /
 // items) to consume. PixelTabs / PixelToggleGroup are the in-repo examples.
@@ -397,6 +413,14 @@ describe('analyzeSurfaceCoherence', () => {
     expect(c.callsUseEffectiveSurface).toBe(true);
     expect(c.useEffectiveSurfaceUsesProp).toBe(true);
     expect(c.usesResolvedSurface).toBe(true);
+  });
+
+  it('detects consumption of the resolved surface (handed straight to a recipe)', () => {
+    const r = analyzeSurfaceCoherence(RECIPE_ON_SURFACE_SOURCE, 'PixelHush.tsx');
+    const c = r.components[0]!;
+    expect(c.useEffectiveSurfaceUsesProp).toBe(true);
+    expect(c.usesResolvedSurface).toBe(true);
+    expect(findingsFor(c)).toEqual([]);
   });
 
   it('detects consumption of the resolved surface (context value)', () => {
