@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { PxlKitToastProvider, useToast } from '../../feedback/PxlKitToastProvider';
 
 type Listener = (e: { matches: boolean }) => void;
@@ -168,5 +168,98 @@ describe('PxlKitToastProvider', () => {
     );
     const viewport = document.querySelector('[data-pxl-toast-viewport]') as HTMLElement;
     expect(viewport.getAttribute('data-stacked')).toBe('false');
+  });
+});
+
+describe('PxlKitToastProvider — viewport and stack', () => {
+  const viewport = () => document.querySelector('[data-pxl-toast-viewport]') as HTMLElement;
+  const dismissButtons = () => screen.getAllByRole('button', { name: 'Dismiss notification' });
+
+  function renderWith(props: Partial<React.ComponentProps<typeof PxlKitToastProvider>> = {}) {
+    const { apiRef, Capture } = makeHarness();
+    render(
+      <PxlKitToastProvider {...props}>
+        <Capture />
+      </PxlKitToastProvider>,
+    );
+    return apiRef;
+  }
+
+  // Regression: the pointer leaving collapsed the stack while focus was still
+  // inside it, hiding the focused toast when it was deep in the stack.
+  it('stays expanded while focus is inside, after the pointer has left', () => {
+    const api = renderWith();
+    act(() => {
+      api.current!.toast.loading('one');
+      api.current!.toast.loading('two');
+    });
+    fireEvent.mouseEnter(viewport());
+    expect(viewport().getAttribute('data-expanded')).toBe('true');
+    act(() => dismissButtons()[0]!.focus());
+    fireEvent.mouseLeave(viewport());
+    expect(viewport().getAttribute('data-expanded')).toBe('true');
+    act(() => dismissButtons()[0]!.blur());
+    expect(viewport().getAttribute('data-expanded')).toBe('false');
+  });
+
+  it('stays expanded while hovered, after focus has left', () => {
+    const api = renderWith();
+    act(() => { api.current!.toast.loading('one'); });
+    act(() => dismissButtons()[0]!.focus());
+    fireEvent.mouseEnter(viewport());
+    act(() => dismissButtons()[0]!.blur());
+    expect(viewport().getAttribute('data-expanded')).toBe('true');
+    fireEvent.mouseLeave(viewport());
+    expect(viewport().getAttribute('data-expanded')).toBe('false');
+  });
+
+  it('collapses when the pointer leaves after the focused toast was dismissed', () => {
+    const api = renderWith();
+    act(() => {
+      api.current!.toast.loading('one');
+      api.current!.toast.loading('two');
+    });
+    fireEvent.mouseEnter(viewport());
+    act(() => dismissButtons()[1]!.focus());
+    act(() => dismissButtons()[1]!.click());
+    expect(api.current!.toasts.map((t) => t.title)).toEqual(['one']);
+    fireEvent.mouseLeave(viewport());
+    expect(viewport().getAttribute('data-expanded')).toBe('false');
+  });
+
+  it('never expands a flat list', () => {
+    const api = renderWith({ stacked: false });
+    act(() => { api.current!.toast.loading('one'); });
+    fireEvent.mouseEnter(viewport());
+    act(() => dismissButtons()[0]!.focus());
+    expect(viewport().getAttribute('data-expanded')).toBe('false');
+  });
+
+  // Regression: at the bottom of the screen the oldest toast was put in front
+  // and the newest at the back of the stack, faded out beyond stackVisible.
+  it('keeps the newest toast in front at the bottom of the screen', () => {
+    const api = renderWith({ position: 'bottom-right' });
+    act(() => {
+      for (const title of ['1', '2', '3', '4']) api.current!.toast.loading(title);
+    });
+    const slots = Array.from(document.querySelectorAll<HTMLElement>('[data-pxl-toast-slot]'));
+    expect(slots.map((slot) => [slot.textContent, slot.getAttribute('data-depth'), slot.style.opacity])).toEqual([
+      ['4', '0', '1'],
+      ['3', '1', '1'],
+      ['2', '2', '1'],
+      ['1', '3', '0'],
+    ]);
+    expect(slots[0]!.style.zIndex).toBe('103');
+  });
+
+  // Regression: an `id: undefined` passed on by the caller overwrote the
+  // generated id, so the returned id could not dismiss the toast.
+  it('dismisses a toast by the id it returned when the input carried id: undefined', () => {
+    const api = renderWith();
+    let id = '';
+    act(() => { id = api.current!.toast({ id: undefined, title: 'temp' }); });
+    expect(api.current!.toasts[0]!.id).toBe(id);
+    act(() => { api.current!.dismiss(id); });
+    expect(api.current!.toasts).toHaveLength(0);
   });
 });

@@ -1,8 +1,12 @@
 import React, { forwardRef } from 'react';
 import {
-  Tone, Surface, cn,
-  toneMap, surfaceClasses, useEffectiveSurface,
-} from '../common';
+  PROGRESS_DEFAULT_LABEL,
+  clampProgress,
+  progressClasses,
+  progressFillWidth,
+  progressSegmentClasses,
+} from '@pxlkit/ui-kit-core';
+import { Tone, Surface, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelProgress — Pixel surface renders 10 segmented HP-bar blocks; linear
@@ -33,65 +37,34 @@ export const PixelProgress = forwardRef<HTMLDivElement, PixelProgressProps>(func
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const safe = Math.max(0, Math.min(100, value));
+  const classes = progressClasses(surface, tone, { indeterminate });
+  const safe = clampProgress(value);
+  const aria = {
+    role: 'progressbar',
+    'aria-valuenow': indeterminate ? undefined : safe,
+    'aria-valuemin': 0,
+    'aria-valuemax': 100,
+    'aria-label': label ?? PROGRESS_DEFAULT_LABEL,
+    'aria-busy': indeterminate || undefined,
+  } as const;
 
   return (
-    <div ref={ref} className="space-y-1.5">
+    <div ref={ref} className={classes.root}>
       {(label || showValue) && (
-        <div className={cn('flex items-center justify-between text-xs text-retro-muted', s.font)}>
+        <div className={classes.header}>
           {label && <span>{label}</span>}
-          {showValue && !indeterminate && <span className={toneMap[tone].text}>{safe}%</span>}
+          {showValue && !indeterminate && <span className={classes.value}>{safe}%</span>}
         </div>
       )}
       {surface === 'pixel' ? (
-        <div
-          role="progressbar"
-          aria-valuenow={indeterminate ? undefined : safe}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={label ?? 'Progress'}
-          aria-busy={indeterminate || undefined}
-          className={cn('flex gap-0.5 p-0.5', s.border, s.radius, 'border-retro-border/60 bg-retro-surface/60')}
-        >
-          {Array.from({ length: 10 }).map((_, i) => {
-            const filled = (i + 1) * 10 <= safe;
-            const partial = !filled && i * 10 < safe;
-            return (
-              <div
-                key={i}
-                className={cn(
-                  'h-2 flex-1 rounded-[1px] transition-all duration-150',
-                  indeterminate
-                    ? cn(toneMap[tone].fill, 'opacity-70 animate-pulse')
-                    : filled
-                      ? toneMap[tone].fill
-                      : partial
-                        ? cn(toneMap[tone].fill, 'opacity-50')
-                        : 'bg-retro-bg/40',
-                )}
-              />
-            );
-          })}
+        <div {...aria} className={classes.track}>
+          {progressSegmentClasses(value, tone, { indeterminate }).map((segment, i) => (
+            <div key={i} className={segment} />
+          ))}
         </div>
       ) : (
-        <div
-          role="progressbar"
-          aria-valuenow={indeterminate ? undefined : safe}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={label ?? 'Progress'}
-          aria-busy={indeterminate || undefined}
-          className="h-2.5 overflow-hidden rounded-full border border-retro-border bg-retro-surface/80"
-        >
-          <div
-            className={cn(
-              'h-full rounded-full transition-all duration-500',
-              toneMap[tone].bg,
-              indeterminate && 'animate-pulse',
-            )}
-            style={{ width: indeterminate ? '100%' : `${safe}%` }}
-          />
+        <div {...aria} className={classes.track}>
+          <div className={classes.fill} style={{ width: progressFillWidth(value, { indeterminate }) }} />
         </div>
       )}
     </div>

@@ -111,6 +111,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with `aria-activedescendant`, submenus usable from the keyboard, Escape closing the submenu
   first, focus returned to the menu button, one tab stop on the button last used), and
   `PixelStepper` draws its active step's ring, whose class Tailwind never generated.
+- `@pxlkit/ui-kit`: toasts hold their countdown until both the pointer and focus have left,
+  show their countdown bar from the start, keep a focused stack expanded and the newest toast
+  in front at the bottom of the screen, and `toast({ id: undefined, … })` returns an id that
+  dismisses the toast.
+- `@pxlkit/ui-kit`: `PixelSpinner` spins and toasts animate in — the stylesheet defined neither
+  the spinner's keyframes nor the toast's entrance utilities.
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined

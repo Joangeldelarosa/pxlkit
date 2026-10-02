@@ -162,7 +162,7 @@ function LoadingTriggers() {
               loading: false,
               duration: 4500,
             });
-          }, 1500);
+          }, 1000);
         }}
       >
         Run loading → success
@@ -187,7 +187,7 @@ function PromiseTriggers() {
         size="sm"
         onClick={() =>
           toast.promise(
-            () => new Promise<string>((resolve) => setTimeout(() => resolve('ok'), 1500)),
+            () => new Promise<string>((resolve) => setTimeout(() => resolve('ok'), 1000)),
             {
               loading: { title: 'Saving…' },
               success: { title: 'Saved', message: 'All set.' },

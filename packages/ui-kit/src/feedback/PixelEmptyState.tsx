@@ -1,8 +1,6 @@
 import React, { forwardRef } from 'react';
-import {
-  Surface, cn,
-  surfaceClasses, useEffectiveSurface,
-} from '../common';
+import { emptyStateClasses } from '@pxlkit/ui-kit-core';
+import { Surface, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelEmptyState — empty / no-results placeholder.
@@ -26,14 +24,13 @@ export const PixelEmptyState = forwardRef<HTMLDivElement, PixelEmptyStateProps>(
   { title, description, action, icon, surface: surfaceProp },
   ref,
 ) {
-  const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
+  const classes = emptyStateClasses(useEffectiveSurface(surfaceProp));
   return (
-    <div ref={ref} className={cn('border-dashed border-retro-border/60 bg-retro-surface/20 p-8 text-center', s.border, s.radiusLg)}>
-      {icon && <div className="mb-3 flex items-center justify-center text-retro-cyan" aria-hidden>{icon}</div>}
-      <h4 className={cn('text-sm font-semibold text-retro-text', s.font)}>{title}</h4>
-      <p className="mx-auto mt-2 max-w-sm text-sm text-retro-muted">{description}</p>
-      {action && <div className="mt-5">{action}</div>}
+    <div ref={ref} className={classes.root}>
+      {icon && <div className={classes.icon} aria-hidden>{icon}</div>}
+      <h4 className={classes.title}>{title}</h4>
+      <p className={classes.description}>{description}</p>
+      {action && <div className={classes.action}>{action}</div>}
     </div>
   );
 });

@@ -1,9 +1,21 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import {
-  Tone, Surface, cn,
-  toneMap, surfaceClasses, useEffectiveSurface,
-  CloseIcon,
-} from '../common';
+  TOAST_DISMISS_LABEL,
+  createToastCountdown,
+  holdToastCountdown,
+  isAssertiveToast,
+  resetToastCountdown,
+  startToastCountdown,
+  toastClasses,
+  toastCountdownDelay,
+  toastCountdownStyle,
+  toastDuration,
+  toastLeading,
+  toastTone,
+  type ToastHolds,
+} from '@pxlkit/ui-kit-core';
+import { Surface, useEffectiveSurface, CloseIcon } from '../common';
+import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 // Type-only import (erased at runtime): PxlKitToastProvider.tsx value-imports
 // PixelToast back, so keeping this edge type-only avoids a runtime cycle.
 import type { ToastItem } from './PxlKitToastProvider';
@@ -20,68 +32,51 @@ export interface PixelToastProps {
   surface?: Surface;
 }
 
-/** Tiny inline spinner used when `toast.loading === true`. Keeps PixelToast
- *  self-contained (no cross-module import from feedback.tsx). */
-function ToastSpinner({ tone }: { tone: Tone }) {
-  return (
-    <span
-      role="presentation"
-      aria-hidden
-      className={cn(
-        'inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-r-transparent',
-        toneMap[tone].text,
-      )}
-    />
-  );
-}
-
 export const PixelToast = forwardRef<HTMLDivElement, PixelToastProps>(function PixelToast(
   { toast, onDismiss, surface: surfaceProp },
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const tone: Tone = toast.tone ?? 'cyan';
-  const duration = toast.loading ? 0 : (toast.duration ?? 4500);
-  const assertive = toast.assertive ?? (tone === 'red' || tone === 'gold');
-
-  const [paused, setPaused] = useState(false);
-  const start = useRef<number>(0);
-  const remaining = useRef<number>(duration);
+  const tone = toastTone(toast);
+  const classes = toastClasses(surface, tone);
+  const duration = toastDuration(toast);
+  const assertive = isAssertiveToast(toast);
+  const leading = toastLeading(toast);
 
   // Keep the latest onDismiss in a ref so re-rendered ToastViewport children
   // (e.g. another toast pushed mid-duration) don't reset the auto-dismiss timer.
   const onDismissRef = useRef(onDismiss);
   useEffect(() => { onDismissRef.current = onDismiss; }, [onDismiss]);
 
-  // Reset the timer whenever the underlying toast changes its duration
-  // (e.g. promise resolved → loading→success patch flips duration 0→4500).
-  useEffect(() => {
-    remaining.current = duration;
+  const [countdown, setCountdown] = useState(() => createToastCountdown(duration));
+  const bar = useRef<HTMLDivElement>(null);
+
+  // Count down afresh when the toast changes its duration (e.g. promise
+  // resolved → loading→success patch flips duration 0→4500).
+  useIsomorphicLayoutEffect(() => {
+    setCountdown((current) => (current.duration === duration ? current : resetToastCountdown(current, duration)));
   }, [duration]);
 
+  // Start once the full bar is on the page: reading its width commits that
+  // style first, so the bar shrinks from full rather than starting empty.
+  useIsomorphicLayoutEffect(() => {
+    if (countdown.startedAt !== null) return;
+    void bar.current?.offsetWidth;
+    setCountdown((current) => startToastCountdown(current, Date.now()));
+  }, [countdown]);
+
   useEffect(() => {
-    if (!duration) return;
-    let timeout: ReturnType<typeof setTimeout> | null = null;
-    if (!paused) {
-      start.current = Date.now();
-      timeout = setTimeout(() => onDismissRef.current(), remaining.current);
-    }
-    return () => { if (timeout) clearTimeout(timeout); };
-  }, [duration, paused]);
+    const delay = toastCountdownDelay(countdown, Date.now());
+    if (delay === null) return;
+    const timeout = setTimeout(() => onDismissRef.current(), delay);
+    return () => clearTimeout(timeout);
+  }, [countdown]);
 
-  const onMouseEnter = () => {
-    if (!duration) return;
-    remaining.current = Math.max(0, remaining.current - (Date.now() - start.current));
-    setPaused(true);
-  };
-  const onMouseLeave = () => {
-    if (!duration) return;
-    setPaused(false);
-  };
-
-  const leadingIcon = toast.animatedIcon
-    ?? (toast.loading ? <ToastSpinner tone={tone} /> : toast.icon);
+  // The pointer over the card or focus inside it holds the countdown, until
+  // both have left. Focus is re-read when the pointer leaves: a focused
+  // element removed from the page takes focus away and need not fire a blur.
+  const hold = (holds: Partial<ToastHolds>) =>
+    setCountdown((current) => holdToastCountdown(current, holds, Date.now()));
 
   return (
     <div
@@ -92,53 +87,33 @@ export const PixelToast = forwardRef<HTMLDivElement, PixelToastProps>(function P
       data-pxl-toast
       data-tone={tone}
       data-loading={toast.loading ? 'true' : 'false'}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onFocus={onMouseEnter}
-      onBlur={onMouseLeave}
-      className={cn(
-        'pointer-events-auto relative w-full max-w-sm overflow-hidden bg-retro-bg shadow-xl',
-        s.border, s.radiusLg,
-        toneMap[tone].border,
-        'animate-in fade-in slide-in-from-top-2 duration-200',
-      )}
+      onMouseEnter={() => hold({ hover: true })}
+      onMouseLeave={(event) => hold({ hover: false, focus: event.currentTarget.contains(document.activeElement) })}
+      onFocus={() => hold({ focus: true })}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) hold({ focus: false });
+      }}
+      className={classes.root}
     >
-      <div className={cn('flex items-start gap-2.5 p-3 pl-4', surface === 'pixel' && 'pl-5')}>
-        {surface === 'pixel' && (
-          <span aria-hidden className={cn('absolute left-0 top-0 bottom-0 w-1', toneMap[tone].fill)} />
-        )}
-        {leadingIcon && (
-          <span
-            data-pxl-toast-leading
-            className={cn('mt-0.5 shrink-0 inline-flex items-center justify-center', toneMap[tone].text)}
-            aria-hidden
-          >
-            {leadingIcon}
+      <div className={classes.row}>
+        {surface === 'pixel' && <span aria-hidden className={classes.stripe} />}
+        {leading && (
+          <span data-pxl-toast-leading className={classes.leading} aria-hidden>
+            {leading.kind === 'spinner' ? <span role="presentation" aria-hidden className={classes.spinner} /> : leading.node}
           </span>
         )}
-        <div className="flex-1 min-w-0">
-          <p className={cn('text-xs font-semibold truncate', s.font, toneMap[tone].text)}>{toast.title}</p>
-          {toast.message && <p className="mt-1 text-sm text-retro-muted">{toast.message}</p>}
-          {toast.action && <div className="mt-2.5">{toast.action}</div>}
+        <div className={classes.body}>
+          <p className={classes.title}>{toast.title}</p>
+          {toast.message && <p className={classes.message}>{toast.message}</p>}
+          {toast.action && <div className={classes.action}>{toast.action}</div>}
         </div>
-        <button
-          type="button"
-          onClick={onDismiss}
-          aria-label="Dismiss notification"
-          className="-mr-1 -mt-1 flex h-6 w-6 shrink-0 items-center justify-center text-retro-muted transition-colors hover:text-retro-text focus:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40"
-        >
+        <button type="button" onClick={onDismiss} aria-label={TOAST_DISMISS_LABEL} className={classes.dismiss}>
           <CloseIcon />
         </button>
       </div>
-      {duration > 0 && (
-        <div className="absolute inset-x-0 bottom-0 h-0.5 bg-retro-surface/40" aria-hidden>
-          <div
-            className={cn('h-full transition-[width] ease-linear', toneMap[tone].fill)}
-            style={{
-              width: paused ? `${(remaining.current / duration) * 100}%` : '0%',
-              transitionDuration: paused ? '0ms' : `${remaining.current}ms`,
-            }}
-          />
+      {countdown.duration > 0 && (
+        <div className={classes.track} aria-hidden>
+          <div ref={bar} className={classes.bar} style={toastCountdownStyle(countdown)} />
         </div>
       )}
     </div>

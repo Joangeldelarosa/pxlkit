@@ -77,6 +77,8 @@
   --animate-float: float 3s ease-in-out infinite;
   --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-scanlines: scanlines 8s linear infinite;
+  /* A toast's entrance: it fades in, dropping into place. */
+  --animate-pxl-toast-in: pxl-toast-in 200ms ease-out;
 
   @keyframes float {
     0%, 100% { transform: translateY(0); }
@@ -86,6 +88,22 @@
     0% { background-position: 0 0; }
     100% { background-position: 0 100%; }
   }
+  @keyframes pxl-toast-in {
+    from { opacity: 0; transform: translateY(-0.5rem); }
+  }
+}
+
+/* ─── Keyframes named in inline styles ────────────────────────
+ * PixelSpinner sets its blade's `animation` inline, where Tailwind
+ * cannot see it, so these are plain keyframes, always emitted: a
+ * turn in eight 45° steps on the pixel surface, a smooth one on the
+ * linear surface.
+ * ──────────────────────────────────────────────────────────── */
+@keyframes pxl-spinner-steps {
+  to { transform: rotate(360deg); }
+}
+@keyframes pxl-spinner-smooth {
+  to { transform: rotate(360deg); }
 }
 
 /* ─── Theme Color Definitions ─────────────────────────────────

@@ -1,7 +1,8 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
-import { PxlKitToastProvider, useToast } from '../../toast';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
+import { PixelToast, PxlKitToastProvider, useToast } from '../../toast';
 
 type Listener = (e: { matches: boolean }) => void;
 
@@ -302,5 +303,89 @@ describe('PixelToast / useToast (upgraded)', () => {
       expect(viewport.getAttribute('data-stacked')).toBe('true');
       expect(viewport.getAttribute('data-expanded')).toBe('false');
     });
+  });
+});
+
+describe('PixelToast — auto-dismiss countdown', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const bar = (card: HTMLElement) => card.querySelector<HTMLElement>('[aria-hidden] > div')!;
+
+  it('dismisses once its duration has passed', () => {
+    const onDismiss = vi.fn();
+    render(<PixelToast toast={{ id: 't', title: 'Saved', duration: 1000 }} onDismiss={onDismiss} />);
+    act(() => { vi.advanceTimersByTime(999); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  // Regression: entering the paused state twice (hover, then focus) counted the
+  // paused time again, and the pointer leaving resumed the countdown while
+  // focus was still inside — the toast then closed under the focused action.
+  it('holds still until both the pointer and focus have left, losing no time meanwhile', () => {
+    const onDismiss = vi.fn();
+    render(
+      <PixelToast
+        toast={{ id: 't', title: 'Deleted', duration: 4500, action: <button type="button">Undo</button> }}
+        onDismiss={onDismiss}
+      />,
+    );
+    const card = screen.getByRole('status');
+    const undo = screen.getByRole('button', { name: 'Undo' });
+    act(() => { vi.advanceTimersByTime(1000); });
+    fireEvent.mouseEnter(card);
+    act(() => { vi.advanceTimersByTime(2000); });
+    act(() => { undo.focus(); });
+    act(() => { vi.advanceTimersByTime(5000); });
+    fireEvent.mouseLeave(card);
+    act(() => { vi.advanceTimersByTime(10_000); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(bar(card).style.width).toBe(`${(3500 / 4500) * 100}%`);
+
+    act(() => { undo.blur(); });
+    expect(bar(card).style.transitionDuration).toBe('3500ms');
+    act(() => { vi.advanceTimersByTime(3499); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps still while focus moves between its buttons', () => {
+    const onDismiss = vi.fn();
+    render(
+      <PixelToast toast={{ id: 't', title: 'Deleted', duration: 1000, action: <button type="button">Undo</button> }} onDismiss={onDismiss} />,
+    );
+    act(() => { screen.getByRole('button', { name: 'Undo' }).focus(); });
+    act(() => { screen.getByRole('button', { name: 'Dismiss notification' }).focus(); });
+    act(() => { vi.advanceTimersByTime(5000); });
+    expect(onDismiss).not.toHaveBeenCalled();
+  });
+
+  // Regression: the bar was rendered empty and only showed after a pause.
+  it('starts with a full bar that shrinks over the duration once on the page', () => {
+    const html = renderToString(<PixelToast toast={{ id: 't', title: 'Saved', duration: 4500 }} onDismiss={() => {}} />);
+    expect(html).toContain('style="width:100%;transition-duration:0ms"');
+    render(<PixelToast toast={{ id: 't', title: 'Saved', duration: 4500 }} onDismiss={() => {}} />);
+    const { width, transitionDuration } = bar(screen.getByRole('status')).style;
+    expect([width, transitionDuration]).toEqual(['0%', '4500ms']);
+  });
+
+  // Regression: after loading → success the bar kept the loading toast's 0 ms.
+  it('counts down the new duration once a loading toast settles', () => {
+    const onDismiss = vi.fn();
+    const { rerender } = render(<PixelToast toast={{ id: 't', title: 'Saving…', loading: true }} onDismiss={onDismiss} />);
+    expect(screen.getByRole('status').querySelector('[aria-hidden] > div')).toBeNull();
+    act(() => { vi.advanceTimersByTime(10_000); });
+    rerender(<PixelToast toast={{ id: 't', title: 'Saved', loading: false, duration: 4500, tone: 'green' }} onDismiss={onDismiss} />);
+    expect(bar(screen.getByRole('status')).style.transitionDuration).toBe('4500ms');
+    act(() => { vi.advanceTimersByTime(4500); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 });

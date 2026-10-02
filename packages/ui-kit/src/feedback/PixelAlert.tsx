@@ -1,8 +1,6 @@
 import React, { forwardRef } from 'react';
-import {
-  Tone, Surface, cn,
-  toneMap, surfaceClasses, useEffectiveSurface,
-} from '../common';
+import { alertClasses, alertLive } from '@pxlkit/ui-kit-core';
+import { Tone, Surface, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelAlert — banner with tone + icon + action. Pixel surface adds a left
@@ -37,31 +35,16 @@ export const PixelAlert = forwardRef<HTMLDivElement, PixelAlertProps>(function P
 ) {
   const resolvedLabel = label ?? title ?? '';
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  // Critical tones get assertive announcements by default; neutral tones go polite.
-  const ariaLive = live ?? (tone === 'red' || tone === 'gold' ? 'assertive' : 'polite');
+  const classes = alertClasses(surface, tone);
   return (
-    <div
-      ref={ref}
-      role="alert"
-      aria-live={ariaLive}
-      className={cn(
-        'relative p-3',
-        s.border, s.radiusLg,
-        toneMap[tone].border,
-        toneMap[tone].soft,
-        surface === 'pixel' && 'pl-4',
-      )}
-    >
-      {surface === 'pixel' && (
-        <span aria-hidden className={cn('absolute left-0 top-0 bottom-0 w-1', toneMap[tone].fill)} />
-      )}
-      <div className="flex items-start gap-2.5">
-        {icon && <span className={cn('mt-0.5 shrink-0 inline-flex items-center justify-center', toneMap[tone].text)}>{icon}</span>}
-        <div className="flex-1">
-          <p className={cn('text-xs font-semibold', s.font, toneMap[tone].text)}>{resolvedLabel}</p>
-          <p className="mt-1 text-sm text-retro-muted">{message}</p>
-          {action && <div className="mt-3">{action}</div>}
+    <div ref={ref} role="alert" aria-live={alertLive(tone, live)} className={classes.root}>
+      {surface === 'pixel' && <span aria-hidden className={classes.stripe} />}
+      <div className={classes.row}>
+        {icon && <span className={classes.icon}>{icon}</span>}
+        <div className={classes.body}>
+          <p className={classes.label}>{resolvedLabel}</p>
+          <p className={classes.message}>{message}</p>
+          {action && <div className={classes.action}>{action}</div>}
         </div>
       </div>
     </div>

@@ -110,6 +110,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | Component | Status | Category |
 | --- | --- | --- |
 | `PixelAccordion` | stable | navigation |
+| `PixelAlert` | stable | feedback |
 | `PixelAlertDialog` | stable | overlays |
 | `PixelAvatar` | stable | data |
 | `PixelAvatarGroup` | stable | data |
@@ -135,6 +136,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelDivider` | stable | layout |
 | `PixelDrawer` | stable | overlays |
 | `PixelDropdown` | stable | overlays |
+| `PixelEmptyState` | stable | feedback |
 | `PixelEqualHeightGrid` | stable | layout |
 | `PixelGrid` | stable | layout |
 | `PixelInput` | stable | forms |
@@ -148,6 +150,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelPasswordInput` | stable | forms |
 | `PixelPopover` | stable | overlay-foundation |
 | `PixelPortal` | stable | overlay-foundation |
+| `PixelProgress` | stable | feedback |
 | `PixelRadioGroup` | stable | forms |
 | `PixelScrollArea` | stable | layout |
 | `PixelSection` | stable | layout |
@@ -156,6 +159,8 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelSelect` | stable | forms |
 | `PixelSheet` | stable | overlays |
 | `PixelSidebar` | stable | navigation |
+| `PixelSkeleton` | stable | feedback |
+| `PixelSpinner` | stable | feedback |
 | `PixelStack` | stable | layout |
 | `PixelStepper` | stable | navigation |
 | `PixelSwitch` | stable | forms |
@@ -163,11 +168,13 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelTextarea` | stable | forms |
 | `PixelTextLink` | stable | data |
 | `PixelTimeline` | stable | data |
+| `PixelToast` | stable | feedback |
 | `PixelToggle` | stable | forms |
 | `PixelTooltip` | stable | overlays |
 | `PixelTwoColumn` | stable | layout |
 | `PxlKitLocaleProvider` | stable | overlay-foundation |
 | `PxlKitSurfaceProvider` | stable | overlay-foundation |
+| `PxlKitToastProvider` | stable | feedback |
 <!-- COMPONENTS:END -->
 
 ## Documentation

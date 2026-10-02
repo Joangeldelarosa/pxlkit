@@ -1,8 +1,6 @@
 import React, { forwardRef } from 'react';
-import {
-  Surface, cn,
-  surfaceClasses, useEffectiveSurface,
-} from '../common';
+import { SKELETON_DEFAULT_HEIGHT, SKELETON_DEFAULT_LABEL, skeletonClasses } from '@pxlkit/ui-kit-core';
+import { Surface, cn, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelSkeleton — loading placeholder. Pixel surface uses sharp corners.
@@ -23,18 +21,25 @@ export interface PixelSkeletonProps extends Omit<React.HTMLAttributes<HTMLDivEle
 }
 
 export const PixelSkeleton = forwardRef<HTMLDivElement, PixelSkeletonProps>(function PixelSkeleton(
-  { width, height = '1rem', rounded = false, className, surface: surfaceProp, ariaLabel = 'Loading', style, ...rest },
+  {
+    width,
+    height = SKELETON_DEFAULT_HEIGHT,
+    rounded = false,
+    className,
+    surface: surfaceProp,
+    ariaLabel = SKELETON_DEFAULT_LABEL,
+    style,
+    ...rest
+  },
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const roundClass = rounded ? (surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full') : s.radius;
   return (
     <div
       ref={ref}
       role="status"
       aria-label={ariaLabel}
-      className={cn('animate-pulse bg-retro-surface/80', roundClass, className)}
+      className={cn(skeletonClasses(surface, { rounded }), className)}
       style={{ width, height, ...style }}
       {...rest}
     />
