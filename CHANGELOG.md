@@ -120,6 +120,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@pxlkit/ui-kit`: `PixelStepper` steps get valid roles and names (clickable steps are buttons,
   the others read their position and state as hidden text), and `PixelAccordion` /
   `PixelCollapsible` panels drop an `aria-labelledby` that ARIA does not allow without a role.
+- `@pxlkit/ui-kit`: the legacy `.pixel-border` utility draws its outer border, and on the site
+  the builder grid's cell borders and the text selection highlight show: all three read theme
+  variables that were never defined (`--color-retro-border-base`, `--color-retro-green-base`).
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined

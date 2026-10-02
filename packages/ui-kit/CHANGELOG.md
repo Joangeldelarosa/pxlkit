@@ -37,6 +37,7 @@
 - Toasts fade and drop into place as they appear, unless the user prefers reduced motion. Their entrance used `tw-animate-css` utilities (`animate-in`, `fade-in`, `slide-in-from-top-2`) that the kit's stylesheet does not include, so they did nothing.
 - `PixelStepper` gives its steps valid roles and names. A clickable step is a `button` named by its position, label and state and described by its description; any other step reads its position and state as visually hidden text, outside the tab order. Every step put its name in an `aria-label` on an element without a role, which ARIA prohibits and screen readers ignore, and clickable steps were focusable controls with no role.
 - `PixelAccordion` and `PixelCollapsible` no longer put `aria-labelledby` on their panels: both deliberately give the panel no `region` role, and an element without a role cannot take a name (axe `aria-prohibited-attr`).
+- The legacy `.pixel-border` utility draws its 2 px outer border. Its shadow read `--color-retro-border-base`, a variable the theme never defined, so the browser dropped the whole declaration.
 - `PixelScrollArea` draws its styled scrollbar. The stylesheet never defined the `.pxl-scroll-*` classes the component sets, so the browser's default scrollbar showed, `variant="hover"` behaved like `auto` and `scrollbarSize` had no effect.
 
 ## 2.1.1 — 2026-08-08

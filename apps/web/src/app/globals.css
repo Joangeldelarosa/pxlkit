@@ -68,7 +68,7 @@
   }
 
   ::selection {
-    background-color: color-mix(in srgb, var(--color-retro-green-base) 20%, transparent);
+    background-color: color-mix(in srgb, var(--color-retro-green) 20%, transparent);
     color: var(--color-retro-green);
   }
 
@@ -128,12 +128,12 @@
 
   /* Pixel grid cell */
   .grid-cell {
-    border: 1px solid color-mix(in srgb, var(--color-retro-border-base) 30%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-retro-border) 30%, transparent);
     transition: border-color 75ms linear;
     cursor: pointer;
   }
   .grid-cell:hover {
-    border-color: color-mix(in srgb, var(--color-retro-green-base) 50%, transparent);
+    border-color: color-mix(in srgb, var(--color-retro-green) 50%, transparent);
   }
 
   /* Glow text */

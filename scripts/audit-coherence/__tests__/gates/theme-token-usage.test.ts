@@ -14,11 +14,15 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { AuditContext } from '../../_lib/load-context.js';
 import gate, {
+  THEME_COLOR_SLUGS,
   ThemeTokenUsageGate,
   classifyClassBody,
+  definedThemeVars,
   extractColorClasses,
   scanFileSource,
   suggestionFor,
+  themeColorSlugs,
+  undefinedThemeVarFindings,
 } from '../../gates/20-theme-token-usage.js';
 
 // ---------------------------------------------------------------------------
@@ -34,6 +38,12 @@ beforeEach(async () => {
 afterEach(async () => {
   await fs.remove(tmpRoot);
 });
+
+async function writeRepoFile(rel: string, contents: string): Promise<void> {
+  const abs = path.join(tmpRoot, rel);
+  await fs.ensureDir(path.dirname(abs));
+  await fs.writeFile(abs, contents, 'utf8');
+}
 
 async function writeUiKitFile(rel: string, contents: string): Promise<void> {
   const abs = path.join(tmpRoot, 'packages/ui-kit/src', rel);
@@ -144,14 +154,22 @@ describe('classifyClassBody', () => {
 });
 
 describe('suggestionFor', () => {
-  it('maps gray-500 → retro-neutral and includes tokens.ts hint', () => {
+  it("maps gray-500 onto the neutral tone's theme color for the prefix, with the tokens.ts hint", () => {
     const s = suggestionFor({
       variant: '',
       prefix: 'bg',
       verdict: { kind: 'palette', palette: 'gray', shade: '500', alpha: null },
     });
-    expect(s).toContain('retro-neutral');
-    expect(s).toContain('tokens.ts');
+    expect(s).toContain('`bg-retro-surface/18`');
+    expect(s).toContain('tokens.ts → tone.neutral.bg');
+    const text = suggestionFor({
+      variant: '',
+      prefix: 'text',
+      verdict: { kind: 'palette', palette: 'zinc', shade: '400', alpha: null },
+    });
+    expect(text).toContain('`text-retro-muted`');
+    // `retro-neutral` is a tone, not a theme color: no class exists for it.
+    expect(`${s} ${text}`).not.toContain('retro-neutral');
   });
 
   it('maps blue-400 → retro-cyan', () => {
@@ -169,7 +187,7 @@ describe('suggestionFor', () => {
       prefix: 'bg',
       verdict: { kind: 'palette', palette: 'gray', shade: '700', alpha: null },
     });
-    expect(s).toContain('hover:bg-retro-neutral');
+    expect(s).toContain('hover:bg-retro-surface');
   });
 
   it('hardcoded suggestion guides toward tokens.ts', () => {
@@ -225,7 +243,7 @@ describe('scanFileSource', () => {
     const r = scanFileSource('packages/ui-kit/src/palette.tsx', src);
     const majors = r.findings.filter((f) => f.severity === 'major');
     expect(majors.length).toBe(2);
-    expect(majors.some((m) => m.suggestion?.includes('retro-neutral'))).toBe(true);
+    expect(majors.some((m) => m.suggestion?.includes('bg-retro-surface'))).toBe(true);
     expect(majors.some((m) => m.suggestion?.includes('retro-cyan'))).toBe(true);
     expect(r.majorCount).toBe(2);
   });
@@ -285,7 +303,7 @@ describe('ThemeTokenUsageGate (integration)', () => {
     const major = r.findings.find((f) => f.severity === 'major');
     expect(major).toBeDefined();
     expect(major!.message).toContain('text-gray-500');
-    expect(major!.suggestion).toContain('retro-neutral');
+    expect(major!.suggestion).toContain('text-retro-muted');
 
     // The summary payload (info) should be present and parseable.
     const summary = r.findings.find((f) => f.severity === 'info');
@@ -355,8 +373,69 @@ describe('ThemeTokenUsageGate (integration)', () => {
     expect(majors.length).toBe(1); // bg-zinc-950
   });
 
+  it('flags retro classes the theme does not define, in the core and the ports too', async () => {
+    await writeRepoFile('packages/ui-kit-core/styles.css', '@theme { --color-retro-green: green; --color-retro-surface: gray; }');
+    await writeRepoFile('packages/ui-kit-core/src/components/recipe.ts', `export const c = 'bg-retro-surface border-retro-line';`);
+    await writeRepoFile('packages/ui-kit-vue/src/Thing.vue', `<template><div class="text-retro-green bg-retro-elev" /></template>`);
+    await writeRepoFile('packages/ui-kit-angular/src/lib/thing.ts', `const host = 'text-retro-green';`);
+
+    const r = await new ThemeTokenUsageGate().run(mockCtx());
+    expect(r.passed).toBe(false);
+    const majors = r.findings.filter((f) => f.severity === 'major');
+    expect(majors.map((f) => f.file).sort()).toEqual([
+      'packages/ui-kit-core/src/components/recipe.ts',
+      'packages/ui-kit-vue/src/Thing.vue',
+    ]);
+    expect(majors[0]!.message).toContain('names no theme color');
+  });
+
+  it('flags theme variables a stylesheet reads that no stylesheet defines', async () => {
+    await writeRepoFile(
+      'packages/ui-kit-core/styles.css',
+      '@theme { --color-retro-border: gray; }\n.pixel-border { box-shadow: 0 0 0 2px var(--color-retro-border-base); }',
+    );
+    await writeRepoFile(
+      'apps/web/src/app/globals.css',
+      ':root { --color-retro-green-dark: #2a8f5f; }\n.a { color: var(--color-retro-green-dark); border-color: var(--color-retro-border); }',
+    );
+
+    const r = await new ThemeTokenUsageGate().run(mockCtx());
+    const majors = r.findings.filter((f) => f.severity === 'major');
+    expect(majors).toHaveLength(1);
+    expect(majors[0]!.message).toBe(
+      '`var(--color-retro-border-base)` at packages/ui-kit-core/styles.css:2:43 reads a theme variable nothing defines — the declaration is dropped',
+    );
+  });
+
   it('default-exported gate instance has id=20 and stable name', () => {
     expect(gate.id).toBe(20);
     expect(gate.name).toBe('theme-token-usage');
+  });
+});
+
+describe('the theme the gate holds the kits to', () => {
+  const realTheme = fs.readFileSync(path.resolve(__dirname, '../../../../packages/ui-kit-core/styles.css'), 'utf8');
+
+  it("names the colors packages/ui-kit-core/styles.css defines, which its fallback list repeats", () => {
+    expect([...themeColorSlugs(realTheme)].sort()).toEqual([...THEME_COLOR_SLUGS].sort());
+  });
+
+  it('reads definitions, not uses', () => {
+    const css = ':root { --retro-bg: #fff; --color-retro-bg: var(--retro-bg); }\n.x { color: var(--color-retro-text); }';
+    expect(definedThemeVars(css)).toEqual(new Set(['--retro-bg', '--color-retro-bg']));
+    expect(themeColorSlugs(css)).toEqual(new Set(['bg']));
+  });
+
+  it('classifies a retro class by the theme it is given', () => {
+    expect(classifyClassBody('bg', 'retro-line').kind).toBe('unknown-retro');
+    expect(classifyClassBody('bg', 'retro-line', new Set(['line'])).kind).toBe('ok-retro');
+    expect(classifyClassBody('border', 'retro-border-strong/60').kind).toBe('ok-retro');
+  });
+
+  it('reports each undefined variable read with its position', () => {
+    const css = '.a {\n  color: var(--color-retro-text);\n  background: var( --retro-paper);\n}';
+    const findings = undefinedThemeVarFindings('x.css', css, new Set(['--color-retro-text']));
+    expect(findings).toHaveLength(1);
+    expect(findings[0]!.message).toContain('`var(--retro-paper)` at x.css:3:19');
   });
 });
