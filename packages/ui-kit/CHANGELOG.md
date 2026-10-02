@@ -18,6 +18,8 @@
 - `PixelAvatar` falls back to the initials when its image fails to load, as `src` documents, and tries again when `src` changes.
 - `PixelAvatar` with a `status` exposes `role="img"` with its name, and the `PixelAvatarGroup` "+N" tile announces "N more users" through visually hidden text: both put `aria-label` on a plain `div`, which ARIA does not support.
 - `PixelPopover` sets `aria-controls` on its trigger while the content is open (a trigger that sets its own keeps it), and `PixelBadgeGroup` names its overflow dialog after the "+N" button.
+- `PixelAlertDialog` on the linear surface stops its pending spinner when the user prefers reduced motion, as the pixel surface already did.
+- `PixelDropdown`: ArrowDown and ArrowUp on the closed trigger open the menu on its first enabled item, as documented — they did nothing, because the items register only once the menu renders. An item whose `disabled` changes keeps its place in the arrow-key order instead of moving to the end.
 - `PixelScrollArea` draws its styled scrollbar. The stylesheet never defined the `.pxl-scroll-*` classes the component sets, so the browser's default scrollbar showed, `variant="hover"` behaved like `auto` and `scrollbarSize` had no effect.
 
 ## 2.1.1 — 2026-08-08

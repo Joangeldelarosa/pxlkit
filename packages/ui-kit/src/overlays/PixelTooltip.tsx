@@ -4,24 +4,21 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef } from 'react';
+import { autoUpdate, useFloating } from '@floating-ui/react-dom';
 import {
-  autoUpdate,
-  flip,
-  offset as floatingOffset,
-  shift,
-  useFloating,
-  type Placement,
-} from '@floating-ui/react-dom';
-import {
-  Surface, cn,
-  surfaceClasses, useEffectiveSurface,
-} from '../common';
+  TOOLTIP_Z_INDEX,
+  anchoredMiddleware,
+  resolveTooltipDelays,
+  tooltipClasses,
+  tooltipTriggerClasses,
+  type TooltipDelay,
+  type TooltipPosition,
+  type TooltipTrigger,
+} from '@pxlkit/ui-kit-core';
+import { Surface, useEffectiveSurface } from '../common';
 import { PixelPortal } from '../overlay-foundation/PixelPortal';
 import { useEscape } from '../hooks/useEscape';
 import { useControllableState } from '../hooks/useControllableState';
-
-type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
-type TooltipTrigger = 'hover' | 'click' | 'focus';
 
 /** Public prop bag for {@link PixelTooltip}. */
 export interface PixelTooltipProps {
@@ -39,7 +36,7 @@ export interface PixelTooltipProps {
    * Open/close delays in ms. A bare `number` is treated as `{ open }` for
    * backwards-compat with the previous API. Defaults to `{ open: 200, close: 100 }`.
    */
-  delay?: number | { open?: number; close?: number };
+  delay?: TooltipDelay;
   /** Controlled open state. When provided, the tooltip ignores its internal state. */
   open?: boolean;
   /** Initial open state when uncontrolled. */
@@ -50,17 +47,6 @@ export interface PixelTooltipProps {
   trigger?: TooltipTrigger;
   /** Distance in px from the trigger. Default `8`. */
   sideOffset?: number;
-}
-
-const DEFAULT_OPEN_DELAY = 200;
-const DEFAULT_CLOSE_DELAY = 100;
-
-function resolveDelays(delay: PixelTooltipProps['delay']): { open: number; close: number } {
-  if (typeof delay === 'number') return { open: delay, close: DEFAULT_CLOSE_DELAY };
-  return {
-    open: delay?.open ?? DEFAULT_OPEN_DELAY,
-    close: delay?.close ?? DEFAULT_CLOSE_DELAY,
-  };
 }
 
 export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(function PixelTooltip({
@@ -77,9 +63,8 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
   sideOffset = 8,
 }, forwardedRef) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const tipId = useId();
-  const delays = useMemo(() => resolveDelays(delay), [delay]);
+  const delays = useMemo(() => resolveTooltipDelays(delay), [delay]);
   const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapperRef = useRef<HTMLSpanElement | null>(null);
@@ -93,9 +78,9 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
 
   const { refs, floatingStyles } = useFloating({
     open,
-    placement: position as Placement,
+    placement: position,
     whileElementsMounted: autoUpdate,
-    middleware: [floatingOffset(sideOffset), flip(), shift({ padding: 8 })],
+    middleware: anchoredMiddleware(sideOffset),
   });
 
   const clearTimers = useCallback(() => {
@@ -171,7 +156,7 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
     <>
       <span
         ref={setWrapperRef}
-        className="relative inline-flex"
+        className={tooltipTriggerClasses}
         aria-describedby={open ? tipId : undefined}
         {...triggerProps}
       >
@@ -183,14 +168,8 @@ export const PixelTooltip = forwardRef<HTMLSpanElement, PixelTooltipProps>(funct
             ref={setFloatingRef}
             id={tipId}
             role="tooltip"
-            style={{ ...floatingStyles, zIndex: 70 }}
-            className={cn(
-              'w-max max-w-[calc(100vw-16px)] break-words bg-retro-bg px-2 py-1 text-[11px] text-retro-text shadow-lg',
-              // Hover/focus tooltips are non-interactive; click tooltips
-              // must accept clicks (e.g. to copy text or click links inside).
-              trigger === 'click' ? '' : 'pointer-events-none',
-              s.border, s.radius, s.font, 'border-retro-border',
-            )}
+            style={{ ...floatingStyles, zIndex: TOOLTIP_Z_INDEX }}
+            className={tooltipClasses(surface, trigger)}
           >
             {body}
           </span>

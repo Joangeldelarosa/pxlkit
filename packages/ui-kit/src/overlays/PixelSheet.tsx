@@ -1,10 +1,9 @@
 'use client';
 
 import React, { forwardRef, useId, useRef } from 'react';
+import { sheetClasses, sheetLayerClasses, type SheetSide, type SheetSize } from '@pxlkit/ui-kit-core';
 import {
   Surface,
-  cn,
-  surfaceClasses,
   useEffectiveSurface,
 } from '../common';
 import { PixelPortal } from '../overlay-foundation/PixelPortal';
@@ -17,8 +16,8 @@ import { useScrollLock } from '../hooks/useScrollLock';
 export interface PixelSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  side?: 'bottom' | 'top';
-  size?: 'sm' | 'md' | 'lg' | 'full';
+  side?: SheetSide;
+  size?: SheetSize;
   dragHandle?: boolean;
   surface?: Surface;
   title?: string;
@@ -30,24 +29,6 @@ export interface PixelSheetProps {
   'aria-label'?: string;
   children: React.ReactNode;
 }
-
-// Mobile bottom-sheet preset. Shares the bottom-sheet pattern slated for
-// PixelDrawer (Ola 4 will fold them together with snap points); for Ola 3 we
-// stand on PixelPortal + Ola 1 hooks directly and keep the API stable.
-const sizeMap = {
-  bottom: {
-    sm: 'h-1/4',
-    md: 'h-1/2',
-    lg: 'h-3/4',
-    full: 'h-[100dvh]',
-  },
-  top: {
-    sm: 'h-1/4',
-    md: 'h-1/2',
-    lg: 'h-3/4',
-    full: 'h-[100dvh]',
-  },
-} as const;
 
 export const PixelSheet = forwardRef<HTMLDivElement, PixelSheetProps>(function PixelSheet(
   {
@@ -65,7 +46,6 @@ export const PixelSheet = forwardRef<HTMLDivElement, PixelSheetProps>(function P
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const titleId = useId();
   const descId = useId();
@@ -90,9 +70,7 @@ export const PixelSheet = forwardRef<HTMLDivElement, PixelSheetProps>(function P
   if (!open) return null;
 
   const isBottom = side === 'bottom';
-  const sideAnchor = isBottom
-    ? 'bottom-0 left-0 right-0'
-    : 'top-0 left-0 right-0';
+  const c = sheetClasses(surface, side, size);
   const enterFrom = isBottom ? 'translate-y-full' : '-translate-y-full';
   void enterFrom; // kept for parity with future motion phase
 
@@ -104,7 +82,7 @@ export const PixelSheet = forwardRef<HTMLDivElement, PixelSheetProps>(function P
 
   return (
     <PixelPortal>
-      <div className="fixed inset-0 z-[90]" data-pixel-sheet="">
+      <div className={sheetLayerClasses} data-pixel-sheet="">
         {/* scrim */}
         <OverlayBackdrop
           position="absolute"
@@ -120,64 +98,33 @@ export const PixelSheet = forwardRef<HTMLDivElement, PixelSheetProps>(function P
           aria-describedby={description ? descId : undefined}
           data-side={side}
           data-size={size}
-          className={cn(
-            'absolute flex flex-col bg-retro-bg shadow-2xl',
-            sideAnchor,
-            sizeMap[side][size],
-            s.border,
-            'border-retro-border',
-            isBottom
-              ? surface === 'pixel'
-                ? 'border-t-2'
-                : 'rounded-t-2xl border-t'
-              : surface === 'pixel'
-                ? 'border-b-2'
-                : 'rounded-b-2xl border-b',
-          )}
+          className={c.panel}
         >
-          {dragHandle && isBottom && (
+          {/* On a top sheet the handle is drawn last, next to its free edge. */}
+          {dragHandle && (
             <div
               data-testid="pixel-sheet-drag-handle"
               aria-hidden="true"
-              className="flex h-5 shrink-0 items-center justify-center"
+              className={c.handle}
             >
-              <span
-                className={cn(
-                  'h-1 w-10 bg-retro-border',
-                  surface === 'pixel' ? 'rounded-none' : 'rounded-full',
-                )}
-              />
-            </div>
-          )}
-          {dragHandle && !isBottom && (
-            <div
-              data-testid="pixel-sheet-drag-handle"
-              aria-hidden="true"
-              className="order-last flex h-5 shrink-0 items-center justify-center"
-            >
-              <span
-                className={cn(
-                  'h-1 w-10 bg-retro-border',
-                  surface === 'pixel' ? 'rounded-none' : 'rounded-full',
-                )}
-              />
+              <span className={c.handleBar} />
             </div>
           )}
           {(title || description) && (
-            <div className="border-b border-retro-border/60 px-5 py-3">
+            <div className={c.header}>
               {title && (
-                <h4 id={titleId} className={cn('text-sm font-semibold text-retro-text', s.fontDisplay)}>
+                <h4 id={titleId} className={c.title}>
                   {title}
                 </h4>
               )}
               {description && (
-                <p id={descId} className="mt-1 text-xs text-retro-muted">
+                <p id={descId} className={c.description}>
                   {description}
                 </p>
               )}
             </div>
           )}
-          <div className="flex-1 overflow-auto p-5 text-sm text-retro-muted">{children}</div>
+          <div className={c.body}>{children}</div>
         </div>
       </div>
     </PixelPortal>

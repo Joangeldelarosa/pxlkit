@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, act, screen } from '@testing-library/react';
 import { PixelDropdown } from '../../overlays/PixelDropdown';
@@ -232,5 +232,73 @@ describe('PixelDropdown — Ola 4a upgrade', () => {
     );
     expect(screen.getByTestId('chk').getAttribute('role')).toBe('menuitem');
     expect(screen.getByTestId('rad').getAttribute('role')).toBe('menuitem');
+  });
+
+  /* ─── Regressions: keyboard ───────────────────────────────────────── */
+
+  // The arrows did nothing on the closed trigger: items register only once
+  // the menu renders, so there was nothing to highlight yet.
+  it('ArrowDown and ArrowUp on the closed trigger open the menu on its first enabled item', () => {
+    render(
+      <PixelDropdown
+        label="Menu"
+        items={[
+          { value: 'a', label: 'Alpha', disabled: true },
+          { value: 'b', label: 'Bravo' },
+          { value: 'c', label: 'Charlie' },
+        ]}
+      />,
+    );
+    const trigger = screen.getByRole('button', { name: /menu/i });
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByRole('menuitem', { name: /bravo/i }).getAttribute('data-highlighted')).toBe('true');
+
+    fireEvent.keyDown(trigger, { key: 'Escape' });
+    expect(screen.queryByRole('menu')).toBeNull();
+    fireEvent.keyDown(trigger, { key: 'ArrowUp' });
+    expect(screen.getByRole('menuitem', { name: /bravo/i }).getAttribute('data-highlighted')).toBe('true');
+  });
+
+  it('drops the first-item highlight when the parent keeps the menu closed', () => {
+    const onOpenChange = vi.fn();
+    const menu = (open: boolean) => (
+      <PixelDropdown.Root open={open} onOpenChange={onOpenChange}>
+        <PixelDropdown.Trigger>Menu</PixelDropdown.Trigger>
+        <PixelDropdown.Content>
+          <PixelDropdown.Item value="a">Alpha</PixelDropdown.Item>
+        </PixelDropdown.Content>
+      </PixelDropdown.Root>
+    );
+    const { rerender } = render(menu(false));
+    fireEvent.keyDown(screen.getByRole('button', { name: /menu/i }), { key: 'ArrowDown' });
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+    expect(screen.queryByRole('menu')).toBeNull();
+    rerender(menu(true));
+    expect(screen.getByRole('menuitem', { name: /alpha/i }).getAttribute('data-highlighted')).toBeNull();
+  });
+
+  // An item whose `disabled` changed was re-registered at the end of the
+  // keyboard order.
+  it('keeps an item in its place in the arrow order when it becomes enabled', () => {
+    function Harness() {
+      const [locked, setLocked] = useState(true);
+      return (
+        <>
+          <PixelDropdown.Root defaultOpen>
+            <PixelDropdown.Trigger>Menu</PixelDropdown.Trigger>
+            <PixelDropdown.Content>
+              <PixelDropdown.Item value="a" disabled={locked}>Alpha</PixelDropdown.Item>
+              <PixelDropdown.Item value="b">Bravo</PixelDropdown.Item>
+            </PixelDropdown.Content>
+          </PixelDropdown.Root>
+          <button type="button" onClick={() => setLocked(false)}>unlock</button>
+        </>
+      );
+    }
+    render(<Harness />);
+    fireEvent.click(screen.getByRole('button', { name: /unlock/i }));
+    fireEvent.keyDown(screen.getByRole('button', { name: /menu/i }), { key: 'ArrowDown' });
+    expect(screen.getByRole('menuitem', { name: /alpha/i }).getAttribute('data-highlighted')).toBe('true');
   });
 });

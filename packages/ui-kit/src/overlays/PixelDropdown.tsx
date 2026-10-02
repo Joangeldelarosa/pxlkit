@@ -23,22 +23,37 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { autoUpdate, useFloating } from '@floating-ui/react-dom';
 import {
-  autoUpdate,
-  offset as floatingOffset,
-  shift,
-  useFloating,
-} from '@floating-ui/react-dom';
+  DROPDOWN_PLACEMENT,
+  DROPDOWN_TYPEAHEAD_RESET_MS,
+  dropdownChevronClasses,
+  dropdownContentClasses,
+  dropdownHeaderClasses,
+  dropdownItemClasses,
+  dropdownItemIconClasses,
+  dropdownItemLabelClasses,
+  dropdownMark,
+  dropdownMarkClasses,
+  dropdownMiddleware,
+  dropdownRootClasses,
+  dropdownSeparatorClasses,
+  dropdownShortcutClasses,
+  dropdownTypeaheadMatch,
+  isTypeaheadKey,
+  nextDropdownHighlight,
+  type DropdownItemKind,
+} from '@pxlkit/ui-kit-core';
 import {
   Tone, Surface, Option, cn, useClickOutside,
-  surfaceClasses, useEffectiveSurface,
+  useEffectiveSurface,
   ChevronDownIcon,
 } from '../common';
 import { PixelButton } from '../actions';
 import { useEscape } from '../hooks/useEscape';
 import { useControllableState } from '../hooks/useControllableState';
 
-export type DropdownItemKind = 'item' | 'separator' | 'header' | 'submenu' | 'checkbox' | 'radio';
+export type { DropdownItemKind };
 
 /**
  * Extended option shape accepted by {@link PixelDropdown} via `items[]`.
@@ -102,23 +117,6 @@ function useDropdownContext(component: string): DropdownContextValue {
   return ctx;
 }
 
-const TYPEAHEAD_RESET_MS = 600;
-
-function isPrintableChar(key: string): boolean {
-  return key.length === 1 && !!key.match(/\S/);
-}
-
-function toneTextClass(tone: Tone | undefined): string {
-  if (!tone) return '';
-  if (tone === 'red') return 'text-retro-red';
-  if (tone === 'green') return 'text-retro-green';
-  if (tone === 'cyan') return 'text-retro-cyan';
-  if (tone === 'gold') return 'text-retro-gold';
-  if (tone === 'purple') return 'text-retro-purple';
-  if (tone === 'pink') return 'text-retro-pink';
-  return '';
-}
-
 /* ─── Root / compositional sub-components ───────────────────────────────── */
 
 interface DropdownRootProps {
@@ -176,19 +174,27 @@ function DropdownRoot({ open: openProp, defaultOpen = false, onOpenChange, surfa
   const typeaheadJump = useCallback((char: string) => {
     if (typeaheadTimer.current) clearTimeout(typeaheadTimer.current);
     typeaheadBuf.current = (typeaheadBuf.current + char).toLowerCase();
-    const buf = typeaheadBuf.current;
-    const ordered = getOrderedValues();
-    // Prefer items whose label starts with buf; fall back to substring match.
-    let match = ordered.find((v) => (labelMapRef.current.get(v) || '').toLowerCase().startsWith(buf));
-    if (!match) match = ordered.find((v) => (labelMapRef.current.get(v) || '').toLowerCase().includes(buf));
+    const match = dropdownTypeaheadMatch(getOrderedValues(), (v) => labelMapRef.current.get(v), typeaheadBuf.current);
     if (match) setHighlightedValue(match);
-    typeaheadTimer.current = setTimeout(() => { typeaheadBuf.current = ''; }, TYPEAHEAD_RESET_MS);
+    typeaheadTimer.current = setTimeout(() => { typeaheadBuf.current = ''; }, DROPDOWN_TYPEAHEAD_RESET_MS);
   }, [getOrderedValues, setHighlightedValue]);
 
   useClickOutside(containerRef, () => { setOpen(false); setHighlightedValue(null); });
   useEscape(() => { setOpen(false); setHighlightedValue(null); }, open);
   useEffect(() => { if (!open) setHighlightedValue(null); }, [open, setHighlightedValue]);
   useEffect(() => () => { if (typeaheadTimer.current) clearTimeout(typeaheadTimer.current); }, []);
+
+  // An arrow key on the closed menu opens it on its first item. Items
+  // register once the menu renders, so the highlight waits for them; a
+  // parent that keeps the menu closed drops the request.
+  const [highlightFirstOnOpen, setHighlightFirstOnOpen] = useState(false);
+  useEffect(() => {
+    if (!highlightFirstOnOpen) return;
+    setHighlightFirstOnOpen(false);
+    if (!open) return;
+    const ordered = getOrderedValues();
+    if (ordered.length) setHighlightedValue(ordered[0]);
+  }, [highlightFirstOnOpen, open, getOrderedValues, setHighlightedValue]);
 
   const labelMap = labelMapRef.current;
   const ctx: DropdownContextValue = useMemo(() => ({
@@ -203,14 +209,10 @@ function DropdownRoot({ open: openProp, defaultOpen = false, onOpenChange, surfa
   const onKey = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       e.preventDefault();
+      if (!open) { setHighlightFirstOnOpen(true); setOpen(true); return; }
       const ordered = getOrderedValues();
       if (ordered.length === 0) return;
-      if (!open) { setOpen(true); setHighlightedValue(ordered[0]); return; }
-      const idx = highlightedValue ? ordered.indexOf(highlightedValue) : -1;
-      const next = e.key === 'ArrowDown'
-        ? ordered[Math.min(idx + 1, ordered.length - 1)]
-        : ordered[Math.max(idx - 1, 0)];
-      setHighlightedValue(next ?? ordered[0]);
+      setHighlightedValue(nextDropdownHighlight(ordered, highlightedValue, e.key === 'ArrowDown' ? 1 : -1) ?? null);
       return;
     }
     if (e.key === 'Home') {
@@ -230,14 +232,14 @@ function DropdownRoot({ open: openProp, defaultOpen = false, onOpenChange, surfa
       selectHighlighted();
       return;
     }
-    if (open && isPrintableChar(e.key)) {
+    if (open && isTypeaheadKey(e.key)) {
       typeaheadJump(e.key);
     }
   };
 
   return (
     <DropdownContext.Provider value={ctx}>
-      <div ref={containerRef} className="relative inline-block" onKeyDown={onKey}>
+      <div ref={containerRef} className={dropdownRootClasses} onKeyDown={onKey}>
         {children}
       </div>
     </DropdownContext.Provider>
@@ -263,7 +265,7 @@ const DropdownTrigger = forwardRef<HTMLButtonElement, DropdownTriggerProps>(func
       tone={tone}
       surface={surface}
       disabled={disabled}
-      iconRight={icon ?? <ChevronDownIcon className={cn('transition-transform', open && 'rotate-180')} />}
+      iconRight={icon ?? <ChevronDownIcon className={dropdownChevronClasses(open)} />}
       onClick={() => setOpen(!open)}
       aria-haspopup="menu"
       aria-expanded={open}
@@ -286,13 +288,12 @@ const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(functio
   ref,
 ) {
   const { open, surface, menuId, containerRef } = useDropdownContext('PixelDropdown.Content');
-  const s = surfaceClasses(surface);
   const { refs, floatingStyles } = useFloating({
     open,
-    placement: 'bottom-start',
+    placement: DROPDOWN_PLACEMENT,
     whileElementsMounted: autoUpdate,
     elements: { reference: containerRef.current },
-    middleware: [floatingOffset(6), shift({ padding: 8 })],
+    middleware: dropdownMiddleware(),
   });
   const setRefs = (node: HTMLDivElement | null) => {
     refs.setFloating(node);
@@ -307,11 +308,7 @@ const DropdownContent = forwardRef<HTMLDivElement, DropdownContentProps>(functio
       role="menu"
       aria-orientation="vertical"
       style={floatingStyles}
-      className={cn(
-        'z-40 min-w-44 max-w-[calc(100vw-1rem)] bg-retro-bg p-1 shadow-xl',
-        s.border, s.radiusLg, 'border-retro-border',
-        className,
-      )}
+      className={cn(dropdownContentClasses(surface), className)}
     >
       {children}
     </div>
@@ -342,16 +339,18 @@ const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(function D
   ref,
 ) {
   const { setOpen, surface, highlightedValue, setHighlightedValue, registerItem, unregisterItem, labelMap, registerItemHandler } = useDropdownContext('PixelDropdown.Item');
-  const s = surfaceClasses(surface);
   const autoIdRaw = useId();
   const itemValue = value ?? autoIdRaw;
   const effectiveTone: Tone | undefined = destructive ? 'red' : tone;
 
+  // Registered while mounted; later changes update the registration in
+  // place, so the item keeps its position in the keyboard order.
+  useEffect(() => () => unregisterItem(itemValue), [itemValue, unregisterItem]);
   useEffect(() => {
     registerItem(itemValue, disabled);
     if (typeof children === 'string') labelMap.set(itemValue, children);
-    return () => unregisterItem(itemValue);
-  }, [itemValue, disabled, registerItem, unregisterItem, labelMap, children]);
+    else labelMap.delete(itemValue);
+  }, [itemValue, disabled, registerItem, labelMap, children]);
 
   // Keep the latest onSelect handler registered for keyboard activation.
   useEffect(() => {
@@ -369,14 +368,7 @@ const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(function D
       aria-disabled={disabled || undefined}
       data-highlighted={isHighlighted || undefined}
       disabled={disabled}
-      className={cn(
-        'flex w-full items-center px-3 py-2 text-left text-xs text-retro-muted transition-colors hover:bg-retro-surface hover:text-retro-text',
-        isHighlighted && 'bg-retro-surface text-retro-text',
-        disabled && 'cursor-not-allowed opacity-50',
-        toneTextClass(effectiveTone),
-        s.font, s.radius,
-        className,
-      )}
+      className={cn(dropdownItemClasses(surface, { highlighted: isHighlighted, disabled, tone: effectiveTone }), className)}
       onMouseEnter={(e) => {
         onMouseEnter?.(e);
         if (!disabled) setHighlightedValue(itemValue);
@@ -389,15 +381,12 @@ const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(function D
       }}
       {...rest}
     >
-      {icon && <span className="mr-2 inline-flex items-center justify-center opacity-80 shrink-0">{icon}</span>}
-      <span className="flex-1 truncate">{children}</span>
+      {icon && <span className={dropdownItemIconClasses}>{icon}</span>}
+      <span className={dropdownItemLabelClasses}>{children}</span>
       {shortcut && (
         <kbd
           data-testid="dropdown-shortcut"
-          className={cn(
-            'ml-3 inline-flex items-center gap-0.5 border px-1.5 py-0.5 text-[10px] text-retro-muted',
-            s.border, s.radius, 'border-retro-border', s.font,
-          )}
+          className={dropdownShortcutClasses(surface)}
         >
           {shortcut}
         </kbd>
@@ -408,7 +397,7 @@ const DropdownItem = forwardRef<HTMLButtonElement, DropdownItemProps>(function D
 DropdownItem.displayName = 'PixelDropdown.Item';
 
 function DropdownSeparator() {
-  return <div role="separator" data-testid="dropdown-separator" className="my-1 h-px bg-retro-border/60" />;
+  return <div role="separator" data-testid="dropdown-separator" className={dropdownSeparatorClasses} />;
 }
 (DropdownSeparator as React.FC).displayName = 'PixelDropdown.Separator';
 
@@ -417,7 +406,7 @@ function DropdownHeader({ children }: { children: React.ReactNode }) {
     <div
       role="presentation"
       data-testid="dropdown-header"
-      className="px-3 pt-2 pb-1 text-[10px] font-pixel uppercase tracking-wider text-retro-muted/70"
+      className={dropdownHeaderClasses}
     >
       {children}
     </div>
@@ -437,7 +426,7 @@ const DropdownCheckboxItem = forwardRef<HTMLButtonElement, DropdownCheckboxItemP
     <DropdownItem
       ref={ref}
       {...rest}
-      icon={<span aria-hidden className="inline-block w-3 text-center">{checked ? '✓' : ''}</span>}
+      icon={<span aria-hidden className={dropdownMarkClasses}>{dropdownMark('checkbox', checked)}</span>}
     >
       {children}
     </DropdownItem>
@@ -457,7 +446,7 @@ const DropdownRadioItem = forwardRef<HTMLButtonElement, DropdownRadioItemProps>(
     <DropdownItem
       ref={ref}
       {...rest}
-      icon={<span aria-hidden className="inline-block w-3 text-center">{checked ? '●' : ''}</span>}
+      icon={<span aria-hidden className={dropdownMarkClasses}>{dropdownMark('radio', checked)}</span>}
     >
       {children}
     </DropdownItem>

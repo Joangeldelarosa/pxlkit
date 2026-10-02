@@ -123,4 +123,36 @@ describe('PixelAlertDialog', () => {
       expect(onOpenChange).toHaveBeenCalledWith(false);
     });
   });
+
+  // Regression: the linear surface's spinner kept spinning under
+  // prefers-reduced-motion while the pixel one stopped.
+  it('stops the pending spinner when the user prefers reduced motion, on every surface', async () => {
+    const original = window.matchMedia;
+    const list = { matches: true, media: '', addEventListener: vi.fn(), removeEventListener: vi.fn() };
+    window.matchMedia = vi.fn().mockReturnValue(list) as unknown as typeof window.matchMedia;
+    try {
+      for (const surface of ['pixel', 'linear'] as const) {
+        const { getByText, unmount } = render(
+          <PixelAlertDialog
+            open
+            onOpenChange={() => {}}
+            title="Submit?"
+            actionLabel="Submit"
+            surface={surface}
+            onAction={() => new Promise<void>(() => {})}
+          />,
+        );
+        fireEvent.click(getByText('Submit'));
+        const spinner = await waitFor(() => {
+          const node = getByText('Submit').closest('button')!.querySelector('span[aria-hidden]');
+          expect(node).not.toBeNull();
+          return node!;
+        });
+        expect(spinner.className).not.toMatch(/animate-spin/);
+        unmount();
+      }
+    } finally {
+      window.matchMedia = original;
+    }
+  });
 });

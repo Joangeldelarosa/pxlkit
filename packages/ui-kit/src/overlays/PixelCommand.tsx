@@ -12,9 +12,16 @@ import React, {
   type ReactNode,
 } from 'react';
 import {
+  commandClasses,
+  commandLayerClasses,
+  commandOptionClasses,
+  commandOptionId,
+  commandRows,
+  matchesCommandShortcut,
+  parseCommandShortcut,
+} from '@pxlkit/ui-kit-core';
+import {
   Surface,
-  cn,
-  surfaceClasses,
   useEffectiveSurface,
 } from '../common';
 import { PixelPortal } from '../overlay-foundation/PixelPortal';
@@ -48,51 +55,6 @@ export interface PixelCommandProps {
   surface?: Surface;
 }
 
-type FlatRow =
-  | { kind: 'heading'; heading: string; key: string }
-  | { kind: 'item'; item: PixelCommandItem; index: number; key: string };
-
-function parseShortcut(shortcut: string): {
-  key: string;
-  mod: boolean;
-  shift: boolean;
-  alt: boolean;
-} {
-  const parts = shortcut.toLowerCase().split('+').map((s) => s.trim());
-  let mod = false;
-  let shift = false;
-  let alt = false;
-  let key = '';
-  for (const p of parts) {
-    if (p === 'mod' || p === 'cmd' || p === 'ctrl' || p === 'meta') mod = true;
-    else if (p === 'shift') shift = true;
-    else if (p === 'alt' || p === 'opt' || p === 'option') alt = true;
-    else key = p;
-  }
-  return { key, mod, shift, alt };
-}
-
-function matchesShortcut(e: KeyboardEvent, parsed: ReturnType<typeof parseShortcut>): boolean {
-  if (e.key.toLowerCase() !== parsed.key) return false;
-  const modPressed = e.metaKey || e.ctrlKey;
-  if (parsed.mod !== modPressed) return false;
-  if (parsed.shift !== e.shiftKey) return false;
-  if (parsed.alt !== e.altKey) return false;
-  return true;
-}
-
-function itemMatches(item: PixelCommandItem, query: string): boolean {
-  if (!query) return true;
-  const q = query.toLowerCase();
-  if (item.label.toLowerCase().includes(q)) return true;
-  if (item.keywords) {
-    for (const k of item.keywords) {
-      if (k.toLowerCase().includes(q)) return true;
-    }
-  }
-  return false;
-}
-
 export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
   function PixelCommand(
     {
@@ -107,7 +69,6 @@ export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
     forwardedRef,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
     const [query, setQuery] = useState('');
     const [highlighted, setHighlighted] = useState(0);
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -126,22 +87,7 @@ export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
     );
 
     // Filter groups → flat list (items only, for navigation).
-    const { rows, items } = useMemo(() => {
-      const flatRows: FlatRow[] = [];
-      const flatItems: PixelCommandItem[] = [];
-      let idx = 0;
-      for (const g of groups) {
-        const visible = g.items.filter((it) => itemMatches(it, query));
-        if (visible.length === 0) continue;
-        flatRows.push({ kind: 'heading', heading: g.heading, key: `h-${g.heading}` });
-        for (const it of visible) {
-          flatRows.push({ kind: 'item', item: it, index: idx, key: `i-${it.id}` });
-          flatItems.push(it);
-          idx += 1;
-        }
-      }
-      return { rows: flatRows, items: flatItems };
-    }, [groups, query]);
+    const { rows, items } = useMemo(() => commandRows(groups, query), [groups, query]);
 
     // Clamp highlighted index when results shrink.
     useEffect(() => {
@@ -169,14 +115,14 @@ export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
 
     // Global shortcut to toggle open.
     const parsedShortcut = useMemo(
-      () => (shortcut ? parseShortcut(shortcut) : null),
+      () => (shortcut ? parseCommandShortcut(shortcut) : null),
       [shortcut],
     );
     useEventListener(
       'keydown',
       (e) => {
         if (!parsedShortcut) return;
-        if (matchesShortcut(e, parsedShortcut)) {
+        if (matchesCommandShortcut(e, parsedShortcut)) {
           e.preventDefault();
           onOpenChange(!open);
         }
@@ -216,14 +162,15 @@ export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
 
     if (!open) return null;
 
-    const optionIdFor = (id: string) => `${listboxId}-opt-${id}`;
+    const optionIdFor = (id: string) => commandOptionId(listboxId, id);
+    const c = commandClasses(surface);
     const activeId = items[highlighted] ? optionIdFor(items[highlighted].id) : undefined;
     const hasListbox = items.length > 0;
 
     return (
       <PixelPortal>
         <div
-          className="fixed inset-0 z-[80] flex items-start justify-center p-4 pt-[10vh]"
+          className={commandLayerClasses}
           aria-hidden={false}
         >
           <OverlayBackdrop
@@ -235,23 +182,12 @@ export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
             role="dialog"
             aria-modal="true"
             aria-label="Command palette"
-            className={cn(
-              'relative w-full max-w-lg bg-retro-bg shadow-2xl outline-none',
-              s.border,
-              s.radiusLg,
-              'border-retro-border',
-              'flex flex-col overflow-hidden',
-            )}
+            className={c.panel}
           >
-            <div
-              className={cn(
-                'flex items-center gap-2 px-3 py-2 border-b-2 border-retro-border',
-                surface === 'linear' && 'border-b',
-              )}
-            >
+            <div className={c.search}>
               <span
                 aria-hidden
-                className={cn('text-retro-muted', s.font, 'text-xs')}
+                className={c.prompt}
               >
                 {'>'}
               </span>
@@ -270,27 +206,19 @@ export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
                   setHighlighted(0);
                 }}
                 onKeyDown={handleInputKeyDown}
-                className={cn(
-                  'flex-1 bg-transparent text-sm text-retro-text outline-none placeholder:text-retro-muted',
-                  s.font,
-                )}
+                className={c.input}
               />
             </div>
 
             {items.length === 0 ? (
-              <div
-                className={cn(
-                  'px-4 py-6 text-center text-xs text-retro-muted',
-                  s.font,
-                )}
-              >
+              <div className={c.empty}>
                 {emptyMessage}
               </div>
             ) : (
               <ul
                 id={listboxId}
                 role="listbox"
-                className="max-h-[60vh] overflow-y-auto p-1"
+                className={c.listbox}
               >
                 {rows.map((row) => {
                   if (row.kind === 'heading') {
@@ -298,10 +226,7 @@ export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
                       <li
                         key={row.key}
                         role="presentation"
-                        className={cn(
-                          'px-2 pt-2 pb-1 text-[10px] uppercase tracking-wider text-retro-muted',
-                          s.font,
-                        )}
+                        className={c.heading}
                       >
                         {row.heading}
                       </li>
@@ -323,30 +248,16 @@ export const PixelCommand = forwardRef<HTMLDivElement, PixelCommandProps>(
                       onClick={() => {
                         it.onSelect();
                       }}
-                      className={cn(
-                        'flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm text-retro-text',
-                        s.font,
-                        s.radius,
-                        isActive && 'bg-retro-surface/80 text-retro-text',
-                        !isActive && 'hover:bg-retro-surface/40',
-                      )}
+                      className={commandOptionClasses(surface, isActive)}
                     >
                       {it.icon && (
-                        <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center text-retro-muted">
+                        <span className={c.icon}>
                           {it.icon}
                         </span>
                       )}
-                      <span className="flex-1 truncate">{it.label}</span>
+                      <span className={c.label}>{it.label}</span>
                       {it.shortcut && (
-                        <kbd
-                          className={cn(
-                            'ml-2 inline-flex items-center gap-0.5 border px-1.5 py-0.5 text-[10px] text-retro-muted',
-                            s.border,
-                            s.radius,
-                            'border-retro-border',
-                            s.font,
-                          )}
-                        >
+                        <kbd className={c.shortcut}>
                           {it.shortcut}
                         </kbd>
                       )}

@@ -95,6 +95,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   broke hydration; `PixelAvatar` falls back to its initials when the image fails; avatars,
   the avatar group's "+N" and `PixelBadgeGroup`'s dialog get valid accessible names; and
   `PixelPopover` sets `aria-controls` on its trigger while open.
+- `@pxlkit/ui-kit`: `PixelDropdown` opens from the keyboard on its closed trigger, as
+  documented, and keeps items in order when one is enabled; the linear `PixelAlertDialog`'s
+  pending spinner respects reduced motion.
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined

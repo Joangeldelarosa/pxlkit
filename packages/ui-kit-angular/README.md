@@ -109,6 +109,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 
 | Component | Status | Category |
 | --- | --- | --- |
+| `PixelAlertDialog` | stable | overlays |
 | `PixelAvatar` | stable | data |
 | `PixelAvatarGroup` | stable | data |
 | `PixelBadge` | stable | data |
@@ -124,8 +125,11 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelCodeInline` | stable | data |
 | `PixelCollapsible` | stable | data |
 | `PixelColorSwatch` | stable | data |
+| `PixelCommand` | stable | overlays |
 | `PixelContainer` | stable | layout |
 | `PixelDivider` | stable | layout |
+| `PixelDrawer` | stable | overlays |
+| `PixelDropdown` | stable | overlays |
 | `PixelEqualHeightGrid` | stable | layout |
 | `PixelGrid` | stable | layout |
 | `PixelKbd` | stable | data |
@@ -135,11 +139,13 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelScrollArea` | stable | layout |
 | `PixelSection` | stable | layout |
 | `PixelSectionHeader` | stable | layout |
+| `PixelSheet` | stable | overlays |
 | `PixelStack` | stable | layout |
 | `PixelSwitch` | stable | forms |
 | `PixelTabs` | stable | navigation |
 | `PixelTextLink` | stable | data |
 | `PixelTimeline` | stable | data |
+| `PixelTooltip` | stable | overlays |
 | `PixelTwoColumn` | stable | layout |
 | `PxlKitLocaleProvider` | stable | overlay-foundation |
 | `PxlKitSurfaceProvider` | stable | overlay-foundation |
