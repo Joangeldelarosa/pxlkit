@@ -91,6 +91,26 @@ describe('PixelSelect — keyboard', () => {
     expect(onChange).toHaveBeenLastCalledWith('blue');
   });
 
+  it('points the trigger at the open listbox and its highlighted option (regression)', () => {
+    const { getByRole, getAllByRole } = render(<PixelSelect options={OPTIONS} />);
+    const trigger = getByRole('combobox');
+    fireEvent.click(trigger);
+    const listbox = getByRole('listbox');
+    expect(listbox.id).toBeTruthy();
+    expect(trigger.getAttribute('aria-controls')).toBe(listbox.id);
+    // Opened by a click, nothing is highlighted yet.
+    expect(trigger.hasAttribute('aria-activedescendant')).toBe(false);
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    const opts = getAllByRole('option');
+    expect(new Set(opts.map((o) => o.id)).size).toBe(3);
+    expect(trigger.getAttribute('aria-activedescendant')).toBe(opts[0].id);
+    fireEvent.keyDown(trigger, { key: 'End' });
+    expect(trigger.getAttribute('aria-activedescendant')).toBe(opts[2].id);
+    fireEvent.keyDown(trigger, { key: 'Escape' });
+    expect(trigger.hasAttribute('aria-controls')).toBe(false);
+    expect(trigger.hasAttribute('aria-activedescendant')).toBe(false);
+  });
+
   it('Escape closes the listbox without selecting', () => {
     const onChange = vi.fn();
     const { getByRole, queryByRole } = render(

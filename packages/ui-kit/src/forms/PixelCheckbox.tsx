@@ -3,9 +3,10 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef } from 'react';
+import { checkboxClasses } from '@pxlkit/ui-kit-core';
 import {
-  Tone, Surface, cn,
-  toneMap, surfaceClasses, useEffectiveSurface,
+  Tone, Surface,
+  useEffectiveSurface,
   CheckIcon,
 } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
@@ -47,13 +48,13 @@ export const PixelCheckbox = forwardRef<HTMLButtonElement, PixelCheckboxProps>(f
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const [internalChecked, setInternalChecked] = useControllableState<boolean>({
     value: checked,
     defaultValue: defaultChecked ?? false,
     onChange,
   });
   const isChecked = internalChecked ?? false;
+  const c = checkboxClasses(surface, { tone, checked: isChecked, disabled });
   return (
     <>
       {name && isChecked && <input type="hidden" name={name} value={value} required={required} />}
@@ -67,24 +68,12 @@ export const PixelCheckbox = forwardRef<HTMLButtonElement, PixelCheckboxProps>(f
         aria-required={required || undefined}
         disabled={disabled}
         onClick={() => setInternalChecked(!isChecked)}
-        className={cn(
-          'group flex items-center gap-2.5 text-sm outline-none',
-          s.font,
-          disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
-        )}
+        className={c.button}
       >
-        <span
-          className={cn(
-            'flex h-[18px] w-[18px] shrink-0 items-center justify-center transition-all',
-            s.border, s.radius,
-            isChecked ? cn(toneMap[tone].border, toneMap[tone].bg) : 'border-retro-border-strong bg-retro-bg',
-            !disabled && 'group-hover:border-retro-muted',
-            'group-focus-visible:ring-2 group-focus-visible:ring-retro-green/40 group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-retro-bg',
-          )}
-        >
-          {isChecked && <CheckIcon className={toneMap[tone].text} />}
+        <span className={c.box}>
+          {isChecked && <CheckIcon className={c.check} />}
         </span>
-        <span className="text-retro-text select-none">{label}</span>
+        <span className={c.label}>{label}</span>
       </button>
     </>
   );

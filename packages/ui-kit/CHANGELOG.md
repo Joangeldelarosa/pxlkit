@@ -20,6 +20,9 @@
 - `PixelPopover` sets `aria-controls` on its trigger while the content is open (a trigger that sets its own keeps it), and `PixelBadgeGroup` names its overflow dialog after the "+N" button.
 - `PixelAlertDialog` on the linear surface stops its pending spinner when the user prefers reduced motion, as the pixel surface already did.
 - `PixelDropdown`: ArrowDown and ArrowUp on the closed trigger open the menu on its first enabled item, as documented — they did nothing, because the items register only once the menu renders. An item whose `disabled` changes keeps its place in the arrow-key order instead of moving to the end.
+- `PixelInput`: the clear button on an uncontrolled input emptied the field's counter but left the typed text in it; it now empties the field.
+- `PixelNumberInput` shows each ArrowUp / ArrowDown step while focused, formatted with its precision and separator — the value changed but the text only caught up on blur.
+- `PixelSelect` points its trigger at the open listbox (`aria-controls`) and at the highlighted option (`aria-activedescendant`), so screen readers announce the option the arrow keys reach.
 - `PixelScrollArea` draws its styled scrollbar. The stylesheet never defined the `.pxl-scroll-*` classes the component sets, so the browser's default scrollbar showed, `variant="hover"` behaved like `auto` and `scrollbarSize` had no effect.
 
 ## 2.1.1 — 2026-08-08

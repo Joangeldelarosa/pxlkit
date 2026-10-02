@@ -98,6 +98,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@pxlkit/ui-kit`: `PixelDropdown` opens from the keyboard on its closed trigger, as
   documented, and keeps items in order when one is enabled; the linear `PixelAlertDialog`'s
   pending spinner respects reduced motion.
+- `@pxlkit/ui-kit`: clearing an uncontrolled `PixelInput` empties the field, `PixelNumberInput`
+  shows arrow-key steps while focused, and `PixelSelect` exposes the highlighted option to
+  screen readers (`aria-controls`, `aria-activedescendant`).
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined

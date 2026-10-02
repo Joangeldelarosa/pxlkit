@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, fireEvent, screen, act } from '@testing-library/react';
 import { PixelNumberInput } from '../../forms/PixelNumberInput';
 
 describe('PixelNumberInput', () => {
@@ -63,6 +63,33 @@ describe('PixelNumberInput', () => {
     // minus stripped → 42
     expect(onChange).toHaveBeenLastCalledWith(42);
     expect(input.value).not.toContain('-');
+  });
+
+  it('shows each ArrowUp / ArrowDown step while focused (regression)', () => {
+    function Wrap() {
+      const [v, setV] = useState(5);
+      return <PixelNumberInput value={v} onChange={setV} min={0} max={100} />;
+    }
+    const { container } = render(<Wrap />);
+    const input = container.querySelector('input[inputmode="decimal"]') as HTMLInputElement;
+    act(() => input.focus());
+    fireEvent.keyDown(input, { key: 'ArrowUp' });
+    expect(input.value).toBe('6');
+    expect(input.getAttribute('aria-valuenow')).toBe('6');
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    expect(input.value).toBe('4');
+  });
+
+  it('formats a focused step with the precision and separator (uncontrolled)', () => {
+    const { container } = render(
+      <PixelNumberInput defaultValue={999.5} step={0.25} precision={2} thousandsSeparator="," />,
+    );
+    const input = container.querySelector('input[inputmode="decimal"]') as HTMLInputElement;
+    act(() => input.focus());
+    fireEvent.keyDown(input, { key: 'ArrowUp' });
+    fireEvent.keyDown(input, { key: 'ArrowUp' });
+    expect(input.value).toBe('1,000.00');
   });
 
   it('controlled mode tracks value prop', () => {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 import { PixelInput } from '../../forms/PixelInput';
 
@@ -59,6 +59,20 @@ describe('PixelInput — upgrades', () => {
     expect(queryByLabelText(/clear input/i)).toBeNull();
     fireEvent.change(container.querySelector('input')!, { target: { value: 'abc' } });
     expect(queryByLabelText(/clear input/i)).toBeTruthy();
+  });
+
+  it('clearing an uncontrolled input empties the field itself (regression)', () => {
+    const onClear = vi.fn();
+    const { container, getByLabelText, queryByLabelText } = render(
+      <PixelInput clearable showCount defaultValue="abc" onClear={onClear} />,
+    );
+    const input = container.querySelector('input') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'abcd' } });
+    fireEvent.click(getByLabelText(/clear input/i));
+    expect(input.value).toBe('');
+    expect(container.textContent).toContain('0');
+    expect(queryByLabelText(/clear input/i)).toBeNull();
+    expect(onClear).toHaveBeenCalledOnce();
   });
 
   it('addonLeft / addonRight render outside the shell joined to input', () => {

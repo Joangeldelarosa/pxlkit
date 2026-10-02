@@ -4,8 +4,15 @@
 
 import React, { forwardRef, useId, useRef, useState } from 'react';
 import {
-  Tone, Size, Surface, Option, cn, useClickOutside,
-  toneMap, focusRing, sizeHeight, surfaceClasses, useEffectiveSurface,
+  selectClasses,
+  selectKeydown,
+  selectListboxId,
+  selectOptionClasses,
+  selectOptionId,
+} from '@pxlkit/ui-kit-core';
+import {
+  Tone, Size, Surface, Option, useClickOutside,
+  useEffectiveSurface,
   ChevronDownIcon, CheckIcon, FieldShell,
 } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
@@ -66,7 +73,6 @@ export const PixelSelect = forwardRef<HTMLButtonElement, PixelSelectProps>(funct
   const surface = useEffectiveSurface(surfaceProp);
   const reactId = useId();
   const triggerId = id ?? `pxl-select-${reactId}`;
-  const s = surfaceClasses(surface);
   const [value, setValue] = useControllableState<string>({
     value: controlledValue,
     defaultValue: defaultValue ?? '',
@@ -85,38 +91,27 @@ export const PixelSelect = forwardRef<HTMLButtonElement, PixelSelectProps>(funct
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') { setOpen(false); return; }
-    if (e.key === 'Tab') { setOpen(false); return; /* allow default Tab */ }
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      if (open && highlighted >= 0) { handleSelect(options[highlighted].value); }
-      else { setOpen(true); }
+    const next = selectKeydown(e.key, { open, highlighted }, options.length);
+    if (!next) return;
+    // Tab keeps its default, so focus moves on as the listbox closes.
+    if (next.preventDefault) e.preventDefault();
+    if (next.select !== undefined) {
+      handleSelect(options[next.select].value);
       return;
     }
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      if (!open) { setOpen(true); setHighlighted(0); return; }
-      setHighlighted((p) => Math.min(p + 1, options.length - 1));
-    }
-    if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setHighlighted((p) => Math.max(p - 1, 0));
-    }
-    if (e.key === 'Home') {
-      e.preventDefault();
-      if (!open) setOpen(true);
-      setHighlighted(0);
-    }
-    if (e.key === 'End') {
-      e.preventDefault();
-      if (!open) setOpen(true);
-      setHighlighted(options.length - 1);
-    }
+    setOpen(next.open);
+    setHighlighted(next.highlighted);
   };
+
+  const c = selectClasses(surface, { tone, size, invalid: !!error, disabled, open, hasValue: !!selected });
+  // Focus stays on the trigger: it points at the open listbox and at the
+  // highlighted option, so screen readers follow the arrow keys.
+  const listboxId = selectListboxId(triggerId);
+  const activeOptionId = open && options[highlighted] ? selectOptionId(triggerId, highlighted) : undefined;
 
   return (
     <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
-      <div ref={containerRef} className="relative">
+      <div ref={containerRef} className={c.container}>
         {name && <input type="hidden" name={name} value={value} required={required} />}
         <button
           ref={ref}
@@ -125,50 +120,45 @@ export const PixelSelect = forwardRef<HTMLButtonElement, PixelSelectProps>(funct
           role="combobox"
           aria-expanded={open}
           aria-haspopup="listbox"
+          aria-controls={open ? listboxId : undefined}
+          aria-activedescendant={activeOptionId}
           aria-disabled={disabled}
           aria-required={required || undefined}
           aria-invalid={error ? true : undefined}
           aria-describedby={ariaDescribedBy}
           disabled={disabled}
-          className={cn(
-            'flex w-full items-center justify-between bg-retro-surface/40 px-3 outline-none',
-            s.font, s.border, s.radius, s.transition,
-            sizeHeight[size], focusRing, toneMap[tone].ring,
-            error ? 'border-retro-red/60' : 'border-retro-border-strong',
-            disabled && 'opacity-50 cursor-not-allowed',
-          )}
+          className={c.trigger}
           onClick={() => !disabled && setOpen(!open)}
           onKeyDown={!disabled ? handleKeyDown : undefined}
         >
-          <span className="flex min-w-0 items-center gap-2">
-            {selected?.icon && <span className="flex-shrink-0 opacity-80">{selected.icon}</span>}
-            <span className={cn('truncate', selected ? 'text-retro-text' : 'text-retro-muted')}>{selected?.label ?? placeholder}</span>
+          <span className={c.triggerContent}>
+            {selected?.icon && <span className={c.icon}>{selected.icon}</span>}
+            <span className={c.value}>{selected?.label ?? placeholder}</span>
           </span>
-          <ChevronDownIcon className={cn('ml-2 flex-shrink-0 text-retro-muted transition-transform', open && 'rotate-180')} />
+          <ChevronDownIcon className={c.chevron} />
         </button>
         {open && (
-          <div role="listbox" className={cn('absolute left-0 top-full z-40 mt-1 w-full bg-retro-bg p-1 shadow-xl', s.border, s.radiusLg, 'border-retro-border-strong')}>
+          <div id={listboxId} role="listbox" className={c.listbox}>
             {options.map((opt, idx) => (
               <button
                 key={opt.value}
+                id={selectOptionId(triggerId, idx)}
                 type="button"
                 role="option"
                 aria-selected={opt.value === value}
-                className={cn(
-                  'flex w-full items-center px-3 py-2 text-left text-xs transition-colors',
-                  s.font, s.radius,
-                  opt.value === value ? cn(toneMap[tone].text, toneMap[tone].soft) : 'text-retro-muted',
-                  idx === highlighted && 'bg-retro-surface',
-                  'hover:bg-retro-surface hover:text-retro-text',
-                )}
+                className={selectOptionClasses(surface, {
+                  tone,
+                  selected: opt.value === value,
+                  highlighted: idx === highlighted,
+                })}
                 onMouseEnter={() => setHighlighted(idx)}
                 onClick={() => handleSelect(opt.value)}
               >
-                <span className="flex flex-1 min-w-0 items-center gap-2">
-                  {opt.icon && <span className="flex-shrink-0 opacity-80">{opt.icon}</span>}
-                  <span className="truncate">{opt.label}</span>
+                <span className={c.optionContent}>
+                  {opt.icon && <span className={c.icon}>{opt.icon}</span>}
+                  <span className={c.optionLabel}>{opt.label}</span>
                 </span>
-                {opt.value === value && <CheckIcon className="ml-auto flex-shrink-0 h-2.5 w-2.5" />}
+                {opt.value === value && <CheckIcon className={c.check} />}
               </button>
             ))}
           </div>
