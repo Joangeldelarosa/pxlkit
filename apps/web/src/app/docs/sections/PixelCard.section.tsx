@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCardDocsSectionProps {
   className?: string;
@@ -74,7 +75,10 @@ export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): 
     </section>
     <section aria-labelledby="pixel-card-usage">
       <h3 id="pixel-card-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelCard } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCard usage'}
+        react={`import { PixelCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -82,34 +86,51 @@ export function Default() {
       <p>Compact dossier on the Atlas migration. Status nominal.</p>
     </PixelCard>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelCard title="Project Atlas">
       <p>Compact dossier on the Atlas migration. Status nominal.</p>
     </PixelCard>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-headerless">
         <h4>Headerless</h4>
-        <pre className="docs-code"><code>{`export function Headerless() {
+        <FrameworkCode
+          variant="docs"
+          label={'Headerless code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function Headerless() {
   return (
     <PixelCard>
       <p>Omit the title to get a plain well container — no header, no divider.</p>
     </PixelCard>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icon">
         <h4>With Icon</h4>
-        <pre className="docs-code"><code>{`export function WithIcon() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Icon code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function WithIcon() {
   const Icon = (
     <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-3 w-3">
       <rect x="3" y="0" width="2" height="8" />
@@ -121,11 +142,17 @@ export function Default() {
       <p>All checks green. Last sync 3 minutes ago.</p>
     </PixelCard>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-description">
         <h4>With Description</h4>
-        <pre className="docs-code"><code>{`export function WithDescription() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Description code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function WithDescription() {
   return (
     <PixelCard
       title="Release Notes"
@@ -134,11 +161,17 @@ export function Default() {
       <p>Body content sits under the description.</p>
     </PixelCard>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-footer">
         <h4>With Footer</h4>
-        <pre className="docs-code"><code>{`export function WithFooter() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Footer code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function WithFooter() {
   return (
     <PixelCard
       title="Invoice #1042"
@@ -147,11 +180,17 @@ export function Default() {
       <p>Total: $1,250.00</p>
     </PixelCard>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelCard title="Cyan" tone="cyan">Tinted border + soft background.</PixelCard>
@@ -160,22 +199,34 @@ export function Default() {
       <PixelCard title="Purple" tone="purple">Tinted border + soft background.</PixelCard>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelCard title="Pixel" surface="pixel">Thick border + offset shadow.</PixelCard>
       <PixelCard title="Linear" surface="linear">Soft border + smooth radius.</PixelCard>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-interactive">
         <h4>Interactive</h4>
-        <pre className="docs-code"><code>{`export function Interactive() {
+        <FrameworkCode
+          variant="docs"
+          label={'Interactive code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function Interactive() {
   return (
     <PixelCard
       title="Click me"
@@ -186,11 +237,17 @@ export function Default() {
       <p>Renders as role=button with focus ring.</p>
     </PixelCard>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-as-link">
         <h4>As Link</h4>
-        <pre className="docs-code"><code>{`export function AsLink() {
+        <FrameworkCode
+          variant="docs"
+          label={'As Link code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function AsLink() {
   return (
     <PixelCard
       title="Read the docs"
@@ -200,11 +257,17 @@ export function Default() {
       description="Root renders as <a href> when href is provided."
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-media">
         <h4>With Media</h4>
-        <pre className="docs-code"><code>{`export function WithMedia() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Media code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function WithMedia() {
   const Media = (
     <div className="h-24 w-full bg-gradient-to-br from-retro-cyan/40 to-retro-purple/40" />
   );
@@ -213,11 +276,17 @@ export function Default() {
       <p>Card body.</p>
     </PixelCard>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-badge">
         <h4>With Ribbon Badge</h4>
-        <pre className="docs-code"><code>{`export function WithBadge() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Ribbon Badge code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function WithBadge() {
   return (
     <PixelCard
       title="New Feature"
@@ -227,11 +296,17 @@ export function Default() {
       <p>Useful for highlighting fresh content.</p>
     </PixelCard>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-clamped-description">
         <h4>Clamped Description</h4>
-        <pre className="docs-code"><code>{`export function ClampedDescription() {
+        <FrameworkCode
+          variant="docs"
+          label={'Clamped Description code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function ClampedDescription() {
   return (
     <PixelCard
       title="Long Description"
@@ -241,22 +316,34 @@ export function Default() {
       <p>Body still renders below the clamp.</p>
     </PixelCard>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-padding-scale">
         <h4>Padding Scale</h4>
-        <pre className="docs-code"><code>{`export function PaddingScale() {
+        <FrameworkCode
+          variant="docs"
+          label={'Padding Scale code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function PaddingScale() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelCard title="Small" padding="sm">Tight padding.</PixelCard>
       <PixelCard title="Large" padding="lg">Roomy padding.</PixelCard>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-subcomponents">
         <h4>With Subcomponents</h4>
-        <pre className="docs-code"><code>{`export function WithSubcomponents() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Subcomponents code'}
+          react={`import { PixelCard } from '@pxlkit/ui-kit';
+
+export function WithSubcomponents() {
   return (
     <PixelCard title="Composed">
       <PixelCard.Header>
@@ -270,7 +357,8 @@ export function Default() {
       </PixelCard.Footer>
     </PixelCard>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

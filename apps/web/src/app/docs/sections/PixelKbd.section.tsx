@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelKbdDocsSectionProps {
   className?: string;
@@ -47,24 +48,68 @@ export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): Re
     </section>
     <section aria-labelledby="pixel-kbd-usage">
       <h3 id="pixel-kbd-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelKbd } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelKbd usage'}
+        react={`import { PixelKbd } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelKbd>Enter</PixelKbd>;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelKbd>Enter</PixelKbd>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`<kbd pxlKbd>Enter</kbd>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelKbd>Enter</PixelKbd>;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelKbd>Enter</PixelKbd>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`<kbd pxlKbd>Enter</kbd>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-common-keys">
         <h4>Common Keys</h4>
-        <pre className="docs-code"><code>{`export function CommonKeys() {
+        <FrameworkCode
+          variant="docs"
+          label={'Common Keys code'}
+          react={`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function CommonKeys() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PixelKbd>Esc</PixelKbd>
@@ -74,11 +119,46 @@ export function Default() {
       <PixelKbd>Shift</PixelKbd>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <PixelKbd>Esc</PixelKbd>
+    <PixelKbd>Tab</PixelKbd>
+    <PixelKbd>Enter</PixelKbd>
+    <PixelKbd>Space</PixelKbd>
+    <PixelKbd>Shift</PixelKbd>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`
+    <div class="flex flex-wrap items-center gap-2">
+      <kbd pxlKbd>Esc</kbd>
+      <kbd pxlKbd>Tab</kbd>
+      <kbd pxlKbd>Enter</kbd>
+      <kbd pxlKbd>Space</kbd>
+      <kbd pxlKbd>Shift</kbd>
+    </div>
+  \`,
+})
+export class CommonKeys {}`}
+        />
       </article>
       <article className="docs-example" id="example-combo">
         <h4>Combo (Ctrl + K)</h4>
-        <pre className="docs-code"><code>{`export function Combo() {
+        <FrameworkCode
+          variant="docs"
+          label={'Combo (Ctrl + K) code'}
+          react={`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function Combo() {
   return (
     <div className="flex items-center gap-1 text-xs">
       <PixelKbd>Ctrl</PixelKbd>
@@ -86,28 +166,110 @@ export function Default() {
       <PixelKbd>K</PixelKbd>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-1 text-xs">
+    <PixelKbd>Ctrl</PixelKbd>
+    <span aria-hidden="true">+</span>
+    <PixelKbd>K</PixelKbd>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`
+    <div class="flex items-center gap-1 text-xs">
+      <kbd pxlKbd>Ctrl</kbd>
+      <span aria-hidden="true">+</span>
+      <kbd pxlKbd>K</kbd>
+    </div>
+  \`,
+})
+export class Combo {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <PixelKbd surface="pixel">P</PixelKbd>
       <PixelKbd surface="linear">L</PixelKbd>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-3">
+    <PixelKbd surface="pixel">P</PixelKbd>
+    <PixelKbd surface="linear">L</PixelKbd>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`
+    <div class="flex flex-wrap items-center gap-3">
+      <kbd pxlKbd surface="pixel">P</kbd>
+      <kbd pxlKbd surface="linear">L</kbd>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-inline-in-prose">
         <h4>Inline in Prose</h4>
-        <pre className="docs-code"><code>{`export function InlineInProse() {
+        <FrameworkCode
+          variant="docs"
+          label={'Inline in Prose code'}
+          react={`import { PixelKbd } from '@pxlkit/ui-kit';
+
+export function InlineInProse() {
   return (
     <p className="text-sm text-retro-text">
       Press <PixelKbd>/</PixelKbd> to focus the search bar, then <PixelKbd>Esc</PixelKbd> to dismiss it.
     </p>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelKbd } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <p class="text-sm text-retro-text">
+    Press <PixelKbd>/</PixelKbd> to focus the search bar, then <PixelKbd>Esc</PixelKbd> to dismiss it.
+  </p>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelKbd } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelKbd],
+  template: \`
+    <p class="text-sm text-retro-text">
+      Press <kbd pxlKbd>/</kbd> to focus the search bar, then <kbd pxlKbd>Esc</kbd> to dismiss it.
+    </p>
+  \`,
+})
+export class InlineInProse {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToggleDocsSectionProps {
   className?: string;
@@ -85,7 +86,10 @@ export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProp
     </section>
     <section aria-labelledby="pixel-toggle-usage">
       <h3 id="pixel-toggle-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelToggle usage'}
+        react={`import { useState } from 'react';
 import { PixelToggle } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -95,36 +99,116 @@ export function Default() {
       Bold
     </PixelToggle>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle } from '@pxlkit/ui-kit-vue';
+
+const pressed = ref(false);
+</script>
+
+<template>
+  <PixelToggle v-model:pressed="pressed" value="bold">Bold</PixelToggle>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle],
+  template: \`<button pxlToggle value="bold" [(pressed)]="pressed">Bold</button>\`,
+})
+export class Default {
+  readonly pressed = signal(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelToggle } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [pressed, setPressed] = useState(false);
   return (
     <PixelToggle value="bold" pressed={pressed} onPressedChange={setPressed}>
       Bold
     </PixelToggle>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle } from '@pxlkit/ui-kit-vue';
+
+const pressed = ref(false);
+</script>
+
+<template>
+  <PixelToggle v-model:pressed="pressed" value="bold">Bold</PixelToggle>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle],
+  template: \`<button pxlToggle value="bold" [(pressed)]="pressed">Bold</button>\`,
+})
+export class Default {
+  readonly pressed = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-pressed">
         <h4>Pressed</h4>
-        <pre className="docs-code"><code>{`export function Pressed() {
+        <FrameworkCode
+          variant="docs"
+          label={'Pressed code'}
+          react={`import { useState } from 'react';
+import { PixelToggle } from '@pxlkit/ui-kit';
+
+export function Pressed() {
   const [pressed, setPressed] = useState(true);
   return (
     <PixelToggle value="italic" pressed={pressed} onPressedChange={setPressed}>
       Italic
     </PixelToggle>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle } from '@pxlkit/ui-kit-vue';
+
+const pressed = ref(true);
+</script>
+
+<template>
+  <PixelToggle v-model:pressed="pressed" value="italic">Italic</PixelToggle>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle],
+  template: \`<button pxlToggle value="italic" [(pressed)]="pressed">Italic</button>\`,
+})
+export class Pressed {
+  readonly pressed = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { useState } from 'react';
+import { PixelToggle } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   const [pixel, setPixel] = useState(true);
   const [linear, setLinear] = useState(true);
   return (
@@ -147,11 +231,47 @@ export function Default() {
       </PixelToggle>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle } from '@pxlkit/ui-kit-vue';
+
+const pixel = ref(true);
+const linear = ref(true);
+</script>
+
+<template>
+  <div class="flex items-center gap-2">
+    <PixelToggle v-model:pressed="pixel" value="pixel" surface="pixel">Pixel</PixelToggle>
+    <PixelToggle v-model:pressed="linear" value="linear" surface="linear">Linear</PixelToggle>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelToggle } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle],
+  template: \`
+    <div class="flex items-center gap-2">
+      <button pxlToggle value="pixel" surface="pixel" [(pressed)]="pixel">Pixel</button>
+      <button pxlToggle value="linear" surface="linear" [(pressed)]="linear">Linear</button>
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly pixel = signal(true);
+  readonly linear = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelToggle } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <div className="flex items-center gap-2">
       <PixelToggle value="off" disabled pressed={false} onPressedChange={() => {}}>
@@ -162,7 +282,31 @@ export function Default() {
       </PixelToggle>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelToggle } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-2">
+    <PixelToggle value="off" disabled :pressed="false">Disabled off</PixelToggle>
+    <PixelToggle value="on" disabled pressed>Disabled on</PixelToggle>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelToggle } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle],
+  template: \`
+    <div class="flex items-center gap-2">
+      <button pxlToggle value="off" disabled [pressed]="false">Disabled off</button>
+      <button pxlToggle value="on" disabled [pressed]="true">Disabled on</button>
+    </div>
+  \`,
+})
+export class Disabled {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

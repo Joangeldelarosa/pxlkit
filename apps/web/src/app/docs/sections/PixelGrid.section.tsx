@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelGridDocsSectionProps {
   className?: string;
@@ -45,7 +46,10 @@ export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): 
     </section>
     <section aria-labelledby="pixel-grid-usage">
       <h3 id="pixel-grid-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelGrid usage'}
+        react={`import React from 'react';
 import { PixelGrid } from '@pxlkit/ui-kit';
 
 function Cell({ children }: { children: React.ReactNode }) {
@@ -67,14 +71,57 @@ export function Default() {
       <Cell>Six</Cell>
     </PixelGrid>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelGrid } from '@pxlkit/ui-kit-vue';
+
+const cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+</script>
+
+<template>
+  <PixelGrid :cols="3" :gap="4">
+    <div v-for="cell in cells" :key="cell" class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {{ cell }}
+    </div>
+  </PixelGrid>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGrid],
+  template: \`
+    <div pxlGrid [cols]="3" [gap]="4">
+      @for (cell of cells; track cell) {
+        <div class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">{{ cell }}</div>
+      }
+    </div>
+  \`,
+})
+export class Default {
+  readonly cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React from 'react';
+import { PixelGrid } from '@pxlkit/ui-kit';
+
+function Cell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {children}
+    </div>
+  );
+}
+
+export function Default() {
   return (
     <PixelGrid cols={3} gap={4}>
       <Cell>One</Cell>
@@ -85,11 +132,55 @@ export function Default() {
       <Cell>Six</Cell>
     </PixelGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGrid } from '@pxlkit/ui-kit-vue';
+
+const cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+</script>
+
+<template>
+  <PixelGrid :cols="3" :gap="4">
+    <div v-for="cell in cells" :key="cell" class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {{ cell }}
+    </div>
+  </PixelGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGrid],
+  template: \`
+    <div pxlGrid [cols]="3" [gap]="4">
+      @for (cell of cells; track cell) {
+        <div class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">{{ cell }}</div>
+      }
+    </div>
+  \`,
+})
+export class Default {
+  readonly cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-responsive">
         <h4>Responsive Columns</h4>
-        <pre className="docs-code"><code>{`export function Responsive() {
+        <FrameworkCode
+          variant="docs"
+          label={'Responsive Columns code'}
+          react={`import React from 'react';
+import { PixelGrid } from '@pxlkit/ui-kit';
+
+function Cell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {children}
+    </div>
+  );
+}
+
+export function Responsive() {
   return (
     <PixelGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} gap={4}>
       <Cell>1</Cell>
@@ -98,11 +189,55 @@ export function Default() {
       <Cell>4</Cell>
     </PixelGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGrid } from '@pxlkit/ui-kit-vue';
+
+const cells = ['1', '2', '3', '4'];
+</script>
+
+<template>
+  <PixelGrid :cols="{ base: 1, sm: 2, md: 3, lg: 4 }" :gap="4">
+    <div v-for="cell in cells" :key="cell" class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {{ cell }}
+    </div>
+  </PixelGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGrid],
+  template: \`
+    <div pxlGrid [cols]="{ base: 1, sm: 2, md: 3, lg: 4 }" [gap]="4">
+      @for (cell of cells; track cell) {
+        <div class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">{{ cell }}</div>
+      }
+    </div>
+  \`,
+})
+export class Responsive {
+  readonly cells = ['1', '2', '3', '4'];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-auto-fit">
         <h4>Auto Fit</h4>
-        <pre className="docs-code"><code>{`export function AutoFit() {
+        <FrameworkCode
+          variant="docs"
+          label={'Auto Fit code'}
+          react={`import React from 'react';
+import { PixelGrid } from '@pxlkit/ui-kit';
+
+function Cell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {children}
+    </div>
+  );
+}
+
+export function AutoFit() {
   return (
     <PixelGrid autoFit minColWidth="12rem" gap={4}>
       <Cell>Auto A</Cell>
@@ -111,11 +246,55 @@ export function Default() {
       <Cell>Auto D</Cell>
     </PixelGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGrid } from '@pxlkit/ui-kit-vue';
+
+const cells = ['Auto A', 'Auto B', 'Auto C', 'Auto D'];
+</script>
+
+<template>
+  <PixelGrid auto-fit min-col-width="12rem" :gap="4">
+    <div v-for="cell in cells" :key="cell" class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {{ cell }}
+    </div>
+  </PixelGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGrid],
+  template: \`
+    <div pxlGrid autoFit minColWidth="12rem" [gap]="4">
+      @for (cell of cells; track cell) {
+        <div class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">{{ cell }}</div>
+      }
+    </div>
+  \`,
+})
+export class AutoFit {
+  readonly cells = ['Auto A', 'Auto B', 'Auto C', 'Auto D'];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-asymmetric-gaps">
         <h4>Asymmetric Gaps</h4>
-        <pre className="docs-code"><code>{`export function AsymmetricGaps() {
+        <FrameworkCode
+          variant="docs"
+          label={'Asymmetric Gaps code'}
+          react={`import React from 'react';
+import { PixelGrid } from '@pxlkit/ui-kit';
+
+function Cell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {children}
+    </div>
+  );
+}
+
+export function AsymmetricGaps() {
   return (
     <PixelGrid cols={2} colGap={8} rowGap={2}>
       <Cell>A</Cell>
@@ -124,7 +303,37 @@ export function Default() {
       <Cell>D</Cell>
     </PixelGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGrid } from '@pxlkit/ui-kit-vue';
+
+const cells = ['A', 'B', 'C', 'D'];
+</script>
+
+<template>
+  <PixelGrid :cols="2" :col-gap="8" :row-gap="2">
+    <div v-for="cell in cells" :key="cell" class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">
+      {{ cell }}
+    </div>
+  </PixelGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGrid],
+  template: \`
+    <div pxlGrid [cols]="2" [colGap]="8" [rowGap]="2">
+      @for (cell of cells; track cell) {
+        <div class="border border-retro-border bg-retro-surface p-3 text-sm text-retro-text">{{ cell }}</div>
+      }
+    </div>
+  \`,
+})
+export class AsymmetricGaps {
+  readonly cells = ['A', 'B', 'C', 'D'];
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

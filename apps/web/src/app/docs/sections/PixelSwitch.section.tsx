@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSwitchDocsSectionProps {
   className?: string;
@@ -75,34 +76,117 @@ export function PixelSwitchDocsSection({ className }: PixelSwitchDocsSectionProp
     </section>
     <section aria-labelledby="pixel-switch-usage">
       <h3 id="pixel-switch-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSwitch usage'}
+        react={`import { useState } from 'react';
 import { PixelSwitch } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [on, setOn] = useState(false);
   return <PixelSwitch label="Enable notifications" checked={on} onChange={setOn} />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSwitch } from '@pxlkit/ui-kit-vue';
+
+const on = ref(false);
+</script>
+
+<template>
+  <PixelSwitch v-model:checked="on" label="Enable notifications" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelSwitch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSwitch],
+  template: \`<pxl-switch label="Enable notifications" [(checked)]="on" />\`,
+})
+export class Default {
+  readonly on = signal(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelSwitch } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [on, setOn] = useState(false);
   return <PixelSwitch label="Enable notifications" checked={on} onChange={setOn} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSwitch } from '@pxlkit/ui-kit-vue';
+
+const on = ref(false);
+</script>
+
+<template>
+  <PixelSwitch v-model:checked="on" label="Enable notifications" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSwitch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSwitch],
+  template: \`<pxl-switch label="Enable notifications" [(checked)]="on" />\`,
+})
+export class Default {
+  readonly on = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-checked">
         <h4>Checked</h4>
-        <pre className="docs-code"><code>{`export function Checked() {
+        <FrameworkCode
+          variant="docs"
+          label={'Checked code'}
+          react={`import { useState } from 'react';
+import { PixelSwitch } from '@pxlkit/ui-kit';
+
+export function Checked() {
   const [on, setOn] = useState(true);
   return <PixelSwitch label="Dark mode" checked={on} onChange={setOn} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSwitch } from '@pxlkit/ui-kit-vue';
+
+const on = ref(true);
+</script>
+
+<template>
+  <PixelSwitch v-model:checked="on" label="Dark mode" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSwitch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSwitch],
+  template: \`<pxl-switch label="Dark mode" [(checked)]="on" />\`,
+})
+export class Checked {
+  readonly on = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { useState } from 'react';
+import { PixelSwitch } from '@pxlkit/ui-kit';
+
+export function Tones() {
   const [on, setOn] = useState(true);
   return (
     <div className="flex flex-col gap-3">
@@ -115,11 +199,56 @@ export function Default() {
       <PixelSwitch label="Pink" tone="pink" checked={on} onChange={setOn} />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSwitch } from '@pxlkit/ui-kit-vue';
+
+const on = ref(true);
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelSwitch v-model:checked="on" label="Neutral" tone="neutral" />
+    <PixelSwitch v-model:checked="on" label="Green" tone="green" />
+    <PixelSwitch v-model:checked="on" label="Cyan" tone="cyan" />
+    <PixelSwitch v-model:checked="on" label="Gold" tone="gold" />
+    <PixelSwitch v-model:checked="on" label="Red" tone="red" />
+    <PixelSwitch v-model:checked="on" label="Purple" tone="purple" />
+    <PixelSwitch v-model:checked="on" label="Pink" tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSwitch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSwitch],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-switch label="Neutral" tone="neutral" [(checked)]="on" />
+      <pxl-switch label="Green" tone="green" [(checked)]="on" />
+      <pxl-switch label="Cyan" tone="cyan" [(checked)]="on" />
+      <pxl-switch label="Gold" tone="gold" [(checked)]="on" />
+      <pxl-switch label="Red" tone="red" [(checked)]="on" />
+      <pxl-switch label="Purple" tone="purple" [(checked)]="on" />
+      <pxl-switch label="Pink" tone="pink" [(checked)]="on" />
+    </div>
+  \`,
+})
+export class Tones {
+  readonly on = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { useState } from 'react';
+import { PixelSwitch } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   const [a, setA] = useState(true);
   const [b, setB] = useState(true);
   return (
@@ -128,22 +257,88 @@ export function Default() {
       <PixelSwitch label="Linear surface" surface="linear" checked={b} onChange={setB} />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSwitch } from '@pxlkit/ui-kit-vue';
+
+const a = ref(true);
+const b = ref(true);
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelSwitch v-model:checked="a" label="Pixel surface" surface="pixel" />
+    <PixelSwitch v-model:checked="b" label="Linear surface" surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSwitch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSwitch],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-switch label="Pixel surface" surface="pixel" [(checked)]="a" />
+      <pxl-switch label="Linear surface" surface="linear" [(checked)]="b" />
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly a = signal(true);
+  readonly b = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelSwitch } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <div className="flex flex-col gap-3">
       <PixelSwitch label="Disabled off" checked={false} onChange={() => {}} disabled />
       <PixelSwitch label="Disabled on" checked onChange={() => {}} disabled />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSwitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelSwitch label="Disabled off" :checked="false" disabled />
+    <PixelSwitch label="Disabled on" checked disabled />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSwitch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSwitch],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-switch label="Disabled off" [checked]="false" disabled />
+      <pxl-switch label="Disabled on" [checked]="true" disabled />
+    </div>
+  \`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-form-name">
         <h4>With Form Name</h4>
-        <pre className="docs-code"><code>{`export function WithFormName() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Form Name code'}
+          react={`import { useState } from 'react';
+import { PixelSwitch } from '@pxlkit/ui-kit';
+
+export function WithFormName() {
   const [on, setOn] = useState(true);
   return (
     <PixelSwitch
@@ -155,7 +350,30 @@ export function Default() {
       required
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSwitch } from '@pxlkit/ui-kit-vue';
+
+const on = ref(true);
+</script>
+
+<template>
+  <PixelSwitch v-model:checked="on" label="Subscribe to newsletter" name="newsletter" value="yes" required />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSwitch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSwitch],
+  template: \`
+    <pxl-switch label="Subscribe to newsletter" name="newsletter" value="yes" [(checked)]="on" required />
+  \`,
+})
+export class WithFormName {
+  readonly on = signal(true);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

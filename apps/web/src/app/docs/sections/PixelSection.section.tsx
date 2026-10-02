@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSectionDocsSectionProps {
   className?: string;
@@ -47,7 +48,10 @@ export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionPr
     </section>
     <section aria-labelledby="pixel-section-usage">
       <h3 id="pixel-section-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSection } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSection usage'}
+        react={`import { PixelSection } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -57,14 +61,44 @@ export function Default() {
       </p>
     </PixelSection>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSection title="Overview" subtitle="Key metrics for this period.">
+    <p class="text-sm text-retro-muted">
+      Section content goes here. Wrap any layout block.
+    </p>
+  </PixelSection>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSection],
+  template: \`
+    <pxl-section title="Overview" subtitle="Key metrics for this period.">
+      <p class="text-sm text-retro-muted">
+        Section content goes here. Wrap any layout block.
+      </p>
+    </pxl-section>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSection } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelSection title="Overview" subtitle="Key metrics for this period.">
       <p className="text-sm text-retro-muted">
@@ -72,37 +106,144 @@ export function Default() {
       </p>
     </PixelSection>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSection title="Overview" subtitle="Key metrics for this period.">
+    <p class="text-sm text-retro-muted">
+      Section content goes here. Wrap any layout block.
+    </p>
+  </PixelSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSection],
+  template: \`
+    <pxl-section title="Overview" subtitle="Key metrics for this period.">
+      <p class="text-sm text-retro-muted">
+        Section content goes here. Wrap any layout block.
+      </p>
+    </pxl-section>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-without-title">
         <h4>Without Title</h4>
-        <pre className="docs-code"><code>{`export function WithoutTitle() {
+        <FrameworkCode
+          variant="docs"
+          label={'Without Title code'}
+          react={`import { PixelSection } from '@pxlkit/ui-kit';
+
+export function WithoutTitle() {
   return (
     <PixelSection>
       <p className="text-sm text-retro-muted">A bare section without a title row.</p>
     </PixelSection>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSection>
+    <p class="text-sm text-retro-muted">A bare section without a title row.</p>
+  </PixelSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSection],
+  template: \`
+    <pxl-section>
+      <p class="text-sm text-retro-muted">A bare section without a title row.</p>
+    </pxl-section>
+  \`,
+})
+export class WithoutTitle {}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
         <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import { PixelSection } from '@pxlkit/ui-kit';
+
+export function PixelSurface() {
   return (
     <PixelSection surface="pixel" title="Pixel Surface" subtitle="8-bit aesthetic.">
       <p className="text-sm text-retro-muted">Renders with the pixel surface tokens.</p>
     </PixelSection>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSection surface="pixel" title="Pixel Surface" subtitle="8-bit aesthetic.">
+    <p class="text-sm text-retro-muted">Renders with the pixel surface tokens.</p>
+  </PixelSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSection],
+  template: \`
+    <pxl-section surface="pixel" title="Pixel Surface" subtitle="8-bit aesthetic.">
+      <p class="text-sm text-retro-muted">Renders with the pixel surface tokens.</p>
+    </pxl-section>
+  \`,
+})
+export class PixelSurface {}`}
+        />
       </article>
       <article className="docs-example" id="example-no-container">
         <h4>No Container</h4>
-        <pre className="docs-code"><code>{`export function NoContainer() {
+        <FrameworkCode
+          variant="docs"
+          label={'No Container code'}
+          react={`import { PixelSection } from '@pxlkit/ui-kit';
+
+export function NoContainer() {
   return (
     <PixelSection container={false} horizontalGutter="md" title="Full Width">
       <p className="text-sm text-retro-muted">No centered container; uses page gutters.</p>
     </PixelSection>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSection :container="false" horizontal-gutter="md" title="Full Width">
+    <p class="text-sm text-retro-muted">No centered container; uses page gutters.</p>
+  </PixelSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSection],
+  template: \`
+    <pxl-section [container]="false" horizontalGutter="md" title="Full Width">
+      <p class="text-sm text-retro-muted">No centered container; uses page gutters.</p>
+    </pxl-section>
+  \`,
+})
+export class NoContainer {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

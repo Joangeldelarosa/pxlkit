@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStatCardDocsSectionProps {
   className?: string;
@@ -48,24 +49,38 @@ export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSection
     </section>
     <section aria-labelledby="pixel-stat-card-usage">
       <h3 id="pixel-stat-card-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelStatCard } from '@pxlkit/ui-kit'
+      <FrameworkCode
+        variant="docs"
+        label={'PixelStatCard usage'}
+        react={`import { PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelStatCard label="Active" value="1,204" tone="green" trend="+3.1%" />
@@ -77,11 +92,17 @@ export function Default() {
       <PixelStatCard label="Drafts" value="7" tone="neutral" />
     </div>
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex flex-col gap-3">
       <PixelStatCard label="Small" value="$1,200" size="sm" trend="+2%" tone="cyan" />
@@ -89,22 +110,34 @@ export function Default() {
       <PixelStatCard label="Large" value="$24,900" size="lg" trend="+11%" tone="green" />
     </div>
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelStatCard label="Pixel" value="$4,200" surface="pixel" tone="gold" trend="+6%" />
       <PixelStatCard label="Linear" value="$4,200" surface="linear" tone="gold" trend="+6%" />
     </div>
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-icon-positions">
         <h4>Icon positions</h4>
-        <pre className="docs-code"><code>{`export function IconPositions() {
+        <FrameworkCode
+          variant="docs"
+          label={'Icon positions code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function IconPositions() {
   const dot = <span aria-hidden="true">$</span>
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -120,24 +153,37 @@ export function Default() {
       />
     </div>
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-without-trend">
         <h4>Without trend</h4>
-        <pre className="docs-code"><code>{`export function WithoutTrend() {
+        <FrameworkCode
+          variant="docs"
+          label={'Without trend code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function WithoutTrend() {
   return <PixelStatCard label="Total users" value="12,480" tone="cyan" />
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-toned-value-centered">
         <h4>Toned value (centered)</h4>
-        <pre className="docs-code"><code>{`export function TonedValueCentered() {
+        <FrameworkCode
+          variant="docs"
+          label={'Toned value (centered) code'}
+          react={`import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function TonedValueCentered() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelStatCard label="Uptime" value="99.98%" tone="green" valueTone align="center" />
       <PixelStatCard label="Error rate" value="0.02%" tone="red" valueTone align="center" />
     </div>
   )
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

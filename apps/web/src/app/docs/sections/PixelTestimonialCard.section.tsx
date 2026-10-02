@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTestimonialCardDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelTestimonialCardDocsSection({ className }: PixelTestimonialC
     </section>
     <section aria-labelledby="pixel-testimonial-card-usage">
       <h3 id="pixel-testimonial-card-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTestimonialCard usage'}
+        react={`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -61,14 +65,19 @@ export function Default() {
       verified
     />
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelTestimonialCard
       quote="pxlkit dropped the polish ceiling. Our marketing site felt like a product launch in a week."
@@ -79,11 +88,17 @@ export function Default() {
       verified
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-avatar-and-tone">
         <h4>With avatar + tone</h4>
-        <pre className="docs-code"><code>{`export function WithAvatarAndTone() {
+        <FrameworkCode
+          variant="docs"
+          label={'With avatar + tone code'}
+          react={`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
+
+export function WithAvatarAndTone() {
   return (
     <PixelTestimonialCard
       tone="cyan"
@@ -95,11 +110,17 @@ export function Default() {
       stars={4}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-compact-quote">
         <h4>Compact quote</h4>
-        <pre className="docs-code"><code>{`export function CompactQuote() {
+        <FrameworkCode
+          variant="docs"
+          label={'Compact quote code'}
+          react={`import { PixelTestimonialCard } from '@pxlkit/ui-kit';
+
+export function CompactQuote() {
   return (
     <PixelTestimonialCard
       quoteSize="compact"
@@ -110,7 +131,8 @@ export function Default() {
       verified
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

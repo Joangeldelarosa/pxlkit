@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSelectDocsSectionProps {
   className?: string;
@@ -101,21 +102,16 @@ export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProp
     </section>
     <section aria-labelledby="pixel-select-usage">
       <h3 id="pixel-select-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelSelect } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSelect usage'}
+        react={`import { PixelSelect } from '@pxlkit/ui-kit';
 
 const FRUITS = [
   { value: 'apple', label: 'Apple' },
   { value: 'banana', label: 'Banana' },
   { value: 'cherry', label: 'Cherry' },
   { value: 'date', label: 'Date' },
-];
-
-const REGIONS = [
-  { value: 'us', label: 'United States' },
-  { value: 've', label: 'Venezuela' },
-  { value: 'es', label: 'Spain' },
-  { value: 'mx', label: 'Mexico' },
 ];
 
 export function Default() {
@@ -127,14 +123,57 @@ export function Default() {
       hint="Choose your favorite"
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+</script>
+
+<template>
+  <PixelSelect label="Fruit" :options="FRUITS" placeholder="Pick a fruit" hint="Choose your favorite" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`<pxl-select label="Fruit" [options]="fruits" placeholder="Pick a fruit" hint="Choose your favorite" />\`,
+})
+export class Default {
+  readonly fruits = FRUITS;
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSelect } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+export function Default() {
   return (
     <PixelSelect
       label="Fruit"
@@ -143,11 +182,55 @@ export function Default() {
       hint="Choose your favorite"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+</script>
+
+<template>
+  <PixelSelect label="Fruit" :options="FRUITS" placeholder="Pick a fruit" hint="Choose your favorite" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`<pxl-select label="Fruit" [options]="fruits" placeholder="Pick a fruit" hint="Choose your favorite" />\`,
+})
+export class Default {
+  readonly fruits = FRUITS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-uncontrolled">
         <h4>Uncontrolled</h4>
-        <pre className="docs-code"><code>{`export function Uncontrolled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Uncontrolled code'}
+          react={`import { PixelSelect } from '@pxlkit/ui-kit';
+
+const REGIONS = [
+  { value: 'us', label: 'United States' },
+  { value: 've', label: 'Venezuela' },
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+];
+
+export function Uncontrolled() {
   return (
     <PixelSelect
       label="Region"
@@ -155,11 +238,56 @@ export function Default() {
       defaultValue="ve"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const REGIONS = [
+  { value: 'us', label: 'United States' },
+  { value: 've', label: 'Venezuela' },
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+];
+</script>
+
+<template>
+  <PixelSelect label="Region" :options="REGIONS" default-value="ve" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const REGIONS = [
+  { value: 'us', label: 'United States' },
+  { value: 've', label: 'Venezuela' },
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`<pxl-select label="Region" [options]="regions" defaultValue="ve" />\`,
+})
+export class Uncontrolled {
+  readonly regions = REGIONS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
         <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
+import { PixelSelect } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+export function Controlled() {
   const [value, setValue] = useState('banana');
   return (
     <PixelSelect
@@ -170,11 +298,58 @@ export function Default() {
       tone="cyan"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+const value = ref('banana');
+</script>
+
+<template>
+  <PixelSelect v-model="value" label="Controlled fruit" :options="FRUITS" tone="cyan" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`<pxl-select label="Controlled fruit" [options]="fruits" [(value)]="value" tone="cyan" />\`,
+})
+export class Controlled {
+  readonly fruits = FRUITS;
+  readonly value = signal('banana');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelSelect } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+export function Tones() {
   return (
     <div className="flex flex-col gap-3">
       <PixelSelect label="Neutral" options={FRUITS} tone="neutral" defaultValue="apple" />
@@ -185,11 +360,71 @@ export function Default() {
       <PixelSelect label="Pink" options={FRUITS} tone="pink" defaultValue="apple" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelSelect label="Neutral" :options="FRUITS" tone="neutral" default-value="apple" />
+    <PixelSelect label="Cyan" :options="FRUITS" tone="cyan" default-value="apple" />
+    <PixelSelect label="Green" :options="FRUITS" tone="green" default-value="apple" />
+    <PixelSelect label="Gold" :options="FRUITS" tone="gold" default-value="apple" />
+    <PixelSelect label="Purple" :options="FRUITS" tone="purple" default-value="apple" />
+    <PixelSelect label="Pink" :options="FRUITS" tone="pink" default-value="apple" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-select label="Neutral" [options]="fruits" tone="neutral" defaultValue="apple" />
+      <pxl-select label="Cyan" [options]="fruits" tone="cyan" defaultValue="apple" />
+      <pxl-select label="Green" [options]="fruits" tone="green" defaultValue="apple" />
+      <pxl-select label="Gold" [options]="fruits" tone="gold" defaultValue="apple" />
+      <pxl-select label="Purple" [options]="fruits" tone="purple" defaultValue="apple" />
+      <pxl-select label="Pink" [options]="fruits" tone="pink" defaultValue="apple" />
+    </div>
+  \`,
+})
+export class Tones {
+  readonly fruits = FRUITS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelSelect } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+export function Sizes() {
   return (
     <div className="flex flex-col gap-3">
       <PixelSelect label="Small" options={FRUITS} size="sm" placeholder="sm" />
@@ -197,22 +432,128 @@ export function Default() {
       <PixelSelect label="Large" options={FRUITS} size="lg" placeholder="lg" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelSelect label="Small" :options="FRUITS" size="sm" placeholder="sm" />
+    <PixelSelect label="Medium" :options="FRUITS" size="md" placeholder="md" />
+    <PixelSelect label="Large" :options="FRUITS" size="lg" placeholder="lg" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-select label="Small" [options]="fruits" size="sm" placeholder="sm" />
+      <pxl-select label="Medium" [options]="fruits" size="md" placeholder="md" />
+      <pxl-select label="Large" [options]="fruits" size="lg" placeholder="lg" />
+    </div>
+  \`,
+})
+export class Sizes {
+  readonly fruits = FRUITS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelSelect } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelSelect label="Pixel" options={FRUITS} surface="pixel" placeholder="pixel surface" />
       <PixelSelect label="Linear" options={FRUITS} surface="linear" placeholder="linear surface" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelSelect label="Pixel" :options="FRUITS" surface="pixel" placeholder="pixel surface" />
+    <PixelSelect label="Linear" :options="FRUITS" surface="linear" placeholder="linear surface" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-select label="Pixel" [options]="fruits" surface="pixel" placeholder="pixel surface" />
+      <pxl-select label="Linear" [options]="fruits" surface="linear" placeholder="linear surface" />
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly fruits = FRUITS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelSelect } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+export function Disabled() {
   return (
     <PixelSelect
       label="Disabled"
@@ -221,11 +562,55 @@ export function Default() {
       disabled
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+</script>
+
+<template>
+  <PixelSelect label="Disabled" :options="FRUITS" default-value="apple" disabled />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`<pxl-select label="Disabled" [options]="fruits" defaultValue="apple" disabled />\`,
+})
+export class Disabled {
+  readonly fruits = FRUITS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
         <h4>With error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <FrameworkCode
+          variant="docs"
+          label={'With error code'}
+          react={`import { PixelSelect } from '@pxlkit/ui-kit';
+
+const REGIONS = [
+  { value: 'us', label: 'United States' },
+  { value: 've', label: 'Venezuela' },
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+];
+
+export function WithError() {
   return (
     <PixelSelect
       label="Region"
@@ -235,11 +620,57 @@ export function Default() {
       tone="red"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const REGIONS = [
+  { value: 'us', label: 'United States' },
+  { value: 've', label: 'Venezuela' },
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+];
+</script>
+
+<template>
+  <PixelSelect label="Region" :options="REGIONS" placeholder="Pick one" error="Please choose a region" tone="red" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const REGIONS = [
+  { value: 'us', label: 'United States' },
+  { value: 've', label: 'Venezuela' },
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`
+    <pxl-select label="Region" [options]="regions" placeholder="Pick one" error="Please choose a region" tone="red" />
+  \`,
+})
+export class WithError {
+  readonly regions = REGIONS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-required">
         <h4>Required</h4>
-        <pre className="docs-code"><code>{`export function Required() {
+        <FrameworkCode
+          variant="docs"
+          label={'Required code'}
+          react={`import { PixelSelect } from '@pxlkit/ui-kit';
+
+const REGIONS = [
+  { value: 'us', label: 'United States' },
+  { value: 've', label: 'Venezuela' },
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+];
+
+export function Required() {
   return (
     <PixelSelect
       label="Region"
@@ -249,11 +680,55 @@ export function Default() {
       placeholder="Required field"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const REGIONS = [
+  { value: 'us', label: 'United States' },
+  { value: 've', label: 'Venezuela' },
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+];
+</script>
+
+<template>
+  <PixelSelect label="Region" :options="REGIONS" name="region" required placeholder="Required field" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const REGIONS = [
+  { value: 'us', label: 'United States' },
+  { value: 've', label: 'Venezuela' },
+  { value: 'es', label: 'Spain' },
+  { value: 'mx', label: 'Mexico' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`<pxl-select label="Region" [options]="regions" name="region" required placeholder="Required field" />\`,
+})
+export class Required {
+  readonly regions = REGIONS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-form-name">
         <h4>With form name</h4>
-        <pre className="docs-code"><code>{`export function WithFormName() {
+        <FrameworkCode
+          variant="docs"
+          label={'With form name code'}
+          react={`import { PixelSelect } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+export function WithFormName() {
   return (
     <form>
       <PixelSelect
@@ -265,7 +740,57 @@ export function Default() {
       />
     </form>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSelect } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+</script>
+
+<template>
+  <form>
+    <PixelSelect
+      label="Fruit"
+      :options="FRUITS"
+      name="fruit"
+      default-value="cherry"
+      hint="Value participates in native form submission"
+    />
+  </form>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSelect } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+];
+
+@Component({
+  imports: [PixelSelect],
+  template: \`
+    <form>
+      <pxl-select
+        label="Fruit"
+        [options]="fruits"
+        name="fruit"
+        defaultValue="cherry"
+        hint="Value participates in native form submission"
+      />
+    </form>
+  \`,
+})
+export class WithFormName {
+  readonly fruits = FRUITS;
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

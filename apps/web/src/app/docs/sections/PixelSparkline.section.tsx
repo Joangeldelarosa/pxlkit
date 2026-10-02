@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSparklineDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelSparklineDocsSection({ className }: PixelSparklineDocsSecti
     </section>
     <section aria-labelledby="pixel-sparkline-usage">
       <h3 id="pixel-sparkline-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSparkline } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSparkline usage'}
+        react={`import { PixelSparkline } from '@pxlkit/ui-kit';
 
 const sample = [
   { x: 'Mon', y: 12 },
@@ -62,20 +66,51 @@ const sample = [
 
 export function Default() {
   return <PixelSparkline data={sample} />;
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSparkline } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Default() {
   return <PixelSparkline data={sample} />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelSparkline } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Tones() {
   return (
     <div className="flex flex-wrap items-center gap-4">
       <PixelSparkline data={sample} tone="cyan" />
@@ -86,11 +121,27 @@ export function Default() {
       <PixelSparkline data={sample} tone="pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelSparkline } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Sizes() {
   return (
     <div className="flex flex-wrap items-center gap-4">
       <PixelSparkline data={sample} size="sm" tone="cyan" />
@@ -98,24 +149,57 @@ export function Default() {
       <PixelSparkline data={sample} size="lg" tone="cyan" />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-area">
         <h4>With Area</h4>
-        <pre className="docs-code"><code>{`export function WithArea() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Area code'}
+          react={`import { PixelSparkline } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function WithArea() {
   return <PixelSparkline data={sample} tone="green" showArea />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelSparkline } from '@pxlkit/ui-kit';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap items-center gap-4">
       <PixelSparkline data={sample} surface="pixel" tone="purple" />
       <PixelSparkline data={sample} surface="linear" tone="purple" />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelHeroMediaDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelHeroMediaDocsSection({ className }: PixelHeroMediaDocsSecti
     </section>
     <section aria-labelledby="pixel-hero-media-usage">
       <h3 id="pixel-hero-media-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelHeroMedia } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelHeroMedia usage'}
+        react={`import { PixelHeroMedia } from '@pxlkit/ui-kit';
 
 const Placeholder = ({ label }: { label: string }) => (
   <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted">
@@ -62,40 +66,76 @@ export function Default() {
       <Placeholder label="16:10 media" />
     </PixelHeroMedia>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelHeroMedia } from '@pxlkit/ui-kit';
+
+const Placeholder = ({ label }: { label: string }) => (
+  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted">
+    {label}
+  </div>
+);
+
+export function Default() {
   return (
     <PixelHeroMedia ratio="16/10">
       <Placeholder label="16:10 media" />
     </PixelHeroMedia>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-framed">
         <h4>Framed with caption</h4>
-        <pre className="docs-code"><code>{`export function Framed() {
+        <FrameworkCode
+          variant="docs"
+          label={'Framed with caption code'}
+          react={`import { PixelHeroMedia } from '@pxlkit/ui-kit';
+
+const Placeholder = ({ label }: { label: string }) => (
+  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted">
+    {label}
+  </div>
+);
+
+export function Framed() {
   return (
     <PixelHeroMedia ratio="16/9" framed tone="cyan" caption="Framed hero with caption">
       <Placeholder label="16:9 framed" />
     </PixelHeroMedia>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-square">
         <h4>Square (1:1)</h4>
-        <pre className="docs-code"><code>{`export function Square() {
+        <FrameworkCode
+          variant="docs"
+          label={'Square (1:1) code'}
+          react={`import { PixelHeroMedia } from '@pxlkit/ui-kit';
+
+const Placeholder = ({ label }: { label: string }) => (
+  <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted">
+    {label}
+  </div>
+);
+
+export function Square() {
   return (
     <PixelHeroMedia ratio="1/1" framed tone="purple">
       <Placeholder label="1:1 square" />
     </PixelHeroMedia>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     </section>

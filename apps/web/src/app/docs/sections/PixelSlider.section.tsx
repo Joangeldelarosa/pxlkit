@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSliderDocsSectionProps {
   className?: string;
@@ -95,7 +96,10 @@ export function PixelSliderDocsSection({ className }: PixelSliderDocsSectionProp
     </section>
     <section aria-labelledby="pixel-slider-usage">
       <h3 id="pixel-slider-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSlider usage'}
+        react={`import { useState } from 'react';
 import { PixelSlider } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -107,14 +111,20 @@ export function Default() {
       onChange={setValue}
     />
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = useState(40);
   return (
     <PixelSlider
@@ -123,11 +133,18 @@ export function Default() {
       onChange={setValue}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-range">
         <h4>Range</h4>
-        <pre className="docs-code"><code>{`export function Range() {
+        <FrameworkCode
+          variant="docs"
+          label={'Range code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function Range() {
   const [value, setValue] = useState<[number, number]>([20, 80]);
   return (
     <PixelSlider
@@ -136,11 +153,18 @@ export function Default() {
       onChange={setValue}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function Tones() {
   const [neutral, setNeutral] = useState(40);
   const [green, setGreen] = useState(50);
   const [cyan, setCyan] = useState(60);
@@ -159,11 +183,18 @@ export function Default() {
       <PixelSlider label="Pink" tone="pink" value={pink} onChange={setPink} />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   const [pixel, setPixel] = useState(40);
   const [linear, setLinear] = useState(60);
   return (
@@ -172,11 +203,18 @@ export function Default() {
       <PixelSlider label="Linear surface" surface="linear" value={linear} onChange={setLinear} />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-min-max">
         <h4>With min/max</h4>
-        <pre className="docs-code"><code>{`export function WithMinMax() {
+        <FrameworkCode
+          variant="docs"
+          label={'With min/max code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function WithMinMax() {
   const [value, setValue] = useState(75);
   return (
     <PixelSlider
@@ -189,11 +227,18 @@ export function Default() {
       onChange={setValue}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-marks">
         <h4>With marks</h4>
-        <pre className="docs-code"><code>{`export function WithMarks() {
+        <FrameworkCode
+          variant="docs"
+          label={'With marks code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function WithMarks() {
   const [value, setValue] = useState(50);
   return (
     <PixelSlider
@@ -209,11 +254,18 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-ticks">
         <h4>With ticks</h4>
-        <pre className="docs-code"><code>{`export function WithTicks() {
+        <FrameworkCode
+          variant="docs"
+          label={'With ticks code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function WithTicks() {
   const [value, setValue] = useState(40);
   return (
     <PixelSlider
@@ -226,11 +278,18 @@ export function Default() {
       onChange={setValue}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-tooltip">
         <h4>Always tooltip</h4>
-        <pre className="docs-code"><code>{`export function WithTooltip() {
+        <FrameworkCode
+          variant="docs"
+          label={'Always tooltip code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function WithTooltip() {
   const [value, setValue] = useState(60);
   return (
     <PixelSlider
@@ -240,11 +299,18 @@ export function Default() {
       showTooltip="always"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tooltip-on-drag">
         <h4>Tooltip on drag</h4>
-        <pre className="docs-code"><code>{`export function TooltipOnDrag() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tooltip on drag code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function TooltipOnDrag() {
   const [value, setValue] = useState(35);
   return (
     <PixelSlider
@@ -254,11 +320,17 @@ export function Default() {
       showTooltip="drag"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelSlider
       label="Disabled"
@@ -267,11 +339,18 @@ export function Default() {
       disabled
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-required">
         <h4>Required</h4>
-        <pre className="docs-code"><code>{`export function Required() {
+        <FrameworkCode
+          variant="docs"
+          label={'Required code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function Required() {
   const [value, setValue] = useState(30);
   return (
     <PixelSlider
@@ -282,11 +361,18 @@ export function Default() {
       name="setting"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-range-with-marks">
         <h4>Range with marks</h4>
-        <pre className="docs-code"><code>{`export function RangeWithMarks() {
+        <FrameworkCode
+          variant="docs"
+          label={'Range with marks code'}
+          react={`import { useState } from 'react';
+import { PixelSlider } from '@pxlkit/ui-kit';
+
+export function RangeWithMarks() {
   const [value, setValue] = useState<[number, number]>([30, 70]);
   return (
     <PixelSlider
@@ -302,7 +388,8 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

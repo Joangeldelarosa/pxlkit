@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFileUploadDocsSectionProps {
   className?: string;
@@ -71,7 +72,10 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
     </section>
     <section aria-labelledby="pixel-file-upload-usage">
       <h3 id="pixel-file-upload-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelFileUpload usage'}
+        react={`import { useState } from 'react';
 import { PixelFileUpload } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -88,14 +92,20 @@ export function Default() {
       maxFiles={5}
     />
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelFileUpload } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [files, setFiles] = useState<File[]>([]);
   return (
     <PixelFileUpload
@@ -109,11 +119,18 @@ export function Default() {
       maxFiles={5}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-button-mode">
         <h4>Button mode</h4>
-        <pre className="docs-code"><code>{`export function ButtonMode() {
+        <FrameworkCode
+          variant="docs"
+          label={'Button mode code'}
+          react={`import { useState } from 'react';
+import { PixelFileUpload } from '@pxlkit/ui-kit';
+
+export function ButtonMode() {
   const [files, setFiles] = useState<File[]>([]);
   return (
     <PixelFileUpload
@@ -123,11 +140,17 @@ export function Default() {
       dropzone={false}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
         <h4>With error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <FrameworkCode
+          variant="docs"
+          label={'With error code'}
+          react={`import { PixelFileUpload } from '@pxlkit/ui-kit';
+
+export function WithError() {
   return (
     <PixelFileUpload
       label="Attachments"
@@ -135,7 +158,8 @@ export function Default() {
       accept=".pdf,.doc,.docx"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

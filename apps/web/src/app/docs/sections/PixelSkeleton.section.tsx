@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSkeletonDocsSectionProps {
   className?: string;
@@ -48,24 +49,68 @@ export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSection
     </section>
     <section aria-labelledby="pixel-skeleton-usage">
       <h3 id="pixel-skeleton-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSkeleton } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSkeleton usage'}
+        react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelSkeleton width="12rem" height="1rem" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSkeleton width="12rem" height="1rem" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`<pxl-skeleton width="12rem" height="1rem" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelSkeleton width="12rem" height="1rem" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSkeleton width="12rem" height="1rem" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`<pxl-skeleton width="12rem" height="1rem" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-text-block">
         <h4>Text Block</h4>
-        <pre className="docs-code"><code>{`export function TextBlock() {
+        <FrameworkCode
+          variant="docs"
+          label={'Text Block code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function TextBlock() {
   return (
     <div className="flex flex-col gap-2">
       <PixelSkeleton width="14rem" height="0.75rem" />
@@ -73,11 +118,42 @@ export function Default() {
       <PixelSkeleton width="9rem" height="0.75rem" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-2">
+    <PixelSkeleton width="14rem" height="0.75rem" />
+    <PixelSkeleton width="11rem" height="0.75rem" />
+    <PixelSkeleton width="9rem" height="0.75rem" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`
+    <div class="flex flex-col gap-2">
+      <pxl-skeleton width="14rem" height="0.75rem" />
+      <pxl-skeleton width="11rem" height="0.75rem" />
+      <pxl-skeleton width="9rem" height="0.75rem" />
+    </div>
+  \`,
+})
+export class TextBlock {}`}
+        />
       </article>
       <article className="docs-example" id="example-rounded">
         <h4>Rounded</h4>
-        <pre className="docs-code"><code>{`export function Rounded() {
+        <FrameworkCode
+          variant="docs"
+          label={'Rounded code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function Rounded() {
   return (
     <div className="flex items-center gap-3">
       <PixelSkeleton width="2.5rem" height="2.5rem" rounded />
@@ -87,22 +163,86 @@ export function Default() {
       </div>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-3">
+    <PixelSkeleton width="2.5rem" height="2.5rem" rounded />
+    <div class="flex flex-col gap-1.5">
+      <PixelSkeleton width="8rem" height="0.75rem" />
+      <PixelSkeleton width="5rem" height="0.75rem" />
+    </div>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`
+    <div class="flex items-center gap-3">
+      <pxl-skeleton width="2.5rem" height="2.5rem" rounded />
+      <div class="flex flex-col gap-1.5">
+        <pxl-skeleton width="8rem" height="0.75rem" />
+        <pxl-skeleton width="5rem" height="0.75rem" />
+      </div>
+    </div>
+  \`,
+})
+export class Rounded {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelSkeleton surface="linear" width="14rem" height="1rem" />
       <PixelSkeleton surface="pixel" width="14rem" height="1rem" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelSkeleton surface="linear" width="14rem" height="1rem" />
+    <PixelSkeleton surface="pixel" width="14rem" height="1rem" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-skeleton surface="linear" width="14rem" height="1rem" />
+      <pxl-skeleton surface="pixel" width="14rem" height="1rem" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-card-placeholder">
         <h4>Card Placeholder</h4>
-        <pre className="docs-code"><code>{`export function CardPlaceholder() {
+        <FrameworkCode
+          variant="docs"
+          label={'Card Placeholder code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function CardPlaceholder() {
   return (
     <div className="flex w-72 flex-col gap-3 rounded border border-retro-border/60 p-4">
       <PixelSkeleton width="100%" height="8rem" />
@@ -110,13 +250,60 @@ export function Default() {
       <PixelSkeleton width="60%" height="0.75rem" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex w-72 flex-col gap-3 rounded border border-retro-border/60 p-4">
+    <PixelSkeleton width="100%" height="8rem" />
+    <PixelSkeleton width="80%" height="0.875rem" />
+    <PixelSkeleton width="60%" height="0.75rem" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`
+    <div class="flex w-72 flex-col gap-3 rounded border border-retro-border/60 p-4">
+      <pxl-skeleton width="100%" height="8rem" />
+      <pxl-skeleton width="80%" height="0.875rem" />
+      <pxl-skeleton width="60%" height="0.75rem" />
+    </div>
+  \`,
+})
+export class CardPlaceholder {}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-label">
         <h4>Custom Label</h4>
-        <pre className="docs-code"><code>{`export function CustomLabel() {
+        <FrameworkCode
+          variant="docs"
+          label={'Custom Label code'}
+          react={`import { PixelSkeleton } from '@pxlkit/ui-kit';
+
+export function CustomLabel() {
   return <PixelSkeleton width="10rem" height="1rem" ariaLabel="Loading user profile" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSkeleton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSkeleton width="10rem" height="1rem" aria-label="Loading user profile" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSkeleton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSkeleton],
+  template: \`<pxl-skeleton width="10rem" height="1rem" ariaLabel="Loading user profile" />\`,
+})
+export class CustomLabel {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

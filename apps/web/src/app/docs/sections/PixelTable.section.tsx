@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTableDocsSectionProps {
   className?: string;
@@ -75,8 +76,10 @@ export function PixelTableDocsSection({ className }: PixelTableDocsSectionProps)
     </section>
     <section aria-labelledby="pixel-table-usage">
       <h3 id="pixel-table-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import * as React from 'react';
-import { PixelTable, type PixelTableSortState } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTable usage'}
+        react={`import { PixelTable } from '@pxlkit/ui-kit';
 
 type Row = {
   id: string;
@@ -99,38 +102,157 @@ const baseColumns = [
 
 export function Default() {
   return <PixelTable<Row> columns={baseColumns} data={rows} />;
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function Default() {
   return <PixelTable<Row> columns={baseColumns} data={rows} />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-striped">
         <h4>Striped</h4>
-        <pre className="docs-code"><code>{`export function Striped() {
+        <FrameworkCode
+          variant="docs"
+          label={'Striped code'}
+          react={`import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function Striped() {
   return <PixelTable<Row> columns={baseColumns} data={rows} striped />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
         <h4>Pixel surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel surface code'}
+          react={`import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function PixelSurface() {
   return <PixelTable<Row> columns={baseColumns} data={rows} surface="pixel" />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-linear-surface">
         <h4>Linear surface</h4>
-        <pre className="docs-code"><code>{`export function LinearSurface() {
+        <FrameworkCode
+          variant="docs"
+          label={'Linear surface code'}
+          react={`import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function LinearSurface() {
   return <PixelTable<Row> columns={baseColumns} data={rows} surface="linear" />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sortable">
         <h4>Sortable columns</h4>
-        <pre className="docs-code"><code>{`export function Sortable() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sortable columns code'}
+          react={`import * as React from 'react';
+import { PixelTable, type PixelTableSortState } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+export function Sortable() {
   const [sort, setSort] = React.useState<PixelTableSortState>({ key: 'name', dir: 'asc' });
   const sortable = [
     { key: 'name', header: 'Name', sortable: true },
@@ -145,11 +267,37 @@ export function Default() {
       onSortChange={setSort}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-single-selection">
         <h4>Single selection</h4>
-        <pre className="docs-code"><code>{`export function SingleSelection() {
+        <FrameworkCode
+          variant="docs"
+          label={'Single selection code'}
+          react={`import * as React from 'react';
+import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function SingleSelection() {
   const [selected, setSelected] = React.useState<string[]>(['1']);
   return (
     <PixelTable<Row>
@@ -160,11 +308,37 @@ export function Default() {
       onSelectionChange={setSelected}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-multi-selection">
         <h4>Multi selection</h4>
-        <pre className="docs-code"><code>{`export function MultiSelection() {
+        <FrameworkCode
+          variant="docs"
+          label={'Multi selection code'}
+          react={`import * as React from 'react';
+import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function MultiSelection() {
   const [selected, setSelected] = React.useState<string[]>([]);
   return (
     <PixelTable<Row>
@@ -175,29 +349,117 @@ export function Default() {
       onSelectionChange={setSelected}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-compact-density">
         <h4>Compact density</h4>
-        <pre className="docs-code"><code>{`export function CompactDensity() {
+        <FrameworkCode
+          variant="docs"
+          label={'Compact density code'}
+          react={`import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function CompactDensity() {
   return <PixelTable<Row> columns={baseColumns} data={rows} density="compact" />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-comfortable-density">
         <h4>Comfortable density</h4>
-        <pre className="docs-code"><code>{`export function ComfortableDensity() {
+        <FrameworkCode
+          variant="docs"
+          label={'Comfortable density code'}
+          react={`import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function ComfortableDensity() {
   return <PixelTable<Row> columns={baseColumns} data={rows} density="comfortable" />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-loading">
         <h4>Loading</h4>
-        <pre className="docs-code"><code>{`export function Loading() {
+        <FrameworkCode
+          variant="docs"
+          label={'Loading code'}
+          react={`import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function Loading() {
   return <PixelTable<Row> columns={baseColumns} data={[]} loading />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-empty">
         <h4>Empty state</h4>
-        <pre className="docs-code"><code>{`export function Empty() {
+        <FrameworkCode
+          variant="docs"
+          label={'Empty state code'}
+          react={`import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function Empty() {
   return (
     <PixelTable<Row>
       columns={baseColumns}
@@ -205,17 +467,61 @@ export function Default() {
       emptyState={<span>No records found.</span>}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sticky-header">
         <h4>Sticky header</h4>
-        <pre className="docs-code"><code>{`export function StickyHeader() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sticky header code'}
+          react={`import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function StickyHeader() {
   return <PixelTable<Row> columns={baseColumns} data={rows} stickyHeader />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-render">
         <h4>Custom cell render</h4>
-        <pre className="docs-code"><code>{`export function CustomRender() {
+        <FrameworkCode
+          variant="docs"
+          label={'Custom cell render code'}
+          react={`import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+export function CustomRender() {
   const columns = [
     { key: 'name', header: 'Name' },
     {
@@ -227,11 +533,37 @@ export function Default() {
     },
   ];
   return <PixelTable<Row> columns={columns} data={rows} />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-clickable-rows">
         <h4>Clickable rows</h4>
-        <pre className="docs-code"><code>{`export function ClickableRows() {
+        <FrameworkCode
+          variant="docs"
+          label={'Clickable rows code'}
+          react={`import * as React from 'react';
+import { PixelTable } from '@pxlkit/ui-kit';
+
+type Row = {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+};
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const baseColumns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+export function ClickableRows() {
   const [last, setLast] = React.useState<string>('');
   return (
     <div>
@@ -243,7 +575,8 @@ export function Default() {
       <p>Last clicked: {last || 'none'}</p>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

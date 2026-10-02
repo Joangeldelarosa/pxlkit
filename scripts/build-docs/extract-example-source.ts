@@ -1,135 +1,161 @@
 /**
- * extract-example-source — turn a component's `.examples.tsx` file into
- * consumer-facing usage code.
+ * extract-example-source — turn a kit's examples module into the code a
+ * reader would paste: one self-contained snippet per example.
  *
- * The SSOT examples are real, runnable React components with realistic
- * props, which makes their SOURCE the best possible usage documentation —
- * provided two transforms:
+ * The SSOT examples are real, runnable components with realistic props,
+ * which makes their SOURCE the best usage documentation. Each snippet holds:
  *
- *   1. Relative imports (`./PixelAreaChart`, `../actions`) become the
- *      package specifier consumers actually write: `@pxlkit/ui-kit`.
- *   2. The bare `import React from 'react'` line is dropped when React is
- *      not referenced as a value (the kit targets the automatic JSX
- *      runtime); files that use `React.*` keep it.
+ *   1. The imports the example uses, other bindings pruned. Relative
+ *      specifiers (the React kit's examples import from its source tree,
+ *      `./PixelAreaChart`, `../actions`) become the package name consumers
+ *      write, `@pxlkit/ui-kit`; every binding they import is a public export.
+ *   2. The module-level helpers the example reaches, transitively — sample
+ *      data, small components, types — in source order.
+ *   3. The example itself.
  *
- * Consumers:
- *   - generate-docs-page embeds the full transformed source as a "Usage"
- *     block per component on /docs.
- *   - the usage-snippets map gives /ui-kit a shorter cut: the module
- *     preamble (imports + shared data consts) plus the FIRST exported
- *     example only.
+ * Read from the TypeScript syntax tree, so it serves the React kit's
+ * `export function X()` examples and the Angular kit's decorated
+ * `export class X {}` ones alike. (The Vue kit's examples are single-file
+ * components, one per example: generate-docs-page shows them verbatim.)
+ *
+ * generate-docs-page embeds the snippets per example on /docs, the first of
+ * them as the component's usage lead, which the usage-snippets maps hand to
+ * /ui-kit.
  */
 
-const RELATIVE_IMPORT_RE = /from\s+(['"])(\.{1,2}\/[^'"]*)\1/g;
+import ts from 'typescript';
 
-/** Rewrite relative import specifiers to the public package name. */
-export function rewriteRelativeImports(source: string, packageName = '@pxlkit/ui-kit'): string {
-  return source.replace(RELATIVE_IMPORT_RE, (_m, quote: string) => `from ${quote}${packageName}${quote}`);
+export interface SelfContainedOptions {
+  /** `tsx` for the React kit's examples, `ts` for the Angular kit's. */
+  kind: 'tsx' | 'ts';
+  /** Specifier that replaces relative import specifiers. */
+  packageName?: string;
 }
 
-/** Drop `import React ... from 'react'` when React is never used as a value. */
-export function dropUnusedReactImport(source: string): string {
-  const usesReactValue = /\bReact\s*[.(]/.test(source.replace(/import[^;]+;/g, ''));
-  if (usesReactValue) return source;
-  return source.replace(/^import\s+React(?:\s*,\s*\{[^}]*\})?\s+from\s+['"]react['"];\s*\r?\n/m, (match) => {
-    // Preserve named imports (hooks) if the React default was combined with them.
-    const named = /\{([^}]*)\}/.exec(match);
-    return named ? `import {${named[1]}} from 'react';\n` : '';
-  });
-}
-
-/**
- * Find the index just past the balanced closing brace of the block whose
- * opening brace sits at/after `from`. String/template/comment aware.
- * Returns -1 when the block never closes.
- */
-function endOfBracedBlock(source: string, from: number): number {
-  const openBrace = source.indexOf('{', from);
-  if (openBrace === -1) return -1;
-
-  let depth = 0;
-  let i = openBrace;
-  let state: 'code' | 'single' | 'double' | 'template' | 'line' | 'block' = 'code';
-  while (i < source.length) {
-    const ch = source[i];
-    const next = source[i + 1];
-    switch (state) {
-      case 'code':
-        if (ch === '{') depth++;
-        else if (ch === '}') {
-          depth--;
-          if (depth === 0) return i + 1;
-        } else if (ch === "'") state = 'single';
-        else if (ch === '"') state = 'double';
-        else if (ch === '`') state = 'template';
-        else if (ch === '/' && next === '/') state = 'line';
-        else if (ch === '/' && next === '*') { state = 'block'; i++; }
-        break;
-      case 'single':
-        if (ch === '\\') i++;
-        else if (ch === "'") state = 'code';
-        break;
-      case 'double':
-        if (ch === '\\') i++;
-        else if (ch === '"') state = 'code';
-        break;
-      case 'template':
-        if (ch === '\\') i++;
-        else if (ch === '`') state = 'code';
-        break;
-      case 'line':
-        if (ch === '\n') state = 'code';
-        break;
-      case 'block':
-        if (ch === '*' && next === '/') { state = 'code'; i++; }
-        break;
-    }
-    i++;
+/** Whether an identifier is read as a value or a type, rather than naming a property, attribute or member. */
+function isReference(id: ts.Identifier): boolean {
+  const parent = id.parent;
+  if (ts.isPropertyAccessExpression(parent) && parent.name === id) return false;
+  if (ts.isQualifiedName(parent) && parent.right === id) return false;
+  if (ts.isJsxAttribute(parent) && parent.name === id) return false;
+  if (ts.isBindingElement(parent) && parent.propertyName === id) return false;
+  if (
+    (ts.isPropertyAssignment(parent) ||
+      ts.isPropertyDeclaration(parent) ||
+      ts.isPropertySignature(parent) ||
+      ts.isMethodDeclaration(parent) ||
+      ts.isMethodSignature(parent) ||
+      ts.isGetAccessorDeclaration(parent) ||
+      ts.isSetAccessorDeclaration(parent) ||
+      ts.isEnumMember(parent)) &&
+    parent.name === id
+  ) {
+    return false;
   }
-  return -1;
+  return true;
 }
 
-const EXPORT_FN_RE = /^export function\s+(\w+)/gm;
+/**
+ * The names a node reads. Conservative: a local that shadows a module-level
+ * name counts as reading it, so a snippet may carry a helper it does not
+ * need, never miss one it does.
+ */
+function referencedNames(node: ts.Node): Set<string> {
+  const names = new Set<string>();
+  const visit = (child: ts.Node): void => {
+    if (ts.isIdentifier(child) && isReference(child)) names.add(child.text);
+    ts.forEachChild(child, visit);
+  };
+  visit(node);
+  return names;
+}
+
+function bindingNames(name: ts.BindingName): string[] {
+  if (ts.isIdentifier(name)) return [name.text];
+  return name.elements.flatMap((element) => (ts.isOmittedExpression(element) ? [] : bindingNames(element.name)));
+}
+
+/** The names a top-level statement declares. */
+function declaredNames(statement: ts.Statement): string[] {
+  if (ts.isVariableStatement(statement)) {
+    return statement.declarationList.declarations.flatMap((declaration) => bindingNames(declaration.name));
+  }
+  if (
+    (ts.isFunctionDeclaration(statement) ||
+      ts.isClassDeclaration(statement) ||
+      ts.isInterfaceDeclaration(statement) ||
+      ts.isTypeAliasDeclaration(statement) ||
+      ts.isEnumDeclaration(statement)) &&
+    statement.name
+  ) {
+    return [statement.name.text];
+  }
+  return [];
+}
+
+/** An import statement keeping only the bindings in `used`, or null when none is. */
+function prunedImport(statement: ts.ImportDeclaration, used: ReadonlySet<string>, packageName?: string): string | null {
+  const written = statement.moduleSpecifier.getText();
+  const specifier = (statement.moduleSpecifier as ts.StringLiteral).text;
+  const quote = written[0];
+  const from = packageName && /^\.{1,2}\//.test(specifier) ? `${quote}${packageName}${quote}` : written;
+  const clause = statement.importClause;
+  if (!clause) return `import ${from};`;
+  const parts: string[] = [];
+  if (clause.name && used.has(clause.name.text)) parts.push(clause.name.text);
+  const bindings = clause.namedBindings;
+  if (bindings && ts.isNamespaceImport(bindings) && used.has(bindings.name.text)) parts.push(`* as ${bindings.name.text}`);
+  if (bindings && ts.isNamedImports(bindings)) {
+    const named = bindings.elements.filter((element) => used.has(element.name.text)).map((element) => element.getText());
+    if (named.length > 0) parts.push(`{ ${named.join(', ')} }`);
+  }
+  if (parts.length === 0) return null;
+  return `import ${clause.isTypeOnly ? 'type ' : ''}${parts.join(', ')} from ${from};`;
+}
 
 /**
- * Extract every top-level `export function Name() {...}` block, verbatim,
- * keyed by export name.
+ * Every top-level declaration of an examples module, keyed by name, as a
+ * self-contained snippet (see above). The caller picks the examples by
+ * their export names.
  */
-export function extractExportFunctions(source: string): Record<string, string> {
+export function selfContainedExamples(source: string, { kind, packageName }: SelfContainedOptions): Record<string, string> {
+  const file = ts.createSourceFile(
+    kind === 'tsx' ? 'examples.tsx' : 'examples.ts',
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    kind === 'tsx' ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  const imports = file.statements.filter(ts.isImportDeclaration);
+  const declarations = file.statements
+    .filter((statement) => !ts.isImportDeclaration(statement))
+    .map((statement) => ({ statement, names: declaredNames(statement), references: referencedNames(statement) }))
+    .filter((declaration) => declaration.names.length > 0);
+  const declaring = new Map<string, (typeof declarations)[number]>();
+  for (const declaration of declarations) for (const name of declaration.names) declaring.set(name, declaration);
+
   const out: Record<string, string> = {};
-  EXPORT_FN_RE.lastIndex = 0;
-  let m: RegExpExecArray | null;
-  while ((m = EXPORT_FN_RE.exec(source)) !== null) {
-    const end = endOfBracedBlock(source, m.index);
-    if (end === -1) continue;
-    out[m[1]!] = source.slice(m.index, end).trimEnd() + '\n';
-    EXPORT_FN_RE.lastIndex = end;
+  for (const root of declarations) {
+    // The declarations the example reaches, transitively.
+    const reached = new Set([root]);
+    const queue = [root];
+    const used = new Set<string>();
+    while (queue.length > 0) {
+      for (const name of queue.shift()!.references) {
+        used.add(name);
+        const target = declaring.get(name);
+        if (target && !reached.has(target)) {
+          reached.add(target);
+          queue.push(target);
+        }
+      }
+    }
+    const importLines = imports
+      .map((statement) => prunedImport(statement, used, packageName))
+      .filter((line): line is string => line !== null);
+    const bodies = declarations.filter((declaration) => reached.has(declaration)).map(({ statement }) => statement.getText(file));
+    const snippet = [importLines.join('\n'), ...bodies].filter(Boolean).join('\n\n') + '\n';
+    for (const name of root.names) out[name] = snippet;
   }
   return out;
-}
-
-/**
- * Slice the module from the top through the end of the FIRST
- * `export function …` block — the preamble (imports, shared sample data)
- * plus the canonical Default example. Returns null when no export function
- * is found.
- */
-export function sliceThroughFirstExport(source: string): string | null {
-  const start = source.search(/^export function\s+\w+/m);
-  if (start === -1) return null;
-  const end = endOfBracedBlock(source, start);
-  if (end === -1) return null;
-  return source.slice(0, end).trimEnd() + '\n';
-}
-
-/** Full usage document: whole examples file, consumer-ready. */
-export function toUsageSource(examplesSource: string, packageName = '@pxlkit/ui-kit'): string {
-  return dropUnusedReactImport(rewriteRelativeImports(examplesSource, packageName)).trim() + '\n';
-}
-
-/** Short usage snippet: preamble + first export only, consumer-ready. */
-export function toUsageSnippet(examplesSource: string, packageName = '@pxlkit/ui-kit'): string | null {
-  const sliced = sliceThroughFirstExport(examplesSource);
-  if (!sliced) return null;
-  return toUsageSource(sliced, packageName);
 }

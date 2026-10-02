@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSectionHeaderDocsSectionProps {
   className?: string;
@@ -49,7 +50,10 @@ export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderD
     </section>
     <section aria-labelledby="pixel-section-header-usage">
       <h3 id="pixel-section-header-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSectionHeader usage'}
+        react={`import { PixelSectionHeader } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -59,14 +63,44 @@ export function Default() {
       description="A retro-cinematic component kit with surface awareness and rhythm tokens."
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSectionHeader
+    eyebrow="Section"
+    title="Build pixel-perfect interfaces"
+    description="A retro-cinematic component kit with surface awareness and rhythm tokens."
+  />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSectionHeader],
+  template: \`
+    <pxl-section-header
+      eyebrow="Section"
+      title="Build pixel-perfect interfaces"
+      description="A retro-cinematic component kit with surface awareness and rhythm tokens."
+    />
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelSectionHeader
       eyebrow="Section"
@@ -74,11 +108,42 @@ export function Default() {
       description="A retro-cinematic component kit with surface awareness and rhythm tokens."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSectionHeader
+    eyebrow="Section"
+    title="Build pixel-perfect interfaces"
+    description="A retro-cinematic component kit with surface awareness and rhythm tokens."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSectionHeader],
+  template: \`
+    <pxl-section-header
+      eyebrow="Section"
+      title="Build pixel-perfect interfaces"
+      description="A retro-cinematic component kit with surface awareness and rhythm tokens."
+    />
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-centered">
         <h4>Centered</h4>
-        <pre className="docs-code"><code>{`export function Centered() {
+        <FrameworkCode
+          variant="docs"
+          label={'Centered code'}
+          react={`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+
+export function Centered() {
   return (
     <PixelSectionHeader
       align="center"
@@ -87,11 +152,44 @@ export function Default() {
       description="Centered headers work great as page intros above a feature grid."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSectionHeader
+    align="center"
+    eyebrow="Features"
+    title="Designed for clarity"
+    description="Centered headers work great as page intros above a feature grid."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSectionHeader],
+  template: \`
+    <pxl-section-header
+      align="center"
+      eyebrow="Features"
+      title="Designed for clarity"
+      description="Centered headers work great as page intros above a feature grid."
+    />
+  \`,
+})
+export class Centered {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-actions">
         <h4>With Actions</h4>
-        <pre className="docs-code"><code>{`export function WithActions() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Actions code'}
+          react={`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+
+export function WithActions() {
   return (
     <PixelSectionHeader
       eyebrow="Dashboard"
@@ -106,11 +204,54 @@ export function Default() {
       }
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSectionHeader
+    eyebrow="Dashboard"
+    title="Recent activity"
+    description="What happened across your workspace today."
+    title-tone="cyan"
+  >
+    <template #actions>
+      <button type="button">Refresh</button>
+      <button type="button">Export</button>
+    </template>
+  </PixelSectionHeader>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSectionHeader],
+  template: \`
+    <pxl-section-header
+      eyebrow="Dashboard"
+      title="Recent activity"
+      description="What happened across your workspace today."
+      titleTone="cyan"
+      [actions]="actions"
+    />
+    <ng-template #actions>
+      <button type="button">Refresh</button>
+      <button type="button">Export</button>
+    </ng-template>
+  \`,
+})
+export class WithActions {}`}
+        />
       </article>
       <article className="docs-example" id="example-large-hero">
         <h4>Large Hero</h4>
-        <pre className="docs-code"><code>{`export function LargeHero() {
+        <FrameworkCode
+          variant="docs"
+          label={'Large Hero code'}
+          react={`import { PixelSectionHeader } from '@pxlkit/ui-kit';
+
+export function LargeHero() {
   return (
     <PixelSectionHeader
       as="h1"
@@ -123,7 +264,43 @@ export function Default() {
       titleTone="green"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSectionHeader
+    as="h1"
+    size="lg"
+    align="center"
+    spacing="loose"
+    eyebrow="Introducing pxlkit"
+    title="The retro-cinematic UI kit"
+    description="Build interfaces that feel handcrafted, with a coherent token system."
+    title-tone="green"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSectionHeader],
+  template: \`
+    <pxl-section-header
+      as="h1"
+      size="lg"
+      align="center"
+      spacing="loose"
+      eyebrow="Introducing pxlkit"
+      title="The retro-cinematic UI kit"
+      description="Build interfaces that feel handcrafted, with a coherent token system."
+      titleTone="green"
+    />
+  \`,
+})
+export class LargeHero {}`}
+        />
       </article>
     </section>
     </section>

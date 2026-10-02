@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCalendarGridDocsSectionProps {
   className?: string;
@@ -110,34 +111,57 @@ export function PixelCalendarGridDocsSection({ className }: PixelCalendarGridDoc
     </section>
     <section aria-labelledby="pixel-calendar-grid-usage">
       <h3 id="pixel-calendar-grid-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React, { useState } from 'react'
-import { PixelCalendarGrid } from '@pxlkit/ui-kit'
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCalendarGrid usage'}
+        react={`import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [value, setValue] = useState<Date | null>(null)
   return <PixelCalendarGrid value={value} onChange={setValue} />
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = useState<Date | null>(null)
   return <PixelCalendarGrid value={value} onChange={setValue} />
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-selected-date">
         <h4>With Selected Date</h4>
-        <pre className="docs-code"><code>{`export function WithSelectedDate() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Selected Date code'}
+          react={`import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
+
+export function WithSelectedDate() {
   const [value, setValue] = useState<Date | null>(new Date())
   return <PixelCalendarGrid value={value} onChange={setValue} />
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-min-max">
         <h4>With Min/Max Bounds</h4>
-        <pre className="docs-code"><code>{`export function WithMinMax() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Min/Max Bounds code'}
+          react={`import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
+
+export function WithMinMax() {
   const today = new Date()
   const min = new Date(today.getFullYear(), today.getMonth(), 1)
   const max = new Date(today.getFullYear(), today.getMonth() + 1, 0)
@@ -150,11 +174,18 @@ export function Default() {
       maxDate={max}
     />
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-disabled-weekends">
         <h4>Disabled Weekends</h4>
-        <pre className="docs-code"><code>{`export function WithDisabledWeekends() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled Weekends code'}
+          react={`import { useState } from 'react';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit';
+
+export function WithDisabledWeekends() {
   const [value, setValue] = useState<Date | null>(null)
   return (
     <PixelCalendarGrid
@@ -163,15 +194,22 @@ export function Default() {
       disabledDates={(d) => d.getDay() === 0 || d.getDay() === 6}
     />
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-range-preview">
         <h4>Range Preview</h4>
-        <pre className="docs-code"><code>{`export function RangePreview() {
+        <FrameworkCode
+          variant="docs"
+          label={'Range Preview code'}
+          react={`import { PixelCalendarGrid } from '@pxlkit/ui-kit';
+
+export function RangePreview() {
   const from = new Date()
   const to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 5)
   return <PixelCalendarGrid rangePreview={{ from, to }} />
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

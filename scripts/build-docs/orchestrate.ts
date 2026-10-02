@@ -405,13 +405,16 @@ export default orchestrate;
 
 // ---------------------------------------------------------------------------
 // Watch mode — poll manifest sources at a fixed interval and re-run the
-// pipeline whenever a *.manifest.ts or *.examples.tsx changes.
+// pipeline whenever a *.manifest.ts or *.examples.tsx changes, or one of the
+// Vue and Angular kits' examples (the docs pages show their code too).
 // Single-flight: a new run is queued only after the previous one finishes.
 // ---------------------------------------------------------------------------
 
 const WATCH_GLOB = [
   "packages/*/src/**/*.manifest.ts",
   "packages/*/src/**/*.examples.tsx",
+  "packages/ui-kit-vue/examples/**/*.vue",
+  "packages/ui-kit-angular/examples/**/*.examples.ts",
 ];
 const WATCH_IGNORE = ["**/node_modules/**", "**/dist/**"];
 

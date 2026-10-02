@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFormDocsSectionProps {
   className?: string;
@@ -71,9 +72,10 @@ export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): 
     </section>
     <section aria-labelledby="pixel-form-usage">
       <h3 id="pixel-form-usage">Usage</h3>
-      <pre className="docs-code"><code>{`'use client';
-
-import { useForm } from 'react-hook-form';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelForm usage'}
+        react={`import { useForm } from 'react-hook-form';
 import { PixelForm } from '@pxlkit/ui-kit';
 import { PixelInput } from '@pxlkit/ui-kit';
 
@@ -128,14 +130,26 @@ export function Default() {
       />
     </PixelForm>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useForm } from 'react-hook-form';
+import { PixelForm } from '@pxlkit/ui-kit';
+import { PixelInput } from '@pxlkit/ui-kit';
+
+type DefaultValues = {
+  username: string;
+  email: string;
+};
+
+export function Default() {
   const form = useForm<DefaultValues>({
     defaultValues: { username: '', email: '' },
   });
@@ -181,7 +195,8 @@ export function Default() {
       />
     </PixelForm>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFlickerDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelFlickerDocsSection({ className }: PixelFlickerDocsSectionPr
     </section>
     <section aria-labelledby="pixel-flicker-usage">
       <h3 id="pixel-flicker-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelFlicker } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelFlicker usage'}
+        react={`import { PixelFlicker } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -56,40 +60,58 @@ export function Default() {
       <span>OPEN 24/7</span>
     </PixelFlicker>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelFlicker } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelFlicker>
       <span>OPEN 24/7</span>
     </PixelFlicker>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-faster-flicker">
         <h4>Faster Flicker</h4>
-        <pre className="docs-code"><code>{`export function FasterFlicker() {
+        <FrameworkCode
+          variant="docs"
+          label={'Faster Flicker code'}
+          react={`import { PixelFlicker } from '@pxlkit/ui-kit';
+
+export function FasterFlicker() {
   return (
     <PixelFlicker duration={900}>
       <span>NEON</span>
     </PixelFlicker>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-hover-trigger">
         <h4>Hover Trigger</h4>
-        <pre className="docs-code"><code>{`export function HoverTrigger() {
+        <FrameworkCode
+          variant="docs"
+          label={'Hover Trigger code'}
+          react={`import { PixelFlicker } from '@pxlkit/ui-kit';
+
+export function HoverTrigger() {
   return (
     <PixelFlicker trigger="hover" repeat={1}>
       <span>Hover me</span>
     </PixelFlicker>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

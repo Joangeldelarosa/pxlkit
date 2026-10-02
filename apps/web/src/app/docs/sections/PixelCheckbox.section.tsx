@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCheckboxDocsSectionProps {
   className?: string;
@@ -75,7 +76,10 @@ export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSection
     </section>
     <section aria-labelledby="pixel-checkbox-usage">
       <h3 id="pixel-checkbox-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCheckbox usage'}
+        react={`import { useState } from 'react';
 import { PixelCheckbox } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -87,14 +91,40 @@ export function Default() {
       onChange={setChecked}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCheckbox } from '@pxlkit/ui-kit-vue';
+
+const checked = ref(false);
+</script>
+
+<template>
+  <PixelCheckbox v-model:checked="checked" label="Accept terms" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelCheckbox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCheckbox],
+  template: \`<pxl-checkbox label="Accept terms" [(checked)]="checked" />\`,
+})
+export class Default {
+  readonly checked = signal(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelCheckbox } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [checked, setChecked] = useState(false);
   return (
     <PixelCheckbox
@@ -103,11 +133,38 @@ export function Default() {
       onChange={setChecked}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCheckbox } from '@pxlkit/ui-kit-vue';
+
+const checked = ref(false);
+</script>
+
+<template>
+  <PixelCheckbox v-model:checked="checked" label="Accept terms" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCheckbox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCheckbox],
+  template: \`<pxl-checkbox label="Accept terms" [(checked)]="checked" />\`,
+})
+export class Default {
+  readonly checked = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-checked">
         <h4>Checked</h4>
-        <pre className="docs-code"><code>{`export function Checked() {
+        <FrameworkCode
+          variant="docs"
+          label={'Checked code'}
+          react={`import { useState } from 'react';
+import { PixelCheckbox } from '@pxlkit/ui-kit';
+
+export function Checked() {
   const [checked, setChecked] = useState(true);
   return (
     <PixelCheckbox
@@ -116,11 +173,38 @@ export function Default() {
       onChange={setChecked}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCheckbox } from '@pxlkit/ui-kit-vue';
+
+const checked = ref(true);
+</script>
+
+<template>
+  <PixelCheckbox v-model:checked="checked" label="Subscribe to newsletter" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCheckbox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCheckbox],
+  template: \`<pxl-checkbox label="Subscribe to newsletter" [(checked)]="checked" />\`,
+})
+export class Checked {
+  readonly checked = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { useState } from 'react';
+import { PixelCheckbox } from '@pxlkit/ui-kit';
+
+export function Tones() {
   const [values, setValues] = useState<Record<string, boolean>>({
     neutral: true,
     green: true,
@@ -176,11 +260,70 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { reactive } from 'vue';
+import { PixelCheckbox } from '@pxlkit/ui-kit-vue';
+
+const values = reactive({
+  neutral: true,
+  green: true,
+  cyan: true,
+  gold: true,
+  red: true,
+  purple: true,
+  pink: true,
+});
+</script>
+
+<template>
+  <div class="space-y-2">
+    <PixelCheckbox v-model:checked="values.neutral" label="Neutral" tone="neutral" />
+    <PixelCheckbox v-model:checked="values.green" label="Green" tone="green" />
+    <PixelCheckbox v-model:checked="values.cyan" label="Cyan" tone="cyan" />
+    <PixelCheckbox v-model:checked="values.gold" label="Gold" tone="gold" />
+    <PixelCheckbox v-model:checked="values.red" label="Red" tone="red" />
+    <PixelCheckbox v-model:checked="values.purple" label="Purple" tone="purple" />
+    <PixelCheckbox v-model:checked="values.pink" label="Pink" tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCheckbox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCheckbox],
+  template: \`
+    <div class="space-y-2">
+      <pxl-checkbox label="Neutral" tone="neutral" [(checked)]="neutral" />
+      <pxl-checkbox label="Green" tone="green" [(checked)]="green" />
+      <pxl-checkbox label="Cyan" tone="cyan" [(checked)]="cyan" />
+      <pxl-checkbox label="Gold" tone="gold" [(checked)]="gold" />
+      <pxl-checkbox label="Red" tone="red" [(checked)]="red" />
+      <pxl-checkbox label="Purple" tone="purple" [(checked)]="purple" />
+      <pxl-checkbox label="Pink" tone="pink" [(checked)]="pink" />
+    </div>
+  \`,
+})
+export class Tones {
+  readonly neutral = signal(true);
+  readonly green = signal(true);
+  readonly cyan = signal(true);
+  readonly gold = signal(true);
+  readonly red = signal(true);
+  readonly purple = signal(true);
+  readonly pink = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { useState } from 'react';
+import { PixelCheckbox } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   const [pixel, setPixel] = useState(true);
   const [linear, setLinear] = useState(true);
   return (
@@ -199,11 +342,47 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCheckbox } from '@pxlkit/ui-kit-vue';
+
+const pixel = ref(true);
+const linear = ref(true);
+</script>
+
+<template>
+  <div class="space-y-2">
+    <PixelCheckbox v-model:checked="pixel" label="Pixel surface" surface="pixel" />
+    <PixelCheckbox v-model:checked="linear" label="Linear surface" surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCheckbox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCheckbox],
+  template: \`
+    <div class="space-y-2">
+      <pxl-checkbox label="Pixel surface" surface="pixel" [(checked)]="pixel" />
+      <pxl-checkbox label="Linear surface" surface="linear" [(checked)]="linear" />
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly pixel = signal(true);
+  readonly linear = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelCheckbox } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <div className="space-y-2">
       <PixelCheckbox
@@ -220,11 +399,41 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCheckbox } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-2">
+    <PixelCheckbox label="Disabled unchecked" disabled :checked="false" />
+    <PixelCheckbox label="Disabled checked" disabled checked />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCheckbox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCheckbox],
+  template: \`
+    <div class="space-y-2">
+      <pxl-checkbox label="Disabled unchecked" disabled [checked]="false" />
+      <pxl-checkbox label="Disabled checked" disabled [checked]="true" />
+    </div>
+  \`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-required">
         <h4>Required</h4>
-        <pre className="docs-code"><code>{`export function Required() {
+        <FrameworkCode
+          variant="docs"
+          label={'Required code'}
+          react={`import { useState } from 'react';
+import { PixelCheckbox } from '@pxlkit/ui-kit';
+
+export function Required() {
   const [checked, setChecked] = useState(false);
   return (
     <PixelCheckbox
@@ -234,11 +443,38 @@ export function Default() {
       onChange={setChecked}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCheckbox } from '@pxlkit/ui-kit-vue';
+
+const checked = ref(false);
+</script>
+
+<template>
+  <PixelCheckbox v-model:checked="checked" label="I agree to the terms" required />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCheckbox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCheckbox],
+  template: \`<pxl-checkbox label="I agree to the terms" required [(checked)]="checked" />\`,
+})
+export class Required {
+  readonly checked = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-form-name">
         <h4>With form name</h4>
-        <pre className="docs-code"><code>{`export function WithFormName() {
+        <FrameworkCode
+          variant="docs"
+          label={'With form name code'}
+          react={`import { useState } from 'react';
+import { PixelCheckbox } from '@pxlkit/ui-kit';
+
+export function WithFormName() {
   const [checked, setChecked] = useState(true);
   return (
     <form>
@@ -251,11 +487,44 @@ export function Default() {
       />
     </form>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCheckbox } from '@pxlkit/ui-kit-vue';
+
+const checked = ref(true);
+</script>
+
+<template>
+  <form>
+    <PixelCheckbox v-model:checked="checked" label="Remember me" name="remember" value="yes" />
+  </form>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCheckbox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCheckbox],
+  template: \`
+    <form>
+      <pxl-checkbox label="Remember me" name="remember" value="yes" [(checked)]="checked" />
+    </form>
+  \`,
+})
+export class WithFormName {
+  readonly checked = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-group">
         <h4>Group</h4>
-        <pre className="docs-code"><code>{`export function Group() {
+        <FrameworkCode
+          variant="docs"
+          label={'Group code'}
+          react={`import { useState } from 'react';
+import { PixelCheckbox } from '@pxlkit/ui-kit';
+
+export function Group() {
   const [prefs, setPrefs] = useState({
     email: true,
     sms: false,
@@ -280,7 +549,40 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { reactive } from 'vue';
+import { PixelCheckbox } from '@pxlkit/ui-kit-vue';
+
+const prefs = reactive({ email: true, sms: false, push: true });
+</script>
+
+<template>
+  <div class="space-y-2">
+    <PixelCheckbox v-model:checked="prefs.email" label="Email notifications" />
+    <PixelCheckbox v-model:checked="prefs.sms" label="SMS notifications" />
+    <PixelCheckbox v-model:checked="prefs.push" label="Push notifications" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCheckbox } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCheckbox],
+  template: \`
+    <div class="space-y-2">
+      <pxl-checkbox label="Email notifications" [(checked)]="email" />
+      <pxl-checkbox label="SMS notifications" [(checked)]="sms" />
+      <pxl-checkbox label="Push notifications" [(checked)]="push" />
+    </div>
+  \`,
+})
+export class Group {
+  readonly email = signal(true);
+  readonly sms = signal(false);
+  readonly push = signal(true);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCommandDocsSectionProps {
   className?: string;
@@ -99,7 +100,10 @@ export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionPr
     </section>
     <section aria-labelledby="pixel-command-usage">
       <h3 id="pixel-command-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCommand usage'}
+        react={`import { useState } from 'react';
 import { PixelCommand } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -157,14 +161,86 @@ export function Default() {
       />
     </>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const close = () => {
+  open.value = false;
+};
+const groups: PixelCommandGroup[] = [
+  {
+    heading: 'Actions',
+    items: [
+      { id: 'new-file', label: 'New file', shortcut: 'Ctrl+N', onSelect: close },
+      { id: 'open-file', label: 'Open file…', shortcut: 'Ctrl+O', onSelect: close },
+      { id: 'save', label: 'Save', shortcut: 'Ctrl+S', onSelect: close },
+    ],
+  },
+  {
+    heading: 'Navigation',
+    items: [
+      { id: 'go-home', label: 'Go to home', keywords: ['dashboard', 'start'], onSelect: close },
+      { id: 'go-settings', label: 'Go to settings', keywords: ['preferences', 'config'], onSelect: close },
+    ],
+  },
+];
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open command palette</button>
+  <PixelCommand v-model:open="open" :groups="groups" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCommand],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open command palette</button>
+    <pxl-command [(open)]="open" [groups]="groups" />
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+  readonly groups: PixelCommandGroup[] = [
+    {
+      heading: 'Actions',
+      items: [
+        { id: 'new-file', label: 'New file', shortcut: 'Ctrl+N', onSelect: () => this.open.set(false) },
+        { id: 'open-file', label: 'Open file…', shortcut: 'Ctrl+O', onSelect: () => this.open.set(false) },
+        { id: 'save', label: 'Save', shortcut: 'Ctrl+S', onSelect: () => this.open.set(false) },
+      ],
+    },
+    {
+      heading: 'Navigation',
+      items: [
+        { id: 'go-home', label: 'Go to home', keywords: ['dashboard', 'start'], onSelect: () => this.open.set(false) },
+        {
+          id: 'go-settings',
+          label: 'Go to settings',
+          keywords: ['preferences', 'config'],
+          onSelect: () => this.open.set(false),
+        },
+      ],
+    },
+  ];
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelCommand } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -219,11 +295,84 @@ export function Default() {
       />
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const close = () => {
+  open.value = false;
+};
+const groups: PixelCommandGroup[] = [
+  {
+    heading: 'Actions',
+    items: [
+      { id: 'new-file', label: 'New file', shortcut: 'Ctrl+N', onSelect: close },
+      { id: 'open-file', label: 'Open file…', shortcut: 'Ctrl+O', onSelect: close },
+      { id: 'save', label: 'Save', shortcut: 'Ctrl+S', onSelect: close },
+    ],
+  },
+  {
+    heading: 'Navigation',
+    items: [
+      { id: 'go-home', label: 'Go to home', keywords: ['dashboard', 'start'], onSelect: close },
+      { id: 'go-settings', label: 'Go to settings', keywords: ['preferences', 'config'], onSelect: close },
+    ],
+  },
+];
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open command palette</button>
+  <PixelCommand v-model:open="open" :groups="groups" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCommand],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open command palette</button>
+    <pxl-command [(open)]="open" [groups]="groups" />
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+  readonly groups: PixelCommandGroup[] = [
+    {
+      heading: 'Actions',
+      items: [
+        { id: 'new-file', label: 'New file', shortcut: 'Ctrl+N', onSelect: () => this.open.set(false) },
+        { id: 'open-file', label: 'Open file…', shortcut: 'Ctrl+O', onSelect: () => this.open.set(false) },
+        { id: 'save', label: 'Save', shortcut: 'Ctrl+S', onSelect: () => this.open.set(false) },
+      ],
+    },
+    {
+      heading: 'Navigation',
+      items: [
+        { id: 'go-home', label: 'Go to home', keywords: ['dashboard', 'start'], onSelect: () => this.open.set(false) },
+        {
+          id: 'go-settings',
+          label: 'Go to settings',
+          keywords: ['preferences', 'config'],
+          onSelect: () => this.open.set(false),
+        },
+      ],
+    },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-custom-shortcut">
         <h4>Custom shortcut</h4>
-        <pre className="docs-code"><code>{`export function WithCustomShortcut() {
+        <FrameworkCode
+          variant="docs"
+          label={'Custom shortcut code'}
+          react={`import { useState } from 'react';
+import { PixelCommand } from '@pxlkit/ui-kit';
+
+export function WithCustomShortcut() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -255,11 +404,63 @@ export function Default() {
       />
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const close = () => {
+  open.value = false;
+};
+const groups: PixelCommandGroup[] = [
+  {
+    heading: 'Commands',
+    items: [
+      { id: 'reload', label: 'Reload window', onSelect: close },
+      { id: 'toggle-theme', label: 'Toggle theme', onSelect: close },
+    ],
+  },
+];
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open (or press Ctrl+Shift+P)</button>
+  <PixelCommand v-model:open="open" shortcut="mod+shift+p" placeholder="Run a command…" :groups="groups" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCommand],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open (or press Ctrl+Shift+P)</button>
+    <pxl-command [(open)]="open" shortcut="mod+shift+p" placeholder="Run a command…" [groups]="groups" />
+  \`,
+})
+export class WithCustomShortcut {
+  readonly open = signal(false);
+  readonly groups: PixelCommandGroup[] = [
+    {
+      heading: 'Commands',
+      items: [
+        { id: 'reload', label: 'Reload window', onSelect: () => this.open.set(false) },
+        { id: 'toggle-theme', label: 'Toggle theme', onSelect: () => this.open.set(false) },
+      ],
+    },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-linear-surface">
         <h4>Linear surface</h4>
-        <pre className="docs-code"><code>{`export function LinearSurface() {
+        <FrameworkCode
+          variant="docs"
+          label={'Linear surface code'}
+          react={`import { useState } from 'react';
+import { PixelCommand } from '@pxlkit/ui-kit';
+
+export function LinearSurface() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -291,7 +492,53 @@ export function Default() {
       />
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const close = () => {
+  open.value = false;
+};
+const groups: PixelCommandGroup[] = [
+  {
+    heading: 'Recent',
+    items: [
+      { id: 'doc-1', label: 'Project roadmap', onSelect: close },
+      { id: 'doc-2', label: 'Sprint notes', onSelect: close },
+    ],
+  },
+];
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open linear palette</button>
+  <PixelCommand v-model:open="open" surface="linear" empty-message="Nothing matches your search." :groups="groups" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCommand],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open linear palette</button>
+    <pxl-command [(open)]="open" surface="linear" emptyMessage="Nothing matches your search." [groups]="groups" />
+  \`,
+})
+export class LinearSurface {
+  readonly open = signal(false);
+  readonly groups: PixelCommandGroup[] = [
+    {
+      heading: 'Recent',
+      items: [
+        { id: 'doc-1', label: 'Project roadmap', onSelect: () => this.open.set(false) },
+        { id: 'doc-2', label: 'Sprint notes', onSelect: () => this.open.set(false) },
+      ],
+    },
+  ];
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

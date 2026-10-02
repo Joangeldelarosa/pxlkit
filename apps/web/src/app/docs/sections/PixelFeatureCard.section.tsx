@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFeatureCardDocsSectionProps {
   className?: string;
@@ -76,14 +77,10 @@ export function PixelFeatureCardDocsSection({ className }: PixelFeatureCardDocsS
     </section>
     <section aria-labelledby="pixel-feature-card-usage">
       <h3 id="pixel-feature-card-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelFeatureCard } from '@pxlkit/ui-kit';
-
-const PixelIcon = (
-  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
-    <rect x="3" y="0" width="2" height="8" />
-    <rect x="0" y="3" width="8" height="2" />
-  </svg>
-);
+      <FrameworkCode
+        variant="docs"
+        label={'PixelFeatureCard usage'}
+        react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -92,25 +89,43 @@ export function Default() {
       description="Push every keystroke to peers via WebSockets — under 50ms p95."
     />
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelFeatureCard
       title="Realtime sync"
       description="Push every keystroke to peers via WebSockets — under 50ms p95."
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icon">
         <h4>With Icon</h4>
-        <pre className="docs-code"><code>{`export function WithIcon() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Icon code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function WithIcon() {
   return (
     <PixelFeatureCard
       icon={PixelIcon}
@@ -118,11 +133,24 @@ export function Default() {
       description="Crisp edges on every retina ratio thanks to shape-rendering: crispEdges."
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-badge">
         <h4>With Badge</h4>
-        <pre className="docs-code"><code>{`export function WithBadge() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Badge code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function WithBadge() {
   return (
     <PixelFeatureCard
       icon={PixelIcon}
@@ -131,11 +159,24 @@ export function Default() {
       description="A built-in copilot that learns your codebase as you ship it."
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function Tones() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelFeatureCard icon={PixelIcon} tone="cyan" title="Cyan" description="Tinted icon frame." />
@@ -144,22 +185,48 @@ export function Default() {
       <PixelFeatureCard icon={PixelIcon} tone="purple" title="Purple" description="Tinted icon frame." />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function Surfaces() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelFeatureCard surface="pixel" icon={PixelIcon} title="Pixel" description="Thick border + offset shadow." />
       <PixelFeatureCard surface="linear" icon={PixelIcon} title="Linear" description="Soft border + smooth radius." />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-horizontal">
         <h4>Horizontal</h4>
-        <pre className="docs-code"><code>{`export function Horizontal() {
+        <FrameworkCode
+          variant="docs"
+          label={'Horizontal code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function Horizontal() {
   return (
     <PixelFeatureCard
       orientation="horizontal"
@@ -168,11 +235,24 @@ export function Default() {
       description="Icon sits to the left of the title and description."
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-interactive">
         <h4>Interactive</h4>
-        <pre className="docs-code"><code>{`export function Interactive() {
+        <FrameworkCode
+          variant="docs"
+          label={'Interactive code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function Interactive() {
   return (
     <PixelFeatureCard
       interactive
@@ -182,11 +262,24 @@ export function Default() {
       description="Press Enter or Space to activate via keyboard."
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-as-link">
         <h4>As Link</h4>
-        <pre className="docs-code"><code>{`export function AsLink() {
+        <FrameworkCode
+          variant="docs"
+          label={'As Link code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function AsLink() {
   return (
     <PixelFeatureCard
       href="https://example.com"
@@ -197,11 +290,24 @@ export function Default() {
       description="Root renders as <a href> when href is provided."
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-footer">
         <h4>With Footer</h4>
-        <pre className="docs-code"><code>{`export function WithFooter() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Footer code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function WithFooter() {
   return (
     <PixelFeatureCard
       icon={PixelIcon}
@@ -210,11 +316,24 @@ export function Default() {
       footer={<span className="text-xs text-retro-muted">Learn more →</span>}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-clamped-description">
         <h4>Clamped Description</h4>
-        <pre className="docs-code"><code>{`export function ClampedDescription() {
+        <FrameworkCode
+          variant="docs"
+          label={'Clamped Description code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function ClampedDescription() {
   return (
     <PixelFeatureCard
       icon={PixelIcon}
@@ -223,18 +342,32 @@ export function Default() {
       descriptionLines={2}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-icon-sizes">
         <h4>Icon Sizes</h4>
-        <pre className="docs-code"><code>{`export function IconSizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Icon Sizes code'}
+          react={`import { PixelFeatureCard } from '@pxlkit/ui-kit';
+
+const PixelIcon = (
+  <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className="h-4 w-4">
+    <rect x="3" y="0" width="2" height="8" />
+    <rect x="0" y="3" width="8" height="2" />
+  </svg>
+);
+
+export function IconSizes() {
   return (
     <div className="grid grid-cols-2 gap-3">
       <PixelFeatureCard icon={PixelIcon} iconSize={48} title="Small" description="48px icon frame." />
       <PixelFeatureCard icon={PixelIcon} iconSize={80} title="Large" description="80px icon frame." />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDividerDocsSectionProps {
   className?: string;
@@ -48,30 +49,95 @@ export function PixelDividerDocsSection({ className }: PixelDividerDocsSectionPr
     </section>
     <section aria-labelledby="pixel-divider-usage">
       <h3 id="pixel-divider-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelDivider } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelDivider usage'}
+        react={`import { PixelDivider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelDivider />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelDivider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDivider />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelDivider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDivider],
+  template: \`<pxl-divider />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelDivider } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelDivider />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDivider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDivider />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDivider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDivider],
+  template: \`<pxl-divider />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-label">
         <h4>With Label</h4>
-        <pre className="docs-code"><code>{`export function WithLabel() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Label code'}
+          react={`import { PixelDivider } from '@pxlkit/ui-kit';
+
+export function WithLabel() {
   return <PixelDivider label="Section" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDivider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDivider label="Section" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDivider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDivider],
+  template: \`<pxl-divider label="Section" />\`,
+})
+export class WithLabel {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelDivider } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-col gap-4">
       <PixelDivider label="Neutral" tone="neutral" />
@@ -83,11 +149,50 @@ export function Default() {
       <PixelDivider label="Pink" tone="pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDivider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-4">
+    <PixelDivider label="Neutral" tone="neutral" />
+    <PixelDivider label="Green" tone="green" />
+    <PixelDivider label="Cyan" tone="cyan" />
+    <PixelDivider label="Gold" tone="gold" />
+    <PixelDivider label="Red" tone="red" />
+    <PixelDivider label="Purple" tone="purple" />
+    <PixelDivider label="Pink" tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDivider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDivider],
+  template: \`
+    <div class="flex flex-col gap-4">
+      <pxl-divider label="Neutral" tone="neutral" />
+      <pxl-divider label="Green" tone="green" />
+      <pxl-divider label="Cyan" tone="cyan" />
+      <pxl-divider label="Gold" tone="gold" />
+      <pxl-divider label="Red" tone="red" />
+      <pxl-divider label="Purple" tone="purple" />
+      <pxl-divider label="Pink" tone="pink" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-spacings">
         <h4>Spacings</h4>
-        <pre className="docs-code"><code>{`export function Spacings() {
+        <FrameworkCode
+          variant="docs"
+          label={'Spacings code'}
+          react={`import { PixelDivider } from '@pxlkit/ui-kit';
+
+export function Spacings() {
   return (
     <div>
       <PixelDivider label="None" spacing="none" />
@@ -96,29 +201,115 @@ export function Default() {
       <PixelDivider label="Large" spacing="lg" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDivider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div>
+    <PixelDivider label="None" spacing="none" />
+    <PixelDivider label="Small" spacing="sm" />
+    <PixelDivider label="Medium" spacing="md" />
+    <PixelDivider label="Large" spacing="lg" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDivider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDivider],
+  template: \`
+    <div>
+      <pxl-divider label="None" spacing="none" />
+      <pxl-divider label="Small" spacing="sm" />
+      <pxl-divider label="Medium" spacing="md" />
+      <pxl-divider label="Large" spacing="lg" />
+    </div>
+  \`,
+})
+export class Spacings {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelDivider } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-6">
       <PixelDivider label="Pixel surface" surface="pixel" />
       <PixelDivider label="Linear surface" surface="linear" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDivider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-6">
+    <PixelDivider label="Pixel surface" surface="pixel" />
+    <PixelDivider label="Linear surface" surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDivider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDivider],
+  template: \`
+    <div class="flex flex-col gap-6">
+      <pxl-divider label="Pixel surface" surface="pixel" />
+      <pxl-divider label="Linear surface" surface="linear" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-plain-rule">
         <h4>Plain Rule</h4>
-        <pre className="docs-code"><code>{`export function PlainRule() {
+        <FrameworkCode
+          variant="docs"
+          label={'Plain Rule code'}
+          react={`import { PixelDivider } from '@pxlkit/ui-kit';
+
+export function PlainRule() {
   return (
     <div className="flex flex-col gap-6">
       <PixelDivider surface="pixel" />
       <PixelDivider surface="linear" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDivider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-6">
+    <PixelDivider surface="pixel" />
+    <PixelDivider surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDivider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDivider],
+  template: \`
+    <div class="flex flex-col gap-6">
+      <pxl-divider surface="pixel" />
+      <pxl-divider surface="linear" />
+    </div>
+  \`,
+})
+export class PlainRule {}`}
+        />
       </article>
     </section>
     </section>

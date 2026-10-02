@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelShakeDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps)
     </section>
     <section aria-labelledby="pixel-shake-usage">
       <h3 id="pixel-shake-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelShake } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelShake usage'}
+        react={`import { PixelShake } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -56,40 +60,58 @@ export function Default() {
       <span>Shake on mount</span>
     </PixelShake>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelShake } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelShake>
       <span>Shake on mount</span>
     </PixelShake>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-on-hover">
         <h4>On Hover</h4>
-        <pre className="docs-code"><code>{`export function OnHover() {
+        <FrameworkCode
+          variant="docs"
+          label={'On Hover code'}
+          react={`import { PixelShake } from '@pxlkit/ui-kit';
+
+export function OnHover() {
   return (
     <PixelShake trigger="hover" repeat="infinite" duration={300}>
       <span>Hover to shake</span>
     </PixelShake>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-strong-shake">
         <h4>Strong Shake</h4>
-        <pre className="docs-code"><code>{`export function StrongShake() {
+        <FrameworkCode
+          variant="docs"
+          label={'Strong Shake code'}
+          react={`import { PixelShake } from '@pxlkit/ui-kit';
+
+export function StrongShake() {
   return (
     <PixelShake distance={6} duration={600} repeat={3}>
       <span>Stronger shake</span>
     </PixelShake>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

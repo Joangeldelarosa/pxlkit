@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBareButtonDocsSectionProps {
   className?: string;
@@ -70,55 +71,88 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
     </section>
     <section aria-labelledby="pixel-bare-button-usage">
       <h3 id="pixel-bare-button-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBareButton } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBareButton usage'}
+        react={`import { PixelBareButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelBareButton>Bare button</PixelBareButton>;
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelBareButton>Bare button</PixelBareButton>;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-custom-class">
         <h4>With custom class</h4>
-        <pre className="docs-code"><code>{`export function WithCustomClass() {
+        <FrameworkCode
+          variant="docs"
+          label={'With custom class code'}
+          react={`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function WithCustomClass() {
   return (
     <PixelBareButton className="rounded-md border border-retro-border bg-retro-surface px-3 py-1 text-sm text-retro-text">
       Styled by consumer
     </PixelBareButton>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-on-click">
         <h4>With onClick</h4>
-        <pre className="docs-code"><code>{`export function WithOnClick() {
+        <FrameworkCode
+          variant="docs"
+          label={'With onClick code'}
+          react={`import React from 'react';
+import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function WithOnClick() {
   const [count, setCount] = React.useState(0);
   return (
     <PixelBareButton onClick={() => setCount((c) => c + 1)}>
       Clicked {count} times
     </PixelBareButton>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelBareButton disabled className="cursor-not-allowed opacity-50">
       Disabled
     </PixelBareButton>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-submit-type">
         <h4>Submit / reset type</h4>
-        <pre className="docs-code"><code>{`export function SubmitType() {
+        <FrameworkCode
+          variant="docs"
+          label={'Submit / reset type code'}
+          react={`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function SubmitType() {
   return (
     <form
       onSubmit={(e) => {
@@ -130,11 +164,17 @@ export function Default() {
       <PixelBareButton type="reset">Reset</PixelBareButton>
     </form>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-as-icon-trigger">
         <h4>As icon trigger</h4>
-        <pre className="docs-code"><code>{`export function AsIconTrigger() {
+        <FrameworkCode
+          variant="docs"
+          label={'As icon trigger code'}
+          react={`import { PixelBareButton } from '@pxlkit/ui-kit';
+
+export function AsIconTrigger() {
   return (
     <PixelBareButton
       aria-label="Close"
@@ -145,7 +185,8 @@ export function Default() {
       </svg>
     </PixelBareButton>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

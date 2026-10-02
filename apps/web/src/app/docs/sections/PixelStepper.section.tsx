@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStepperDocsSectionProps {
   className?: string;
@@ -105,8 +106,10 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
     </section>
     <section aria-labelledby="pixel-stepper-usage">
       <h3 id="pixel-stepper-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelStepper } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelStepper usage'}
+        react={`import { PixelStepper } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -116,14 +119,44 @@ export function Default() {
       <PixelStepper.Step label="Confirm" description="Review and submit" />
     </PixelStepper>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStepper :active="1">
+    <PixelStepperStep label="Account" description="Create your account" />
+    <PixelStepperStep label="Profile" description="Add some details" />
+    <PixelStepperStep label="Confirm" description="Review and submit" />
+  </PixelStepper>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <pxl-stepper [active]="1">
+      <pxl-stepper-step label="Account" description="Create your account" />
+      <pxl-stepper-step label="Profile" description="Add some details" />
+      <pxl-stepper-step label="Confirm" description="Review and submit" />
+    </pxl-stepper>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelStepper active={1}>
       <PixelStepper.Step label="Account" description="Create your account" />
@@ -131,11 +164,43 @@ export function Default() {
       <PixelStepper.Step label="Confirm" description="Review and submit" />
     </PixelStepper>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStepper :active="1">
+    <PixelStepperStep label="Account" description="Create your account" />
+    <PixelStepperStep label="Profile" description="Add some details" />
+    <PixelStepperStep label="Confirm" description="Review and submit" />
+  </PixelStepper>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <pxl-stepper [active]="1">
+      <pxl-stepper-step label="Account" description="Create your account" />
+      <pxl-stepper-step label="Profile" description="Add some details" />
+      <pxl-stepper-step label="Confirm" description="Review and submit" />
+    </pxl-stepper>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-interactive">
         <h4>Interactive</h4>
-        <pre className="docs-code"><code>{`export function Interactive() {
+        <FrameworkCode
+          variant="docs"
+          label={'Interactive code'}
+          react={`import { useState } from 'react';
+import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function Interactive() {
   const [active, setActive] = useState(0);
   const total = 4;
   return (
@@ -164,11 +229,79 @@ export function Default() {
       </div>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+
+const active = ref(0);
+const total = 4;
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelStepper :active="active" @step-click="active = $event">
+      <PixelStepperStep label="Plan" description="Pick a tier" />
+      <PixelStepperStep label="Billing" description="Payment method" />
+      <PixelStepperStep label="Confirm" description="Review charges" />
+      <PixelStepperStep label="Done" description="All set" />
+    </PixelStepper>
+    <div class="flex gap-2">
+      <button type="button" class="text-xs px-2 py-1 border border-retro-border" @click="active = Math.max(0, active - 1)">
+        Back
+      </button>
+      <button
+        type="button"
+        class="text-xs px-2 py-1 border border-retro-border"
+        @click="active = Math.min(total - 1, active + 1)"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <div class="space-y-3">
+      <pxl-stepper [active]="active()" clickable (stepClick)="active.set($event)">
+        <pxl-stepper-step label="Plan" description="Pick a tier" />
+        <pxl-stepper-step label="Billing" description="Payment method" />
+        <pxl-stepper-step label="Confirm" description="Review charges" />
+        <pxl-stepper-step label="Done" description="All set" />
+      </pxl-stepper>
+      <div class="flex gap-2">
+        <button type="button" class="text-xs px-2 py-1 border border-retro-border" (click)="back()">Back</button>
+        <button type="button" class="text-xs px-2 py-1 border border-retro-border" (click)="next()">Next</button>
+      </div>
+    </div>
+  \`,
+})
+export class Interactive {
+  readonly active = signal(0);
+  private readonly total = 4;
+
+  back(): void {
+    this.active.update((i) => Math.max(0, i - 1));
+  }
+
+  next(): void {
+    this.active.update((i) => Math.min(this.total - 1, i + 1));
+  }
+}`}
+        />
       </article>
       <article className="docs-example" id="example-vertical">
         <h4>Vertical</h4>
-        <pre className="docs-code"><code>{`export function Vertical() {
+        <FrameworkCode
+          variant="docs"
+          label={'Vertical code'}
+          react={`import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function Vertical() {
   return (
     <PixelStepper active={1} orientation="vertical">
       <PixelStepper.Step label="Upload" description="Pick a file" />
@@ -176,11 +309,42 @@ export function Default() {
       <PixelStepper.Step label="Publish" description="Make it live" />
     </PixelStepper>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStepper :active="1" orientation="vertical">
+    <PixelStepperStep label="Upload" description="Pick a file" />
+    <PixelStepperStep label="Process" description="Running checks" loading />
+    <PixelStepperStep label="Publish" description="Make it live" />
+  </PixelStepper>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <pxl-stepper [active]="1" orientation="vertical">
+      <pxl-stepper-step label="Upload" description="Pick a file" />
+      <pxl-stepper-step label="Process" description="Running checks" loading />
+      <pxl-stepper-step label="Publish" description="Make it live" />
+    </pxl-stepper>
+  \`,
+})
+export class Vertical {}`}
+        />
       </article>
       <article className="docs-example" id="example-states">
         <h4>States</h4>
-        <pre className="docs-code"><code>{`export function States() {
+        <FrameworkCode
+          variant="docs"
+          label={'States code'}
+          react={`import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function States() {
   return (
     <PixelStepper active={2}>
       <PixelStepper.Step label="Created" completed />
@@ -190,11 +354,46 @@ export function Default() {
       <PixelStepper.Step label="Done" />
     </PixelStepper>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStepper :active="2">
+    <PixelStepperStep label="Created" completed />
+    <PixelStepperStep label="Validated" completed />
+    <PixelStepperStep label="Signing" loading />
+    <PixelStepperStep label="Failed" error />
+    <PixelStepperStep label="Done" />
+  </PixelStepper>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <pxl-stepper [active]="2">
+      <pxl-stepper-step label="Created" completed />
+      <pxl-stepper-step label="Validated" completed />
+      <pxl-stepper-step label="Signing" loading />
+      <pxl-stepper-step label="Failed" error />
+      <pxl-stepper-step label="Done" />
+    </pxl-stepper>
+  \`,
+})
+export class States {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="space-y-6">
       <PixelStepper active={1} size="sm">
@@ -214,11 +413,66 @@ export function Default() {
       </PixelStepper>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-6">
+    <PixelStepper :active="1" size="sm">
+      <PixelStepperStep label="One" />
+      <PixelStepperStep label="Two" />
+      <PixelStepperStep label="Three" />
+    </PixelStepper>
+    <PixelStepper :active="1" size="md">
+      <PixelStepperStep label="One" />
+      <PixelStepperStep label="Two" />
+      <PixelStepperStep label="Three" />
+    </PixelStepper>
+    <PixelStepper :active="1" size="lg">
+      <PixelStepperStep label="One" />
+      <PixelStepperStep label="Two" />
+      <PixelStepperStep label="Three" />
+    </PixelStepper>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <div class="space-y-6">
+      <pxl-stepper [active]="1" size="sm">
+        <pxl-stepper-step label="One" />
+        <pxl-stepper-step label="Two" />
+        <pxl-stepper-step label="Three" />
+      </pxl-stepper>
+      <pxl-stepper [active]="1" size="md">
+        <pxl-stepper-step label="One" />
+        <pxl-stepper-step label="Two" />
+        <pxl-stepper-step label="Three" />
+      </pxl-stepper>
+      <pxl-stepper [active]="1" size="lg">
+        <pxl-stepper-step label="One" />
+        <pxl-stepper-step label="Two" />
+        <pxl-stepper-step label="Three" />
+      </pxl-stepper>
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="grid grid-cols-1 gap-6">
       <PixelStepper active={1} surface="pixel" ariaLabel="Pixel stepper">
@@ -233,11 +487,57 @@ export function Default() {
       </PixelStepper>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-1 gap-6">
+    <PixelStepper :active="1" surface="pixel" aria-label="Pixel stepper">
+      <PixelStepperStep label="Start" />
+      <PixelStepperStep label="Build" />
+      <PixelStepperStep label="Ship" />
+    </PixelStepper>
+    <PixelStepper :active="1" surface="linear" aria-label="Linear stepper">
+      <PixelStepperStep label="Start" />
+      <PixelStepperStep label="Build" />
+      <PixelStepperStep label="Ship" />
+    </PixelStepper>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <div class="grid grid-cols-1 gap-6">
+      <pxl-stepper [active]="1" surface="pixel" ariaLabel="Pixel stepper">
+        <pxl-stepper-step label="Start" />
+        <pxl-stepper-step label="Build" />
+        <pxl-stepper-step label="Ship" />
+      </pxl-stepper>
+      <pxl-stepper [active]="1" surface="linear" ariaLabel="Linear stepper">
+        <pxl-stepper-step label="Start" />
+        <pxl-stepper-step label="Build" />
+        <pxl-stepper-step label="Ship" />
+      </pxl-stepper>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-allow-next-steps-select">
         <h4>Allow next steps</h4>
-        <pre className="docs-code"><code>{`export function AllowNextStepsSelect() {
+        <FrameworkCode
+          variant="docs"
+          label={'Allow next steps code'}
+          react={`import { useState } from 'react';
+import { PixelStepper } from '@pxlkit/ui-kit';
+
+export function AllowNextStepsSelect() {
   const [active, setActive] = useState(1);
   return (
     <PixelStepper active={active} onStepClick={setActive} allowNextStepsSelect>
@@ -247,7 +547,40 @@ export function Default() {
       <PixelStepper.Step label="Finish" description="Complete" />
     </PixelStepper>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
+
+const active = ref(1);
+</script>
+
+<template>
+  <PixelStepper :active="active" allow-next-steps-select @step-click="active = $event">
+    <PixelStepperStep label="Intro" description="Welcome" />
+    <PixelStepperStep label="Details" description="Tell us more" />
+    <PixelStepperStep label="Review" description="Almost there" />
+    <PixelStepperStep label="Finish" description="Complete" />
+  </PixelStepper>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStepper, PixelStepperStep],
+  template: \`
+    <pxl-stepper [active]="active()" clickable allowNextStepsSelect (stepClick)="active.set($event)">
+      <pxl-stepper-step label="Intro" description="Welcome" />
+      <pxl-stepper-step label="Details" description="Tell us more" />
+      <pxl-stepper-step label="Review" description="Almost there" />
+      <pxl-stepper-step label="Finish" description="Complete" />
+    </pxl-stepper>
+  \`,
+})
+export class AllowNextStepsSelect {
+  readonly active = signal(1);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

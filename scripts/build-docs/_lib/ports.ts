@@ -102,16 +102,17 @@ export async function portComponents(repoRoot: string, port: KitPort): Promise<M
   return out;
 }
 
-/** Component key → the example exports a port implements. */
-export async function portExamples(repoRoot: string, port: KitPort): Promise<Map<string, Set<string>>> {
-  const out = new Map<string, Set<string>>();
-  for (const [key, component] of await portComponents(repoRoot, port)) out.set(key, component.exports);
-  return out;
-}
-
 /** The key a port files a component's examples under. */
 export function portKey(port: KitPort, component: string): string {
   return port.framework === "vue" ? component : kebabCase(component);
+}
+
+/** Whether a port implements a component in full: every one of its manifest examples. */
+export function implementsInFull(
+  component: PortedComponent | undefined,
+  exampleExports: readonly string[],
+): component is PortedComponent {
+  return component !== undefined && exampleExports.length > 0 && exampleExports.every((name) => component.exports.has(name));
 }
 
 /**
@@ -123,13 +124,11 @@ export async function portedManifests(
   port: KitPort,
   manifests: ManifestRecord[],
 ): Promise<ManifestRecord[]> {
-  const examples = await portExamples(repoRoot, port);
+  const components = await portComponents(repoRoot, port);
   const out: ManifestRecord[] = [];
   for (const record of manifests) {
-    const implemented = examples.get(portKey(port, record.manifest.name));
-    if (!implemented) continue;
-    const expected = await manifestExampleExports(record);
-    if (expected.length > 0 && expected.every((name) => implemented.has(name))) out.push(record);
+    const component = components.get(portKey(port, record.manifest.name));
+    if (component && implementsInFull(component, await manifestExampleExports(record))) out.push(record);
   }
   return out;
 }

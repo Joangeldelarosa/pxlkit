@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelRotateDocsSectionProps {
   className?: string;
@@ -47,7 +48,10 @@ export function PixelRotateDocsSection({ className }: PixelRotateDocsSectionProp
     </section>
     <section aria-labelledby="pixel-rotate-usage">
       <h3 id="pixel-rotate-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelRotate } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelRotate usage'}
+        react={`import { PixelRotate } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -55,40 +59,58 @@ export function Default() {
       <span>Rotate</span>
     </PixelRotate>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelRotate } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelRotate>
       <span>Rotate</span>
     </PixelRotate>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-reverse-direction">
         <h4>Reverse Direction</h4>
-        <pre className="docs-code"><code>{`export function ReverseDirection() {
+        <FrameworkCode
+          variant="docs"
+          label={'Reverse Direction code'}
+          react={`import { PixelRotate } from '@pxlkit/ui-kit';
+
+export function ReverseDirection() {
   return (
     <PixelRotate direction="reverse" duration={2400}>
       <span>Reverse</span>
     </PixelRotate>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-hover-trigger">
         <h4>Hover Trigger</h4>
-        <pre className="docs-code"><code>{`export function HoverTrigger() {
+        <FrameworkCode
+          variant="docs"
+          label={'Hover Trigger code'}
+          react={`import { PixelRotate } from '@pxlkit/ui-kit';
+
+export function HoverTrigger() {
   return (
     <PixelRotate trigger="hover" repeat={1} duration={900}>
       <span>Hover me</span>
     </PixelRotate>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

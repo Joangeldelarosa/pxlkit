@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelScrollAreaDocsSectionProps {
   className?: string;
@@ -80,7 +81,10 @@ export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSec
     </section>
     <section aria-labelledby="pixel-scroll-area-usage">
       <h3 id="pixel-scroll-area-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelScrollArea } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelScrollArea usage'}
+        react={`import { PixelScrollArea } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -94,14 +98,50 @@ export function Default() {
       </div>
     </PixelScrollArea>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelScrollArea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelScrollArea aria-label="Sample scrollable region" :max-height="160">
+    <div class="space-y-2 p-3">
+      <p v-for="i in 12" :key="i" class="text-sm text-retro-muted">Scroll item {{ i }}</p>
+    </div>
+  </PixelScrollArea>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelScrollArea } from '@pxlkit/ui-kit-angular';
+
+const upTo = (count: number) => Array.from({ length: count }, (_, i) => i + 1);
+
+@Component({
+  imports: [PixelScrollArea],
+  template: \`
+    <pxl-scroll-area aria-label="Sample scrollable region" [maxHeight]="160">
+      <div class="space-y-2 p-3">
+        @for (i of items; track i) {
+          <p class="text-sm text-retro-muted">Scroll item {{ i }}</p>
+        }
+      </div>
+    </pxl-scroll-area>
+  \`,
+})
+export class Default {
+  readonly items = upTo(12);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelScrollArea } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelScrollArea aria-label="Sample scrollable region" maxHeight={160}>
       <div className="space-y-2 p-3">
@@ -113,11 +153,48 @@ export function Default() {
       </div>
     </PixelScrollArea>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelScrollArea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelScrollArea aria-label="Sample scrollable region" :max-height="160">
+    <div class="space-y-2 p-3">
+      <p v-for="i in 12" :key="i" class="text-sm text-retro-muted">Scroll item {{ i }}</p>
+    </div>
+  </PixelScrollArea>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelScrollArea } from '@pxlkit/ui-kit-angular';
+
+const upTo = (count: number) => Array.from({ length: count }, (_, i) => i + 1);
+
+@Component({
+  imports: [PixelScrollArea],
+  template: \`
+    <pxl-scroll-area aria-label="Sample scrollable region" [maxHeight]="160">
+      <div class="space-y-2 p-3">
+        @for (i of items; track i) {
+          <p class="text-sm text-retro-muted">Scroll item {{ i }}</p>
+        }
+      </div>
+    </pxl-scroll-area>
+  \`,
+})
+export class Default {
+  readonly items = upTo(12);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-always-visible">
         <h4>Always Visible</h4>
-        <pre className="docs-code"><code>{`export function AlwaysVisible() {
+        <FrameworkCode
+          variant="docs"
+          label={'Always Visible code'}
+          react={`import { PixelScrollArea } from '@pxlkit/ui-kit';
+
+export function AlwaysVisible() {
   return (
     <PixelScrollArea
       aria-label="Always-visible scrollbar"
@@ -134,11 +211,48 @@ export function Default() {
       </div>
     </PixelScrollArea>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelScrollArea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelScrollArea aria-label="Always-visible scrollbar" type="always" :max-height="140" offset-scrollbars>
+    <div class="space-y-2 p-3">
+      <p v-for="i in 10" :key="i" class="text-sm text-retro-muted">Row {{ i }}</p>
+    </div>
+  </PixelScrollArea>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelScrollArea } from '@pxlkit/ui-kit-angular';
+
+const upTo = (count: number) => Array.from({ length: count }, (_, i) => i + 1);
+
+@Component({
+  imports: [PixelScrollArea],
+  template: \`
+    <pxl-scroll-area aria-label="Always-visible scrollbar" type="always" [maxHeight]="140" offsetScrollbars>
+      <div class="space-y-2 p-3">
+        @for (i of items; track i) {
+          <p class="text-sm text-retro-muted">Row {{ i }}</p>
+        }
+      </div>
+    </pxl-scroll-area>
+  \`,
+})
+export class AlwaysVisible {
+  readonly items = upTo(10);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-scrollbar-size">
         <h4>Custom Scrollbar Size</h4>
-        <pre className="docs-code"><code>{`export function CustomScrollbarSize() {
+        <FrameworkCode
+          variant="docs"
+          label={'Custom Scrollbar Size code'}
+          react={`import { PixelScrollArea } from '@pxlkit/ui-kit';
+
+export function CustomScrollbarSize() {
   return (
     <PixelScrollArea
       aria-label="Custom scrollbar size"
@@ -155,7 +269,39 @@ export function Default() {
       </div>
     </PixelScrollArea>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelScrollArea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelScrollArea aria-label="Custom scrollbar size" type="hover" :max-height="140" :scrollbar-size="10">
+    <div class="space-y-2 p-3">
+      <p v-for="i in 10" :key="i" class="text-sm text-retro-muted">Hover row {{ i }}</p>
+    </div>
+  </PixelScrollArea>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelScrollArea } from '@pxlkit/ui-kit-angular';
+
+const upTo = (count: number) => Array.from({ length: count }, (_, i) => i + 1);
+
+@Component({
+  imports: [PixelScrollArea],
+  template: \`
+    <pxl-scroll-area aria-label="Custom scrollbar size" type="hover" [maxHeight]="140" [scrollbarSize]="10">
+      <div class="space-y-2 p-3">
+        @for (i of items; track i) {
+          <p class="text-sm text-retro-muted">Hover row {{ i }}</p>
+        }
+      </div>
+    </pxl-scroll-area>
+  \`,
+})
+export class CustomScrollbarSize {
+  readonly items = upTo(10);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

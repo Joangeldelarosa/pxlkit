@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToastDocsSectionProps {
   className?: string;
@@ -75,9 +76,11 @@ export function PixelToastDocsSection({ className }: PixelToastDocsSectionProps)
     </section>
     <section aria-labelledby="pixel-toast-usage">
       <h3 id="pixel-toast-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelToast } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelToast usage'}
+        react={`import { PixelToast } from '@pxlkit/ui-kit';
 import type { ToastItem } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
 
 const noop = () => {};
 
@@ -92,20 +95,117 @@ const baseToast = (overrides: Partial<ToastItem> = {}): ToastItem => ({
 
 export function Default() {
   return <PixelToast toast={baseToast()} onDismiss={noop} />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-vue';
+
+const toast: ToastItem = {
+  id: 'demo',
+  title: 'Saved',
+  message: 'Your changes have been persisted.',
+  tone: 'cyan',
+  duration: 0,
+};
+</script>
+
+<template>
+  <PixelToast :toast="toast" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToast],
+  template: \`<pxl-toast-card [toast]="toast" />\`,
+})
+export class Default {
+  readonly toast: ToastItem = {
+    id: 'demo',
+    title: 'Saved',
+    message: 'Your changes have been persisted.',
+    tone: 'cyan',
+    duration: 0,
+  };
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelToast } from '@pxlkit/ui-kit';
+import type { ToastItem } from '@pxlkit/ui-kit';
+
+const noop = () => {};
+
+const baseToast = (overrides: Partial<ToastItem> = {}): ToastItem => ({
+  id: 'demo',
+  title: 'Saved',
+  message: 'Your changes have been persisted.',
+  tone: 'cyan',
+  duration: 0,
+  ...overrides,
+});
+
+export function Default() {
   return <PixelToast toast={baseToast()} onDismiss={noop} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-vue';
+
+const toast: ToastItem = {
+  id: 'demo',
+  title: 'Saved',
+  message: 'Your changes have been persisted.',
+  tone: 'cyan',
+  duration: 0,
+};
+</script>
+
+<template>
+  <PixelToast :toast="toast" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToast],
+  template: \`<pxl-toast-card [toast]="toast" />\`,
+})
+export class Default {
+  readonly toast: ToastItem = {
+    id: 'demo',
+    title: 'Saved',
+    message: 'Your changes have been persisted.',
+    tone: 'cyan',
+    duration: 0,
+  };
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelToast } from '@pxlkit/ui-kit';
+import type { ToastItem } from '@pxlkit/ui-kit';
+
+const noop = () => {};
+
+const baseToast = (overrides: Partial<ToastItem> = {}): ToastItem => ({
+  id: 'demo',
+  title: 'Saved',
+  message: 'Your changes have been persisted.',
+  tone: 'cyan',
+  duration: 0,
+  ...overrides,
+});
+
+export function Tones() {
   return (
     <div className="flex flex-col gap-3">
       <PixelToast
@@ -138,11 +238,72 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-vue';
+
+const toasts: ToastItem[] = [
+  { id: 't-neutral', tone: 'neutral', title: 'Heads up', message: 'Neutral notification.', duration: 0 },
+  { id: 't-green', tone: 'green', title: 'Saved', message: 'Changes synced.', duration: 0 },
+  { id: 't-cyan', tone: 'cyan', title: 'Info', message: 'Heads up — new build available.', duration: 0 },
+  { id: 't-gold', tone: 'gold', title: 'Warning', message: 'Storage almost full.', duration: 0 },
+  { id: 't-red', tone: 'red', title: 'Error', message: 'Upload failed.', duration: 0 },
+  { id: 't-purple', tone: 'purple', title: 'Tip', message: 'Press ⌘K to search.', duration: 0 },
+  { id: 't-pink', tone: 'pink', title: 'Unlocked', message: 'You earned a badge.', duration: 0 },
+];
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelToast v-for="toast in toasts" :key="toast.id" :toast="toast" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToast],
+  template: \`
+    <div class="flex flex-col gap-3">
+      @for (toast of toasts; track toast.id) {
+        <pxl-toast-card [toast]="toast" />
+      }
+    </div>
+  \`,
+})
+export class Tones {
+  readonly toasts: ToastItem[] = [
+    { id: 't-neutral', tone: 'neutral', title: 'Heads up', message: 'Neutral notification.', duration: 0 },
+    { id: 't-green', tone: 'green', title: 'Saved', message: 'Changes synced.', duration: 0 },
+    { id: 't-cyan', tone: 'cyan', title: 'Info', message: 'Heads up — new build available.', duration: 0 },
+    { id: 't-gold', tone: 'gold', title: 'Warning', message: 'Storage almost full.', duration: 0 },
+    { id: 't-red', tone: 'red', title: 'Error', message: 'Upload failed.', duration: 0 },
+    { id: 't-purple', tone: 'purple', title: 'Tip', message: 'Press ⌘K to search.', duration: 0 },
+    { id: 't-pink', tone: 'pink', title: 'Unlocked', message: 'You earned a badge.', duration: 0 },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelToast } from '@pxlkit/ui-kit';
+import type { ToastItem } from '@pxlkit/ui-kit';
+
+const noop = () => {};
+
+const baseToast = (overrides: Partial<ToastItem> = {}): ToastItem => ({
+  id: 'demo',
+  title: 'Saved',
+  message: 'Your changes have been persisted.',
+  tone: 'cyan',
+  duration: 0,
+  ...overrides,
+});
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelToast
@@ -157,11 +318,64 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelToast } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelToast
+      surface="linear"
+      :toast="{ id: 't-linear', tone: 'cyan', title: 'Linear surface', message: 'Rounded card.', duration: 0 }"
+    />
+    <PixelToast
+      surface="pixel"
+      :toast="{ id: 't-pixel', tone: 'cyan', title: 'Pixel surface', message: 'Chamfered + HP bar.', duration: 0 }"
+    />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelToast } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToast],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-toast-card
+        surface="linear"
+        [toast]="{ id: 't-linear', tone: 'cyan', title: 'Linear surface', message: 'Rounded card.', duration: 0 }"
+      />
+      <pxl-toast-card
+        surface="pixel"
+        [toast]="{ id: 't-pixel', tone: 'cyan', title: 'Pixel surface', message: 'Chamfered + HP bar.', duration: 0 }"
+      />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-loading">
         <h4>Loading</h4>
-        <pre className="docs-code"><code>{`export function Loading() {
+        <FrameworkCode
+          variant="docs"
+          label={'Loading code'}
+          react={`import { PixelToast } from '@pxlkit/ui-kit';
+import type { ToastItem } from '@pxlkit/ui-kit';
+
+const noop = () => {};
+
+const baseToast = (overrides: Partial<ToastItem> = {}): ToastItem => ({
+  id: 'demo',
+  title: 'Saved',
+  message: 'Your changes have been persisted.',
+  tone: 'cyan',
+  duration: 0,
+  ...overrides,
+});
+
+export function Loading() {
   return (
     <PixelToast
       toast={baseToast({
@@ -174,11 +388,63 @@ export function Default() {
       onDismiss={noop}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-vue';
+
+const toast: ToastItem = {
+  id: 't-loading',
+  tone: 'cyan',
+  title: 'Uploading…',
+  message: 'Hang tight while we sync your files.',
+  loading: true,
+  duration: 0,
+};
+</script>
+
+<template>
+  <PixelToast :toast="toast" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToast],
+  template: \`<pxl-toast-card [toast]="toast" />\`,
+})
+export class Loading {
+  readonly toast: ToastItem = {
+    id: 't-loading',
+    tone: 'cyan',
+    title: 'Uploading…',
+    message: 'Hang tight while we sync your files.',
+    loading: true,
+    duration: 0,
+  };
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-action">
         <h4>With Action</h4>
-        <pre className="docs-code"><code>{`export function WithAction() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Action code'}
+          react={`import { PixelToast } from '@pxlkit/ui-kit';
+import type { ToastItem } from '@pxlkit/ui-kit';
+import { PixelButton } from '@pxlkit/ui-kit';
+
+const noop = () => {};
+
+const baseToast = (overrides: Partial<ToastItem> = {}): ToastItem => ({
+  id: 'demo',
+  title: 'Saved',
+  message: 'Your changes have been persisted.',
+  tone: 'cyan',
+  duration: 0,
+  ...overrides,
+});
+
+export function WithAction() {
   return (
     <PixelToast
       toast={baseToast({
@@ -195,11 +461,79 @@ export function Default() {
       onDismiss={noop}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelButton, PixelToast, type ToastItem } from '@pxlkit/ui-kit-vue';
+
+const toast: ToastItem = {
+  id: 't-action',
+  tone: 'red',
+  title: 'Connection lost',
+  message: 'We could not reach the server.',
+  duration: 0,
+  action: () => h(PixelButton, { size: 'sm', tone: 'red', variant: 'outline' }, () => 'Retry'),
+};
+</script>
+
+<template>
+  <PixelToast :toast="toast" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelToast } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelToast],
+  template: \`
+    <pxl-toast-card
+      [toast]="{
+        id: 't-action',
+        tone: 'red',
+        title: 'Connection lost',
+        message: 'We could not reach the server.',
+        duration: 0,
+        action: retry,
+      }"
+    />
+    <ng-template #retry><button pxlButton size="sm" tone="red" variant="outline">Retry</button></ng-template>
+  \`,
+})
+export class WithAction {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icon">
         <h4>With Icon</h4>
-        <pre className="docs-code"><code>{`export function WithIcon() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Icon code'}
+          react={`import { PixelToast } from '@pxlkit/ui-kit';
+import type { ToastItem } from '@pxlkit/ui-kit';
+
+const noop = () => {};
+
+const baseToast = (overrides: Partial<ToastItem> = {}): ToastItem => ({
+  id: 'demo',
+  title: 'Saved',
+  message: 'Your changes have been persisted.',
+  tone: 'cyan',
+  duration: 0,
+  ...overrides,
+});
+
+const DotIcon = () => (
+  <span
+    aria-hidden
+    style={{
+      width: 10,
+      height: 10,
+      borderRadius: 9999,
+      background: 'currentColor',
+      display: 'inline-block',
+    }}
+  />
+);
+
+export function WithIcon() {
   return (
     <PixelToast
       toast={baseToast({
@@ -212,11 +546,68 @@ export function Default() {
       onDismiss={noop}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-vue';
+
+const toast: ToastItem = {
+  id: 't-icon',
+  tone: 'green',
+  title: 'Deployed',
+  message: 'Build #482 is live.',
+  duration: 0,
+  icon: () =>
+    h('span', {
+      'aria-hidden': 'true',
+      style: { width: '10px', height: '10px', borderRadius: '9999px', background: 'currentColor', display: 'inline-block' },
+    }),
+};
+</script>
+
+<template>
+  <PixelToast :toast="toast" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelToast } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToast],
+  template: \`
+    <pxl-toast-card
+      [toast]="{ id: 't-icon', tone: 'green', title: 'Deployed', message: 'Build #482 is live.', duration: 0, icon: dot }"
+    />
+    <ng-template #dot>
+      <span
+        aria-hidden="true"
+        style="width: 10px; height: 10px; border-radius: 9999px; background: currentColor; display: inline-block"
+      ></span>
+    </ng-template>
+  \`,
+})
+export class WithIcon {}`}
+        />
       </article>
       <article className="docs-example" id="example-assertive">
         <h4>Assertive</h4>
-        <pre className="docs-code"><code>{`export function Assertive() {
+        <FrameworkCode
+          variant="docs"
+          label={'Assertive code'}
+          react={`import { PixelToast } from '@pxlkit/ui-kit';
+import type { ToastItem } from '@pxlkit/ui-kit';
+
+const noop = () => {};
+
+const baseToast = (overrides: Partial<ToastItem> = {}): ToastItem => ({
+  id: 'demo',
+  title: 'Saved',
+  message: 'Your changes have been persisted.',
+  tone: 'cyan',
+  duration: 0,
+  ...overrides,
+});
+
+export function Assertive() {
   return (
     <PixelToast
       toast={baseToast({
@@ -229,11 +620,62 @@ export function Default() {
       onDismiss={noop}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-vue';
+
+const toast: ToastItem = {
+  id: 't-assertive',
+  tone: 'cyan',
+  title: 'Important',
+  message: 'Forced assertive announcement.',
+  assertive: true,
+  duration: 0,
+};
+</script>
+
+<template>
+  <PixelToast :toast="toast" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToast],
+  template: \`<pxl-toast-card [toast]="toast" />\`,
+})
+export class Assertive {
+  readonly toast: ToastItem = {
+    id: 't-assertive',
+    tone: 'cyan',
+    title: 'Important',
+    message: 'Forced assertive announcement.',
+    assertive: true,
+    duration: 0,
+  };
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-progress">
         <h4>Auto-dismiss Progress</h4>
-        <pre className="docs-code"><code>{`export function WithProgress() {
+        <FrameworkCode
+          variant="docs"
+          label={'Auto-dismiss Progress code'}
+          react={`import { PixelToast } from '@pxlkit/ui-kit';
+import type { ToastItem } from '@pxlkit/ui-kit';
+
+const noop = () => {};
+
+const baseToast = (overrides: Partial<ToastItem> = {}): ToastItem => ({
+  id: 'demo',
+  title: 'Saved',
+  message: 'Your changes have been persisted.',
+  tone: 'cyan',
+  duration: 0,
+  ...overrides,
+});
+
+export function WithProgress() {
   return (
     <PixelToast
       toast={baseToast({
@@ -246,7 +688,39 @@ export function Default() {
       onDismiss={noop}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-vue';
+
+const toast: ToastItem = {
+  id: 't-progress',
+  tone: 'green',
+  title: 'Auto-dismiss',
+  message: 'Hover to pause the countdown bar.',
+  duration: 4500,
+};
+</script>
+
+<template>
+  <PixelToast :toast="toast" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelToast, type ToastItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToast],
+  template: \`<pxl-toast-card [toast]="toast" />\`,
+})
+export class WithProgress {
+  readonly toast: ToastItem = {
+    id: 't-progress',
+    tone: 'green',
+    title: 'Auto-dismiss',
+    message: 'Hover to pause the countdown bar.',
+    duration: 4500,
+  };
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

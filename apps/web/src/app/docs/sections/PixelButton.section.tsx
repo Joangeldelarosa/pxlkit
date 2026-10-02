@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelButtonDocsSectionProps {
   className?: string;
@@ -70,24 +71,68 @@ export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProp
     </section>
     <section aria-labelledby="pixel-button-usage">
       <h3 id="pixel-button-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelButton } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelButton usage'}
+        react={`import { PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelButton>Click me</PixelButton>;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelButton>Click me</PixelButton>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`<button pxlButton>Click me</button>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelButton>Click me</PixelButton>;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelButton>Click me</PixelButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`<button pxlButton>Click me</button>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton tone="green">Green</PixelButton>
@@ -99,11 +144,50 @@ export function Default() {
       <PixelButton tone="neutral">Neutral</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton tone="green">Green</PixelButton>
+    <PixelButton tone="cyan">Cyan</PixelButton>
+    <PixelButton tone="gold">Gold</PixelButton>
+    <PixelButton tone="red">Red</PixelButton>
+    <PixelButton tone="purple">Purple</PixelButton>
+    <PixelButton tone="pink">Pink</PixelButton>
+    <PixelButton tone="neutral">Neutral</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton tone="green">Green</button>
+      <button pxlButton tone="cyan">Cyan</button>
+      <button pxlButton tone="gold">Gold</button>
+      <button pxlButton tone="red">Red</button>
+      <button pxlButton tone="purple">Purple</button>
+      <button pxlButton tone="pink">Pink</button>
+      <button pxlButton tone="neutral">Neutral</button>
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PixelButton size="sm">Small</PixelButton>
@@ -111,11 +195,42 @@ export function Default() {
       <PixelButton size="lg">Large</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <PixelButton size="sm">Small</PixelButton>
+    <PixelButton size="md">Medium</PixelButton>
+    <PixelButton size="lg">Large</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap items-center gap-2">
+      <button pxlButton size="sm">Small</button>
+      <button pxlButton size="md">Medium</button>
+      <button pxlButton size="lg">Large</button>
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-variants">
         <h4>Variants</h4>
-        <pre className="docs-code"><code>{`export function Variants() {
+        <FrameworkCode
+          variant="docs"
+          label={'Variants code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Variants() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton variant="solid">Solid</PixelButton>
@@ -124,22 +239,88 @@ export function Default() {
       <PixelButton variant="ghost">Ghost</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton variant="solid">Solid</PixelButton>
+    <PixelButton variant="soft">Soft</PixelButton>
+    <PixelButton variant="outline">Outline</PixelButton>
+    <PixelButton variant="ghost">Ghost</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton variant="solid">Solid</button>
+      <button pxlButton variant="soft">Soft</button>
+      <button pxlButton variant="outline">Outline</button>
+      <button pxlButton variant="ghost">Ghost</button>
+    </div>
+  \`,
+})
+export class Variants {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton surface="pixel">Pixel</PixelButton>
       <PixelButton surface="linear">Linear</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton surface="pixel">Pixel</PixelButton>
+    <PixelButton surface="linear">Linear</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton surface="pixel">Pixel</button>
+      <button pxlButton surface="linear">Linear</button>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icons">
         <h4>With icons</h4>
-        <pre className="docs-code"><code>{`export function WithIcons() {
+        <FrameworkCode
+          variant="docs"
+          label={'With icons code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+const Arrow = () => (
+  <span aria-hidden className="inline-block h-3.5 w-3.5">→</span>
+);
+
+export function WithIcons() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton iconLeft={<Arrow />}>Leading</PixelButton>
@@ -147,43 +328,170 @@ export function Default() {
       <PixelButton iconLeft={<Arrow />} iconRight={<Arrow />}>Both</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton>
+      <template #icon-left><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+      Leading
+    </PixelButton>
+    <PixelButton>
+      Trailing
+      <template #icon-right><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+    </PixelButton>
+    <PixelButton>
+      <template #icon-left><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+      Both
+      <template #icon-right><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+    </PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton [iconLeft]="arrow">Leading</button>
+      <button pxlButton [iconRight]="arrow">Trailing</button>
+      <button pxlButton [iconLeft]="arrow" [iconRight]="arrow">Both</button>
+    </div>
+    <ng-template #arrow><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></ng-template>
+  \`,
+})
+export class WithIcons {}`}
+        />
       </article>
       <article className="docs-example" id="example-loading">
         <h4>Loading</h4>
-        <pre className="docs-code"><code>{`export function Loading() {
+        <FrameworkCode
+          variant="docs"
+          label={'Loading code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Loading() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton loading>Saving</PixelButton>
       <PixelButton loading tone="cyan" variant="outline">Loading</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton loading>Saving</PixelButton>
+    <PixelButton loading tone="cyan" variant="outline">Loading</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton loading>Saving</button>
+      <button pxlButton loading tone="cyan" variant="outline">Loading</button>
+    </div>
+  \`,
+})
+export class Loading {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelButton disabled>Disabled</PixelButton>
       <PixelButton disabled variant="outline">Disabled outline</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton disabled>Disabled</PixelButton>
+    <PixelButton disabled variant="outline">Disabled outline</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton disabled>Disabled</button>
+      <button pxlButton disabled variant="outline">Disabled outline</button>
+    </div>
+  \`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-full-width">
         <h4>Full width</h4>
-        <pre className="docs-code"><code>{`export function FullWidth() {
+        <FrameworkCode
+          variant="docs"
+          label={'Full width code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function FullWidth() {
   return (
     <div className="w-full max-w-sm">
       <PixelButton fullWidth>Full width</PixelButton>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="w-full max-w-sm">
+    <PixelButton full-width>Full width</PixelButton>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <div class="w-full max-w-sm">
+      <button pxlButton fullWidth>Full width</button>
+    </div>
+  \`,
+})
+export class FullWidth {}`}
+        />
       </article>
       <article className="docs-example" id="example-as-child">
         <h4>As child (link)</h4>
-        <pre className="docs-code"><code>{`export function AsChild() {
+        <FrameworkCode
+          variant="docs"
+          label={'As child (link) code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+
+export function AsChild() {
   return (
     <PixelButton asChild tone="cyan">
       <a href="https://pxlkit.dev" target="_blank" rel="noreferrer">
@@ -191,7 +499,27 @@ export function Default() {
       </a>
     </PixelButton>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelButton as-child tone="cyan">
+    <a href="https://pxlkit.dev" target="_blank" rel="noreferrer">External link</a>
+  </PixelButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton],
+  template: \`
+    <a pxlButton tone="cyan" href="https://pxlkit.dev" target="_blank" rel="noreferrer">External link</a>
+  \`,
+})
+export class AsChild {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

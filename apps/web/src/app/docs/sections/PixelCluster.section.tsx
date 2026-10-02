@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelClusterDocsSectionProps {
   className?: string;
@@ -47,7 +48,10 @@ export function PixelClusterDocsSection({ className }: PixelClusterDocsSectionPr
     </section>
     <section aria-labelledby="pixel-cluster-usage">
       <h3 id="pixel-cluster-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCluster usage'}
+        react={`import React from 'react';
 import { PixelCluster } from '@pxlkit/ui-kit';
 
 function Chip({ children }: { children: React.ReactNode }) {
@@ -68,14 +72,57 @@ export function Default() {
       <Chip>vite</Chip>
     </PixelCluster>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelCluster } from '@pxlkit/ui-kit-vue';
+
+const tags = ['react', 'typescript', 'tailwind', 'next', 'vite'];
+</script>
+
+<template>
+  <PixelCluster>
+    <span v-for="tag in tags" :key="tag" class="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">
+      {{ tag }}
+    </span>
+  </PixelCluster>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelCluster } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCluster],
+  template: \`
+    <div pxlCluster>
+      @for (tag of tags; track tag) {
+        <span class="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">{{ tag }}</span>
+      }
+    </div>
+  \`,
+})
+export class Default {
+  readonly tags = ['react', 'typescript', 'tailwind', 'next', 'vite'];
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React from 'react';
+import { PixelCluster } from '@pxlkit/ui-kit';
+
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">
+      {children}
+    </span>
+  );
+}
+
+export function Default() {
   return (
     <PixelCluster>
       <Chip>react</Chip>
@@ -85,11 +132,55 @@ export function Default() {
       <Chip>vite</Chip>
     </PixelCluster>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCluster } from '@pxlkit/ui-kit-vue';
+
+const tags = ['react', 'typescript', 'tailwind', 'next', 'vite'];
+</script>
+
+<template>
+  <PixelCluster>
+    <span v-for="tag in tags" :key="tag" class="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">
+      {{ tag }}
+    </span>
+  </PixelCluster>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCluster } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCluster],
+  template: \`
+    <div pxlCluster>
+      @for (tag of tags; track tag) {
+        <span class="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">{{ tag }}</span>
+      }
+    </div>
+  \`,
+})
+export class Default {
+  readonly tags = ['react', 'typescript', 'tailwind', 'next', 'vite'];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-justified">
         <h4>Justified</h4>
-        <pre className="docs-code"><code>{`export function Justified() {
+        <FrameworkCode
+          variant="docs"
+          label={'Justified code'}
+          react={`import React from 'react';
+import { PixelCluster } from '@pxlkit/ui-kit';
+
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">
+      {children}
+    </span>
+  );
+}
+
+export function Justified() {
   return (
     <PixelCluster justify="between" gap={6}>
       <Chip>left</Chip>
@@ -97,11 +188,55 @@ export function Default() {
       <Chip>right</Chip>
     </PixelCluster>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCluster } from '@pxlkit/ui-kit-vue';
+
+const tags = ['left', 'middle', 'right'];
+</script>
+
+<template>
+  <PixelCluster justify="between" :gap="6">
+    <span v-for="tag in tags" :key="tag" class="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">
+      {{ tag }}
+    </span>
+  </PixelCluster>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCluster } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCluster],
+  template: \`
+    <div pxlCluster justify="between" [gap]="6">
+      @for (tag of tags; track tag) {
+        <span class="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">{{ tag }}</span>
+      }
+    </div>
+  \`,
+})
+export class Justified {
+  readonly tags = ['left', 'middle', 'right'];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
         <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import React from 'react';
+import { PixelCluster } from '@pxlkit/ui-kit';
+
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">
+      {children}
+    </span>
+  );
+}
+
+export function PixelSurface() {
   return (
     <PixelCluster surface="pixel" gap={3}>
       <Chip>alpha</Chip>
@@ -109,7 +244,37 @@ export function Default() {
       <Chip>gamma</Chip>
     </PixelCluster>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCluster } from '@pxlkit/ui-kit-vue';
+
+const tags = ['alpha', 'beta', 'gamma'];
+</script>
+
+<template>
+  <PixelCluster surface="pixel" :gap="3">
+    <span v-for="tag in tags" :key="tag" class="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">
+      {{ tag }}
+    </span>
+  </PixelCluster>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCluster } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCluster],
+  template: \`
+    <div pxlCluster surface="pixel" [gap]="3">
+      @for (tag of tags; track tag) {
+        <span class="rounded border border-retro-border px-2 py-1 text-xs text-retro-text">{{ tag }}</span>
+      }
+    </div>
+  \`,
+})
+export class PixelSurface {
+  readonly tags = ['alpha', 'beta', 'gamma'];
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

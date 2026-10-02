@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCarouselDocsSectionProps {
   className?: string;
@@ -85,7 +86,10 @@ export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSection
     </section>
     <section aria-labelledby="pixel-carousel-usage">
       <h3 id="pixel-carousel-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelCarousel } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCarousel usage'}
+        react={`import { PixelCarousel } from '@pxlkit/ui-kit';
 
 function Slide({ label, tone }: { label: string; tone: string }) {
   return (
@@ -112,14 +116,30 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function Default() {
   return (
     <PixelCarousel aria-label="Featured items">
       <PixelCarousel.Item>
@@ -133,11 +153,28 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-dots">
         <h4>With dots</h4>
-        <pre className="docs-code"><code>{`export function WithDots() {
+        <FrameworkCode
+          variant="docs"
+          label={'With dots code'}
+          react={`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function WithDots() {
   return (
     <PixelCarousel aria-label="Featured items with dots" showDots>
       <PixelCarousel.Item>
@@ -151,11 +188,28 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-looping">
         <h4>Looping</h4>
-        <pre className="docs-code"><code>{`export function Looping() {
+        <FrameworkCode
+          variant="docs"
+          label={'Looping code'}
+          react={`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function Looping() {
   return (
     <PixelCarousel aria-label="Looping carousel" opts={{ loop: true }} showDots>
       <PixelCarousel.Item>
@@ -169,11 +223,28 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-vertical">
         <h4>Vertical</h4>
-        <pre className="docs-code"><code>{`export function Vertical() {
+        <FrameworkCode
+          variant="docs"
+          label={'Vertical code'}
+          react={`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function Vertical() {
   return (
     <div style={{ height: 240 }}>
       <PixelCarousel aria-label="Vertical carousel" orientation="vertical" showDots>
@@ -189,11 +260,28 @@ export function Default() {
       </PixelCarousel>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-linear-surface">
         <h4>Linear surface</h4>
-        <pre className="docs-code"><code>{`export function LinearSurface() {
+        <FrameworkCode
+          variant="docs"
+          label={'Linear surface code'}
+          react={`import { PixelCarousel } from '@pxlkit/ui-kit';
+
+function Slide({ label, tone }: { label: string; tone: string }) {
+  return (
+    <div
+      className="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text"
+      style={{ background: tone }}
+    >
+      <span className="text-xs">{label}</span>
+    </div>
+  );
+}
+
+export function LinearSurface() {
   return (
     <PixelCarousel aria-label="Linear surface carousel" surface="linear" showDots>
       <PixelCarousel.Item>
@@ -204,7 +292,8 @@ export function Default() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

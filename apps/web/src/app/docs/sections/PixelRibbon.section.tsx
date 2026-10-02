@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelRibbonDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelRibbonDocsSection({ className }: PixelRibbonDocsSectionProp
     </section>
     <section aria-labelledby="pixel-ribbon-usage">
       <h3 id="pixel-ribbon-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelRibbon usage'}
+        react={`import React from 'react';
 import { PixelRibbon } from '@pxlkit/ui-kit';
 
 function Container({ children }: { children: React.ReactNode }) {
@@ -66,24 +70,55 @@ export function Default() {
       <PixelRibbon>New</PixelRibbon>
     </Container>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React from 'react';
+import { PixelRibbon } from '@pxlkit/ui-kit';
+
+function Container({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      {children}
+    </div>
+  );
+}
+
+export function Default() {
   return (
     <Container>
       <PixelRibbon>New</PixelRibbon>
     </Container>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-corner-tilted">
         <h4>Corner tilted</h4>
-        <pre className="docs-code"><code>{`export function CornerTilted() {
+        <FrameworkCode
+          variant="docs"
+          label={'Corner tilted code'}
+          react={`import React from 'react';
+import { PixelRibbon } from '@pxlkit/ui-kit';
+
+function Container({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      {children}
+    </div>
+  );
+}
+
+export function CornerTilted() {
   return (
     <Container>
       <PixelRibbon position="corner-tr" tone="red">
@@ -91,11 +126,27 @@ export function Default() {
       </PixelRibbon>
     </Container>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import React from 'react';
+import { PixelRibbon } from '@pxlkit/ui-kit';
+
+function Container({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      {children}
+    </div>
+  );
+}
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-6">
       <Container>
@@ -109,11 +160,27 @@ export function Default() {
       </Container>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-position-left">
         <h4>Position left</h4>
-        <pre className="docs-code"><code>{`export function PositionLeft() {
+        <FrameworkCode
+          variant="docs"
+          label={'Position left code'}
+          react={`import React from 'react';
+import { PixelRibbon } from '@pxlkit/ui-kit';
+
+function Container({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      {children}
+    </div>
+  );
+}
+
+export function PositionLeft() {
   return (
     <Container>
       <PixelRibbon position="top-left" offset="lg" tone="gold">
@@ -121,7 +188,8 @@ export function Default() {
       </PixelRibbon>
     </Container>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

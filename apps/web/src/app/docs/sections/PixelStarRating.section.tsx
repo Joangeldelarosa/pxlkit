@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStarRatingDocsSectionProps {
   className?: string;
@@ -71,45 +72,78 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
     </section>
     <section aria-labelledby="pixel-star-rating-usage">
       <h3 id="pixel-star-rating-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PxlKitIcon } from '@pxlkit/core';
-import { Heart } from '@pxlkit/gamification';
-import { PixelStarRating } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelStarRating usage'}
+        react={`import { PixelStarRating } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelStarRating value={4} />;
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelStarRating value={4} />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-count">
         <h4>With Count</h4>
-        <pre className="docs-code"><code>{`export function WithCount() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Count code'}
+          react={`import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function WithCount() {
   return <PixelStarRating value={3} max={5} showCount />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-green-tone">
         <h4>Green Tone (Large)</h4>
-        <pre className="docs-code"><code>{`export function GreenTone() {
+        <FrameworkCode
+          variant="docs"
+          label={'Green Tone (Large) code'}
+          react={`import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function GreenTone() {
   return <PixelStarRating value={5} tone="green" size="lg" />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-interactive">
         <h4>Interactive</h4>
-        <pre className="docs-code"><code>{`export function Interactive() {
+        <FrameworkCode
+          variant="docs"
+          label={'Interactive code'}
+          react={`import React from 'react';
+import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function Interactive() {
   const [rating, setRating] = React.useState(3);
   return <PixelStarRating value={rating} interactive onChange={setRating} />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-icon">
         <h4>Custom Icon (Heart)</h4>
-        <pre className="docs-code"><code>{`export function CustomIcon() {
+        <FrameworkCode
+          variant="docs"
+          label={'Custom Icon (Heart) code'}
+          react={`import { PxlKitIcon } from '@pxlkit/core';
+import { Heart } from '@pxlkit/gamification';
+import { PixelStarRating } from '@pxlkit/ui-kit';
+
+export function CustomIcon() {
   return (
     <PixelStarRating
       value={3}
@@ -118,7 +152,8 @@ export function Default() {
       }
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     </section>

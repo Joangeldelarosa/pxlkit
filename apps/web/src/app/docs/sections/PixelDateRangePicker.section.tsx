@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDateRangePickerDocsSectionProps {
   className?: string;
@@ -113,7 +114,10 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
     </section>
     <section aria-labelledby="pixel-date-range-picker-usage">
       <h3 id="pixel-date-range-picker-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelDateRangePicker usage'}
+        react={`import { useState } from 'react';
 import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -126,14 +130,20 @@ export function Default() {
       placeholder="Select date range"
     />
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [range, setRange] = useState<DateRangeValue>({});
   return (
     <PixelDateRangePicker
@@ -143,11 +153,18 @@ export function Default() {
       placeholder="Select date range"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-presets">
         <h4>With Presets</h4>
-        <pre className="docs-code"><code>{`export function WithPresets() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Presets code'}
+          react={`import { useState } from 'react';
+import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
+
+export function WithPresets() {
   const [range, setRange] = useState<DateRangeValue>({});
   const today = new Date();
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -167,11 +184,18 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-single-month">
         <h4>Single Month</h4>
-        <pre className="docs-code"><code>{`export function SingleMonth() {
+        <FrameworkCode
+          variant="docs"
+          label={'Single Month code'}
+          react={`import { useState } from 'react';
+import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
+
+export function SingleMonth() {
   const [range, setRange] = useState<DateRangeValue>({});
   return (
     <PixelDateRangePicker
@@ -183,7 +207,8 @@ export function Default() {
       clearable
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

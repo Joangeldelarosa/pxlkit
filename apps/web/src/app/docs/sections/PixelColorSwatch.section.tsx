@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelColorSwatchDocsSectionProps {
   className?: string;
@@ -47,24 +48,68 @@ export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsS
     </section>
     <section aria-labelledby="pixel-color-swatch-usage">
       <h3 id="pixel-color-swatch-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelColorSwatch usage'}
+        react={`import { PixelColorSwatch } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorSwatch],
+  template: \`<pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorSwatch],
+  template: \`<pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-palette">
         <h4>Palette</h4>
-        <pre className="docs-code"><code>{`export function Palette() {
+        <FrameworkCode
+          variant="docs"
+          label={'Palette code'}
+          react={`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+
+export function Palette() {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl">
       <PixelColorSwatch name="green" cssVar="--color-retro-green" />
@@ -75,22 +120,88 @@ export function Default() {
       <PixelColorSwatch name="pink" cssVar="--color-retro-pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl">
+    <PixelColorSwatch name="green" css-var="--color-retro-green" />
+    <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" />
+    <PixelColorSwatch name="gold" css-var="--color-retro-gold" />
+    <PixelColorSwatch name="purple" css-var="--color-retro-purple" />
+    <PixelColorSwatch name="red" css-var="--color-retro-red" />
+    <PixelColorSwatch name="pink" css-var="--color-retro-pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorSwatch],
+  template: \`
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl">
+      <pxl-color-swatch name="green" cssVar="--color-retro-green" />
+      <pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" />
+      <pxl-color-swatch name="gold" cssVar="--color-retro-gold" />
+      <pxl-color-swatch name="purple" cssVar="--color-retro-purple" />
+      <pxl-color-swatch name="red" cssVar="--color-retro-red" />
+      <pxl-color-swatch name="pink" cssVar="--color-retro-pink" />
+    </div>
+  \`,
+})
+export class Palette {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-4">
       <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" surface="pixel" />
       <PixelColorSwatch name="cyan" cssVar="--color-retro-cyan" surface="linear" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-4">
+    <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" surface="pixel" />
+    <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorSwatch],
+  template: \`
+    <div class="flex flex-col gap-4">
+      <pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" surface="pixel" />
+      <pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" surface="linear" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-surface-tokens">
         <h4>Surface Tokens</h4>
-        <pre className="docs-code"><code>{`export function SurfaceTokens() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surface Tokens code'}
+          react={`import { PixelColorSwatch } from '@pxlkit/ui-kit';
+
+export function SurfaceTokens() {
   return (
     <div className="grid grid-cols-2 gap-3 max-w-md">
       <PixelColorSwatch name="surface" cssVar="--color-retro-surface" />
@@ -99,7 +210,35 @@ export function Default() {
       <PixelColorSwatch name="muted" cssVar="--color-retro-muted" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3 max-w-md">
+    <PixelColorSwatch name="surface" css-var="--color-retro-surface" />
+    <PixelColorSwatch name="border" css-var="--color-retro-border" />
+    <PixelColorSwatch name="text" css-var="--color-retro-text" />
+    <PixelColorSwatch name="muted" css-var="--color-retro-muted" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorSwatch],
+  template: \`
+    <div class="grid grid-cols-2 gap-3 max-w-md">
+      <pxl-color-swatch name="surface" cssVar="--color-retro-surface" />
+      <pxl-color-swatch name="border" cssVar="--color-retro-border" />
+      <pxl-color-swatch name="text" cssVar="--color-retro-text" />
+      <pxl-color-swatch name="muted" cssVar="--color-retro-muted" />
+    </div>
+  \`,
+})
+export class SurfaceTokens {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

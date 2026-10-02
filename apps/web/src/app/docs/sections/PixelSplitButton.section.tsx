@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSplitButtonDocsSectionProps {
   className?: string;
@@ -74,7 +75,10 @@ export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsS
     </section>
     <section aria-labelledby="pixel-split-button-usage">
       <h3 id="pixel-split-button-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSplitButton } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSplitButton usage'}
+        react={`import { PixelSplitButton } from '@pxlkit/ui-kit';
 
 const exportOptions = [
   { value: 'png', label: 'Export as PNG' },
@@ -91,14 +95,25 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSplitButton } from '@pxlkit/ui-kit';
+
+const exportOptions = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+
+export function Default() {
   return (
     <PixelSplitButton
       label="Export"
@@ -107,11 +122,23 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelSplitButton } from '@pxlkit/ui-kit';
+
+const exportOptions = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-3">
       <PixelSplitButton label="Green" tone="green" options={exportOptions} />
@@ -123,22 +150,46 @@ export function Default() {
       <PixelSplitButton label="Neutral" tone="neutral" options={exportOptions} />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelSplitButton } from '@pxlkit/ui-kit';
+
+const exportOptions = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap gap-3">
       <PixelSplitButton label="Pixel" surface="pixel" options={exportOptions} />
       <PixelSplitButton label="Linear" surface="linear" options={exportOptions} />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelSplitButton } from '@pxlkit/ui-kit';
+
+const exportOptions = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+
+export function Disabled() {
   return (
     <PixelSplitButton
       label="Export"
@@ -146,11 +197,18 @@ export function Default() {
       disabled
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-callbacks">
         <h4>With Callbacks</h4>
-        <pre className="docs-code"><code>{`export function WithCallbacks() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Callbacks code'}
+          react={`import React from 'react';
+import { PixelSplitButton } from '@pxlkit/ui-kit';
+
+export function WithCallbacks() {
   const [last, setLast] = React.useState<string>('—');
   return (
     <div className="flex flex-col items-start gap-2">
@@ -168,7 +226,8 @@ export function Default() {
       <span className="text-xs text-retro-muted">last action: {last}</span>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

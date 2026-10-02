@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTextLinkDocsSectionProps {
   className?: string;
@@ -76,24 +77,68 @@ export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSection
     </section>
     <section aria-labelledby="pixel-text-link-usage">
       <h3 id="pixel-text-link-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelTextLink } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTextLink usage'}
+        react={`import { PixelTextLink } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelTextLink } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelTextLink } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextLink],
+  template: \`<a pxlTextLink href="https://pxlkit.dev">Read the docs</a>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTextLink } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextLink } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextLink } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextLink],
+  template: \`<a pxlTextLink href="https://pxlkit.dev">Read the docs</a>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelTextLink } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-4">
       <PixelTextLink href="#" tone="cyan">Cyan link</PixelTextLink>
@@ -105,32 +150,129 @@ export function Default() {
       <PixelTextLink href="#" tone="neutral">Neutral link</PixelTextLink>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextLink } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-4">
+    <PixelTextLink href="#" tone="cyan">Cyan link</PixelTextLink>
+    <PixelTextLink href="#" tone="green">Green link</PixelTextLink>
+    <PixelTextLink href="#" tone="gold">Gold link</PixelTextLink>
+    <PixelTextLink href="#" tone="red">Red link</PixelTextLink>
+    <PixelTextLink href="#" tone="purple">Purple link</PixelTextLink>
+    <PixelTextLink href="#" tone="pink">Pink link</PixelTextLink>
+    <PixelTextLink href="#" tone="neutral">Neutral link</PixelTextLink>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextLink } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextLink],
+  template: \`
+    <div class="flex flex-wrap gap-4">
+      <a pxlTextLink href="#" tone="cyan">Cyan link</a>
+      <a pxlTextLink href="#" tone="green">Green link</a>
+      <a pxlTextLink href="#" tone="gold">Gold link</a>
+      <a pxlTextLink href="#" tone="red">Red link</a>
+      <a pxlTextLink href="#" tone="purple">Purple link</a>
+      <a pxlTextLink href="#" tone="pink">Pink link</a>
+      <a pxlTextLink href="#" tone="neutral">Neutral link</a>
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-as-button">
         <h4>As button</h4>
-        <pre className="docs-code"><code>{`export function AsButton() {
+        <FrameworkCode
+          variant="docs"
+          label={'As button code'}
+          react={`import { PixelTextLink } from '@pxlkit/ui-kit';
+
+export function AsButton() {
   return (
     <PixelTextLink tone="cyan" onClick={() => console.log('clicked')}>
       Trigger an action
     </PixelTextLink>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextLink } from '@pxlkit/ui-kit-vue';
+
+function onClick() {
+  console.log('clicked');
+}
+</script>
+
+<template>
+  <PixelTextLink tone="cyan" @click="onClick">Trigger an action</PixelTextLink>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextLink } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextLink],
+  template: \`<button pxlTextLink tone="cyan" (click)="onClick()">Trigger an action</button>\`,
+})
+export class AsButton {
+  onClick(): void {
+    console.log('clicked');
+  }
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelTextLink } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelTextLink href="#" surface="pixel">Pixel surface</PixelTextLink>
       <PixelTextLink href="#" surface="linear">Linear surface</PixelTextLink>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextLink } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelTextLink href="#" surface="pixel">Pixel surface</PixelTextLink>
+    <PixelTextLink href="#" surface="linear">Linear surface</PixelTextLink>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextLink } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextLink],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <a pxlTextLink href="#" surface="pixel">Pixel surface</a>
+      <a pxlTextLink href="#" surface="linear">Linear surface</a>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-external-link">
         <h4>External link</h4>
-        <pre className="docs-code"><code>{`export function ExternalLink() {
+        <FrameworkCode
+          variant="docs"
+          label={'External link code'}
+          react={`import { PixelTextLink } from '@pxlkit/ui-kit';
+
+export function ExternalLink() {
   return (
     <PixelTextLink
       href="https://pxlkit.dev"
@@ -140,11 +282,32 @@ export function Default() {
       Open in new tab
     </PixelTextLink>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextLink } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTextLink href="https://pxlkit.dev" target="_blank" rel="noopener noreferrer">Open in new tab</PixelTextLink>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextLink } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextLink],
+  template: \`<a pxlTextLink href="https://pxlkit.dev" target="_blank" rel="noopener noreferrer">Open in new tab</a>\`,
+})
+export class ExternalLink {}`}
+        />
       </article>
       <article className="docs-example" id="example-inline-in-prose">
         <h4>Inline in prose</h4>
-        <pre className="docs-code"><code>{`export function InlineInProse() {
+        <FrameworkCode
+          variant="docs"
+          label={'Inline in prose code'}
+          react={`import { PixelTextLink } from '@pxlkit/ui-kit';
+
+export function InlineInProse() {
   return (
     <p className="max-w-md">
       Built with{' '}
@@ -154,7 +317,31 @@ export function Default() {
       , a tone-coloured component library for retro interfaces.
     </p>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextLink } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <p class="max-w-md">
+    Built with <PixelTextLink href="https://pxlkit.dev" tone="green">pxlkit</PixelTextLink>, a tone-coloured component
+    library for retro interfaces.
+  </p>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextLink } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextLink],
+  template: \`
+    <p class="max-w-md">
+      Built with <a pxlTextLink href="https://pxlkit.dev" tone="green">pxlkit</a>, a tone-coloured component library for
+      retro interfaces.
+    </p>
+  \`,
+})
+export class InlineInProse {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

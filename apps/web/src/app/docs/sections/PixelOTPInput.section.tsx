@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelOTPInputDocsSectionProps {
   className?: string;
@@ -93,27 +94,43 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
     </section>
     <section aria-labelledby="pixel-otp-input-usage">
       <h3 id="pixel-otp-input-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react'
-import { PixelOTPInput } from '@pxlkit/ui-kit'
+      <FrameworkCode
+        variant="docs"
+        label={'PixelOTPInput usage'}
+        react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [value, setValue] = React.useState('')
   return <PixelOTPInput length={6} value={value} onChange={setValue} />
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = React.useState('')
   return <PixelOTPInput length={6} value={value} onChange={setValue} />
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-numeric-4">
         <h4>4-digit Numeric</h4>
-        <pre className="docs-code"><code>{`export function Numeric4() {
+        <FrameworkCode
+          variant="docs"
+          label={'4-digit Numeric code'}
+          react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
+
+export function Numeric4() {
   const [value, setValue] = React.useState('')
   return (
     <PixelOTPInput
@@ -123,11 +140,18 @@ export function Default() {
       onChange={setValue}
     />
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-alphanumeric">
         <h4>Alphanumeric</h4>
-        <pre className="docs-code"><code>{`export function Alphanumeric() {
+        <FrameworkCode
+          variant="docs"
+          label={'Alphanumeric code'}
+          react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
+
+export function Alphanumeric() {
   const [value, setValue] = React.useState('')
   return (
     <PixelOTPInput
@@ -137,11 +161,18 @@ export function Default() {
       onChange={setValue}
     />
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-masked">
         <h4>Masked</h4>
-        <pre className="docs-code"><code>{`export function Masked() {
+        <FrameworkCode
+          variant="docs"
+          label={'Masked code'}
+          react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
+
+export function Masked() {
   const [value, setValue] = React.useState('')
   return (
     <PixelOTPInput
@@ -151,11 +182,18 @@ export function Default() {
       onChange={setValue}
     />
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-separator">
         <h4>With Separator</h4>
-        <pre className="docs-code"><code>{`export function WithSeparator() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Separator code'}
+          react={`import React from 'react';
+import { PixelOTPInput } from '@pxlkit/ui-kit';
+
+export function WithSeparator() {
   const [value, setValue] = React.useState('')
   return (
     <PixelOTPInput
@@ -165,7 +203,8 @@ export function Default() {
       onChange={setValue}
     />
   )
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

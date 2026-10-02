@@ -32,6 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   port and compares a canonical DOM — on mount, on the server and after every step of
   scripted interactions, focus and scroll lock included. The porting rules are in
   `docs/ui-kit-porting.md` (ADR-0006).
+- **React, Vue and Angular code on the site.** The component reference (`/docs`) shows
+  each example's code, and the usage lead, in every framework whose kit implements the
+  component, as tabs that remember the reader's pick across the site; the generated
+  sections of `/ui-kit` do the same. Each snippet is self-contained: the example with the
+  imports and helpers it uses.
 - **`@pxlkit/core/vanilla` and the shared rendering engine.** A React-free entry point
   exports the icon data model, every utility and the engine the three frameworks build on:
   `renderIconSvg` / `renderIconDataUri`, `createAnimatedIconPlayer`,
@@ -125,6 +130,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   variables that were never defined (`--color-retro-border-base`, `--color-retro-green-base`).
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
+- Site: the component reference lists every manifest example. Five whose ids did not
+  spell their export's name — four of `PixelInput`'s and `PixelBreadcrumb`'s
+  `with-onclick` — were left out.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined
   `--font-mono`, so monospace text fell back to the system stack although the kit's
   fonts URL loads JetBrains Mono.

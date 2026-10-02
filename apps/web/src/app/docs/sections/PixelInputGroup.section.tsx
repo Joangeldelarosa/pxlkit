@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelInputGroupDocsSectionProps {
   className?: string;
@@ -65,7 +66,10 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
     </section>
     <section aria-labelledby="pixel-input-group-usage">
       <h3 id="pixel-input-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelInputGroup } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelInputGroup usage'}
+        react={`import { PixelInputGroup } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -75,14 +79,44 @@ export function Default() {
       <input aria-label="Top-level domain" defaultValue=".xyz" className="bg-transparent px-2 outline-none" />
     </PixelInputGroup>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelInputGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInputGroup aria-label="Website URL">
+    <input aria-label="Protocol" value="https://" class="bg-transparent px-2 outline-none" />
+    <input aria-label="Domain name" value="pxlkit" class="bg-transparent px-2 outline-none" />
+    <input aria-label="Top-level domain" value=".xyz" class="bg-transparent px-2 outline-none" />
+  </PixelInputGroup>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInputGroup, PixelInputGroupItem],
+  template: \`
+    <pxl-input-group aria-label="Website URL">
+      <input pxlInputGroupItem aria-label="Protocol" value="https://" class="bg-transparent px-2 outline-none" />
+      <input pxlInputGroupItem aria-label="Domain name" value="pxlkit" class="bg-transparent px-2 outline-none" />
+      <input pxlInputGroupItem aria-label="Top-level domain" value=".xyz" class="bg-transparent px-2 outline-none" />
+    </pxl-input-group>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelInputGroup } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelInputGroup aria-label="Website URL">
       <input aria-label="Protocol" defaultValue="https://" className="bg-transparent px-2 outline-none" />
@@ -90,11 +124,42 @@ export function Default() {
       <input aria-label="Top-level domain" defaultValue=".xyz" className="bg-transparent px-2 outline-none" />
     </PixelInputGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInputGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInputGroup aria-label="Website URL">
+    <input aria-label="Protocol" value="https://" class="bg-transparent px-2 outline-none" />
+    <input aria-label="Domain name" value="pxlkit" class="bg-transparent px-2 outline-none" />
+    <input aria-label="Top-level domain" value=".xyz" class="bg-transparent px-2 outline-none" />
+  </PixelInputGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInputGroup, PixelInputGroupItem],
+  template: \`
+    <pxl-input-group aria-label="Website URL">
+      <input pxlInputGroupItem aria-label="Protocol" value="https://" class="bg-transparent px-2 outline-none" />
+      <input pxlInputGroupItem aria-label="Domain name" value="pxlkit" class="bg-transparent px-2 outline-none" />
+      <input pxlInputGroupItem aria-label="Top-level domain" value=".xyz" class="bg-transparent px-2 outline-none" />
+    </pxl-input-group>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelInputGroup } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex flex-col gap-3">
       <PixelInputGroup size="sm" aria-label="Small group">
@@ -111,11 +176,60 @@ export function Default() {
       </PixelInputGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInputGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelInputGroup size="sm" aria-label="Small group">
+      <input aria-label="First segment" value="small" class="bg-transparent px-2 outline-none" />
+      <input aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+    </PixelInputGroup>
+    <PixelInputGroup size="md" aria-label="Medium group">
+      <input aria-label="First segment" value="medium" class="bg-transparent px-2 outline-none" />
+      <input aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+    </PixelInputGroup>
+    <PixelInputGroup size="lg" aria-label="Large group">
+      <input aria-label="First segment" value="large" class="bg-transparent px-2 outline-none" />
+      <input aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+    </PixelInputGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInputGroup, PixelInputGroupItem],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-input-group size="sm" aria-label="Small group">
+        <input pxlInputGroupItem aria-label="First segment" value="small" class="bg-transparent px-2 outline-none" />
+        <input pxlInputGroupItem aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+      </pxl-input-group>
+      <pxl-input-group size="md" aria-label="Medium group">
+        <input pxlInputGroupItem aria-label="First segment" value="medium" class="bg-transparent px-2 outline-none" />
+        <input pxlInputGroupItem aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+      </pxl-input-group>
+      <pxl-input-group size="lg" aria-label="Large group">
+        <input pxlInputGroupItem aria-label="First segment" value="large" class="bg-transparent px-2 outline-none" />
+        <input pxlInputGroupItem aria-label="Second segment" value="size" class="bg-transparent px-2 outline-none" />
+      </pxl-input-group>
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelInputGroup } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelInputGroup surface="pixel" aria-label="Pixel surface group">
@@ -128,11 +242,52 @@ export function Default() {
       </PixelInputGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInputGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelInputGroup surface="pixel" aria-label="Pixel surface group">
+      <input aria-label="First segment" value="pixel" class="bg-transparent px-2 outline-none" />
+      <input aria-label="Second segment" value="surface" class="bg-transparent px-2 outline-none" />
+    </PixelInputGroup>
+    <PixelInputGroup surface="linear" aria-label="Linear surface group">
+      <input aria-label="First segment" value="linear" class="bg-transparent px-2 outline-none" />
+      <input aria-label="Second segment" value="surface" class="bg-transparent px-2 outline-none" />
+    </PixelInputGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInputGroup, PixelInputGroupItem],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-input-group surface="pixel" aria-label="Pixel surface group">
+        <input pxlInputGroupItem aria-label="First segment" value="pixel" class="bg-transparent px-2 outline-none" />
+        <input pxlInputGroupItem aria-label="Second segment" value="surface" class="bg-transparent px-2 outline-none" />
+      </pxl-input-group>
+      <pxl-input-group surface="linear" aria-label="Linear surface group">
+        <input pxlInputGroupItem aria-label="First segment" value="linear" class="bg-transparent px-2 outline-none" />
+        <input pxlInputGroupItem aria-label="Second segment" value="surface" class="bg-transparent px-2 outline-none" />
+      </pxl-input-group>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-phone-with-country-code">
         <h4>Phone with Country Code</h4>
-        <pre className="docs-code"><code>{`export function PhoneWithCountryCode() {
+        <FrameworkCode
+          variant="docs"
+          label={'Phone with Country Code code'}
+          react={`import { PixelInputGroup } from '@pxlkit/ui-kit';
+
+export function PhoneWithCountryCode() {
   return (
     <PixelInputGroup aria-label="Phone number with country code">
       <input
@@ -148,7 +303,37 @@ export function Default() {
       />
     </PixelInputGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelInputGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelInputGroup aria-label="Phone number with country code">
+    <input aria-label="Country code" value="+58" class="bg-transparent px-2 outline-none" style="max-width: 5rem" />
+    <input aria-label="Phone number" placeholder="412 555 0123" class="bg-transparent px-2 outline-none" />
+  </PixelInputGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelInputGroup, PixelInputGroupItem],
+  template: \`
+    <pxl-input-group aria-label="Phone number with country code">
+      <input
+        pxlInputGroupItem
+        aria-label="Country code"
+        value="+58"
+        class="bg-transparent px-2 outline-none"
+        style="max-width: 5rem"
+      />
+      <input pxlInputGroupItem aria-label="Phone number" placeholder="412 555 0123" class="bg-transparent px-2 outline-none" />
+    </pxl-input-group>
+  \`,
+})
+export class PhoneWithCountryCode {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

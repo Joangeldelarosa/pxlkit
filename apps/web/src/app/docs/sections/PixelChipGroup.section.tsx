@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelChipGroupDocsSectionProps {
   className?: string;
@@ -106,13 +107,13 @@ export function PixelChipGroupDocsSection({ className }: PixelChipGroupDocsSecti
     </section>
     <section aria-labelledby="pixel-chip-group-usage">
       <h3 id="pixel-chip-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React, { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelChipGroup usage'}
+        react={`import React, { useState } from 'react';
 import { PixelChipGroup } from '@pxlkit/ui-kit';
 import { PixelChip } from '@pxlkit/ui-kit';
 
-// PixelChipGroup reads \`value\` off each child via children inspection; the chip
-// component itself forwards unknown attrs, so we use a tiny shim here so the
-// example reads naturally without leaking a \`value\` prop into PixelChipProps.
 const Chip = PixelChip as unknown as React.ComponentType<
   React.ComponentProps<typeof PixelChip> & { value: string }
 >;
@@ -126,14 +127,55 @@ export function Default() {
       <Chip value="svelte" label="Svelte" tone="gold" />
     </PixelChipGroup>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelChip, PixelChipGroup } from '@pxlkit/ui-kit-vue';
+
+const value = ref(['react']);
+</script>
+
+<template>
+  <PixelChipGroup v-model="value" aria-label="Frameworks">
+    <PixelChip value="react" label="React" tone="cyan" />
+    <PixelChip value="vue" label="Vue" tone="green" />
+    <PixelChip value="svelte" label="Svelte" tone="gold" />
+  </PixelChipGroup>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelChip, PixelChipGroup, PixelChipGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip, PixelChipGroup, PixelChipGroupItem],
+  template: \`
+    <pxl-chip-group [(value)]="value" aria-label="Frameworks">
+      <pxl-chip *pxlChipGroupItem="'react'" label="React" tone="cyan" />
+      <pxl-chip *pxlChipGroupItem="'vue'" label="Vue" tone="green" />
+      <pxl-chip *pxlChipGroupItem="'svelte'" label="Svelte" tone="gold" />
+    </pxl-chip-group>
+  \`,
+})
+export class Default {
+  readonly value = signal(['react']);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React, { useState } from 'react';
+import { PixelChipGroup } from '@pxlkit/ui-kit';
+import { PixelChip } from '@pxlkit/ui-kit';
+
+const Chip = PixelChip as unknown as React.ComponentType<
+  React.ComponentProps<typeof PixelChip> & { value: string }
+>;
+
+export function Default() {
   const [value, setValue] = useState<string[]>(['react']);
   return (
     <PixelChipGroup value={value} onChange={setValue} aria-label="Frameworks">
@@ -142,11 +184,53 @@ export function Default() {
       <Chip value="svelte" label="Svelte" tone="gold" />
     </PixelChipGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelChip, PixelChipGroup } from '@pxlkit/ui-kit-vue';
+
+const value = ref(['react']);
+</script>
+
+<template>
+  <PixelChipGroup v-model="value" aria-label="Frameworks">
+    <PixelChip value="react" label="React" tone="cyan" />
+    <PixelChip value="vue" label="Vue" tone="green" />
+    <PixelChip value="svelte" label="Svelte" tone="gold" />
+  </PixelChipGroup>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelChip, PixelChipGroup, PixelChipGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip, PixelChipGroup, PixelChipGroupItem],
+  template: \`
+    <pxl-chip-group [(value)]="value" aria-label="Frameworks">
+      <pxl-chip *pxlChipGroupItem="'react'" label="React" tone="cyan" />
+      <pxl-chip *pxlChipGroupItem="'vue'" label="Vue" tone="green" />
+      <pxl-chip *pxlChipGroupItem="'svelte'" label="Svelte" tone="gold" />
+    </pxl-chip-group>
+  \`,
+})
+export class Default {
+  readonly value = signal(['react']);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-multi-select">
         <h4>Multi Select</h4>
-        <pre className="docs-code"><code>{`export function MultiSelect() {
+        <FrameworkCode
+          variant="docs"
+          label={'Multi Select code'}
+          react={`import React, { useState } from 'react';
+import { PixelChipGroup } from '@pxlkit/ui-kit';
+import { PixelChip } from '@pxlkit/ui-kit';
+
+const Chip = PixelChip as unknown as React.ComponentType<
+  React.ComponentProps<typeof PixelChip> & { value: string }
+>;
+
+export function MultiSelect() {
   const [value, setValue] = useState<string[]>(['ts', 'rust']);
   return (
     <PixelChipGroup
@@ -161,11 +245,55 @@ export function Default() {
       <Chip value="py" label="Python" tone="purple" />
     </PixelChipGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelChip, PixelChipGroup } from '@pxlkit/ui-kit-vue';
+
+const value = ref(['ts', 'rust']);
+</script>
+
+<template>
+  <PixelChipGroup v-model="value" multiple aria-label="Languages">
+    <PixelChip value="ts" label="TypeScript" tone="cyan" />
+    <PixelChip value="rust" label="Rust" tone="gold" />
+    <PixelChip value="go" label="Go" tone="green" />
+    <PixelChip value="py" label="Python" tone="purple" />
+  </PixelChipGroup>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelChip, PixelChipGroup, PixelChipGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip, PixelChipGroup, PixelChipGroupItem],
+  template: \`
+    <pxl-chip-group [(value)]="value" multiple aria-label="Languages">
+      <pxl-chip *pxlChipGroupItem="'ts'" label="TypeScript" tone="cyan" />
+      <pxl-chip *pxlChipGroupItem="'rust'" label="Rust" tone="gold" />
+      <pxl-chip *pxlChipGroupItem="'go'" label="Go" tone="green" />
+      <pxl-chip *pxlChipGroupItem="'py'" label="Python" tone="purple" />
+    </pxl-chip-group>
+  \`,
+})
+export class MultiSelect {
+  readonly value = signal(['ts', 'rust']);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import React, { useState } from 'react';
+import { PixelChipGroup } from '@pxlkit/ui-kit';
+import { PixelChip } from '@pxlkit/ui-kit';
+
+const Chip = PixelChip as unknown as React.ComponentType<
+  React.ComponentProps<typeof PixelChip> & { value: string }
+>;
+
+export function Surfaces() {
   const [a, setA] = useState<string[]>(['one']);
   const [b, setB] = useState<string[]>(['one']);
   return (
@@ -180,7 +308,50 @@ export function Default() {
       </PixelChipGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelChip, PixelChipGroup } from '@pxlkit/ui-kit-vue';
+
+const a = ref(['one']);
+const b = ref(['one']);
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelChipGroup v-model="a" surface="pixel" aria-label="Pixel surface">
+      <PixelChip value="one" label="One" tone="green" />
+      <PixelChip value="two" label="Two" tone="green" />
+    </PixelChipGroup>
+    <PixelChipGroup v-model="b" surface="linear" aria-label="Linear surface">
+      <PixelChip value="one" label="One" tone="cyan" />
+      <PixelChip value="two" label="Two" tone="cyan" />
+    </PixelChipGroup>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelChip, PixelChipGroup, PixelChipGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip, PixelChipGroup, PixelChipGroupItem],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-chip-group [(value)]="a" surface="pixel" aria-label="Pixel surface">
+        <pxl-chip *pxlChipGroupItem="'one'" label="One" tone="green" />
+        <pxl-chip *pxlChipGroupItem="'two'" label="Two" tone="green" />
+      </pxl-chip-group>
+      <pxl-chip-group [(value)]="b" surface="linear" aria-label="Linear surface">
+        <pxl-chip *pxlChipGroupItem="'one'" label="One" tone="cyan" />
+        <pxl-chip *pxlChipGroupItem="'two'" label="Two" tone="cyan" />
+      </pxl-chip-group>
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly a = signal(['one']);
+  readonly b = signal(['one']);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

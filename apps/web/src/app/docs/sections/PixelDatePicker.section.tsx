@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDatePickerDocsSectionProps {
   className?: string;
@@ -112,7 +113,10 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
     </section>
     <section aria-labelledby="pixel-date-picker-usage">
       <h3 id="pixel-date-picker-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelDatePicker usage'}
+        react={`import { useState } from 'react';
 import { PixelDatePicker } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -125,14 +129,20 @@ export function Default() {
       placeholder="Select date"
     />
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelDatePicker } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [date, setDate] = useState<Date | null>(null);
   return (
     <PixelDatePicker
@@ -142,11 +152,18 @@ export function Default() {
       placeholder="Select date"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-presets">
         <h4>With Presets</h4>
-        <pre className="docs-code"><code>{`export function WithPresets() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Presets code'}
+          react={`import { useState } from 'react';
+import { PixelDatePicker } from '@pxlkit/ui-kit';
+
+export function WithPresets() {
   const [date, setDate] = useState<Date | null>(null);
   const today = new Date();
   const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
@@ -164,11 +181,18 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-min-max">
         <h4>With Min/Max</h4>
-        <pre className="docs-code"><code>{`export function WithMinMax() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Min/Max code'}
+          react={`import { useState } from 'react';
+import { PixelDatePicker } from '@pxlkit/ui-kit';
+
+export function WithMinMax() {
   const [date, setDate] = useState<Date | null>(null);
   const today = new Date();
   const min = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -183,7 +207,8 @@ export function Default() {
       max={max}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

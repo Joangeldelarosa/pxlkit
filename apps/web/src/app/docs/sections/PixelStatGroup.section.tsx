@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStatGroupDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSecti
     </section>
     <section aria-labelledby="pixel-stat-group-usage">
       <h3 id="pixel-stat-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelStatGroup } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelStatGroup usage'}
+        react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
 import { PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -59,14 +63,20 @@ export function Default() {
       <PixelStatCard label="Active" value="312" />
     </PixelStatGroup>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
+import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelStatGroup aria-label="Key metrics">
       <PixelStatCard label="Users" value="1,284" />
@@ -74,11 +84,18 @@ export function Default() {
       <PixelStatCard label="Active" value="312" />
     </PixelStatGroup>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-row-layout">
         <h4>Row layout</h4>
-        <pre className="docs-code"><code>{`export function RowLayout() {
+        <FrameworkCode
+          variant="docs"
+          label={'Row layout code'}
+          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
+import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function RowLayout() {
   return (
     <PixelStatGroup layout="row" aria-label="Row metrics">
       <PixelStatCard label="Sessions" value="842" />
@@ -86,11 +103,18 @@ export function Default() {
       <PixelStatCard label="Bounce" value="24%" />
     </PixelStatGroup>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-grid-layout">
         <h4>Grid layout</h4>
-        <pre className="docs-code"><code>{`export function GridLayout() {
+        <FrameworkCode
+          variant="docs"
+          label={'Grid layout code'}
+          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
+import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function GridLayout() {
   return (
     <PixelStatGroup layout="grid" columns={4} aria-label="Grid metrics">
       <PixelStatCard label="A" value="10" />
@@ -99,11 +123,18 @@ export function Default() {
       <PixelStatCard label="D" value="40" />
     </PixelStatGroup>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-grid-with-gap">
         <h4>Grid with gap</h4>
-        <pre className="docs-code"><code>{`export function GridWithGap() {
+        <FrameworkCode
+          variant="docs"
+          label={'Grid with gap code'}
+          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
+import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function GridWithGap() {
   return (
     <PixelStatGroup layout="grid" columns={3} gap={3} aria-label="Spaced grid metrics">
       <PixelStatCard label="Users" value="1,284" />
@@ -111,11 +142,18 @@ export function Default() {
       <PixelStatCard label="Active" value="312" />
     </PixelStatGroup>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
+import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-col gap-3">
       <PixelStatGroup tone="cyan" aria-label="Cyan group">
@@ -128,11 +166,18 @@ export function Default() {
       </PixelStatGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
+import { PixelStatCard } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelStatGroup surface="pixel" aria-label="Pixel surface">
@@ -145,7 +190,8 @@ export function Default() {
       </PixelStatGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

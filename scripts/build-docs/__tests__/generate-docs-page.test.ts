@@ -14,6 +14,7 @@
 
 import path from "node:path";
 import os from "node:os";
+import { pathToFileURL } from "node:url";
 import fs from "fs-extra";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -22,7 +23,9 @@ import {
   FILE_EXT,
   escapeForTemplateLiteral,
   escapeJsxText,
+  exampleSourcesOf,
   generateDocsPage,
+  readPorts,
   renderInlineText,
   normalizeExamples,
   normalizeKeyboard,
@@ -30,9 +33,10 @@ import {
   normalizeDeprecation,
   planEntryFor,
   renderSectionModule,
+  renderUsageSnippetsModule,
   slugFor,
 } from "../generate-docs-page";
-import type { ManifestRecord } from "../_lib/generator-base";
+import { readManifest, type ManifestRecord } from "../_lib/generator-base";
 
 function fakeRecord(
   manifest: Record<string, unknown>,
@@ -188,9 +192,32 @@ describe("normalizeExamples", () => {
     } as never);
     expect(out).toHaveLength(2);
     expect(out[0]!.id).toBe("with-icon");
-    expect(out[0]!.code).toContain("Button");
+    expect(out[0]!.code).toEqual({ react: "<Button icon='star' />" });
     expect(out[0]!.description).toBe("Has an icon");
     expect(out[1]!.id).toBe("alt");
+  });
+
+  it("finds each example's code under its export, resolved by identity, in every framework", () => {
+    const Stub = () => null;
+    const manifest = {
+      name: "X",
+      examples: [
+        // The id's spelling misses the export (WithOnclick ≠ WithOnClick).
+        { id: "with-onclick", label: "With onClick", Component: Stub },
+        { id: "plain", label: "Plain", Component: Stub },
+      ],
+    } as never;
+    const react = { WithOnClick: "react-a", Plain: "react-b" };
+    expect(normalizeExamples(manifest, react).map((e) => e.id)).toEqual(["plain"]);
+    const out = normalizeExamples(manifest, react, {
+      exportNames: ["WithOnClick", "Plain"],
+      vue: { WithOnClick: "vue-a\n", Plain: "vue-b" },
+      angular: { WithOnClick: "ng-a" },
+    });
+    expect(out.map((e) => [e.id, e.code])).toEqual([
+      ["with-onclick", { react: "react-a", vue: "vue-a", angular: "ng-a" }],
+      ["plain", { react: "react-b", vue: "vue-b" }],
+    ]);
   });
 });
 
@@ -414,6 +441,38 @@ describe("renderSectionModule", () => {
     expect(src).toContain("\\`a \\${b}");
   });
 
+  it("renders the code as framework tabs, one source per framework that has it", () => {
+    const entry = planEntryFor(baseRec(), "/o");
+    entry.examples[0]!.code = { react: "<PixelButton />", angular: "export class Default {}" };
+    const src = renderSectionModule(entry);
+    expect(src).toContain("import { FrameworkCode } from '@/components/FrameworkCode';");
+    expect(src).toContain(
+      [
+        `        <FrameworkCode`,
+        `          variant="docs"`,
+        `          label={'Default code'}`,
+        "          react={`<PixelButton />`}",
+        "          angular={`export class Default {}`}",
+        `        />`,
+      ].join("\n"),
+    );
+    expect(src).not.toContain("vue={");
+  });
+
+  it("passes the tabs' label as a JS string, which JSX attribute strings cannot escape", () => {
+    const entry = planEntryFor(baseRec(), "/o");
+    entry.examples[0]!.label = "Don't 'quote' me";
+    expect(renderSectionModule(entry)).toContain(`label={'Don\\'t \\'quote\\' me code'}`);
+  });
+
+  it("leads with the first example as usage, and imports no tabs without code", () => {
+    const src = renderSectionModule(planEntryFor(baseRec(), "/o"));
+    expect(src).toContain(`label={'PixelButton usage'}`);
+    const bare = planEntryFor(fakeRecord({ name: "PixelBare", examples: [] }), "/o");
+    expect(bare.usageSnippet).toBeNull();
+    expect(renderSectionModule(bare)).not.toContain("FrameworkCode");
+  });
+
   it("escapes hostile JSX text in description / label", () => {
     const rec = fakeRecord({
       name: "PixelButton",
@@ -498,8 +557,8 @@ describe("generateDocsPage (e2e against tmpdir)", () => {
 
     expect(report.ok).toBe(true);
     expect(report.count).toBe(2);
-    // 2 sections + the usage-snippets map module
-    expect(report.written).toBe(3);
+    // 2 sections + the usage-snippets modules (React, Vue, Angular)
+    expect(report.written).toBe(5);
     expect(report.errors).toEqual([]);
 
     const a = path.join(outRoot, `PixelButton${FILE_EXT}`);
@@ -545,8 +604,8 @@ describe("generateDocsPage (e2e against tmpdir)", () => {
     });
 
     expect(report.ok).toBe(false);
-    // 1 valid section + the usage-snippets map module
-    expect(report.written).toBe(2);
+    // 1 valid section + the usage-snippets modules (React, Vue, Angular)
+    expect(report.written).toBe(4);
     expect(report.errors).toHaveLength(1);
     expect(report.errors[0]!.message).toMatch(/missing a string `name`/);
   });
@@ -563,5 +622,80 @@ describe("generateDocsPage (e2e against tmpdir)", () => {
     const expectedSuffix = `${DEFAULT_OUT_SUBPATH}/PixelKbd${FILE_EXT}`;
     const out = report.entries[0]!.outFile.split(path.sep).join("/");
     expect(out.endsWith(expectedSuffix)).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Usage snippets and the ports' example sources
+// ---------------------------------------------------------------------------
+
+describe("renderUsageSnippetsModule", () => {
+  const entries = () => {
+    const a = planEntryFor(fakeRecord({ name: "PixelAlpha", examples: [] }), "/o");
+    const b = planEntryFor(fakeRecord({ name: "PixelBeta", examples: [] }), "/o");
+    a.usageSnippet = { react: "<PixelAlpha />", vue: "<template><PixelAlpha /></template>" };
+    b.usageSnippet = { react: "<PixelBeta />" };
+    return [b, a];
+  };
+
+  it("maps every slug to React's snippet, sorted", () => {
+    const src = renderUsageSnippetsModule(entries());
+    expect(src).toContain("export const USAGE_SNIPPETS: Record<string, string> = {");
+    expect(src.indexOf("'pixel-alpha'")).toBeLessThan(src.indexOf("'pixel-beta'"));
+  });
+
+  it("holds a port's snippets in a map of their own, for the components it implements", () => {
+    const src = renderUsageSnippetsModule(entries(), "vue");
+    expect(src).toContain("export const USAGE_SNIPPETS_VUE: Record<string, string> = {");
+    expect(src).toContain("'pixel-alpha': `<template><PixelAlpha /></template>`,");
+    expect(src).not.toContain("pixel-beta");
+    expect(renderUsageSnippetsModule(entries(), "angular")).toContain(
+      "export const USAGE_SNIPPETS_ANGULAR: Record<string, string> = {\n};",
+    );
+  });
+});
+
+describe("exampleSourcesOf", () => {
+  const repoRoot = path.resolve(__dirname, "../../..");
+  const button = path.join(repoRoot, "packages/ui-kit/src/actions/PixelButton.manifest.ts");
+
+  it("reads the examples' exports and both ports' code of a component they implement", async () => {
+    const rec = (await readManifest(button))!;
+    const sources = await exampleSourcesOf(repoRoot, rec, await readPorts(repoRoot));
+    const examples = await import(pathToFileURL(rec.examplesFile!).href);
+    expect(sources.exportNames).toEqual(
+      (rec.manifest.examples as unknown as Array<{ Component: unknown }>).map(
+        ({ Component }) => Object.keys(examples).find((key) => examples[key] === Component),
+      ),
+    );
+    for (const name of sources.exportNames!) {
+      expect(sources.vue![name]).toMatch(/^<script setup lang="ts">/);
+      expect(sources.vue![name]).toContain("from '@pxlkit/ui-kit-vue'");
+      expect(sources.angular![name]).toContain(`export class ${name} `);
+      expect(sources.angular![name]).toContain("from '@pxlkit/ui-kit-angular'");
+    }
+  });
+
+  it("has no port code where no port implements the component", async () => {
+    const rec = (await readManifest(button))!;
+    const empty = await fs.mkdtemp(path.join(os.tmpdir(), "gen-docs-ports-"));
+    try {
+      const sources = await exampleSourcesOf(empty, rec, await readPorts(empty));
+      expect(sources.exportNames!.length).toBeGreaterThan(0);
+      expect(sources.vue).toBeUndefined();
+      expect(sources.angular).toBeUndefined();
+    } finally {
+      await fs.remove(empty);
+    }
+  });
+
+  it("leaves a manifest without a name to planEntryFor to report", async () => {
+    const rec = {
+      manifest: { description: "no name" } as unknown as ManifestRecord["manifest"],
+      sourceFile: "/r.tsx",
+      manifestFile: "/r.manifest.ts",
+      package: "@pxlkit/ui-kit",
+    };
+    expect(await exampleSourcesOf(repoRoot, rec, await readPorts(repoRoot))).toEqual({});
   });
 });

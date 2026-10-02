@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSheetDocsSectionProps {
   className?: string;
@@ -79,7 +80,10 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
     </section>
     <section aria-labelledby="pixel-sheet-usage">
       <h3 id="pixel-sheet-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSheet usage'}
+        react={`import { useState } from 'react';
 import { PixelSheet } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -102,14 +106,50 @@ export function Default() {
       </PixelSheet>
     </>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSheet } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open sheet</button>
+  <PixelSheet v-model:open="open" title="Quick actions" description="Pick an action below">
+    <p>Sheet content goes here.</p>
+    <button type="button" @click="open = false">Close</button>
+  </PixelSheet>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelSheet } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSheet],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open sheet</button>
+    <pxl-sheet [(open)]="open" title="Quick actions" description="Pick an action below">
+      <p>Sheet content goes here.</p>
+      <button type="button" (click)="open.set(false)">Close</button>
+    </pxl-sheet>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelSheet } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -129,11 +169,48 @@ export function Default() {
       </PixelSheet>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSheet } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open sheet</button>
+  <PixelSheet v-model:open="open" title="Quick actions" description="Pick an action below">
+    <p>Sheet content goes here.</p>
+    <button type="button" @click="open = false">Close</button>
+  </PixelSheet>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSheet } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSheet],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open sheet</button>
+    <pxl-sheet [(open)]="open" title="Quick actions" description="Pick an action below">
+      <p>Sheet content goes here.</p>
+      <button type="button" (click)="open.set(false)">Close</button>
+    </pxl-sheet>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-drag-handle">
         <h4>With drag handle</h4>
-        <pre className="docs-code"><code>{`export function WithDragHandle() {
+        <FrameworkCode
+          variant="docs"
+          label={'With drag handle code'}
+          react={`import { useState } from 'react';
+import { PixelSheet } from '@pxlkit/ui-kit';
+
+export function WithDragHandle() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -151,11 +228,46 @@ export function Default() {
       </PixelSheet>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSheet } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open sheet</button>
+  <PixelSheet v-model:open="open" size="lg" drag-handle title="Drag handle">
+    <p>Bottom sheet with a drag handle affordance.</p>
+  </PixelSheet>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSheet } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSheet],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open sheet</button>
+    <pxl-sheet [(open)]="open" size="lg" dragHandle title="Drag handle">
+      <p>Bottom sheet with a drag handle affordance.</p>
+    </pxl-sheet>
+  \`,
+})
+export class WithDragHandle {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-top-full">
         <h4>Top side, full height</h4>
-        <pre className="docs-code"><code>{`export function TopFull() {
+        <FrameworkCode
+          variant="docs"
+          label={'Top side, full height code'}
+          react={`import { useState } from 'react';
+import { PixelSheet } from '@pxlkit/ui-kit';
+
+export function TopFull() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -176,7 +288,38 @@ export function Default() {
       </PixelSheet>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSheet } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open top sheet</button>
+  <PixelSheet v-model:open="open" side="top" size="full" aria-label="Top full-screen sheet">
+    <p>Top-anchored full-height sheet.</p>
+    <button type="button" @click="open = false">Close</button>
+  </PixelSheet>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSheet } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSheet],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open top sheet</button>
+    <pxl-sheet [(open)]="open" side="top" size="full" ariaLabel="Top full-screen sheet">
+      <p>Top-anchored full-height sheet.</p>
+      <button type="button" (click)="open.set(false)">Close</button>
+    </pxl-sheet>
+  \`,
+})
+export class TopFull {
+  readonly open = signal(false);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

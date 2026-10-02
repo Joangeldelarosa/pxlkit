@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelComboboxDocsSectionProps {
   className?: string;
@@ -91,7 +92,98 @@ export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSection
     </section>
     <section aria-labelledby="pixel-combobox-usage">
       <h3 id="pixel-combobox-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCombobox usage'}
+        react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+export function Default() {
+  return (
+    <PixelCombobox
+      label="Fruit"
+      options={FRUITS}
+      placeholder="Pick a fruit"
+      hint="Type to filter"
+    />
+  );
+}`}
+      />
+    </section>
+    <section aria-label="Examples">
+      <h3>Examples</h3>
+      <article className="docs-example" id="example-default">
+        <h4>Default</h4>
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+export function Default() {
+  return (
+    <PixelCombobox
+      label="Fruit"
+      options={FRUITS}
+      placeholder="Pick a fruit"
+      hint="Type to filter"
+    />
+  );
+}`}
+        />
+      </article>
+      <article className="docs-example" id="example-uncontrolled">
+        <h4>Uncontrolled</h4>
+        <FrameworkCode
+          variant="docs"
+          label={'Uncontrolled code'}
+          react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+export function Uncontrolled() {
+  return (
+    <PixelCombobox
+      label="Fruit"
+      options={FRUITS}
+      defaultValue="banana"
+    />
+  );
+}`}
+        />
+      </article>
+      <article className="docs-example" id="example-controlled">
+        <h4>Controlled</h4>
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
 import { PixelCombobox } from '@pxlkit/ui-kit';
 
 const FRUITS = [
@@ -104,6 +196,26 @@ const FRUITS = [
   { value: 'grape', label: 'Grape' },
 ];
 
+export function Controlled() {
+  const [value, setValue] = useState('cherry');
+  return (
+    <PixelCombobox
+      label="Controlled fruit"
+      options={FRUITS}
+      value={value}
+      onChange={setValue}
+    />
+  );
+}`}
+        />
+      </article>
+      <article className="docs-example" id="example-grouped">
+        <h4>Grouped options</h4>
+        <FrameworkCode
+          variant="docs"
+          label={'Grouped options code'}
+          react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
 const GROUPED = [
   { value: 'us', label: 'United States', group: 'Americas' },
   { value: 've', label: 'Venezuela', group: 'Americas' },
@@ -115,62 +227,7 @@ const GROUPED = [
   { value: 'kr', label: 'South Korea', group: 'Asia' },
 ];
 
-export function Default() {
-  return (
-    <PixelCombobox
-      label="Fruit"
-      options={FRUITS}
-      placeholder="Pick a fruit"
-      hint="Type to filter"
-    />
-  );
-}
-`}</code></pre>
-    </section>
-    <section aria-label="Examples">
-      <h3>Examples</h3>
-      <article className="docs-example" id="example-default">
-        <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
-  return (
-    <PixelCombobox
-      label="Fruit"
-      options={FRUITS}
-      placeholder="Pick a fruit"
-      hint="Type to filter"
-    />
-  );
-}`}</code></pre>
-      </article>
-      <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
-        <pre className="docs-code"><code>{`export function Uncontrolled() {
-  return (
-    <PixelCombobox
-      label="Fruit"
-      options={FRUITS}
-      defaultValue="banana"
-    />
-  );
-}`}</code></pre>
-      </article>
-      <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
-  const [value, setValue] = useState('cherry');
-  return (
-    <PixelCombobox
-      label="Controlled fruit"
-      options={FRUITS}
-      value={value}
-      onChange={setValue}
-    />
-  );
-}`}</code></pre>
-      </article>
-      <article className="docs-example" id="example-grouped">
-        <h4>Grouped options</h4>
-        <pre className="docs-code"><code>{`export function Grouped() {
+export function Grouped() {
   return (
     <PixelCombobox
       label="Country"
@@ -178,11 +235,27 @@ export function Default() {
       placeholder="Pick a country"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-not-searchable">
         <h4>Without search</h4>
-        <pre className="docs-code"><code>{`export function NotSearchable() {
+        <FrameworkCode
+          variant="docs"
+          label={'Without search code'}
+          react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+export function NotSearchable() {
   return (
     <PixelCombobox
       label="Fruit"
@@ -191,11 +264,27 @@ export function Default() {
       placeholder="No filter"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+export function Sizes() {
   return (
     <div className="flex flex-col gap-3">
       <PixelCombobox label="Small" options={FRUITS} size="sm" placeholder="sm" />
@@ -203,22 +292,54 @@ export function Default() {
       <PixelCombobox label="Large" options={FRUITS} size="lg" placeholder="lg" />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelCombobox label="Pixel" options={FRUITS} surface="pixel" placeholder="pixel surface" />
       <PixelCombobox label="Linear" options={FRUITS} surface="linear" placeholder="linear surface" />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+export function Disabled() {
   return (
     <PixelCombobox
       label="Disabled"
@@ -227,11 +348,27 @@ export function Default() {
       disabled
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
         <h4>With error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <FrameworkCode
+          variant="docs"
+          label={'With error code'}
+          react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+export function WithError() {
   return (
     <PixelCombobox
       label="Fruit"
@@ -240,11 +377,27 @@ export function Default() {
       error="Please choose a fruit"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-form-name">
         <h4>With form name</h4>
-        <pre className="docs-code"><code>{`export function WithFormName() {
+        <FrameworkCode
+          variant="docs"
+          label={'With form name code'}
+          react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+export function WithFormName() {
   return (
     <form>
       <PixelCombobox
@@ -256,11 +409,27 @@ export function Default() {
       />
     </form>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-empty-message">
         <h4>Custom empty message</h4>
-        <pre className="docs-code"><code>{`export function CustomEmptyMessage() {
+        <FrameworkCode
+          variant="docs"
+          label={'Custom empty message code'}
+          react={`import { PixelCombobox } from '@pxlkit/ui-kit';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+export function CustomEmptyMessage() {
   return (
     <PixelCombobox
       label="Fruit"
@@ -269,7 +438,8 @@ export function Default() {
       emptyMessage="No fruits match your filter"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

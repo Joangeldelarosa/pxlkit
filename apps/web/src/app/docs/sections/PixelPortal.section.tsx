@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPortalDocsSectionProps {
   className?: string;
@@ -49,8 +50,10 @@ export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProp
     </section>
     <section aria-labelledby="pixel-portal-usage">
       <h3 id="pixel-portal-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react'
-import { PixelPortal } from '@pxlkit/ui-kit'
+      <FrameworkCode
+        variant="docs"
+        label={'PixelPortal usage'}
+        react={`import { PixelPortal } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,30 +61,97 @@ export function Default() {
       <div>Portaled content (renders into document.body after mount)</div>
     </PixelPortal>
   )
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelPortal } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPortal>
+    <div>Portaled content (renders into document.body after mount)</div>
+  </PixelPortal>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelPortal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPortal],
+  template: \`<div *pxlPortal>Portaled content (renders into document.body after mount)</div>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelPortal } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelPortal>
       <div>Portaled content (renders into document.body after mount)</div>
     </PixelPortal>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPortal } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPortal>
+    <div>Portaled content (renders into document.body after mount)</div>
+  </PixelPortal>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPortal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPortal],
+  template: \`<div *pxlPortal>Portaled content (renders into document.body after mount)</div>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled (inline)</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled (inline) code'}
+          react={`import { PixelPortal } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelPortal disabled>
       <div>Rendered inline — portal disabled</div>
     </PixelPortal>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPortal } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPortal disabled>
+    <div>Rendered inline — portal disabled</div>
+  </PixelPortal>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPortal } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPortal],
+  template: \`
+    <ng-template pxlPortal pxlPortalDisabled>
+      <div>Rendered inline — portal disabled</div>
+    </ng-template>
+  \`,
+})
+export class Disabled {}`}
+        />
       </article>
     </section>
     </section>

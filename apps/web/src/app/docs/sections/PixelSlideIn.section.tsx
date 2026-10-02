@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSlideInDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelSlideInDocsSection({ className }: PixelSlideInDocsSectionPr
     </section>
     <section aria-labelledby="pixel-slide-in-usage">
       <h3 id="pixel-slide-in-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelSlideIn } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSlideIn usage'}
+        react={`import { PixelSlideIn } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,14 +62,19 @@ export function Default() {
       </div>
     </PixelSlideIn>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSlideIn } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelSlideIn>
       <div style={{ padding: 16, background: '#111', color: '#fff' }}>
@@ -73,11 +82,17 @@ export function Default() {
       </div>
     </PixelSlideIn>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-from-left">
         <h4>From Left</h4>
-        <pre className="docs-code"><code>{`export function FromLeft() {
+        <FrameworkCode
+          variant="docs"
+          label={'From Left code'}
+          react={`import { PixelSlideIn } from '@pxlkit/ui-kit';
+
+export function FromLeft() {
   return (
     <PixelSlideIn from="left" duration={500} distance={20}>
       <div style={{ padding: 16, background: '#0EA5E9', color: '#000' }}>
@@ -85,11 +100,17 @@ export function Default() {
       </div>
     </PixelSlideIn>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-on-hover">
         <h4>On Hover</h4>
-        <pre className="docs-code"><code>{`export function OnHover() {
+        <FrameworkCode
+          variant="docs"
+          label={'On Hover code'}
+          react={`import { PixelSlideIn } from '@pxlkit/ui-kit';
+
+export function OnHover() {
   return (
     <PixelSlideIn trigger="hover" from="right" duration={300}>
       <div style={{ padding: 16, background: '#222', color: '#0EA5E9' }}>
@@ -97,7 +118,8 @@ export function Default() {
       </div>
     </PixelSlideIn>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

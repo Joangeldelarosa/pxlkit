@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStackDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps)
     </section>
     <section aria-labelledby="pixel-stack-usage">
       <h3 id="pixel-stack-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelStack } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelStack usage'}
+        react={`import { PixelStack } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,14 +62,44 @@ export function Default() {
       <div className="text-sm text-retro-muted">Third item</div>
     </PixelStack>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack :gap="4">
+    <div class="text-sm text-retro-muted">First item</div>
+    <div class="text-sm text-retro-muted">Second item</div>
+    <div class="text-sm text-retro-muted">Third item</div>
+  </PixelStack>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack [gap]="4">
+      <div class="text-sm text-retro-muted">First item</div>
+      <div class="text-sm text-retro-muted">Second item</div>
+      <div class="text-sm text-retro-muted">Third item</div>
+    </div>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelStack gap={4}>
       <div className="text-sm text-retro-muted">First item</div>
@@ -73,11 +107,42 @@ export function Default() {
       <div className="text-sm text-retro-muted">Third item</div>
     </PixelStack>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack :gap="4">
+    <div class="text-sm text-retro-muted">First item</div>
+    <div class="text-sm text-retro-muted">Second item</div>
+    <div class="text-sm text-retro-muted">Third item</div>
+  </PixelStack>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack [gap]="4">
+      <div class="text-sm text-retro-muted">First item</div>
+      <div class="text-sm text-retro-muted">Second item</div>
+      <div class="text-sm text-retro-muted">Third item</div>
+    </div>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-row">
         <h4>Row</h4>
-        <pre className="docs-code"><code>{`export function Row() {
+        <FrameworkCode
+          variant="docs"
+          label={'Row code'}
+          react={`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function Row() {
   return (
     <PixelStack direction="row" gap={3} align="center">
       <div className="text-sm text-retro-muted">Left</div>
@@ -85,22 +150,82 @@ export function Default() {
       <div className="text-sm text-retro-muted">Right</div>
     </PixelStack>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack direction="row" :gap="3" align="center">
+    <div class="text-sm text-retro-muted">Left</div>
+    <div class="text-sm text-retro-muted">Center</div>
+    <div class="text-sm text-retro-muted">Right</div>
+  </PixelStack>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack direction="row" [gap]="3" align="center">
+      <div class="text-sm text-retro-muted">Left</div>
+      <div class="text-sm text-retro-muted">Center</div>
+      <div class="text-sm text-retro-muted">Right</div>
+    </div>
+  \`,
+})
+export class Row {}`}
+        />
       </article>
       <article className="docs-example" id="example-space-between">
         <h4>Space Between</h4>
-        <pre className="docs-code"><code>{`export function SpaceBetween() {
+        <FrameworkCode
+          variant="docs"
+          label={'Space Between code'}
+          react={`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function SpaceBetween() {
   return (
     <PixelStack direction="row" justify="between" align="center">
       <div className="text-sm text-retro-muted">Start</div>
       <div className="text-sm text-retro-muted">End</div>
     </PixelStack>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack direction="row" justify="between" align="center">
+    <div class="text-sm text-retro-muted">Start</div>
+    <div class="text-sm text-retro-muted">End</div>
+  </PixelStack>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack direction="row" justify="between" align="center">
+      <div class="text-sm text-retro-muted">Start</div>
+      <div class="text-sm text-retro-muted">End</div>
+    </div>
+  \`,
+})
+export class SpaceBetween {}`}
+        />
       </article>
       <article className="docs-example" id="example-wrapped">
         <h4>Wrapped</h4>
-        <pre className="docs-code"><code>{`export function Wrapped() {
+        <FrameworkCode
+          variant="docs"
+          label={'Wrapped code'}
+          react={`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function Wrapped() {
   return (
     <PixelStack direction="row" gap={2} wrap>
       <div className="text-sm text-retro-muted">Tag A</div>
@@ -109,18 +234,75 @@ export function Default() {
       <div className="text-sm text-retro-muted">Tag D</div>
     </PixelStack>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack direction="row" :gap="2" wrap>
+    <div class="text-sm text-retro-muted">Tag A</div>
+    <div class="text-sm text-retro-muted">Tag B</div>
+    <div class="text-sm text-retro-muted">Tag C</div>
+    <div class="text-sm text-retro-muted">Tag D</div>
+  </PixelStack>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack direction="row" [gap]="2" wrap>
+      <div class="text-sm text-retro-muted">Tag A</div>
+      <div class="text-sm text-retro-muted">Tag B</div>
+      <div class="text-sm text-retro-muted">Tag C</div>
+      <div class="text-sm text-retro-muted">Tag D</div>
+    </div>
+  \`,
+})
+export class Wrapped {}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
         <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import { PixelStack } from '@pxlkit/ui-kit';
+
+export function PixelSurface() {
   return (
     <PixelStack surface="pixel" gap={4}>
       <div className="text-sm text-retro-muted">Surface-aware item</div>
       <div className="text-sm text-retro-muted">Picks up pixel transition</div>
     </PixelStack>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelStack } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStack surface="pixel" :gap="4">
+    <div class="text-sm text-retro-muted">Surface-aware item</div>
+    <div class="text-sm text-retro-muted">Picks up pixel transition</div>
+  </PixelStack>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStack } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStack],
+  template: \`
+    <div pxlStack surface="pixel" [gap]="4">
+      <div class="text-sm text-retro-muted">Surface-aware item</div>
+      <div class="text-sm text-retro-muted">Picks up pixel transition</div>
+    </div>
+  \`,
+})
+export class PixelSurface {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

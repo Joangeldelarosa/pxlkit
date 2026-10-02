@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPricingCardDocsSectionProps {
   className?: string;
@@ -48,8 +49,10 @@ export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsS
     </section>
     <section aria-labelledby="pixel-pricing-card-usage">
       <h3 id="pixel-pricing-card-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelPricingCard } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelPricingCard usage'}
+        react={`import { PixelPricingCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -66,14 +69,19 @@ export function Default() {
       ]}
     />
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelPricingCard } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelPricingCard
       tone="cyan"
@@ -88,11 +96,18 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-price-badge">
         <h4>With price badge</h4>
-        <pre className="docs-code"><code>{`export function WithPriceBadge() {
+        <FrameworkCode
+          variant="docs"
+          label={'With price badge code'}
+          react={`import { PixelPricingCard } from '@pxlkit/ui-kit';
+import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function WithPriceBadge() {
   return (
     <PixelPricingCard
       tone="green"
@@ -108,11 +123,17 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-popular">
         <h4>Popular (highlighted)</h4>
-        <pre className="docs-code"><code>{`export function Popular() {
+        <FrameworkCode
+          variant="docs"
+          label={'Popular (highlighted) code'}
+          react={`import { PixelPricingCard } from '@pxlkit/ui-kit';
+
+export function Popular() {
   return (
     <PixelPricingCard
       tone="gold"
@@ -128,7 +149,8 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

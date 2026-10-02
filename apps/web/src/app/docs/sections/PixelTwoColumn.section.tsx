@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTwoColumnDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSecti
     </section>
     <section aria-labelledby="pixel-two-column-usage">
       <h3 id="pixel-two-column-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTwoColumn usage'}
+        react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -57,25 +61,80 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Right column</div>}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn>
+    <template #left><div class="text-sm text-retro-muted">Left column</div></template>
+    <template #right><div class="text-sm text-retro-muted">Right column</div></template>
+  </PixelTwoColumn>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Left column</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Right column</div></ng-template>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelTwoColumn
       left={<div className="text-sm text-retro-muted">Left column</div>}
       right={<div className="text-sm text-retro-muted">Right column</div>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn>
+    <template #left><div class="text-sm text-retro-muted">Left column</div></template>
+    <template #right><div class="text-sm text-retro-muted">Right column</div></template>
+  </PixelTwoColumn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Left column</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Right column</div></ng-template>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-sixty-forty">
         <h4>Sixty Forty</h4>
-        <pre className="docs-code"><code>{`export function SixtyForty() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sixty Forty code'}
+          react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function SixtyForty() {
   return (
     <PixelTwoColumn
       ratio="60/40"
@@ -84,11 +143,39 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Sidebar (40%)</div>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn ratio="60/40" :gap="6">
+    <template #left><div class="text-sm text-retro-muted">Main content (60%)</div></template>
+    <template #right><div class="text-sm text-retro-muted">Sidebar (40%)</div></template>
+  </PixelTwoColumn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn ratio="60/40" [gap]="6" [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Main content (60%)</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Sidebar (40%)</div></ng-template>
+  \`,
+})
+export class SixtyForty {}`}
+        />
       </article>
       <article className="docs-example" id="example-reversed">
         <h4>Reversed</h4>
-        <pre className="docs-code"><code>{`export function Reversed() {
+        <FrameworkCode
+          variant="docs"
+          label={'Reversed code'}
+          react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function Reversed() {
   return (
     <PixelTwoColumn
       ratio="70/30"
@@ -97,11 +184,39 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Visually first</div>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn ratio="70/30" reverse>
+    <template #left><div class="text-sm text-retro-muted">Logical left</div></template>
+    <template #right><div class="text-sm text-retro-muted">Visually first</div></template>
+  </PixelTwoColumn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn ratio="70/30" reverse [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Logical left</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Visually first</div></ng-template>
+  \`,
+})
+export class Reversed {}`}
+        />
       </article>
       <article className="docs-example" id="example-stacked-below-lg">
         <h4>Stacked Below Lg</h4>
-        <pre className="docs-code"><code>{`export function StackedBelowLg() {
+        <FrameworkCode
+          variant="docs"
+          label={'Stacked Below Lg code'}
+          react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function StackedBelowLg() {
   return (
     <PixelTwoColumn
       stackBelow="lg"
@@ -110,11 +225,39 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Side-by-side at lg+</div>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn stack-below="lg" align="center">
+    <template #left><div class="text-sm text-retro-muted">Stacks below lg</div></template>
+    <template #right><div class="text-sm text-retro-muted">Side-by-side at lg+</div></template>
+  </PixelTwoColumn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn stackBelow="lg" align="center" [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Stacks below lg</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Side-by-side at lg+</div></ng-template>
+  \`,
+})
+export class StackedBelowLg {}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
         <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import { PixelTwoColumn } from '@pxlkit/ui-kit';
+
+export function PixelSurface() {
   return (
     <PixelTwoColumn
       surface="pixel"
@@ -123,7 +266,30 @@ export function Default() {
       right={<div className="text-sm text-retro-muted">Surface-aware right</div>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTwoColumn surface="pixel" ratio="50/50">
+    <template #left><div class="text-sm text-retro-muted">Surface-aware left</div></template>
+    <template #right><div class="text-sm text-retro-muted">Surface-aware right</div></template>
+  </PixelTwoColumn>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTwoColumn],
+  template: \`
+    <div pxlTwoColumn surface="pixel" ratio="50/50" [left]="left" [right]="right"></div>
+    <ng-template #left><div class="text-sm text-retro-muted">Surface-aware left</div></ng-template>
+    <ng-template #right><div class="text-sm text-retro-muted">Surface-aware right</div></ng-template>
+  \`,
+})
+export class PixelSurface {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

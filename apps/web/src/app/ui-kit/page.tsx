@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { USAGE_SNIPPETS } from '../docs/sections/usage-snippets.generated';
+import { USAGE_SNIPPETS_VUE } from '../docs/sections/usage-snippets.vue.generated';
+import { USAGE_SNIPPETS_ANGULAR } from '../docs/sections/usage-snippets.angular.generated';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import {
   PixelAccordion,
@@ -65,6 +67,7 @@ import { Trophy, Lightning, FireSword, Crown, Shield, Coin, Star } from '@pxlkit
 import { Bell, CheckCircle, WarningTriangle, InfoCircle } from '@pxlkit/feedback';
 import { Heart, Message } from '@pxlkit/social';
 import { CodeBlock } from '../../components/CodeBlock';
+import { FrameworkCode } from '../../components/FrameworkCode';
 import { PropsTable, type PropDef } from './_doc-section';
 import { useToast, type ToastPosition, type ToastTone } from '../../components/ToastProvider';
 import { WhatsNewStrip, type WhatsNewItem } from '../../components/whats-new-strip';
@@ -551,6 +554,8 @@ function MoreComponentSection({ id, name }: { id: string; name: string }) {
         </>
       }
       code={USAGE_SNIPPETS[id] ?? `import { ${name} } from '@pxlkit/ui-kit';`}
+      vue={USAGE_SNIPPETS_VUE[id]}
+      angular={USAGE_SNIPPETS_ANGULAR[id]}
     >
       {Demo ? (
         <Demo />
@@ -574,13 +579,19 @@ function DocSection({
   description,
   props,
   code,
+  vue,
+  angular,
   children,
 }: {
   id: string;
   title: string;
   description: React.ReactNode;
   props?: PropDef[];
+  /** React code. */
   code?: string;
+  /** The same code for the Vue and Angular kits: with either, the code shows as framework tabs. */
+  vue?: string;
+  angular?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -608,7 +619,12 @@ function DocSection({
       )}
 
       {/* Code example */}
-      {code && <CodeBlock code={code} language="tsx" />}
+      {code &&
+        (vue || angular ? (
+          <FrameworkCode react={code} vue={vue} angular={angular} label={`${title} code`} />
+        ) : (
+          <CodeBlock code={code} language="tsx" />
+        ))}
     </section>
   );
 }

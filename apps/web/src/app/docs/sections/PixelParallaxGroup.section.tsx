@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelParallaxGroupDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelParallaxGroupDocsSection({ className }: PixelParallaxGroupD
     </section>
     <section aria-labelledby="pixel-parallax-group-usage">
       <h3 id="pixel-parallax-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelParallaxGroup } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelParallaxGroup usage'}
+        react={`import { PixelParallaxGroup } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -60,14 +64,19 @@ export function Default() {
       </div>
     </PixelParallaxGroup>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelParallaxGroup } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelParallaxGroup
       style={{ height: 240, background: '#0b0b0f', color: '#e5e7eb' }}
@@ -77,11 +86,17 @@ export function Default() {
       </div>
     </PixelParallaxGroup>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-as-section">
         <h4>As Section</h4>
-        <pre className="docs-code"><code>{`export function AsSection() {
+        <FrameworkCode
+          variant="docs"
+          label={'As Section code'}
+          react={`import { PixelParallaxGroup } from '@pxlkit/ui-kit';
+
+export function AsSection() {
   return (
     <PixelParallaxGroup
       as="section"
@@ -92,7 +107,8 @@ export function Default() {
       </div>
     </PixelParallaxGroup>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

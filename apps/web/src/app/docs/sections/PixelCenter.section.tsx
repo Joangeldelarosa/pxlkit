@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCenterDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProp
     </section>
     <section aria-labelledby="pixel-center-usage">
       <h3 id="pixel-center-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelCenter } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelCenter usage'}
+        react={`import { PixelCenter } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,14 +62,44 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelCenter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCenter>
+    <p class="text-sm text-retro-muted">
+      Centered content with the default max-width and page gutter.
+    </p>
+  </PixelCenter>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelCenter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCenter],
+  template: \`
+    <div pxlCenter>
+      <p class="text-sm text-retro-muted">
+        Centered content with the default max-width and page gutter.
+      </p>
+    </div>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelCenter } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelCenter>
       <p className="text-sm text-retro-muted">
@@ -73,11 +107,42 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCenter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCenter>
+    <p class="text-sm text-retro-muted">
+      Centered content with the default max-width and page gutter.
+    </p>
+  </PixelCenter>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCenter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCenter],
+  template: \`
+    <div pxlCenter>
+      <p class="text-sm text-retro-muted">
+        Centered content with the default max-width and page gutter.
+      </p>
+    </div>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-narrow-prose">
         <h4>Narrow Prose</h4>
-        <pre className="docs-code"><code>{`export function NarrowProse() {
+        <FrameworkCode
+          variant="docs"
+          label={'Narrow Prose code'}
+          react={`import { PixelCenter } from '@pxlkit/ui-kit';
+
+export function NarrowProse() {
   return (
     <PixelCenter maxWidth="2xl" text="left">
       <p className="text-sm text-retro-muted">
@@ -85,11 +150,42 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCenter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCenter max-width="2xl" text="left">
+    <p class="text-sm text-retro-muted">
+      A narrower max-width is useful for long-form reading flows where measure matters.
+    </p>
+  </PixelCenter>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCenter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCenter],
+  template: \`
+    <div pxlCenter maxWidth="2xl" text="left">
+      <p class="text-sm text-retro-muted">
+        A narrower max-width is useful for long-form reading flows where measure matters.
+      </p>
+    </div>
+  \`,
+})
+export class NarrowProse {}`}
+        />
       </article>
       <article className="docs-example" id="example-text-centered">
         <h4>Text Centered</h4>
-        <pre className="docs-code"><code>{`export function TextCentered() {
+        <FrameworkCode
+          variant="docs"
+          label={'Text Centered code'}
+          react={`import { PixelCenter } from '@pxlkit/ui-kit';
+
+export function TextCentered() {
   return (
     <PixelCenter maxWidth="3xl" text="center" gutter="md">
       <p className="text-sm text-retro-muted">
@@ -97,11 +193,42 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCenter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCenter max-width="3xl" text="center" gutter="md">
+    <p class="text-sm text-retro-muted">
+      Both the wrapper and the inner text are centered.
+    </p>
+  </PixelCenter>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCenter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCenter],
+  template: \`
+    <div pxlCenter maxWidth="3xl" text="center" gutter="md">
+      <p class="text-sm text-retro-muted">
+        Both the wrapper and the inner text are centered.
+      </p>
+    </div>
+  \`,
+})
+export class TextCentered {}`}
+        />
       </article>
       <article className="docs-example" id="example-as-section">
         <h4>As Section</h4>
-        <pre className="docs-code"><code>{`export function AsSection() {
+        <FrameworkCode
+          variant="docs"
+          label={'As Section code'}
+          react={`import { PixelCenter } from '@pxlkit/ui-kit';
+
+export function AsSection() {
   return (
     <PixelCenter as="section" maxWidth="4xl" gutter="lg" surface="pixel">
       <p className="text-sm text-retro-muted">
@@ -109,7 +236,33 @@ export function Default() {
       </p>
     </PixelCenter>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCenter } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCenter as="section" max-width="4xl" gutter="lg" surface="pixel">
+    <p class="text-sm text-retro-muted">
+      Polymorphic: renders as a semantic &lt;section&gt; on the pixel surface.
+    </p>
+  </PixelCenter>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCenter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCenter],
+  template: \`
+    <section pxlCenter maxWidth="4xl" gutter="lg" surface="pixel">
+      <p class="text-sm text-retro-muted">
+        Polymorphic: renders as a semantic &lt;section&gt; on the pixel surface.
+      </p>
+    </section>
+  \`,
+})
+export class AsSection {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTextareaDocsSectionProps {
   className?: string;
@@ -75,8 +76,10 @@ export function PixelTextareaDocsSection({ className }: PixelTextareaDocsSection
     </section>
     <section aria-labelledby="pixel-textarea-usage">
       <h3 id="pixel-textarea-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelTextarea } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTextarea usage'}
+        react={`import { PixelTextarea } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -86,14 +89,34 @@ export function Default() {
       hint="Up to 280 characters."
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTextarea label="Notes" placeholder="Write something..." hint="Up to 280 characters." />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`<pxl-textarea label="Notes" placeholder="Write something..." hint="Up to 280 characters." />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTextarea } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelTextarea
       label="Notes"
@@ -101,11 +124,32 @@ export function Default() {
       hint="Up to 280 characters."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTextarea label="Notes" placeholder="Write something..." hint="Up to 280 characters." />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`<pxl-textarea label="Notes" placeholder="Write something..." hint="Up to 280 characters." />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-uncontrolled">
         <h4>Uncontrolled</h4>
-        <pre className="docs-code"><code>{`export function Uncontrolled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Uncontrolled code'}
+          react={`import { PixelTextarea } from '@pxlkit/ui-kit';
+
+export function Uncontrolled() {
   return (
     <PixelTextarea
       label="Bio"
@@ -113,11 +157,33 @@ export function Default() {
       hint="Edit freely."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTextarea label="Bio" default-value="Frontend engineer focused on retro UIs." hint="Edit freely." />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`<pxl-textarea label="Bio" defaultValue="Frontend engineer focused on retro UIs." hint="Edit freely." />\`,
+})
+export class Uncontrolled {}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
         <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
+import { PixelTextarea } from '@pxlkit/ui-kit';
+
+export function Controlled() {
   const [value, setValue] = useState('');
   return (
     <PixelTextarea
@@ -128,11 +194,44 @@ export function Default() {
       hint={\`\${value.length} chars\`}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelTextarea v-model="value" label="Message" placeholder="Type to see live updates..." :hint="\`\${value.length} chars\`" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`
+    <pxl-textarea
+      label="Message"
+      [(value)]="value"
+      placeholder="Type to see live updates..."
+      [hint]="value().length + ' chars'"
+    />
+  \`,
+})
+export class Controlled {
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelTextarea } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-col gap-3">
       <PixelTextarea label="Neutral" tone="neutral" defaultValue="Neutral tone" />
@@ -144,22 +243,90 @@ export function Default() {
       <PixelTextarea label="Pink" tone="pink" defaultValue="Pink tone" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelTextarea label="Neutral" tone="neutral" default-value="Neutral tone" />
+    <PixelTextarea label="Green" tone="green" default-value="Green tone" />
+    <PixelTextarea label="Cyan" tone="cyan" default-value="Cyan tone" />
+    <PixelTextarea label="Gold" tone="gold" default-value="Gold tone" />
+    <PixelTextarea label="Red" tone="red" default-value="Red tone" />
+    <PixelTextarea label="Purple" tone="purple" default-value="Purple tone" />
+    <PixelTextarea label="Pink" tone="pink" default-value="Pink tone" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-textarea label="Neutral" tone="neutral" defaultValue="Neutral tone" />
+      <pxl-textarea label="Green" tone="green" defaultValue="Green tone" />
+      <pxl-textarea label="Cyan" tone="cyan" defaultValue="Cyan tone" />
+      <pxl-textarea label="Gold" tone="gold" defaultValue="Gold tone" />
+      <pxl-textarea label="Red" tone="red" defaultValue="Red tone" />
+      <pxl-textarea label="Purple" tone="purple" defaultValue="Purple tone" />
+      <pxl-textarea label="Pink" tone="pink" defaultValue="Pink tone" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelTextarea } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelTextarea label="Pixel surface" surface="pixel" defaultValue="Chunky pixel chrome" />
       <PixelTextarea label="Linear surface" surface="linear" defaultValue="Sleek linear chrome" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelTextarea label="Pixel surface" surface="pixel" default-value="Chunky pixel chrome" />
+    <PixelTextarea label="Linear surface" surface="linear" default-value="Sleek linear chrome" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-textarea label="Pixel surface" surface="pixel" defaultValue="Chunky pixel chrome" />
+      <pxl-textarea label="Linear surface" surface="linear" defaultValue="Sleek linear chrome" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
         <h4>With error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <FrameworkCode
+          variant="docs"
+          label={'With error code'}
+          react={`import { PixelTextarea } from '@pxlkit/ui-kit';
+
+export function WithError() {
   return (
     <PixelTextarea
       label="Feedback"
@@ -168,11 +335,44 @@ export function Default() {
       placeholder="Tell us what went wrong..."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTextarea
+    label="Feedback"
+    default-value=""
+    error="Feedback is required."
+    placeholder="Tell us what went wrong..."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`
+    <pxl-textarea
+      label="Feedback"
+      defaultValue=""
+      error="Feedback is required."
+      placeholder="Tell us what went wrong..."
+    />
+  \`,
+})
+export class WithError {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelTextarea } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelTextarea
       label="Locked notes"
@@ -180,11 +380,33 @@ export function Default() {
       defaultValue="Cannot edit this field"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTextarea label="Locked notes" disabled default-value="Cannot edit this field" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`<pxl-textarea label="Locked notes" disabled defaultValue="Cannot edit this field" />\`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-autosize">
         <h4>Autosize</h4>
-        <pre className="docs-code"><code>{`export function Autosize() {
+        <FrameworkCode
+          variant="docs"
+          label={'Autosize code'}
+          react={`import { useState } from 'react';
+import { PixelTextarea } from '@pxlkit/ui-kit';
+
+export function Autosize() {
   const [value, setValue] = useState(
     'Type more lines to watch this grow.\\nIt will expand between minRows and maxRows.',
   );
@@ -198,11 +420,38 @@ export function Default() {
       onChange={(e) => setValue(e.target.value)}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+
+const value = ref('Type more lines to watch this grow.\\nIt will expand between minRows and maxRows.');
+</script>
+
+<template>
+  <PixelTextarea v-model="value" label="Auto-grow" autosize :min-rows="2" :max-rows="8" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`<pxl-textarea label="Auto-grow" autosize [minRows]="2" [maxRows]="8" [(value)]="value" />\`,
+})
+export class Autosize {
+  readonly value = signal('Type more lines to watch this grow.\\nIt will expand between minRows and maxRows.');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-char-count">
         <h4>With char count</h4>
-        <pre className="docs-code"><code>{`export function WithCharCount() {
+        <FrameworkCode
+          variant="docs"
+          label={'With char count code'}
+          react={`import { useState } from 'react';
+import { PixelTextarea } from '@pxlkit/ui-kit';
+
+export function WithCharCount() {
   const [value, setValue] = useState('Short blurb');
   return (
     <PixelTextarea
@@ -213,11 +462,39 @@ export function Default() {
       placeholder="Up to 140 characters"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+
+const value = ref('Short blurb');
+</script>
+
+<template>
+  <PixelTextarea v-model="value" label="Short bio" :show-count="{ max: 140 }" placeholder="Up to 140 characters" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`
+    <pxl-textarea label="Short bio" [(value)]="value" [showCount]="{ max: 140 }" placeholder="Up to 140 characters" />
+  \`,
+})
+export class WithCharCount {
+  readonly value = signal('Short blurb');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-required">
         <h4>Required</h4>
-        <pre className="docs-code"><code>{`export function Required() {
+        <FrameworkCode
+          variant="docs"
+          label={'Required code'}
+          react={`import { PixelTextarea } from '@pxlkit/ui-kit';
+
+export function Required() {
   return (
     <PixelTextarea
       label="Required"
@@ -226,7 +503,23 @@ export function Default() {
       hint="Don't leave it blank."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTextarea } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTextarea label="Required" required placeholder="This field is required" hint="Don't leave it blank." />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTextarea } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTextarea],
+  template: \`<pxl-textarea label="Required" required placeholder="This field is required" hint="Don't leave it blank." />\`,
+})
+export class Required {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

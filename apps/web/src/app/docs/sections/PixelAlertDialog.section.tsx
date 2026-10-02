@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAlertDialogDocsSectionProps {
   className?: string;
@@ -75,7 +76,10 @@ export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsS
     </section>
     <section aria-labelledby="pixel-alert-dialog-usage">
       <h3 id="pixel-alert-dialog-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelAlertDialog usage'}
+        react={`import { useState } from 'react';
 import { PixelAlertDialog } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -95,14 +99,61 @@ export function Default() {
       />
     </div>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <div>
+    <button type="button" @click="open = true">Open alert dialog</button>
+    <PixelAlertDialog
+      v-model:open="open"
+      title="Save changes?"
+      description="Your edits will be applied to the live document."
+      action-label="Save"
+      @action="open = false"
+    />
+  </div>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlertDialog],
+  template: \`
+    <div>
+      <button type="button" (click)="open.set(true)">Open alert dialog</button>
+      <pxl-alert-dialog
+        [(open)]="open"
+        title="Save changes?"
+        description="Your edits will be applied to the live document."
+        actionLabel="Save"
+        [onAction]="save"
+      />
+    </div>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+  readonly save = () => this.open.set(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelAlertDialog } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [open, setOpen] = useState(false);
   return (
     <div>
@@ -119,11 +170,59 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <div>
+    <button type="button" @click="open = true">Open alert dialog</button>
+    <PixelAlertDialog
+      v-model:open="open"
+      title="Save changes?"
+      description="Your edits will be applied to the live document."
+      action-label="Save"
+      @action="open = false"
+    />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlertDialog],
+  template: \`
+    <div>
+      <button type="button" (click)="open.set(true)">Open alert dialog</button>
+      <pxl-alert-dialog
+        [(open)]="open"
+        title="Save changes?"
+        description="Your edits will be applied to the live document."
+        actionLabel="Save"
+        [onAction]="save"
+      />
+    </div>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+  readonly save = () => this.open.set(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-destructive">
         <h4>Destructive</h4>
-        <pre className="docs-code"><code>{`export function Destructive() {
+        <FrameworkCode
+          variant="docs"
+          label={'Destructive code'}
+          react={`import { useState } from 'react';
+import { PixelAlertDialog } from '@pxlkit/ui-kit';
+
+export function Destructive() {
   const [open, setOpen] = useState(false);
   return (
     <div>
@@ -142,11 +241,63 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <div>
+    <button type="button" @click="open = true">Delete item</button>
+    <PixelAlertDialog
+      v-model:open="open"
+      title="Delete this item?"
+      description="This action cannot be undone."
+      cancel-label="Keep"
+      action-label="Delete"
+      destructive
+      @action="open = false"
+    />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlertDialog],
+  template: \`
+    <div>
+      <button type="button" (click)="open.set(true)">Delete item</button>
+      <pxl-alert-dialog
+        [(open)]="open"
+        title="Delete this item?"
+        description="This action cannot be undone."
+        cancelLabel="Keep"
+        actionLabel="Delete"
+        destructive
+        [onAction]="remove"
+      />
+    </div>
+  \`,
+})
+export class Destructive {
+  readonly open = signal(false);
+  readonly remove = () => this.open.set(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-async-action">
         <h4>Async Action</h4>
-        <pre className="docs-code"><code>{`export function AsyncAction() {
+        <FrameworkCode
+          variant="docs"
+          label={'Async Action code'}
+          react={`import { useState } from 'react';
+import { PixelAlertDialog } from '@pxlkit/ui-kit';
+
+export function AsyncAction() {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   return (
@@ -167,7 +318,66 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+const error = ref<string | null>(null);
+
+function show() {
+  error.value = null;
+  open.value = true;
+}
+
+const submit = () => new Promise<void>((resolve) => setTimeout(resolve, 600));
+</script>
+
+<template>
+  <div>
+    <button type="button" @click="show">Submit</button>
+    <PixelAlertDialog
+      v-model:open="open"
+      title="Submit report?"
+      :description="error ?? 'The report will be sent for review.'"
+      action-label="Submit"
+      @action="submit"
+      @error="(e) => (error = e instanceof Error ? e.message : 'Failed')"
+    />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAlertDialog],
+  template: \`
+    <div>
+      <button type="button" (click)="show()">Submit</button>
+      <pxl-alert-dialog
+        [(open)]="open"
+        title="Submit report?"
+        [description]="error() ?? 'The report will be sent for review.'"
+        actionLabel="Submit"
+        [onAction]="submit"
+        [onError]="fail"
+      />
+    </div>
+  \`,
+})
+export class AsyncAction {
+  readonly open = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly submit = () => new Promise<void>((resolve) => setTimeout(resolve, 600));
+  readonly fail = (e: unknown) => this.error.set(e instanceof Error ? e.message : 'Failed');
+
+  show(): void {
+    this.error.set(null);
+    this.open.set(true);
+  }
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

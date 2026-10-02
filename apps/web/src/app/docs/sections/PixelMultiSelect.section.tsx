@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelMultiSelectDocsSectionProps {
   className?: string;
@@ -91,7 +92,10 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
     </section>
     <section aria-labelledby="pixel-multi-select-usage">
       <h3 id="pixel-multi-select-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelMultiSelect usage'}
+        react={`import React from 'react';
 import { PixelMultiSelect } from '@pxlkit/ui-kit';
 
 const OPTIONS = [
@@ -113,14 +117,28 @@ export function Default() {
       placeholder="Pick frameworks…"
     />
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import React from 'react';
+import { PixelMultiSelect } from '@pxlkit/ui-kit';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+export function Default() {
   const [value, setValue] = React.useState<string[]>(['react']);
   return (
     <PixelMultiSelect
@@ -131,11 +149,26 @@ export function Default() {
       placeholder="Pick frameworks…"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-searchable">
         <h4>Searchable + Clearable</h4>
-        <pre className="docs-code"><code>{`export function Searchable() {
+        <FrameworkCode
+          variant="docs"
+          label={'Searchable + Clearable code'}
+          react={`import React from 'react';
+import { PixelMultiSelect } from '@pxlkit/ui-kit';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+export function Searchable() {
   const [value, setValue] = React.useState<string[]>([]);
   return (
     <PixelMultiSelect
@@ -148,11 +181,26 @@ export function Default() {
       clearable
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-max">
         <h4>With Max</h4>
-        <pre className="docs-code"><code>{`export function WithMax() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Max code'}
+          react={`import React from 'react';
+import { PixelMultiSelect } from '@pxlkit/ui-kit';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+export function WithMax() {
   const [value, setValue] = React.useState<string[]>(['react', 'vue']);
   return (
     <PixelMultiSelect
@@ -164,7 +212,8 @@ export function Default() {
       clearable
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

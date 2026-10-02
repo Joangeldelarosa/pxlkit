@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFloatDocsSectionProps {
   className?: string;
@@ -47,7 +48,10 @@ export function PixelFloatDocsSection({ className }: PixelFloatDocsSectionProps)
     </section>
     <section aria-labelledby="pixel-float-usage">
       <h3 id="pixel-float-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelFloat } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelFloat usage'}
+        react={`import { PixelFloat } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -55,40 +59,58 @@ export function Default() {
       <span>Float</span>
     </PixelFloat>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelFloat } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelFloat>
       <span>Float</span>
     </PixelFloat>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-farther-travel">
         <h4>Farther Travel</h4>
-        <pre className="docs-code"><code>{`export function FartherTravel() {
+        <FrameworkCode
+          variant="docs"
+          label={'Farther Travel code'}
+          react={`import { PixelFloat } from '@pxlkit/ui-kit';
+
+export function FartherTravel() {
   return (
     <PixelFloat distance={14} duration={2800}>
       <span>Drifting Higher</span>
     </PixelFloat>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-hover-trigger">
         <h4>Hover Trigger</h4>
-        <pre className="docs-code"><code>{`export function HoverTrigger() {
+        <FrameworkCode
+          variant="docs"
+          label={'Hover Trigger code'}
+          react={`import { PixelFloat } from '@pxlkit/ui-kit';
+
+export function HoverTrigger() {
   return (
     <PixelFloat trigger="hover" repeat={3}>
       <span>Hover me</span>
     </PixelFloat>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

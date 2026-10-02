@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelEmptyStateDocsSectionProps {
   className?: string;
@@ -45,8 +46,10 @@ export function PixelEmptyStateDocsSection({ className }: PixelEmptyStateDocsSec
     </section>
     <section aria-labelledby="pixel-empty-state-usage">
       <h3 id="pixel-empty-state-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelEmptyState } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelEmptyState usage'}
+        react={`import { PixelEmptyState } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -55,25 +58,95 @@ export function Default() {
       description="Try adjusting your filters or search terms to find what you are looking for."
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelEmptyState } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelEmptyState
+    title="No results found"
+    description="Try adjusting your filters or search terms to find what you are looking for."
+  />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelEmptyState } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEmptyState],
+  template: \`
+    <pxl-empty-state
+      title="No results found"
+      description="Try adjusting your filters or search terms to find what you are looking for."
+    />
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelEmptyState } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelEmptyState
       title="No results found"
       description="Try adjusting your filters or search terms to find what you are looking for."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelEmptyState } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelEmptyState
+    title="No results found"
+    description="Try adjusting your filters or search terms to find what you are looking for."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelEmptyState } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEmptyState],
+  template: \`
+    <pxl-empty-state
+      title="No results found"
+      description="Try adjusting your filters or search terms to find what you are looking for."
+    />
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icon">
         <h4>With Icon</h4>
-        <pre className="docs-code"><code>{`export function WithIcon() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Icon code'}
+          react={`import { PixelEmptyState } from '@pxlkit/ui-kit';
+
+const FolderIcon = () => (
+  <span
+    aria-hidden
+    style={{
+      width: 32,
+      height: 32,
+      borderRadius: 4,
+      border: '2px solid currentColor',
+      display: 'inline-block',
+    }}
+  />
+);
+
+export function WithIcon() {
   return (
     <PixelEmptyState
       icon={<FolderIcon />}
@@ -81,11 +154,52 @@ export function Default() {
       description="Create your first project to get started organizing your work."
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelEmptyState } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelEmptyState title="No projects yet" description="Create your first project to get started organizing your work.">
+    <template #icon>
+      <span
+        aria-hidden="true"
+        style="width: 32px; height: 32px; border-radius: 4px; border: 2px solid currentColor; display: inline-block"
+      />
+    </template>
+  </PixelEmptyState>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelEmptyState } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEmptyState],
+  template: \`
+    <pxl-empty-state
+      title="No projects yet"
+      description="Create your first project to get started organizing your work."
+      [icon]="folder"
+    />
+    <ng-template #folder>
+      <span
+        aria-hidden="true"
+        style="width: 32px; height: 32px; border-radius: 4px; border: 2px solid currentColor; display: inline-block"
+      ></span>
+    </ng-template>
+  \`,
+})
+export class WithIcon {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-action">
         <h4>With Action</h4>
-        <pre className="docs-code"><code>{`export function WithAction() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Action code'}
+          react={`import { PixelEmptyState } from '@pxlkit/ui-kit';
+import { PixelButton } from '@pxlkit/ui-kit';
+
+export function WithAction() {
   return (
     <PixelEmptyState
       title="Your inbox is empty"
@@ -97,11 +211,57 @@ export function Default() {
       }
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PixelEmptyState } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelEmptyState title="Your inbox is empty" description="When you receive new messages, they will appear here.">
+    <template #action>
+      <PixelButton size="sm" tone="cyan" variant="solid">Refresh</PixelButton>
+    </template>
+  </PixelEmptyState>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelEmptyState } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelEmptyState],
+  template: \`
+    <pxl-empty-state
+      title="Your inbox is empty"
+      description="When you receive new messages, they will appear here."
+      [action]="refresh"
+    />
+    <ng-template #refresh><button pxlButton size="sm" tone="cyan" variant="solid">Refresh</button></ng-template>
+  \`,
+})
+export class WithAction {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icon-and-action">
         <h4>With Icon + Action</h4>
-        <pre className="docs-code"><code>{`export function WithIconAndAction() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Icon + Action code'}
+          react={`import { PixelEmptyState } from '@pxlkit/ui-kit';
+import { PixelButton } from '@pxlkit/ui-kit';
+
+const FolderIcon = () => (
+  <span
+    aria-hidden
+    style={{
+      width: 32,
+      height: 32,
+      borderRadius: 4,
+      border: '2px solid currentColor',
+      display: 'inline-block',
+    }}
+  />
+);
+
+export function WithIconAndAction() {
   return (
     <PixelEmptyState
       icon={<FolderIcon />}
@@ -114,11 +274,56 @@ export function Default() {
       }
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PixelEmptyState } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelEmptyState title="No documents" description="Upload a file or create a new document to begin.">
+    <template #icon>
+      <span
+        aria-hidden="true"
+        style="width: 32px; height: 32px; border-radius: 4px; border: 2px solid currentColor; display: inline-block"
+      />
+    </template>
+    <template #action>
+      <PixelButton size="sm" tone="green" variant="solid">Create document</PixelButton>
+    </template>
+  </PixelEmptyState>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PixelEmptyState } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PixelEmptyState],
+  template: \`
+    <pxl-empty-state
+      title="No documents"
+      description="Upload a file or create a new document to begin."
+      [icon]="folder"
+      [action]="create"
+    />
+    <ng-template #folder>
+      <span
+        aria-hidden="true"
+        style="width: 32px; height: 32px; border-radius: 4px; border: 2px solid currentColor; display: inline-block"
+      ></span>
+    </ng-template>
+    <ng-template #create><button pxlButton size="sm" tone="green" variant="solid">Create document</button></ng-template>
+  \`,
+})
+export class WithIconAndAction {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelEmptyState } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-4">
       <PixelEmptyState
@@ -133,7 +338,31 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelEmptyState } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-4">
+    <PixelEmptyState surface="linear" title="Linear surface" description="Soft dashed border with rounded corners." />
+    <PixelEmptyState surface="pixel" title="Pixel surface" description="Chamfered dashed border with retro typography." />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelEmptyState } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEmptyState],
+  template: \`
+    <div class="flex flex-col gap-4">
+      <pxl-empty-state surface="linear" title="Linear surface" description="Soft dashed border with rounded corners." />
+      <pxl-empty-state surface="pixel" title="Pixel surface" description="Chamfered dashed border with retro typography." />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

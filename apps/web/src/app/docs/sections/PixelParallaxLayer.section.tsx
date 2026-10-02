@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelParallaxLayerDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerD
     </section>
     <section aria-labelledby="pixel-parallax-layer-usage">
       <h3 id="pixel-parallax-layer-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelParallaxLayer usage'}
+        react={`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -58,14 +62,19 @@ export function Default() {
       </div>
     </PixelParallaxLayer>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default (background)</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default (background) code'}
+          react={`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelParallaxLayer speed={0.5} axis="y">
       <div style={{ padding: 24, background: '#111', color: '#fff' }}>
@@ -73,11 +82,17 @@ export function Default() {
       </div>
     </PixelParallaxLayer>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-foreground">
         <h4>Foreground (reverse)</h4>
-        <pre className="docs-code"><code>{`export function Foreground() {
+        <FrameworkCode
+          variant="docs"
+          label={'Foreground (reverse) code'}
+          react={`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
+
+export function Foreground() {
   return (
     <PixelParallaxLayer speed={-0.3} axis="y">
       <div style={{ padding: 24, background: '#222', color: '#fff' }}>
@@ -85,11 +100,17 @@ export function Default() {
       </div>
     </PixelParallaxLayer>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-horizontal">
         <h4>Horizontal axis</h4>
-        <pre className="docs-code"><code>{`export function Horizontal() {
+        <FrameworkCode
+          variant="docs"
+          label={'Horizontal axis code'}
+          react={`import { PixelParallaxLayer } from '@pxlkit/ui-kit';
+
+export function Horizontal() {
   return (
     <div className="relative w-full overflow-hidden">
       <PixelParallaxLayer speed={0.4} axis="x">
@@ -99,7 +120,8 @@ export function Default() {
       </PixelParallaxLayer>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     </section>

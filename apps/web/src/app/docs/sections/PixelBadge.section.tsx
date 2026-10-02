@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBadgeDocsSectionProps {
   className?: string;
@@ -70,24 +71,68 @@ export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps)
     </section>
     <section aria-labelledby="pixel-badge-usage">
       <h3 id="pixel-badge-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBadge } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBadge usage'}
+        react={`import { PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelBadge>NEW</PixelBadge>;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBadge } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBadge>NEW</PixelBadge>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBadge } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge],
+  template: \`<pxl-badge>NEW</pxl-badge>\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelBadge>NEW</PixelBadge>;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBadge>NEW</PixelBadge>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge],
+  template: \`<pxl-badge>NEW</pxl-badge>\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PixelBadge tone="neutral">neutral</PixelBadge>
@@ -99,11 +144,50 @@ export function Default() {
       <PixelBadge tone="pink">pink</PixelBadge>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <PixelBadge tone="neutral">neutral</PixelBadge>
+    <PixelBadge tone="green">green</PixelBadge>
+    <PixelBadge tone="cyan">cyan</PixelBadge>
+    <PixelBadge tone="gold">gold</PixelBadge>
+    <PixelBadge tone="red">red</PixelBadge>
+    <PixelBadge tone="purple">purple</PixelBadge>
+    <PixelBadge tone="pink">pink</PixelBadge>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge],
+  template: \`
+    <div class="flex flex-wrap items-center gap-2">
+      <pxl-badge tone="neutral">neutral</pxl-badge>
+      <pxl-badge tone="green">green</pxl-badge>
+      <pxl-badge tone="cyan">cyan</pxl-badge>
+      <pxl-badge tone="gold">gold</pxl-badge>
+      <pxl-badge tone="red">red</pxl-badge>
+      <pxl-badge tone="purple">purple</pxl-badge>
+      <pxl-badge tone="pink">pink</pxl-badge>
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PixelBadge size="sm" tone="cyan">small</PixelBadge>
@@ -111,11 +195,42 @@ export function Default() {
       <PixelBadge size="lg" tone="cyan">large</PixelBadge>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <PixelBadge size="sm" tone="cyan">small</PixelBadge>
+    <PixelBadge size="md" tone="cyan">medium</PixelBadge>
+    <PixelBadge size="lg" tone="cyan">large</PixelBadge>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge],
+  template: \`
+    <div class="flex flex-wrap items-center gap-2">
+      <pxl-badge size="sm" tone="cyan">small</pxl-badge>
+      <pxl-badge size="md" tone="cyan">medium</pxl-badge>
+      <pxl-badge size="lg" tone="cyan">large</pxl-badge>
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-variants">
         <h4>Variants</h4>
-        <pre className="docs-code"><code>{`export function Variants() {
+        <FrameworkCode
+          variant="docs"
+          label={'Variants code'}
+          react={`import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function Variants() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PixelBadge variant="soft" tone="green">soft</PixelBadge>
@@ -124,22 +239,91 @@ export function Default() {
       <PixelBadge variant="ghost" tone="green">ghost</PixelBadge>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <PixelBadge variant="soft" tone="green">soft</PixelBadge>
+    <PixelBadge variant="solid" tone="green">solid</PixelBadge>
+    <PixelBadge variant="outline" tone="green">outline</PixelBadge>
+    <PixelBadge variant="ghost" tone="green">ghost</PixelBadge>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge],
+  template: \`
+    <div class="flex flex-wrap items-center gap-2">
+      <pxl-badge variant="soft" tone="green">soft</pxl-badge>
+      <pxl-badge variant="solid" tone="green">solid</pxl-badge>
+      <pxl-badge variant="outline" tone="green">outline</pxl-badge>
+      <pxl-badge variant="ghost" tone="green">ghost</pxl-badge>
+    </div>
+  \`,
+})
+export class Variants {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <PixelBadge surface="pixel" tone="gold">pixel</PixelBadge>
       <PixelBadge surface="linear" tone="gold">linear</PixelBadge>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-3">
+    <PixelBadge surface="pixel" tone="gold">pixel</PixelBadge>
+    <PixelBadge surface="linear" tone="gold">linear</PixelBadge>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge],
+  template: \`
+    <div class="flex flex-wrap items-center gap-3">
+      <pxl-badge surface="pixel" tone="gold">pixel</pxl-badge>
+      <pxl-badge surface="linear" tone="gold">linear</pxl-badge>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icon">
         <h4>With Icon</h4>
-        <pre className="docs-code"><code>{`export function WithIcon() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Icon code'}
+          react={`import { PixelBadge } from '@pxlkit/ui-kit';
+
+const DotIcon = () => (
+  <span
+    aria-hidden
+    style={{ width: 6, height: 6, borderRadius: 9999, background: 'currentColor', display: 'inline-block' }}
+  />
+);
+
+export function WithIcon() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PixelBadge tone="green" iconLeft={<DotIcon />}>online</PixelBadge>
@@ -147,17 +331,85 @@ export function Default() {
       <PixelBadge tone="gold" iconLeft={<DotIcon />}>warn</PixelBadge>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge } from '@pxlkit/ui-kit-vue';
+
+const dot = { width: '6px', height: '6px', borderRadius: '9999px', background: 'currentColor', display: 'inline-block' };
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <PixelBadge tone="green">
+      <template #icon-left><span aria-hidden="true" :style="dot" /></template>
+      online
+    </PixelBadge>
+    <PixelBadge tone="red">
+      <template #icon-left><span aria-hidden="true" :style="dot" /></template>
+      error
+    </PixelBadge>
+    <PixelBadge tone="gold">
+      <template #icon-left><span aria-hidden="true" :style="dot" /></template>
+      warn
+    </PixelBadge>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge],
+  template: \`
+    <div class="flex flex-wrap items-center gap-2">
+      <pxl-badge tone="green" [iconLeft]="dot">online</pxl-badge>
+      <pxl-badge tone="red" [iconLeft]="dot">error</pxl-badge>
+      <pxl-badge tone="gold" [iconLeft]="dot">warn</pxl-badge>
+    </div>
+    <ng-template #dot>
+      <span
+        aria-hidden="true"
+        style="width: 6px; height: 6px; border-radius: 9999px; background: currentColor; display: inline-block"
+      ></span>
+    </ng-template>
+  \`,
+})
+export class WithIcon {}`}
+        />
       </article>
       <article className="docs-example" id="example-clickable">
         <h4>Clickable</h4>
-        <pre className="docs-code"><code>{`export function Clickable() {
+        <FrameworkCode
+          variant="docs"
+          label={'Clickable code'}
+          react={`import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function Clickable() {
   return (
     <PixelBadge tone="cyan" variant="outline" onClick={() => undefined}>
       click me
     </PixelBadge>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge } from '@pxlkit/ui-kit-vue';
+
+function onClick() {}
+</script>
+
+<template>
+  <PixelBadge tone="cyan" variant="outline" @click="onClick">click me</PixelBadge>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge],
+  template: \`<button pxlBadge tone="cyan" variant="outline" (click)="onClick()">click me</button>\`,
+})
+export class Clickable {
+  onClick(): void {}
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

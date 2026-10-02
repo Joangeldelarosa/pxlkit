@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDropdownDocsSectionProps {
   className?: string;
@@ -126,8 +127,10 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
     </section>
     <section aria-labelledby="pixel-dropdown-usage">
       <h3 id="pixel-dropdown-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelDropdown } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelDropdown usage'}
+        react={`import { PixelDropdown } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -141,14 +144,54 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDropdown
+    label="Actions"
+    :items="[
+      { value: 'edit', label: 'Edit' },
+      { value: 'duplicate', label: 'Duplicate' },
+      { value: 'archive', label: 'Archive' },
+    ]"
+    @select="() => {}"
+  />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`
+    <pxl-dropdown
+      label="Actions"
+      [items]="[
+        { value: 'edit', label: 'Edit' },
+        { value: 'duplicate', label: 'Duplicate' },
+        { value: 'archive', label: 'Archive' },
+      ]"
+      (selected)="select()"
+    />
+  \`,
+})
+export class Default {
+  select(): void {}
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelDropdown
       label="Actions"
@@ -160,11 +203,52 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDropdown
+    label="Actions"
+    :items="[
+      { value: 'edit', label: 'Edit' },
+      { value: 'duplicate', label: 'Duplicate' },
+      { value: 'archive', label: 'Archive' },
+    ]"
+    @select="() => {}"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`
+    <pxl-dropdown
+      label="Actions"
+      [items]="[
+        { value: 'edit', label: 'Edit' },
+        { value: 'duplicate', label: 'Duplicate' },
+        { value: 'archive', label: 'Archive' },
+      ]"
+      (selected)="select()"
+    />
+  \`,
+})
+export class Default {
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-wrap items-start gap-4">
       <PixelDropdown
@@ -189,11 +273,44 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-start gap-4">
+    <PixelDropdown label="Neutral" tone="neutral" :items="[{ value: 'a', label: 'Option A' }]" />
+    <PixelDropdown label="Cyan" tone="cyan" :items="[{ value: 'a', label: 'Option A' }]" />
+    <PixelDropdown label="Green" tone="green" :items="[{ value: 'a', label: 'Option A' }]" />
+    <PixelDropdown label="Red" tone="red" :items="[{ value: 'a', label: 'Option A' }]" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`
+    <div class="flex flex-wrap items-start gap-4">
+      <pxl-dropdown label="Neutral" tone="neutral" [items]="[{ value: 'a', label: 'Option A' }]" />
+      <pxl-dropdown label="Cyan" tone="cyan" [items]="[{ value: 'a', label: 'Option A' }]" />
+      <pxl-dropdown label="Green" tone="green" [items]="[{ value: 'a', label: 'Option A' }]" />
+      <pxl-dropdown label="Red" tone="red" [items]="[{ value: 'a', label: 'Option A' }]" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap items-start gap-4">
       <PixelDropdown
@@ -214,11 +331,68 @@ export function Default() {
       />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-start gap-4">
+    <PixelDropdown
+      label="Pixel"
+      surface="pixel"
+      :items="[
+        { value: 'one', label: 'First' },
+        { value: 'two', label: 'Second' },
+      ]"
+    />
+    <PixelDropdown
+      label="Linear"
+      surface="linear"
+      :items="[
+        { value: 'one', label: 'First' },
+        { value: 'two', label: 'Second' },
+      ]"
+    />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`
+    <div class="flex flex-wrap items-start gap-4">
+      <pxl-dropdown
+        label="Pixel"
+        surface="pixel"
+        [items]="[
+          { value: 'one', label: 'First' },
+          { value: 'two', label: 'Second' },
+        ]"
+      />
+      <pxl-dropdown
+        label="Linear"
+        surface="linear"
+        [items]="[
+          { value: 'one', label: 'First' },
+          { value: 'two', label: 'Second' },
+        ]"
+      />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled trigger</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled trigger code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelDropdown
       label="Unavailable"
@@ -226,11 +400,32 @@ export function Default() {
       items={[{ value: 'a', label: 'Option A' }]}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDropdown label="Unavailable" disabled :items="[{ value: 'a', label: 'Option A' }]" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`<pxl-dropdown label="Unavailable" disabled [items]="[{ value: 'a', label: 'Option A' }]" />\`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icons-and-shortcuts">
         <h4>Shortcuts</h4>
-        <pre className="docs-code"><code>{`export function WithIconsAndShortcuts() {
+        <FrameworkCode
+          variant="docs"
+          label={'Shortcuts code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function WithIconsAndShortcuts() {
   return (
     <PixelDropdown
       label="File"
@@ -242,11 +437,52 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDropdown
+    label="File"
+    :items="[
+      { value: 'new', label: 'New', shortcut: 'Ctrl+N' },
+      { value: 'open', label: 'Open…', shortcut: 'Ctrl+O' },
+      { value: 'save', label: 'Save', shortcut: 'Ctrl+S' },
+    ]"
+    @select="() => {}"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`
+    <pxl-dropdown
+      label="File"
+      [items]="[
+        { value: 'new', label: 'New', shortcut: 'Ctrl+N' },
+        { value: 'open', label: 'Open…', shortcut: 'Ctrl+O' },
+        { value: 'save', label: 'Save', shortcut: 'Ctrl+S' },
+      ]"
+      (selected)="select()"
+    />
+  \`,
+})
+export class WithIconsAndShortcuts {
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-headers-and-separators">
         <h4>Headers + separators</h4>
-        <pre className="docs-code"><code>{`export function HeadersAndSeparators() {
+        <FrameworkCode
+          variant="docs"
+          label={'Headers + separators code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function HeadersAndSeparators() {
   return (
     <PixelDropdown
       label="Account"
@@ -261,11 +497,52 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-vue';
+
+const items: DropdownOption[] = [
+  { value: 'h1', label: 'Profile', kind: 'header' },
+  { value: 'view', label: 'View profile' },
+  { value: 'edit', label: 'Edit profile' },
+  { value: 'sep1', label: '', kind: 'separator' },
+  { value: 'h2', label: 'Danger Zone', kind: 'header' },
+  { value: 'delete', label: 'Delete account', tone: 'red' },
+];
+</script>
+
+<template>
+  <PixelDropdown label="Account" :items="items" @select="() => {}" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`<pxl-dropdown label="Account" [items]="items" (selected)="select()" />\`,
+})
+export class HeadersAndSeparators {
+  readonly items: DropdownOption[] = [
+    { value: 'h1', label: 'Profile', kind: 'header' },
+    { value: 'view', label: 'View profile' },
+    { value: 'edit', label: 'Edit profile' },
+    { value: 'sep1', label: '', kind: 'separator' },
+    { value: 'h2', label: 'Danger Zone', kind: 'header' },
+    { value: 'delete', label: 'Delete account', tone: 'red' },
+  ];
+
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-checkbox-and-radio">
         <h4>Checkbox + radio items</h4>
-        <pre className="docs-code"><code>{`export function CheckboxAndRadio() {
+        <FrameworkCode
+          variant="docs"
+          label={'Checkbox + radio items code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function CheckboxAndRadio() {
   return (
     <PixelDropdown
       label="View"
@@ -282,11 +559,56 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-vue';
+
+const items: DropdownOption[] = [
+  { value: 'g1', label: 'Show', kind: 'header' },
+  { value: 'grid', label: 'Grid lines', kind: 'checkbox', checked: true },
+  { value: 'ruler', label: 'Ruler', kind: 'checkbox', checked: false },
+  { value: 'sep', label: '', kind: 'separator' },
+  { value: 'g2', label: 'Density', kind: 'header' },
+  { value: 'compact', label: 'Compact', kind: 'radio', checked: false },
+  { value: 'cozy', label: 'Cozy', kind: 'radio', checked: true },
+  { value: 'spacious', label: 'Spacious', kind: 'radio', checked: false },
+];
+</script>
+
+<template>
+  <PixelDropdown label="View" :items="items" @select="() => {}" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`<pxl-dropdown label="View" [items]="items" (selected)="select()" />\`,
+})
+export class CheckboxAndRadio {
+  readonly items: DropdownOption[] = [
+    { value: 'g1', label: 'Show', kind: 'header' },
+    { value: 'grid', label: 'Grid lines', kind: 'checkbox', checked: true },
+    { value: 'ruler', label: 'Ruler', kind: 'checkbox', checked: false },
+    { value: 'sep', label: '', kind: 'separator' },
+    { value: 'g2', label: 'Density', kind: 'header' },
+    { value: 'compact', label: 'Compact', kind: 'radio', checked: false },
+    { value: 'cozy', label: 'Cozy', kind: 'radio', checked: true },
+    { value: 'spacious', label: 'Spacious', kind: 'radio', checked: false },
+  ];
+
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled-items">
         <h4>Disabled items</h4>
-        <pre className="docs-code"><code>{`export function DisabledItems() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled items code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function DisabledItems() {
   return (
     <PixelDropdown
       label="Edit"
@@ -301,11 +623,52 @@ export function Default() {
       onSelect={() => {}}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-vue';
+
+const items: DropdownOption[] = [
+  { value: 'undo', label: 'Undo', shortcut: 'Ctrl+Z' },
+  { value: 'redo', label: 'Redo', shortcut: 'Ctrl+Y', disabled: true },
+  { value: 'sep', label: '', kind: 'separator' },
+  { value: 'cut', label: 'Cut' },
+  { value: 'copy', label: 'Copy' },
+  { value: 'paste', label: 'Paste', disabled: true },
+];
+</script>
+
+<template>
+  <PixelDropdown label="Edit" :items="items" @select="() => {}" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdown, type DropdownOption } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdown],
+  template: \`<pxl-dropdown label="Edit" [items]="items" (selected)="select()" />\`,
+})
+export class DisabledItems {
+  readonly items: DropdownOption[] = [
+    { value: 'undo', label: 'Undo', shortcut: 'Ctrl+Z' },
+    { value: 'redo', label: 'Redo', shortcut: 'Ctrl+Y', disabled: true },
+    { value: 'sep', label: '', kind: 'separator' },
+    { value: 'cut', label: 'Cut' },
+    { value: 'copy', label: 'Copy' },
+    { value: 'paste', label: 'Paste', disabled: true },
+  ];
+
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-composition">
         <h4>Compositional API</h4>
-        <pre className="docs-code"><code>{`export function Composition() {
+        <FrameworkCode
+          variant="docs"
+          label={'Compositional API code'}
+          react={`import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function Composition() {
   return (
     <PixelDropdown.Root>
       <PixelDropdown.Trigger>Menu</PixelDropdown.Trigger>
@@ -324,11 +687,69 @@ export function Default() {
       </PixelDropdown.Content>
     </PixelDropdown.Root>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import {
+  PixelDropdownContent,
+  PixelDropdownHeader,
+  PixelDropdownItem,
+  PixelDropdownRoot,
+  PixelDropdownSeparator,
+  PixelDropdownTrigger,
+} from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelDropdownRoot>
+    <PixelDropdownTrigger>Menu</PixelDropdownTrigger>
+    <PixelDropdownContent>
+      <PixelDropdownHeader>Project</PixelDropdownHeader>
+      <PixelDropdownItem value="rename" @select="() => {}">Rename</PixelDropdownItem>
+      <PixelDropdownItem value="share" shortcut="Ctrl+E" @select="() => {}">Share</PixelDropdownItem>
+      <PixelDropdownSeparator />
+      <PixelDropdownItem value="delete" destructive @select="() => {}">Delete</PixelDropdownItem>
+    </PixelDropdownContent>
+  </PixelDropdownRoot>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDropdownContent, PixelDropdownHeader, PixelDropdownItem, PixelDropdownRoot, PixelDropdownSeparator, PixelDropdownTrigger } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [
+    PixelDropdownRoot,
+    PixelDropdownTrigger,
+    PixelDropdownContent,
+    PixelDropdownHeader,
+    PixelDropdownItem,
+    PixelDropdownSeparator,
+  ],
+  template: \`
+    <pxl-dropdown-root>
+      <pxl-dropdown-trigger>Menu</pxl-dropdown-trigger>
+      <div *pxlDropdownContent>
+        <pxl-dropdown-header>Project</pxl-dropdown-header>
+        <button pxlDropdownItem value="rename" (selected)="select()">Rename</button>
+        <button pxlDropdownItem value="share" shortcut="Ctrl+E" (selected)="select()">Share</button>
+        <pxl-dropdown-separator />
+        <button pxlDropdownItem value="delete" destructive (selected)="select()">Delete</button>
+      </div>
+    </pxl-dropdown-root>
+  \`,
+})
+export class Composition {
+  select(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled-open">
         <h4>Controlled open</h4>
-        <pre className="docs-code"><code>{`export function ControlledOpen() {
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled open code'}
+          react={`import { useState } from 'react';
+import { PixelDropdown } from '@pxlkit/ui-kit';
+
+export function ControlledOpen() {
   const [open, setOpen] = useState(false);
   return (
     <PixelDropdown.Root open={open} onOpenChange={setOpen}>
@@ -343,7 +764,44 @@ export function Default() {
       </PixelDropdown.Content>
     </PixelDropdown.Root>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDropdownContent, PixelDropdownItem, PixelDropdownRoot, PixelDropdownTrigger } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelDropdownRoot v-model:open="open">
+    <PixelDropdownTrigger>{{ open ? 'Close' : 'Open' }} menu</PixelDropdownTrigger>
+    <PixelDropdownContent>
+      <PixelDropdownItem value="one" @select="() => {}">One</PixelDropdownItem>
+      <PixelDropdownItem value="two" @select="() => {}">Two</PixelDropdownItem>
+    </PixelDropdownContent>
+  </PixelDropdownRoot>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDropdownContent, PixelDropdownItem, PixelDropdownRoot, PixelDropdownTrigger } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDropdownRoot, PixelDropdownTrigger, PixelDropdownContent, PixelDropdownItem],
+  template: \`
+    <pxl-dropdown-root [(open)]="open">
+      <pxl-dropdown-trigger>{{ open() ? 'Close' : 'Open' }} menu</pxl-dropdown-trigger>
+      <div *pxlDropdownContent>
+        <button pxlDropdownItem value="one" (selected)="select()">One</button>
+        <button pxlDropdownItem value="two" (selected)="select()">Two</button>
+      </div>
+    </pxl-dropdown-root>
+  \`,
+})
+export class ControlledOpen {
+  readonly open = signal(false);
+
+  select(): void {}
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

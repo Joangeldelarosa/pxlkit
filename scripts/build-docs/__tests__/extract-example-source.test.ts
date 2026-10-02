@@ -1,21 +1,24 @@
 import { describe, it, expect } from 'vitest';
-import {
-  rewriteRelativeImports,
-  dropUnusedReactImport,
-  sliceThroughFirstExport,
-  extractExportFunctions,
-  toUsageSnippet,
-  toUsageSource,
-} from '../extract-example-source';
+import { selfContainedExamples } from '../extract-example-source';
 
-const SAMPLE = `import React from 'react';
+const REACT = `import React, { useState } from 'react';
 import { PixelAreaChart } from './PixelAreaChart';
+import { PixelButton, PixelBadge } from '../actions';
 import { Trophy } from '@pxlkit/gamification';
+import type { Tone } from '../common';
 
 const sample = [
   { x: 'Mon', y: 12 },
   { x: 'Tue', y: 18 },
 ];
+
+const TONES: Tone[] = ['green', 'gold'];
+
+interface ArrowProps { flip?: boolean }
+
+function Arrow({ flip }: ArrowProps) {
+  return <span aria-hidden="true">{flip ? '←' : '→'}</span>;
+}
 
 export function Default() {
   return <PixelAreaChart data={sample} />;
@@ -24,101 +27,165 @@ export function Default() {
 export function Tones() {
   return (
     <div className="flex gap-4">
-      <PixelAreaChart data={sample} tone="gold" />
+      {TONES.map((tone) => <PixelAreaChart key={tone} data={sample} tone={tone} />)}
     </div>
   );
 }
-`;
 
-describe('rewriteRelativeImports', () => {
-  it('rewrites ./ and ../ specifiers to the package name, leaves packages alone', () => {
-    const out = rewriteRelativeImports(SAMPLE);
-    expect(out).toContain("from '@pxlkit/ui-kit';");
-    expect(out).not.toContain("from './PixelAreaChart'");
-    expect(out).toContain("from '@pxlkit/gamification';");
-  });
-
-  it('handles ../category/Component paths', () => {
-    const out = rewriteRelativeImports("import { PxlKitButton } from '../actions';\n");
-    expect(out).toBe("import { PxlKitButton } from '@pxlkit/ui-kit';\n");
-  });
-});
-
-describe('dropUnusedReactImport', () => {
-  it('drops a bare unused React default import', () => {
-    expect(dropUnusedReactImport(SAMPLE)).not.toMatch(/^import React from 'react';$/m);
-  });
-
-  it('keeps React when used as a value', () => {
-    const src = "import React from 'react';\nexport function X() { return React.createElement('i'); }\n";
-    expect(dropUnusedReactImport(src)).toContain("import React from 'react';");
-  });
-
-  it('preserves named hooks when combined with the default import', () => {
-    const src = "import React, { useState } from 'react';\nexport function X() { const [a] = useState(0); return <i>{a}</i>; }\n";
-    const out = dropUnusedReactImport(src);
-    expect(out).toContain("import { useState } from 'react';");
-    expect(out).not.toMatch(/React,/);
-  });
-});
-
-describe('sliceThroughFirstExport', () => {
-  it('returns preamble plus only the first export function', () => {
-    const out = sliceThroughFirstExport(SAMPLE);
-    expect(out).toContain('const sample');
-    expect(out).toContain('export function Default()');
-    expect(out).not.toContain('export function Tones');
-  });
-
-  it('is not fooled by braces inside strings, templates, or comments', () => {
-    const tricky = `export function Default() {
-  // a comment with a brace }
-  const s = "}}";
-  const t = \`}\${'}'}\`;
-  return <i title={'}'} />;
+export function WithIcons() {
+  const [count, setCount] = useState(0);
+  return (
+    <PixelButton iconLeft={<Arrow flip />} onClick={() => setCount(count + 1)}>
+      <Trophy /> {count}
+    </PixelButton>
+  );
 }
 
-export function Second() { return null; }
+export function Counter() {
+  const [count, setCount] = React.useState(0);
+  return <PixelBadge onClick={() => setCount(count + 1)}>{count}</PixelBadge>;
+}
 `;
-    const out = sliceThroughFirstExport(tricky);
-    expect(out).toContain("title={'}'}");
-    expect(out).not.toContain('Second');
+
+const ANGULAR = `import { Component, signal, computed } from '@angular/core';
+import { PixelSelect, PixelButton, type Option } from '@pxlkit/ui-kit-angular';
+
+const FRUITS: Option[] = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'pear', label: 'Pear' },
+];
+
+@Component({
+  selector: 'example-shout',
+  imports: [PixelButton],
+  template: '<pxl-button>Shout</pxl-button>',
+})
+class Shout {}
+
+@Component({
+  selector: 'example-controlled',
+  imports: [PixelSelect],
+  template: '<pxl-select [options]="fruits" [(value)]="value" />',
+})
+export class Controlled {
+  readonly fruits = FRUITS;
+  readonly value = signal('apple');
+}
+
+@Component({
+  selector: 'example-with-shout',
+  imports: [Shout],
+  template: '<example-shout />',
+})
+export class WithShout {
+  readonly upper = computed(() => 'SHOUT');
+}
+`;
+
+describe('selfContainedExamples — React examples', () => {
+  const examples = selfContainedExamples(REACT, { kind: 'tsx', packageName: '@pxlkit/ui-kit' });
+
+  it('keys every top-level declaration by its name', () => {
+    expect(Object.keys(examples)).toEqual(['sample', 'TONES', 'ArrowProps', 'Arrow', 'Default', 'Tones', 'WithIcons', 'Counter']);
   });
 
-  it('returns null when no export function exists', () => {
-    expect(sliceThroughFirstExport('const x = 1;\n')).toBeNull();
+  it('keeps only the imports an example uses, relative ones rewritten to the package', () => {
+    expect(examples.Default).toBe(
+      [
+        "import { PixelAreaChart } from '@pxlkit/ui-kit';",
+        '',
+        'const sample = [',
+        "  { x: 'Mon', y: 12 },",
+        "  { x: 'Tue', y: 18 },",
+        '];',
+        '',
+        'export function Default() {',
+        '  return <PixelAreaChart data={sample} />;',
+        '}',
+        '',
+      ].join('\n'),
+    );
+  });
+
+  it('carries the helpers an example reaches, transitively and in source order', () => {
+    const snippet = examples.WithIcons!;
+    expect(snippet).toContain("import { useState } from 'react';");
+    expect(snippet).toContain("import { PixelButton } from '@pxlkit/ui-kit';");
+    expect(snippet).toContain("import { Trophy } from '@pxlkit/gamification';");
+    // Arrow, and the props type Arrow reads.
+    expect(snippet.indexOf('interface ArrowProps')).toBeGreaterThan(-1);
+    expect(snippet.indexOf('interface ArrowProps')).toBeLessThan(snippet.indexOf('function Arrow('));
+    expect(snippet.indexOf('function Arrow(')).toBeLessThan(snippet.indexOf('export function WithIcons'));
+    // Nothing it does not use.
+    expect(snippet).not.toContain('PixelBadge');
+    expect(snippet).not.toContain('PixelAreaChart');
+    expect(snippet).not.toContain('const sample');
+    expect(snippet).not.toMatch(/^import React/m);
+  });
+
+  it('keeps a type-only import as one, for the helpers whose types read it', () => {
+    expect(examples.Tones).toContain("import type { Tone } from '@pxlkit/ui-kit';");
+    expect(examples.Tones).toContain('const TONES: Tone[]');
+    expect(examples.Tones).toContain('const sample');
+  });
+
+  it('keeps the React default import only where React is read', () => {
+    expect(examples.Counter).toContain("import React from 'react';");
+    expect(examples.Counter).not.toContain('useState }');
+    expect(examples.Default).not.toContain("from 'react'");
+  });
+
+  it('leaves the specifiers alone without a package name', () => {
+    const raw = selfContainedExamples(REACT, { kind: 'tsx' });
+    expect(raw.Default).toContain("import { PixelAreaChart } from './PixelAreaChart';");
+  });
+
+  it('does not count property names, attributes or members as reads', () => {
+    const source = `import { label, onClick, data } from 'elsewhere';
+export function X() {
+  const value = { label: 1 };
+  return <i onClick={() => value.label} data-x="1" />;
+}
+`;
+    expect(selfContainedExamples(source, { kind: 'tsx' }).X).not.toContain('import');
   });
 });
 
-describe('toUsageSnippet / toUsageSource', () => {
-  it('produces a consumer-ready snippet: package import, no React import, Default only', () => {
-    const snippet = toUsageSnippet(SAMPLE);
-    expect(snippet).toContain("import { PixelAreaChart } from '@pxlkit/ui-kit';");
-    expect(snippet).not.toContain("from './");
-    expect(snippet).not.toMatch(/^import React from 'react';$/m);
-    expect(snippet).toContain('export function Default()');
-    expect(snippet).not.toContain('Tones');
+describe('selfContainedExamples — Angular examples', () => {
+  const examples = selfContainedExamples(ANGULAR, { kind: 'ts' });
+
+  it('keeps the decorator, the class and the data the class reads', () => {
+    expect(examples.Controlled).toBe(
+      [
+        "import { Component, signal } from '@angular/core';",
+        "import { PixelSelect, type Option } from '@pxlkit/ui-kit-angular';",
+        '',
+        'const FRUITS: Option[] = [',
+        "  { value: 'apple', label: 'Apple' },",
+        "  { value: 'pear', label: 'Pear' },",
+        '];',
+        '',
+        '@Component({',
+        "  selector: 'example-controlled',",
+        '  imports: [PixelSelect],',
+        `  template: '<pxl-select [options]="fruits" [(value)]="value" />',`,
+        '})',
+        'export class Controlled {',
+        '  readonly fruits = FRUITS;',
+        "  readonly value = signal('apple');",
+        '}',
+        '',
+      ].join('\n'),
+    );
   });
 
-  it('full usage source keeps every example', () => {
-    const full = toUsageSource(SAMPLE);
-    expect(full).toContain('export function Default()');
-    expect(full).toContain('export function Tones()');
-  });
-});
-
-describe('extractExportFunctions', () => {
-  it('extracts every export function verbatim, keyed by name', () => {
-    const out = extractExportFunctions(SAMPLE);
-    expect(Object.keys(out)).toEqual(['Default', 'Tones']);
-    expect(out.Default).toContain('return <PixelAreaChart data={sample} />;');
-    expect(out.Tones).toContain('tone="gold"');
-    expect(out.Default).not.toContain('Tones');
-  });
-
-  it('survives braces in strings inside any block', () => {
-    const src = 'export function A() {\n  return <i title={"}"} />;\n}\n\nexport function B() {\n  return null;\n}\n';
-    const out = extractExportFunctions(src);
-    expect(Object.keys(out)).toEqual(['A', 'B']);
+  it('carries the components an example imports from its own module', () => {
+    const snippet = examples.WithShout!;
+    expect(snippet).toContain("import { Component, computed } from '@angular/core';");
+    expect(snippet).toContain("import { PixelButton } from '@pxlkit/ui-kit-angular';");
+    expect(snippet.indexOf('class Shout {}')).toBeGreaterThan(-1);
+    expect(snippet.indexOf('class Shout {}')).toBeLessThan(snippet.indexOf('export class WithShout'));
+    expect(snippet).not.toContain('FRUITS');
+    expect(snippet).not.toContain('signal');
   });
 });

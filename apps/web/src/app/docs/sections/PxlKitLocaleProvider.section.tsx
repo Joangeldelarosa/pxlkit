@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitLocaleProviderDocsSectionProps {
   className?: string;
@@ -47,7 +48,10 @@ export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProvi
     </section>
     <section aria-labelledby="pxl-kit-locale-provider-usage">
       <h3 id="pxl-kit-locale-provider-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PxlKitLocaleProvider usage'}
+        react={`import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -55,30 +59,105 @@ export function Default() {
       <p>Hello, world!</p>
     </PxlKitLocaleProvider>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitLocaleProvider locale="en">
+    <p>Hello, world!</p>
+  </PxlKitLocaleProvider>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitLocaleProvider],
+  template: \`
+    <pxl-locale-provider locale="en">
+      <p>Hello, world!</p>
+    </pxl-locale-provider>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PxlKitLocaleProvider locale="en">
       <p>Hello, world!</p>
     </PxlKitLocaleProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitLocaleProvider locale="en">
+    <p>Hello, world!</p>
+  </PxlKitLocaleProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitLocaleProvider],
+  template: \`
+    <pxl-locale-provider locale="en">
+      <p>Hello, world!</p>
+    </pxl-locale-provider>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-turkish">
         <h4>Turkish</h4>
-        <pre className="docs-code"><code>{`export function Turkish() {
+        <FrameworkCode
+          variant="docs"
+          label={'Turkish code'}
+          react={`import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
+
+export function Turkish() {
   return (
     <PxlKitLocaleProvider locale="tr">
       <p>İstanbul güneşli bir şehirdir</p>
     </PxlKitLocaleProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitLocaleProvider locale="tr">
+    <p>İstanbul güneşli bir şehirdir</p>
+  </PxlKitLocaleProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitLocaleProvider],
+  template: \`
+    <pxl-locale-provider locale="tr">
+      <p>İstanbul güneşli bir şehirdir</p>
+    </pxl-locale-provider>
+  \`,
+})
+export class Turkish {}`}
+        />
       </article>
     </section>
     </section>

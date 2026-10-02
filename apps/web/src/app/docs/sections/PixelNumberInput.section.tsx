@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelNumberInputDocsSectionProps {
   className?: string;
@@ -70,7 +71,10 @@ export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsS
     </section>
     <section aria-labelledby="pixel-number-input-usage">
       <h3 id="pixel-number-input-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelNumberInput usage'}
+        react={`import { useState } from 'react';
 import { PixelNumberInput } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -84,14 +88,40 @@ export function Default() {
       max={100}
     />
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(5);
+</script>
+
+<template>
+  <PixelNumberInput v-model="value" label="Quantity" :min="0" :max="100" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`<pxl-number-input label="Quantity" [(value)]="value" [min]="0" [max]="100" />\`,
+})
+export class Default {
+  readonly value = signal(5);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = useState<number>(5);
   return (
     <PixelNumberInput
@@ -102,11 +132,38 @@ export function Default() {
       max={100}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(5);
+</script>
+
+<template>
+  <PixelNumberInput v-model="value" label="Quantity" :min="0" :max="100" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`<pxl-number-input label="Quantity" [(value)]="value" [min]="0" [max]="100" />\`,
+})
+export class Default {
+  readonly value = signal(5);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-prefix-suffix">
         <h4>With Prefix &amp; Suffix</h4>
-        <pre className="docs-code"><code>{`export function WithPrefixSuffix() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Prefix & Suffix code'}
+          react={`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function WithPrefixSuffix() {
   const [value, setValue] = useState<number>(19.99);
   return (
     <PixelNumberInput
@@ -120,11 +177,56 @@ export function Default() {
       min={0}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(19.99);
+</script>
+
+<template>
+  <PixelNumberInput
+    v-model="value"
+    label="Price"
+    prefix="$"
+    suffix="USD"
+    :precision="2"
+    :step="0.01"
+    :min="0"
+  />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`
+    <pxl-number-input
+      label="Price"
+      [(value)]="value"
+      prefix="$"
+      suffix="USD"
+      [precision]="2"
+      [step]="0.01"
+      [min]="0"
+    />
+  \`,
+})
+export class WithPrefixSuffix {
+  readonly value = signal(19.99);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-thousands-separator">
         <h4>Thousands Separator</h4>
-        <pre className="docs-code"><code>{`export function ThousandsSeparator() {
+        <FrameworkCode
+          variant="docs"
+          label={'Thousands Separator code'}
+          react={`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function ThousandsSeparator() {
   const [value, setValue] = useState<number>(1500000);
   return (
     <PixelNumberInput
@@ -135,11 +237,38 @@ export function Default() {
       min={0}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(1500000);
+</script>
+
+<template>
+  <PixelNumberInput v-model="value" label="Population" thousands-separator="," :min="0" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`<pxl-number-input label="Population" [(value)]="value" thousandsSeparator="," [min]="0" />\`,
+})
+export class ThousandsSeparator {
+  readonly value = signal(1500000);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-hide-controls">
         <h4>Hide Controls</h4>
-        <pre className="docs-code"><code>{`export function HideControls() {
+        <FrameworkCode
+          variant="docs"
+          label={'Hide Controls code'}
+          react={`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function HideControls() {
   const [value, setValue] = useState<number>(42);
   return (
     <PixelNumberInput
@@ -151,11 +280,38 @@ export function Default() {
       max={120}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(42);
+</script>
+
+<template>
+  <PixelNumberInput v-model="value" label="Age" hide-controls :min="0" :max="120" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`<pxl-number-input label="Age" [(value)]="value" hideControls [min]="0" [max]="120" />\`,
+})
+export class HideControls {
+  readonly value = signal(42);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
         <h4>With Error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Error code'}
+          react={`import { useState } from 'react';
+import { PixelNumberInput } from '@pxlkit/ui-kit';
+
+export function WithError() {
   const [value, setValue] = useState<number>(150);
   return (
     <PixelNumberInput
@@ -168,7 +324,44 @@ export function Default() {
       tone="red"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelNumberInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref(150);
+</script>
+
+<template>
+  <PixelNumberInput
+    v-model="value"
+    label="Score"
+    :min="0"
+    :max="100"
+    error="Score must be between 0 and 100"
+    tone="red"
+  />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNumberInput],
+  template: \`
+    <pxl-number-input
+      label="Score"
+      [(value)]="value"
+      [min]="0"
+      [max]="100"
+      error="Score must be between 0 and 100"
+      tone="red"
+    />
+  \`,
+})
+export class WithError {
+  readonly value = signal(150);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

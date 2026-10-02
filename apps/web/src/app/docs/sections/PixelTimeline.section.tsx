@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTimelineDocsSectionProps {
   className?: string;
@@ -49,7 +50,10 @@ export function PixelTimelineDocsSection({ className }: PixelTimelineDocsSection
     </section>
     <section aria-labelledby="pixel-timeline-usage">
       <h3 id="pixel-timeline-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelTimeline usage'}
+        react={`import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -65,14 +69,44 @@ export function Default() {
       </PixelTimelineItem>
     </PixelTimeline>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTimeline :active="1">
+    <PixelTimelineItem title="Order placed" time="09:00">Confirmation email sent.</PixelTimelineItem>
+    <PixelTimelineItem title="Packed" time="11:20">At the warehouse.</PixelTimelineItem>
+    <PixelTimelineItem title="Shipped" time="—">Awaiting carrier pickup.</PixelTimelineItem>
+  </PixelTimeline>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTimeline, PixelTimelineItem],
+  template: \`
+    <ol pxlTimeline [active]="1">
+      <li pxlTimelineItem title="Order placed" time="09:00" description="Confirmation email sent."></li>
+      <li pxlTimelineItem title="Packed" time="11:20" description="At the warehouse."></li>
+      <li pxlTimelineItem title="Shipped" time="—" description="Awaiting carrier pickup."></li>
+    </ol>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelTimeline active={1}>
       <PixelTimelineItem title="Order placed" time="09:00">
@@ -86,11 +120,42 @@ export function Default() {
       </PixelTimelineItem>
     </PixelTimeline>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTimeline :active="1">
+    <PixelTimelineItem title="Order placed" time="09:00">Confirmation email sent.</PixelTimelineItem>
+    <PixelTimelineItem title="Packed" time="11:20">At the warehouse.</PixelTimelineItem>
+    <PixelTimelineItem title="Shipped" time="—">Awaiting carrier pickup.</PixelTimelineItem>
+  </PixelTimeline>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTimeline, PixelTimelineItem],
+  template: \`
+    <ol pxlTimeline [active]="1">
+      <li pxlTimelineItem title="Order placed" time="09:00" description="Confirmation email sent."></li>
+      <li pxlTimelineItem title="Packed" time="11:20" description="At the warehouse."></li>
+      <li pxlTimelineItem title="Shipped" time="—" description="Awaiting carrier pickup."></li>
+    </ol>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-dashed">
         <h4>Dashed connectors</h4>
-        <pre className="docs-code"><code>{`export function Dashed() {
+        <FrameworkCode
+          variant="docs"
+          label={'Dashed connectors code'}
+          react={`import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit';
+
+export function Dashed() {
   return (
     <PixelTimeline active={0} bulletSize="lg">
       <PixelTimelineItem title="Draft" lineVariant="dashed">
@@ -102,11 +167,42 @@ export function Default() {
       <PixelTimelineItem title="Published" lineVariant="dashed" />
     </PixelTimeline>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTimeline :active="0" bullet-size="lg">
+    <PixelTimelineItem title="Draft" line-variant="dashed">Currently editing.</PixelTimelineItem>
+    <PixelTimelineItem title="Review" line-variant="dashed">Pending approval.</PixelTimelineItem>
+    <PixelTimelineItem title="Published" line-variant="dashed" />
+  </PixelTimeline>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTimeline, PixelTimelineItem],
+  template: \`
+    <ol pxlTimeline [active]="0" bulletSize="lg">
+      <li pxlTimelineItem title="Draft" lineVariant="dashed" description="Currently editing."></li>
+      <li pxlTimelineItem title="Review" lineVariant="dashed" description="Pending approval."></li>
+      <li pxlTimelineItem title="Published" lineVariant="dashed"></li>
+    </ol>
+  \`,
+})
+export class Dashed {}`}
+        />
       </article>
       <article className="docs-example" id="example-right-aligned">
         <h4>Right aligned</h4>
-        <pre className="docs-code"><code>{`export function RightAligned() {
+        <FrameworkCode
+          variant="docs"
+          label={'Right aligned code'}
+          react={`import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit';
+
+export function RightAligned() {
   return (
     <PixelTimeline active={2} align="right">
       <PixelTimelineItem title="Step 1" time="Mon" />
@@ -114,7 +210,33 @@ export function Default() {
       <PixelTimelineItem title="Step 3" time="Wed" />
     </PixelTimeline>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTimeline :active="2" align="right">
+    <PixelTimelineItem title="Step 1" time="Mon" />
+    <PixelTimelineItem title="Step 2" time="Tue" />
+    <PixelTimelineItem title="Step 3" time="Wed" />
+  </PixelTimeline>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTimeline, PixelTimelineItem],
+  template: \`
+    <ol pxlTimeline [active]="2" align="right">
+      <li pxlTimelineItem title="Step 1" time="Mon"></li>
+      <li pxlTimelineItem title="Step 2" time="Tue"></li>
+      <li pxlTimelineItem title="Step 3" time="Wed"></li>
+    </ol>
+  \`,
+})
+export class RightAligned {}`}
+        />
       </article>
     </section>
     </section>

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelColorInputDocsSectionProps {
   className?: string;
@@ -87,7 +88,10 @@ export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSec
     </section>
     <section aria-labelledby="pixel-color-input-usage">
       <h3 id="pixel-color-input-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelColorInput usage'}
+        react={`import { useState } from 'react';
 import { PixelColorInput } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -99,14 +103,20 @@ export function Default() {
       onChange={setValue}
     />
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelColorInput } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = useState<string>('#06b6d4');
   return (
     <PixelColorInput
@@ -115,11 +125,18 @@ export function Default() {
       onChange={setValue}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-rgb-format">
         <h4>RGB format</h4>
-        <pre className="docs-code"><code>{`export function RgbFormat() {
+        <FrameworkCode
+          variant="docs"
+          label={'RGB format code'}
+          react={`import { useState } from 'react';
+import { PixelColorInput } from '@pxlkit/ui-kit';
+
+export function RgbFormat() {
   const [value, setValue] = useState<string>('rgb(34, 197, 94)');
   return (
     <PixelColorInput
@@ -130,11 +147,18 @@ export function Default() {
       hint="Stored as rgb()"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-presets">
         <h4>Custom presets</h4>
-        <pre className="docs-code"><code>{`export function CustomPresets() {
+        <FrameworkCode
+          variant="docs"
+          label={'Custom presets code'}
+          react={`import { useState } from 'react';
+import { PixelColorInput } from '@pxlkit/ui-kit';
+
+export function CustomPresets() {
   const [value, setValue] = useState<string>('#ef4444');
   return (
     <PixelColorInput
@@ -144,11 +168,17 @@ export function Default() {
       onChange={setValue}
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
         <h4>With error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <FrameworkCode
+          variant="docs"
+          label={'With error code'}
+          react={`import { PixelColorInput } from '@pxlkit/ui-kit';
+
+export function WithError() {
   return (
     <PixelColorInput
       label="Background"
@@ -156,7 +186,8 @@ export function Default() {
       error="Invalid color value"
     />
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

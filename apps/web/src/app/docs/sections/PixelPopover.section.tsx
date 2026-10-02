@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPopoverDocsSectionProps {
   className?: string;
@@ -65,7 +66,10 @@ export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionPr
     </section>
     <section aria-labelledby="pixel-popover-usage">
       <h3 id="pixel-popover-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelPopover usage'}
+        react={`import { useState } from 'react';
 import { PixelPopover } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -83,14 +87,56 @@ export function Default() {
       </PixelPopover.Content>
     </PixelPopover>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPopover, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelPopover v-model:open="open">
+    <PixelPopoverTrigger>
+      <button type="button">Open popover</button>
+    </PixelPopoverTrigger>
+    <PixelPopoverContent aria-labelledby="popover-title">
+      <h3 id="popover-title" class="font-bold mb-1">Popover</h3>
+      <p class="text-sm">Floating content anchored to the trigger.</p>
+    </PixelPopoverContent>
+  </PixelPopover>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelPopover, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPopover, PixelPopoverTrigger, PixelPopoverContent],
+  template: \`
+    <pxl-popover [(open)]="open">
+      <button type="button" pxlPopoverTrigger>Open popover</button>
+      <div *pxlPopoverContent aria-labelledby="popover-title">
+        <h3 id="popover-title" class="font-bold mb-1">Popover</h3>
+        <p class="text-sm">Floating content anchored to the trigger.</p>
+      </div>
+    </pxl-popover>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelPopover } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [open, setOpen] = useState(false);
   return (
     <PixelPopover open={open} onOpenChange={setOpen}>
@@ -105,11 +151,54 @@ export function Default() {
       </PixelPopover.Content>
     </PixelPopover>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPopover, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelPopover v-model:open="open">
+    <PixelPopoverTrigger>
+      <button type="button">Open popover</button>
+    </PixelPopoverTrigger>
+    <PixelPopoverContent aria-labelledby="popover-title">
+      <h3 id="popover-title" class="font-bold mb-1">Popover</h3>
+      <p class="text-sm">Floating content anchored to the trigger.</p>
+    </PixelPopoverContent>
+  </PixelPopover>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPopover, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPopover, PixelPopoverTrigger, PixelPopoverContent],
+  template: \`
+    <pxl-popover [(open)]="open">
+      <button type="button" pxlPopoverTrigger>Open popover</button>
+      <div *pxlPopoverContent aria-labelledby="popover-title">
+        <h3 id="popover-title" class="font-bold mb-1">Popover</h3>
+        <p class="text-sm">Floating content anchored to the trigger.</p>
+      </div>
+    </pxl-popover>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-with-arrow">
         <h4>With arrow</h4>
-        <pre className="docs-code"><code>{`export function WithArrow() {
+        <FrameworkCode
+          variant="docs"
+          label={'With arrow code'}
+          react={`import { useState } from 'react';
+import { PixelPopover } from '@pxlkit/ui-kit';
+
+export function WithArrow() {
   const [open, setOpen] = useState(false);
   return (
     <PixelPopover open={open} onOpenChange={setOpen} side="bottom" align="center">
@@ -125,11 +214,56 @@ export function Default() {
       </PixelPopover.Content>
     </PixelPopover>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPopover, PixelPopoverArrow, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelPopover v-model:open="open" side="bottom" align="center">
+    <PixelPopoverTrigger>
+      <button type="button">With arrow</button>
+    </PixelPopoverTrigger>
+    <PixelPopoverContent aria-labelledby="popover-arrow-title">
+      <h3 id="popover-arrow-title" class="font-bold mb-1">Pointed popover</h3>
+      <p class="text-sm">Includes a decorative arrow.</p>
+      <PixelPopoverArrow />
+    </PixelPopoverContent>
+  </PixelPopover>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPopover, PixelPopoverArrow, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPopover, PixelPopoverTrigger, PixelPopoverContent, PixelPopoverArrow],
+  template: \`
+    <pxl-popover [(open)]="open" side="bottom" align="center">
+      <button type="button" pxlPopoverTrigger>With arrow</button>
+      <div *pxlPopoverContent aria-labelledby="popover-arrow-title">
+        <h3 id="popover-arrow-title" class="font-bold mb-1">Pointed popover</h3>
+        <p class="text-sm">Includes a decorative arrow.</p>
+        <pxl-popover-arrow />
+      </div>
+    </pxl-popover>
+  \`,
+})
+export class WithArrow {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-side-placement">
         <h4>Side placement</h4>
-        <pre className="docs-code"><code>{`export function SidePlacement() {
+        <FrameworkCode
+          variant="docs"
+          label={'Side placement code'}
+          react={`import { useState } from 'react';
+import { PixelPopover } from '@pxlkit/ui-kit';
+
+export function SidePlacement() {
   const [open, setOpen] = useState(false);
   return (
     <PixelPopover
@@ -150,11 +284,54 @@ export function Default() {
       </PixelPopover.Content>
     </PixelPopover>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPopover, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelPopover v-model:open="open" side="right" align="start" :side-offset="12">
+    <PixelPopoverTrigger>
+      <button type="button">Right / start</button>
+    </PixelPopoverTrigger>
+    <PixelPopoverContent aria-labelledby="popover-side-title">
+      <h3 id="popover-side-title" class="font-bold mb-1">Side placement</h3>
+      <p class="text-sm">Anchored to the right of the trigger.</p>
+    </PixelPopoverContent>
+  </PixelPopover>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPopover, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPopover, PixelPopoverTrigger, PixelPopoverContent],
+  template: \`
+    <pxl-popover [(open)]="open" side="right" align="start" [sideOffset]="12">
+      <button type="button" pxlPopoverTrigger>Right / start</button>
+      <div *pxlPopoverContent aria-labelledby="popover-side-title">
+        <h3 id="popover-side-title" class="font-bold mb-1">Side placement</h3>
+        <p class="text-sm">Anchored to the right of the trigger.</p>
+      </div>
+    </pxl-popover>
+  \`,
+})
+export class SidePlacement {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-interactive-content">
         <h4>Interactive content</h4>
-        <pre className="docs-code"><code>{`export function InteractiveContent() {
+        <FrameworkCode
+          variant="docs"
+          label={'Interactive content code'}
+          react={`import { useState } from 'react';
+import { PixelPopover } from '@pxlkit/ui-kit';
+
+export function InteractiveContent() {
   const [open, setOpen] = useState(false);
   return (
     <PixelPopover open={open} onOpenChange={setOpen} align="start">
@@ -179,7 +356,56 @@ export function Default() {
       </PixelPopover.Content>
     </PixelPopover>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPopover, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <PixelPopover v-model:open="open" align="start">
+    <PixelPopoverTrigger>
+      <button type="button">Rename layer</button>
+    </PixelPopoverTrigger>
+    <PixelPopoverContent aria-labelledby="popover-form-title" class="w-64">
+      <h3 id="popover-form-title" class="font-bold mb-2">Rename layer</h3>
+      <label for="popover-form-name" class="block text-sm mb-1">Name</label>
+      <input
+        id="popover-form-name"
+        value="Background"
+        class="w-full mb-3 px-2 py-1 text-sm bg-retro-surface border border-retro-border text-retro-text"
+      />
+      <button type="button" @click="open = false">Save</button>
+    </PixelPopoverContent>
+  </PixelPopover>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPopover, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPopover, PixelPopoverTrigger, PixelPopoverContent],
+  template: \`
+    <pxl-popover [(open)]="open" align="start">
+      <button type="button" pxlPopoverTrigger>Rename layer</button>
+      <div *pxlPopoverContent aria-labelledby="popover-form-title" class="w-64">
+        <h3 id="popover-form-title" class="font-bold mb-2">Rename layer</h3>
+        <label for="popover-form-name" class="block text-sm mb-1">Name</label>
+        <input
+          id="popover-form-name"
+          value="Background"
+          class="w-full mb-3 px-2 py-1 text-sm bg-retro-surface border border-retro-border text-retro-text"
+        />
+        <button type="button" (click)="open.set(false)">Save</button>
+      </div>
+    </pxl-popover>
+  \`,
+})
+export class InteractiveContent {
+  readonly open = signal(false);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

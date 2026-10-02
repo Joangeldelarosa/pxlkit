@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBounceDocsSectionProps {
   className?: string;
@@ -47,7 +48,10 @@ export function PixelBounceDocsSection({ className }: PixelBounceDocsSectionProp
     </section>
     <section aria-labelledby="pixel-bounce-usage">
       <h3 id="pixel-bounce-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBounce } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBounce usage'}
+        react={`import { PixelBounce } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -55,40 +59,58 @@ export function Default() {
       <span>Bounce</span>
     </PixelBounce>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBounce } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelBounce>
       <span>Bounce</span>
     </PixelBounce>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-taller-bounce">
         <h4>Taller Bounce</h4>
-        <pre className="docs-code"><code>{`export function TallerBounce() {
+        <FrameworkCode
+          variant="docs"
+          label={'Taller Bounce code'}
+          react={`import { PixelBounce } from '@pxlkit/ui-kit';
+
+export function TallerBounce() {
   return (
     <PixelBounce height={16} duration={1000}>
       <span>Higher Jump</span>
     </PixelBounce>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-hover-trigger">
         <h4>Hover Trigger</h4>
-        <pre className="docs-code"><code>{`export function HoverTrigger() {
+        <FrameworkCode
+          variant="docs"
+          label={'Hover Trigger code'}
+          react={`import { PixelBounce } from '@pxlkit/ui-kit';
+
+export function HoverTrigger() {
   return (
     <PixelBounce trigger="hover" repeat={1}>
       <span>Hover me</span>
     </PixelBounce>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

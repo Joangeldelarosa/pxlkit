@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSpinnerDocsSectionProps {
   className?: string;
@@ -48,25 +49,68 @@ export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionPr
     </section>
     <section aria-labelledby="pixel-spinner-usage">
       <h3 id="pixel-spinner-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react'
-import { PixelSpinner } from '@pxlkit/ui-kit'
+      <FrameworkCode
+        variant="docs"
+        label={'PixelSpinner usage'}
+        react={`import { PixelSpinner } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelSpinner />
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSpinner />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`<pxl-spinner />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelSpinner } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelSpinner />
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSpinner />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`<pxl-spinner />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelSpinner } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex items-center gap-4">
       <PixelSpinner size="xs" />
@@ -75,11 +119,44 @@ export function Default() {
       <PixelSpinner size="lg" />
     </div>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-4">
+    <PixelSpinner size="xs" />
+    <PixelSpinner size="sm" />
+    <PixelSpinner size="md" />
+    <PixelSpinner size="lg" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`
+    <div class="flex items-center gap-4">
+      <pxl-spinner size="xs" />
+      <pxl-spinner size="sm" />
+      <pxl-spinner size="md" />
+      <pxl-spinner size="lg" />
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelSpinner } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex items-center gap-4">
       <PixelSpinner tone="neutral" />
@@ -91,24 +168,108 @@ export function Default() {
       <PixelSpinner tone="pink" />
     </div>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-4">
+    <PixelSpinner tone="neutral" />
+    <PixelSpinner tone="green" />
+    <PixelSpinner tone="cyan" />
+    <PixelSpinner tone="gold" />
+    <PixelSpinner tone="red" />
+    <PixelSpinner tone="purple" />
+    <PixelSpinner tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`
+    <div class="flex items-center gap-4">
+      <pxl-spinner tone="neutral" />
+      <pxl-spinner tone="green" />
+      <pxl-spinner tone="cyan" />
+      <pxl-spinner tone="gold" />
+      <pxl-spinner tone="red" />
+      <pxl-spinner tone="purple" />
+      <pxl-spinner tone="pink" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
         <h4>Pixel surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel surface code'}
+          react={`import { PixelSpinner } from '@pxlkit/ui-kit';
+
+export function PixelSurface() {
   return <PixelSpinner surface="pixel" size="lg" tone="cyan" />
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSpinner surface="pixel" size="lg" tone="cyan" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`<pxl-spinner surface="pixel" size="lg" tone="cyan" />\`,
+})
+export class PixelSurface {}`}
+        />
       </article>
       <article className="docs-example" id="example-decorative">
         <h4>Decorative (inside aria-busy parent)</h4>
-        <pre className="docs-code"><code>{`export function Decorative() {
+        <FrameworkCode
+          variant="docs"
+          label={'Decorative (inside aria-busy parent) code'}
+          react={`import { PixelSpinner } from '@pxlkit/ui-kit';
+
+export function Decorative() {
   return (
     <button type="button" aria-busy="true" className="inline-flex items-center gap-2">
       <PixelSpinner decorative size="sm" />
       <span>Saving…</span>
     </button>
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSpinner } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <button type="button" aria-busy="true" class="inline-flex items-center gap-2">
+    <PixelSpinner decorative size="sm" />
+    <span>Saving…</span>
+  </button>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSpinner } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSpinner],
+  template: \`
+    <button type="button" aria-busy="true" class="inline-flex items-center gap-2">
+      <pxl-spinner decorative size="sm" />
+      <span>Saving…</span>
+    </button>
+  \`,
+})
+export class Decorative {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

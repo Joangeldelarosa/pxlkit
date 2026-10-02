@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBadgeGroupDocsSectionProps {
   className?: string;
@@ -76,7 +77,10 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
     </section>
     <section aria-labelledby="pixel-badge-group-usage">
       <h3 id="pixel-badge-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBadgeGroup } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBadgeGroup usage'}
+        react={`import { PixelBadgeGroup } from '@pxlkit/ui-kit';
 import { PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -87,14 +91,45 @@ export function Default() {
       <PixelBadge tone="gold">design</PixelBadge>
     </PixelBadgeGroup>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBadge, PixelBadgeGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBadgeGroup aria-label="Tags">
+    <PixelBadge tone="cyan">react</PixelBadge>
+    <PixelBadge tone="green">typescript</PixelBadge>
+    <PixelBadge tone="gold">design</PixelBadge>
+  </PixelBadgeGroup>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem],
+  template: \`
+    <pxl-badge-group aria-label="Tags">
+      <pxl-badge *pxlBadgeGroupItem tone="cyan">react</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="green">typescript</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="gold">design</pxl-badge>
+    </pxl-badge-group>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBadgeGroup } from '@pxlkit/ui-kit';
+import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelBadgeGroup aria-label="Tags">
       <PixelBadge tone="cyan">react</PixelBadge>
@@ -102,11 +137,43 @@ export function Default() {
       <PixelBadge tone="gold">design</PixelBadge>
     </PixelBadgeGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge, PixelBadgeGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBadgeGroup aria-label="Tags">
+    <PixelBadge tone="cyan">react</PixelBadge>
+    <PixelBadge tone="green">typescript</PixelBadge>
+    <PixelBadge tone="gold">design</PixelBadge>
+  </PixelBadgeGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem],
+  template: \`
+    <pxl-badge-group aria-label="Tags">
+      <pxl-badge *pxlBadgeGroupItem tone="cyan">react</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="green">typescript</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="gold">design</pxl-badge>
+    </pxl-badge-group>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-overflow">
         <h4>Overflow +N</h4>
-        <pre className="docs-code"><code>{`export function Overflow() {
+        <FrameworkCode
+          variant="docs"
+          label={'Overflow +N code'}
+          react={`import { PixelBadgeGroup } from '@pxlkit/ui-kit';
+import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function Overflow() {
   return (
     <PixelBadgeGroup aria-label="Stack" max={3}>
       <PixelBadge tone="cyan">react</PixelBadge>
@@ -117,11 +184,49 @@ export function Default() {
       <PixelBadge tone="red">vitest</PixelBadge>
     </PixelBadgeGroup>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge, PixelBadgeGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBadgeGroup aria-label="Stack" :max="3">
+    <PixelBadge tone="cyan">react</PixelBadge>
+    <PixelBadge tone="green">typescript</PixelBadge>
+    <PixelBadge tone="gold">design</PixelBadge>
+    <PixelBadge tone="purple">tailwind</PixelBadge>
+    <PixelBadge tone="pink">motion</PixelBadge>
+    <PixelBadge tone="red">vitest</PixelBadge>
+  </PixelBadgeGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem],
+  template: \`
+    <pxl-badge-group aria-label="Stack" [max]="3">
+      <pxl-badge *pxlBadgeGroupItem tone="cyan">react</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="green">typescript</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="gold">design</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="purple">tailwind</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="pink">motion</pxl-badge>
+      <pxl-badge *pxlBadgeGroupItem tone="red">vitest</pxl-badge>
+    </pxl-badge-group>
+  \`,
+})
+export class Overflow {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelBadgeGroup } from '@pxlkit/ui-kit';
+import { PixelBadge } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-3">
       <PixelBadgeGroup aria-label="Pixel tags" surface="pixel">
@@ -136,7 +241,47 @@ export function Default() {
       </PixelBadgeGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBadge, PixelBadgeGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelBadgeGroup aria-label="Pixel tags" surface="pixel">
+      <PixelBadge tone="cyan">pixel</PixelBadge>
+      <PixelBadge tone="green">chamfered</PixelBadge>
+      <PixelBadge tone="gold">retro</PixelBadge>
+    </PixelBadgeGroup>
+    <PixelBadgeGroup aria-label="Linear tags" surface="linear">
+      <PixelBadge tone="cyan">linear</PixelBadge>
+      <PixelBadge tone="green">pill</PixelBadge>
+      <PixelBadge tone="gold">modern</PixelBadge>
+    </PixelBadgeGroup>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-badge-group aria-label="Pixel tags" surface="pixel">
+        <pxl-badge *pxlBadgeGroupItem tone="cyan">pixel</pxl-badge>
+        <pxl-badge *pxlBadgeGroupItem tone="green">chamfered</pxl-badge>
+        <pxl-badge *pxlBadgeGroupItem tone="gold">retro</pxl-badge>
+      </pxl-badge-group>
+      <pxl-badge-group aria-label="Linear tags" surface="linear">
+        <pxl-badge *pxlBadgeGroupItem tone="cyan">linear</pxl-badge>
+        <pxl-badge *pxlBadgeGroupItem tone="green">pill</pxl-badge>
+        <pxl-badge *pxlBadgeGroupItem tone="gold">modern</pxl-badge>
+      </pxl-badge-group>
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

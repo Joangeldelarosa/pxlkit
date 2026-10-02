@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPasswordInputDocsSectionProps {
   className?: string;
@@ -71,25 +72,68 @@ export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputD
     </section>
     <section aria-labelledby="pixel-password-input-usage">
       <h3 id="pixel-password-input-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelPasswordInput } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelPasswordInput usage'}
+        react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelPasswordInput label="Password" placeholder="Enter password" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" placeholder="Enter password" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" placeholder="Enter password" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelPasswordInput label="Password" placeholder="Enter password" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" placeholder="Enter password" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" placeholder="Enter password" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-hint">
         <h4>With hint</h4>
-        <pre className="docs-code"><code>{`export function WithHint() {
+        <FrameworkCode
+          variant="docs"
+          label={'With hint code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function WithHint() {
   return (
     <PixelPasswordInput
       label="Password"
@@ -97,11 +141,42 @@ export function Default() {
       placeholder="Enter password"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput
+    label="Password"
+    hint="At least 8 characters, mixing letters and numbers."
+    placeholder="Enter password"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`
+    <pxl-password-input
+      label="Password"
+      hint="At least 8 characters, mixing letters and numbers."
+      placeholder="Enter password"
+    />
+  \`,
+})
+export class WithHint {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-error">
         <h4>With error</h4>
-        <pre className="docs-code"><code>{`export function WithError() {
+        <FrameworkCode
+          variant="docs"
+          label={'With error code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function WithError() {
   return (
     <PixelPasswordInput
       label="Password"
@@ -109,11 +184,32 @@ export function Default() {
       defaultValue="abc"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" error="Password is too short." default-value="abc" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" error="Password is too short." defaultValue="abc" />\`,
+})
+export class WithError {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="space-y-3">
       <PixelPasswordInput label="Neutral" tone="neutral" placeholder="Password" />
@@ -125,11 +221,50 @@ export function Default() {
       <PixelPasswordInput label="Pink" tone="pink" placeholder="Password" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelPasswordInput label="Neutral" tone="neutral" placeholder="Password" />
+    <PixelPasswordInput label="Green" tone="green" placeholder="Password" />
+    <PixelPasswordInput label="Cyan" tone="cyan" placeholder="Password" />
+    <PixelPasswordInput label="Gold" tone="gold" placeholder="Password" />
+    <PixelPasswordInput label="Red" tone="red" placeholder="Password" />
+    <PixelPasswordInput label="Purple" tone="purple" placeholder="Password" />
+    <PixelPasswordInput label="Pink" tone="pink" placeholder="Password" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`
+    <div class="space-y-3">
+      <pxl-password-input label="Neutral" tone="neutral" placeholder="Password" />
+      <pxl-password-input label="Green" tone="green" placeholder="Password" />
+      <pxl-password-input label="Cyan" tone="cyan" placeholder="Password" />
+      <pxl-password-input label="Gold" tone="gold" placeholder="Password" />
+      <pxl-password-input label="Red" tone="red" placeholder="Password" />
+      <pxl-password-input label="Purple" tone="purple" placeholder="Password" />
+      <pxl-password-input label="Pink" tone="pink" placeholder="Password" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="space-y-3">
       <PixelPasswordInput label="Small" size="sm" placeholder="Password" />
@@ -137,22 +272,82 @@ export function Default() {
       <PixelPasswordInput label="Large" size="lg" placeholder="Password" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelPasswordInput label="Small" size="sm" placeholder="Password" />
+    <PixelPasswordInput label="Medium" size="md" placeholder="Password" />
+    <PixelPasswordInput label="Large" size="lg" placeholder="Password" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`
+    <div class="space-y-3">
+      <pxl-password-input label="Small" size="sm" placeholder="Password" />
+      <pxl-password-input label="Medium" size="md" placeholder="Password" />
+      <pxl-password-input label="Large" size="lg" placeholder="Password" />
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="space-y-3">
       <PixelPasswordInput label="Pixel surface" surface="pixel" placeholder="Password" />
       <PixelPasswordInput label="Linear surface" surface="linear" placeholder="Password" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="space-y-3">
+    <PixelPasswordInput label="Pixel surface" surface="pixel" placeholder="Password" />
+    <PixelPasswordInput label="Linear surface" surface="linear" placeholder="Password" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`
+    <div class="space-y-3">
+      <pxl-password-input label="Pixel surface" surface="pixel" placeholder="Password" />
+      <pxl-password-input label="Linear surface" surface="linear" placeholder="Password" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Disabled() {
   return (
     <PixelPasswordInput
       label="Password"
@@ -160,11 +355,32 @@ export function Default() {
       defaultValue="cannot-edit"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" disabled default-value="cannot-edit" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" disabled defaultValue="cannot-edit" />\`,
+})
+export class Disabled {}`}
+        />
       </article>
       <article className="docs-example" id="example-custom-toggle-labels">
         <h4>Custom toggle labels</h4>
-        <pre className="docs-code"><code>{`export function CustomToggleLabels() {
+        <FrameworkCode
+          variant="docs"
+          label={'Custom toggle labels code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function CustomToggleLabels() {
   return (
     <PixelPasswordInput
       label="Password"
@@ -172,11 +388,33 @@ export function Default() {
       placeholder="Enter password"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" :toggle-labels="['View', 'Mask']" placeholder="Enter password" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" [toggleLabels]="['View', 'Mask']" placeholder="Enter password" />\`,
+})
+export class CustomToggleLabels {}`}
+        />
       </article>
       <article className="docs-example" id="example-controlled">
         <h4>Controlled</h4>
-        <pre className="docs-code"><code>{`export function Controlled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Controlled code'}
+          react={`import { useState } from 'react';
+import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Controlled() {
   const [value, setValue] = useState('');
   return (
     <PixelPasswordInput
@@ -186,18 +424,60 @@ export function Default() {
       hint={\`Length: \${value.length}\`}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelPasswordInput v-model="value" label="Password" :hint="\`Length: \${value.length}\`" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" [(value)]="value" [hint]="'Length: ' + value().length" />\`,
+})
+export class Controlled {
+  readonly value = signal('');
+}`}
+        />
       </article>
       <article className="docs-example" id="example-uncontrolled">
         <h4>Uncontrolled</h4>
-        <pre className="docs-code"><code>{`export function Uncontrolled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Uncontrolled code'}
+          react={`import { PixelPasswordInput } from '@pxlkit/ui-kit';
+
+export function Uncontrolled() {
   return (
     <PixelPasswordInput
       label="Password"
       defaultValue="hunter2"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPasswordInput label="Password" default-value="hunter2" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPasswordInput],
+  template: \`<pxl-password-input label="Password" defaultValue="hunter2" />\`,
+})
+export class Uncontrolled {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

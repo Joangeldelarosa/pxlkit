@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDrawerDocsSectionProps {
   className?: string;
@@ -79,7 +80,10 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
     </section>
     <section aria-labelledby="pixel-drawer-usage">
       <h3 id="pixel-drawer-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelDrawer usage'}
+        react={`import { useState } from 'react';
 import { PixelDrawer } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -107,14 +111,66 @@ export function Default() {
       </PixelDrawer>
     </>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open drawer</button>
+  <PixelDrawer v-model:open="open" title="Settings">
+    <PixelDrawerHeader>
+      <span>Settings</span>
+      <button type="button" @click="open = false">Close</button>
+    </PixelDrawerHeader>
+    <PixelDrawerBody>
+      <p>Drawer content goes here.</p>
+    </PixelDrawerBody>
+    <PixelDrawerFooter>
+      <button type="button" @click="open = false">Done</button>
+    </PixelDrawerFooter>
+  </PixelDrawer>
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDrawer, PixelDrawerHeader, PixelDrawerBody, PixelDrawerFooter],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open drawer</button>
+    <pxl-drawer [(open)]="open" title="Settings">
+      <pxl-drawer-header>
+        <span>Settings</span>
+        <button type="button" (click)="open.set(false)">Close</button>
+      </pxl-drawer-header>
+      <pxl-drawer-body>
+        <p>Drawer content goes here.</p>
+      </pxl-drawer-body>
+      <pxl-drawer-footer>
+        <button type="button" (click)="open.set(false)">Done</button>
+      </pxl-drawer-footer>
+    </pxl-drawer>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelDrawer } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -139,11 +195,64 @@ export function Default() {
       </PixelDrawer>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open drawer</button>
+  <PixelDrawer v-model:open="open" title="Settings">
+    <PixelDrawerHeader>
+      <span>Settings</span>
+      <button type="button" @click="open = false">Close</button>
+    </PixelDrawerHeader>
+    <PixelDrawerBody>
+      <p>Drawer content goes here.</p>
+    </PixelDrawerBody>
+    <PixelDrawerFooter>
+      <button type="button" @click="open = false">Done</button>
+    </PixelDrawerFooter>
+  </PixelDrawer>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDrawer, PixelDrawerHeader, PixelDrawerBody, PixelDrawerFooter],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open drawer</button>
+    <pxl-drawer [(open)]="open" title="Settings">
+      <pxl-drawer-header>
+        <span>Settings</span>
+        <button type="button" (click)="open.set(false)">Close</button>
+      </pxl-drawer-header>
+      <pxl-drawer-body>
+        <p>Drawer content goes here.</p>
+      </pxl-drawer-body>
+      <pxl-drawer-footer>
+        <button type="button" (click)="open.set(false)">Done</button>
+      </pxl-drawer-footer>
+    </pxl-drawer>
+  \`,
+})
+export class Default {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-left-side">
         <h4>Left side, large</h4>
-        <pre className="docs-code"><code>{`export function LeftSide() {
+        <FrameworkCode
+          variant="docs"
+          label={'Left side, large code'}
+          react={`import { useState } from 'react';
+import { PixelDrawer } from '@pxlkit/ui-kit';
+
+export function LeftSide() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -164,11 +273,52 @@ export function Default() {
       </PixelDrawer>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerHeader } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open left drawer</button>
+  <PixelDrawer v-model:open="open" side="left" size="lg" title="Navigation">
+    <PixelDrawerHeader>Navigation</PixelDrawerHeader>
+    <PixelDrawerBody>
+      <p>Menu items here.</p>
+    </PixelDrawerBody>
+  </PixelDrawer>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerHeader } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDrawer, PixelDrawerHeader, PixelDrawerBody],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open left drawer</button>
+    <pxl-drawer [(open)]="open" side="left" size="lg" title="Navigation">
+      <pxl-drawer-header>Navigation</pxl-drawer-header>
+      <pxl-drawer-body>
+        <p>Menu items here.</p>
+      </pxl-drawer-body>
+    </pxl-drawer>
+  \`,
+})
+export class LeftSide {
+  readonly open = signal(false);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-bottom-sheet">
         <h4>Bottom sheet</h4>
-        <pre className="docs-code"><code>{`export function BottomSheet() {
+        <FrameworkCode
+          variant="docs"
+          label={'Bottom sheet code'}
+          react={`import { useState } from 'react';
+import { PixelDrawer } from '@pxlkit/ui-kit';
+
+export function BottomSheet() {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -194,7 +344,46 @@ export function Default() {
       </PixelDrawer>
     </>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter } from '@pxlkit/ui-kit-vue';
+
+const open = ref(false);
+</script>
+
+<template>
+  <button type="button" @click="open = true">Open bottom sheet</button>
+  <PixelDrawer v-model:open="open" side="bottom" size="md" title="Quick actions" description="Pick an action below">
+    <PixelDrawerBody>
+      <p>Sheet content.</p>
+    </PixelDrawerBody>
+    <PixelDrawerFooter>
+      <button type="button" @click="open = false">Cancel</button>
+    </PixelDrawerFooter>
+  </PixelDrawer>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDrawer, PixelDrawerBody, PixelDrawerFooter],
+  template: \`
+    <button type="button" (click)="open.set(true)">Open bottom sheet</button>
+    <pxl-drawer [(open)]="open" side="bottom" size="md" title="Quick actions" description="Pick an action below">
+      <pxl-drawer-body>
+        <p>Sheet content.</p>
+      </pxl-drawer-body>
+      <pxl-drawer-footer>
+        <button type="button" (click)="open.set(false)">Cancel</button>
+      </pxl-drawer-footer>
+    </pxl-drawer>
+  \`,
+})
+export class BottomSheet {
+  readonly open = signal(false);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

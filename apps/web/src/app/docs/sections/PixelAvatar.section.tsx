@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAvatarDocsSectionProps {
   className?: string;
@@ -48,24 +49,68 @@ export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProp
     </section>
     <section aria-labelledby="pixel-avatar-usage">
       <h3 id="pixel-avatar-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelAvatar } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelAvatar usage'}
+        react={`import { PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelAvatar name="Joangel De La Rosa" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAvatar name="Joangel De La Rosa" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`<pxl-avatar name="Joangel De La Rosa" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelAvatar name="Joangel De La Rosa" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAvatar name="Joangel De La Rosa" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`<pxl-avatar name="Joangel De La Rosa" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex items-end gap-3">
       <PixelAvatar name="Ana Lopez" size="xs" />
@@ -75,11 +120,46 @@ export function Default() {
       <PixelAvatar name="Ana Lopez" size="xl" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-end gap-3">
+    <PixelAvatar name="Ana Lopez" size="xs" />
+    <PixelAvatar name="Ana Lopez" size="sm" />
+    <PixelAvatar name="Ana Lopez" size="md" />
+    <PixelAvatar name="Ana Lopez" size="lg" />
+    <PixelAvatar name="Ana Lopez" size="xl" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex items-end gap-3">
+      <pxl-avatar name="Ana Lopez" size="xs" />
+      <pxl-avatar name="Ana Lopez" size="sm" />
+      <pxl-avatar name="Ana Lopez" size="md" />
+      <pxl-avatar name="Ana Lopez" size="lg" />
+      <pxl-avatar name="Ana Lopez" size="xl" />
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-3">
       <PixelAvatar name="Green User" tone="green" />
@@ -91,22 +171,90 @@ export function Default() {
       <PixelAvatar name="Neutral User" tone="neutral" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-3">
+    <PixelAvatar name="Green User" tone="green" />
+    <PixelAvatar name="Cyan User" tone="cyan" />
+    <PixelAvatar name="Gold User" tone="gold" />
+    <PixelAvatar name="Red User" tone="red" />
+    <PixelAvatar name="Purple User" tone="purple" />
+    <PixelAvatar name="Pink User" tone="pink" />
+    <PixelAvatar name="Neutral User" tone="neutral" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex flex-wrap gap-3">
+      <pxl-avatar name="Green User" tone="green" />
+      <pxl-avatar name="Cyan User" tone="cyan" />
+      <pxl-avatar name="Gold User" tone="gold" />
+      <pxl-avatar name="Red User" tone="red" />
+      <pxl-avatar name="Purple User" tone="purple" />
+      <pxl-avatar name="Pink User" tone="pink" />
+      <pxl-avatar name="Neutral User" tone="neutral" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex items-center gap-3">
       <PixelAvatar name="Pixel Surface" surface="pixel" />
       <PixelAvatar name="Linear Surface" surface="linear" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-3">
+    <PixelAvatar name="Pixel Surface" surface="pixel" />
+    <PixelAvatar name="Linear Surface" surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex items-center gap-3">
+      <pxl-avatar name="Pixel Surface" surface="pixel" />
+      <pxl-avatar name="Linear Surface" surface="linear" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-shapes">
         <h4>Shapes</h4>
-        <pre className="docs-code"><code>{`export function Shapes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Shapes code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Shapes() {
   return (
     <div className="flex items-center gap-3">
       <PixelAvatar name="Circle Shape" shape="circle" />
@@ -114,11 +262,42 @@ export function Default() {
       <PixelAvatar name="Square Shape" shape="square" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-3">
+    <PixelAvatar name="Circle Shape" shape="circle" />
+    <PixelAvatar name="Rounded Shape" shape="rounded" />
+    <PixelAvatar name="Square Shape" shape="square" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex items-center gap-3">
+      <pxl-avatar name="Circle Shape" shape="circle" />
+      <pxl-avatar name="Rounded Shape" shape="rounded" />
+      <pxl-avatar name="Square Shape" shape="square" />
+    </div>
+  \`,
+})
+export class Shapes {}`}
+        />
       </article>
       <article className="docs-example" id="example-statuses">
         <h4>Statuses</h4>
-        <pre className="docs-code"><code>{`export function Statuses() {
+        <FrameworkCode
+          variant="docs"
+          label={'Statuses code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function Statuses() {
   return (
     <div className="flex items-center gap-3">
       <PixelAvatar name="Online User" status="online" />
@@ -127,11 +306,44 @@ export function Default() {
       <PixelAvatar name="Offline User" status="offline" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-3">
+    <PixelAvatar name="Online User" status="online" />
+    <PixelAvatar name="Away User" status="away" />
+    <PixelAvatar name="Busy User" status="busy" />
+    <PixelAvatar name="Offline User" status="offline" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex items-center gap-3">
+      <pxl-avatar name="Online User" status="online" />
+      <pxl-avatar name="Away User" status="away" />
+      <pxl-avatar name="Busy User" status="busy" />
+      <pxl-avatar name="Offline User" status="offline" />
+    </div>
+  \`,
+})
+export class Statuses {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-image">
         <h4>With Image</h4>
-        <pre className="docs-code"><code>{`export function WithImage() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Image code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function WithImage() {
   return (
     <PixelAvatar
       name="Joangel"
@@ -140,11 +352,32 @@ export function Default() {
       status="online"
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelAvatar name="Joangel" src="https://i.pravatar.cc/80?img=12" size="lg" status="online" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`<pxl-avatar name="Joangel" src="https://i.pravatar.cc/80?img=12" size="lg" status="online" />\`,
+})
+export class WithImage {}`}
+        />
       </article>
       <article className="docs-example" id="example-color-seed">
         <h4>Color Seed</h4>
-        <pre className="docs-code"><code>{`export function ColorSeed() {
+        <FrameworkCode
+          variant="docs"
+          label={'Color Seed code'}
+          react={`import { PixelAvatar } from '@pxlkit/ui-kit';
+
+export function ColorSeed() {
   return (
     <div className="flex items-center gap-3">
       <PixelAvatar name="Alice Adams" colorSeed="alice@example.com" />
@@ -153,7 +386,35 @@ export function Default() {
       <PixelAvatar name="Dave Diaz" colorSeed="dave@example.com" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAvatar } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex items-center gap-3">
+    <PixelAvatar name="Alice Adams" color-seed="alice@example.com" />
+    <PixelAvatar name="Bob Brown" color-seed="bob@example.com" />
+    <PixelAvatar name="Carol Chen" color-seed="carol@example.com" />
+    <PixelAvatar name="Dave Diaz" color-seed="dave@example.com" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAvatar } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAvatar],
+  template: \`
+    <div class="flex items-center gap-3">
+      <pxl-avatar name="Alice Adams" colorSeed="alice@example.com" />
+      <pxl-avatar name="Bob Brown" colorSeed="bob@example.com" />
+      <pxl-avatar name="Carol Chen" colorSeed="carol@example.com" />
+      <pxl-avatar name="Dave Diaz" colorSeed="dave@example.com" />
+    </div>
+  \`,
+})
+export class ColorSeed {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

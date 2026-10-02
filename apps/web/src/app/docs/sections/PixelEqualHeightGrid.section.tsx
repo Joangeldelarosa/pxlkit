@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelEqualHeightGridDocsSectionProps {
   className?: string;
@@ -44,11 +45,12 @@ export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightG
     </section>
     <section aria-labelledby="pixel-equal-height-grid-usage">
       <h3 id="pixel-equal-height-grid-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { cn } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelEqualHeightGrid usage'}
+        react={`import { cn } from '@pxlkit/ui-kit';
 import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
 
-// PixelEqualHeightGrid lays out the rows of each item through its
-// className, so the card passes it on to its root.
 function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
     <div className={cn('border border-retro-border p-4', className)}>
@@ -67,14 +69,73 @@ export function Default() {
       <Card title="Three" body="Medium length copy here." />
     </PixelEqualHeightGrid>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';
+
+const cards = [
+  { title: 'One', body: 'Short copy.' },
+  { title: 'Two', body: 'A longer body that forces the row to grow taller than the first card.' },
+  { title: 'Three', body: 'Medium length copy here.' },
+];
+</script>
+
+<template>
+  <PixelEqualHeightGrid :cols="{ base: 1, sm: 3 }" :gap="4">
+    <div v-for="card in cards" :key="card.title" class="border border-retro-border p-4">
+      <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+      <p class="text-sm text-retro-muted">{{ card.body }}</p>
+      <div class="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  </PixelEqualHeightGrid>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEqualHeightGrid],
+  template: \`
+    <div pxlEqualHeightGrid [cols]="{ base: 1, sm: 3 }" [gap]="4">
+      @for (card of cards; track card.title) {
+        <div class="border border-retro-border p-4">
+          <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+          <p class="text-sm text-retro-muted">{{ card.body }}</p>
+          <div class="mt-2 text-xs text-retro-muted">Footer</div>
+        </div>
+      }
+    </div>
+  \`,
+})
+export class Default {
+  readonly cards = [
+    { title: 'One', body: 'Short copy.' },
+    { title: 'Two', body: 'A longer body that forces the row to grow taller than the first card.' },
+    { title: 'Three', body: 'Medium length copy here.' },
+  ];
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { cn } from '@pxlkit/ui-kit';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
+  return (
+    <div className={cn('border border-retro-border p-4', className)}>
+      <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
+      <p className="text-sm text-retro-muted">{body}</p>
+      <div className="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  );
+}
+
+export function Default() {
   return (
     <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={4}>
       <Card title="One" body="Short copy." />
@@ -82,11 +143,71 @@ export function Default() {
       <Card title="Three" body="Medium length copy here." />
     </PixelEqualHeightGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';
+
+const cards = [
+  { title: 'One', body: 'Short copy.' },
+  { title: 'Two', body: 'A longer body that forces the row to grow taller than the first card.' },
+  { title: 'Three', body: 'Medium length copy here.' },
+];
+</script>
+
+<template>
+  <PixelEqualHeightGrid :cols="{ base: 1, sm: 3 }" :gap="4">
+    <div v-for="card in cards" :key="card.title" class="border border-retro-border p-4">
+      <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+      <p class="text-sm text-retro-muted">{{ card.body }}</p>
+      <div class="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  </PixelEqualHeightGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEqualHeightGrid],
+  template: \`
+    <div pxlEqualHeightGrid [cols]="{ base: 1, sm: 3 }" [gap]="4">
+      @for (card of cards; track card.title) {
+        <div class="border border-retro-border p-4">
+          <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+          <p class="text-sm text-retro-muted">{{ card.body }}</p>
+          <div class="mt-2 text-xs text-retro-muted">Footer</div>
+        </div>
+      }
+    </div>
+  \`,
+})
+export class Default {
+  readonly cards = [
+    { title: 'One', body: 'Short copy.' },
+    { title: 'Two', body: 'A longer body that forces the row to grow taller than the first card.' },
+    { title: 'Three', body: 'Medium length copy here.' },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-row-align-top">
         <h4>Row Align Top</h4>
-        <pre className="docs-code"><code>{`export function RowAlignTop() {
+        <FrameworkCode
+          variant="docs"
+          label={'Row Align Top code'}
+          react={`import { cn } from '@pxlkit/ui-kit';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
+  return (
+    <div className={cn('border border-retro-border p-4', className)}>
+      <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
+      <p className="text-sm text-retro-muted">{body}</p>
+      <div className="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  );
+}
+
+export function RowAlignTop() {
   return (
     <PixelEqualHeightGrid cols={{ base: 1, sm: 3 }} gap={4} rowAlign="top">
       <Card title="One" body="Short copy." />
@@ -94,18 +215,120 @@ export function Default() {
       <Card title="Three" body="Medium length copy here." />
     </PixelEqualHeightGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';
+
+const cards = [
+  { title: 'One', body: 'Short copy.' },
+  { title: 'Two', body: 'A longer body that would otherwise stretch siblings.' },
+  { title: 'Three', body: 'Medium length copy here.' },
+];
+</script>
+
+<template>
+  <PixelEqualHeightGrid :cols="{ base: 1, sm: 3 }" :gap="4" row-align="top">
+    <div v-for="card in cards" :key="card.title" class="border border-retro-border p-4">
+      <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+      <p class="text-sm text-retro-muted">{{ card.body }}</p>
+      <div class="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  </PixelEqualHeightGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEqualHeightGrid],
+  template: \`
+    <div pxlEqualHeightGrid [cols]="{ base: 1, sm: 3 }" [gap]="4" rowAlign="top">
+      @for (card of cards; track card.title) {
+        <div class="border border-retro-border p-4">
+          <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+          <p class="text-sm text-retro-muted">{{ card.body }}</p>
+          <div class="mt-2 text-xs text-retro-muted">Footer</div>
+        </div>
+      }
+    </div>
+  \`,
+})
+export class RowAlignTop {
+  readonly cards = [
+    { title: 'One', body: 'Short copy.' },
+    { title: 'Two', body: 'A longer body that would otherwise stretch siblings.' },
+    { title: 'Three', body: 'Medium length copy here.' },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-pixel-surface">
         <h4>Pixel Surface</h4>
-        <pre className="docs-code"><code>{`export function PixelSurface() {
+        <FrameworkCode
+          variant="docs"
+          label={'Pixel Surface code'}
+          react={`import { cn } from '@pxlkit/ui-kit';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
+  return (
+    <div className={cn('border border-retro-border p-4', className)}>
+      <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
+      <p className="text-sm text-retro-muted">{body}</p>
+      <div className="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  );
+}
+
+export function PixelSurface() {
   return (
     <PixelEqualHeightGrid cols={2} gap={4} surface="pixel">
       <Card title="Pixel A" body="Surface-aware grid item." />
       <Card title="Pixel B" body="Renders with the pixel surface tokens applied to the grid." />
     </PixelEqualHeightGrid>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';
+
+const cards = [
+  { title: 'Pixel A', body: 'Surface-aware grid item.' },
+  { title: 'Pixel B', body: 'Renders with the pixel surface tokens applied to the grid.' },
+];
+</script>
+
+<template>
+  <PixelEqualHeightGrid :cols="2" :gap="4" surface="pixel">
+    <div v-for="card in cards" :key="card.title" class="border border-retro-border p-4">
+      <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+      <p class="text-sm text-retro-muted">{{ card.body }}</p>
+      <div class="mt-2 text-xs text-retro-muted">Footer</div>
+    </div>
+  </PixelEqualHeightGrid>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelEqualHeightGrid],
+  template: \`
+    <div pxlEqualHeightGrid [cols]="2" [gap]="4" surface="pixel">
+      @for (card of cards; track card.title) {
+        <div class="border border-retro-border p-4">
+          <h3 class="text-sm font-semibold text-retro-text">{{ card.title }}</h3>
+          <p class="text-sm text-retro-muted">{{ card.body }}</p>
+          <div class="mt-2 text-xs text-retro-muted">Footer</div>
+        </div>
+      }
+    </div>
+  \`,
+})
+export class PixelSurface {
+  readonly cards = [
+    { title: 'Pixel A', body: 'Surface-aware grid item.' },
+    { title: 'Pixel B', body: 'Renders with the pixel surface tokens applied to the grid.' },
+  ];
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

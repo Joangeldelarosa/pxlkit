@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelMouseParallaxDocsSectionProps {
   className?: string;
@@ -47,7 +48,10 @@ export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxD
     </section>
     <section aria-labelledby="pixel-mouse-parallax-usage">
       <h3 id="pixel-mouse-parallax-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelMouseParallax } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelMouseParallax usage'}
+        react={`import { PixelMouseParallax } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -59,14 +63,19 @@ export function Default() {
       </PixelMouseParallax>
     </div>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelMouseParallax } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <div className="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
       <PixelMouseParallax strength={20}>
@@ -76,11 +85,17 @@ export function Default() {
       </PixelMouseParallax>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-inverted">
         <h4>Inverted</h4>
-        <pre className="docs-code"><code>{`export function Inverted() {
+        <FrameworkCode
+          variant="docs"
+          label={'Inverted code'}
+          react={`import { PixelMouseParallax } from '@pxlkit/ui-kit';
+
+export function Inverted() {
   return (
     <div className="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
       <PixelMouseParallax strength={30} invert>
@@ -90,7 +105,8 @@ export function Default() {
       </PixelMouseParallax>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

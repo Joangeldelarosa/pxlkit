@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelNavigationMenuDocsSectionProps {
   className?: string;
@@ -101,8 +102,10 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
     </section>
     <section aria-labelledby="pixel-navigation-menu-usage">
       <h3 id="pixel-navigation-menu-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react'
-import { PixelNavigationMenu } from '@pxlkit/ui-kit'
+      <FrameworkCode
+        variant="docs"
+        label={'PixelNavigationMenu usage'}
+        react={`import { PixelNavigationMenu } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -124,14 +127,67 @@ export function Default() {
       ]}
     />
   )
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelNavigationMenuItem[] = [
+  { label: 'Home', href: '#home' },
+  {
+    label: 'Products',
+    content: () =>
+      h('div', { class: 'grid gap-2 text-sm text-retro-text' }, [
+        h('a', { href: '#analytics', class: 'hover:underline' }, 'Analytics'),
+        h('a', { href: '#dashboard', class: 'hover:underline' }, 'Dashboard'),
+        h('a', { href: '#reports', class: 'hover:underline' }, 'Reports'),
+      ]),
+  },
+  { label: 'Docs', href: '#docs' },
+  { label: 'Pricing', href: '#pricing' },
+];
+</script>
+
+<template>
+  <PixelNavigationMenu :items="items" />
+</template>`}
+        angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNavigationMenu],
+  template: \`
+    <pxl-navigation-menu [items]="items()" />
+    <ng-template #products>
+      <div class="grid gap-2 text-sm text-retro-text">
+        <a href="#analytics" class="hover:underline">Analytics</a>
+        <a href="#dashboard" class="hover:underline">Dashboard</a>
+        <a href="#reports" class="hover:underline">Reports</a>
+      </div>
+    </ng-template>
+  \`,
+})
+export class Default {
+  private readonly products = viewChild.required<TemplateRef<unknown>>('products');
+  readonly items = computed<PixelNavigationMenuItem[]>(() => [
+    { label: 'Home', href: '#home' },
+    { label: 'Products', content: this.products() },
+    { label: 'Docs', href: '#docs' },
+    { label: 'Pricing', href: '#pricing' },
+  ]);
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelNavigationMenu } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelNavigationMenu
       items={[
@@ -151,11 +207,65 @@ export function Default() {
       ]}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelNavigationMenuItem[] = [
+  { label: 'Home', href: '#home' },
+  {
+    label: 'Products',
+    content: () =>
+      h('div', { class: 'grid gap-2 text-sm text-retro-text' }, [
+        h('a', { href: '#analytics', class: 'hover:underline' }, 'Analytics'),
+        h('a', { href: '#dashboard', class: 'hover:underline' }, 'Dashboard'),
+        h('a', { href: '#reports', class: 'hover:underline' }, 'Reports'),
+      ]),
+  },
+  { label: 'Docs', href: '#docs' },
+  { label: 'Pricing', href: '#pricing' },
+];
+</script>
+
+<template>
+  <PixelNavigationMenu :items="items" />
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNavigationMenu],
+  template: \`
+    <pxl-navigation-menu [items]="items()" />
+    <ng-template #products>
+      <div class="grid gap-2 text-sm text-retro-text">
+        <a href="#analytics" class="hover:underline">Analytics</a>
+        <a href="#dashboard" class="hover:underline">Dashboard</a>
+        <a href="#reports" class="hover:underline">Reports</a>
+      </div>
+    </ng-template>
+  \`,
+})
+export class Default {
+  private readonly products = viewChild.required<TemplateRef<unknown>>('products');
+  readonly items = computed<PixelNavigationMenuItem[]>(() => [
+    { label: 'Home', href: '#home' },
+    { label: 'Products', content: this.products() },
+    { label: 'Docs', href: '#docs' },
+    { label: 'Pricing', href: '#pricing' },
+  ]);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-vertical">
         <h4>Vertical</h4>
-        <pre className="docs-code"><code>{`export function Vertical() {
+        <FrameworkCode
+          variant="docs"
+          label={'Vertical code'}
+          react={`import { PixelNavigationMenu } from '@pxlkit/ui-kit';
+
+export function Vertical() {
   return (
     <PixelNavigationMenu
       orientation="vertical"
@@ -166,11 +276,44 @@ export function Default() {
       ]}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelNavigationMenuItem[] = [
+  { label: 'Overview', href: '#overview' },
+  { label: 'Settings', href: '#settings' },
+  { label: 'Billing', href: '#billing' },
+];
+</script>
+
+<template>
+  <PixelNavigationMenu orientation="vertical" :items="items" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNavigationMenu],
+  template: \`<pxl-navigation-menu orientation="vertical" [items]="items" />\`,
+})
+export class Vertical {
+  readonly items: PixelNavigationMenuItem[] = [
+    { label: 'Overview', href: '#overview' },
+    { label: 'Settings', href: '#settings' },
+    { label: 'Billing', href: '#billing' },
+  ];
+}`}
+        />
       </article>
       <article className="docs-example" id="example-inline-panels">
         <h4>Inline Panels</h4>
-        <pre className="docs-code"><code>{`export function InlinePanels() {
+        <FrameworkCode
+          variant="docs"
+          label={'Inline Panels code'}
+          react={`import { PixelNavigationMenu } from '@pxlkit/ui-kit';
+
+export function InlinePanels() {
   return (
     <PixelNavigationMenu
       viewport={false}
@@ -188,7 +331,50 @@ export function Default() {
       ]}
     />
   )
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-vue';
+
+const items: PixelNavigationMenuItem[] = [
+  { label: 'Home', href: '#home' },
+  {
+    label: 'Resources',
+    content: () =>
+      h('div', { class: 'grid gap-2 text-sm text-retro-text' }, [
+        h('a', { href: '#guides', class: 'hover:underline' }, 'Guides'),
+        h('a', { href: '#api', class: 'hover:underline' }, 'API Reference'),
+      ]),
+  },
+];
+</script>
+
+<template>
+  <PixelNavigationMenu :viewport="false" :items="items" />
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelNavigationMenu],
+  template: \`
+    <pxl-navigation-menu [viewport]="false" [items]="items()" />
+    <ng-template #resources>
+      <div class="grid gap-2 text-sm text-retro-text">
+        <a href="#guides" class="hover:underline">Guides</a>
+        <a href="#api" class="hover:underline">API Reference</a>
+      </div>
+    </ng-template>
+  \`,
+})
+export class InlinePanels {
+  private readonly resources = viewChild.required<TemplateRef<unknown>>('resources');
+  readonly items = computed<PixelNavigationMenuItem[]>(() => [
+    { label: 'Home', href: '#home' },
+    { label: 'Resources', content: this.resources() },
+  ]);
+}`}
+        />
       </article>
     </section>
     </section>

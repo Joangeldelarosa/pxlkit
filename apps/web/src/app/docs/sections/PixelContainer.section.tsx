@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelContainerDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelContainerDocsSection({ className }: PixelContainerDocsSecti
     </section>
     <section aria-labelledby="pixel-container-usage">
       <h3 id="pixel-container-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelContainer } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelContainer usage'}
+        react={`import { PixelContainer } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -56,50 +60,179 @@ export function Default() {
       <p className="text-sm text-retro-muted">Default container — section landmark, xl max-width, lg rhythm.</p>
     </PixelContainer>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelContainer } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelContainer>
+    <p class="text-sm text-retro-muted">Default container — section landmark, xl max-width, lg rhythm.</p>
+  </PixelContainer>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelContainer } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelContainer],
+  template: \`
+    <section pxlContainer>
+      <p class="text-sm text-retro-muted">Default container — section landmark, xl max-width, lg rhythm.</p>
+    </section>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelContainer } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelContainer>
       <p className="text-sm text-retro-muted">Default container — section landmark, xl max-width, lg rhythm.</p>
     </PixelContainer>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelContainer } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelContainer>
+    <p class="text-sm text-retro-muted">Default container — section landmark, xl max-width, lg rhythm.</p>
+  </PixelContainer>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelContainer } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelContainer],
+  template: \`
+    <section pxlContainer>
+      <p class="text-sm text-retro-muted">Default container — section landmark, xl max-width, lg rhythm.</p>
+    </section>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-narrow">
         <h4>Narrow</h4>
-        <pre className="docs-code"><code>{`export function Narrow() {
+        <FrameworkCode
+          variant="docs"
+          label={'Narrow code'}
+          react={`import { PixelContainer } from '@pxlkit/ui-kit';
+
+export function Narrow() {
   return (
     <PixelContainer maxWidth="md" padding="md">
       <p className="text-sm text-retro-muted">Narrow container with md rhythm.</p>
     </PixelContainer>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelContainer } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelContainer max-width="md" padding="md">
+    <p class="text-sm text-retro-muted">Narrow container with md rhythm.</p>
+  </PixelContainer>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelContainer } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelContainer],
+  template: \`
+    <section pxlContainer maxWidth="md" padding="md">
+      <p class="text-sm text-retro-muted">Narrow container with md rhythm.</p>
+    </section>
+  \`,
+})
+export class Narrow {}`}
+        />
       </article>
       <article className="docs-example" id="example-as-main">
         <h4>As Main</h4>
-        <pre className="docs-code"><code>{`export function AsMain() {
+        <FrameworkCode
+          variant="docs"
+          label={'As Main code'}
+          react={`import { PixelContainer } from '@pxlkit/ui-kit';
+
+export function AsMain() {
   return (
     <PixelContainer as="main" aria-label="Page content" maxWidth="2xl" padding={{ x: 'lg', y: 'xl' }}>
       <p className="text-sm text-retro-muted">Rendered as the main landmark with split padding.</p>
     </PixelContainer>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelContainer } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelContainer as="main" aria-label="Page content" max-width="2xl" :padding="{ x: 'lg', y: 'xl' }">
+    <p class="text-sm text-retro-muted">Rendered as the main landmark with split padding.</p>
+  </PixelContainer>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelContainer } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelContainer],
+  template: \`
+    <main pxlContainer aria-label="Page content" maxWidth="2xl" [padding]="{ x: 'lg', y: 'xl' }">
+      <p class="text-sm text-retro-muted">Rendered as the main landmark with split padding.</p>
+    </main>
+  \`,
+})
+export class AsMain {}`}
+        />
       </article>
       <article className="docs-example" id="example-prose-width">
         <h4>Prose Width</h4>
-        <pre className="docs-code"><code>{`export function ProseWidth() {
+        <FrameworkCode
+          variant="docs"
+          label={'Prose Width code'}
+          react={`import { PixelContainer } from '@pxlkit/ui-kit';
+
+export function ProseWidth() {
   return (
     <PixelContainer maxWidth="prose" padding="sm">
       <p className="text-sm text-retro-muted">Prose-width container ideal for long-form reading.</p>
     </PixelContainer>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelContainer } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelContainer max-width="prose" padding="sm">
+    <p class="text-sm text-retro-muted">Prose-width container ideal for long-form reading.</p>
+  </PixelContainer>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelContainer } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelContainer],
+  template: \`
+    <section pxlContainer maxWidth="prose" padding="sm">
+      <p class="text-sm text-retro-muted">Prose-width container ideal for long-form reading.</p>
+    </section>
+  \`,
+})
+export class ProseWidth {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

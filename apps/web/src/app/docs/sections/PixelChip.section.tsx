@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelChipDocsSectionProps {
   className?: string;
@@ -75,25 +76,68 @@ export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): 
     </section>
     <section aria-labelledby="pixel-chip-usage">
       <h3 id="pixel-chip-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
-import { PixelChip } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelChip usage'}
+        react={`import { PixelChip } from '@pxlkit/ui-kit';
 
 export function Default() {
   return <PixelChip label="React" />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelChip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelChip label="React" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelChip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip],
+  template: \`<pxl-chip label="React" />\`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelChip } from '@pxlkit/ui-kit';
+
+export function Default() {
   return <PixelChip label="React" />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelChip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelChip label="React" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelChip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip],
+  template: \`<pxl-chip label="React" />\`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PixelChip } from '@pxlkit/ui-kit';
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelChip label="Neutral" tone="neutral" />
@@ -105,11 +149,50 @@ export function Default() {
       <PixelChip label="Pink" tone="pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelChip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelChip label="Neutral" tone="neutral" />
+    <PixelChip label="Green" tone="green" />
+    <PixelChip label="Cyan" tone="cyan" />
+    <PixelChip label="Gold" tone="gold" />
+    <PixelChip label="Red" tone="red" />
+    <PixelChip label="Purple" tone="purple" />
+    <PixelChip label="Pink" tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelChip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <pxl-chip label="Neutral" tone="neutral" />
+      <pxl-chip label="Green" tone="green" />
+      <pxl-chip label="Cyan" tone="cyan" />
+      <pxl-chip label="Gold" tone="gold" />
+      <pxl-chip label="Red" tone="red" />
+      <pxl-chip label="Purple" tone="purple" />
+      <pxl-chip label="Pink" tone="pink" />
+    </div>
+  \`,
+})
+export class Tones {}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PixelChip } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <PixelChip label="Small" size="sm" />
@@ -117,11 +200,42 @@ export function Default() {
       <PixelChip label="Large" size="lg" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelChip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-2">
+    <PixelChip label="Small" size="sm" />
+    <PixelChip label="Medium" size="md" />
+    <PixelChip label="Large" size="lg" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelChip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip],
+  template: \`
+    <div class="flex flex-wrap items-center gap-2">
+      <pxl-chip label="Small" size="sm" />
+      <pxl-chip label="Medium" size="md" />
+      <pxl-chip label="Large" size="lg" />
+    </div>
+  \`,
+})
+export class Sizes {}`}
+        />
       </article>
       <article className="docs-example" id="example-variants">
         <h4>Variants</h4>
-        <pre className="docs-code"><code>{`export function Variants() {
+        <FrameworkCode
+          variant="docs"
+          label={'Variants code'}
+          react={`import { PixelChip } from '@pxlkit/ui-kit';
+
+export function Variants() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelChip label="Soft" variant="soft" tone="cyan" />
@@ -130,22 +244,84 @@ export function Default() {
       <PixelChip label="Ghost" variant="ghost" tone="cyan" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelChip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelChip label="Soft" variant="soft" tone="cyan" />
+    <PixelChip label="Solid" variant="solid" tone="cyan" />
+    <PixelChip label="Outline" variant="outline" tone="cyan" />
+    <PixelChip label="Ghost" variant="ghost" tone="cyan" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelChip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <pxl-chip label="Soft" variant="soft" tone="cyan" />
+      <pxl-chip label="Solid" variant="solid" tone="cyan" />
+      <pxl-chip label="Outline" variant="outline" tone="cyan" />
+      <pxl-chip label="Ghost" variant="ghost" tone="cyan" />
+    </div>
+  \`,
+})
+export class Variants {}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelChip } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   return (
     <div className="flex flex-wrap gap-2">
       <PixelChip label="Pixel" surface="pixel" tone="green" />
       <PixelChip label="Linear" surface="linear" tone="green" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelChip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-2">
+    <PixelChip label="Pixel" surface="pixel" tone="green" />
+    <PixelChip label="Linear" surface="linear" tone="green" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelChip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip],
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <pxl-chip label="Pixel" surface="pixel" tone="green" />
+      <pxl-chip label="Linear" surface="linear" tone="green" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
+        />
       </article>
       <article className="docs-example" id="example-with-icon">
         <h4>With Icon</h4>
-        <pre className="docs-code"><code>{`export function WithIcon() {
+        <FrameworkCode
+          variant="docs"
+          label={'With Icon code'}
+          react={`import { PixelChip } from '@pxlkit/ui-kit';
+
+export function WithIcon() {
   return (
     <PixelChip
       label="TypeScript"
@@ -153,11 +329,37 @@ export function Default() {
       iconLeft={<span aria-hidden>TS</span>}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelChip } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelChip label="TypeScript" tone="cyan">
+    <template #icon-left><span aria-hidden="true">TS</span></template>
+  </PixelChip>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelChip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip],
+  template: \`
+    <pxl-chip label="TypeScript" tone="cyan" [iconLeft]="ts" />
+    <ng-template #ts><span aria-hidden="true">TS</span></ng-template>
+  \`,
+})
+export class WithIcon {}`}
+        />
       </article>
       <article className="docs-example" id="example-clickable">
         <h4>Clickable</h4>
-        <pre className="docs-code"><code>{`export function Clickable() {
+        <FrameworkCode
+          variant="docs"
+          label={'Clickable code'}
+          react={`import { PixelChip } from '@pxlkit/ui-kit';
+
+export function Clickable() {
   return (
     <PixelChip
       label="Click me"
@@ -167,11 +369,37 @@ export function Default() {
       }}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelChip } from '@pxlkit/ui-kit-vue';
+
+function onClick() {}
+</script>
+
+<template>
+  <PixelChip label="Click me" tone="gold" @click="onClick" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelChip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip],
+  template: \`<button pxlChip label="Click me" tone="gold" (click)="onClick()"></button>\`,
+})
+export class Clickable {
+  onClick(): void {}
+}`}
+        />
       </article>
       <article className="docs-example" id="example-deletable">
         <h4>Deletable</h4>
-        <pre className="docs-code"><code>{`export function Deletable() {
+        <FrameworkCode
+          variant="docs"
+          label={'Deletable code'}
+          react={`import { useState } from 'react';
+import { PixelChip } from '@pxlkit/ui-kit';
+
+export function Deletable() {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
@@ -181,11 +409,42 @@ export function Default() {
       onDelete={() => setVisible(false)}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelChip } from '@pxlkit/ui-kit-vue';
+
+const visible = ref(true);
+</script>
+
+<template>
+  <PixelChip v-if="visible" label="Remove me" tone="red" @delete="visible = false" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelChip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip],
+  template: \`
+    @if (visible()) {
+      <pxl-chip label="Remove me" tone="red" deletable (delete)="visible.set(false)" />
+    }
+  \`,
+})
+export class Deletable {
+  readonly visible = signal(true);
+}`}
+        />
       </article>
       <article className="docs-example" id="example-clickable-and-deletable">
         <h4>Clickable + Deletable</h4>
-        <pre className="docs-code"><code>{`export function ClickableAndDeletable() {
+        <FrameworkCode
+          variant="docs"
+          label={'Clickable + Deletable code'}
+          react={`import { useState } from 'react';
+import { PixelChip } from '@pxlkit/ui-kit';
+
+export function ClickableAndDeletable() {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
@@ -198,7 +457,36 @@ export function Default() {
       onDelete={() => setVisible(false)}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelChip } from '@pxlkit/ui-kit-vue';
+
+const visible = ref(true);
+
+function select() {}
+</script>
+
+<template>
+  <PixelChip v-if="visible" label="Tag" tone="purple" @click="select" @delete="visible = false" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelChip } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelChip],
+  template: \`
+    @if (visible()) {
+      <pxl-chip label="Tag" tone="purple" clickable deletable (clicked)="select()" (delete)="visible.set(false)" />
+    }
+  \`,
+})
+export class ClickableAndDeletable {
+  readonly visible = signal(true);
+
+  select(): void {}
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

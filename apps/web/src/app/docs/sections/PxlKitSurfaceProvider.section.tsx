@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitSurfaceProviderDocsSectionProps {
   className?: string;
@@ -47,7 +48,10 @@ export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfacePro
     </section>
     <section aria-labelledby="pxl-kit-surface-provider-usage">
       <h3 id="pxl-kit-surface-provider-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelButton } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PxlKitSurfaceProvider usage'}
+        react={`import { PixelButton } from '@pxlkit/ui-kit';
 import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -59,14 +63,47 @@ export function Default() {
       </div>
     </PxlKitSurfaceProvider>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="pixel">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton>Pixel</PixelButton>
+      <PixelButton variant="outline" tone="cyan">Pixel outline</PixelButton>
+    </div>
+  </PxlKitSurfaceProvider>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitSurfaceProvider],
+  template: \`
+    <ng-container pxlKitSurface="pixel">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton>Pixel</button>
+        <button pxlButton variant="outline" tone="cyan">Pixel outline</button>
+      </div>
+    </ng-container>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default (Pixel)</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default (Pixel) code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PxlKitSurfaceProvider surface="pixel">
       <div className="flex flex-wrap gap-2">
@@ -75,11 +112,45 @@ export function Default() {
       </div>
     </PxlKitSurfaceProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="pixel">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton>Pixel</PixelButton>
+      <PixelButton variant="outline" tone="cyan">Pixel outline</PixelButton>
+    </div>
+  </PxlKitSurfaceProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitSurfaceProvider],
+  template: \`
+    <ng-container pxlKitSurface="pixel">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton>Pixel</button>
+        <button pxlButton variant="outline" tone="cyan">Pixel outline</button>
+      </div>
+    </ng-container>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-linear">
         <h4>Linear</h4>
-        <pre className="docs-code"><code>{`export function Linear() {
+        <FrameworkCode
+          variant="docs"
+          label={'Linear code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+export function Linear() {
   return (
     <PxlKitSurfaceProvider surface="linear">
       <div className="flex flex-wrap gap-2">
@@ -88,11 +159,45 @@ export function Default() {
       </div>
     </PxlKitSurfaceProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="linear">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton>Linear</PixelButton>
+      <PixelButton variant="outline" tone="cyan">Linear outline</PixelButton>
+    </div>
+  </PxlKitSurfaceProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitSurfaceProvider],
+  template: \`
+    <ng-container pxlKitSurface="linear">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton>Linear</button>
+        <button pxlButton variant="outline" tone="cyan">Linear outline</button>
+      </div>
+    </ng-container>
+  \`,
+})
+export class Linear {}`}
+        />
       </article>
       <article className="docs-example" id="example-override">
         <h4>Per-component override</h4>
-        <pre className="docs-code"><code>{`export function Override() {
+        <FrameworkCode
+          variant="docs"
+          label={'Per-component override code'}
+          react={`import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+export function Override() {
   return (
     <PxlKitSurfaceProvider surface="linear">
       <div className="flex flex-wrap gap-2">
@@ -101,7 +206,35 @@ export function Default() {
       </div>
     </PxlKitSurfaceProvider>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="linear">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton>From the provider</PixelButton>
+      <PixelButton surface="pixel">Own surface prop</PixelButton>
+    </div>
+  </PxlKitSurfaceProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelButton, PxlKitSurfaceProvider],
+  template: \`
+    <ng-container pxlKitSurface="linear">
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton>From the provider</button>
+        <button pxlButton surface="pixel">Own surface prop</button>
+      </div>
+    </ng-container>
+  \`,
+})
+export class Override {}`}
+        />
       </article>
     </section>
     </section>

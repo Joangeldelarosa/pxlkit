@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelHeroSectionDocsSectionProps {
   className?: string;
@@ -48,8 +49,10 @@ export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsS
     </section>
     <section aria-labelledby="pixel-hero-section-usage">
       <h3 id="pixel-hero-section-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import React from 'react'
-import { PixelHeroSection } from '@pxlkit/ui-kit'
+      <FrameworkCode
+        variant="docs"
+        label={'PixelHeroSection usage'}
+        react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -61,14 +64,19 @@ export function Default() {
       secondaryCta={<button type="button">View docs</button>}
     />
   )
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelHeroSection
       eyebrow="Introducing"
@@ -78,11 +86,17 @@ export function Default() {
       secondaryCta={<button type="button">View docs</button>}
     />
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-split">
         <h4>Split with media</h4>
-        <pre className="docs-code"><code>{`export function Split() {
+        <FrameworkCode
+          variant="docs"
+          label={'Split with media code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function Split() {
   return (
     <PixelHeroSection
       variant="split"
@@ -94,11 +108,17 @@ export function Default() {
       tone="cyan"
     />
   )
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-compact">
         <h4>Compact density</h4>
-        <pre className="docs-code"><code>{`export function Compact() {
+        <FrameworkCode
+          variant="docs"
+          label={'Compact density code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function Compact() {
   return (
     <PixelHeroSection
       density="compact"
@@ -107,7 +127,8 @@ export function Default() {
       subline="Tighter rhythm for denser layouts."
     />
   )
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

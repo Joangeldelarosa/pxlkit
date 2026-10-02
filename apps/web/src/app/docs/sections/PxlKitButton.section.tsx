@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitButtonDocsSectionProps {
   className?: string;
@@ -72,7 +73,10 @@ export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionPr
     </section>
     <section aria-labelledby="pxl-kit-button-usage">
       <h3 id="pxl-kit-button-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PxlKitButton } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PxlKitButton usage'}
+        react={`import { PxlKitButton } from '@pxlkit/ui-kit';
 
 const StarIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -80,28 +84,45 @@ const StarIcon = () => (
   </svg>
 );
 
-const PlusIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-    <path d="M12 5v14M5 12h14" />
-  </svg>
-);
-
 export function Default() {
   return <PxlKitButton label="Favorite" icon={<StarIcon />} />;
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PxlKitButton } from '@pxlkit/ui-kit';
+
+const StarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+  </svg>
+);
+
+export function Default() {
   return <PxlKitButton label="Favorite" icon={<StarIcon />} />;
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-tones">
         <h4>Tones</h4>
-        <pre className="docs-code"><code>{`export function Tones() {
+        <FrameworkCode
+          variant="docs"
+          label={'Tones code'}
+          react={`import { PxlKitButton } from '@pxlkit/ui-kit';
+
+const StarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+  </svg>
+);
+
+export function Tones() {
   return (
     <div className="flex flex-wrap gap-2">
       <PxlKitButton label="Neutral" icon={<StarIcon />} tone="neutral" />
@@ -113,11 +134,23 @@ export function Default() {
       <PxlKitButton label="Pink" icon={<StarIcon />} tone="pink" />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { PxlKitButton } from '@pxlkit/ui-kit';
+
+const PlusIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+);
+
+export function Sizes() {
   return (
     <div className="flex items-center gap-2">
       <PxlKitButton label="Small" icon={<PlusIcon />} size="sm" />
@@ -125,24 +158,49 @@ export function Default() {
       <PxlKitButton label="Large" icon={<PlusIcon />} size="lg" />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PxlKitButton } from '@pxlkit/ui-kit';
+
+const StarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+  </svg>
+);
+
+export function Surfaces() {
   return (
     <div className="flex gap-2">
       <PxlKitButton label="Pixel surface" icon={<StarIcon />} surface="pixel" />
       <PxlKitButton label="Linear surface" icon={<StarIcon />} surface="linear" />
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-disabled">
         <h4>Disabled</h4>
-        <pre className="docs-code"><code>{`export function Disabled() {
+        <FrameworkCode
+          variant="docs"
+          label={'Disabled code'}
+          react={`import { PxlKitButton } from '@pxlkit/ui-kit';
+
+const StarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+  </svg>
+);
+
+export function Disabled() {
   return <PxlKitButton label="Disabled" icon={<StarIcon />} disabled />;
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

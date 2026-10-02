@@ -12,7 +12,8 @@
  *   - Full Props table (name, type, required, default, description)
  *   - A11y block (WCAG level, ARIA patterns, notes)
  *   - Keyboard bindings table (key, action, when)
- *   - Examples list (label + code block, when codeOverride is provided)
+ *   - Usage lead + examples: each example's code, self-contained, in React
+ *     and in every port (Vue, Angular) that implements the component in full
  *
  * Safety: NEVER overwrites hand-authored files. Always writes
  *   <Name>.section.tsx into a NEW `sections/` subtree; the orchestrator owns
@@ -48,7 +49,16 @@ import {
 } from "./_lib/generator-base.js";
 import { createLogger, type Logger } from "./_lib/logger.js";
 import { findComponentDirs } from "./_lib/scan-fs.js";
-import { extractExportFunctions, toUsageSnippet } from "./extract-example-source.js";
+import { selfContainedExamples } from "./extract-example-source.js";
+import {
+  KIT_PORTS,
+  implementsInFull,
+  manifestExampleExports,
+  portComponents,
+  portKey,
+  type PortFramework,
+  type PortedComponent,
+} from "./_lib/ports.js";
 
 // ---------------------------------------------------------------------------
 // Public contract
@@ -71,11 +81,31 @@ export interface KeyboardEntry {
   when: string;
 }
 
+/**
+ * An example's code in each framework: React always, a port's once that kit
+ * implements the component in full (every manifest example).
+ */
+export interface FrameworkSources {
+  react: string;
+  vue?: string;
+  angular?: string;
+}
+
 export interface ExampleEntry {
   id: string;
   label: string;
   description: string;
-  code: string;
+  code: FrameworkSources;
+}
+
+/** What resolves a manifest's examples to code beyond the React examples module. */
+export interface ExampleSourcesInput {
+  /** The examples' export names, in manifest order, resolved by identity. */
+  exportNames?: readonly string[];
+  /** The Vue kit's example sources by export name. */
+  vue?: Readonly<Record<string, string>>;
+  /** The Angular kit's example sources by export name. */
+  angular?: Readonly<Record<string, string>>;
 }
 
 export interface DeprecationInfo {
@@ -115,11 +145,11 @@ export interface DocsPagePlanEntry {
   /** Examples with code (may be empty). */
   examples: ExampleEntry[];
   /**
-   * Consumer-ready usage lead: the examples file's preamble (imports +
-   * shared data) plus its first export, with relative imports rewritten to
-   * the package specifier. Null when no examples file exists.
+   * Consumer-ready usage lead: the first example, self-contained (the
+   * imports and module helpers it uses), per framework. Null when the
+   * component has no example with code.
    */
-  usageSnippet: string | null;
+  usageSnippet: FrameworkSources | null;
   /** Related component names (may be empty). */
   related: string[];
   /** Tags (may be empty). */
@@ -230,11 +260,12 @@ export function normalizeKeyboard(manifest: PermissiveManifest): KeyboardEntry[]
 export function normalizeExamples(
   manifest: PermissiveManifest,
   exportSources: Record<string, string> = {},
+  sources: ExampleSourcesInput = {},
 ): ExampleEntry[] {
   const ex = manifest.examples as unknown;
   if (!Array.isArray(ex)) return [];
   const out: ExampleEntry[] = [];
-  for (const e of ex) {
+  for (const [index, e] of ex.entries()) {
     if (!e || typeof e !== "object") continue;
     const rec = e as Record<string, unknown>;
     const id = clean(rec.id);
@@ -247,17 +278,22 @@ export function normalizeExamples(
     // cannot survive serialization through a generated file.
     // NB: extracted source is multi-line — never run it through clean(),
     // which collapses all whitespace.
-    const extracted = exportSources[exportNameForExampleId(id || label)]?.trimEnd();
-    const code =
+    // The export is the example's Component, resolved by identity when the
+    // caller could (`sources.exportNames`); its id's spelling otherwise.
+    const exportName = sources.exportNames?.[index] ?? exportNameForExampleId(id || label);
+    const extracted = exportSources[exportName]?.trimEnd();
+    const react =
       clean(
         typeof rec.codeOverride === "string" ? rec.codeOverride : (rec.code as string | undefined),
       ) || extracted || "";
-    if (!code) continue;
+    if (!react) continue;
+    const vue = sources.vue?.[exportName]?.trimEnd();
+    const angular = sources.angular?.[exportName]?.trimEnd();
     out.push({
       id: id || slugFor(label),
       label,
       description: clean(rec.description),
-      code,
+      code: { react, ...(vue ? { vue } : {}), ...(angular ? { angular } : {}) },
     });
   }
   return out;
@@ -288,6 +324,7 @@ export function normalizeDeprecation(manifest: PermissiveManifest): DeprecationI
 export function planEntryFor(
   rec: ManifestRecord,
   outRoot: string,
+  sources: ExampleSourcesInput = {},
 ): DocsPagePlanEntry {
   const manifest = rec.manifest as PermissiveManifest;
   const name = manifest.name;
@@ -312,11 +349,13 @@ export function planEntryFor(
 
   // The SSOT examples are live components, so manifests carry no code
   // strings — usage code comes from the sibling `<Name>.examples.tsx`
-  // SOURCE: a consumer-ready lead snippet plus one verbatim block per
-  // exported example.
+  // SOURCE: one self-contained block per exported example (its imports and
+  // the module helpers it uses), the first of them also as the usage lead.
   const examplesSource = readExamplesSource(rec.manifestFile, name);
-  const exportSources = examplesSource ? extractExportFunctions(examplesSource) : {};
-  const usageSnippet = examplesSource ? toUsageSnippet(examplesSource) : null;
+  const exportSources = examplesSource
+    ? selfContainedExamples(examplesSource, { kind: "tsx", packageName: "@pxlkit/ui-kit" })
+    : {};
+  const examples = normalizeExamples(manifest, exportSources, sources);
 
   return {
     name,
@@ -332,8 +371,8 @@ export function planEntryFor(
     ariaPatterns,
     ariaNotes,
     keyboard: normalizeKeyboard(manifest),
-    examples: normalizeExamples(manifest, exportSources),
-    usageSnippet,
+    examples,
+    usageSnippet: examples[0]?.code ?? null,
     related: asStringArray(manifest.related),
     tags: asStringArray(manifest.tags),
     deprecation: normalizeDeprecation(manifest),
@@ -531,18 +570,30 @@ function renderA11ySection(entry: DocsPagePlanEntry): string {
   return lines.join("\n");
 }
 
+/**
+ * The code in every framework it exists in, as a `<FrameworkCode>` element
+ * (apps/web/src/components/FrameworkCode.tsx): tabs that remember the
+ * reader's framework.
+ */
+function renderFrameworkCode(code: FrameworkSources, label: string, indent: string): string {
+  const sources = (["react", "vue", "angular"] as const)
+    .filter((framework) => code[framework])
+    .map((framework) => `${indent}  ${framework}={\`${escapeForTemplateLiteral(code[framework]!)}\`}`);
+  // A JS string in braces: JSX attribute strings take no escapes.
+  return [`${indent}<FrameworkCode`, `${indent}  variant="docs"`, `${indent}  label={${jsxAttr(label)}}`, ...sources, `${indent}/>`].join("\n");
+}
+
 function renderExamples(examples: ExampleEntry[]): string {
   if (examples.length === 0) return "";
   const blocks = examples
     .map((e) => {
-      const code = escapeForTemplateLiteral(e.code);
       const desc = e.description
         ? `        <p>${escapeJsxText(e.description)}</p>\n`
         : "";
       return [
         `      <article className="docs-example" id="example-${e.id}">`,
         `        <h4>${escapeJsxText(e.label)}</h4>`,
-        desc + `        <pre className="docs-code"><code>{\`${code}\`}</code></pre>`,
+        desc + renderFrameworkCode(e.code, `${e.label} code`, "        "),
         `      </article>`,
       ].join("\n");
     })
@@ -594,6 +645,9 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
   const lines: string[] = [];
   lines.push(FILE_BANNER);
   lines.push(`import * as React from 'react';`);
+  if (entry.usageSnippet || entry.examples.length > 0) {
+    lines.push(`import { FrameworkCode } from '@/components/FrameworkCode';`);
+  }
   lines.push(``);
   lines.push(`export interface ${entry.name}DocsSectionProps {`);
   lines.push(`  className?: string;`);
@@ -645,9 +699,7 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
   if (entry.usageSnippet) {
     lines.push(`    <section aria-labelledby="${entry.slug}-usage">`);
     lines.push(`      <h3 id="${entry.slug}-usage">Usage</h3>`);
-    lines.push(
-      `      <pre className="docs-code"><code>{\`${escapeForTemplateLiteral(entry.usageSnippet)}\`}</code></pre>`,
-    );
+    lines.push(renderFrameworkCode(entry.usageSnippet, `${entry.name} usage`, "      "));
     lines.push(`    </section>`);
   }
 
@@ -706,36 +758,99 @@ export class GenerateDocsPageGenerator extends Generator {
   }
 
   async run(ctx: GeneratorContext): Promise<GeneratorResult> {
-    const entries = ctx.manifests.map((rec) => planEntryFor(rec, this.outRoot));
+    const ports = await readPorts(ctx.repoRoot);
+    const entries: DocsPagePlanEntry[] = [];
+    for (const rec of ctx.manifests) {
+      entries.push(planEntryFor(rec, this.outRoot, await exampleSourcesOf(ctx.repoRoot, rec, ports)));
+    }
     const writes = entries.map((entry) => ({
       path: entry.outFile,
       content: renderSectionModule(entry),
     }));
-    writes.push({
-      path: ensurePosix(path.join(this.outRoot, "usage-snippets.generated.ts")),
-      content: renderUsageSnippetsModule(entries),
-    });
+    writes.push(...usageSnippetWrites(this.outRoot, entries));
     return { writes };
   }
+}
+
+/** What each port implements, keyed like `portComponents`; read once per run. */
+export type PortsIndex = ReadonlyMap<PortFramework, ReadonlyMap<string, PortedComponent>>;
+
+export async function readPorts(repoRoot: string): Promise<PortsIndex> {
+  const out = new Map<PortFramework, ReadonlyMap<string, PortedComponent>>();
+  for (const port of KIT_PORTS) out.set(port.framework, await portComponents(repoRoot, port));
+  return out;
+}
+
+/**
+ * A manifest's examples' export names (by identity) and the ports' sources
+ * of them: the Vue kit's single-file components verbatim, the Angular kit's
+ * classes self-contained — from the kits that implement the component in
+ * full, as the READMEs and audit gate 37 count it.
+ */
+export async function exampleSourcesOf(
+  repoRoot: string,
+  rec: ManifestRecord,
+  ports: PortsIndex,
+): Promise<ExampleSourcesInput> {
+  const name = (rec.manifest as { name?: unknown }).name;
+  // A manifest without a name is planEntryFor's to report.
+  if (typeof name !== "string") return {};
+  const exportNames = await manifestExampleExports(rec);
+  const out: ExampleSourcesInput = { exportNames };
+  for (const port of KIT_PORTS) {
+    const component = ports.get(port.framework)?.get(portKey(port, name));
+    if (!implementsInFull(component, exportNames)) continue;
+    if (port.framework === "vue") {
+      out.vue = Object.fromEntries(
+        exportNames.map((example) => [
+          example,
+          fs.readFileSync(path.join(repoRoot, component.path, `${example}.vue`), "utf8"),
+        ]),
+      );
+    } else {
+      const classes = selfContainedExamples(fs.readFileSync(path.join(repoRoot, component.path), "utf8"), {
+        kind: "ts",
+      });
+      out.angular = Object.fromEntries(exportNames.map((example) => [example, classes[example]!]));
+    }
+  }
+  return out;
 }
 
 /**
  * Slug → consumer-ready usage snippet map for pages that surface a quick
  * "how do I use this" block outside the full /docs reference (e.g. the
- * /ui-kit showcase).
+ * /ui-kit showcase): `USAGE_SNIPPETS` holds React's; with `framework`, the
+ * module holds that framework's (`USAGE_SNIPPETS_VUE`, …), in a module of
+ * its own so a page loads it only when a reader picks the framework.
  */
-export function renderUsageSnippetsModule(entries: DocsPagePlanEntry[]): string {
+export function renderUsageSnippetsModule(
+  entries: DocsPagePlanEntry[],
+  framework: keyof FrameworkSources = "react",
+): string {
   const lines: string[] = [];
   lines.push(FILE_BANNER.trimEnd());
   lines.push(``);
-  lines.push(`export const USAGE_SNIPPETS: Record<string, string> = {`);
+  const name = framework === "react" ? "USAGE_SNIPPETS" : `USAGE_SNIPPETS_${framework.toUpperCase()}`;
+  lines.push(`export const ${name}: Record<string, string> = {`);
   for (const e of [...entries].sort((a, b) => a.slug.localeCompare(b.slug))) {
-    if (!e.usageSnippet) continue;
-    lines.push(`  '${e.slug}': \`${escapeForTemplateLiteral(e.usageSnippet)}\`,`);
+    const snippet = e.usageSnippet?.[framework];
+    if (!snippet) continue;
+    lines.push(`  '${e.slug}': \`${escapeForTemplateLiteral(snippet)}\`,`);
   }
   lines.push(`};`);
   lines.push(``);
   return lines.join("\n");
+}
+
+/** The usage snippet modules: React's, then one per port. */
+function usageSnippetWrites(outRoot: string, entries: DocsPagePlanEntry[]): Array<{ path: string; content: string }> {
+  return (["react", "vue", "angular"] as const).map((framework) => ({
+    path: ensurePosix(
+      path.join(outRoot, framework === "react" ? "usage-snippets.generated.ts" : `usage-snippets.${framework}.generated.ts`),
+    ),
+    content: renderUsageSnippetsModule(entries, framework),
+  }));
 }
 
 // ---------------------------------------------------------------------------
@@ -763,9 +878,10 @@ export async function generateDocsPage(
   let written = 0;
   let skipped = 0;
 
+  const ports = await readPorts(repoRoot);
   for (const rec of manifests) {
     try {
-      const entry = planEntryFor(rec, outRoot);
+      const entry = planEntryFor(rec, outRoot, await exampleSourcesOf(repoRoot, rec, ports));
       entries.push(entry);
       if (opts.dryRun) {
         skipped++;
@@ -784,11 +900,10 @@ export async function generateDocsPage(
   }
 
   if (!opts.dryRun && entries.length > 0) {
-    await writeOutput(
-      ensurePosix(path.join(outRoot, "usage-snippets.generated.ts")),
-      renderUsageSnippetsModule(entries),
-    );
-    written++;
+    for (const write of usageSnippetWrites(outRoot, entries)) {
+      await writeOutput(write.path, write.content);
+      written++;
+    }
   }
 
   return {

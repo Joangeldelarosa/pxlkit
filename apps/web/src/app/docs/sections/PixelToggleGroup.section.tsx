@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToggleGroupDocsSectionProps {
   className?: string;
@@ -85,7 +86,10 @@ export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsS
     </section>
     <section aria-labelledby="pixel-toggle-group-usage">
       <h3 id="pixel-toggle-group-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { useState } from 'react';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelToggleGroup usage'}
+        react={`import { useState } from 'react';
 import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
 
 export function Default() {
@@ -102,14 +106,20 @@ export function Default() {
       <PixelToggle value="right">Right</PixelToggle>
     </PixelToggleGroup>
   );
-}
-`}</code></pre>
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Default() {
   const [value, setValue] = useState<string>('left');
   return (
     <PixelToggleGroup
@@ -123,11 +133,18 @@ export function Default() {
       <PixelToggle value="right">Right</PixelToggle>
     </PixelToggleGroup>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-multiple">
         <h4>Multiple</h4>
-        <pre className="docs-code"><code>{`export function Multiple() {
+        <FrameworkCode
+          variant="docs"
+          label={'Multiple code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Multiple() {
   const [value, setValue] = useState<string[]>(['bold']);
   return (
     <PixelToggleGroup
@@ -141,11 +158,18 @@ export function Default() {
       <PixelToggle value="underline">Underline</PixelToggle>
     </PixelToggleGroup>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-variants">
         <h4>Variants</h4>
-        <pre className="docs-code"><code>{`export function Variants() {
+        <FrameworkCode
+          variant="docs"
+          label={'Variants code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Variants() {
   const [a, setA] = useState<string>('one');
   const [b, setB] = useState<string>('one');
   const [c, setC] = useState<string>('one');
@@ -174,11 +198,18 @@ export function Default() {
       </PixelToggleGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-sizes">
         <h4>Sizes</h4>
-        <pre className="docs-code"><code>{`export function Sizes() {
+        <FrameworkCode
+          variant="docs"
+          label={'Sizes code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Sizes() {
   const [sm, setSm] = useState<string>('a');
   const [md, setMd] = useState<string>('a');
   const [lg, setLg] = useState<string>('a');
@@ -201,11 +232,18 @@ export function Default() {
       </PixelToggleGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-roving-focus">
         <h4>Roving focus</h4>
-        <pre className="docs-code"><code>{`export function RovingFocus() {
+        <FrameworkCode
+          variant="docs"
+          label={'Roving focus code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function RovingFocus() {
   const [value, setValue] = useState<string>('list');
   return (
     <PixelToggleGroup
@@ -221,11 +259,18 @@ export function Default() {
       <PixelToggle value="board">Board</PixelToggle>
     </PixelToggleGroup>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { useState } from 'react';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit';
+
+export function Surfaces() {
   const [pixel, setPixel] = useState<string>('one');
   const [linear, setLinear] = useState<string>('one');
   return (
@@ -252,7 +297,8 @@ export function Default() {
       </PixelToggleGroup>
     </div>
   );
-}`}</code></pre>
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

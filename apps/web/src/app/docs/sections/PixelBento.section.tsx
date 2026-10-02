@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBentoDocsSectionProps {
   className?: string;
@@ -48,7 +49,10 @@ export function PixelBentoDocsSection({ className }: PixelBentoDocsSectionProps)
     </section>
     <section aria-labelledby="pixel-bento-usage">
       <h3 id="pixel-bento-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelBento usage'}
+        react={`import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -73,14 +77,74 @@ export function Default() {
       </PixelBentoCell>
     </PixelBento>
   );
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBento :columns="3" :gap="4">
+    <PixelBentoCell span="2x2" kind="feature" tone="cyan">
+      <strong>Feature</strong>
+      <span>Spans 2x2 with a feature layout.</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="stat" tone="green">
+      <strong>42</strong>
+      <span>Stats</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="compact" tone="gold">
+      <span>Compact</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="2x1" kind="feature" tone="purple">
+      <strong>Wide</strong>
+      <span>Spans 2x1.</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="media" tone="neutral">
+      <div class="h-full w-full bg-retro-surface" />
+    </PixelBentoCell>
+  </PixelBento>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBento, PixelBentoCell],
+  template: \`
+    <pxl-bento [columns]="3" [gap]="4">
+      <pxl-bento-cell span="2x2" kind="feature" tone="cyan">
+        <strong>Feature</strong>
+        <span>Spans 2x2 with a feature layout.</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="stat" tone="green">
+        <strong>42</strong>
+        <span>Stats</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="compact" tone="gold">
+        <span>Compact</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="2x1" kind="feature" tone="purple">
+        <strong>Wide</strong>
+        <span>Spans 2x1.</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="media" tone="neutral">
+        <div class="h-full w-full bg-retro-surface"></div>
+      </pxl-bento-cell>
+    </pxl-bento>
+  \`,
+})
+export class Default {}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
+
+export function Default() {
   return (
     <PixelBento columns={3} gap={4}>
       <PixelBentoCell span="2x2" kind="feature" tone="cyan">
@@ -103,11 +167,72 @@ export function Default() {
       </PixelBentoCell>
     </PixelBento>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBento :columns="3" :gap="4">
+    <PixelBentoCell span="2x2" kind="feature" tone="cyan">
+      <strong>Feature</strong>
+      <span>Spans 2x2 with a feature layout.</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="stat" tone="green">
+      <strong>42</strong>
+      <span>Stats</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="compact" tone="gold">
+      <span>Compact</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="2x1" kind="feature" tone="purple">
+      <strong>Wide</strong>
+      <span>Spans 2x1.</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="media" tone="neutral">
+      <div class="h-full w-full bg-retro-surface" />
+    </PixelBentoCell>
+  </PixelBento>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBento, PixelBentoCell],
+  template: \`
+    <pxl-bento [columns]="3" [gap]="4">
+      <pxl-bento-cell span="2x2" kind="feature" tone="cyan">
+        <strong>Feature</strong>
+        <span>Spans 2x2 with a feature layout.</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="stat" tone="green">
+        <strong>42</strong>
+        <span>Stats</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="compact" tone="gold">
+        <span>Compact</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="2x1" kind="feature" tone="purple">
+        <strong>Wide</strong>
+        <span>Spans 2x1.</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="media" tone="neutral">
+        <div class="h-full w-full bg-retro-surface"></div>
+      </pxl-bento-cell>
+    </pxl-bento>
+  \`,
+})
+export class Default {}`}
+        />
       </article>
       <article className="docs-example" id="example-four-columns">
         <h4>Four Columns</h4>
-        <pre className="docs-code"><code>{`export function FourColumns() {
+        <FrameworkCode
+          variant="docs"
+          label={'Four Columns code'}
+          react={`import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
+
+export function FourColumns() {
   return (
     <PixelBento columns={4} gap={3}>
       <PixelBentoCell span="2x2" kind="feature" tone="cyan">
@@ -129,11 +254,70 @@ export function Default() {
       </PixelBentoCell>
     </PixelBento>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBento :columns="4" :gap="3">
+    <PixelBentoCell span="2x2" kind="feature" tone="cyan">
+      <strong>Hero</strong>
+    </PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="stat" tone="green">
+      <strong>12</strong>
+      <span>Active</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="stat" tone="gold">
+      <strong>87%</strong>
+      <span>Uptime</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="compact" tone="red">
+      <span>Alert</span>
+    </PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="compact" tone="purple">
+      <span>Tag</span>
+    </PixelBentoCell>
+  </PixelBento>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBento, PixelBentoCell],
+  template: \`
+    <pxl-bento [columns]="4" [gap]="3">
+      <pxl-bento-cell span="2x2" kind="feature" tone="cyan">
+        <strong>Hero</strong>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="stat" tone="green">
+        <strong>12</strong>
+        <span>Active</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="stat" tone="gold">
+        <strong>87%</strong>
+        <span>Uptime</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="compact" tone="red">
+        <span>Alert</span>
+      </pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="compact" tone="purple">
+        <span>Tag</span>
+      </pxl-bento-cell>
+    </pxl-bento>
+  \`,
+})
+export class FourColumns {}`}
+        />
       </article>
       <article className="docs-example" id="example-cells">
         <h4>Cell Tones</h4>
-        <pre className="docs-code"><code>{`export function Cells() {
+        <FrameworkCode
+          variant="docs"
+          label={'Cell Tones code'}
+          react={`import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
+
+export function Cells() {
   return (
     <PixelBento columns={3} gap={4}>
       <PixelBentoCell span="1x1" kind="feature" tone="neutral">
@@ -156,7 +340,39 @@ export function Default() {
       </PixelBentoCell>
     </PixelBento>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBento :columns="3" :gap="4">
+    <PixelBentoCell span="1x1" kind="feature" tone="neutral">Neutral</PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="feature" tone="cyan">Cyan</PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="feature" tone="green">Green</PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="feature" tone="gold">Gold</PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="feature" tone="red">Red</PixelBentoCell>
+    <PixelBentoCell span="1x1" kind="feature" tone="purple">Purple</PixelBentoCell>
+  </PixelBento>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBento, PixelBentoCell],
+  template: \`
+    <pxl-bento [columns]="3" [gap]="4">
+      <pxl-bento-cell span="1x1" kind="feature" tone="neutral">Neutral</pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="feature" tone="cyan">Cyan</pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="feature" tone="green">Green</pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="feature" tone="gold">Gold</pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="feature" tone="red">Red</pxl-bento-cell>
+      <pxl-bento-cell span="1x1" kind="feature" tone="purple">Purple</pxl-bento-cell>
+    </pxl-bento>
+  \`,
+})
+export class Cells {}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">

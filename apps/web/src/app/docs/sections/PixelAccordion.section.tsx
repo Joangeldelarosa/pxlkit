@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAccordionDocsSectionProps {
   className?: string;
@@ -75,7 +76,10 @@ export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSecti
     </section>
     <section aria-labelledby="pixel-accordion-usage">
       <h3 id="pixel-accordion-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelAccordion } from '@pxlkit/ui-kit';
+      <FrameworkCode
+        variant="docs"
+        label={'PixelAccordion usage'}
+        react={`import { PixelAccordion } from '@pxlkit/ui-kit';
 
 const SAMPLE_ITEMS = [
   {
@@ -97,43 +101,297 @@ const SAMPLE_ITEMS = [
 
 export function Default() {
   return <PixelAccordion items={SAMPLE_ITEMS} />;
-}
-`}</code></pre>
+}`}
+        vue={`<script setup lang="ts">
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-vue';
+
+const items: AccordionItem[] = [
+  { id: 'overview', title: 'Overview', content: 'Introductory section that opens by default.' },
+  { id: 'details', title: 'Details', content: 'Secondary section with extended copy.' },
+  { id: 'faq', title: 'FAQ', content: 'Common questions and short answers.' },
+];
+</script>
+
+<template>
+  <PixelAccordion :items="items" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE_ITEMS: AccordionItem[] = [
+  { id: 'overview', title: 'Overview', content: 'Introductory section that opens by default.' },
+  { id: 'details', title: 'Details', content: 'Secondary section with extended copy.' },
+  { id: 'faq', title: 'FAQ', content: 'Common questions and short answers.' },
+];
+
+@Component({
+  imports: [PixelAccordion],
+  template: \`<pxl-accordion [items]="items" />\`,
+})
+export class Default {
+  readonly items = SAMPLE_ITEMS;
+}`}
+      />
     </section>
     <section aria-label="Examples">
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
-        <pre className="docs-code"><code>{`export function Default() {
+        <FrameworkCode
+          variant="docs"
+          label={'Default code'}
+          react={`import { PixelAccordion } from '@pxlkit/ui-kit';
+
+const SAMPLE_ITEMS = [
+  {
+    id: 'overview',
+    title: 'Overview',
+    content: 'Introductory section that opens by default.',
+  },
+  {
+    id: 'details',
+    title: 'Details',
+    content: 'Secondary section with extended copy.',
+  },
+  {
+    id: 'faq',
+    title: 'FAQ',
+    content: 'Common questions and short answers.',
+  },
+];
+
+export function Default() {
   return <PixelAccordion items={SAMPLE_ITEMS} />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-vue';
+
+const items: AccordionItem[] = [
+  { id: 'overview', title: 'Overview', content: 'Introductory section that opens by default.' },
+  { id: 'details', title: 'Details', content: 'Secondary section with extended copy.' },
+  { id: 'faq', title: 'FAQ', content: 'Common questions and short answers.' },
+];
+</script>
+
+<template>
+  <PixelAccordion :items="items" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE_ITEMS: AccordionItem[] = [
+  { id: 'overview', title: 'Overview', content: 'Introductory section that opens by default.' },
+  { id: 'details', title: 'Details', content: 'Secondary section with extended copy.' },
+  { id: 'faq', title: 'FAQ', content: 'Common questions and short answers.' },
+];
+
+@Component({
+  imports: [PixelAccordion],
+  template: \`<pxl-accordion [items]="items" />\`,
+})
+export class Default {
+  readonly items = SAMPLE_ITEMS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-collapsed-by-default">
         <h4>Collapsed by default</h4>
-        <pre className="docs-code"><code>{`export function CollapsedByDefault() {
+        <FrameworkCode
+          variant="docs"
+          label={'Collapsed by default code'}
+          react={`import { PixelAccordion } from '@pxlkit/ui-kit';
+
+const SAMPLE_ITEMS = [
+  {
+    id: 'overview',
+    title: 'Overview',
+    content: 'Introductory section that opens by default.',
+  },
+  {
+    id: 'details',
+    title: 'Details',
+    content: 'Secondary section with extended copy.',
+  },
+  {
+    id: 'faq',
+    title: 'FAQ',
+    content: 'Common questions and short answers.',
+  },
+];
+
+export function CollapsedByDefault() {
   return <PixelAccordion items={SAMPLE_ITEMS} collapsedByDefault />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-vue';
+
+const items: AccordionItem[] = [
+  { id: 'overview', title: 'Overview', content: 'Introductory section that opens by default.' },
+  { id: 'details', title: 'Details', content: 'Secondary section with extended copy.' },
+  { id: 'faq', title: 'FAQ', content: 'Common questions and short answers.' },
+];
+</script>
+
+<template>
+  <PixelAccordion :items="items" collapsed-by-default />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE_ITEMS: AccordionItem[] = [
+  { id: 'overview', title: 'Overview', content: 'Introductory section that opens by default.' },
+  { id: 'details', title: 'Details', content: 'Secondary section with extended copy.' },
+  { id: 'faq', title: 'FAQ', content: 'Common questions and short answers.' },
+];
+
+@Component({
+  imports: [PixelAccordion],
+  template: \`<pxl-accordion [items]="items" collapsedByDefault />\`,
+})
+export class CollapsedByDefault {
+  readonly items = SAMPLE_ITEMS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-allow-multiple">
         <h4>Allow multiple</h4>
-        <pre className="docs-code"><code>{`export function AllowMultiple() {
+        <FrameworkCode
+          variant="docs"
+          label={'Allow multiple code'}
+          react={`import { PixelAccordion } from '@pxlkit/ui-kit';
+
+const SAMPLE_ITEMS = [
+  {
+    id: 'overview',
+    title: 'Overview',
+    content: 'Introductory section that opens by default.',
+  },
+  {
+    id: 'details',
+    title: 'Details',
+    content: 'Secondary section with extended copy.',
+  },
+  {
+    id: 'faq',
+    title: 'FAQ',
+    content: 'Common questions and short answers.',
+  },
+];
+
+export function AllowMultiple() {
   return <PixelAccordion items={SAMPLE_ITEMS} allowMultiple />;
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-vue';
+
+const items: AccordionItem[] = [
+  { id: 'overview', title: 'Overview', content: 'Introductory section that opens by default.' },
+  { id: 'details', title: 'Details', content: 'Secondary section with extended copy.' },
+  { id: 'faq', title: 'FAQ', content: 'Common questions and short answers.' },
+];
+</script>
+
+<template>
+  <PixelAccordion :items="items" allow-multiple />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE_ITEMS: AccordionItem[] = [
+  { id: 'overview', title: 'Overview', content: 'Introductory section that opens by default.' },
+  { id: 'details', title: 'Details', content: 'Secondary section with extended copy.' },
+  { id: 'faq', title: 'FAQ', content: 'Common questions and short answers.' },
+];
+
+@Component({
+  imports: [PixelAccordion],
+  template: \`<pxl-accordion [items]="items" allowMultiple />\`,
+})
+export class AllowMultiple {
+  readonly items = SAMPLE_ITEMS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-surfaces">
         <h4>Surfaces</h4>
-        <pre className="docs-code"><code>{`export function Surfaces() {
+        <FrameworkCode
+          variant="docs"
+          label={'Surfaces code'}
+          react={`import { PixelAccordion } from '@pxlkit/ui-kit';
+
+const SAMPLE_ITEMS = [
+  {
+    id: 'overview',
+    title: 'Overview',
+    content: 'Introductory section that opens by default.',
+  },
+  {
+    id: 'details',
+    title: 'Details',
+    content: 'Secondary section with extended copy.',
+  },
+  {
+    id: 'faq',
+    title: 'FAQ',
+    content: 'Common questions and short answers.',
+  },
+];
+
+export function Surfaces() {
   return (
     <div className="flex flex-col gap-4">
       <PixelAccordion items={SAMPLE_ITEMS} surface="pixel" />
       <PixelAccordion items={SAMPLE_ITEMS} surface="linear" />
     </div>
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-vue';
+
+const items: AccordionItem[] = [
+  { id: 'overview', title: 'Overview', content: 'Introductory section that opens by default.' },
+  { id: 'details', title: 'Details', content: 'Secondary section with extended copy.' },
+  { id: 'faq', title: 'FAQ', content: 'Common questions and short answers.' },
+];
+</script>
+
+<template>
+  <div class="flex flex-col gap-4">
+    <PixelAccordion :items="items" surface="pixel" />
+    <PixelAccordion :items="items" surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE_ITEMS: AccordionItem[] = [
+  { id: 'overview', title: 'Overview', content: 'Introductory section that opens by default.' },
+  { id: 'details', title: 'Details', content: 'Secondary section with extended copy.' },
+  { id: 'faq', title: 'FAQ', content: 'Common questions and short answers.' },
+];
+
+@Component({
+  imports: [PixelAccordion],
+  template: \`
+    <div class="flex flex-col gap-4">
+      <pxl-accordion [items]="items" surface="pixel" />
+      <pxl-accordion [items]="items" surface="linear" />
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly items = SAMPLE_ITEMS;
+}`}
+        />
       </article>
       <article className="docs-example" id="example-rich-content">
         <h4>Rich content</h4>
-        <pre className="docs-code"><code>{`export function RichContent() {
+        <FrameworkCode
+          variant="docs"
+          label={'Rich content code'}
+          react={`import { PixelAccordion } from '@pxlkit/ui-kit';
+
+export function RichContent() {
   return (
     <PixelAccordion
       items={[
@@ -161,7 +419,61 @@ export function Default() {
       ]}
     />
   );
-}`}</code></pre>
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-vue';
+
+const items: AccordionItem[] = [
+  {
+    id: 'changelog',
+    title: 'Changelog v1.2.0',
+    content: () =>
+      h('ul', { class: 'list-disc pl-4' }, [
+        h('li', 'Added accordion keyboard wiring'),
+        h('li', 'Surface-aware typography'),
+        h('li', 'Optional multi-open behaviour'),
+      ]),
+  },
+  {
+    id: 'migration',
+    title: 'Migration notes',
+    content: () => h('p', ['Pass ', h('code', 'collapsedByDefault'), ' to keep every item closed on first render.']),
+  },
+];
+</script>
+
+<template>
+  <PixelAccordion :items="items" />
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelAccordion, type AccordionItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelAccordion],
+  template: \`
+    <pxl-accordion [items]="items()" />
+    <ng-template #changelog>
+      <ul class="list-disc pl-4">
+        <li>Added accordion keyboard wiring</li>
+        <li>Surface-aware typography</li>
+        <li>Optional multi-open behaviour</li>
+      </ul>
+    </ng-template>
+    <ng-template #migration>
+      <p>Pass <code>collapsedByDefault</code> to keep every item closed on first render.</p>
+    </ng-template>
+  \`,
+})
+export class RichContent {
+  private readonly changelog = viewChild.required<TemplateRef<unknown>>('changelog');
+  private readonly migration = viewChild.required<TemplateRef<unknown>>('migration');
+  readonly items = computed<AccordionItem[]>(() => [
+    { id: 'changelog', title: 'Changelog v1.2.0', content: this.changelog() },
+    { id: 'migration', title: 'Migration notes', content: this.migration() },
+  ]);
+}`}
+        />
       </article>
     </section>
     <section aria-label="Related components">
