@@ -22,6 +22,12 @@ export type ParityStep =
     }
   | { action: 'input'; target: string; value: string; nth?: number }
   | { action: 'select'; target: string; value: string; nth?: number }
+  /**
+   * Lets real time pass, for components driven by timers. A wait that
+   * expects a timer to have fired should outlast it by a wide margin (about
+   * 500 ms): on a loaded machine timers fire late, never early, and the two
+   * frameworks being compared may each fire them at a different point.
+   */
   | { action: 'wait'; ms: number };
 
 export interface ParityScenario {

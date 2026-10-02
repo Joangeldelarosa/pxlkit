@@ -57,7 +57,7 @@ export const scenarios: ParityScenario[] = [
       { action: 'click', target: opener },
       { action: 'click', target: closeButton },
       { action: 'keydown', key: 'Escape' },
-      { action: 'wait', ms: 900 },
+      { action: 'wait', ms: 1600 },
     ],
   },
   {
@@ -99,7 +99,7 @@ export const scenarios: ParityScenario[] = [
     steps: [
       { action: 'click', target: opener },
       // Cancel takes focus a task after opening.
-      { action: 'wait', ms: 10 },
+      { action: 'wait', ms: 200 },
       { action: 'keydown', key: 'Tab', shiftKey: true },
       { action: 'keydown', key: 'Tab' },
       { action: 'keydown', key: 'Escape' },
@@ -124,7 +124,7 @@ export const scenarios: ParityScenario[] = [
     name: 'accents a destructive action and confirms it',
     steps: [
       { action: 'click', target: opener },
-      { action: 'wait', ms: 10 },
+      { action: 'wait', ms: 200 },
       { action: 'keydown', key: 'Tab', shiftKey: true },
       { action: 'click', target: alertButton, nth: 1 },
     ],
@@ -139,7 +139,7 @@ export const scenarios: ParityScenario[] = [
       { action: 'keydown', key: 'Escape' },
       { action: 'click', target: backdrop },
       { action: 'click', target: alertButton },
-      { action: 'wait', ms: 800 },
+      { action: 'wait', ms: 1400 },
     ],
   },
   {
@@ -315,9 +315,9 @@ export const scenarios: ParityScenario[] = [
     name: 'opens after the hover delay and closes after the leave delay',
     steps: [
       { action: 'hover', target: anchor },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
       { action: 'unhover', target: anchor },
-      { action: 'wait', ms: 200 },
+      { action: 'wait', ms: 600 },
     ],
   },
   {
@@ -326,9 +326,9 @@ export const scenarios: ParityScenario[] = [
     name: 'opens on focus and closes on blur, after the delays',
     steps: [
       { action: 'focus', target: anchorButton },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
       { action: 'blur', target: anchorButton },
-      { action: 'wait', ms: 200 },
+      { action: 'wait', ms: 600 },
     ],
   },
   {
@@ -347,13 +347,13 @@ export const scenarios: ParityScenario[] = [
     name: 'closes on Escape and stays closed until the pointer leaves and comes back',
     steps: [
       { action: 'hover', target: anchor },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
       { action: 'keydown', key: 'Escape' },
       { action: 'hover', target: anchor },
       { action: 'wait', ms: 300 },
       { action: 'unhover', target: anchor },
       { action: 'hover', target: anchor },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
     ],
   },
   {
@@ -372,12 +372,12 @@ export const scenarios: ParityScenario[] = [
     name: 'describes the focused trigger while open, and closes on Escape until focus leaves and comes back',
     steps: [
       { action: 'focus', target: anchorButton },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
       { action: 'keydown', key: 'Escape' },
       { action: 'wait', ms: 300 },
       { action: 'blur', target: anchorButton },
       { action: 'focus', target: anchorButton },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
     ],
   },
   {
@@ -388,7 +388,7 @@ export const scenarios: ParityScenario[] = [
       { action: 'hover', target: anchor, nth: 1 },
       { action: 'hover', target: anchor, nth: 2 },
       { action: 'hover', target: anchor, nth: 3 },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
     ],
   },
   {
@@ -399,9 +399,9 @@ export const scenarios: ParityScenario[] = [
       { action: 'hover', target: anchor, nth: 1 },
       { action: 'wait', ms: 300 },
       { action: 'focus', target: anchorButton, nth: 1 },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
       { action: 'click', target: anchorButton, nth: 2 },
-      { action: 'wait', ms: 200 },
+      { action: 'wait', ms: 600 },
       { action: 'keydown', key: 'Escape' },
       { action: 'click', target: anchorButton, nth: 2 },
       { action: 'click', target: anchorButton, nth: 2 },
@@ -415,12 +415,12 @@ export const scenarios: ParityScenario[] = [
     name: 'closes the focus tooltip on Escape until focus leaves and comes back',
     steps: [
       { action: 'focus', target: anchorButton, nth: 1 },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
       { action: 'keydown', key: 'Escape' },
       { action: 'wait', ms: 300 },
       { action: 'blur', target: anchorButton, nth: 1 },
       { action: 'focus', target: anchorButton, nth: 1 },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
     ],
   },
   {
@@ -430,7 +430,7 @@ export const scenarios: ParityScenario[] = [
     steps: [
       { action: 'hover', target: anchor },
       { action: 'hover', target: anchor, nth: 1 },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
     ],
   },
   {
@@ -439,7 +439,7 @@ export const scenarios: ParityScenario[] = [
     name: 'renders rich content',
     steps: [
       { action: 'hover', target: anchor },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
     ],
   },
   {
@@ -451,7 +451,7 @@ export const scenarios: ParityScenario[] = [
       { action: 'unhover', target: anchor },
       { action: 'hover', target: anchor, nth: 1 },
       { action: 'wait', ms: 300 },
-      { action: 'wait', ms: 450 },
+      { action: 'wait', ms: 900 },
       { action: 'unhover', target: anchor, nth: 1 },
     ],
   },
@@ -461,11 +461,11 @@ export const scenarios: ParityScenario[] = [
     name: 'reports hover to its parent and follows the open state it gets back',
     steps: [
       { action: 'hover', target: anchor },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
       { action: 'click', target: anchorButton, nth: 1 },
       { action: 'click', target: anchorButton, nth: 1 },
       { action: 'unhover', target: anchor },
-      { action: 'wait', ms: 200 },
+      { action: 'wait', ms: 600 },
     ],
   },
   {
@@ -488,7 +488,7 @@ export const scenarios: ParityScenario[] = [
     steps: [
       { action: 'hover', target: anchor },
       { action: 'hover', target: anchor, nth: 1 },
-      { action: 'wait', ms: 300 },
+      { action: 'wait', ms: 700 },
     ],
   },
   {
@@ -566,10 +566,10 @@ export const scenarios: ParityScenario[] = [
       { action: 'click', target: menuTrigger },
       { action: 'keydown', key: 'a' },
       { action: 'keydown', key: 'd' },
-      { action: 'wait', ms: 700 },
+      { action: 'wait', ms: 1200 },
       { action: 'keydown', key: 'd' },
       { action: 'keydown', key: 'u' },
-      { action: 'wait', ms: 700 },
+      { action: 'wait', ms: 1200 },
       { action: 'keydown', key: 'e' },
       { action: 'keydown', key: 'Enter' },
     ],
