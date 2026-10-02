@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   scrollAreaClasses,
@@ -53,5 +56,19 @@ describe('scroll area recipes', () => {
     expect(scrollAreaNameWarning({ labelledBy: 'log-title' })).toBeNull();
     expect(scrollAreaNameWarning({ tabIndex: -1 })).toBeNull();
     expect(scrollAreaNameWarning({ label: '', tabIndex: undefined })).not.toBeNull();
+  });
+
+  it('emits only scrollbar classes the stylesheet styles, which reads the thickness variable', () => {
+    const theme = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../../../styles.css'), 'utf8');
+    const emitted = [
+      ...Object.values(scrollAreaVariantClasses),
+      scrollAreaClasses('pixel', { variant: 'auto' }),
+      scrollAreaClasses('linear', { variant: 'auto' }),
+    ].flatMap((classes) => classes.split(' ').filter((name) => name.startsWith('pxl-scroll-')));
+    expect(new Set(emitted)).toEqual(
+      new Set(['pxl-scroll-auto', 'pxl-scroll-always', 'pxl-scroll-scroll', 'pxl-scroll-hover', 'pxl-scroll-pixel', 'pxl-scroll-linear']),
+    );
+    for (const name of emitted) expect(theme).toMatch(new RegExp(`\\.${name}\\b`));
+    expect(theme).toContain('var(--pxl-scrollbar-size, 8px)');
   });
 });

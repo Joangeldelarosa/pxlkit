@@ -90,6 +90,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dialog when they open — `PixelPortal` re-mounted its content after the first client
   render, dropping the focus the trap had set — and `PixelPopover` returns focus to its
   trigger when its content closes while holding focus.
+- `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
+  the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined
   `--font-mono`, so monospace text fell back to the system stack although the kit's
   fonts URL loads JetBrains Mono.

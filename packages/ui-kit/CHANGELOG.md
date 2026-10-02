@@ -13,6 +13,7 @@
 - The `PxlKitLocaleProvider` docs no longer say it loads fonts: it exposes `fontsUrl` for the app to load (see the setup guide).
 - `PixelGrid`: `colGap={0}` and `rowGap={0}` set a zero gap. Zero counted as unset, so `gap-x-0` and `gap-y-0` were unreachable and `colGap={0}` fell back to the uniform `gap`.
 - The `PixelEqualHeightGrid` examples show what the component does — footers lined up across a row: their card dropped the class the grid gives each item.
+- `PixelScrollArea` draws its styled scrollbar. The stylesheet never defined the `.pxl-scroll-*` classes the component sets, so the browser's default scrollbar showed, `variant="hover"` behaved like `auto` and `scrollbarSize` had no effect.
 
 ## 2.1.1 — 2026-08-08
 

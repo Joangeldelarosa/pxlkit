@@ -392,3 +392,51 @@
       0 0 0 2px var(--color-retro-border-base);
   }
 }
+
+/* ─── Scroll Areas ────────────────────────────────────────────
+ * PixelScrollArea's scrollbar, in every kit. The variant class picks
+ * when it shows, the surface class the shape of its thumb, and
+ * --pxl-scrollbar-size its thickness (8px by default).
+ *
+ * WebKit and Blink draw the ::-webkit-scrollbar parts, but Blink ignores
+ * them on an element that sets scrollbar-width or scrollbar-color — so
+ * those standard properties only apply where the parts do not exist
+ * (Firefox), which has no custom thickness: `thin` stands in for it.
+ * ──────────────────────────────────────────────────────────── */
+@layer components {
+  :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover)::-webkit-scrollbar {
+    width: var(--pxl-scrollbar-size, 8px);
+    height: var(--pxl-scrollbar-size, 8px);
+  }
+  :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover)::-webkit-scrollbar-track,
+  :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover)::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+  :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover)::-webkit-scrollbar-thumb {
+    background-color: var(--color-retro-border);
+  }
+  :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover)::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-retro-muted);
+  }
+  /* Square thumb on the pixel surface, rounded on the linear one. */
+  .pxl-scroll-pixel::-webkit-scrollbar-thumb {
+    border-radius: 0;
+  }
+  .pxl-scroll-linear::-webkit-scrollbar-thumb {
+    border-radius: 9999px;
+  }
+  /* `hover`: the thumb shows while the region is hovered or focused. */
+  .pxl-scroll-hover:not(:hover, :focus-visible)::-webkit-scrollbar-thumb {
+    background-color: transparent;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    :is(.pxl-scroll-auto, .pxl-scroll-always, .pxl-scroll-scroll, .pxl-scroll-hover) {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-retro-border) transparent;
+    }
+    .pxl-scroll-hover:not(:hover, :focus-visible) {
+      scrollbar-color: transparent transparent;
+    }
+  }
+}
