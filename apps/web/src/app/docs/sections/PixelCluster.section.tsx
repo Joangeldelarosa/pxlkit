@@ -25,7 +25,7 @@ export function PixelClusterDocsSection({ className }: PixelClusterDocsSectionPr
       <ul className="docs-highlights">
         <li>Flex row with wrap and configurable stack gap token</li>
         <li>Surface-aware via useEffectiveSurface for transitions</li>
-        <li>Polymorphic via `as` to render as any intrinsic element</li>
+        <li>Polymorphic via <code>as</code> to render as any intrinsic element</li>
         <li>Align and justify props mirror flexbox semantics</li>
       </ul>
     <dl className="docs-meta">
@@ -43,7 +43,7 @@ export function PixelClusterDocsSection({ className }: PixelClusterDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>polymorphic-wrap-container</code></li>
       </ul>
-      <p className="docs-aria-notes">Polymorphic wrap container; inherits semantics from `as`. Defaults to &lt;div&gt; with no implicit role.</p>
+      <p className="docs-aria-notes">Polymorphic wrap container; inherits semantics from <code>as</code>. Defaults to &lt;div&gt; with no implicit role.</p>
     </section>
     <section aria-labelledby="pixel-cluster-usage">
       <h3 id="pixel-cluster-usage">Usage</h3>

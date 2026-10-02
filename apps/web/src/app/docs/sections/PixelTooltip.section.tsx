@@ -26,7 +26,7 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
         <li>Auto-flip and shift via floating-ui — stays inside the viewport across all four positions.</li>
         <li>Three trigger modes (hover, focus, click) — click variant accepts pointer events and dismisses on outside click or Escape.</li>
         <li>Portal-rendered so it escapes overflow/transform ancestors without z-index gymnastics.</li>
-        <li>Controlled (`open` + `onOpenChange`) or uncontrolled (`defaultOpen`) — uses useControllableState internally.</li>
+        <li>Controlled (<code>open</code> + <code>onOpenChange</code>) or uncontrolled (<code>defaultOpen</code>) — uses useControllableState internally.</li>
         <li>Surface-aware (pixel/linear) and inherits from PxlKitSurfaceProvider when no surface prop is passed.</li>
       </ul>
     <dl className="docs-meta">

@@ -26,7 +26,7 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
         <li>Bottom or top anchored, four sizes (sm/md/lg/full)</li>
         <li>Focus trap, scroll lock and Escape-to-close out of the box</li>
         <li>Optional drag handle affordance for touch dismissal</li>
-        <li>WCAG 4.1.2 compliant: requires `title` or `aria-label` for accessible name</li>
+        <li>WCAG 4.1.2 compliant: requires <code>title</code> or <code>aria-label</code> for accessible name</li>
         <li>Surface-aware borders inherited from theme context</li>
       </ul>
     <dl className="docs-meta">
@@ -48,7 +48,7 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
         <li><code>Escape key closes the sheet</code></li>
         <li><code>Accessible name via `title` (aria-labelledby) or `aria-label`</code></li>
       </ul>
-      <p className="docs-aria-notes">Dev-only warning fires when neither `title` nor `aria-label` is provided to enforce WCAG 4.1.2. Drag handle is decorative (aria-hidden) and intended as a visual affordance only.</p>
+      <p className="docs-aria-notes">Dev-only warning fires when neither <code>title</code> nor <code>aria-label</code> is provided to enforce WCAG 4.1.2. Drag handle is decorative (aria-hidden) and intended as a visual affordance only.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

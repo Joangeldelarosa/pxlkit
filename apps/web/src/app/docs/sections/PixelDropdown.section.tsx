@@ -23,7 +23,7 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
       <h2 id='pixel-dropdown-heading'>PixelDropdown</h2>
       <p className="docs-lead">Button-triggered menu of actions with keyboard navigation, typeahead, and a compositional API for advanced layouts.</p>
       <ul className="docs-highlights">
-        <li>Dual API: declarative `items[]` sugar and compositional `Root/Trigger/Content/Item` parts.</li>
+        <li>Dual API: declarative <code>items[]</code> sugar and compositional <code>Root/Trigger/Content/Item</code> parts.</li>
         <li>Item kinds: item, separator, header, checkbox, radio, submenu (chevron affordance).</li>
         <li>Full keyboard support: arrow navigation, Home/End, Enter/Space activation, printable-key typeahead.</li>
         <li>Tones + destructive styling, optional shortcut kbd badges, and disabled rows skipped by focus.</li>
@@ -45,7 +45,7 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
         <li><code>menu</code></li>
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Trigger exposes `aria-haspopup=&quot;menu&quot;`, `aria-expanded`, and `aria-controls` wired to the menu id while the menu is open, and names the menu through `aria-labelledby` (its own `id`, or a generated one). The open menu takes focus (`tabindex=&quot;-1&quot;`) and points `aria-activedescendant` at the highlighted item, so assistive technology follows the arrows, Home/End and typeahead. Items use `role=&quot;menuitem&quot;` — `menuitemcheckbox` and `menuitemradio` with `aria-checked` for checkbox and radio rows — with `aria-disabled` for skipped rows. Separators use `role=&quot;separator&quot;`; headers are `role=&quot;presentation&quot;`. Escape, choosing an item and Tab return focus to the trigger; a press outside closes the menu and leaves focus where the pointer put it.</p>
+      <p className="docs-aria-notes">Trigger exposes <code>aria-haspopup=&quot;menu&quot;</code>, <code>aria-expanded</code>, and <code>aria-controls</code> wired to the menu id while the menu is open, and names the menu through <code>aria-labelledby</code> (its own <code>id</code>, or a generated one). The open menu takes focus (<code>tabindex=&quot;-1&quot;</code>) and points <code>aria-activedescendant</code> at the highlighted item, so assistive technology follows the arrows, Home/End and typeahead. Items use <code>role=&quot;menuitem&quot;</code> — <code>menuitemcheckbox</code> and <code>menuitemradio</code> with <code>aria-checked</code> for checkbox and radio rows — with <code>aria-disabled</code> for skipped rows. Separators use <code>role=&quot;separator&quot;</code>; headers are <code>role=&quot;presentation&quot;</code>. Escape, choosing an item and Tab return focus to the trigger; a press outside closes the menu and leaves focus where the pointer put it.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

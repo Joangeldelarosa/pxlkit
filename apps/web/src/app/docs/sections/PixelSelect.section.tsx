@@ -21,12 +21,12 @@ export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProp
   return (
     <section aria-labelledby={'pixel-select-heading'} className={className} data-status='stable'>
       <h2 id='pixel-select-heading'>PixelSelect</h2>
-      <p className="docs-lead">Custom single-value dropdown built on a button + listbox (no native `&lt;select&gt;`) with full keyboard navigation and tone/size/surface theming.</p>
+      <p className="docs-lead">Custom single-value dropdown built on a button + listbox (no native <code>&lt;select&gt;</code>) with full keyboard navigation and tone/size/surface theming.</p>
       <ul className="docs-highlights">
-        <li>WAI-ARIA combobox + listbox semantics — `aria-expanded`, `aria-haspopup`, `aria-selected` wired to the trigger and options.</li>
+        <li>WAI-ARIA combobox + listbox semantics — <code>aria-expanded</code>, <code>aria-haspopup</code>, <code>aria-selected</code> wired to the trigger and options.</li>
         <li>Full keyboard support: ArrowUp/Down, Home/End, Enter/Space to select, Escape to close, Tab to dismiss.</li>
-        <li>Controlled or uncontrolled — `value` + `onChange` or `defaultValue`; emits the selected option value as a string.</li>
-        <li>Form-friendly — hidden mirror input lets the value participate in native `&lt;form&gt;` submissions via `name`.</li>
+        <li>Controlled or uncontrolled — <code>value</code> + <code>onChange</code> or <code>defaultValue</code>; emits the selected option value as a string.</li>
+        <li>Form-friendly — hidden mirror input lets the value participate in native <code>&lt;form&gt;</code> submissions via <code>name</code>.</li>
         <li>Tone, size, and surface (pixel/linear) variants share the same primitives as the rest of the input family.</li>
       </ul>
     <dl className="docs-meta">
@@ -45,7 +45,7 @@ export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProp
         <li><code>combobox</code></li>
         <li><code>listbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Trigger is a `&lt;button role=&quot;combobox&quot;&gt;` paired with a `role=&quot;listbox&quot;` popup containing `role=&quot;option&quot;` children. Provide an accessible name via `label`; the hint/error it shows is linked through `aria-describedby`, after any ids you pass, and `error` automatically sets `aria-invalid`.</p>
+      <p className="docs-aria-notes">Trigger is a <code>&lt;button role=&quot;combobox&quot;&gt;</code> paired with a <code>role=&quot;listbox&quot;</code> popup containing <code>role=&quot;option&quot;</code> children. Provide an accessible name via <code>label</code>; the hint/error it shows is linked through <code>aria-describedby</code>, after any ids you pass, and <code>error</code> automatically sets <code>aria-invalid</code>.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

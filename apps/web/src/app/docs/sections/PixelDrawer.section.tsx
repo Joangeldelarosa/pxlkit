@@ -25,7 +25,7 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
       <ul className="docs-highlights">
         <li>Four anchor sides (right/left/top/bottom) and five sizes (sm/md/lg/xl/full)</li>
         <li>Focus trap, scroll lock and Escape-to-close out of the box</li>
-        <li>WCAG 4.1.2 compliant: requires `title` or `aria-label` for accessible name</li>
+        <li>WCAG 4.1.2 compliant: requires <code>title</code> or <code>aria-label</code> for accessible name</li>
         <li>Surface-aware borders inherited from theme context</li>
         <li>Composable subparts: PixelDrawer.Header / Body / Footer</li>
       </ul>
@@ -48,7 +48,7 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
         <li><code>Escape key closes the drawer</code></li>
         <li><code>Accessible name via `title` (aria-labelledby) or `aria-label`</code></li>
       </ul>
-      <p className="docs-aria-notes">Dev-only warning fires when neither `title` nor `aria-label` is provided to enforce WCAG 4.1.2.</p>
+      <p className="docs-aria-notes">Dev-only warning fires when neither <code>title</code> nor <code>aria-label</code> is provided to enforce WCAG 4.1.2.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

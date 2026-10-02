@@ -24,10 +24,10 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
       <p className="docs-lead">Visually joins multiple form controls into a single shell — strips inner borders/radii from children and adds segment dividers, so combos like country-code + phone read as one field.</p>
       <ul className="docs-highlights">
         <li>Composes any form children (input, button, select) into a single joined shell.</li>
-        <li>`size` and `surface` props inherit the kit-wide design tokens.</li>
-        <li>Accessible: applies `role=&quot;group&quot;` only when an `aria-label`/`aria-labelledby` is provided.</li>
+        <li><code>size</code> and <code>surface</code> props inherit the kit-wide design tokens.</li>
+        <li>Accessible: applies <code>role=&quot;group&quot;</code> only when an <code>aria-label</code>/<code>aria-labelledby</code> is provided.</li>
         <li>Dev-mode warning when a multi-child group is missing an accessible name.</li>
-        <li>Preserves child `className` (consumer styles win over the join overrides).</li>
+        <li>Preserves child <code>className</code> (consumer styles win over the join overrides).</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -44,7 +44,7 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
       </ul>
-      <p className="docs-aria-notes">Sets `role=&quot;group&quot;` only when given an accessible name (`aria-label` / `aria-labelledby`). Decorative addons inside should use `aria-hidden`; child controls keep their own labels.</p>
+      <p className="docs-aria-notes">Sets <code>role=&quot;group&quot;</code> only when given an accessible name (<code>aria-label</code> / <code>aria-labelledby</code>). Decorative addons inside should use <code>aria-hidden</code>; child controls keep their own labels.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

@@ -25,8 +25,8 @@ export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSec
       <ul className="docs-highlights">
         <li>Surface-aware scrollbar palette (retro / pixel) via useEffectiveSurface</li>
         <li>Scrollbar visibility modes: auto, always, scroll, hover</li>
-        <li>`maxHeight` caps content before scrolling kicks in</li>
-        <li>`scrollbarSize` and `offsetScrollbars` (stable gutter) for layout stability</li>
+        <li><code>maxHeight</code> caps content before scrolling kicks in</li>
+        <li><code>scrollbarSize</code> and <code>offsetScrollbars</code> (stable gutter) for layout stability</li>
         <li>Focusable region (tabIndex 0) with focus-visible ring and dev-time a11y warning</li>
       </ul>
     <dl className="docs-meta">

@@ -45,7 +45,7 @@ export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderD
         <li><code>Heading hierarchy via as=h1..h6</code></li>
         <li><code>Decorative eyebrow tagged with aria-hidden and restated sr-only inside the heading</code></li>
       </ul>
-      <p className="docs-aria-notes">Choose `as` to match the document outline of the page. The eyebrow is visually decorative but is preserved for screen readers via sr-only prefix on the heading.</p>
+      <p className="docs-aria-notes">Choose <code>as</code> to match the document outline of the page. The eyebrow is visually decorative but is preserved for screen readers via sr-only prefix on the heading.</p>
     </section>
     <section aria-labelledby="pixel-section-header-usage">
       <h3 id="pixel-section-header-usage">Usage</h3>

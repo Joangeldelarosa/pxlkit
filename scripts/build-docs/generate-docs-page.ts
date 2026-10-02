@@ -384,6 +384,20 @@ export function escapeJsxText(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
+/**
+ * Prose from a manifest or a doc comment as JSX text: escaped, with each
+ * markdown code span (`` `aria-expanded` ``) set in `<code>`. A backtick
+ * without a partner stays as written.
+ */
+export function renderInlineText(s: string): string {
+  const parts = s.split("`");
+  // An odd count of backticks leaves the last one unpaired: keep it literal.
+  const paired = parts.length % 2 === 1 ? parts : [...parts.slice(0, -2), `${parts[parts.length - 2]}\`${parts[parts.length - 1]}`];
+  return paired
+    .map((part, index) => (index % 2 === 1 ? `<code>${escapeJsxText(part)}</code>` : escapeJsxText(part)))
+    .join("");
+}
+
 /** JS template-literal-safe escape: protect backticks, backslashes, and ${. */
 export function escapeForTemplateLiteral(s: string): string {
   return s
@@ -400,7 +414,7 @@ function jsxAttr(s: string): string {
 function renderHighlights(highlights: string[]): string {
   if (highlights.length === 0) return "";
   const lis = highlights
-    .map((h) => `        <li>${escapeJsxText(h)}</li>`)
+    .map((h) => `        <li>${renderInlineText(h)}</li>`)
     .join("\n");
   return [
     `      <ul className="docs-highlights">`,
@@ -413,7 +427,7 @@ function renderDeprecationBanner(d: DeprecationInfo): string {
   if (!d.deprecated) return "";
   const parts: string[] = [];
   parts.push(`        <strong>Deprecated.</strong>`);
-  if (d.note) parts.push(`{' '}${escapeJsxText(d.note)}`);
+  if (d.note) parts.push(`{' '}${renderInlineText(d.note)}`);
   if (d.replacement) {
     parts.push(`{' '}Use <code>${escapeJsxText(d.replacement)}</code> instead.`);
   }
@@ -438,7 +452,7 @@ function renderPropsTable(props: PropEntry[]): string {
         `            <td><code>${escapeJsxText(p.name)}</code>${p.required ? `<span className="docs-required" aria-label="required">*</span>` : ""}</td>`,
         `            <td><code>${escapeJsxText(p.type)}</code></td>`,
         `            <td>${p.defaultValue ? `<code>${escapeJsxText(p.defaultValue)}</code>` : `<span className="docs-muted">—</span>`}</td>`,
-        `            <td>${escapeJsxText(p.description) || `<span className="docs-muted">—</span>`}</td>`,
+        `            <td>${renderInlineText(p.description) || `<span className="docs-muted">—</span>`}</td>`,
         `          </tr>`,
       ].join("\n"),
     )
@@ -467,8 +481,8 @@ function renderKeyboardTable(rows: KeyboardEntry[]): string {
       [
         `          <tr>`,
         `            <td><kbd>${escapeJsxText(r.key)}</kbd></td>`,
-        `            <td>${escapeJsxText(r.does)}</td>`,
-        `            <td>${r.when ? escapeJsxText(r.when) : `<span className="docs-muted">—</span>`}</td>`,
+        `            <td>${renderInlineText(r.does)}</td>`,
+        `            <td>${r.when ? renderInlineText(r.when) : `<span className="docs-muted">—</span>`}</td>`,
         `          </tr>`,
       ].join("\n"),
     )
@@ -506,7 +520,7 @@ function renderA11ySection(entry: DocsPagePlanEntry): string {
     lines.push(`      </ul>`);
   }
   if (entry.ariaNotes) {
-    lines.push(`      <p className="docs-aria-notes">${escapeJsxText(entry.ariaNotes)}</p>`);
+    lines.push(`      <p className="docs-aria-notes">${renderInlineText(entry.ariaNotes)}</p>`);
   }
   const kbd = renderKeyboardTable(entry.keyboard);
   if (kbd) {
@@ -614,7 +628,7 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
   if (banner) lines.push(banner);
 
   if (entry.description) {
-    lines.push(`      <p className="docs-lead">${escapeJsxText(entry.description)}</p>`);
+    lines.push(`      <p className="docs-lead">${renderInlineText(entry.description)}</p>`);
   }
   const highlights = renderHighlights(entry.highlights);
   if (highlights) lines.push(highlights);

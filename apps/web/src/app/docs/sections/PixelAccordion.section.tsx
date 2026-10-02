@@ -23,8 +23,8 @@ export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSecti
       <h2 id='pixel-accordion-heading'>PixelAccordion</h2>
       <p className="docs-lead">Vertical list of expandable disclosure items, each header wired to its panel with aria-expanded / aria-controls.</p>
       <ul className="docs-highlights">
-        <li>Single-open by default; opt into multi-open via `allowMultiple`</li>
-        <li>First item auto-expanded unless `collapsedByDefault` is set</li>
+        <li>Single-open by default; opt into multi-open via <code>allowMultiple</code></li>
+        <li>First item auto-expanded unless <code>collapsedByDefault</code> is set</li>
         <li>Surface-aware typography and borders (pixel vs linear)</li>
         <li>aria-expanded + aria-controls wired per header for assistive tech</li>
         <li>SSR-safe and tree-shakable; unopened panels are not rendered</li>

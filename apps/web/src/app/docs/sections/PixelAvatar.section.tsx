@@ -26,8 +26,8 @@ export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProp
         <li>Initials fallback locale-aware via PxlKitLocale (uppercases per locale rules)</li>
         <li>Five sizes (xs/sm/md/lg/xl) and three shapes (circle/rounded/square)</li>
         <li>Optional status dot (online/away/busy/offline) baked into the accessible name</li>
-        <li>Deterministic tinted fallback via `colorSeed` (djb2 hash → tone palette)</li>
-        <li>Lazy/async image loading when `src` is provided</li>
+        <li>Deterministic tinted fallback via <code>colorSeed</code> (djb2 hash → tone palette)</li>
+        <li>Lazy/async image loading when <code>src</code> is provided</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -44,7 +44,7 @@ export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProp
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
       </ul>
-      <p className="docs-aria-notes">Avatar is a presentational identity badge. The user name is exposed via `title`; when `status` is set the frame becomes role=&quot;img&quot; named by the user name plus the status word (no live region — status dots are not transient announcements). When `src` is provided the inner &lt;img&gt; uses the same accessible name as its alt text.</p>
+      <p className="docs-aria-notes">Avatar is a presentational identity badge. The user name is exposed via <code>title</code>; when <code>status</code> is set the frame becomes role=&quot;img&quot; named by the user name plus the status word (no live region — status dots are not transient announcements). When <code>src</code> is provided the inner &lt;img&gt; uses the same accessible name as its alt text.</p>
     </section>
     <section aria-labelledby="pixel-avatar-usage">
       <h3 id="pixel-avatar-usage">Usage</h3>

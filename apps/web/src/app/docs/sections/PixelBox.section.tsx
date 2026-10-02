@@ -25,7 +25,7 @@ export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): Re
       <ul className="docs-highlights">
         <li>Surface-aware tokens via useEffectiveSurface (retro / pixel)</li>
         <li>Tone + variant matrix (solid / soft / outline / ghost)</li>
-        <li>Polymorphic `as` for semantic landmarks (section, nav, aside, main, header, footer, article)</li>
+        <li>Polymorphic <code>as</code> for semantic landmarks (section, nav, aside, main, header, footer, article)</li>
         <li>Dev-time a11y warning when rendered as a landmark without an accessible name</li>
         <li>Padding and radius scale tokens with sensible defaults</li>
       </ul>
@@ -44,7 +44,7 @@ export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): Re
       <ul className="docs-aria-patterns">
         <li><code>unopinionated-polymorphic-surface</code></li>
       </ul>
-      <p className="docs-aria-notes">Inherits semantics from the `as` element. When `as` is a landmark (section, nav, aside, main), provide aria-label or aria-labelledby for an accessible name.</p>
+      <p className="docs-aria-notes">Inherits semantics from the <code>as</code> element. When <code>as</code> is a landmark (section, nav, aside, main), provide aria-label or aria-labelledby for an accessible name.</p>
     </section>
     <section aria-labelledby="pixel-box-usage">
       <h3 id="pixel-box-usage">Usage</h3>

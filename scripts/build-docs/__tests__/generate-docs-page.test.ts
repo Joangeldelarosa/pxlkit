@@ -23,6 +23,7 @@ import {
   escapeForTemplateLiteral,
   escapeJsxText,
   generateDocsPage,
+  renderInlineText,
   normalizeExamples,
   normalizeKeyboard,
   normalizeProps,
@@ -74,6 +75,22 @@ describe("escapeJsxText", () => {
     expect(escapeJsxText("&")).toBe("&amp;");
     // Make sure we did not double-escape: input "<" -> "&lt;", not "&amp;lt;"
     expect(escapeJsxText("<")).toBe("&lt;");
+  });
+});
+
+describe("renderInlineText", () => {
+  it("sets markdown code spans in <code>, escaping inside and out", () => {
+    expect(renderInlineText('Trigger exposes `aria-haspopup="menu"` & `{x}`.')).toBe(
+      "Trigger exposes <code>aria-haspopup=&quot;menu&quot;</code> &amp; <code>&#123;x&#125;</code>.",
+    );
+  });
+
+  it("leaves text without code spans as escapeJsxText does", () => {
+    expect(renderInlineText("a < b")).toBe(escapeJsxText("a < b"));
+  });
+
+  it("keeps an unpaired backtick as written", () => {
+    expect(renderInlineText("`a` then ` alone")).toBe("<code>a</code> then ` alone");
   });
 });
 

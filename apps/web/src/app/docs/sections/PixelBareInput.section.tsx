@@ -21,10 +21,10 @@ export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSecti
   return (
     <section aria-labelledby={'pixel-bare-input-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bare-input-heading'>PixelBareInput</h2>
-      <p className="docs-lead">Unstyled, forwardRef-enabled `&lt;input&gt;` primitive used as an escape hatch for fully custom field compositions.</p>
+      <p className="docs-lead">Unstyled, forwardRef-enabled <code>&lt;input&gt;</code> primitive used as an escape hatch for fully custom field compositions.</p>
       <ul className="docs-highlights">
-        <li>Native `&lt;input&gt;` semantics — accepts every `InputHTMLAttributes` prop verbatim.</li>
-        <li>forwardRef passthrough exposes the underlying `HTMLInputElement` for measurement, focus, or imperative APIs.</li>
+        <li>Native <code>&lt;input&gt;</code> semantics — accepts every <code>InputHTMLAttributes</code> prop verbatim.</li>
+        <li>forwardRef passthrough exposes the underlying <code>HTMLInputElement</code> for measurement, focus, or imperative APIs.</li>
         <li>Zero styling — pair with parent surfaces (PixelInputGroup, PixelFieldset) when building bespoke field widgets.</li>
         <li>SSR-safe and tree-shakable — no client effects or runtime dependencies.</li>
       </ul>
@@ -43,7 +43,7 @@ export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSecti
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Because this primitive is unstyled, callers MUST supply an accessible name via `aria-label`, `aria-labelledby`, or an associated `&lt;label&gt;` element. Visual focus styling is the consumer&#39;s responsibility.</p>
+      <p className="docs-aria-notes">Because this primitive is unstyled, callers MUST supply an accessible name via <code>aria-label</code>, <code>aria-labelledby</code>, or an associated <code>&lt;label&gt;</code> element. Visual focus styling is the consumer&#39;s responsibility.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

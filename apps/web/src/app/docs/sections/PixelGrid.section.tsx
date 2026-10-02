@@ -26,7 +26,7 @@ export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): 
         <li>Numeric or responsive column spec (base/sm/md/lg/xl)</li>
         <li>Asymmetric colGap/rowGap via stack-gap tokens</li>
         <li>autoFit / autoFill with configurable minColWidth</li>
-        <li>Polymorphic via `as`; inherits semantics from rendered element</li>
+        <li>Polymorphic via <code>as</code>; inherits semantics from rendered element</li>
         <li>Surface-aware transition classes via useEffectiveSurface</li>
       </ul>
     <dl className="docs-meta">
@@ -41,7 +41,7 @@ export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): 
     <section aria-labelledby="pixel-grid-a11y">
       <h3 id="pixel-grid-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
-      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the element provided via `as` (e.g. ul, section). Authors are responsible for the semantic role of grid children.</p>
+      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the element provided via <code>as</code> (e.g. ul, section). Authors are responsible for the semantic role of grid children.</p>
     </section>
     <section aria-labelledby="pixel-grid-usage">
       <h3 id="pixel-grid-usage">Usage</h3>

@@ -25,8 +25,8 @@ export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSection
       <ul className="docs-highlights">
         <li>Width/height props accept any CSS length so blocks can mirror the final content footprint.</li>
         <li>Pixel and linear surfaces match the rest of the kit — sharp pixel corners or smooth rounded fills.</li>
-        <li>`rounded` flips between square/avatar shapes (circle on linear, 2px chamfer on pixel).</li>
-        <li>Ships with `role=&quot;status&quot;` and an overridable `ariaLabel` for screen-reader-friendly loading.</li>
+        <li><code>rounded</code> flips between square/avatar shapes (circle on linear, 2px chamfer on pixel).</li>
+        <li>Ships with <code>role=&quot;status&quot;</code> and an overridable <code>ariaLabel</code> for screen-reader-friendly loading.</li>
         <li>Forwards refs and arbitrary div attributes — drop it anywhere a placeholder block is needed.</li>
       </ul>
     <dl className="docs-meta">
@@ -44,7 +44,7 @@ export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSection
       <ul className="docs-aria-patterns">
         <li><code>status</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders with `role=&quot;status&quot;` and a polite implicit live region. Override `ariaLabel` when the placeholder represents a specific resource (e.g. &quot;Loading user profile&quot;) so assistive tech announces what is loading.</p>
+      <p className="docs-aria-notes">Renders with <code>role=&quot;status&quot;</code> and a polite implicit live region. Override <code>ariaLabel</code> when the placeholder represents a specific resource (e.g. &quot;Loading user profile&quot;) so assistive tech announces what is loading.</p>
     </section>
     <section aria-labelledby="pixel-skeleton-usage">
       <h3 id="pixel-skeleton-usage">Usage</h3>

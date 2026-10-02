@@ -27,7 +27,7 @@ export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionPr
       <p className="docs-lead">Deprecated alias for PixelIconButton — a square icon-only button with a required accessible label.</p>
       <ul className="docs-highlights">
         <li>Identical runtime to PixelIconButton (re-exported as-is).</li>
-        <li>Renders a square, icon-only button with required `label` exposed as aria-label and title.</li>
+        <li>Renders a square, icon-only button with required <code>label</code> exposed as aria-label and title.</li>
         <li>Supports tones, sizes, and pixel/linear surface aesthetics.</li>
         <li>Kept as an alias for backward compatibility; removal carried forward to v3.0.0 (see ADR-0004).</li>
       </ul>
@@ -46,7 +46,7 @@ export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">The `label` prop is required and is wired to both aria-label and title so screen reader and tooltip discovery stay in sync for an icon-only control.</p>
+      <p className="docs-aria-notes">The <code>label</code> prop is required and is wired to both aria-label and title so screen reader and tooltip discovery stay in sync for an icon-only control.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

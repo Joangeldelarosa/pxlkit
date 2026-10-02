@@ -21,11 +21,11 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
   return (
     <section aria-labelledby={'pixel-badge-group-heading'} className={className} data-status='stable'>
       <h2 id='pixel-badge-group-heading'>PixelBadgeGroup</h2>
-      <p className="docs-lead">Inline row of badges with automatic &quot;+N&quot; overflow popover when the count exceeds `max`.</p>
+      <p className="docs-lead">Inline row of badges with automatic &quot;+N&quot; overflow popover when the count exceeds <code>max</code>.</p>
       <ul className="docs-highlights">
-        <li>Renders the first `max - 1` badges inline; remaining items collapse into a &quot;+N&quot; trigger.</li>
+        <li>Renders the first <code>max - 1</code> badges inline; remaining items collapse into a &quot;+N&quot; trigger.</li>
         <li>Overflow trigger opens a PixelPopover with the hidden badges, surface-matched.</li>
-        <li>Wrapper becomes `role=&quot;group&quot;` when an accessible name (aria-label or aria-labelledby) is provided.</li>
+        <li>Wrapper becomes <code>role=&quot;group&quot;</code> when an accessible name (aria-label or aria-labelledby) is provided.</li>
         <li>Surface-aware: pixel chamfered radius + pixel font or linear pill, propagated to the popover.</li>
         <li>Forwarded ref to the underlying div and full passthrough of HTMLAttributes.</li>
       </ul>

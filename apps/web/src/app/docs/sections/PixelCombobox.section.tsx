@@ -23,10 +23,10 @@ export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSection
       <h2 id='pixel-combobox-heading'>PixelCombobox</h2>
       <p className="docs-lead">Searchable single-value combobox built on a button trigger + listbox popover with type-to-filter, optional grouping, and full keyboard navigation.</p>
       <ul className="docs-highlights">
-        <li>WAI-ARIA combobox pattern — `role=&quot;combobox&quot;` trigger paired with a `role=&quot;listbox&quot;` popup and `aria-activedescendant` for highlight tracking.</li>
-        <li>Type-to-filter search input is opt-out (`searchable=&#123;false&#125;`) for short lists where filtering adds friction.</li>
-        <li>Optional `group` field on options renders sticky group headings in the listbox without breaking keyboard navigation.</li>
-        <li>Controlled or uncontrolled — `value` + `onChange` or `defaultValue`; integrates with native forms via hidden `name` input.</li>
+        <li>WAI-ARIA combobox pattern — <code>role=&quot;combobox&quot;</code> trigger paired with a <code>role=&quot;listbox&quot;</code> popup and <code>aria-activedescendant</code> for highlight tracking.</li>
+        <li>Type-to-filter search input is opt-out (<code>searchable=&#123;false&#125;</code>) for short lists where filtering adds friction.</li>
+        <li>Optional <code>group</code> field on options renders sticky group headings in the listbox without breaking keyboard navigation.</li>
+        <li>Controlled or uncontrolled — <code>value</code> + <code>onChange</code> or <code>defaultValue</code>; integrates with native forms via hidden <code>name</code> input.</li>
         <li>Tone-free surface theming (pixel/linear) and shared size scale (sm/md/lg) match the rest of the input family.</li>
       </ul>
     <dl className="docs-meta">
@@ -45,7 +45,7 @@ export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSection
         <li><code>combobox</code></li>
         <li><code>listbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Trigger is a `&lt;button role=&quot;combobox&quot;&gt;` with `aria-haspopup=&quot;listbox&quot;`, `aria-expanded`, and `aria-activedescendant` wired to the highlighted option id. When searchable, an inner `role=&quot;searchbox&quot;` input proxies keyboard navigation to the listbox. Provide an accessible name via `label`; `error` automatically sets `aria-invalid`.</p>
+      <p className="docs-aria-notes">Trigger is a <code>&lt;button role=&quot;combobox&quot;&gt;</code> with <code>aria-haspopup=&quot;listbox&quot;</code>, <code>aria-expanded</code>, and <code>aria-activedescendant</code> wired to the highlighted option id. When searchable, an inner <code>role=&quot;searchbox&quot;</code> input proxies keyboard navigation to the listbox. Provide an accessible name via <code>label</code>; <code>error</code> automatically sets <code>aria-invalid</code>.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

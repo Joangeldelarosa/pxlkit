@@ -43,7 +43,7 @@ export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>semantic-section</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders as a semantic &lt;section&gt;. When `title` is provided it becomes the section heading; consumers may add aria-labelledby externally when needed.</p>
+      <p className="docs-aria-notes">Renders as a semantic &lt;section&gt;. When <code>title</code> is provided it becomes the section heading; consumers may add aria-labelledby externally when needed.</p>
     </section>
     <section aria-labelledby="pixel-section-usage">
       <h3 id="pixel-section-usage">Usage</h3>

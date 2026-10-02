@@ -25,7 +25,7 @@ export function PixelContainerDocsSection({ className }: PixelContainerDocsSecti
       <ul className="docs-highlights">
         <li>Surface-aware tokens via useEffectiveSurface (retro / pixel)</li>
         <li>Token-driven maxWidth, padding x (gutter), and padding y (section rhythm)</li>
-        <li>Polymorphic `as` for semantic landmarks (section, main, header, footer, article, aside, div)</li>
+        <li>Polymorphic <code>as</code> for semantic landmarks (section, main, header, footer, article, aside, div)</li>
         <li>Composes PixelCenter internally for consistent horizontal centering</li>
         <li>SSR-safe and forwards refs to the underlying element</li>
       </ul>
@@ -44,7 +44,7 @@ export function PixelContainerDocsSection({ className }: PixelContainerDocsSecti
       <ul className="docs-aria-patterns">
         <li><code>semantic-section-wrapper</code></li>
       </ul>
-      <p className="docs-aria-notes">Inherits semantics from the `as` element (defaults to `section`). When rendered as a landmark, provide aria-label or aria-labelledby for an accessible name.</p>
+      <p className="docs-aria-notes">Inherits semantics from the <code>as</code> element (defaults to <code>section</code>). When rendered as a landmark, provide aria-label or aria-labelledby for an accessible name.</p>
     </section>
     <section aria-labelledby="pixel-container-usage">
       <h3 id="pixel-container-usage">Usage</h3>

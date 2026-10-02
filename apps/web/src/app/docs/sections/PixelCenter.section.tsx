@@ -25,7 +25,7 @@ export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProp
       <ul className="docs-highlights">
         <li>Token-driven max-width via the containerWidth scale</li>
         <li>Token-driven horizontal padding via the pageGutter scale</li>
-        <li>Polymorphic via the `as` prop — inherits semantics from the chosen element</li>
+        <li>Polymorphic via the <code>as</code> prop — inherits semantics from the chosen element</li>
         <li>Optional text alignment helper (left / center / right)</li>
         <li>Surface-aware transition tokens through useEffectiveSurface</li>
       </ul>
@@ -44,7 +44,7 @@ export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProp
       <ul className="docs-aria-patterns">
         <li><code>polymorphic-wrapper</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; consumers pass `as` to inherit appropriate semantics (e.g. section, main, article). No additional ARIA is required.</p>
+      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; consumers pass <code>as</code> to inherit appropriate semantics (e.g. section, main, article). No additional ARIA is required.</p>
     </section>
     <section aria-labelledby="pixel-center-usage">
       <h3 id="pixel-center-usage">Usage</h3>

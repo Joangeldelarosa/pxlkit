@@ -23,7 +23,7 @@ export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSection
       <h2 id='pixel-text-link-heading'>PixelTextLink</h2>
       <p className="docs-lead">Inline anchor or button styled as a tone-coloured underlined link for prose, callouts, and CTAs.</p>
       <ul className="docs-highlights">
-        <li>Polymorphic: renders &lt;a&gt; when `href` is provided, &lt;button type=&quot;button&quot;&gt; otherwise</li>
+        <li>Polymorphic: renders &lt;a&gt; when <code>href</code> is provided, &lt;button type=&quot;button&quot;&gt; otherwise</li>
         <li>Seven brand tones (cyan default) with consistent focus ring and hover behaviour</li>
         <li>Surface-aware typography (pixel vs linear) via shared surface context</li>
         <li>Forwards native anchor/button attributes (target, rel, onClick, aria-*, etc.)</li>

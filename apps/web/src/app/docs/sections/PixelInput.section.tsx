@@ -23,11 +23,11 @@ export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps)
       <h2 id='pixel-input-heading'>PixelInput</h2>
       <p className="docs-lead">Single-line text input with label, hint, error message, tone/size/surface variants, prefix/suffix slots, joinable addons, clearable button, char counter, and loading state.</p>
       <ul className="docs-highlights">
-        <li>Controlled or uncontrolled — works with `value`/`onChange` or `defaultValue`.</li>
-        <li>Inside-shell `prefix`/`suffix` slots plus outside-shell `addonLeft`/`addonRight` for joined groups.</li>
-        <li>Optional `clearable` × button, `loading` spinner, and `showCount` character counter.</li>
-        <li>`tone`, `size`, and `surface` follow the kit-wide design tokens.</li>
-        <li>Accessible: pairs `aria-invalid` + `aria-describedby` with hint/error text.</li>
+        <li>Controlled or uncontrolled — works with <code>value</code>/<code>onChange</code> or <code>defaultValue</code>.</li>
+        <li>Inside-shell <code>prefix</code>/<code>suffix</code> slots plus outside-shell <code>addonLeft</code>/<code>addonRight</code> for joined groups.</li>
+        <li>Optional <code>clearable</code> × button, <code>loading</code> spinner, and <code>showCount</code> character counter.</li>
+        <li><code>tone</code>, <code>size</code>, and <code>surface</code> follow the kit-wide design tokens.</li>
+        <li>Accessible: pairs <code>aria-invalid</code> + <code>aria-describedby</code> with hint/error text.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -44,7 +44,7 @@ export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps)
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Sets `aria-invalid` when `error` is provided and links the hint/error text it shows via `aria-describedby`, after any ids you pass (none while neither shows). The clear button is `tabIndex=&#123;-1&#125;` so keyboard users edit the value directly instead of tabbing through it.</p>
+      <p className="docs-aria-notes">Sets <code>aria-invalid</code> when <code>error</code> is provided and links the hint/error text it shows via <code>aria-describedby</code>, after any ids you pass (none while neither shows). The clear button is <code>tabIndex=&#123;-1&#125;</code> so keyboard users edit the value directly instead of tabbing through it.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

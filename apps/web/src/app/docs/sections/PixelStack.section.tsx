@@ -27,7 +27,7 @@ export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps)
         <li>Token-based gap scale via stackGap for consistent rhythm</li>
         <li>Alignment and justification helpers including baseline and space variants</li>
         <li>Surface-aware transitions through useEffectiveSurface</li>
-        <li>Polymorphic via the `as` prop to render any intrinsic element</li>
+        <li>Polymorphic via the <code>as</code> prop to render any intrinsic element</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -44,7 +44,7 @@ export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps)
       <ul className="docs-aria-patterns">
         <li><code>polymorphic-flex-container</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the `as` prop when overridden.</p>
+      <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the <code>as</code> prop when overridden.</p>
     </section>
     <section aria-labelledby="pixel-stack-usage">
       <h3 id="pixel-stack-usage">Usage</h3>
