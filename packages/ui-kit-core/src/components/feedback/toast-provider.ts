@@ -1,10 +1,13 @@
 /**
  * PxlKitToastProvider — the toast queue every kit's provider holds, the
  * imperative API over it (`toast()`, its tone shortcuts and `promise()`), and
- * the viewport the toasts render in, stacked or as a list.
+ * the viewport the toasts render in, stacked or as a list: a landmark a
+ * hotkey reaches, holding the two live regions that announce the toasts, and
+ * keeping focus when a focused toast leaves it.
  */
 import { cn } from '../../common';
-import { TOAST_DURATION, type ToastItem, type ToastTone } from './toast';
+import { matchesCommandShortcut, parseCommandShortcut, type CommandKeyPress } from '../overlays/command';
+import { TOAST_DURATION, isAssertiveToast, toastTone, type ToastItem, type ToastTone } from './toast';
 
 export type ToastPosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
 
@@ -58,8 +61,17 @@ export const TOAST_MAX = 5;
 /** Cards peeking behind the front one in a collapsed stack, by default. */
 export const TOAST_STACK_VISIBLE = 2;
 
-/** Auto-dismiss delays of a settled `promise()` toast without its own `duration`, in ms. */
-export const TOAST_PROMISE_DURATION = { success: 4500, error: 6000 } as const;
+/** Least auto-dismiss delay of a settled `promise()` error toast without its own `duration`, in ms. */
+export const TOAST_ERROR_DURATION = 6000;
+
+/**
+ * Auto-dismiss delay of a settled `promise()` error toast without its own
+ * `duration`, from the provider's `duration`: never shorter than the other
+ * toasts nor than 6 s — and never, like them, when the provider's is `0`.
+ */
+export function toastErrorDuration(duration: number): number {
+  return duration > 0 ? Math.max(duration, TOAST_ERROR_DURATION) : 0;
+}
 
 /** Accessible name of the viewport landmark. */
 export const TOAST_VIEWPORT_LABEL = 'Notifications';
@@ -71,9 +83,12 @@ export function createToastId(): string {
   return `pxl-toast-${++sequence}`;
 }
 
-/** The toast an input describes: with the default duration unless it sets one, and its id or a new one. */
-export function toToastItem<TNode>(input: ToastInput<TNode>): ToastItem<TNode> {
-  return { duration: TOAST_DURATION, ...input, id: input.id ?? createToastId() };
+/**
+ * The toast an input describes: with the provider's `duration` unless it sets
+ * its own, and its id or a new one.
+ */
+export function toToastItem<TNode>(input: ToastInput<TNode>, duration = TOAST_DURATION): ToastItem<TNode> {
+  return { ...input, duration: input.duration ?? duration, id: input.id ?? createToastId() };
 }
 
 /**
@@ -109,8 +124,15 @@ function shortcutInput<TNode>(
   return titleOrInput;
 }
 
-/** The `toast()` API over a provider's queue. */
-export function createToastFn<TNode>({ push, update, dismiss }: ToastQueueActions<TNode>): ToastFn<TNode> {
+/**
+ * The `toast()` API over a provider's queue. `duration` reads the provider's
+ * auto-dismiss delay, which a settled promise toast takes unless it sets its
+ * own — an error toast at least 6 s.
+ */
+export function createToastFn<TNode>(
+  { push, update, dismiss }: ToastQueueActions<TNode>,
+  duration: () => number = () => TOAST_DURATION,
+): ToastFn<TNode> {
   const toned =
     (tone: ToastTone): ToastShortcut<TNode> =>
     (titleOrInput, message) =>
@@ -130,17 +152,149 @@ export function createToastFn<TNode>({ push, update, dismiss }: ToastQueueAction
     return promise.then(
       (value) => {
         const patch = typeof opts.success === 'function' ? opts.success(value) : opts.success;
-        update(id, { tone: 'green', loading: false, duration: patch.duration ?? TOAST_PROMISE_DURATION.success, ...patch });
+        update(id, { tone: 'green', loading: false, duration: patch.duration ?? duration(), ...patch });
         return value;
       },
       (err: unknown) => {
         const patch = typeof opts.error === 'function' ? opts.error(err) : opts.error;
-        update(id, { tone: 'red', loading: false, duration: patch.duration ?? TOAST_PROMISE_DURATION.error, ...patch });
+        update(id, { tone: 'red', loading: false, duration: patch.duration ?? toastErrorDuration(duration()), ...patch });
         throw err;
       },
     );
   };
   return fn;
+}
+
+/* ── Hotkey ─────────────────────────────────────────────────────────────── */
+
+/** The key that moves focus to the viewport, by default. */
+export const TOAST_HOTKEY = 'F8';
+
+/**
+ * Whether a key press is the provider's `hotkey`, written like `F8` or
+ * `alt+t` (see `parseCommandShortcut`); `false` is none. It is honoured in
+ * text fields too: a function key types nothing.
+ */
+export function isToastHotkey(press: CommandKeyPress, hotkey: string | false): boolean {
+  return hotkey !== false && matchesCommandShortcut(press, parseCommandShortcut(hotkey));
+}
+
+/** Accessible name of the viewport, telling the hotkey that reaches it: "Notifications (F8)". */
+export function toastViewportLabel(hotkey: string | false): string {
+  return hotkey ? `${TOAST_VIEWPORT_LABEL} (${hotkey})` : TOAST_VIEWPORT_LABEL;
+}
+
+/* ── Announcements ──────────────────────────────────────────────────────── */
+
+/** What announces a toast: its title, then its message. */
+export function toastAnnouncement(toast: Pick<ToastItem, 'title' | 'message'>): string {
+  return toast.message ? `${toast.title} ${toast.message}` : toast.title;
+}
+
+/** One message of a live region. */
+export interface ToastLiveMessage {
+  /** Unique: a message repeated later is new content, which the region reads again. */
+  key: number;
+  /** The toast it announces; the message leaves the region with it. */
+  toastId: string;
+  text: string;
+}
+
+/** What the viewport's live regions say: `polite` in its `role="status"` region, `assertive` in its `role="alert"` one. */
+export interface ToastLiveRegions {
+  polite: readonly ToastLiveMessage[];
+  assertive: readonly ToastLiveMessage[];
+}
+
+/** Live regions with nothing to say, as the viewport renders them at first. */
+export const NO_TOAST_MESSAGES: ToastLiveRegions = { polite: [], assertive: [] };
+
+/** Announces a toast just pushed, or `toast` once an update made it from `previous`. */
+export type ToastAnnouncer = (toast: ToastItem, previous?: ToastItem) => void;
+
+/**
+ * The announcements of a provider, written to its live regions through
+ * `onChange`. A toast is announced when pushed, and when an update changes
+ * its title, message or tone (a settled promise), in the region its urgency
+ * picks (`isAssertiveToast`). Toasts announced together — in one task — are
+ * read together; the next announcement replaces them with new messages, so
+ * a repeated text is read again.
+ */
+export function createToastAnnouncer(onChange: (regions: ToastLiveRegions) => void): ToastAnnouncer {
+  let regions = NO_TOAST_MESSAGES;
+  let open = false;
+  let key = 0;
+  return (toast, previous) => {
+    if (
+      previous &&
+      previous.title === toast.title &&
+      previous.message === toast.message &&
+      toastTone(previous) === toastTone(toast)
+    ) {
+      return;
+    }
+    if (!open) {
+      open = true;
+      regions = NO_TOAST_MESSAGES;
+      queueMicrotask(() => {
+        open = false;
+      });
+    }
+    const message: ToastLiveMessage = { key: ++key, toastId: toast.id, text: toastAnnouncement(toast) };
+    regions = isAssertiveToast(toast)
+      ? { ...regions, assertive: [...regions.assertive, message] }
+      : { ...regions, polite: [...regions.polite, message] };
+    onChange(regions);
+  };
+}
+
+/** What the live regions say about the toasts still in the queue. */
+export function liveToastMessages(regions: ToastLiveRegions, toasts: readonly { id: string }[]): ToastLiveRegions {
+  const shown = (messages: readonly ToastLiveMessage[]) =>
+    messages.filter((message) => toasts.some((toast) => toast.id === message.toastId));
+  return { polite: shown(regions.polite), assertive: shown(regions.assertive) };
+}
+
+/* ── Focus ──────────────────────────────────────────────────────────────── */
+
+/**
+ * Call right before the queue of `viewport` changes. When focus is inside one
+ * of its toasts, returns what to call once the change has rendered: if that
+ * toast has left, taking focus with it, focus moves to the dismiss button of
+ * the next toast still in the viewport, else of the previous one, else to
+ * `returnTo()` — the element focus entered the viewport from — while it is on
+ * the page; otherwise it stays on `<body>`.
+ */
+export function keepToastFocus(
+  viewport: HTMLElement | null | undefined,
+  returnTo: () => HTMLElement | null | undefined,
+): (() => void) | undefined {
+  if (!viewport) return undefined;
+  const cards = Array.from(viewport.querySelectorAll<HTMLElement>('[data-pxl-toast]'));
+  const index = cards.findIndex((card) => card.contains(viewport.ownerDocument.activeElement));
+  const card = cards[index];
+  if (!card) return undefined;
+  return () => {
+    const active = card.ownerDocument.activeElement;
+    if (card.isConnected || (active && active !== card.ownerDocument.body)) return;
+    const neighbour =
+      cards.slice(index + 1).find((other) => other.isConnected) ??
+      cards
+        .slice(0, index)
+        .reverse()
+        .find((other) => other.isConnected);
+    const target = neighbour ? neighbour.querySelector<HTMLElement>('[data-pxl-toast-dismiss]') : returnTo();
+    if (target?.isConnected) target.focus();
+  };
+}
+
+/**
+ * The element focus came from into `viewport`, to return to once no toast is
+ * left — none when it came from inside, or from nowhere: focus handed on
+ * from a toast that left comes from the body, and keeps the first origin.
+ */
+export function toastFocusOrigin(viewport: Element, from: EventTarget | null): HTMLElement | undefined {
+  return from instanceof HTMLElement && !viewport.contains(from) ? from : undefined;
 }
 
 /* ── Viewport ───────────────────────────────────────────────────────────── */
@@ -165,6 +319,9 @@ export function toastViewportClasses(position: ToastPosition): string {
 
 /** The slot around each toast in the viewport. */
 export const toastSlotClasses = 'w-full';
+
+/** The viewport's live regions, read by assistive technology only. */
+export const toastLiveRegionClasses = 'sr-only';
 
 /**
  * Inline style of a toast's slot in the viewport — an object type rather than

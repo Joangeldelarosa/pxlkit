@@ -19,7 +19,6 @@ import {
   TOAST_DISMISS_LABEL,
   createToastCountdown,
   holdToastCountdown,
-  isAssertiveToast,
   resetToastCountdown,
   startToastCountdown,
   toastClasses,
@@ -35,15 +34,16 @@ import {
 import { PxlOutlet } from '../_internal/outlet';
 import { PixelGlyph } from '../_internal/pixel-glyph';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
+import { injectEventListener } from '../utilities/dom';
 import type { ToastItem } from './toast-context';
 
 /**
  * One toast card: title in the tone colour, optional message, leading icon
  * (a spinner while loading) and action, a dismiss button and the countdown
  * bar of its auto-dismiss, which holds still while the card is hovered or
- * focused. It announces itself with `role="status"` (polite), or
- * `role="alert"` (assertive) for critical tones and `assertive` toasts.
- * Usually rendered by `<pxl-toast-provider>` through `injectToast()`; use it
+ * focused, the page is hidden or the window is in the background. The card
+ * is no live region: `<pxl-toast-provider>` announces its toasts. Usually
+ * rendered by `<pxl-toast-provider>` through `injectToast()`; use it
  * directly for custom rendering. The host is the card.
  *
  * Its tag is `pxl-toast-card`: `<pxl-toast>` is the icon toast of
@@ -57,9 +57,6 @@ import type { ToastItem } from './toast-context';
   imports: [PxlOutlet, PixelGlyph],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    '[attr.role]': 'assertive() ? "alert" : "status"',
-    '[attr.aria-live]': 'assertive() ? "assertive" : "polite"',
-    'aria-atomic': 'true',
     'data-pxl-toast': 'true',
     '[attr.data-tone]': 'tone()',
     '[attr.data-loading]': 'toast().loading ? "true" : "false"',
@@ -92,7 +89,13 @@ import type { ToastItem } from './toast-context';
           <div [class]="classes().action"><ng-container *pxlOutlet="toast().action; let text">{{ text }}</ng-container></div>
         }
       </div>
-      <button type="button" [attr.aria-label]="dismissLabel" [class]="classes().dismiss" (click)="dismiss.emit()">
+      <button
+        type="button"
+        [attr.aria-label]="dismissLabel"
+        data-pxl-toast-dismiss="true"
+        [class]="classes().dismiss"
+        (click)="dismiss.emit()"
+      >
         <svg pxlGlyph="close"></svg>
       </button>
     </div>
@@ -127,8 +130,6 @@ export class PixelToast {
   /** @internal */
   protected readonly classes = computed(() => toastClasses(this.effectiveSurface(), this.tone()));
   /** @internal */
-  protected readonly assertive = computed(() => isAssertiveToast(this.toast()));
-  /** @internal */
   protected readonly leading = computed(() => toastLeading(this.toast()));
   /** @internal */
   protected readonly dismissLabel = TOAST_DISMISS_LABEL;
@@ -146,6 +147,15 @@ export class PixelToast {
   protected readonly barStyle = computed(() => toastCountdownStyle(this.countdown()));
 
   constructor() {
+    // A page nobody looks at — hidden, or in a window in the background —
+    // holds the countdown too.
+    injectEventListener(
+      'visibilitychange',
+      () => this.hold({ hidden: this.document.hidden }),
+      () => this.document,
+    );
+    injectEventListener('blur', () => this.hold({ blurred: true }));
+    injectEventListener('focus', () => this.hold({ blurred: false }));
     if (!isPlatformBrowser(inject(PLATFORM_ID))) return;
     // The timer runs outside the zone, so a zone.js application stays
     // stable meanwhile; the dismissal is handled inside it.

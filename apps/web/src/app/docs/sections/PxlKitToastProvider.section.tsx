@@ -28,7 +28,7 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
         <li>Sonner-style stacked mode: collapsed cards peek behind the front, hover/focus expands the stack.</li>
         <li>Configurable max simultaneous toasts; oldest are dropped when the queue exceeds the cap.</li>
         <li>Surface-aware (auto / pixel / linear) — pixel surface adds an HP-bar tone accent to each toast.</li>
-        <li>Single role=&quot;region&quot; landmark announces &quot;Notifications&quot;; per-toast aria-live avoids double announcements.</li>
+        <li>Announced through two persistent live regions, polite and assertive; F8 moves focus to the toasts, and <code>duration</code> sets or turns off their auto-dismiss.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -43,9 +43,11 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
       <h3 id="pxl-kit-toast-provider-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
+        <li><code>region</code></li>
+        <li><code>status</code></li>
         <li><code>alert</code></li>
       </ul>
-      <p className="docs-aria-notes">The provider mounts a single role=&quot;region&quot; with aria-label=&quot;Notifications&quot; as a landmark for the toast viewport. Individual toasts declare their own role (alert for assertive tones like red/gold, status for the rest) with matching aria-live (assertive/polite) and aria-atomic=&quot;true&quot;, so nesting another aria-live region here is intentionally avoided to prevent double announcements. Hovering or focusing the viewport expands the stacked layout so assistive-tech users can read all queued toasts; focusing inside any toast also pauses its auto-dismiss timer.</p>
+      <p className="docs-aria-notes">The viewport is a <code>role=&quot;region&quot;</code> landmark named after its hotkey — &quot;Notifications (F8)&quot; by default; <code>hotkey</code> sets another key or, with <code>false</code>, none — and takes focus from it (<code>tabindex=&quot;-1&quot;</code>), from where Tab reaches the toasts&#39; buttons. The hotkey works in text fields too, since F8 types nothing. Two visually hidden live regions inside the viewport, there and empty before any toast, announce the toasts: each toast&#39;s title and message are written to <code>role=&quot;status&quot;</code> — or <code>role=&quot;alert&quot;</code> for critical tones (red, gold) and <code>assertive</code> toasts — when it is pushed and when an update changes its title, message or tone (a settled promise), as new content each time, so a repeated message is read again. The cards themselves are not live regions. Toasts dismiss themselves after the provider&#39;s <code>duration</code> (4.5 s; <code>0</code> keeps them until dismissed, WCAG 2.2.1), a promise&#39;s error toast after at least 6 s; a toast&#39;s countdown holds while it is hovered or focused, while the page is hidden and while the window is in the background. Hovering or focusing the viewport expands the stacked layout. When the toast holding focus leaves, focus moves to the dismiss button of the next toast, else the previous one, else back to the element it entered the viewport from.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -57,14 +59,24 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
         </thead>
         <tbody>
           <tr>
+            <td><kbd>F8</kbd></td>
+            <td>Move focus to the toast viewport, expanding stacked toasts.</td>
+            <td>Toasts on screen; another key, or none, with <code>hotkey</code>.</td>
+          </tr>
+          <tr>
             <td><kbd>Tab</kbd></td>
-            <td>Move focus into the toast viewport, expanding stacked toasts.</td>
+            <td>Move through the toasts&#39; action and dismiss buttons, from the viewport or the page, expanding stacked toasts.</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>Shift+Tab</kbd></td>
-            <td>Move focus back out of the viewport, collapsing the stack.</td>
+            <td>Move focus back through the toasts and out of the viewport, collapsing the stack.</td>
             <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Enter</kbd></td>
+            <td>Dismiss the toast; focus moves to the next toast&#39;s dismiss button, or the previous one&#39;s, or back to where it came from.</td>
+            <td>Dismiss button focused.</td>
           </tr>
         </tbody>
       </table>
@@ -874,6 +886,104 @@ export class PromiseFlow {
       success: { title: 'Saved', message: 'All set.' },
       error: { title: 'Failed', message: 'Try again.' },
     });
+  }
+}`}
+        />
+      </article>
+      <article className="docs-example" id="example-promise-rejected">
+        <h4>Promise Rejected</h4>
+        <FrameworkCode
+          variant="docs"
+          label={'Promise Rejected code'}
+          react={`import React from 'react';
+import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
+import { PixelButton } from '@pxlkit/ui-kit';
+
+function TriggerRow({ children }: { children: React.ReactNode }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>;
+}
+
+function RejectedPromiseTriggers() {
+  const { toast } = useToast();
+  return (
+    <TriggerRow>
+      <PixelButton
+        size="sm"
+        tone="red"
+        onClick={() =>
+          toast
+            .promise(
+              () => new Promise<string>((_resolve, reject) => setTimeout(() => reject(new Error('Network down')), 1000)),
+              {
+                loading: { title: 'Saving…' },
+                success: { title: 'Saved', message: 'All set.' },
+                error: { title: 'Failed', message: 'Try again.' },
+              },
+            )
+            // The error toast tells the user; the rejection needs no other handling.
+            .catch(() => {})
+        }
+      >
+        Run failing promise
+      </PixelButton>
+    </TriggerRow>
+  );
+}
+
+export function PromiseRejected() {
+  return (
+    <PxlKitToastProvider>
+      <RejectedPromiseTriggers />
+    </PxlKitToastProvider>
+  );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelButton, PxlKitToastProvider, type UseToastReturn } from '@pxlkit/ui-kit-vue';
+
+function runFailingSave(toast: UseToastReturn['toast']) {
+  toast
+    .promise(() => new Promise<string>((_resolve, reject) => setTimeout(() => reject(new Error('Network down')), 1000)), {
+      loading: { title: 'Saving…' },
+      success: { title: 'Saved', message: 'All set.' },
+      error: { title: 'Failed', message: 'Try again.' },
+    })
+    // The error toast tells the user; the rejection needs no other handling.
+    .catch(() => {});
+}
+</script>
+
+<template>
+  <PxlKitToastProvider v-slot="{ toast }">
+    <div class="flex flex-wrap gap-2">
+      <PixelButton size="sm" tone="red" @click="runFailingSave(toast)">Run failing promise</PixelButton>
+    </div>
+  </PxlKitToastProvider>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelButton, PxlKitToastProvider, type ToastApi } from '@pxlkit/ui-kit-angular';
+
+type ToastFn = ToastApi['toast'];
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: \`
+    <pxl-toast-provider #toaster>
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" tone="red" (click)="runFailingSave(toaster.toast)">Run failing promise</button>
+      </div>
+    </pxl-toast-provider>
+  \`,
+})
+export class PromiseRejected {
+  runFailingSave(toast: ToastFn): void {
+    toast
+      .promise(() => new Promise<string>((_resolve, reject) => setTimeout(() => reject(new Error('Network down')), 1000)), {
+        loading: { title: 'Saving…' },
+        success: { title: 'Saved', message: 'All set.' },
+        error: { title: 'Failed', message: 'Try again.' },
+      })
+      // The error toast tells the user; the rejection needs no other handling.
+      .catch(() => {});
   }
 }`}
         />

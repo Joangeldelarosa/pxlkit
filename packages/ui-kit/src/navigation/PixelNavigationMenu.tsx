@@ -2,8 +2,6 @@
 
 import React, {
   forwardRef,
-  useCallback,
-  useEffect,
   useId,
   useRef,
   useState,
@@ -12,16 +10,22 @@ import React, {
 } from 'react';
 import {
   navigationMenuClasses,
+  navigationMenuClick,
   navigationMenuFocusIndex,
   navigationMenuIconClasses,
-  navigationMenuIds,
   navigationMenuItemClasses,
   navigationMenuKeyAction,
   navigationMenuLabelClasses,
   navigationMenuListClasses,
   navigationMenuPanelClasses,
+  navigationMenuPanelEntry,
+  navigationMenuPanelId,
+  navigationMenuPointerEnter,
+  navigationMenuPointerLeave,
   navigationMenuTriggerClasses,
   navigationMenuViewportClasses,
+  returnNavigationMenuFocus,
+  type NavigationMenuOpen,
 } from '@pxlkit/ui-kit-core';
 import {
   Surface,
@@ -31,8 +35,14 @@ import {
 
 export interface PixelNavigationMenuItem {
   label: string;
+  /** Link target of an item without `content`, which is then an `<a>`. */
   href?: string;
+  /** Called when the item is clicked, or activated with Enter or Space. */
   onSelect?: () => void;
+  /**
+   * Panel content: the item is a button that shows and hides it, and never
+   * follows an `href`.
+   */
   content?: ReactNode;
   icon?: ReactNode;
   description?: string;
@@ -68,29 +78,24 @@ export const PixelNavigationMenu = forwardRef<
   forwardedRef,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [open, setOpenState] = useState<NavigationMenuOpen | null>(null);
   const itemRefs = useRef<Array<HTMLElement | null>>([]);
   const baseId = useId();
 
   // Reset refs length to match items.
   itemRefs.current.length = items.length;
 
-  const closeAll = useCallback(() => setActiveIndex(null), []);
+  // A panel closing while focus is inside it hands focus to its button.
+  const setOpen = (next: NavigationMenuOpen | null) => {
+    if (open && open.index !== next?.index) returnNavigationMenuFocus(itemRefs.current[open.index]);
+    setOpenState(next);
+  };
 
-  const openIndex = useCallback(
-    (idx: number) => {
-      const item = items[idx];
-      if (!item) return;
-      if (item.content) setActiveIndex(idx);
-      else setActiveIndex(null);
-    },
-    [items],
-  );
-
-  const focusItem = useCallback((idx: number) => {
-    const el = itemRefs.current[idx];
-    if (el) el.focus();
-  }, []);
+  const close = (e: ReactKeyboardEvent<HTMLElement>) => {
+    if (!open) return;
+    e.preventDefault();
+    setOpen(null);
+  };
 
   const handleItemKeyDown = (
     e: ReactKeyboardEvent<HTMLElement>,
@@ -98,74 +103,60 @@ export const PixelNavigationMenu = forwardRef<
   ) => {
     const action = navigationMenuKeyAction(e.key, orientation);
     if (action === undefined) return;
-    if (action === 'activate') {
-      const item = items[idx];
-      // Anchors handle Enter natively — let the browser navigate.
-      if (!item || item.href) return;
+    if (action === 'close') {
+      close(e);
+      return;
+    }
+    if (action === 'panel') {
+      const entry = navigationMenuPanelEntry(e.currentTarget);
+      if (!entry) return;
       e.preventDefault();
-      if (item.content) {
-        setActiveIndex((cur) => (cur === idx ? null : idx));
-      }
-      item.onSelect?.();
+      entry.focus();
       return;
     }
     e.preventDefault();
-    if (action === 'close') closeAll();
-    else focusItem(navigationMenuFocusIndex(idx, action, items.length));
+    itemRefs.current[navigationMenuFocusIndex(idx, action, items.length)]?.focus();
+  };
+
+  const handlePanelKeyDown = (e: ReactKeyboardEvent<HTMLElement>) => {
+    if (navigationMenuKeyAction(e.key, orientation) === 'close') close(e);
   };
 
   const handleRootMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
     onMouseLeave?.(e);
-    if (!e.defaultPrevented) closeAll();
+    if (!e.defaultPrevented) setOpen(navigationMenuPointerLeave(open));
   };
 
   const setItemRef = (idx: number) => (node: HTMLElement | null) => {
     itemRefs.current[idx] = node;
   };
 
-  const activeItem = activeIndex !== null ? items[activeIndex] : null;
-  const activeContent = activeItem?.content;
-
   return (
     <nav
       ref={forwardedRef}
-      // <nav> already implies role=navigation; the previously-redundant
-      // role attr was removed. aria-orientation is NOT allowed on a nav
-      // landmark (axe: aria-allowed-attr) — it lives on the menubar below.
+      // <nav> already implies role=navigation, and the WAI-ARIA disclosure
+      // navigation pattern adds no roles below it: a list of links and of
+      // buttons that show and hide the panel after them.
       aria-label={ariaLabel}
       className={cn(navigationMenuClasses(surface), className)}
       onMouseLeave={handleRootMouseLeave}
       {...rest}
     >
-      <ul
-        role="menubar"
-        aria-orientation={orientation}
-        className={navigationMenuListClasses(orientation)}
-      >
+      <ul className={navigationMenuListClasses(orientation)}>
         {items.map((item, idx) => {
           const hasContent = Boolean(item.content);
-          const expanded = activeIndex === idx && hasContent;
-          const { trigger: triggerId, panel: panelId } = navigationMenuIds(baseId, idx);
-          const sharedClass = navigationMenuTriggerClasses(surface, expanded);
+          const expanded = hasContent && open?.index === idx;
+          const panelId = navigationMenuPanelId(baseId, idx);
 
           const commonProps = {
-            id: triggerId,
-            role: 'menuitem' as const,
-            tabIndex: 0,
-            ref: setItemRef(idx) as React.Ref<HTMLElement>,
-            'aria-haspopup': hasContent ? ('menu' as const) : undefined,
-            'aria-expanded': hasContent ? expanded : undefined,
-            'aria-controls': hasContent && expanded ? panelId : undefined,
-            onMouseEnter: () => {
-              if (hasContent) openIndex(idx);
-              else setActiveIndex(null);
-            },
-            onFocus: () => {
-              if (hasContent) openIndex(idx);
-            },
+            ref: setItemRef(idx),
+            // Only a mouse opens a panel by pointing: a tap fires the
+            // pointer, mouse and focus events of a hover before its click.
+            onPointerEnter: (e: React.PointerEvent<HTMLElement>) =>
+              setOpen(navigationMenuPointerEnter(open, idx, hasContent, e.pointerType)),
             onKeyDown: (e: ReactKeyboardEvent<HTMLElement>) =>
               handleItemKeyDown(e, idx),
-            className: sharedClass,
+            className: navigationMenuTriggerClasses(surface, expanded),
           };
 
           const inner = (
@@ -185,38 +176,20 @@ export const PixelNavigationMenu = forwardRef<
           return (
             <li
               key={`${item.label}-${idx}`}
-              role="none"
-              className={navigationMenuItemClasses}
+              className={navigationMenuItemClasses(viewport)}
             >
-              {item.href ? (
-                <a
-                  {...(commonProps as React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-                    ref: React.Ref<HTMLAnchorElement>;
-                  })}
-                  href={item.href}
-                  onClick={(e) => {
-                    if (item.onSelect) {
-                      item.onSelect();
-                    }
-                    if (hasContent) {
-                      // For href + content, prevent navigation when toggling.
-                      e.preventDefault();
-                      setActiveIndex((cur) => (cur === idx ? null : idx));
-                    }
-                  }}
-                >
+              {item.href && !hasContent ? (
+                <a {...commonProps} href={item.href} onClick={() => item.onSelect?.()}>
                   {inner}
                 </a>
               ) : (
                 <button
                   type="button"
-                  {...(commonProps as React.ButtonHTMLAttributes<HTMLButtonElement> & {
-                    ref: React.Ref<HTMLButtonElement>;
-                  })}
+                  {...commonProps}
+                  aria-expanded={hasContent ? expanded : undefined}
+                  aria-controls={hasContent ? panelId : undefined}
                   onClick={() => {
-                    if (hasContent) {
-                      setActiveIndex((cur) => (cur === idx ? null : idx));
-                    }
+                    if (hasContent) setOpen(navigationMenuClick(open, idx));
                     item.onSelect?.();
                   }}
                 >
@@ -224,13 +197,17 @@ export const PixelNavigationMenu = forwardRef<
                 </button>
               )}
 
-              {/* Inline panel (used when viewport=false). */}
-              {!viewport && expanded && item.content && (
+              {/* The panel follows its button, so Tab moves into it. The shared
+                  viewport is drawn below the whole list all the same. */}
+              {expanded && (
                 <div
                   id={panelId}
-                  role="menu"
-                  aria-labelledby={triggerId}
-                  className={navigationMenuPanelClasses(surface)}
+                  className={
+                    viewport
+                      ? navigationMenuViewportClasses(surface, orientation)
+                      : navigationMenuPanelClasses(surface)
+                  }
+                  onKeyDown={handlePanelKeyDown}
                 >
                   {item.content}
                 </div>
@@ -239,18 +216,6 @@ export const PixelNavigationMenu = forwardRef<
           );
         })}
       </ul>
-
-      {/* Shared viewport — one panel below the menubar. */}
-      {viewport && activeContent && activeIndex !== null && (
-        <div
-          id={navigationMenuIds(baseId, activeIndex).panel}
-          role="menu"
-          aria-labelledby={navigationMenuIds(baseId, activeIndex).trigger}
-          className={navigationMenuViewportClasses(surface, orientation)}
-        >
-          {activeContent}
-        </div>
-      )}
     </nav>
   );
 });

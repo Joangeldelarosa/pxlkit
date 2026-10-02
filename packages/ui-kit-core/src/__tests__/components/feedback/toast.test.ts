@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   TOAST_DISMISS_LABEL,
   TOAST_DURATION,
@@ -163,7 +163,12 @@ describe('toast countdown', () => {
   it('counts down afresh from a new duration, still held if it was', () => {
     const loading = holdToastCountdown(createToastCountdown(0), { focus: true }, 0);
     const settled = resetToastCountdown(loading, 4500);
-    expect(settled).toEqual({ duration: 4500, remaining: 4500, startedAt: null, holds: { hover: false, focus: true } });
+    expect(settled).toEqual({
+      duration: 4500,
+      remaining: 4500,
+      startedAt: null,
+      holds: { hover: false, focus: true, hidden: false, blurred: false },
+    });
     expect(startToastCountdown(settled, 10)).toBe(settled);
     expect(toastCountdownDelay(holdToastCountdown(settled, { focus: false }, 20), 20)).toBe(4500);
 
@@ -172,7 +177,32 @@ describe('toast countdown', () => {
       duration: 6000,
       remaining: 6000,
       startedAt: null,
-      holds: { hover: false, focus: false },
+      holds: { hover: false, focus: false, hidden: false, blurred: false },
     });
+  });
+
+  it('holds still while the page is hidden or the window in the background, until both come back', () => {
+    const running = startToastCountdown(createToastCountdown(4500), 0);
+    const hidden = holdToastCountdown(running, { hidden: true }, 1000);
+    const blurred = holdToastCountdown(hidden, { blurred: true }, 2000);
+    expect(blurred.remaining).toBe(3500);
+    const shown = holdToastCountdown(blurred, { hidden: false }, 3000);
+    expect(shown.startedAt).toBeNull();
+    const back = holdToastCountdown(shown, { blurred: false }, 9000);
+    expect(toastCountdownDelay(back, 9000)).toBe(3500);
+  });
+});
+
+describe('toast countdown on a hidden page', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('starts held, so a toast shown meanwhile waits for the page to come back', () => {
+    vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+    const countdown = createToastCountdown(4500);
+    expect(countdown.holds.hidden).toBe(true);
+    expect(startToastCountdown(countdown, 0)).toBe(countdown);
+    expect(toastCountdownDelay(holdToastCountdown(countdown, { hidden: false }, 500), 500)).toBe(4500);
   });
 });

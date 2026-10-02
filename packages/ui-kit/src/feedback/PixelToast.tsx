@@ -3,7 +3,6 @@ import {
   TOAST_DISMISS_LABEL,
   createToastCountdown,
   holdToastCountdown,
-  isAssertiveToast,
   resetToastCountdown,
   startToastCountdown,
   toastClasses,
@@ -15,6 +14,7 @@ import {
   type ToastHolds,
 } from '@pxlkit/ui-kit-core';
 import { Surface, useEffectiveSurface, CloseIcon } from '../common';
+import { useEventListener } from '../hooks/useEventListener';
 import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 // Type-only import (erased at runtime): PxlKitToastProvider.tsx value-imports
 // PixelToast back, so keeping this edge type-only avoids a runtime cycle.
@@ -40,7 +40,6 @@ export const PixelToast = forwardRef<HTMLDivElement, PixelToastProps>(function P
   const tone = toastTone(toast);
   const classes = toastClasses(surface, tone);
   const duration = toastDuration(toast);
-  const assertive = isAssertiveToast(toast);
   const leading = toastLeading(toast);
 
   // Keep the latest onDismiss in a ref so re-rendered ToastViewport children
@@ -78,12 +77,21 @@ export const PixelToast = forwardRef<HTMLDivElement, PixelToastProps>(function P
   const hold = (holds: Partial<ToastHolds>) =>
     setCountdown((current) => holdToastCountdown(current, holds, Date.now()));
 
+  // A page nobody looks at — hidden, or in a window in the background —
+  // holds the countdown too.
+  useEventListener(
+    'visibilitychange',
+    () => hold({ hidden: document.hidden }),
+    typeof document !== 'undefined' ? document : null,
+  );
+  useEventListener('blur', () => hold({ blurred: true }));
+  useEventListener('focus', () => hold({ blurred: false }));
+
+  // The provider announces the toast in its live regions: the card is no live
+  // region of its own, which would be read unreliably as it is inserted.
   return (
     <div
       ref={ref}
-      role={assertive ? 'alert' : 'status'}
-      aria-live={assertive ? 'assertive' : 'polite'}
-      aria-atomic="true"
       data-pxl-toast
       data-tone={tone}
       data-loading={toast.loading ? 'true' : 'false'}
@@ -107,7 +115,13 @@ export const PixelToast = forwardRef<HTMLDivElement, PixelToastProps>(function P
           {toast.message && <p className={classes.message}>{toast.message}</p>}
           {toast.action && <div className={classes.action}>{toast.action}</div>}
         </div>
-        <button type="button" onClick={onDismiss} aria-label={TOAST_DISMISS_LABEL} className={classes.dismiss}>
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label={TOAST_DISMISS_LABEL}
+          data-pxl-toast-dismiss
+          className={classes.dismiss}
+        >
           <CloseIcon />
         </button>
       </div>

@@ -37,11 +37,11 @@
 ### PixelToast
 - stable · since 1.0.0
 - Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast().
-- Seven tones with matching border, text color, and HP-bar accent on pixel surface. · Auto-dismiss with a visual progress bar; hover/focus pauses the countdown. · Smart aria semantics — assertive role=alert for red/gold by default, polite role=status otherwise; overridable per toast. · Optional leading slot for icon, animatedIcon, or built-in loading spinner. · Action slot for inline retry / undo buttons; dismiss button always present.
+- Seven tones with matching border, text color, and HP-bar accent on pixel surface. · Auto-dismiss with a visual progress bar; hover, focus, a hidden page or a background window pause the countdown. · Announced by PxlKitToastProvider — assertively for red/gold by default, politely otherwise; overridable per toast. · Optional leading slot for icon, animatedIcon, or built-in loading spinner. · Action slot for inline retry / undo buttons; dismiss button always present.
 - related: PxlKitToastProvider, PixelAlert, PixelAlertDialog
 
 ### PxlKitToastProvider
 - stable · since 1.8.0
 - App-root toast provider that hosts the toast queue, viewport portal, and stacked/expanded visual mode — paired with useToast() for imperative push/update/dismiss/promise APIs.
-- Six positions (top/bottom × left/right/center) with portal-rendered viewport. · Sonner-style stacked mode: collapsed cards peek behind the front, hover/focus expands the stack. · Configurable max simultaneous toasts; oldest are dropped when the queue exceeds the cap. · Surface-aware (auto / pixel / linear) — pixel surface adds an HP-bar tone accent to each toast. · Single role="region" landmark announces "Notifications"; per-toast aria-live avoids double announcements.
+- Six positions (top/bottom × left/right/center) with portal-rendered viewport. · Sonner-style stacked mode: collapsed cards peek behind the front, hover/focus expands the stack. · Configurable max simultaneous toasts; oldest are dropped when the queue exceeds the cap. · Surface-aware (auto / pixel / linear) — pixel surface adds an HP-bar tone accent to each toast. · Announced through two persistent live regions, polite and assertive; F8 moves focus to the toasts, and `duration` sets or turns off their auto-dismiss.
 - related: PixelToast, PixelAlert, PixelAlertDialog

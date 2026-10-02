@@ -1,21 +1,33 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  NO_TOAST_MESSAGES,
+  TOAST_ERROR_DURATION,
+  TOAST_HOTKEY,
   TOAST_MAX,
-  TOAST_PROMISE_DURATION,
   TOAST_STACK_VISIBLE,
   TOAST_VIEWPORT_LABEL,
   addToast,
+  createToastAnnouncer,
   createToastFn,
   createToastId,
+  isToastHotkey,
+  keepToastFocus,
+  liveToastMessages,
   removeToast,
+  toastFocusOrigin,
   toToastItem,
+  toastAnnouncement,
+  toastErrorDuration,
+  toastLiveRegionClasses,
   toastPositionClasses,
   toastSlotClasses,
   toastSlots,
   toastViewportClasses,
+  toastViewportLabel,
   updateToast,
   type ToastInput,
   type ToastItem,
+  type ToastLiveRegions,
   type ToastPatch,
   type ToastPosition,
 } from '../../../index';
@@ -23,10 +35,10 @@ import {
 const item = (id: string, title = id): ToastItem => ({ id, title });
 
 /** A queue held in a plain array, the way each kit's provider holds its own. */
-function queue(max = TOAST_MAX) {
+function queue(max = TOAST_MAX, duration?: number) {
   let toasts: ToastItem[] = [];
   const push = vi.fn((input: ToastInput) => {
-    const toast = toToastItem(input);
+    const toast = toToastItem(input, duration);
     toasts = addToast(toasts, toast, max);
     return toast.id;
   });
@@ -36,7 +48,8 @@ function queue(max = TOAST_MAX) {
   const dismiss = vi.fn((id: string) => {
     toasts = removeToast(toasts, id);
   });
-  return { toast: createToastFn({ push, update, dismiss }), push, update, dismiss, toasts: () => toasts };
+  const toast = createToastFn({ push, update, dismiss }, duration === undefined ? undefined : () => duration);
+  return { toast, push, update, dismiss, toasts: () => toasts };
 }
 
 describe('toast queue', () => {
@@ -51,6 +64,12 @@ describe('toast queue', () => {
     expect(toToastItem({ id: 'mine', title: 'Saved', duration: 0 })).toEqual({ id: 'mine', title: 'Saved', duration: 0 });
     // An id passed on as `undefined` still gets one.
     expect(toToastItem({ id: undefined, title: 'Saved' }).id).toMatch(/^pxl-toast-/);
+  });
+
+  it("gives an input the provider's duration instead, also for a duration passed on as undefined", () => {
+    expect(toToastItem({ title: 'Saved' }, 0).duration).toBe(0);
+    expect(toToastItem({ title: 'Saved', duration: undefined }, 10_000).duration).toBe(10_000);
+    expect(toToastItem({ title: 'Saved', duration: 1000 }, 10_000).duration).toBe(1000);
   });
 
   it('adds the newest toast last, replacing one with its id', () => {
@@ -113,7 +132,7 @@ describe('toast()', () => {
     expect(toasts()).toEqual([{ id: expect.any(String), title: 'Saving…', tone: 'cyan', loading: true, duration: 0 }]);
     resolve(42);
     await expect(outcome).resolves.toBe(42);
-    expect(toasts()[0]).toMatchObject({ title: 'Saved #42', tone: 'green', loading: false, duration: TOAST_PROMISE_DURATION.success });
+    expect(toasts()[0]).toMatchObject({ title: 'Saved #42', tone: 'green', loading: false, duration: 4500 });
   });
 
   it('turns it into the error toast on rejection and rejects in turn', async () => {
@@ -126,6 +145,22 @@ describe('toast()', () => {
     });
     await expect(outcome).rejects.toBe(error);
     expect(toasts()[0]).toMatchObject({ title: 'Failed', message: 'boom', tone: 'red', loading: false, duration: 6000 });
+  });
+
+  it("settles into toasts with the provider's duration, an error at least 6 s, and none when it is 0", async () => {
+    const settle = async (duration: number) => {
+      const { toast, toasts } = queue(TOAST_MAX, duration);
+      await toast.promise(Promise.resolve('x'), { loading: { title: 'Saving…' }, success: { title: 'Saved' }, error: { title: 'Failed' } });
+      await toast
+        .promise(Promise.reject(new Error('no')), { loading: { title: 'Saving…' }, success: { title: 'Saved' }, error: { title: 'Failed' } })
+        .catch(() => {});
+      return toasts().map((t) => t.duration);
+    };
+    expect(await settle(2000)).toEqual([2000, 6000]);
+    expect(await settle(10_000)).toEqual([10_000, 10_000]);
+    expect(await settle(0)).toEqual([0, 0]);
+    expect(TOAST_ERROR_DURATION).toBe(6000);
+    expect([toastErrorDuration(4500), toastErrorDuration(8000), toastErrorDuration(0)]).toEqual([6000, 8000, 0]);
   });
 
   it('lets the settled toasts set their own tone and duration', async () => {
@@ -214,5 +249,167 @@ describe('toast viewport', () => {
   it('keeps more cards in sight with a larger stackVisible', () => {
     const slots = toastSlots(toasts, { position: 'top-right', ...collapsed, stackVisible: 3 });
     expect(slots.every((slot) => slot.style.opacity === 1)).toBe(true);
+  });
+});
+
+describe('toast hotkey', () => {
+  const press = (key: string, modifiers: { shiftKey?: boolean; altKey?: boolean } = {}) => ({
+    key,
+    metaKey: false,
+    ctrlKey: false,
+    shiftKey: false,
+    altKey: false,
+    ...modifiers,
+  });
+
+  it('is F8 by default, else the key given, or none', () => {
+    expect(TOAST_HOTKEY).toBe('F8');
+    expect(isToastHotkey(press('F8'), TOAST_HOTKEY)).toBe(true);
+    expect(isToastHotkey(press('F8', { shiftKey: true }), TOAST_HOTKEY)).toBe(false);
+    expect(isToastHotkey(press('F7'), TOAST_HOTKEY)).toBe(false);
+    expect(isToastHotkey(press('t', { altKey: true }), 'alt+t')).toBe(true);
+    expect(isToastHotkey(press('F8'), false)).toBe(false);
+  });
+
+  it('names the viewport after its hotkey', () => {
+    expect(toastViewportLabel('F8')).toBe('Notifications (F8)');
+    expect(toastViewportLabel('alt+t')).toBe('Notifications (alt+t)');
+    expect(toastViewportLabel(false)).toBe(TOAST_VIEWPORT_LABEL);
+  });
+});
+
+describe('toast announcements', () => {
+  function announcer() {
+    const said: ToastLiveRegions[] = [];
+    return { announce: createToastAnnouncer((regions) => said.push(regions)), said };
+  }
+  const texts = (regions: ToastLiveRegions) => ({
+    polite: regions.polite.map((message) => message.text),
+    assertive: regions.assertive.map((message) => message.text),
+  });
+
+  it('reads a toast by its title, then its message', () => {
+    expect(toastAnnouncement({ title: 'Saved' })).toBe('Saved');
+    expect(toastAnnouncement({ title: 'Saved', message: 'All set.' })).toBe('Saved All set.');
+  });
+
+  it('reads the toasts announced in one task together, politely or assertively, and replaces them with the next ones', async () => {
+    const { announce, said } = announcer();
+    announce({ id: 'a', title: 'First' });
+    announce({ id: 'b', title: 'Failed', tone: 'red' });
+    announce({ id: 'c', title: 'Heads up', message: 'Done.', assertive: true });
+    expect(texts(said[2]!)).toEqual({ polite: ['First'], assertive: ['Failed', 'Heads up Done.'] });
+
+    await Promise.resolve();
+    announce({ id: 'a', title: 'First' });
+    expect(texts(said[3]!)).toEqual({ polite: ['First'], assertive: [] });
+    // The repeated text is a new message, which the region reads again.
+    expect(said[3]!.polite[0]!.key).not.toBe(said[0]!.polite[0]!.key);
+    expect(said[3]!.polite[0]!.toastId).toBe('a');
+  });
+
+  it('announces an update that changes the title, the message or the tone, and no other', () => {
+    const { announce, said } = announcer();
+    const loading: ToastItem = { id: 'p', title: 'Saving…', tone: 'cyan', loading: true, duration: 0 };
+    announce({ ...loading, loading: false, duration: 4500 }, loading);
+    announce({ ...loading, tone: undefined }, loading);
+    expect(said).toHaveLength(0);
+    announce({ ...loading, title: 'Saved' }, loading);
+    announce({ ...loading, message: 'Almost there.' }, loading);
+    announce({ ...loading, tone: 'red' }, loading);
+    expect(texts(said[2]!)).toEqual({ polite: ['Saved', 'Saving… Almost there.'], assertive: ['Saving…'] });
+  });
+
+  it('keeps the messages of the toasts still in the queue', () => {
+    const regions: ToastLiveRegions = {
+      polite: [
+        { key: 1, toastId: 'a', text: 'A' },
+        { key: 2, toastId: 'b', text: 'B' },
+      ],
+      assertive: [{ key: 3, toastId: 'c', text: 'C' }],
+    };
+    expect(liveToastMessages(regions, [{ id: 'b' }])).toEqual({ polite: [regions.polite[1]], assertive: [] });
+    expect(liveToastMessages(NO_TOAST_MESSAGES, [{ id: 'b' }])).toEqual(NO_TOAST_MESSAGES);
+    expect(toastLiveRegionClasses).toBe('sr-only');
+  });
+});
+
+describe('toast focus', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  /** A trigger, and a viewport of cards with an action and a dismiss button each. */
+  function page(count: number) {
+    const cards = Array.from(
+      { length: count },
+      (_, i) =>
+        `<div data-pxl-toast id="card-${i}"><button id="undo-${i}">Undo</button><button data-pxl-toast-dismiss aria-label="Dismiss notification" id="dismiss-${i}"></button></div>`,
+    );
+    document.body.innerHTML = `<button id="trigger">Push</button><div id="viewport">${cards.join('')}</div>`;
+    const $ = (id: string) => document.getElementById(id)!;
+    return { viewport: $('viewport'), trigger: $('trigger'), $ };
+  }
+
+  it('moves focus from a leaving toast to the dismiss button of the next one', () => {
+    const { viewport, trigger, $ } = page(3);
+    $('undo-0').focus();
+    const restore = keepToastFocus(viewport, () => trigger)!;
+    $('card-0').remove();
+    restore();
+    expect(document.activeElement).toBe($('dismiss-1'));
+  });
+
+  it('moves focus to the previous toast when no later one stays, past those leaving together', () => {
+    const { viewport, trigger, $ } = page(3);
+    $('dismiss-1').focus();
+    const restore = keepToastFocus(viewport, () => trigger)!;
+    $('card-1').remove();
+    $('card-2').remove();
+    restore();
+    expect(document.activeElement).toBe($('dismiss-0'));
+  });
+
+  it('moves focus back where it came from once no toast is left, else leaves it on the body', () => {
+    const { viewport, trigger, $ } = page(1);
+    $('dismiss-0').focus();
+    let restore = keepToastFocus(viewport, () => trigger)!;
+    $('card-0').remove();
+    restore();
+    expect(document.activeElement).toBe(trigger);
+
+    const again = page(1);
+    again.$('dismiss-0').focus();
+    restore = keepToastFocus(again.viewport, () => trigger)!;
+    again.$('card-0').remove();
+    restore();
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it('remembers where focus entered the viewport from, but not a move inside it or from nowhere', () => {
+    const { viewport, trigger, $ } = page(1);
+    expect(toastFocusOrigin(viewport, trigger)).toBe(trigger);
+    expect(toastFocusOrigin(viewport, $('undo-0'))).toBeUndefined();
+    expect(toastFocusOrigin(viewport, null)).toBeUndefined();
+    expect(toastFocusOrigin(viewport, window)).toBeUndefined();
+  });
+
+  it('leaves focus alone outside the toasts, on a toast that stays, or once it has moved on', () => {
+    const { viewport, trigger, $ } = page(2);
+    trigger.focus();
+    expect(keepToastFocus(viewport, () => trigger)).toBeUndefined();
+    expect(keepToastFocus(null, () => trigger)).toBeUndefined();
+
+    $('undo-0').focus();
+    let restore = keepToastFocus(viewport, () => trigger)!;
+    $('card-1').remove();
+    restore();
+    expect(document.activeElement).toBe($('undo-0'));
+
+    restore = keepToastFocus(viewport, () => trigger)!;
+    trigger.focus();
+    $('card-0').remove();
+    restore();
+    expect(document.activeElement).toBe(trigger);
   });
 });

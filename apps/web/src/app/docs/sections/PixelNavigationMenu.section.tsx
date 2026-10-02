@@ -26,7 +26,7 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
       <ul className="docs-highlights">
         <li>Horizontal or vertical orientation</li>
         <li>Optional shared viewport panel or inline per-item panels</li>
-        <li>Full keyboard support (Arrow/Home/End/Escape/Enter)</li>
+        <li>WAI-ARIA disclosure navigation: each panel follows its button in the tab order, with Arrow/Home/End/Escape keys</li>
         <li>Surface-aware via useEffectiveSurface</li>
         <li>SSR-safe, ref-forwarded nav landmark</li>
       </ul>
@@ -43,10 +43,10 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
       <h3 id="pixel-navigation-menu-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>menubar</code></li>
-        <li><code>menu</code></li>
+        <li><code>navigation</code></li>
+        <li><code>disclosure</code></li>
       </ul>
-      <p className="docs-aria-notes">Provide a unique ariaLabel when more than one nav landmark exists on the page (WCAG 2.4.6). The root is a nav landmark; submenus render role=menu and mega-panels are labelled by their trigger.</p>
+      <p className="docs-aria-notes">Follows the WAI-ARIA disclosure navigation pattern, without menu roles (those are for application menus): a <code>&lt;nav&gt;</code> landmark — give it a unique <code>ariaLabel</code> when the page has more than one (WCAG 2.4.6) — holding a list of links, and of buttons with <code>aria-expanded</code> and <code>aria-controls</code> for the items with <code>content</code>. Each panel is a plain container rendered right after its button, inside the same list item, so Tab moves from the button into the open panel; the shared viewport is only drawn below the whole list. A click, or Enter / Space on the button, toggles the panel; focus alone never opens it. A mouse pointing at an item opens its panel — touch and pen pointers do not, so a tap opens it once — and the pointer leaving the menu closes that panel, unless a click on its button kept it open: a panel opened by a click stays open until a click on its button or another one, or Escape. A panel that closes while focus is inside it hands focus back to its button. An item with both an <code>href</code> and <code>content</code> is a button whose activation toggles the panel instead of navigating.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -58,23 +58,48 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
         </thead>
         <tbody>
           <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Move to the next link or button; from the button of an open panel, into the panel</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+Tab</kbd></td>
+            <td>Move to the previous link or button</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Enter</kbd></td>
+            <td>Toggle the panel of a button, or follow a link; invokes <code>onSelect</code></td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Space</kbd></td>
+            <td>Toggle the panel of a button; invokes <code>onSelect</code></td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
             <td><kbd>ArrowRight</kbd></td>
-            <td>Focus next item</td>
+            <td>Focus next item, wrapping round</td>
             <td>horizontal</td>
           </tr>
           <tr>
             <td><kbd>ArrowLeft</kbd></td>
-            <td>Focus previous item</td>
+            <td>Focus previous item, wrapping round</td>
             <td>horizontal</td>
           </tr>
           <tr>
             <td><kbd>ArrowDown</kbd></td>
-            <td>Focus next item</td>
+            <td>Focus the first link of the open panel</td>
+            <td>horizontal, on the button of an open panel</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowDown</kbd></td>
+            <td>Focus next item, wrapping round</td>
             <td>vertical</td>
           </tr>
           <tr>
             <td><kbd>ArrowUp</kbd></td>
-            <td>Focus previous item</td>
+            <td>Focus previous item, wrapping round</td>
             <td>vertical</td>
           </tr>
           <tr>
@@ -88,13 +113,8 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
-            <td><kbd>Enter</kbd></td>
-            <td>Toggle submenu or invoke onSelect</td>
-            <td><span className="docs-muted">—</span></td>
-          </tr>
-          <tr>
             <td><kbd>Escape</kbd></td>
-            <td>Close any open submenu</td>
+            <td>Close the open panel; focus on its button or inside it returns to the button</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
         </tbody>

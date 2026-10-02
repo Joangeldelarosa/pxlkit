@@ -1,33 +1,84 @@
 /**
- * PixelNavigationMenu — a `<nav>` landmark whose items (links or buttons, in
- * a row or a column) can open a panel of content: one shared panel below the
- * list (the viewport), or a panel under each item. Pointing at or focusing
- * an item with content opens its panel; the arrow keys of the orientation
- * move focus round the items, Home and End jump to the ends, Escape closes
- * the panel, and Enter or Space toggles it (a link with an `href` follows
- * it instead).
+ * PixelNavigationMenu — a `<nav>` landmark of links and disclosure buttons,
+ * in a row or a column, after the WAI-ARIA disclosure navigation pattern: a
+ * button shows or hides a panel of content that follows it inside its list
+ * item, so Tab moves from the button into the open panel. The panel sits
+ * under its item, or below the whole list (the viewport). A click — or Enter
+ * and Space, which the browser turns into one — toggles a panel; a mouse
+ * pointing at an item opens its panel, which closes again once the pointer
+ * leaves the menu, unless a click kept it open. The arrow keys of the
+ * orientation move focus round the items, Home and End jump to the ends,
+ * ArrowDown on the open button of a row moves into its panel, and Escape
+ * closes the panel, keeping focus on its button.
  */
 import { cn, surfaceClasses, type Surface } from '../../common';
+import { getFocusableElements } from '../../dom/focus-trap';
 
 export type NavigationMenuOrientation = 'horizontal' | 'vertical';
 
-/** Ids of an item and of its panel, from the menu's generated base id. */
-export function navigationMenuIds(baseId: string, index: number): { trigger: string; panel: string } {
-  return { trigger: `${baseId}-trigger-${index}`, panel: `${baseId}-panel-${index}` };
+/** Id of an item's panel, from the menu's generated base id. */
+export function navigationMenuPanelId(baseId: string, index: number): string {
+  return `${baseId}-panel-${index}`;
 }
+
+/* ── Opening ────────────────────────────────────────────────────────────── */
+
+/** The open panel: its item, and whether the pointer opened it. */
+export interface NavigationMenuOpen {
+  index: number;
+  /** Opened by a mouse pointing at the item: it closes as the pointer leaves the menu. */
+  hover: boolean;
+}
+
+/**
+ * The open panel once a pointer enters item `index`: a mouse opens the
+ * item's panel — or closes the one it opened, at an item without a panel —
+ * and leaves a panel a click opened alone. Touch and pen pointers change
+ * nothing: their tap ends in a click.
+ */
+export function navigationMenuPointerEnter(
+  open: NavigationMenuOpen | null,
+  index: number,
+  hasPanel: boolean,
+  pointerType: string,
+): NavigationMenuOpen | null {
+  if (pointerType !== 'mouse' || (open && !open.hover)) return open;
+  if (!hasPanel) return null;
+  return open?.index === index ? open : { index, hover: true };
+}
+
+/**
+ * The open panel after a click on item `index`, which has one: the click
+ * opens it, keeps it open when the pointer opened it (the next click closes
+ * it), and closes it when a click opened it.
+ */
+export function navigationMenuClick(open: NavigationMenuOpen | null, index: number): NavigationMenuOpen | null {
+  return open?.index === index && !open.hover ? null : { index, hover: false };
+}
+
+/** The open panel once the pointer leaves the menu: closed when the pointer opened it. */
+export function navigationMenuPointerLeave(open: NavigationMenuOpen | null): NavigationMenuOpen | null {
+  return open?.hover ? null : open;
+}
+
+/* ── Keyboard and focus ─────────────────────────────────────────────────── */
 
 /** Where a key moves focus among the items. */
 export type NavigationMenuMove = 1 | -1 | 'first' | 'last';
 
+/** What a key pressed on an item does. */
+export type NavigationMenuKeyAction = NavigationMenuMove | 'close' | 'panel';
+
 /**
  * What a key pressed on an item does: the arrows of the orientation and Home
- * / End move focus, Escape closes the open panel, Enter and Space activate
- * the item. `undefined` for any other key.
+ * / End move focus, Escape closes the open panel, and ArrowDown on a row
+ * moves into the item's open panel. `undefined` for any other key: Enter and
+ * Space are the browser's, which activates the link or button.
  */
 export function navigationMenuKeyAction(
   key: string,
   orientation: NavigationMenuOrientation,
-): NavigationMenuMove | 'close' | 'activate' | undefined {
+): NavigationMenuKeyAction | undefined {
   const horizontal = orientation === 'horizontal';
   switch (key) {
     case horizontal ? 'ArrowRight' : 'ArrowDown':
@@ -40,11 +91,8 @@ export function navigationMenuKeyAction(
       return 'last';
     case 'Escape':
       return 'close';
-    case 'Enter':
-    case ' ':
-      return 'activate';
     default:
-      return undefined;
+      return horizontal && key === 'ArrowDown' ? 'panel' : undefined;
   }
 }
 
@@ -54,6 +102,24 @@ export function navigationMenuFocusIndex(index: number, move: NavigationMenuMove
   if (move === 'last') return count - 1;
   return (index + move + count) % count;
 }
+
+/** The first element taking focus in the open panel that `button` controls, if any. */
+export function navigationMenuPanelEntry(button: HTMLElement): HTMLElement | undefined {
+  const id = button.getAttribute('aria-controls');
+  const panel = id ? button.ownerDocument.getElementById(id) : null;
+  return panel ? getFocusableElements(panel)[0] : undefined;
+}
+
+/**
+ * Call before the panel of the item `trigger` closes: focus inside the panel
+ * moves to the item's button, rather than fall to `<body>` with the panel.
+ */
+export function returnNavigationMenuFocus(trigger: HTMLElement | null | undefined): void {
+  const active = trigger?.ownerDocument.activeElement;
+  if (trigger && active && active !== trigger && trigger.parentElement?.contains(active)) trigger.focus();
+}
+
+/* ── Recipes ────────────────────────────────────────────────────────────── */
 
 /** The `<nav>`. */
 export function navigationMenuClasses(surface: Surface): string {
@@ -68,8 +134,13 @@ export function navigationMenuListClasses(orientation: NavigationMenuOrientation
   );
 }
 
-/** An item's `<li>`, which also anchors its own panel. */
-export const navigationMenuItemClasses = 'relative list-none min-w-0';
+/**
+ * An item's `<li>`, which holds its panel and anchors it — except with the
+ * shared viewport, which is placed against the `<nav>`, below the whole list.
+ */
+export function navigationMenuItemClasses(viewport: boolean): string {
+  return cn(!viewport && 'relative', 'list-none min-w-0');
+}
 
 /** An item's link or button, tinted while its panel is open. */
 export function navigationMenuTriggerClasses(surface: Surface, expanded: boolean): string {

@@ -129,6 +129,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@pxlkit/ui-kit`: `PixelStepper` steps get valid roles and names (clickable steps are buttons,
   the others read their position and state as hidden text), and `PixelAccordion` /
   `PixelCollapsible` panels drop an `aria-labelledby` that ARIA does not allow without a role.
+- `@pxlkit/ui-kit`: `PixelNavigationMenu` follows the WAI-ARIA disclosure navigation
+  pattern — a `<nav>` with a list of links and `<button aria-expanded aria-controls>`
+  disclosures — instead of application-menu roles (`menubar`, `menuitem`, `menu`) whose
+  panels held links. Each panel follows its button, so Tab moves into it; only a mouse opens
+  a panel by pointing, so a tap opens it once instead of opening and closing it; a click keeps
+  a panel open as the pointer leaves; Escape closes it and returns focus to its button, and
+  ArrowDown moves into it.
+- `@pxlkit/ui-kit`: toasts are announced through two live regions the viewport keeps
+  (`role="status"` and `role="alert"`), filled as a toast arrives or an update changes its
+  text or tone — a failed promise is announced at once — instead of each card being a live
+  region inserted already filled. `PxlKitToastProvider` takes a `duration` (the auto-dismiss
+  delay, `0` for none; a promise's error toast stays at least 6 s) and a `hotkey` (F8 by
+  default) that moves focus to the toasts; countdowns hold while the page is hidden or the
+  window is in the background (WCAG 2.2.1); and dismissing the focused toast moves focus to
+  the next one, or back where it came from.
 - `@pxlkit/ui-kit`: `trigger="inView"` animations play where `IntersectionObserver` is
   missing instead of throwing, and follow the latest of several intersection changes; a
   second click on a `trigger="click"` animation no longer throws where the Web Animations

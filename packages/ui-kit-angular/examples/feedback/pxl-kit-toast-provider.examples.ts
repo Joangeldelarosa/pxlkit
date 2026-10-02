@@ -176,6 +176,29 @@ export class PromiseFlow {
 @Component({
   imports: [PixelButton, PxlKitToastProvider],
   template: `
+    <pxl-toast-provider #toaster>
+      <div class="flex flex-wrap gap-2">
+        <button pxlButton size="sm" tone="red" (click)="runFailingSave(toaster.toast)">Run failing promise</button>
+      </div>
+    </pxl-toast-provider>
+  `,
+})
+export class PromiseRejected {
+  runFailingSave(toast: ToastFn): void {
+    toast
+      .promise(() => new Promise<string>((_resolve, reject) => setTimeout(() => reject(new Error('Network down')), 1000)), {
+        loading: { title: 'Saving…' },
+        success: { title: 'Saved', message: 'All set.' },
+        error: { title: 'Failed', message: 'Try again.' },
+      })
+      // The error toast tells the user; the rejection needs no other handling.
+      .catch(() => {});
+  }
+}
+
+@Component({
+  imports: [PixelButton, PxlKitToastProvider],
+  template: `
     <pxl-toast-provider #toaster [max]="2">
       <div class="flex flex-wrap gap-2">
         <button pxlButton size="sm" (click)="pushFive(toaster.toast)">Push five (max 2)</button>

@@ -1,17 +1,23 @@
 <script setup lang="ts">
-import { computed, ref, useId, type ComponentPublicInstance } from 'vue';
+import { computed, shallowRef, useId, type ComponentPublicInstance } from 'vue';
 import {
   navigationMenuClasses,
+  navigationMenuClick,
   navigationMenuFocusIndex,
   navigationMenuIconClasses,
-  navigationMenuIds,
   navigationMenuItemClasses,
   navigationMenuKeyAction,
   navigationMenuLabelClasses,
   navigationMenuListClasses,
   navigationMenuPanelClasses,
+  navigationMenuPanelEntry,
+  navigationMenuPanelId,
+  navigationMenuPointerEnter,
+  navigationMenuPointerLeave,
   navigationMenuTriggerClasses,
   navigationMenuViewportClasses,
+  returnNavigationMenuFocus,
+  type NavigationMenuOpen,
   type NavigationMenuOrientation,
   type Surface,
 } from '@pxlkit/ui-kit-core';
@@ -21,11 +27,14 @@ import { useEffectiveSurface } from '../composables/surface.js';
 /** One item of a `PixelNavigationMenu`. */
 export interface PixelNavigationMenuItem {
   label: string;
-  /** Link target: the item is an `<a>`; without one it is a `<button>`. */
+  /** Link target of an item without `content`, which is then an `<a>`; any other item is a `<button>`. */
   href?: string;
-  /** Called when the item is clicked, or activated with Enter or Space (a link follows its `href` instead). */
+  /** Called when the item is clicked, or activated with Enter or Space. */
   onSelect?: () => void;
-  /** Panel content, which the item opens: text, a VNode or a render function. */
+  /**
+   * Panel content: text, a VNode or a render function. The item is a button
+   * that shows and hides it, and never follows an `href`.
+   */
   content?: PxlNode;
   /** Icon before the label, hidden from assistive technology. */
   icon?: PxlNode;
@@ -34,12 +43,16 @@ export interface PixelNavigationMenuItem {
 }
 
 /**
- * Navigation landmark of links and buttons, in a row or a column, whose items
- * can open a panel of content: one shared panel below the list
- * (`viewport`), or a panel under each item. Pointing at or focusing an item
- * opens its panel and leaving the menu closes it; the arrow keys of the
- * orientation move focus round the items, Home and End jump to the ends,
- * Escape closes the panel and Enter or Space toggles it.
+ * Navigation landmark of links and disclosure buttons, in a row or a column,
+ * after the WAI-ARIA disclosure navigation pattern: a button shows and hides
+ * a panel of content rendered right after it, so Tab moves into the open
+ * panel — drawn under its item, or below the whole list (`viewport`). A
+ * click (or Enter and Space, natively) toggles a panel; a mouse pointing at
+ * an item opens its panel, which closes as the pointer leaves the menu
+ * unless a click kept it open. The arrow keys of the orientation move focus
+ * round the items, Home and End jump to the ends, ArrowDown on the open
+ * button of a row moves into its panel, and Escape closes the panel, focus
+ * back on its button.
  *
  * @example
  * <PixelNavigationMenu :items="[{ label: 'Home', href: '/' }, { label: 'Products', content: () => h(ProductLinks) }]" />
@@ -66,110 +79,108 @@ const props = withDefaults(defineProps<PixelNavigationMenuProps>(), {
 
 const surface = useEffectiveSurface(() => props.surface);
 const baseId = useId();
-const active = ref<number | null>(null);
+const open = shallowRef<NavigationMenuOpen | null>(null);
 const triggers: HTMLElement[] = [];
 
 const rows = computed(() =>
   props.items.map((item, index) => {
-    const expanded = active.value === index && !!item.content;
-    return { item, index, expanded, ids: navigationMenuIds(baseId, index), classes: navigationMenuTriggerClasses(surface.value, expanded) };
+    const expanded = !!item.content && open.value?.index === index;
+    return {
+      item,
+      index,
+      expanded,
+      link: !item.content && !!item.href,
+      panelId: navigationMenuPanelId(baseId, index),
+      classes: navigationMenuTriggerClasses(surface.value, expanded),
+    };
   }),
 );
-const viewportPanel = computed(() => {
-  const index = active.value;
-  const item = index === null ? undefined : props.items[index];
-  return props.viewport && index !== null && item?.content ? { content: item.content, ids: navigationMenuIds(baseId, index) } : null;
-});
 
 function setTrigger(index: number, element: Element | ComponentPublicInstance | null) {
   if (element instanceof HTMLElement) triggers[index] = element;
 }
 
-function toggle(index: number) {
-  active.value = active.value === index ? null : index;
+// A panel closing while focus is inside it hands focus to its button.
+function setOpen(next: NavigationMenuOpen | null) {
+  const current = open.value;
+  if (current && current.index !== next?.index) returnNavigationMenuFocus(triggers[current.index]);
+  open.value = next;
 }
 
-function onMouseenter(item: PixelNavigationMenuItem, index: number) {
-  active.value = item.content ? index : null;
+// Only a mouse opens a panel by pointing: a tap fires the pointer, mouse and
+// focus events of a hover before its click.
+function onPointerenter(event: PointerEvent, item: PixelNavigationMenuItem, index: number) {
+  setOpen(navigationMenuPointerEnter(open.value, index, !!item.content, event.pointerType));
 }
 
-function onFocus(item: PixelNavigationMenuItem, index: number) {
-  if (item.content) active.value = index;
-}
-
-function onClick(event: MouseEvent, item: PixelNavigationMenuItem, index: number) {
+function onClick(item: PixelNavigationMenuItem, index: number) {
+  if (item.content) setOpen(navigationMenuClick(open.value, index));
   item.onSelect?.();
-  if (!item.content) return;
-  // A link with a panel toggles it instead of navigating.
-  if (item.href) event.preventDefault();
-  toggle(index);
 }
 
-function onKeydown(event: KeyboardEvent, item: PixelNavigationMenuItem, index: number) {
+function close(event: KeyboardEvent) {
+  if (!open.value) return;
+  event.preventDefault();
+  setOpen(null);
+}
+
+function onKeydown(event: KeyboardEvent, index: number) {
   const action = navigationMenuKeyAction(event.key, props.orientation);
   if (action === undefined) return;
-  if (action === 'activate') {
-    // Links handle Enter natively: the browser follows them.
-    if (item.href) return;
+  if (action === 'close') {
+    close(event);
+    return;
+  }
+  if (action === 'panel') {
+    const entry = navigationMenuPanelEntry(event.currentTarget as HTMLElement);
+    if (!entry) return;
     event.preventDefault();
-    if (item.content) toggle(index);
-    item.onSelect?.();
+    entry.focus();
     return;
   }
   event.preventDefault();
-  if (action === 'close') active.value = null;
-  else triggers[navigationMenuFocusIndex(index, action, props.items.length)]?.focus();
+  triggers[navigationMenuFocusIndex(index, action, props.items.length)]?.focus();
+}
+
+function onPanelKeydown(event: KeyboardEvent) {
+  if (navigationMenuKeyAction(event.key, props.orientation) === 'close') close(event);
 }
 
 function onMouseleave(event: MouseEvent) {
-  if (!event.defaultPrevented) active.value = null;
+  if (!event.defaultPrevented) setOpen(navigationMenuPointerLeave(open.value));
 }
 </script>
 
 <template>
   <nav :aria-label="ariaLabel" :class="navigationMenuClasses(surface)" @mouseleave="onMouseleave">
-    <ul role="menubar" :aria-orientation="orientation" :class="navigationMenuListClasses(orientation)">
-      <li v-for="row in rows" :key="`${row.item.label}-${row.index}`" role="none" :class="navigationMenuItemClasses">
+    <ul :class="navigationMenuListClasses(orientation)">
+      <li v-for="row in rows" :key="`${row.item.label}-${row.index}`" :class="navigationMenuItemClasses(viewport)">
         <component
-          :is="row.item.href ? 'a' : 'button'"
+          :is="row.link ? 'a' : 'button'"
           :ref="(element: Element | ComponentPublicInstance | null) => setTrigger(row.index, element)"
-          v-bind="row.item.href ? { href: row.item.href } : { type: 'button' }"
-          :id="row.ids.trigger"
-          role="menuitem"
-          tabindex="0"
-          :aria-haspopup="row.item.content ? 'menu' : undefined"
+          v-bind="row.link ? { href: row.item.href } : { type: 'button' }"
           :aria-expanded="row.item.content ? row.expanded : undefined"
-          :aria-controls="row.expanded ? row.ids.panel : undefined"
+          :aria-controls="row.item.content ? row.panelId : undefined"
           :class="row.classes"
-          @mouseenter="onMouseenter(row.item, row.index)"
-          @focus="onFocus(row.item, row.index)"
-          @keydown="onKeydown($event, row.item, row.index)"
-          @click="onClick($event, row.item, row.index)"
+          @pointerenter="onPointerenter($event, row.item, row.index)"
+          @keydown="onKeydown($event, row.index)"
+          @click="onClick(row.item, row.index)"
         >
           <span v-if="row.item.icon" aria-hidden="true" :class="navigationMenuIconClasses">
             <RenderNode :node="row.item.icon" />
           </span>
           <span :class="navigationMenuLabelClasses">{{ row.item.label }}</span>
         </component>
+        <!-- The panel follows its button, so Tab moves into it; the shared viewport is drawn below the whole list all the same. -->
         <div
-          v-if="!viewport && row.expanded"
-          :id="row.ids.panel"
-          role="menu"
-          :aria-labelledby="row.ids.trigger"
-          :class="navigationMenuPanelClasses(surface)"
+          v-if="row.expanded"
+          :id="row.panelId"
+          :class="viewport ? navigationMenuViewportClasses(surface, orientation) : navigationMenuPanelClasses(surface)"
+          @keydown="onPanelKeydown"
         >
           <RenderNode :node="row.item.content" />
         </div>
       </li>
     </ul>
-    <div
-      v-if="viewportPanel"
-      :id="viewportPanel.ids.panel"
-      role="menu"
-      :aria-labelledby="viewportPanel.ids.trigger"
-      :class="navigationMenuViewportClasses(surface, orientation)"
-    >
-      <RenderNode :node="viewportPanel.content" />
-    </div>
   </nav>
 </template>

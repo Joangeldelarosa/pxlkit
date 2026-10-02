@@ -1,6 +1,7 @@
 /**
  * PixelToast: the dismiss event, the auto-dismiss countdown and what holds
- * it, and the content its toast carries as text, VNodes or render functions.
+ * it — the pointer, focus, a hidden page, a window in the background — and
+ * the content its toast carries as text, VNodes or render functions.
  * Rendering is covered against React by the parity suite.
  */
 import { enableAutoUnmount, mount } from '@vue/test-utils';
@@ -25,11 +26,11 @@ describe('PixelToast', () => {
     expect(document.body.contains(wrapper.element)).toBe(true);
   });
 
-  it('announces politely, or assertively for critical tones and assertive toasts', () => {
-    expect(mountToast({}).attributes()).toMatchObject({ role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' });
-    expect(mountToast({ tone: 'gold' }).attributes()).toMatchObject({ role: 'alert', 'aria-live': 'assertive' });
-    expect(mountToast({ assertive: true }).attributes('role')).toBe('alert');
-    expect(mountToast({ tone: 'red', assertive: false }).attributes('role')).toBe('status');
+  it('is no live region of its own, whatever its tone: the provider announces it', () => {
+    for (const toast of [{}, { tone: 'gold' as const }, { assertive: true }]) {
+      const attributes = mountToast(toast).attributes();
+      expect([attributes.role, attributes['aria-live'], attributes['aria-atomic']]).toEqual([undefined, undefined, undefined]);
+    }
   });
 
   it('renders text, VNodes and render functions, the animated icon winning over the icon', () => {
@@ -67,6 +68,7 @@ describe('PixelToast — auto-dismiss countdown', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it('dismisses once its duration has passed, shrinking its bar meanwhile', async () => {
@@ -126,6 +128,42 @@ describe('PixelToast — auto-dismiss countdown', () => {
     expect(wrapper.emitted('dismiss')).toBeUndefined();
     await wrapper.trigger('mouseleave');
     expect(bar(wrapper.element).style.transitionDuration).toBe('1000ms');
+    vi.advanceTimersByTime(1000);
+    expect(wrapper.emitted('dismiss')).toHaveLength(1);
+  });
+
+  it('holds still while the page is hidden or the window in the background, until both come back', async () => {
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
+    const wrapper = mountToast({ duration: 4500 });
+    await nextTick();
+    vi.advanceTimersByTime(1000);
+    hidden.mockReturnValue(true);
+    document.dispatchEvent(new Event('visibilitychange'));
+    window.dispatchEvent(new FocusEvent('blur'));
+    hidden.mockReturnValue(false);
+    document.dispatchEvent(new Event('visibilitychange'));
+    await nextTick();
+    vi.advanceTimersByTime(60_000);
+    expect(wrapper.emitted('dismiss')).toBeUndefined();
+    expect(bar(wrapper.element).style.width).toBe(`${(3500 / 4500) * 100}%`);
+
+    window.dispatchEvent(new FocusEvent('focus'));
+    await nextTick();
+    expect(bar(wrapper.element).style.transitionDuration).toBe('3500ms');
+    vi.advanceTimersByTime(3500);
+    expect(wrapper.emitted('dismiss')).toHaveLength(1);
+  });
+
+  it('waits for a hidden page to come back before counting down', async () => {
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+    const wrapper = mountToast({ duration: 1000 });
+    await nextTick();
+    vi.advanceTimersByTime(60_000);
+    expect(wrapper.emitted('dismiss')).toBeUndefined();
+    expect(bar(wrapper.element).style.width).toBe('100%');
+    hidden.mockReturnValue(false);
+    document.dispatchEvent(new Event('visibilitychange'));
+    await nextTick();
     vi.advanceTimersByTime(1000);
     expect(wrapper.emitted('dismiss')).toHaveLength(1);
   });

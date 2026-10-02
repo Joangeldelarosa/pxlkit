@@ -1,5 +1,10 @@
 import type { ParityScenario } from '../interact';
 
+// PixelNavigationMenu: its links and buttons, the links of an open panel, the landmark.
+const navItem = 'li > :first-child';
+const panelLink = 'li > div a';
+const nav = '[aria-label="Main navigation"]';
+
 export const scenarios: ParityScenario[] = [
   {
     component: 'PixelTabs',
@@ -252,53 +257,90 @@ export const scenarios: ParityScenario[] = [
   {
     component: 'PixelNavigationMenu',
     example: 'Default',
-    name: 'pointing at an item with content opens the shared panel; another item or leaving the menu closes it',
+    name: 'a mouse pointing at an item opens its panel in the shared viewport; another item or leaving the menu closes it',
     steps: [
-      { action: 'hover', target: '[role="menuitem"]', nth: 1 },
-      { action: 'hover', target: '[role="menuitem"]', nth: 2 },
-      { action: 'hover', target: '[role="menuitem"]', nth: 1 },
-      { action: 'unhover', target: '[aria-label="Main navigation"]' },
+      { action: 'hover', target: navItem, nth: 1 },
+      { action: 'hover', target: navItem, nth: 2 },
+      { action: 'hover', target: navItem, nth: 1 },
+      { action: 'unhover', target: nav },
     ],
   },
   {
     component: 'PixelNavigationMenu',
     example: 'Default',
-    name: 'focus opens a panel, arrows wrap round the items, Escape closes, Enter and Space toggle',
+    name: 'a click toggles a panel, which neither focus opens nor the pointer closes',
     steps: [
-      { action: 'focus', target: '[role="menuitem"]', nth: 1 },
+      { action: 'focus', target: navItem, nth: 1 },
+      { action: 'click', target: navItem, nth: 1 },
+      { action: 'unhover', target: nav },
+      { action: 'hover', target: navItem, nth: 2 },
+      { action: 'click', target: navItem, nth: 1 },
+    ],
+  },
+  {
+    component: 'PixelNavigationMenu',
+    example: 'Default',
+    name: 'a click keeps open the panel the mouse opened, until the next click',
+    steps: [
+      { action: 'hover', target: navItem, nth: 1 },
+      { action: 'click', target: navItem, nth: 1 },
+      { action: 'unhover', target: nav },
+      { action: 'click', target: navItem, nth: 1 },
+    ],
+  },
+  {
+    component: 'PixelNavigationMenu',
+    example: 'Default',
+    name: 'arrows wrap round the items, Home and End jump, and Enter and Space are left to the browser',
+    steps: [
+      { action: 'focus', target: navItem, nth: 1 },
       { action: 'keydown', key: 'ArrowRight' },
       { action: 'keydown', key: 'ArrowLeft' },
-      { action: 'keydown', key: 'Escape' },
       { action: 'keydown', key: 'Enter' },
       { action: 'keydown', key: ' ' },
       { action: 'keydown', key: 'End' },
       { action: 'keydown', key: 'ArrowRight' },
       { action: 'keydown', key: 'ArrowLeft' },
       { action: 'keydown', key: 'Home' },
-      { action: 'keydown', key: 'Enter' },
+      { action: 'keydown', key: 'ArrowDown' },
     ],
   },
   {
     component: 'PixelNavigationMenu',
     example: 'Default',
-    name: 'a click toggles the panel of an item with content',
+    name: 'ArrowDown moves into the open panel and Escape closes it, focus back on its button or left on another item',
     steps: [
-      { action: 'click', target: '[role="menuitem"]', nth: 1 },
-      { action: 'click', target: '[role="menuitem"]', nth: 1 },
-      { action: 'blur', target: '[role="menuitem"]', nth: 1 },
-      { action: 'click', target: '[role="menuitem"]', nth: 1 },
+      { action: 'click', target: navItem, nth: 1 },
+      { action: 'keydown', key: 'ArrowDown' },
+      { action: 'keydown', key: 'Escape' },
+      { action: 'keydown', key: 'ArrowDown' },
+      { action: 'click', target: navItem, nth: 1 },
+      { action: 'keydown', key: 'ArrowRight' },
+      { action: 'keydown', key: 'Escape' },
+    ],
+  },
+  {
+    component: 'PixelNavigationMenu',
+    example: 'Default',
+    name: 'a panel the mouse opened hands focus inside it back to its button as the pointer leaves the menu',
+    steps: [
+      { action: 'hover', target: navItem, nth: 1 },
+      { action: 'focus', target: panelLink, nth: 1 },
+      { action: 'unhover', target: nav },
     ],
   },
   {
     component: 'PixelNavigationMenu',
     example: 'InlinePanels',
-    name: 'panels open under their own item',
+    name: 'panels open under their own item, and Escape inside one returns focus to its button',
     steps: [
-      { action: 'hover', target: '[role="menuitem"]', nth: 1 },
-      { action: 'focus', target: '[role="menuitem"]', nth: 1 },
+      { action: 'hover', target: navItem, nth: 1 },
+      { action: 'click', target: navItem, nth: 1 },
       { action: 'keydown', key: 'Escape' },
-      { action: 'keydown', key: 'Enter' },
-      { action: 'hover', target: '[role="menuitem"]', nth: 0 },
+      { action: 'click', target: navItem, nth: 1 },
+      { action: 'focus', target: panelLink, nth: 0 },
+      { action: 'keydown', key: 'Escape' },
+      { action: 'hover', target: navItem, nth: 0 },
     ],
   },
   {
@@ -306,7 +348,7 @@ export const scenarios: ParityScenario[] = [
     example: 'Vertical',
     name: 'up and down arrows move round a vertical menu',
     steps: [
-      { action: 'focus', target: '[role="menuitem"]', nth: 0 },
+      { action: 'focus', target: navItem, nth: 0 },
       { action: 'keydown', key: 'ArrowUp' },
       { action: 'keydown', key: 'ArrowDown' },
       { action: 'keydown', key: 'ArrowDown' },

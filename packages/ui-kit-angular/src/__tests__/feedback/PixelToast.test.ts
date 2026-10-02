@@ -1,7 +1,8 @@
 /**
  * <pxl-toast-card>: the (dismiss) output, the auto-dismiss countdown and what
- * holds it, and the content its toast carries as text or templates.
- * Rendering is covered against React by the parity suite.
+ * holds it — the pointer, focus, a hidden page, a window in the background —
+ * and the content its toast carries as text or templates. Rendering is
+ * covered against React by the parity suite.
  */
 import { Component, signal, type Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -10,7 +11,16 @@ import { PixelToast, type ToastItem } from '../../public-api';
 
 const card = () => document.querySelector<HTMLElement>('pxl-toast-card')!;
 const bar = () => card().querySelector<HTMLElement>('[aria-hidden="true"] > div')!;
-const wait = (ms: number) => new Promise((done) => setTimeout(done, ms));
+
+/**
+ * Runs the countdown and Angular's scheduler on simulated time: the clock
+ * moves only when a test moves it, however busy the machine is.
+ */
+const useSimulatedTime = () =>
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame', 'Date'] });
+
+// A task passes — on the fake clock when the test runs on one.
+const tick = () => (vi.isFakeTimers() ? vi.advanceTimersByTimeAsync(0) : new Promise((done) => setTimeout(done, 0)));
 
 @Component({
   imports: [PixelToast],
@@ -27,10 +37,16 @@ class Host {
 async function render<T>(Component: Type<T>) {
   const fixture = TestBed.createComponent(Component);
   document.body.appendChild(fixture.nativeElement);
+  // On simulated time, change detection scheduled on a timer runs only as
+  // the clock moves: run what is due until nothing is pending.
+  const stable = async () => {
+    for (let round = 0; round < 100 && !fixture.isStable(); round++) await tick();
+    await fixture.whenStable();
+  };
   const settle = async () => {
-    await fixture.whenStable();
-    await wait(0);
-    await fixture.whenStable();
+    await stable();
+    await tick();
+    await stable();
   };
   await settle();
   return { fixture, host: fixture.componentInstance, settle };
@@ -50,19 +66,16 @@ describe('PixelToast', () => {
     expect(card().isConnected).toBe(true);
   });
 
-  it('announces politely, or assertively for critical tones and assertive toasts', async () => {
+  it('is no live region of its own, whatever its tone: the provider announces it', async () => {
     const { host, settle } = await render(Host);
-    expect([card().getAttribute('role'), card().getAttribute('aria-live'), card().getAttribute('aria-atomic')]).toEqual([
-      'status',
-      'polite',
-      'true',
-    ]);
+    const announcing = () => ['role', 'aria-live', 'aria-atomic'].map((name) => card().getAttribute(name));
+    expect(announcing()).toEqual([null, null, null]);
     host.toast.set({ id: 't', title: 'Low disk', tone: 'gold', duration: 0 });
     await settle();
-    expect([card().getAttribute('role'), card().getAttribute('aria-live')]).toEqual(['alert', 'assertive']);
+    expect(announcing()).toEqual([null, null, null]);
     host.toast.set({ id: 't', title: 'Heads up', assertive: true, duration: 0 });
     await settle();
-    expect(card().getAttribute('role')).toBe('alert');
+    expect(announcing()).toEqual([null, null, null]);
   });
 
   it('renders text and templates, the animated icon winning over the icon, and a spinner while loading', async () => {
@@ -92,18 +105,20 @@ describe('PixelToast', () => {
   });
 
   it('dismisses once its duration has passed, shrinking its bar meanwhile', async () => {
+    useSimulatedTime();
     const { host, settle } = await render(Host);
-    // Long enough that a slow machine cannot get past it before the checks.
     host.toast.set({ id: 't', title: 'Saved', duration: 1000 });
     await settle();
     expect(bar().style.width).toBe('0%');
     expect(bar().style.transitionDuration).toBe('1000ms');
+    await vi.advanceTimersByTimeAsync(999);
     expect(host.dismissed).toBe(0);
-    await vi.waitFor(() => expect(host.dismissed).toBe(1), { timeout: 5000 });
+    await vi.advanceTimersByTimeAsync(1);
+    expect(host.dismissed).toBe(1);
   });
 
   it('holds still until both the pointer and focus have left, losing no time meanwhile', async () => {
-    vi.useFakeTimers({ toFake: ['Date'] });
+    useSimulatedTime();
     @Component({
       imports: [PixelToast],
       template: `
@@ -116,38 +131,82 @@ describe('PixelToast', () => {
     }
     const { host, settle } = await render(Held);
     const undo = document.getElementById('undo')!;
-    // The clock runs on fake time; the long duration keeps the real
-    // countdown from running out before the hover holds it.
-    vi.advanceTimersByTime(500);
+    await vi.advanceTimersByTimeAsync(500);
     card().dispatchEvent(new MouseEvent('mouseenter'));
-    vi.advanceTimersByTime(1000);
+    await vi.advanceTimersByTimeAsync(1000);
     undo.focus();
     card().dispatchEvent(new MouseEvent('mouseleave'));
     await settle();
     expect(bar().style.width).toBe('75%');
-    await wait(500);
+    await vi.advanceTimersByTimeAsync(10_000);
     expect(host.dismissed).toBe(0);
 
     undo.blur();
     await settle();
     expect(bar().style.transitionDuration).toBe('1500ms');
-    await vi.waitFor(() => expect(host.dismissed).toBe(1), { timeout: 5000 });
+    await vi.advanceTimersByTimeAsync(1499);
+    expect(host.dismissed).toBe(0);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(host.dismissed).toBe(1);
   });
 
   it('counts down the new duration once a loading toast settles, held if hovered meanwhile', async () => {
+    useSimulatedTime();
     const { host, settle } = await render(Host);
     host.toast.set({ id: 't', title: 'Saving…', loading: true });
     await settle();
     card().dispatchEvent(new MouseEvent('mouseenter'));
-    host.toast.set({ id: 't', title: 'Saved', tone: 'green', loading: false, duration: 60 });
+    host.toast.set({ id: 't', title: 'Saved', tone: 'green', loading: false, duration: 1000 });
     await settle();
     expect(bar().style.width).toBe('100%');
-    await wait(150);
+    await vi.advanceTimersByTimeAsync(5000);
     expect(host.dismissed).toBe(0);
     card().dispatchEvent(new MouseEvent('mouseleave'));
     await settle();
-    expect(bar().style.transitionDuration).toBe('60ms');
-    await vi.waitFor(() => expect(host.dismissed).toBe(1));
+    expect(bar().style.transitionDuration).toBe('1000ms');
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(host.dismissed).toBe(1);
+  });
+
+  it('holds still while the page is hidden or the window in the background, until both come back', async () => {
+    useSimulatedTime();
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
+    const { host, settle } = await render(Host);
+    host.toast.set({ id: 't', title: 'Saved', duration: 4000 });
+    await settle();
+    await vi.advanceTimersByTimeAsync(1000);
+    hidden.mockReturnValue(true);
+    document.dispatchEvent(new Event('visibilitychange'));
+    window.dispatchEvent(new FocusEvent('blur'));
+    hidden.mockReturnValue(false);
+    document.dispatchEvent(new Event('visibilitychange'));
+    await settle();
+    expect([bar().style.width, bar().style.transitionDuration]).toEqual(['75%', '0ms']);
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(host.dismissed).toBe(0);
+
+    window.dispatchEvent(new FocusEvent('focus'));
+    await settle();
+    expect(bar().style.transitionDuration).toBe('3000ms');
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(host.dismissed).toBe(1);
+  });
+
+  it('waits for a hidden page to come back before counting down', async () => {
+    useSimulatedTime();
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+    const { host, settle } = await render(Host);
+    host.toast.set({ id: 't', title: 'Saved', duration: 1000 });
+    await settle();
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(host.dismissed).toBe(0);
+    expect([bar().style.width, bar().style.transitionDuration]).toEqual(['100%', '0ms']);
+    hidden.mockReturnValue(false);
+    document.dispatchEvent(new Event('visibilitychange'));
+    await settle();
+    expect(bar().style.transitionDuration).toBe('1000ms');
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(host.dismissed).toBe(1);
   });
 
   it('stops its timer when destroyed', async () => {

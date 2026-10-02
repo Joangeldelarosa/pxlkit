@@ -9,16 +9,22 @@ import {
 } from '@angular/core';
 import {
   navigationMenuClasses,
+  navigationMenuClick,
   navigationMenuFocusIndex,
   navigationMenuIconClasses,
-  navigationMenuIds,
   navigationMenuItemClasses,
   navigationMenuKeyAction,
   navigationMenuLabelClasses,
   navigationMenuListClasses,
   navigationMenuPanelClasses,
+  navigationMenuPanelEntry,
+  navigationMenuPanelId,
+  navigationMenuPointerEnter,
+  navigationMenuPointerLeave,
   navigationMenuTriggerClasses,
   navigationMenuViewportClasses,
+  returnNavigationMenuFocus,
+  type NavigationMenuOpen,
   type NavigationMenuOrientation,
   type Surface,
 } from '@pxlkit/ui-kit-core';
@@ -33,11 +39,14 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
  */
 export interface PixelNavigationMenuItem {
   label: string;
-  /** Link target: the item is an `<a>`; without one it is a `<button>`. */
+  /** Link target of an item without `content`, which is then an `<a>`; any other item is a `<button>`. */
   href?: string;
-  /** Called when the item is clicked, or activated with Enter or Space (a link follows its `href` instead). */
+  /** Called when the item is clicked, or activated with Enter or Space. */
   onSelect?: () => void;
-  /** Panel content, which the item opens: text or an `<ng-template>`. */
+  /**
+   * Panel content, text or an `<ng-template>`. The item is a button that
+   * shows and hides it, and never follows an `href`.
+   */
   content?: PxlContent;
   /** Icon before the label, hidden from assistive technology. */
   icon?: PxlContent;
@@ -46,13 +55,17 @@ export interface PixelNavigationMenuItem {
 }
 
 /**
- * Navigation landmark of links and buttons, in a row or a column, whose items
- * can open a panel of content: one shared panel below the list
- * (`viewport`), or a panel under each item. Pointing at or focusing an item
- * opens its panel and leaving the menu closes it; the arrow keys of the
- * orientation move focus round the items, Home and End jump to the ends,
- * Escape closes the panel and Enter or Space toggles it. The host is the
- * landmark (`role="navigation"`), named by `ariaLabel`.
+ * Navigation landmark of links and disclosure buttons, in a row or a column,
+ * after the WAI-ARIA disclosure navigation pattern: a button shows and hides
+ * a panel of content rendered right after it, so Tab moves into the open
+ * panel — drawn under its item, or below the whole list (`viewport`). A
+ * click (or Enter and Space, natively) toggles a panel; a mouse pointing at
+ * an item opens its panel, which closes as the pointer leaves the menu
+ * unless a click kept it open. The arrow keys of the orientation move focus
+ * round the items, Home and End jump to the ends, ArrowDown on the open
+ * button of a row moves into its panel, and Escape closes the panel, focus
+ * back on its button. The host is the landmark (`role="navigation"`), named
+ * by `ariaLabel`.
  *
  * @example
  * <pxl-navigation-menu [items]="[{ label: 'Home', href: '/' }, { label: 'Products', content: productLinks }]" />
@@ -68,24 +81,17 @@ export interface PixelNavigationMenuItem {
     '(mouseleave)': 'onMouseleave($event)',
   },
   template: `
-    <ul role="menubar" [attr.aria-orientation]="orientation()" [class]="listClasses()">
+    <ul [class]="listClasses()">
       @for (row of rows(); track row.item.label + '-' + row.index) {
-        <li role="none" [class]="itemClasses">
-          @if (row.item.href) {
+        <li [class]="itemClasses()">
+          @if (row.link) {
             <a
               #trigger
               [attr.href]="row.item.href"
-              [id]="row.ids.trigger"
-              role="menuitem"
-              tabindex="0"
-              [attr.aria-haspopup]="row.item.content ? 'menu' : null"
-              [attr.aria-expanded]="row.item.content ? row.expanded : null"
-              [attr.aria-controls]="row.expanded ? row.ids.panel : null"
               [class]="row.classes"
-              (mouseenter)="onMouseenter(row.item, row.index)"
-              (focus)="onFocus(row.item, row.index)"
-              (keydown)="onKeydown($event, row.item, row.index)"
-              (click)="onClick($event, row.item, row.index)"
+              (pointerenter)="onPointerenter($event, row.item, row.index)"
+              (keydown)="onKeydown($event, row.index)"
+              (click)="onClick(row.item, row.index)"
             >
               @if (row.item.icon) {
                 <span aria-hidden="true" [class]="iconClasses">
@@ -98,17 +104,12 @@ export interface PixelNavigationMenuItem {
             <button
               #trigger
               type="button"
-              [id]="row.ids.trigger"
-              role="menuitem"
-              tabindex="0"
-              [attr.aria-haspopup]="row.item.content ? 'menu' : null"
               [attr.aria-expanded]="row.item.content ? row.expanded : null"
-              [attr.aria-controls]="row.expanded ? row.ids.panel : null"
+              [attr.aria-controls]="row.item.content ? row.panelId : null"
               [class]="row.classes"
-              (mouseenter)="onMouseenter(row.item, row.index)"
-              (focus)="onFocus(row.item, row.index)"
-              (keydown)="onKeydown($event, row.item, row.index)"
-              (click)="onClick($event, row.item, row.index)"
+              (pointerenter)="onPointerenter($event, row.item, row.index)"
+              (keydown)="onKeydown($event, row.index)"
+              (click)="onClick(row.item, row.index)"
             >
               @if (row.item.icon) {
                 <span aria-hidden="true" [class]="iconClasses">
@@ -118,19 +119,15 @@ export interface PixelNavigationMenuItem {
               <span [class]="labelClasses">{{ row.item.label }}</span>
             </button>
           }
-          @if (!viewport() && row.expanded) {
-            <div [id]="row.ids.panel" role="menu" [attr.aria-labelledby]="row.ids.trigger" [class]="panelClasses()">
+          <!-- The panel follows its button, so Tab moves into it; the shared viewport is drawn below the whole list all the same. -->
+          @if (row.expanded) {
+            <div [id]="row.panelId" [class]="panelClasses()" (keydown)="onPanelKeydown($event)">
               <ng-container *pxlOutlet="row.item.content; context: { $implicit: row.item }; let text">{{ text }}</ng-container>
             </div>
           }
         </li>
       }
     </ul>
-    @if (viewportPanel(); as panel) {
-      <div [id]="panel.ids.panel" role="menu" [attr.aria-labelledby]="panel.ids.trigger" [class]="viewportClasses()">
-        <ng-container *pxlOutlet="panel.item.content; context: { $implicit: panel.item }; let text">{{ text }}</ng-container>
-      </div>
-    }
   `,
 })
 export class PixelNavigationMenu {
@@ -149,7 +146,7 @@ export class PixelNavigationMenu {
 
   private readonly baseId = injectId();
   private readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
-  private readonly active = signal<number | null>(null);
+  private readonly open = signal<NavigationMenuOpen | null>(null);
   private readonly triggers = viewChildren<ElementRef<HTMLElement>>('trigger');
 
   /** @internal */
@@ -157,13 +154,13 @@ export class PixelNavigationMenu {
   /** @internal */
   protected readonly listClasses = computed(() => navigationMenuListClasses(this.orientation()));
   /** @internal */
-  protected readonly panelClasses = computed(() => navigationMenuPanelClasses(this.effectiveSurface()));
-  /** @internal */
-  protected readonly viewportClasses = computed(() =>
-    navigationMenuViewportClasses(this.effectiveSurface(), this.orientation()),
+  protected readonly itemClasses = computed(() => navigationMenuItemClasses(this.viewport()));
+  /** @internal The open panel: the shared viewport, or the panel under its item. */
+  protected readonly panelClasses = computed(() =>
+    this.viewport()
+      ? navigationMenuViewportClasses(this.effectiveSurface(), this.orientation())
+      : navigationMenuPanelClasses(this.effectiveSurface()),
   );
-  /** @internal */
-  protected readonly itemClasses = navigationMenuItemClasses;
   /** @internal */
   protected readonly iconClasses = navigationMenuIconClasses;
   /** @internal */
@@ -171,65 +168,70 @@ export class PixelNavigationMenu {
   /** @internal */
   protected readonly rows = computed(() =>
     this.items().map((item, index) => {
-      const expanded = this.active() === index && !!item.content;
+      const expanded = !!item.content && this.open()?.index === index;
       return {
         item,
         index,
         expanded,
-        ids: navigationMenuIds(this.baseId, index),
+        link: !item.content && !!item.href,
+        panelId: navigationMenuPanelId(this.baseId, index),
         classes: navigationMenuTriggerClasses(this.effectiveSurface(), expanded),
       };
     }),
   );
-  /** @internal The shared panel, while an item with content is open. */
-  protected readonly viewportPanel = computed(() => {
-    const index = this.active();
-    const item = index === null ? undefined : this.items()[index];
-    return this.viewport() && index !== null && item?.content ? { item, ids: navigationMenuIds(this.baseId, index) } : null;
-  });
 
+  // Only a mouse opens a panel by pointing: a tap fires the pointer, mouse
+  // and focus events of a hover before its click.
   /** @internal */
-  protected onMouseenter(item: PixelNavigationMenuItem, index: number): void {
-    this.active.set(item.content ? index : null);
+  protected onPointerenter(event: PointerEvent, item: PixelNavigationMenuItem, index: number): void {
+    this.setOpen(navigationMenuPointerEnter(this.open(), index, !!item.content, event.pointerType));
   }
 
   /** @internal */
-  protected onFocus(item: PixelNavigationMenuItem, index: number): void {
-    if (item.content) this.active.set(index);
-  }
-
-  /** @internal */
-  protected onClick(event: MouseEvent, item: PixelNavigationMenuItem, index: number): void {
+  protected onClick(item: PixelNavigationMenuItem, index: number): void {
+    if (item.content) this.setOpen(navigationMenuClick(this.open(), index));
     item.onSelect?.();
-    if (!item.content) return;
-    // A link with a panel toggles it instead of navigating.
-    if (item.href) event.preventDefault();
-    this.toggle(index);
   }
 
   /** @internal */
-  protected onKeydown(event: KeyboardEvent, item: PixelNavigationMenuItem, index: number): void {
+  protected onKeydown(event: KeyboardEvent, index: number): void {
     const action = navigationMenuKeyAction(event.key, this.orientation());
     if (action === undefined) return;
-    if (action === 'activate') {
-      // Links handle Enter natively: the browser follows them.
-      if (item.href) return;
+    if (action === 'close') {
+      this.close(event);
+      return;
+    }
+    if (action === 'panel') {
+      const entry = navigationMenuPanelEntry(event.currentTarget as HTMLElement);
+      if (!entry) return;
       event.preventDefault();
-      if (item.content) this.toggle(index);
-      item.onSelect?.();
+      entry.focus();
       return;
     }
     event.preventDefault();
-    if (action === 'close') this.active.set(null);
-    else this.triggers()[navigationMenuFocusIndex(index, action, this.items().length)]?.nativeElement.focus();
+    this.triggers()[navigationMenuFocusIndex(index, action, this.items().length)]?.nativeElement.focus();
+  }
+
+  /** @internal */
+  protected onPanelKeydown(event: KeyboardEvent): void {
+    if (navigationMenuKeyAction(event.key, this.orientation()) === 'close') this.close(event);
   }
 
   /** @internal */
   protected onMouseleave(event: MouseEvent): void {
-    if (!event.defaultPrevented) this.active.set(null);
+    if (!event.defaultPrevented) this.setOpen(navigationMenuPointerLeave(this.open()));
   }
 
-  private toggle(index: number): void {
-    this.active.update((current) => (current === index ? null : index));
+  private close(event: KeyboardEvent): void {
+    if (!this.open()) return;
+    event.preventDefault();
+    this.setOpen(null);
+  }
+
+  // A panel closing while focus is inside it hands focus to its button.
+  private setOpen(next: NavigationMenuOpen | null): void {
+    const current = this.open();
+    if (current && current.index !== next?.index) returnNavigationMenuFocus(this.triggers()[current.index]?.nativeElement);
+    this.open.set(next);
   }
 }

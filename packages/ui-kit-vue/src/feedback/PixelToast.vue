@@ -4,7 +4,6 @@ import {
   TOAST_DISMISS_LABEL,
   createToastCountdown,
   holdToastCountdown,
-  isAssertiveToast,
   resetToastCountdown,
   startToastCountdown,
   toastClasses,
@@ -18,6 +17,7 @@ import {
 } from '@pxlkit/ui-kit-core';
 import PixelGlyph from '../_internal/PixelGlyph.vue';
 import { RenderNode } from '../_internal/render-node.js';
+import { useEventListener } from '../composables/event-listener.js';
 import { useEffectiveSurface } from '../composables/surface.js';
 import type { ToastItem } from './toast-context.js';
 
@@ -25,10 +25,10 @@ import type { ToastItem } from './toast-context.js';
  * One toast card: title in the tone colour, optional message, leading icon
  * (a spinner while loading) and action, a dismiss button and the countdown
  * bar of its auto-dismiss, which holds still while the card is hovered or
- * focused. It announces itself with `role="status"` (polite), or
- * `role="alert"` (assertive) for critical tones and `assertive` toasts.
- * Usually rendered by `PxlKitToastProvider` through `useToast()`; use it
- * directly for custom rendering.
+ * focused, the page is hidden or the window is in the background. The card
+ * is no live region: `PxlKitToastProvider` announces its toasts. Usually
+ * rendered by `PxlKitToastProvider` through `useToast()`; use it directly
+ * for custom rendering.
  *
  * @example
  * <PixelToast :toast="{ id: 'saved', title: 'Saved', tone: 'green' }" @dismiss="saved = false" />
@@ -49,7 +49,6 @@ const emit = defineEmits<{
 const surface = useEffectiveSurface(() => props.surface);
 const tone = computed(() => toastTone(props.toast));
 const classes = computed(() => toastClasses(surface.value, tone.value));
-const assertive = computed(() => isAssertiveToast(props.toast));
 const leading = computed(() => toastLeading(props.toast));
 const duration = computed(() => toastDuration(props.toast));
 
@@ -87,6 +86,16 @@ function hold(holds: Partial<ToastHolds>) {
   countdown.value = holdToastCountdown(countdown.value, holds, Date.now());
 }
 
+// A page nobody looks at — hidden, or in a window in the background — holds
+// the countdown too.
+useEventListener(
+  'visibilitychange',
+  () => hold({ hidden: document.hidden }),
+  () => (typeof document !== 'undefined' ? document : null),
+);
+useEventListener('blur', () => hold({ blurred: true }));
+useEventListener('focus', () => hold({ blurred: false }));
+
 function onMouseleave(event: MouseEvent) {
   hold({ hover: false, focus: (event.currentTarget as HTMLElement).contains(document.activeElement) });
 }
@@ -98,9 +107,6 @@ function onFocusout(event: FocusEvent) {
 
 <template>
   <div
-    :role="assertive ? 'alert' : 'status'"
-    :aria-live="assertive ? 'assertive' : 'polite'"
-    aria-atomic="true"
     data-pxl-toast="true"
     :data-tone="tone"
     :data-loading="toast.loading ? 'true' : 'false'"
@@ -121,7 +127,13 @@ function onFocusout(event: FocusEvent) {
         <p v-if="toast.message" :class="classes.message">{{ toast.message }}</p>
         <div v-if="toast.action" :class="classes.action"><RenderNode :node="toast.action" /></div>
       </div>
-      <button type="button" :aria-label="TOAST_DISMISS_LABEL" :class="classes.dismiss" @click="emit('dismiss')">
+      <button
+        type="button"
+        :aria-label="TOAST_DISMISS_LABEL"
+        data-pxl-toast-dismiss="true"
+        :class="classes.dismiss"
+        @click="emit('dismiss')"
+      >
         <PixelGlyph name="close" />
       </button>
     </div>

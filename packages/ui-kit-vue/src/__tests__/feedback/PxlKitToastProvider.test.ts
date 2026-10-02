@@ -1,9 +1,10 @@
 /**
  * PxlKitToastProvider and useToast: the API through injection and through
  * the default slot, the queue it holds, the error outside a provider, the
- * viewport (portalled once mounted, never on the server) and its stack.
- * Rendering and the shared flows are covered against React by the parity
- * suite.
+ * viewport (portalled once mounted, never on the server), its stack, its
+ * hotkey, its live regions, focus when a focused toast leaves, and the
+ * `duration` and `hotkey` props. Rendering and the shared flows are covered
+ * against React by the parity suite.
  */
 import { enableAutoUnmount, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -13,15 +14,24 @@ import { PxlKitSurfaceProvider, PxlKitToastProvider, useToast, type UseToastRetu
 
 enableAutoUnmount(afterEach);
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
+// A task passes — on the fake clock when the test runs on one.
 const settle = async () => {
   await nextTick();
-  await new Promise((done) => setTimeout(done, 0));
+  await (vi.isFakeTimers() ? vi.advanceTimersByTimeAsync(0) : new Promise((done) => setTimeout(done, 0)));
   await nextTick();
 };
 
 const viewport = () => document.querySelector<HTMLElement>('[data-pxl-toast-viewport]')!;
 const cards = () => Array.from(document.querySelectorAll<HTMLElement>('[data-pxl-toast]'));
 const titles = () => cards().map((card) => card.querySelector('p')!.textContent);
+const region = (role: 'status' | 'alert') => viewport().querySelector<HTMLElement>(`[role="${role}"]`)!;
+const dismissButtons = () => Array.from(document.querySelectorAll<HTMLElement>('[data-pxl-toast] button[aria-label="Dismiss notification"]'));
+const press = (key: string, init: KeyboardEventInit = {}) =>
+  document.body.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...init }));
 
 /** Mounts a provider around a child that captures `useToast()`. */
 async function harness(props: Record<string, unknown> = {}, wrap: (inner: () => VNode) => VNode = (inner) => inner()) {
@@ -58,7 +68,7 @@ describe('useToast', () => {
     const id = toast.success('ok', 'all good');
     toast.error('fail');
     toast.info('fyi');
-    toast.warning({ title: 'careful', duration: 1000 });
+    toast.warning({ title: 'careful', duration: 60_000 });
     toast.loading('working');
     expect(toasts.value.map((t) => [t.title, t.tone])).toEqual([
       ['ok', 'green'],
@@ -108,9 +118,29 @@ describe('useToast', () => {
     ).rejects.toBe(error);
     await settle();
     expect(cards().map((card) => [card.getAttribute('role'), card.textContent])).toEqual([
-      ['status', 'Saved #42'],
-      ['alert', 'Failedboom'],
+      [null, 'Saved #42'],
+      [null, 'Failedboom'],
     ]);
+    // The error is announced assertively, replacing what was said before.
+    expect([region('status').textContent, region('alert').textContent]).toEqual(['', 'Failed boom']);
+  });
+
+  it("gives toasts without their own duration the provider's, a promise error at least 6 s, and 0 keeps them", async () => {
+    const { api } = await harness({ duration: 8000 });
+    api().toast({ title: 'slow' });
+    api().toast({ title: 'own', duration: 60_000 });
+    await api()
+      .toast.promise(Promise.reject(new Error('no')), { loading: { title: 'Saving…' }, success: { title: 'Saved' }, error: { title: 'Failed' } })
+      .catch(() => {});
+    expect(api().toasts.value.map((t) => t.duration)).toEqual([8000, 60_000, 8000]);
+
+    const kept = await harness({ duration: 0 });
+    kept.api().toast({ title: 'kept' });
+    await kept
+      .api()
+      .toast.promise(Promise.reject(new Error('no')), { loading: { title: 'Saving…' }, success: { title: 'Saved' }, error: { title: 'Failed' } })
+      .catch(() => {});
+    expect(kept.api().toasts.value.map((t) => t.duration)).toEqual([0, 0]);
   });
 });
 
@@ -123,12 +153,12 @@ describe('PxlKitToastProvider', () => {
     expect(html).not.toContain('data-pxl-toast-viewport');
   });
 
-  it('portals the "Notifications" region into the body once mounted', async () => {
+  it('portals the "Notifications (F8)" region into the body once mounted', async () => {
     await harness();
     expect(viewport().parentElement).toBe(document.body);
     expect(document.getElementById('app')!.parentElement!.contains(viewport())).toBe(false);
     expect(viewport().getAttribute('role')).toBe('region');
-    expect(viewport().getAttribute('aria-label')).toBe('Notifications');
+    expect(viewport().getAttribute('aria-label')).toBe('Notifications (F8)');
     expect(viewport().classList).toContain('top-4');
     expect(viewport().classList).toContain('right-4');
   });
@@ -155,8 +185,9 @@ describe('PxlKitToastProvider', () => {
   });
 
   it('removes a toast from its dismiss button and once its duration has passed', async () => {
+    // On simulated time: the countdown runs out when the clock says so, however busy the machine.
+    vi.useFakeTimers();
     const { api } = await harness();
-    // Neither counts down yet, so a slow machine cannot expire one early.
     api().toast({ title: 'manual', duration: 0 });
     const timed = api().toast({ title: 'timed', duration: 0 });
     await settle();
@@ -166,8 +197,14 @@ describe('PxlKitToastProvider', () => {
       .click();
     await settle();
     expect(titles()).toEqual(['timed']);
-    api().update(timed, { duration: 50 });
-    await vi.waitFor(() => expect(cards()).toHaveLength(0));
+    api().update(timed, { duration: 1000 });
+    await settle();
+    await vi.advanceTimersByTimeAsync(999);
+    await settle();
+    expect(titles()).toEqual(['timed']);
+    await vi.advanceTimersByTimeAsync(1);
+    await settle();
+    expect(cards()).toHaveLength(0);
   });
 
   it('expands the stack while hovered or focused, and never a flat list', async () => {
@@ -194,6 +231,91 @@ describe('PxlKitToastProvider', () => {
     await settle();
     expect(flatViewport.dataset.expanded).toBe('false');
     expect(flatViewport.dataset.stacked).toBe('false');
+  });
+
+  it('moves focus to the viewport with F8 while toasts are on screen, naming the hotkey', async () => {
+    const { api } = await harness();
+    expect(viewport().getAttribute('aria-label')).toBe('Notifications (F8)');
+    expect(viewport().getAttribute('tabindex')).toBe('-1');
+    press('F8');
+    expect(document.activeElement).toBe(document.body);
+    api().toast.loading('one');
+    await settle();
+    expect(press('F8', { shiftKey: true })).toBe(true);
+    expect(document.activeElement).toBe(document.body);
+    expect(press('F8')).toBe(false);
+    expect(document.activeElement).toBe(viewport());
+    await settle();
+    expect(viewport().dataset.expanded).toBe('true');
+  });
+
+  it('takes another hotkey, or none', async () => {
+    const { api, wrapper } = await harness({ hotkey: 'alt+t' });
+    api().toast.loading('one');
+    await settle();
+    expect(viewport().getAttribute('aria-label')).toBe('Notifications (alt+t)');
+    press('F8');
+    expect(document.activeElement).toBe(document.body);
+    press('t', { altKey: true });
+    expect(document.activeElement).toBe(viewport());
+    wrapper.unmount();
+
+    const none = await harness({ hotkey: false });
+    none.api().toast.loading('one');
+    await settle();
+    expect(viewport().getAttribute('aria-label')).toBe('Notifications');
+    expect(press('F8')).toBe(true);
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it('hands focus from a leaving toast to the next one, the previous one, then back where it came from', async () => {
+    const trigger = document.body.appendChild(document.createElement('button'));
+    const { api } = await harness();
+    for (const title of ['one', 'two', 'three']) api().toast.loading(title);
+    await settle();
+    const focusedTitle = () => document.activeElement!.closest('[data-pxl-toast]')!.querySelector('p')!.textContent;
+    trigger.focus();
+    dismissButtons()[0]!.focus();
+    dismissButtons()[0]!.click();
+    await settle();
+    expect(focusedTitle()).toBe('two');
+    dismissButtons()[1]!.focus();
+    dismissButtons()[1]!.click();
+    await settle();
+    expect(focusedTitle()).toBe('two');
+    // However it leaves: here by the API.
+    api().dismiss(api().toasts.value[0]!.id);
+    await settle();
+    expect(document.activeElement).toBe(trigger);
+    trigger.remove();
+  });
+
+  it('announces pushed toasts and changed ones in two live regions, there and empty before any toast', async () => {
+    const { api } = await harness();
+    expect([region('status').textContent, region('alert').textContent]).toEqual(['', '']);
+    const id = api().toast.loading('Saving…');
+    await settle();
+    expect(region('status').textContent).toBe('Saving…');
+    api().update(id, { loading: false });
+    await settle();
+    expect(region('status').textContent).toBe('Saving…');
+    api().update(id, { title: 'Failed', message: 'Try again.', tone: 'red', loading: false });
+    await settle();
+    expect([region('status').textContent, region('alert').textContent]).toEqual(['', 'Failed Try again.']);
+
+    // The same message again is new content, which the region reads again.
+    const first = region('alert').firstElementChild;
+    api().update(id, { tone: 'cyan' });
+    await settle();
+    api().update(id, { tone: 'red' });
+    await settle();
+    expect(region('alert').textContent).toBe('Failed Try again.');
+    expect(region('alert').firstElementChild).not.toBe(first);
+
+    // A message leaves the region with its toast.
+    api().dismiss(id);
+    await settle();
+    expect(region('alert').textContent).toBe('');
   });
 
   it('draws the toasts on the surface of the nearest provider unless given one', async () => {

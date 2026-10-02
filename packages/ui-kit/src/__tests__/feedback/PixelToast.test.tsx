@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { PixelToast, PxlKitToastProvider, useToast } from '../../toast';
 
@@ -201,12 +201,10 @@ describe('PixelToast / useToast (upgraded)', () => {
         expect(v).toBe(42);
       });
 
-      await waitFor(() => {
-        const t = apiRef.current!.toasts[0];
-        expect(t.title).toBe('saved #42');
-        expect(t.tone).toBe('green');
-        expect(t.loading).toBe(false);
-      });
+      const t = apiRef.current!.toasts[0];
+      expect(t.title).toBe('saved #42');
+      expect(t.tone).toBe('green');
+      expect(t.loading).toBe(false);
     });
 
     it('flips loading → error on reject and re-throws', async () => {
@@ -237,13 +235,11 @@ describe('PixelToast / useToast (upgraded)', () => {
         await expect(outcome!).rejects.toBe(err);
       });
 
-      await waitFor(() => {
-        const t = apiRef.current!.toasts[0];
-        expect(t.title).toBe('failed');
-        expect(t.message).toBe('boom');
-        expect(t.tone).toBe('red');
-        expect(t.loading).toBe(false);
-      });
+      const t = apiRef.current!.toasts[0];
+      expect(t.title).toBe('failed');
+      expect(t.message).toBe('boom');
+      expect(t.tone).toBe('red');
+      expect(t.loading).toBe(false);
     });
 
     it('also accepts a factory `() => Promise`', async () => {
@@ -268,15 +264,15 @@ describe('PixelToast / useToast (upgraded)', () => {
         expect(v).toBe('hello');
       });
 
-      await waitFor(() => {
-        expect(apiRef.current!.toasts[0].title).toBe('done');
-        expect(apiRef.current!.toasts[0].tone).toBe('green');
-      });
+      expect(apiRef.current!.toasts[0].title).toBe('done');
+      expect(apiRef.current!.toasts[0].tone).toBe('green');
     });
   });
 
   describe('viewport / stacked visual', () => {
-    it('renders newest toast with role=status and respects assertive tones', () => {
+    // Regression: each card was its own live region, inserted already filled
+    // (read unreliably) and re-reading its buttons' labels (aria-atomic).
+    it('announces critical tones in the assertive region, the card being no live region', () => {
       const { apiRef, Capture } = makeHarness();
       render(
         <PxlKitToastProvider>
@@ -284,12 +280,13 @@ describe('PixelToast / useToast (upgraded)', () => {
         </PxlKitToastProvider>,
       );
       act(() => {
-        apiRef.current!.toast.error('boom');
+        apiRef.current!.toast.error('boom', 'Upload failed.');
       });
-      // tone=red → assertive role=alert with aria-live=assertive
-      const alert = screen.getByRole('alert');
-      expect(alert).toBeTruthy();
-      expect(alert.getAttribute('aria-live')).toBe('assertive');
+      // tone=red → the role=alert region of the viewport, assertive.
+      expect(screen.getByRole('alert').textContent).toBe('boom Upload failed.');
+      expect(screen.getByRole('status').textContent).toBe('');
+      const card = document.querySelector('[data-pxl-toast]')!;
+      expect(['role', 'aria-live', 'aria-atomic'].map((name) => card.getAttribute(name))).toEqual([null, null, null]);
     });
 
     it('viewport carries stacked + expanded data attributes', () => {
@@ -313,9 +310,11 @@ describe('PixelToast — auto-dismiss countdown', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   const bar = (card: HTMLElement) => card.querySelector<HTMLElement>('[aria-hidden] > div')!;
+  const card = () => document.querySelector<HTMLElement>('[data-pxl-toast]')!;
 
   it('dismisses once its duration has passed', () => {
     const onDismiss = vi.fn();
@@ -337,20 +336,19 @@ describe('PixelToast — auto-dismiss countdown', () => {
         onDismiss={onDismiss}
       />,
     );
-    const card = screen.getByRole('status');
     const undo = screen.getByRole('button', { name: 'Undo' });
     act(() => { vi.advanceTimersByTime(1000); });
-    fireEvent.mouseEnter(card);
+    fireEvent.mouseEnter(card());
     act(() => { vi.advanceTimersByTime(2000); });
     act(() => { undo.focus(); });
     act(() => { vi.advanceTimersByTime(5000); });
-    fireEvent.mouseLeave(card);
+    fireEvent.mouseLeave(card());
     act(() => { vi.advanceTimersByTime(10_000); });
     expect(onDismiss).not.toHaveBeenCalled();
-    expect(bar(card).style.width).toBe(`${(3500 / 4500) * 100}%`);
+    expect(bar(card()).style.width).toBe(`${(3500 / 4500) * 100}%`);
 
     act(() => { undo.blur(); });
-    expect(bar(card).style.transitionDuration).toBe('3500ms');
+    expect(bar(card()).style.transitionDuration).toBe('3500ms');
     act(() => { vi.advanceTimersByTime(3499); });
     expect(onDismiss).not.toHaveBeenCalled();
     act(() => { vi.advanceTimersByTime(1); });
@@ -373,7 +371,7 @@ describe('PixelToast — auto-dismiss countdown', () => {
     const html = renderToString(<PixelToast toast={{ id: 't', title: 'Saved', duration: 4500 }} onDismiss={() => {}} />);
     expect(html).toContain('style="width:100%;transition-duration:0ms"');
     render(<PixelToast toast={{ id: 't', title: 'Saved', duration: 4500 }} onDismiss={() => {}} />);
-    const { width, transitionDuration } = bar(screen.getByRole('status')).style;
+    const { width, transitionDuration } = bar(card()).style;
     expect([width, transitionDuration]).toEqual(['0%', '4500ms']);
   });
 
@@ -381,11 +379,45 @@ describe('PixelToast — auto-dismiss countdown', () => {
   it('counts down the new duration once a loading toast settles', () => {
     const onDismiss = vi.fn();
     const { rerender } = render(<PixelToast toast={{ id: 't', title: 'Saving…', loading: true }} onDismiss={onDismiss} />);
-    expect(screen.getByRole('status').querySelector('[aria-hidden] > div')).toBeNull();
+    expect(card().querySelector('[aria-hidden] > div')).toBeNull();
     act(() => { vi.advanceTimersByTime(10_000); });
     rerender(<PixelToast toast={{ id: 't', title: 'Saved', loading: false, duration: 4500, tone: 'green' }} onDismiss={onDismiss} />);
-    expect(bar(screen.getByRole('status')).style.transitionDuration).toBe('4500ms');
+    expect(bar(card()).style.transitionDuration).toBe('4500ms');
     act(() => { vi.advanceTimersByTime(4500); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  // Regression: a toast ran out while nobody looked at the page (WCAG 2.2.1).
+  it('holds still while the page is hidden or the window in the background, until both come back', () => {
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(false);
+    const onDismiss = vi.fn();
+    render(<PixelToast toast={{ id: 't', title: 'Saved', duration: 4500 }} onDismiss={onDismiss} />);
+    act(() => { vi.advanceTimersByTime(1000); });
+    hidden.mockReturnValue(true);
+    act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    act(() => { window.dispatchEvent(new FocusEvent('blur')); });
+    hidden.mockReturnValue(false);
+    act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    act(() => { vi.advanceTimersByTime(60_000); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(bar(card()).style.width).toBe(`${(3500 / 4500) * 100}%`);
+
+    act(() => { window.dispatchEvent(new FocusEvent('focus')); });
+    expect(bar(card()).style.transitionDuration).toBe('3500ms');
+    act(() => { vi.advanceTimersByTime(3500); });
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('waits for a hidden page to come back before counting down', () => {
+    const hidden = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+    const onDismiss = vi.fn();
+    render(<PixelToast toast={{ id: 't', title: 'Saved', duration: 1000 }} onDismiss={onDismiss} />);
+    act(() => { vi.advanceTimersByTime(60_000); });
+    expect(onDismiss).not.toHaveBeenCalled();
+    expect(bar(card()).style.width).toBe('100%');
+    hidden.mockReturnValue(false);
+    act(() => { document.dispatchEvent(new Event('visibilitychange')); });
+    act(() => { vi.advanceTimersByTime(1000); });
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 });

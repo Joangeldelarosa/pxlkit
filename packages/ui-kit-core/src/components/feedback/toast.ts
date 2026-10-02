@@ -2,7 +2,8 @@
  * PixelToast — one toast card (tone border and title, a leading icon or a
  * spinner while loading, message, action, dismiss button and the countdown
  * bar), the rules every kit applies to a toast, and its auto-dismiss
- * countdown, which holds still while the toast is hovered or focused.
+ * countdown, which holds still while the toast is hovered or focused, and
+ * while nobody looks at the page: hidden, or in a window in the background.
  */
 import { cn, surfaceClasses, toneMap, type Surface, type Tone } from '../../common';
 import { isCriticalTone } from './alert';
@@ -18,7 +19,7 @@ export interface ToastItem<TNode = unknown> {
   title: string;
   message?: string;
   tone?: ToastTone;
-  /** Auto-dismiss in ms. Set to `0` to disable. Defaults to 4500. */
+  /** Auto-dismiss in ms. Set to `0` to disable. Defaults to the provider's `duration` (4500). */
   duration?: number;
   /** Optional icon rendered to the left of the title. */
   icon?: TNode;
@@ -29,7 +30,10 @@ export interface ToastItem<TNode = unknown> {
   animatedIcon?: TNode;
   /** Optional inline action (typically a button or a link). */
   action?: TNode;
-  /** When `true`, render with `role="alert"` (assertive). Defaults based on tone. */
+  /**
+   * When `true`, the provider announces the toast assertively, in its
+   * `role="alert"` region. Defaults based on tone.
+   */
   assertive?: boolean;
   /**
    * Show a leading spinner (used by `toast.loading()` and `toast.promise()`'s
@@ -58,9 +62,9 @@ export function toastDuration(toast: Pick<ToastItem, 'duration' | 'loading'>): n
 }
 
 /**
- * Whether the toast interrupts (`role="alert"`, `aria-live="assertive"`)
- * rather than waits (`role="status"`, `aria-live="polite"`): `assertive` when
- * set, else critical tones (red, gold) do.
+ * Whether the toast is announced assertively (the `role="alert"` region)
+ * rather than politely (the `role="status"` one): `assertive` when set, else
+ * critical tones (red, gold) are.
  */
 export function isAssertiveToast(toast: Pick<ToastItem, 'assertive' | 'tone'>): boolean {
   return toast.assertive ?? isCriticalTone(toastTone(toast));
@@ -129,11 +133,17 @@ export function toastClasses(surface: Surface, tone: ToastTone): ToastClasses {
 
 /* ── Countdown ──────────────────────────────────────────────────────────── */
 
-/** What holds a toast still: the pointer over it, and focus inside it. */
+/** What holds a toast still: the pointer over it, focus inside it, and a page nobody looks at. */
 export interface ToastHolds {
   hover: boolean;
   focus: boolean;
+  /** The document is hidden: another tab is in front, or the window is minimised. */
+  hidden: boolean;
+  /** The window has lost focus to another window or application. */
+  blurred: boolean;
 }
+
+const HOLDS = ['hover', 'focus', 'hidden', 'blurred'] as const;
 
 /**
  * State of a toast's auto-dismiss countdown. The kits keep it per toast card,
@@ -150,11 +160,22 @@ export interface ToastCountdown {
   readonly holds: Readonly<ToastHolds>;
 }
 
-const isHeld = (holds: Readonly<ToastHolds>) => holds.hover || holds.focus;
+const isHeld = (holds: Readonly<ToastHolds>) => HOLDS.some((hold) => holds[hold]);
 
-/** A countdown over `duration`, stopped with the bar full. */
+/**
+ * A countdown over `duration`, stopped with the bar full — and held already
+ * when the page is hidden, so a toast shown meanwhile waits for it to come
+ * back. Whether the window has focus is only known from its `blur` and
+ * `focus` events.
+ */
 export function createToastCountdown(duration: number): ToastCountdown {
-  return { duration, remaining: duration, startedAt: null, holds: { hover: false, focus: false } };
+  const hidden = typeof document !== 'undefined' && document.hidden;
+  return {
+    duration,
+    remaining: duration,
+    startedAt: null,
+    holds: { hover: false, focus: false, hidden, blurred: false },
+  };
 }
 
 /**
@@ -179,7 +200,7 @@ export function resetToastCountdown(countdown: ToastCountdown, duration: number)
  */
 export function holdToastCountdown(countdown: ToastCountdown, holds: Partial<ToastHolds>, now: number): ToastCountdown {
   const next = { ...countdown.holds, ...holds };
-  if (next.hover === countdown.holds.hover && next.focus === countdown.holds.focus) return countdown;
+  if (HOLDS.every((hold) => next[hold] === countdown.holds[hold])) return countdown;
   if (isHeld(next) && countdown.startedAt !== null) {
     const remaining = Math.max(0, countdown.remaining - (now - countdown.startedAt));
     return { ...countdown, holds: next, remaining, startedAt: null };

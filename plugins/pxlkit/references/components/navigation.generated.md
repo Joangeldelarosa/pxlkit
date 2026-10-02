@@ -25,7 +25,7 @@
 ### PixelNavigationMenu
 - stable · since 1.9.0
 - Accessible nav landmark with optional mega-panel submenus, keyboard navigation, and surface-aware styling.
-- Horizontal or vertical orientation · Optional shared viewport panel or inline per-item panels · Full keyboard support (Arrow/Home/End/Escape/Enter) · Surface-aware via useEffectiveSurface · SSR-safe, ref-forwarded nav landmark
+- Horizontal or vertical orientation · Optional shared viewport panel or inline per-item panels · WAI-ARIA disclosure navigation: each panel follows its button in the tab order, with Arrow/Home/End/Escape keys · Surface-aware via useEffectiveSurface · SSR-safe, ref-forwarded nav landmark
 
 ### PixelPagination
 - stable · since 1.0.0

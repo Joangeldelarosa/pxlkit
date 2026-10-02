@@ -5,15 +5,13 @@ const viewport = '[data-pxl-toast-viewport]';
 const dismiss = '[data-pxl-toast] button[aria-label="Dismiss notification"]';
 const action = '[data-pxl-toast] button:not([aria-label])';
 // The examples settle their pending toasts 1 s after the click, and a toast
-// dismisses itself after its default 4.5 s; the waits outlast both by a wide
-// margin.
+// dismisses itself after its default 4.5 s; the waits outlast both.
 const settle = { action: 'wait', ms: 1500 } as const;
 const expire = { action: 'wait', ms: 5000 } as const;
 
 // A toast holds its countdown while hovered or focused, and the bar then
-// shows the share of time left — which depends on the clock. The scenarios
-// hold only toasts that are not counting down (loading ones, or cards without
-// a duration), and hover the viewport rather than the toasts in it.
+// shows the share of time left: on the simulated clock of the recordings
+// (see clock.ts) that share is the same in every framework.
 export const scenarios: ParityScenario[] = [
   {
     component: 'PxlKitToastProvider',
@@ -60,12 +58,13 @@ export const scenarios: ParityScenario[] = [
   {
     component: 'PxlKitToastProvider',
     example: 'Stacked',
-    name: 'dismisses a toast from an expanded stack and collapses once the pointer leaves',
+    name: 'dismisses a toast from an expanded stack, handing focus to the next one, and collapses once pointer and focus have left',
     steps: [
       { action: 'click', target: trigger },
       { action: 'hover', target: viewport },
       { action: 'click', target: dismiss, nth: 1 },
       { action: 'unhover', target: viewport },
+      { action: 'blur', target: dismiss, nth: 1 },
     ],
   },
   {
@@ -163,6 +162,38 @@ export const scenarios: ParityScenario[] = [
     example: 'PromiseFlow',
     name: 'shows the pending promise as a loading toast, then the success toast',
     steps: [{ action: 'click', target: trigger }, settle],
+  },
+  {
+    component: 'PxlKitToastProvider',
+    example: 'PromiseRejected',
+    name: 'turns the loading toast of a rejected promise into the error toast, announced assertively',
+    steps: [{ action: 'click', target: trigger }, settle],
+  },
+  {
+    component: 'PxlKitToastProvider',
+    example: 'Default',
+    name: 'F8 moves focus to the viewport while toasts are on screen, and dismissing the last toast returns focus where it came from',
+    steps: [
+      { action: 'keydown', key: 'F8' },
+      { action: 'click', target: trigger },
+      { action: 'keydown', key: 'F8', shiftKey: true },
+      { action: 'keydown', key: 'F8' },
+      { action: 'focus', target: dismiss },
+      { action: 'click', target: dismiss },
+    ],
+  },
+  {
+    component: 'PxlKitToastProvider',
+    example: 'Stacked',
+    name: 'dismissing the focused toast moves focus to the next toast, else the previous one, else back where it came from',
+    steps: [
+      { action: 'click', target: trigger },
+      { action: 'focus', target: dismiss, nth: 0 },
+      { action: 'click', target: dismiss, nth: 0 },
+      { action: 'focus', target: dismiss, nth: 1 },
+      { action: 'click', target: dismiss, nth: 1 },
+      { action: 'click', target: dismiss, nth: 0 },
+    ],
   },
   {
     component: 'PxlKitToastProvider',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { PxlKitToastProvider, useToast } from '../../feedback/PxlKitToastProvider';
 
 type Listener = (e: { matches: boolean }) => void;
@@ -223,6 +223,13 @@ describe('PxlKitToastProvider — viewport and stack', () => {
     act(() => dismissButtons()[1]!.focus());
     act(() => dismissButtons()[1]!.click());
     expect(api.current!.toasts.map((t) => t.title)).toEqual(['one']);
+    // Focus moved on to the toast left, which keeps the stack open.
+    fireEvent.mouseLeave(viewport());
+    expect(viewport().getAttribute('data-expanded')).toBe('true');
+    // Focus came from nowhere: with the last toast gone it stays on the body.
+    fireEvent.mouseEnter(viewport());
+    act(() => dismissButtons()[0]!.click());
+    expect(document.activeElement).toBe(document.body);
     fireEvent.mouseLeave(viewport());
     expect(viewport().getAttribute('data-expanded')).toBe('false');
   });
@@ -250,6 +257,121 @@ describe('PxlKitToastProvider — viewport and stack', () => {
       ['1', '3', '0'],
     ]);
     expect(slots[0]!.style.zIndex).toBe('103');
+  });
+
+  // Regression: the viewport, at the end of the page, could only be reached by
+  // tabbing through the whole page.
+  it('moves focus to the viewport with F8 while toasts are on screen, naming the hotkey', () => {
+    const api = renderWith();
+    expect(viewport().getAttribute('aria-label')).toBe('Notifications (F8)');
+    expect(viewport().getAttribute('tabindex')).toBe('-1');
+    fireEvent.keyDown(document.body, { key: 'F8' });
+    expect(document.activeElement).toBe(document.body);
+    act(() => { api.current!.toast.loading('one'); });
+    expect(fireEvent.keyDown(document.body, { key: 'F8', shiftKey: true })).toBe(true);
+    expect(document.activeElement).toBe(document.body);
+    expect(fireEvent.keyDown(document.body, { key: 'F8' })).toBe(false);
+    expect(document.activeElement).toBe(viewport());
+    expect(viewport().getAttribute('data-expanded')).toBe('true');
+  });
+
+  it('takes another hotkey, or none', () => {
+    const custom = renderWith({ hotkey: 'alt+t' });
+    act(() => { custom.current!.toast.loading('one'); });
+    expect(viewport().getAttribute('aria-label')).toBe('Notifications (alt+t)');
+    fireEvent.keyDown(document.body, { key: 'F8' });
+    expect(document.activeElement).toBe(document.body);
+    fireEvent.keyDown(document.body, { key: 't', altKey: true });
+    expect(document.activeElement).toBe(viewport());
+    cleanup();
+
+    const none = renderWith({ hotkey: false });
+    act(() => { none.current!.toast.loading('one'); });
+    expect(viewport().getAttribute('aria-label')).toBe('Notifications');
+    expect(fireEvent.keyDown(document.body, { key: 'F8' })).toBe(true);
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  // Regression: dismissing the focused toast dropped focus to the body.
+  it('hands focus from a leaving toast to the next one, the previous one, then back where it came from', () => {
+    const trigger = document.body.appendChild(document.createElement('button'));
+    const api = renderWith();
+    act(() => {
+      for (const title of ['one', 'two', 'three']) api.current!.toast.loading(title);
+    });
+    const focusedTitle = () => document.activeElement!.closest('[data-pxl-toast]')!.querySelector('p')!.textContent;
+    act(() => trigger.focus());
+    act(() => dismissButtons()[0]!.focus());
+    act(() => dismissButtons()[0]!.click());
+    expect(focusedTitle()).toBe('two');
+    act(() => dismissButtons()[1]!.focus());
+    act(() => dismissButtons()[1]!.click());
+    expect(focusedTitle()).toBe('two');
+    // However it leaves: here by the API.
+    act(() => { api.current!.dismiss(api.current!.toasts[0]!.id); });
+    expect(document.activeElement).toBe(trigger);
+    trigger.remove();
+  });
+
+  // Regression: each card was a live region inserted already filled, which
+  // screen readers announce unreliably, and a promise that settled flipped it
+  // from status to alert, which is not announced either.
+  it('announces pushed toasts and changed ones in two live regions, there and empty before any toast', async () => {
+    const api = renderWith();
+    const status = screen.getByRole('status');
+    const alert = screen.getByRole('alert');
+    expect([status.textContent, alert.textContent]).toEqual(['', '']);
+    expect(viewport().contains(status) && viewport().contains(alert)).toBe(true);
+    // Toasts announced in one task are read together; each step here is a task of its own.
+    const step = (change: () => void) => act(async () => change());
+
+    let id = '';
+    await step(() => { id = api.current!.toast.loading('Saving…'); });
+    expect(status.textContent).toBe('Saving…');
+    await step(() => api.current!.update(id, { loading: false }));
+    expect(status.textContent).toBe('Saving…');
+    await step(() => api.current!.update(id, { title: 'Failed', message: 'Try again.', tone: 'red', loading: false }));
+    expect([status.textContent, alert.textContent]).toEqual(['', 'Failed Try again.']);
+
+    // The same message again is new content, which the region reads again.
+    const first = alert.firstElementChild;
+    await step(() => api.current!.update(id, { tone: 'cyan' }));
+    await step(() => api.current!.update(id, { tone: 'red' }));
+    expect(alert.textContent).toBe('Failed Try again.');
+    expect(alert.firstElementChild).not.toBe(first);
+
+    // Toasts pushed together are read together; a message leaves with its toast.
+    await step(() => {
+      api.current!.toast.info('One');
+      api.current!.toast.info('Two');
+    });
+    expect([status.textContent, alert.textContent]).toEqual(['OneTwo', '']);
+    await step(() => api.current!.clear());
+    expect(status.textContent).toBe('');
+  });
+
+  it('gives toasts without their own duration the provider\'s, 0 keeping them until dismissed', async () => {
+    const api = renderWith({ duration: 0 });
+    act(() => { api.current!.toast({ title: 'kept' }); });
+    act(() => { api.current!.toast({ title: 'timed', duration: 60_000 }); });
+    expect(api.current!.toasts.map((t) => t.duration)).toEqual([0, 60_000]);
+    expect(document.querySelectorAll('[data-pxl-toast] [aria-hidden] > div')).toHaveLength(1);
+    await act(async () => {
+      await api.current!.toast
+        .promise(Promise.reject(new Error('no')), { loading: { title: 'Saving…' }, success: { title: 'Saved' }, error: { title: 'Failed' } })
+        .catch(() => {});
+    });
+    expect(api.current!.toasts[2]).toMatchObject({ title: 'Failed', duration: 0 });
+    cleanup();
+
+    const slow = renderWith({ duration: 8000 });
+    act(() => { slow.current!.toast({ title: 'slow' }); });
+    await act(async () => {
+      await slow.current!.toast
+        .promise(Promise.reject(new Error('no')), { loading: { title: 'Saving…' }, success: { title: 'Saved' }, error: { title: 'Failed' } })
+        .catch(() => {});
+    });
+    expect(slow.current!.toasts.map((t) => t.duration)).toEqual([8000, 8000]);
   });
 
   // Regression: an `id: undefined` passed on by the caller overwrote the
