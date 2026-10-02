@@ -68,9 +68,11 @@ export default defineConfig({
           name: 'package',
           environment: 'node',
           include: ['src/__tests__/package/*.test.ts'],
-          // Runs npm and loads the built bundle through the JIT linker:
-          // seconds of work on a busy CI runner, past the 5 s default.
-          testTimeout: 30_000,
+          // Runs npm and loads the built bundle through the JIT linker,
+          // which compiles every component in it on import: work that grows
+          // with the kit, and took past 30 s on a busy four-core runner.
+          // The limit only has to catch a hang.
+          testTimeout: 120_000,
         },
       },
     ],
