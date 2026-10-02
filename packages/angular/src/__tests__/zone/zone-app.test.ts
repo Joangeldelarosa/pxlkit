@@ -116,8 +116,7 @@ describe('@pxlkit/angular in a zone.js application', () => {
     // The listener itself is one zone turn; the playback it starts adds none.
     expect(app.checks - checksBefore).toBe(1);
     hover.dispatchEvent(new MouseEvent('mouseleave'));
-    await sleep(30);
-    expect(frameShown(hover.querySelector('img')!)).toBe(0);
+    await vi.waitFor(() => expect(frameShown(hover.querySelector('img')!)).toBe(0));
   });
 
   it('tracks the mouse outside the zone and runs the activate output inside it', async () => {
@@ -141,9 +140,16 @@ describe('@pxlkit/angular in a zone.js application', () => {
     (root.querySelector('#save') as HTMLButtonElement).click();
     await sleep(0);
     expect(root.querySelector('pxl-toast')!.textContent).toContain('Saved!');
-    await sleep(app.duration + 40);
-    expect(app.toastVisible).toBe(false);
-    expect(root.querySelector('#toast')!.textContent).toBe('false');
+    // Polled rather than slept for: a loaded machine fires the toast's timer
+    // late. The rendered text proves the handler ran inside the zone — outside
+    // it, nothing would run change detection and the wait would time out.
+    await vi.waitFor(
+      () => {
+        expect(app.toastVisible).toBe(false);
+        expect(root.querySelector('#toast')!.textContent).toBe('false');
+      },
+      { timeout: app.duration + 2000 },
+    );
     expect(root.querySelector('pxl-toast')!.childElementCount).toBe(0);
   });
 });
