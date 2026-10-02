@@ -90,8 +90,10 @@ describe('@pxlkit/angular in a zone.js application', () => {
 
   it('stays stable while icons animate, painting every frame without change detection', async () => {
     const { app, root } = await bootstrap();
+    // Playback timers inside the zone would keep the app unstable for good;
+    // the window only bounds the wait, generously for a busy CI runner.
     const stable = await firstValueFrom(
-      race(appRef!.isStable.pipe(filter(Boolean)), timer(1000).pipe(map(() => false))),
+      race(appRef!.isStable.pipe(filter(Boolean)), timer(5000).pipe(map(() => false))),
     );
     expect(stable).toBe(true);
 

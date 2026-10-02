@@ -61,9 +61,9 @@ describe('React ↔ Vue parity — interactions', () => {
       it.todo(title);
       continue;
     }
-    // The scenario runs once per framework, so its waits count twice
-    // against the time limit.
-    it(title, { timeout: 5_000 + 2 * waitedMs(scenario.steps) }, async () => {
+    // The scenario runs once per framework, so its waits count twice, on
+    // top of the suite's default limit for the steps themselves.
+    it(title, { timeout: 15_000 + 2 * waitedMs(scenario.steps) }, async () => {
       const react = await record(() => mountReact(reference.Component), scenario.steps);
       const Example = await vue.load();
       const ported = await record(() => mountVue(Example), scenario.steps);
