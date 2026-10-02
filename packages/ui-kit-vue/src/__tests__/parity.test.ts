@@ -6,7 +6,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { reactExamples } from '../../../../scripts/parity/catalog';
 import { canonicalPage } from '../../../../scripts/parity/canonical';
-import { perform } from '../../../../scripts/parity/interact';
+import { perform, waitedMs } from '../../../../scripts/parity/interact';
 import { mountReact, type Mounted } from '../../../../scripts/parity/react';
 import { scenarios } from '../../../../scripts/parity/scenarios';
 import { loadKit, vueExamples } from './examples';
@@ -61,7 +61,9 @@ describe('React ↔ Vue parity — interactions', () => {
       it.todo(title);
       continue;
     }
-    it(title, async () => {
+    // The scenario runs once per framework, so its waits count twice
+    // against the time limit.
+    it(title, { timeout: 5_000 + 2 * waitedMs(scenario.steps) }, async () => {
       const react = await record(() => mountReact(reference.Component), scenario.steps);
       const Example = await vue.load();
       const ported = await record(() => mountVue(Example), scenario.steps);

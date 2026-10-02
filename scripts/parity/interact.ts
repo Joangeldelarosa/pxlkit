@@ -30,6 +30,11 @@ export type ParityStep =
    */
   | { action: 'wait'; ms: number };
 
+/** The real time a scenario's `wait` steps take on one rendering. */
+export function waitedMs(steps: readonly ParityStep[]): number {
+  return steps.reduce((ms, step) => (step.action === 'wait' ? ms + step.ms : ms), 0);
+}
+
 export interface ParityScenario {
   /** Component name, as in its manifest. */
   component: string;
