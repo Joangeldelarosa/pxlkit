@@ -84,7 +84,7 @@ These all came up during the first ports; the parity suites catch each of them.
 ## Proving parity
 
 1. **Write the examples.** One Vue SFC and one Angular class per manifest example, named after the React export, rendering the same content with the same props. Use the ported kit's own components where the React example uses kit components.
-2. **Add scenarios** for every interaction the component has, in `scripts/parity/scenarios/`. A scenario starts from an example and lists steps (`click`, `pointerdown`, `hover`, `focus`, `keydown` with modifiers, `input`, `select`, `wait`); the DOM is compared after each step.
+2. **Add scenarios** for every interaction the component has, in `scripts/parity/scenarios/`. A scenario starts from an example and lists steps (`click`, `pointerdown`, `hover`, `focus`, `keydown` with modifiers, `input`, `select`, a failed `error` load, `wait` on the simulated clock, the page's `visibility` and the `window` losing or regaining focus); the DOM is compared after each step. `reducedMotion: true` renders it for a reader who prefers reduced motion.
 3. **Run the suites** in each kit:
 
    ```bash

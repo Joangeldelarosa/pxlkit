@@ -6,6 +6,7 @@
  */
 
 import { elapse } from './clock';
+import { setPageVisibility } from './page';
 
 export type ParityStep =
   | { action: 'click' | 'pointerdown' | 'hover' | 'unhover' | 'focus' | 'blur'; target: string; nth?: number }
@@ -30,7 +31,11 @@ export type ParityStep =
    * in each framework at the same step. To see a timer fire, wait at least
    * its delay; no margin is needed.
    */
-  | { action: 'wait'; ms: number };
+  | { action: 'wait'; ms: number }
+  /** The page hidden or shown again, as switching tabs does (see `page.ts`). */
+  | { action: 'visibility'; state: 'hidden' | 'visible' }
+  /** The window losing focus to another application, or getting it back: `blur` / `focus` on `window`. */
+  | { action: 'window'; event: 'blur' | 'focus' };
 
 export interface ParityScenario {
   /** Component name, as in its manifest. */
@@ -39,6 +44,8 @@ export interface ParityScenario {
   example: string;
   /** What the scenario checks. */
   name: string;
+  /** Renders for a reader who prefers reduced motion (see `page.ts`). */
+  reducedMotion?: boolean;
   steps: ParityStep[];
 }
 
@@ -145,6 +152,12 @@ export async function perform(step: ParityStep, flush: () => Promise<void>): Pro
     }
     case 'wait':
       await elapse(step.ms);
+      break;
+    case 'visibility':
+      setPageVisibility(step.state);
+      break;
+    case 'window':
+      window.dispatchEvent(new FocusEvent(step.event));
       break;
   }
   await flush();

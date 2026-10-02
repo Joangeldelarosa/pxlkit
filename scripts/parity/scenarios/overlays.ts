@@ -93,6 +93,29 @@ export const scenarios: ParityScenario[] = [
     steps: [{ action: 'click', target: opener }],
   },
   {
+    component: 'PixelModal',
+    example: 'Default',
+    name: 'opens and closes without its pulse, for a reader who prefers reduced motion',
+    reducedMotion: true,
+    steps: [
+      { action: 'click', target: opener },
+      { action: 'click', target: closeButton },
+    ],
+  },
+  {
+    component: 'PixelAlertDialog',
+    example: 'AsyncAction',
+    name: 'shows its pending action without spinning, for a reader who prefers reduced motion',
+    reducedMotion: true,
+    steps: [
+      { action: 'click', target: opener },
+      { action: 'wait', ms: 200 },
+      { action: 'click', target: alertButton, nth: 1 },
+      // The example's action settles after 600 ms.
+      { action: 'wait', ms: 600 },
+    ],
+  },
+  {
     component: 'PixelAlertDialog',
     example: 'Default',
     name: 'opens with focus on Cancel, keeps Tab inside and closes on Escape, returning focus',

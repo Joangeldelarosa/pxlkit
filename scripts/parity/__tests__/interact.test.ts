@@ -1,11 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { perform } from '../interact';
+import { resetPage } from '../page';
 
 const flush = vi.fn(async () => {});
 
 afterEach(() => {
   document.body.innerHTML = '';
   flush.mockClear();
+  resetPage();
 });
 
 function record(element: EventTarget, types: string[]) {
@@ -65,6 +67,20 @@ describe('perform', () => {
     expect(select.value).toBe('b');
     expect(inputEvents.map((s) => s.split(':')[0])).toEqual(['input']);
     expect(selectEvents.map((s) => s.split(':')[0])).toEqual(['input', 'change']);
+  });
+
+  it('hides and shows the page, and blurs and focuses the window', async () => {
+    const seen = record(document, ['visibilitychange']);
+    const onWindow = record(window, ['blur', 'focus']);
+    await perform({ action: 'visibility', state: 'hidden' }, flush);
+    expect(document.visibilityState).toBe('hidden');
+    await perform({ action: 'visibility', state: 'visible' }, flush);
+    expect(document.visibilityState).toBe('visible');
+    await perform({ action: 'window', event: 'blur' }, flush);
+    await perform({ action: 'window', event: 'focus' }, flush);
+    expect(seen).toEqual(['visibilitychange:Event', 'visibilitychange:Event']);
+    expect(onWindow).toEqual(['blur:FocusEvent', 'focus:FocusEvent']);
+    expect(flush).toHaveBeenCalledTimes(4);
   });
 
   it('fails a load like the browser: an error event on the target that does not bubble', async () => {

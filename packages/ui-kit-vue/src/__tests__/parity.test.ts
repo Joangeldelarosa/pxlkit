@@ -7,7 +7,8 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { reactExamples } from '../../../../scripts/parity/catalog';
 import { canonicalPage } from '../../../../scripts/parity/canonical';
 import { useRealTime, useSimulatedTime } from '../../../../scripts/parity/clock';
-import { perform } from '../../../../scripts/parity/interact';
+import { perform, type ParityScenario } from '../../../../scripts/parity/interact';
+import { resetPage, usePreferences } from '../../../../scripts/parity/page';
 import { mountReact, type Mounted } from '../../../../scripts/parity/react';
 import { scenarios } from '../../../../scripts/parity/scenarios';
 import { loadKit, vueExamples } from './examples';
@@ -16,11 +17,17 @@ import { mountVue } from './vue';
 const unwrap = (element: Element) => element.hasAttribute('data-parity-root');
 const snapshot = () => canonicalPage(document, { unwrap });
 
-async function record(mount: () => Promise<Mounted>, steps: Parameters<typeof perform>[0][] = []): Promise<string[]> {
-  // Each rendering runs on its own simulated clock: see clock.ts.
+async function record(
+  mount: () => Promise<Mounted>,
+  { steps = [], reducedMotion }: Partial<Pick<ParityScenario, 'steps' | 'reducedMotion'>> = {},
+): Promise<string[]> {
+  // Each rendering runs on its own simulated clock (see clock.ts), on a page
+  // with the scenario's preferences (see page.ts).
   useSimulatedTime();
-  const mounted = await mount();
+  usePreferences({ reducedMotion });
+  let mounted: Mounted | undefined;
   try {
+    mounted = await mount();
     const states = [snapshot()];
     for (const step of steps) {
       await perform(step, mounted.flush);
@@ -28,7 +35,8 @@ async function record(mount: () => Promise<Mounted>, steps: Parameters<typeof pe
     }
     return states;
   } finally {
-    await mounted.unmount();
+    await mounted?.unmount();
+    resetPage();
     useRealTime();
   }
 }
@@ -66,9 +74,9 @@ describe('React ↔ Vue parity — interactions', () => {
       continue;
     }
     it(title, async () => {
-      const react = await record(() => mountReact(reference.Component), scenario.steps);
+      const react = await record(() => mountReact(reference.Component), scenario);
       const Example = await vue.load();
-      const ported = await record(() => mountVue(Example), scenario.steps);
+      const ported = await record(() => mountVue(Example), scenario);
       expect(ported).toEqual(react);
     });
   }

@@ -32,6 +32,13 @@ export const scenarios: ParityScenario[] = [
     name: 'plays while hovered, stops once the pointer leaves, and plays again',
     steps: hoverSteps,
   })),
+  ...hoverExamples.map(({ component, example }) => ({
+    component,
+    example,
+    name: 'holds still while hovered, for a reader who prefers reduced motion',
+    reducedMotion: true,
+    steps: hoverSteps,
+  })),
   {
     component: 'PixelZoomIn',
     example: 'HoverTrigger',
@@ -52,6 +59,13 @@ export const scenarios: ParityScenario[] = [
       { action: 'wait', ms: 330 },
       { action: 'wait', ms: 540 },
     ],
+  },
+  {
+    component: 'PixelTypewriter',
+    example: 'Default',
+    name: 'shows the whole text at once, without a caret, for a reader who prefers reduced motion',
+    reducedMotion: true,
+    steps: [{ action: 'wait', ms: 330 }],
   },
   {
     component: 'PixelTypewriter',
