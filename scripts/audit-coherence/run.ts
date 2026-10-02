@@ -8,9 +8,10 @@
  * Registration is by discovery, not by list: a gate joins the audit the moment
  * a `gates/NN-name.ts` file default-exports a Gate (or a functional gate wrapped
  * in `adaptFunctionalGate`). `NN` only orders the report. Gates currently
- * registered run 01…36, including `36-skill-refs-fresh`, which verifies that
+ * registered run 01…37, including `36-skill-refs-fresh`, which verifies that
  * the generated `plugins/pxlkit/references/` corpus is still in sync with the
- * ui-kit SSOT.
+ * ui-kit SSOT, and `37-port-examples`, which holds the Vue and Angular kits to
+ * the React manifests' examples.
  *
  * Programmatic API:
  *   const result = await runAudit({ repoRoot: '/path/to/repo' });

@@ -53,11 +53,25 @@ export async function manifestExampleExports(record: ManifestRecord): Promise<st
   });
 }
 
-/** Component name → the example exports a port implements. */
-export async function portExamples(repoRoot: string, port: KitPort): Promise<Map<string, Set<string>>> {
+/** What a port implements of one component. */
+export interface PortedComponent {
+  /** The folder its examples are in, which mirrors the manifest's category. */
+  category: string;
+  /** Its example exports. */
+  exports: Set<string>;
+  /** The examples' folder (Vue) or file (Angular), relative to the repository root. */
+  path: string;
+}
+
+/**
+ * Component key — the component name for Vue, its kebab-case form for
+ * Angular — → what the port implements of it.
+ */
+export async function portComponents(repoRoot: string, port: KitPort): Promise<Map<string, PortedComponent>> {
   const root = path.join(repoRoot, port.dir, "examples");
-  const out = new Map<string, Set<string>>();
+  const out = new Map<string, PortedComponent>();
   if (!(await fs.pathExists(root))) return out;
+  const relative = (target: string) => path.relative(repoRoot, target).split(path.sep).join("/");
   for (const category of (await fs.readdir(root)).sort()) {
     const categoryDir = path.join(root, category);
     if (!(await fs.stat(categoryDir)).isDirectory()) continue;
@@ -66,18 +80,38 @@ export async function portExamples(repoRoot: string, port: KitPort): Promise<Map
         const componentDir = path.join(categoryDir, component);
         if (!(await fs.stat(componentDir)).isDirectory()) continue;
         const files = (await fs.readdir(componentDir)).filter((file) => file.endsWith(".vue"));
-        out.set(component, new Set(files.map((file) => file.slice(0, -".vue".length))));
+        out.set(component, {
+          category,
+          exports: new Set(files.map((file) => file.slice(0, -".vue".length))),
+          path: relative(componentDir),
+        });
       }
     } else {
       for (const file of (await fs.readdir(categoryDir)).sort()) {
         if (!file.endsWith(".examples.ts")) continue;
         const source = await fs.readFile(path.join(categoryDir, file), "utf8");
         const classes = Array.from(source.matchAll(/^export class (\w+)/gm), (match) => match[1]!);
-        out.set(file.slice(0, -".examples.ts".length), new Set(classes));
+        out.set(file.slice(0, -".examples.ts".length), {
+          category,
+          exports: new Set(classes),
+          path: relative(path.join(categoryDir, file)),
+        });
       }
     }
   }
   return out;
+}
+
+/** Component key → the example exports a port implements. */
+export async function portExamples(repoRoot: string, port: KitPort): Promise<Map<string, Set<string>>> {
+  const out = new Map<string, Set<string>>();
+  for (const [key, component] of await portComponents(repoRoot, port)) out.set(key, component.exports);
+  return out;
+}
+
+/** The key a port files a component's examples under. */
+export function portKey(port: KitPort, component: string): string {
+  return port.framework === "vue" ? component : kebabCase(component);
 }
 
 /**
@@ -92,8 +126,7 @@ export async function portedManifests(
   const examples = await portExamples(repoRoot, port);
   const out: ManifestRecord[] = [];
   for (const record of manifests) {
-    const key = port.framework === "vue" ? record.manifest.name : kebabCase(record.manifest.name);
-    const implemented = examples.get(key);
+    const implemented = examples.get(portKey(port, record.manifest.name));
     if (!implemented) continue;
     const expected = await manifestExampleExports(record);
     if (expected.length > 0 && expected.every((name) => implemented.has(name))) out.push(record);
