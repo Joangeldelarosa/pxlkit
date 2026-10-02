@@ -25,7 +25,7 @@ export function PixelMenubarDocsSection({ className }: PixelMenubarDocsSectionPr
       <ul className="docs-highlights">
         <li>Top-level menus with click + hover-to-switch behavior</li>
         <li>Nested submenus with right-arrow open / left-arrow close</li>
-        <li>Full arrow-key, Home/End, Enter/Space, and Escape support</li>
+        <li>WAI-ARIA menubar keyboard model: arrows, Home/End, Enter/Space, Escape and Tab</li>
         <li>Shortcut labels and disabled / separator items</li>
         <li>Surface-aware (border, radius, font) via Surface context</li>
       </ul>
@@ -46,7 +46,7 @@ export function PixelMenubarDocsSection({ className }: PixelMenubarDocsSectionPr
         <li><code>menu</code></li>
         <li><code>menuitem</code></li>
       </ul>
-      <p className="docs-aria-notes">Click-outside closes all open menus. Disabled and separator items are skipped during keyboard traversal. Triggers are role=menuitem with aria-haspopup/aria-expanded; submenus are role=menu labelled by their trigger.</p>
+      <p className="docs-aria-notes">The menubar is one tab stop: the menu button that last had focus or a menu open. Menu buttons are `role=&quot;menuitem&quot;` with `aria-haspopup=&quot;menu&quot;`, `aria-expanded` and `aria-controls` wired to the open menu, which is `role=&quot;menu&quot;` labelled by its button. The open menu takes focus (`tabindex=&quot;-1&quot;`) and points `aria-activedescendant` at the highlighted item — in the menu or its submenu — so assistive technology follows the arrows and Home/End. Separators (`role=&quot;separator&quot;`) and disabled items (`aria-disabled`) are skipped; items with a submenu carry `aria-haspopup` and `aria-expanded`, and the submenu is named after its item. Choosing an item, Escape and Tab return focus to the menu button; a press outside closes every menu and leaves focus where the pointer put it.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -58,39 +58,69 @@ export function PixelMenubarDocsSection({ className }: PixelMenubarDocsSectionPr
         </thead>
         <tbody>
           <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Open its menu with focus in it, highlighting the first enabled item.</td>
+            <td>menu button focused</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowDown</kbd></td>
+            <td>Open its menu with focus in it, highlighting the first enabled item.</td>
+            <td>menu button focused</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowUp</kbd></td>
+            <td>Open its menu with focus in it, highlighting the last enabled item.</td>
+            <td>menu button focused</td>
+          </tr>
+          <tr>
             <td><kbd>ArrowRight / ArrowLeft</kbd></td>
-            <td>Move between top-level menus</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Open the next / previous menu, wrapping round, with focus in it.</td>
+            <td>menu button focused</td>
           </tr>
           <tr>
             <td><kbd>ArrowDown / ArrowUp</kbd></td>
-            <td>Move focus within an open menu</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Highlight the next / previous enabled item, wrapping round — in the submenu when the highlight is in one.</td>
+            <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Home / End</kbd></td>
-            <td>Jump to first / last enabled item</td>
-            <td><span className="docs-muted">—</span></td>
-          </tr>
-          <tr>
-            <td><kbd>Enter / Space</kbd></td>
-            <td>Activate item or open its submenu</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Highlight the first / last enabled item — of the submenu when the highlight is in one.</td>
+            <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>ArrowRight</kbd></td>
-            <td>Open submenu of the active item</td>
-            <td>menu is open</td>
+            <td>Open the submenu, highlighting its first enabled item.</td>
+            <td>item with a submenu highlighted</td>
           </tr>
           <tr>
             <td><kbd>ArrowLeft</kbd></td>
-            <td>Close current submenu</td>
-            <td>submenu is open</td>
+            <td>Close the submenu; the highlight returns to its item.</td>
+            <td>submenu open</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowRight / ArrowLeft</kbd></td>
+            <td>Close the menu and open the next / previous one, wrapping round.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Choose the highlighted item, close the menu and return focus to its button — or open the highlighted item’s submenu on its first item.</td>
+            <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Escape</kbd></td>
-            <td>Close any open menu</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Close the submenu; the highlight returns to its item.</td>
+            <td>submenu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Escape</kbd></td>
+            <td>Close the menu and return focus to its button.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Tab / Shift+Tab</kbd></td>
+            <td>Close the menu and move focus on from its button, out of the menubar.</td>
+            <td>menu open</td>
           </tr>
         </tbody>
       </table>

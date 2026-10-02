@@ -100,6 +100,7 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 
 | Component | Status | Category |
 | --- | --- | --- |
+| `PixelAccordion` | stable | navigation |
 | `PixelAlertDialog` | stable | overlays |
 | `PixelAvatar` | stable | data |
 | `PixelAvatarGroup` | stable | data |
@@ -110,6 +111,7 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | `PixelBento` | stable | layout |
 | `PixelBentoCell` | stable | layout |
 | `PixelBox` | stable | layout |
+| `PixelBreadcrumb` | stable | navigation |
 | `PixelButton` | stable | actions |
 | `PixelCenter` | stable | layout |
 | `PixelCheckbox` | stable | forms |
@@ -129,8 +131,11 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | `PixelInput` | stable | forms |
 | `PixelInputGroup` | stable | forms |
 | `PixelKbd` | stable | data |
+| `PixelMenubar` | stable | navigation |
 | `PixelModal` | stable | overlays |
+| `PixelNavigationMenu` | stable | navigation |
 | `PixelNumberInput` | stable | forms |
+| `PixelPagination` | stable | navigation |
 | `PixelPasswordInput` | stable | forms |
 | `PixelPopover` | stable | overlay-foundation |
 | `PixelPortal` | stable | overlay-foundation |
@@ -141,7 +146,9 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | `PixelSegmented` | stable | forms |
 | `PixelSelect` | stable | forms |
 | `PixelSheet` | stable | overlays |
+| `PixelSidebar` | stable | navigation |
 | `PixelStack` | stable | layout |
+| `PixelStepper` | stable | navigation |
 | `PixelSwitch` | stable | forms |
 | `PixelTabs` | stable | navigation |
 | `PixelTextarea` | stable | forms |

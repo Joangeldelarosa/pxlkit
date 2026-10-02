@@ -2,9 +2,27 @@
 
 import React, { forwardRef } from 'react';
 import {
-  cn, Surface, useEffectiveSurface, surfaceClasses, focusRing,
-} from '../common';
-import { tone as toneTokens, ToneKey } from '../tokens';
+  sidebarBadgeClasses,
+  sidebarBodyClasses,
+  sidebarClasses,
+  sidebarFooterClasses,
+  sidebarHeaderClasses,
+  sidebarHeaderContentClasses,
+  sidebarItemClasses,
+  sidebarItemIconClasses,
+  sidebarItemLabelClasses,
+  sidebarListClasses,
+  sidebarNestedListClasses,
+  sidebarSectionClasses,
+  sidebarSectionLabel,
+  sidebarSectionTitleClasses,
+  sidebarToggleArrow,
+  sidebarToggleArrowClasses,
+  sidebarToggleClasses,
+  sidebarToggleLabel,
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ToneKey } from '../tokens';
 
 export interface PixelSidebarItemProps {
   id: string;
@@ -47,20 +65,8 @@ function SidebarBadge({
   surface: Surface;
   collapsed: boolean;
 }) {
-  const s = surfaceClasses(surface);
-  const t = toneTokens[badge.tone ?? 'neutral'];
   if (collapsed) return null;
-  return (
-    <span
-      className={cn(
-        'ml-auto inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-semibold',
-        s.border, s.radiusFull, s.font,
-        t.bg, t.border, t.text,
-      )}
-    >
-      {badge.label}
-    </span>
-  );
+  return <span className={sidebarBadgeClasses(surface, badge.tone)}>{badge.label}</span>;
 }
 
 function SidebarItem({
@@ -74,7 +80,6 @@ function SidebarItem({
   collapsed: boolean;
   depth: number;
 }) {
-  const s = surfaceClasses(surface);
   const hasNested = !!item.nested && item.nested.length > 0;
 
   const onClick = () => {
@@ -82,28 +87,16 @@ function SidebarItem({
   };
 
   const isLink = !!item.href;
-  const padLeft = depth === 0 ? 'pl-2' : depth === 1 ? 'pl-6' : 'pl-10';
-
-  const sharedClassName = cn(
-    'group relative flex w-full items-center gap-2 pr-2 py-2 text-xs outline-none',
-    padLeft,
-    s.font, s.radius, s.transition,
-    focusRing, 'focus-visible:ring-retro-cyan/40',
-    item.active
-      ? cn('bg-retro-cyan/15 text-retro-cyan', toneTokens.cyan.border)
-      : 'text-retro-text hover:bg-retro-surface/60',
-    'border border-transparent',
-    collapsed && 'justify-center pr-0 pl-0',
-  );
+  const sharedClassName = sidebarItemClasses(surface, { depth, active: !!item.active, collapsed });
 
   const inner = (
     <>
       {item.icon && (
-        <span aria-hidden className="inline-flex h-4 w-4 shrink-0 items-center justify-center">
+        <span aria-hidden className={sidebarItemIconClasses}>
           {item.icon}
         </span>
       )}
-      <span className={cn('truncate', collapsed && 'sr-only')}>{item.label}</span>
+      <span className={sidebarItemLabelClasses(collapsed)}>{item.label}</span>
       {item.badge && (
         <SidebarBadge badge={item.badge} surface={surface} collapsed={collapsed} />
       )}
@@ -137,7 +130,7 @@ function SidebarItem({
         </button>
       )}
       {hasNested && !collapsed && (
-        <ul className="mt-1 space-y-0.5">
+        <ul className={sidebarNestedListClasses}>
           {item.nested!.map((child) => (
             <SidebarItem
               key={child.id}
@@ -169,7 +162,6 @@ export const PixelSidebar = forwardRef<HTMLElement, PixelSidebarProps>(function 
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
 
   const isControlled = collapsedProp !== undefined;
   const [internalCollapsed, setInternalCollapsed] = React.useState<boolean>(
@@ -187,57 +179,37 @@ export const PixelSidebar = forwardRef<HTMLElement, PixelSidebarProps>(function 
     <nav
       ref={ref}
       aria-label="Sidebar"
-      className={cn(
-        'flex h-full flex-col bg-retro-bg/40',
-        s.border, 'border-retro-border/40',
-        collapsed ? 'w-14' : 'w-56',
-        s.transition,
-        className,
-      )}
+      className={cn(sidebarClasses(surface, collapsed), className)}
       {...rest}
     >
       {(header || collapsible) && (
-        <div
-          className={cn(
-            'flex items-center gap-2 border-b border-retro-border/30 px-2 py-2',
-            collapsed && 'justify-center',
-          )}
-        >
-          {!collapsed && header && <div className="min-w-0 flex-1">{header}</div>}
+        <div className={sidebarHeaderClasses(collapsed)}>
+          {!collapsed && header && <div className={sidebarHeaderContentClasses}>{header}</div>}
           {collapsible && (
             <button
               type="button"
               onClick={toggle}
               aria-expanded={!collapsed}
-              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              className={cn(
-                'inline-flex h-7 w-7 items-center justify-center text-retro-muted hover:text-retro-text',
-                s.border, s.radius, s.font, focusRing, 'focus-visible:ring-retro-cyan/40',
-                'border-retro-border/40',
-              )}
+              aria-label={sidebarToggleLabel(collapsed)}
+              className={sidebarToggleClasses(surface)}
             >
-              <span aria-hidden className="text-[10px]">{collapsed ? '>' : '<'}</span>
+              <span aria-hidden className={sidebarToggleArrowClasses}>{sidebarToggleArrow(collapsed)}</span>
             </button>
           )}
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto py-2">
+      <div className={sidebarBodyClasses}>
         {sections.map((section, idx) => {
-          const sectionLabel = section.label ?? section.title;
+          const sectionLabel = sidebarSectionLabel(section);
           return (
-          <div key={sectionLabel ?? `section-${idx}`} className={cn(idx > 0 && 'mt-3')}>
+          <div key={sectionLabel ?? `section-${idx}`} className={sidebarSectionClasses(idx)}>
             {sectionLabel && !collapsed && (
-              <h3
-                className={cn(
-                  'px-3 pb-1 text-[10px] uppercase tracking-wider text-retro-muted',
-                  s.fontDisplay,
-                )}
-              >
+              <h3 className={sidebarSectionTitleClasses(surface)}>
                 {sectionLabel}
               </h3>
             )}
-            <ul role="list" className="space-y-0.5 px-1">
+            <ul role="list" className={sidebarListClasses}>
               {section.items.map((item) => (
                 <SidebarItem
                   key={item.id}
@@ -254,12 +226,7 @@ export const PixelSidebar = forwardRef<HTMLElement, PixelSidebarProps>(function 
       </div>
 
       {footer && (
-        <div
-          className={cn(
-            'border-t border-retro-border/30 px-2 py-2',
-            collapsed && 'flex justify-center',
-          )}
-        >
+        <div className={sidebarFooterClasses(collapsed)}>
           {footer}
         </div>
       )}

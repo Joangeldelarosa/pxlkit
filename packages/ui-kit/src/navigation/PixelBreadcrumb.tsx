@@ -1,5 +1,16 @@
 import React, { forwardRef } from 'react';
-import { Surface, cn, surfaceClasses, useEffectiveSurface } from '../common';
+import {
+  breadcrumbChevron,
+  breadcrumbClasses,
+  breadcrumbCrumbKind,
+  breadcrumbCurrentClasses,
+  breadcrumbItemClasses,
+  breadcrumbLinkClasses,
+  breadcrumbListClasses,
+  breadcrumbSlashClasses,
+  breadcrumbTextClasses,
+} from '@pxlkit/ui-kit-core';
+import { Surface, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelBreadcrumb — trail with pixel chevron separators.
@@ -32,40 +43,40 @@ export const PixelBreadcrumb = forwardRef<HTMLElement, PixelBreadcrumbProps>(fun
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   return (
-    <nav ref={ref} aria-label={ariaLabel} className={cn('flex items-center gap-1.5 text-xs', s.font)}>
-      <ol className="flex flex-wrap items-center gap-1.5">
-        {items.map((item, idx) => (
-          <li key={idx} className="flex items-center gap-1.5">
-            {idx > 0 && (
-              surface === 'pixel' ? (
-                <svg viewBox="0 0 8 8" className="h-2 w-2 shrink-0 text-retro-border" shapeRendering="crispEdges" fill="currentColor" preserveAspectRatio="xMidYMid meet" aria-hidden style={{ display: 'inline-block', verticalAlign: 'middle', overflow: 'visible' }}>
-                  <rect x="2" y="1" width="1" height="1" />
-                  <rect x="3" y="2" width="1" height="1" />
-                  <rect x="4" y="3" width="2" height="1" />
-                  <rect x="3" y="5" width="1" height="1" />
-                  <rect x="2" y="6" width="1" height="1" />
-                </svg>
+    <nav ref={ref} aria-label={ariaLabel} className={breadcrumbClasses(surface)}>
+      <ol className={breadcrumbListClasses}>
+        {items.map((item, idx) => {
+          const kind = breadcrumbCrumbKind(item);
+          return (
+            <li key={idx} className={breadcrumbItemClasses}>
+              {idx > 0 && (
+                surface === 'pixel' ? (
+                  <svg viewBox={breadcrumbChevron.viewBox} className={breadcrumbChevron.className} shapeRendering="crispEdges" fill="currentColor" preserveAspectRatio="xMidYMid meet" aria-hidden style={breadcrumbChevron.style}>
+                    {breadcrumbChevron.rects.map(([x, y, width, height]) => (
+                      <rect key={`${x}-${y}`} x={x} y={y} width={width} height={height} />
+                    ))}
+                  </svg>
+                ) : (
+                  <span aria-hidden className={breadcrumbSlashClasses}>/</span>
+                )
+              )}
+              {kind === 'current' ? (
+                <span aria-current="page" className={breadcrumbCurrentClasses}>{item.label}</span>
+              ) : kind === 'button' ? (
+                <button type="button" onClick={item.onClick} className={breadcrumbLinkClasses}>
+                  {item.label}
+                </button>
+              ) : kind === 'link' ? (
+                <a href={item.href} className={breadcrumbLinkClasses}>
+                  {item.label}
+                </a>
               ) : (
-                <span aria-hidden className="text-retro-border">/</span>
-              )
-            )}
-            {item.active ? (
-              <span aria-current="page" className="text-retro-text font-medium">{item.label}</span>
-            ) : item.onClick ? (
-              <button type="button" onClick={item.onClick} className="text-retro-muted transition-colors hover:text-retro-green focus:outline-none focus-visible:underline">
-                {item.label}
-              </button>
-            ) : item.href ? (
-              <a href={item.href} className="text-retro-muted transition-colors hover:text-retro-green focus:outline-none focus-visible:underline">
-                {item.label}
-              </a>
-            ) : (
-              <span className="text-retro-muted">{item.label}</span>
-            )}
-          </li>
-        ))}
+                <span className={breadcrumbTextClasses}>{item.label}</span>
+              )}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );

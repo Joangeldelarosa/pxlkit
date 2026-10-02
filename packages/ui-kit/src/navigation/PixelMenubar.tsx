@@ -10,9 +10,30 @@ import React, {
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
 import {
+  MENUBAR_SUBMENU_ARROW,
+  menubarClasses,
+  menubarHasSubmenu,
+  menubarHighlight,
+  menubarIds,
+  menubarItemClasses,
+  menubarItemIconClasses,
+  menubarItemLabelClasses,
+  menubarItemSlotClasses,
+  menubarKeyAction,
+  menubarMenuClasses,
+  menubarSeparatorClasses,
+  menubarShortcutClasses,
+  menubarSubmenuArrowClasses,
+  menubarSubmenuClasses,
+  menubarSubmenuLabel,
+  menubarTabStop,
+  menubarTriggerClasses,
+  menubarTriggerSlotClasses,
+  type MenubarMove,
+} from '@pxlkit/ui-kit-core';
+import {
   Surface,
   cn,
-  surfaceClasses,
   useEffectiveSurface,
 } from '../common';
 
@@ -37,42 +58,24 @@ export interface PixelMenubarProps extends React.HTMLAttributes<HTMLDivElement> 
   surface?: Surface;
 }
 
-/** Index of a real (non-separator, enabled) item among items in a menu. */
-function firstFocusableIndex(items: PixelMenubarItem[]): number {
-  for (let i = 0; i < items.length; i += 1) {
-    const it = items[i];
-    if (!it.separator && !it.disabled) return i;
-  }
-  return -1;
-}
-
-function nextFocusableIndex(items: PixelMenubarItem[], from: number, dir: 1 | -1): number {
-  const n = items.length;
-  if (n === 0) return -1;
-  let i = from;
-  for (let step = 0; step < n; step += 1) {
-    i = (i + dir + n) % n;
-    const it = items[i];
-    if (!it.separator && !it.disabled) return i;
-  }
-  return from;
-}
-
 export const PixelMenubar = forwardRef<HTMLDivElement, PixelMenubarProps>(
   function PixelMenubar(
     { menus, surface: surfaceProp, className, onKeyDown, ...rest },
     forwardedRef,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
-    const baseId = useId();
+    const ids = menubarIds(useId());
 
     const [openMenu, setOpenMenu] = useState<number | null>(null);
     const [activeItem, setActiveItem] = useState<number>(-1);
     const [openSubmenuItem, setOpenSubmenuItem] = useState<number | null>(null);
+    const [activeSubItem, setActiveSubItem] = useState<number>(-1);
+    // The button that last had focus or a menu open keeps the tab stop.
+    const [lastTrigger, setLastTrigger] = useState(0);
 
     const rootRef = useRef<HTMLDivElement | null>(null);
     const triggerRefs = useRef<Array<HTMLButtonElement | null>>([]);
+    const menuRef = useRef<HTMLDivElement | null>(null);
 
     const setRefs = useCallback(
       (node: HTMLDivElement | null) => {
@@ -85,19 +88,38 @@ export const PixelMenubar = forwardRef<HTMLDivElement, PixelMenubarProps>(
       [forwardedRef],
     );
 
+    // The open menu takes focus as it mounts, so screen readers follow its
+    // aria-activedescendant; the stable callback runs once per menu.
+    const setMenuRef = useCallback((node: HTMLDivElement | null) => {
+      menuRef.current = node;
+      node?.focus({ preventScroll: true });
+    }, []);
+
     const closeAll = useCallback(() => {
       setOpenMenu(null);
       setActiveItem(-1);
       setOpenSubmenuItem(null);
+      setActiveSubItem(-1);
     }, []);
 
+    // Closing from inside the open menu (Escape, choosing an item) hands
+    // focus back to its button; a press outside leaves focus to the pointer.
+    const closeToTrigger = () => {
+      if (openMenu !== null && menuRef.current?.contains(document.activeElement)) {
+        triggerRefs.current[openMenu]?.focus();
+      }
+      closeAll();
+    };
+
     const openMenuAt = useCallback(
-      (idx: number) => {
+      (idx: number, move: MenubarMove = 'first') => {
         const menu = menus[idx];
         if (!menu) return;
         setOpenMenu(idx);
-        setActiveItem(firstFocusableIndex(menu.items));
+        setLastTrigger(idx);
+        setActiveItem(menubarHighlight(menu.items, -1, move));
         setOpenSubmenuItem(null);
+        setActiveSubItem(-1);
       },
       [menus],
     );
@@ -131,106 +153,78 @@ export const PixelMenubar = forwardRef<HTMLDivElement, PixelMenubarProps>(
 
     const activateItem = (item: PixelMenubarItem) => {
       if (item.disabled || item.separator) return;
-      if (item.submenu && item.submenu.length > 0) return;
+      if (menubarHasSubmenu(item)) return;
       item.onSelect?.();
-      closeAll();
+      closeToTrigger();
     };
 
     const handleRootKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
       onKeyDown?.(e);
       if (e.defaultPrevented) return;
 
-      // Escape closes any open menu
-      if (e.key === 'Escape') {
-        if (openMenu !== null) {
-          e.preventDefault();
-          closeAll();
-        }
+      const items = openMenu === null ? [] : menus[openMenu]?.items ?? [];
+      const highlighted = items[activeItem];
+      const submenu = openSubmenuItem === null ? [] : items[openSubmenuItem]?.submenu ?? [];
+      const action = menubarKeyAction(e.key, {
+        open: openMenu !== null,
+        onSubmenuParent: menubarHasSubmenu(highlighted),
+        submenuOpen: openSubmenuItem !== null,
+        inSubmenu: openSubmenuItem !== null && activeSubItem >= 0,
+      });
+      if (!action) return;
+
+      if (action.type === 'leave') {
+        // Focus is back on the button before the browser's own Tab, which
+        // then moves on from there.
+        if (openMenu !== null) triggerRefs.current[openMenu]?.focus();
+        closeAll();
         return;
       }
-
-      // Horizontal navigation between top-level menus
-      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-        // If a submenu parent is active and Right is pressed → open submenu
-        if (
-          e.key === 'ArrowRight' &&
-          openMenu !== null &&
-          activeItem >= 0 &&
-          menus[openMenu]?.items[activeItem]?.submenu
-        ) {
-          e.preventDefault();
+      e.preventDefault();
+      const focusedTrigger = triggerRefs.current.indexOf(e.target as HTMLButtonElement);
+      switch (action.type) {
+        case 'switch': {
+          // While every menu is closed, the focused button is the current one.
+          const current = openMenu ?? Math.max(0, focusedTrigger);
+          openMenuAt((current + action.step + menus.length) % menus.length);
+          break;
+        }
+        case 'open':
+          if (focusedTrigger >= 0) openMenuAt(focusedTrigger, action.move);
+          break;
+        case 'move':
+          if (action.level === 'submenu') {
+            setActiveSubItem(menubarHighlight(submenu, activeSubItem, action.move));
+          } else {
+            setActiveItem(menubarHighlight(items, activeItem, action.move));
+            setOpenSubmenuItem(null);
+            setActiveSubItem(-1);
+          }
+          break;
+        case 'enter':
           setOpenSubmenuItem(activeItem);
-          return;
-        }
-        // If submenu is open and Left is pressed → close submenu
-        if (e.key === 'ArrowLeft' && openSubmenuItem !== null) {
-          e.preventDefault();
+          setActiveSubItem(menubarHighlight(highlighted?.submenu ?? [], -1, 'first'));
+          break;
+        case 'exit':
           setOpenSubmenuItem(null);
-          return;
-        }
-        e.preventDefault();
-        const dir = e.key === 'ArrowRight' ? 1 : -1;
-        const current = openMenu ?? 0;
-        const next = (current + dir + menus.length) % menus.length;
-        openMenuAt(next);
-        // Move focus to the new trigger
-        triggerRefs.current[next]?.focus();
-        return;
-      }
-
-      // Vertical navigation within current menu
-      if (openMenu !== null) {
-        const items = menus[openMenu].items;
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          const from = activeItem < 0 ? -1 : activeItem;
-          setActiveItem(nextFocusableIndex(items, from, 1));
-          setOpenSubmenuItem(null);
-          return;
-        }
-        if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          const from = activeItem < 0 ? items.length : activeItem;
-          setActiveItem(nextFocusableIndex(items, from, -1));
-          setOpenSubmenuItem(null);
-          return;
-        }
-        if (e.key === 'Home') {
-          e.preventDefault();
-          setActiveItem(firstFocusableIndex(items));
-          return;
-        }
-        if (e.key === 'End') {
-          e.preventDefault();
-          // last focusable
-          let last = -1;
-          for (let i = items.length - 1; i >= 0; i -= 1) {
-            if (!items[i].separator && !items[i].disabled) {
-              last = i;
-              break;
+          setActiveSubItem(-1);
+          break;
+        case 'select':
+          if (activeSubItem >= 0) {
+            const sub = submenu[activeSubItem];
+            if (sub && !sub.disabled) {
+              sub.onSelect?.();
+              closeToTrigger();
             }
+          } else if (highlighted) {
+            activateItem(highlighted);
           }
-          setActiveItem(last);
-          return;
-        }
-        if (e.key === 'Enter' || e.key === ' ') {
-          if (activeItem >= 0) {
-            const item = items[activeItem];
-            if (item.submenu && item.submenu.length > 0) {
-              e.preventDefault();
-              setOpenSubmenuItem(activeItem);
-              return;
-            }
-            e.preventDefault();
-            activateItem(item);
-          }
-        }
+          break;
+        case 'close':
+          closeToTrigger();
+          break;
       }
     };
-
-    const triggerId = (idx: number) => `${baseId}-trigger-${idx}`;
-    const menuId = (idx: number) => `${baseId}-menu-${idx}`;
-    const itemId = (mIdx: number, iIdx: number) => `${baseId}-item-${mIdx}-${iIdx}`;
 
     return (
       <div
@@ -238,58 +232,47 @@ export const PixelMenubar = forwardRef<HTMLDivElement, PixelMenubarProps>(
         role="menubar"
         aria-orientation="horizontal"
         onKeyDown={handleRootKeyDown}
-        className={cn(
-          'relative inline-flex items-center gap-0.5 p-1',
-          s.border,
-          s.radius,
-          'border-retro-border bg-retro-bg',
-          className,
-        )}
+        className={cn(menubarClasses(surface), className)}
         {...rest}
       >
         {menus.map((menu, mIdx) => {
           const isOpen = openMenu === mIdx;
+          const activeDescendant =
+            openSubmenuItem !== null && activeSubItem >= 0
+              ? ids.subitem(mIdx, openSubmenuItem, activeSubItem)
+              : activeItem >= 0
+                ? ids.item(mIdx, activeItem)
+                : undefined;
           return (
-            <div key={`${menu.label}-${mIdx}`} className="relative max-sm:static">
+            <div key={`${menu.label}-${mIdx}`} className={menubarTriggerSlotClasses}>
               <button
                 ref={(node) => {
                   triggerRefs.current[mIdx] = node;
                 }}
-                id={triggerId(mIdx)}
+                id={ids.trigger(mIdx)}
                 type="button"
                 role="menuitem"
                 aria-haspopup="menu"
                 aria-expanded={isOpen}
-                aria-controls={isOpen ? menuId(mIdx) : undefined}
-                tabIndex={openMenu === null ? (mIdx === 0 ? 0 : -1) : isOpen ? 0 : -1}
+                aria-controls={isOpen ? ids.menu(mIdx) : undefined}
+                tabIndex={mIdx === menubarTabStop(openMenu, lastTrigger, menus.length) ? 0 : -1}
+                onFocus={() => setLastTrigger(mIdx)}
                 onClick={() => handleTriggerClick(mIdx)}
                 onMouseEnter={() => handleTriggerMouseEnter(mIdx)}
-                className={cn(
-                  'px-3 py-1.5 text-xs text-retro-text outline-none',
-                  s.font,
-                  s.radius,
-                  'hover:bg-retro-surface/60',
-                  'focus-visible:ring-2 focus-visible:ring-retro-border/60',
-                  isOpen && 'bg-retro-surface/80',
-                )}
+                className={menubarTriggerClasses(surface, isOpen)}
               >
                 {menu.label}
               </button>
 
               {isOpen && (
                 <div
-                  id={menuId(mIdx)}
+                  ref={setMenuRef}
+                  id={ids.menu(mIdx)}
                   role="menu"
-                  aria-labelledby={triggerId(mIdx)}
-                  aria-activedescendant={
-                    activeItem >= 0 ? itemId(mIdx, activeItem) : undefined
-                  }
-                  className={cn(
-                    'absolute left-0 top-full z-50 mt-1 min-w-48 bg-retro-bg p-1 shadow-xl max-sm:left-1 max-sm:right-1',
-                    s.border,
-                    s.radiusLg,
-                    'border-retro-border',
-                  )}
+                  tabIndex={-1}
+                  aria-labelledby={ids.trigger(mIdx)}
+                  aria-activedescendant={activeDescendant}
+                  className={menubarMenuClasses(surface)}
                 >
                   {menu.items.map((item, iIdx) => {
                     if (item.separator) {
@@ -297,65 +280,51 @@ export const PixelMenubar = forwardRef<HTMLDivElement, PixelMenubarProps>(
                         <div
                           key={`sep-${iIdx}`}
                           role="separator"
-                          className="my-1 h-px bg-retro-border/60"
+                          className={menubarSeparatorClasses}
                         />
                       );
                     }
 
                     const isActive = activeItem === iIdx;
-                    const hasSub = !!item.submenu && item.submenu.length > 0;
+                    const hasSub = menubarHasSubmenu(item);
                     const subOpen = hasSub && openSubmenuItem === iIdx;
 
                     return (
                       <div
                         key={item.value}
-                        className="relative"
+                        className={menubarItemSlotClasses}
                         onMouseEnter={() => {
                           if (item.disabled) return;
                           setActiveItem(iIdx);
+                          setActiveSubItem(-1);
                           if (hasSub) setOpenSubmenuItem(iIdx);
                           else setOpenSubmenuItem(null);
                         }}
                       >
                         <div
-                          id={itemId(mIdx, iIdx)}
+                          id={ids.item(mIdx, iIdx)}
                           role="menuitem"
                           aria-disabled={item.disabled || undefined}
                           aria-haspopup={hasSub ? 'menu' : undefined}
                           aria-expanded={hasSub ? subOpen : undefined}
                           tabIndex={-1}
                           onClick={() => activateItem(item)}
-                          className={cn(
-                            'flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-xs text-retro-text',
-                            s.font,
-                            s.radius,
-                            isActive && !item.disabled && 'bg-retro-surface/80',
-                            !isActive && !item.disabled && 'hover:bg-retro-surface/40',
-                            item.disabled && 'cursor-not-allowed opacity-50',
-                          )}
+                          className={menubarItemClasses(surface, { highlighted: isActive, disabled: !!item.disabled })}
                         >
                           {item.icon && (
-                            <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center text-retro-muted">
+                            <span className={menubarItemIconClasses}>
                               {item.icon}
                             </span>
                           )}
-                          <span className="flex-1 truncate">{item.label}</span>
+                          <span className={menubarItemLabelClasses}>{item.label}</span>
                           {item.shortcut && (
-                            <kbd
-                              className={cn(
-                                'ml-2 inline-flex items-center gap-0.5 border px-1.5 py-0.5 text-[10px] text-retro-muted',
-                                s.border,
-                                s.radius,
-                                'border-retro-border',
-                                s.font,
-                              )}
-                            >
+                            <kbd className={menubarShortcutClasses(surface)}>
                               {item.shortcut}
                             </kbd>
                           )}
                           {hasSub && (
-                            <span aria-hidden className="text-retro-muted">
-                              ▸
+                            <span aria-hidden className={menubarSubmenuArrowClasses}>
+                              {MENUBAR_SUBMENU_ARROW}
                             </span>
                           )}
                         </div>
@@ -363,13 +332,8 @@ export const PixelMenubar = forwardRef<HTMLDivElement, PixelMenubarProps>(
                         {subOpen && item.submenu && (
                           <div
                             role="menu"
-                            aria-label={`${item.label} submenu`}
-                            className={cn(
-                              'absolute left-0 top-full z-50 mt-1 min-w-44 max-w-[calc(100vw-2rem)] bg-retro-bg p-1 shadow-xl sm:left-full sm:top-0 sm:ml-1 sm:mt-0 sm:max-w-none',
-                              s.border,
-                              s.radiusLg,
-                              'border-retro-border',
-                            )}
+                            aria-label={menubarSubmenuLabel(item.label)}
+                            className={menubarSubmenuClasses(surface)}
                           >
                             {item.submenu.map((sub, sIdx) => {
                               if (sub.separator) {
@@ -377,36 +341,38 @@ export const PixelMenubar = forwardRef<HTMLDivElement, PixelMenubarProps>(
                                   <div
                                     key={`sub-sep-${sIdx}`}
                                     role="separator"
-                                    className="my-1 h-px bg-retro-border/60"
+                                    className={menubarSeparatorClasses}
                                   />
                                 );
                               }
                               return (
                                 <div
                                   key={sub.value}
+                                  id={ids.subitem(mIdx, iIdx, sIdx)}
                                   role="menuitem"
                                   aria-disabled={sub.disabled || undefined}
                                   tabIndex={-1}
+                                  onMouseEnter={() => {
+                                    if (!sub.disabled) setActiveSubItem(sIdx);
+                                  }}
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     if (sub.disabled) return;
                                     sub.onSelect?.();
-                                    closeAll();
+                                    closeToTrigger();
                                   }}
-                                  className={cn(
-                                    'flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-xs text-retro-text',
-                                    s.font,
-                                    s.radius,
-                                    !sub.disabled && 'hover:bg-retro-surface/60',
-                                    sub.disabled && 'cursor-not-allowed opacity-50',
-                                  )}
+                                  className={menubarItemClasses(surface, {
+                                    highlighted: activeSubItem === sIdx,
+                                    disabled: !!sub.disabled,
+                                    submenu: true,
+                                  })}
                                 >
                                   {sub.icon && (
-                                    <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center text-retro-muted">
+                                    <span className={menubarItemIconClasses}>
                                       {sub.icon}
                                     </span>
                                   )}
-                                  <span className="flex-1 truncate">{sub.label}</span>
+                                  <span className={menubarItemLabelClasses}>{sub.label}</span>
                                 </div>
                               );
                             })}

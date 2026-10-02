@@ -19,7 +19,7 @@
 ### PixelMenubar
 - stable · since 1.9.0
 - Horizontal application menubar with nested submenus, keyboard navigation, and shortcut hints.
-- Top-level menus with click + hover-to-switch behavior · Nested submenus with right-arrow open / left-arrow close · Full arrow-key, Home/End, Enter/Space, and Escape support · Shortcut labels and disabled / separator items · Surface-aware (border, radius, font) via Surface context
+- Top-level menus with click + hover-to-switch behavior · Nested submenus with right-arrow open / left-arrow close · WAI-ARIA menubar keyboard model: arrows, Home/End, Enter/Space, Escape and Tab · Shortcut labels and disabled / separator items · Surface-aware (border, radius, font) via Surface context
 - related: PixelDropdown, PixelTabs, PixelBreadcrumbs
 
 ### PixelNavigationMenu

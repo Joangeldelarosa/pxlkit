@@ -107,6 +107,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   every mode (WCAG 1.4.13) and describes the focused element.
 - `@pxlkit/ui-kit`: form fields' hints and errors are announced: `aria-describedby` pointed at a
   message without an id (`PixelInput`) or was missing (ten other fields).
+- `@pxlkit/ui-kit`: `PixelMenubar` follows the ARIA menubar pattern (focus in the open menu
+  with `aria-activedescendant`, submenus usable from the keyboard, Escape closing the submenu
+  first, focus returned to the menu button, one tab stop on the button last used), and
+  `PixelStepper` draws its active step's ring, whose class Tailwind never generated.
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined
