@@ -100,7 +100,9 @@ describe('@pxlkit/angular in a zone.js application', () => {
     const img = root.querySelector('pxl-animated-icon img')!;
     const checksBefore = app.checks;
     const seen = new Set<number>();
-    for (let i = 0; i < 12; i++) {
+    // Sampled until both frames have shown: a loaded machine runs the
+    // playback timer late, and a sample may land on the same frame again.
+    for (let i = 0; i < 300 && seen.size < 2; i++) {
       await sleep(10);
       seen.add(frameShown(img));
     }

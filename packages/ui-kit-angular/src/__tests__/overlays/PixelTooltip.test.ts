@@ -7,21 +7,31 @@
 import { Component, signal, type Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import type { TooltipDelay, TooltipTrigger } from '@pxlkit/ui-kit-core';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { elapse, useRealTime, useSimulatedTime } from '../../../../../scripts/parity/clock';
 import { PixelTooltip } from '../../public-api';
 
 const tooltip = () => document.querySelector<HTMLElement>('[role="tooltip"]');
 const wrapper = () => document.querySelector<HTMLElement>('span.relative')!;
 const button = () => wrapper().querySelector('button')!;
-const wait = (ms: number) => new Promise((done) => setTimeout(done, ms));
+/** Moves the simulated clock: the delays fire exactly when they are due. */
+const wait = elapse;
 
 async function render<T>(Host: Type<T>) {
   const fixture = TestBed.createComponent(Host);
   document.body.appendChild(fixture.nativeElement);
+  // On simulated time, the change detection Angular schedules on a timer
+  // runs only as the clock moves, and a zero-delay timer set while the clock
+  // moves is due a millisecond later: step it a millisecond at a time until
+  // nothing is pending, a few milliseconds against the delays under test.
+  const stable = async () => {
+    for (let round = 0; round < 20 && !fixture.isStable(); round++) await wait(1);
+    await fixture.whenStable();
+  };
   const settle = async () => {
-    await fixture.whenStable();
+    await stable();
     await wait(0);
-    await fixture.whenStable();
+    await stable();
   };
   await settle();
   return { fixture, host: fixture.componentInstance, settle };
@@ -41,7 +51,12 @@ class Bound {
   readonly delay = signal<TooltipDelay | undefined>({ open: 40, close: 40 });
 }
 
+beforeEach(() => {
+  useSimulatedTime();
+});
+
 afterEach(() => {
+  useRealTime();
   document.body.innerHTML = '';
 });
 

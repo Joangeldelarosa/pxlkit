@@ -12,14 +12,13 @@ import { provideServerRendering, renderApplication } from '@angular/platform-ser
 import { getAnimationFrame, renderIconDataUri } from '@pxlkit/angular';
 import { SSR_DOCUMENT, SsrApp, ssrProps } from './app';
 
-const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
-
 describe('@pxlkit/angular client hydration', () => {
   let appRef: ApplicationRef | undefined;
 
   afterEach(() => {
     appRef?.destroy();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('adopts the server-rendered DOM and starts the browser-only behaviour', async () => {
@@ -38,6 +37,10 @@ describe('@pxlkit/angular client hydration', () => {
     const serverNodes = Array.from(document.querySelectorAll('pxl-ssr-app *'));
     expect(serverNodes.length).toBeGreaterThan(30);
 
+    // Playback's interval on simulated time: it advances a frame when the
+    // clock does, however busy the machine is. Angular's own scheduling
+    // stays on real time.
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     const log = vi.spyOn(console, 'log').mockImplementation(() => {});
     const errors = vi.spyOn(console, 'error');
     const warnings = vi.spyOn(console, 'warn');
@@ -62,7 +65,8 @@ describe('@pxlkit/angular client hydration', () => {
     const img = document.querySelector('#animated img')!;
     const icon = ssrProps.animated.icon;
     expect(img.getAttribute('src')).toBe(renderIconDataUri(getAnimationFrame(icon, 0)));
-    await sleep(icon.frameDuration + 50);
+    vi.advanceTimersByTime(icon.frameDuration);
+    await appRef.whenStable();
     expect(img.getAttribute('src')).toBe(renderIconDataUri(getAnimationFrame(icon, 1)));
   });
 });
