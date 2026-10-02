@@ -134,3 +134,31 @@ describe('PixelInput — upgrades', () => {
     expect(getByText('Use a real one')).toBeTruthy();
   });
 });
+
+describe('PixelInput — hint / error description (regression)', () => {
+  // The input pointed aria-describedby at `<id>-msg`, an id no element had.
+  it('describes the input with the hint, then with the error that replaces it', () => {
+    const { getByRole, rerender } = render(<PixelInput label="Email" hint="We never share it" />);
+    const input = getByRole('textbox', { name: 'Email' });
+    expect(input).toHaveAccessibleDescription('We never share it');
+    rerender(<PixelInput label="Email" hint="We never share it" error="Enter a valid email" />);
+    expect(input).toHaveAccessibleDescription('Enter a valid email');
+    rerender(<PixelInput label="Email" />);
+    expect(input).not.toHaveAttribute('aria-describedby');
+  });
+
+  it("adds the message after the consumer's aria-describedby instead of replacing it", () => {
+    const field = (hint?: string) => (
+      <>
+        <p id="email-rules">Work addresses only</p>
+        <PixelInput id="email" label="Email" aria-describedby="email-rules" hint={hint} />
+      </>
+    );
+    const { getByRole, rerender } = render(field());
+    const input = getByRole('textbox', { name: 'Email' });
+    expect(input).toHaveAttribute('aria-describedby', 'email-rules');
+    rerender(field('We never share it'));
+    expect(input).toHaveAttribute('aria-describedby', 'email-rules email-msg');
+    expect(input).toHaveAccessibleDescription('Work addresses only We never share it');
+  });
+});

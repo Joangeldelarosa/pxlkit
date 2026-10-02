@@ -10,6 +10,7 @@ import React, {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
+import { fieldDescribedBy, fieldMessageId } from '@pxlkit/ui-kit-core';
 import {
   Surface, cn,
   surfaceClasses, useEffectiveSurface,
@@ -192,7 +193,7 @@ export const PixelCombobox = forwardRef<HTMLButtonElement, PixelComboboxProps>(
     const activeId = items[highlighted] ? optionIdFor(items[highlighted].value) : undefined;
 
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId} messageId={fieldMessageId(triggerId)}>
         <div className="relative">
           {name && (
             <input
@@ -224,6 +225,7 @@ export const PixelCombobox = forwardRef<HTMLButtonElement, PixelComboboxProps>(
                 aria-activedescendant={open ? activeId : undefined}
                 aria-disabled={disabled || undefined}
                 aria-invalid={error ? true : undefined}
+                aria-describedby={fieldDescribedBy(triggerId, { hint, error })}
                 disabled={disabled}
                 onKeyDown={(e) => {
                   // ArrowDown/Up open the popup if closed (APG combobox); otherwise

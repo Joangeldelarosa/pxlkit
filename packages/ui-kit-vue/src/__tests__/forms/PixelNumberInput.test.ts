@@ -110,4 +110,40 @@ describe('PixelNumberInput', () => {
     expect(keys).toEqual(['ArrowUp']);
     expect((wrapper.vm as unknown as { element: HTMLInputElement }).element).toBe(input.element);
   });
+
+  it('describes the spinbutton with the hint or the error, after the ids passed to it', async () => {
+    const describedBy = ref<string | undefined>('qty-note');
+    const hint = ref<string | undefined>('Up to 10 per order');
+    const error = ref<string | undefined>();
+    const wrapper = mount(
+      defineComponent({
+        render: () =>
+          h(PixelNumberInput, {
+            label: 'Quantity', id: 'qty',
+            hint: hint.value,
+            error: error.value,
+            'aria-describedby': describedBy.value,
+          }),
+      }),
+      { attachTo: document.body },
+    );
+    const control = wrapper.find(spinbutton);
+    const message = () => document.getElementById('qty-msg')?.textContent;
+    expect(control.attributes('aria-describedby')).toBe('qty-note qty-msg');
+    expect(message()).toBe('Up to 10 per order');
+    error.value = 'Out of stock';
+    await nextTick();
+    expect(control.attributes('aria-describedby')).toBe('qty-note qty-msg');
+    expect(message()).toBe('Out of stock');
+    hint.value = undefined;
+    error.value = undefined;
+    describedBy.value = 'qty-policy';
+    await nextTick();
+    expect(control.attributes('aria-describedby')).toBe('qty-policy');
+    expect(message()).toBeUndefined();
+    describedBy.value = undefined;
+    await nextTick();
+    expect(control.attributes()).not.toHaveProperty('aria-describedby');
+    wrapper.unmount();
+  });
 });

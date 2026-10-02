@@ -1,6 +1,7 @@
 'use client';
 
 import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { fieldDescribedBy, fieldMessageId } from '@pxlkit/ui-kit-core';
 import {
   Surface,
   cn,
@@ -519,7 +520,7 @@ export const PixelDateRangePicker = forwardRef<
   const displayTo = pendingFrom ? undefined : range.to;
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId} messageId={fieldMessageId(triggerId)}>
       <span className="relative block">
         <PixelPopover
           open={open}
@@ -536,6 +537,7 @@ export const PixelDateRangePicker = forwardRef<
               data-testid={dataTestId}
               aria-haspopup="dialog"
               aria-invalid={error ? true : undefined}
+              aria-describedby={fieldDescribedBy(triggerId, { hint, error })}
               className={triggerClasses}
             >
               <span className="truncate">{triggerLabel}</span>

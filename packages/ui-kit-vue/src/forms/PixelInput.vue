@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, useId, useTemplateRef, type VNode } from 'vue';
+import { computed, useAttrs, useId, useTemplateRef, type VNode } from 'vue';
 import {
   characterCountClasses,
   characterCountText,
+  fieldDescribedBy,
+  fieldMessageId,
   getStringLength,
   inputClasses,
   inputControlClasses,
@@ -96,6 +98,11 @@ const slots = defineSlots<{
 const surface = useEffectiveSurface(() => props.surface);
 const generatedId = useId();
 const inputId = computed(() => props.id ?? `pxl-input-${generatedId}`);
+const attrs = useAttrs();
+// Attributes are not reactive: the consumer's `aria-describedby` is read while
+// rendering, and the hint / error is added to it while one shows.
+const describedBy = () =>
+  fieldDescribedBy(inputId.value, props, attrs['aria-describedby'] as string | undefined);
 const input = useTemplateRef<HTMLInputElement>('input');
 
 const [value, setValue] = useControllableState<string | number>({
@@ -141,7 +148,14 @@ defineExpose({
 </script>
 
 <template>
-  <FieldShell :label="label" :hint="hint" :error="error" :surface="surface" :html-for="inputId">
+  <FieldShell
+    :label="label"
+    :hint="hint"
+    :error="error"
+    :surface="surface"
+    :html-for="inputId"
+    :message-id="fieldMessageId(inputId)"
+  >
     <Wrap :tag="$slots['addon-left'] || $slots['addon-right'] ? 'span' : undefined" :class="classes.addons">
       <span v-if="$slots['addon-left']" :class="classes.addonLeft"><slot name="addon-left" /></span>
       <span :class="classes.shell">
@@ -152,12 +166,12 @@ defineExpose({
           :id="inputId"
           ref="input"
           :aria-invalid="error ? true : undefined"
-          :aria-describedby="error || hint ? `${inputId}-msg` : undefined"
           :value="value"
           :disabled="disabled || loading"
           :maxlength="max"
           :class="controlClasses()"
           v-bind="$attrs"
+          :aria-describedby="describedBy()"
           @input="onInput"
         />
         <span v-if="showClear || loading || $slots.suffix" :class="classes.trailing">

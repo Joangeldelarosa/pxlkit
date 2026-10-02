@@ -17,6 +17,11 @@ const props = defineProps<{
    * real `<label for>`; without it the text renders as a plain span.
    */
   htmlFor?: string;
+  /**
+   * Id of the hint / error text, for the control's `aria-describedby`
+   * (`fieldMessageId` / `fieldDescribedBy` from the core).
+   */
+  messageId?: string;
 }>();
 defineSlots<{ default?(): VNode[] }>();
 
@@ -34,7 +39,7 @@ const text = computed(() => fieldShellTextClasses(surface.value));
       <span v-else :class="text.label">{{ label }}</span>
     </template>
     <slot />
-    <span v-if="error" :class="text.error">{{ error }}</span>
-    <span v-else-if="hint" :class="text.hint">{{ hint }}</span>
+    <span v-if="error" :id="messageId" :class="text.error">{{ error }}</span>
+    <span v-else-if="hint" :id="messageId" :class="text.hint">{{ hint }}</span>
   </div>
 </template>

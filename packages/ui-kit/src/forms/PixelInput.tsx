@@ -6,6 +6,8 @@ import React, { forwardRef, useCallback, useId, useRef, useState } from 'react';
 import {
   characterCountClasses,
   characterCountText,
+  fieldDescribedBy,
+  fieldMessageId,
   inputClasses,
   inputControlClasses,
   showCountMax,
@@ -70,6 +72,7 @@ export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function
     defaultValue,
     onChange,
     disabled,
+    'aria-describedby': ariaDescribedBy,
     ...rest
   },
   ref,
@@ -128,7 +131,7 @@ export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function
         id={inputId}
         ref={setRefs}
         aria-invalid={error ? true : undefined}
-        aria-describedby={error || hint ? `${inputId}-msg` : undefined}
+        aria-describedby={fieldDescribedBy(inputId, { hint, error }, ariaDescribedBy)}
         value={isControlled ? (value as string | number) : undefined}
         defaultValue={!isControlled ? defaultValue : undefined}
         onChange={handleChange}
@@ -177,7 +180,7 @@ export const PixelInput = forwardRef<HTMLInputElement, PixelInputProps>(function
   ) : inputEl;
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId} messageId={fieldMessageId(inputId)}>
       {shellBody}
       {showCount && (
         <span aria-live="polite" className={characterCountClasses(surface, valueLen, max)}>

@@ -109,3 +109,27 @@ describe('PixelNumberInput', () => {
     expect(input.value).toBe('99');
   });
 });
+
+describe('PixelNumberInput — hint / error description (regression)', () => {
+  it('describes the spinbutton with the hint, then with the error, only while one shows', () => {
+    const { getByRole, rerender } = render(<PixelNumberInput label="Quantity" hint="Up to 10 per order" />);
+    const input = getByRole('spinbutton', { name: 'Quantity' });
+    expect(input).toHaveAccessibleDescription('Up to 10 per order');
+    rerender(<PixelNumberInput label="Quantity" hint="Up to 10 per order" error="Out of stock" />);
+    expect(input).toHaveAccessibleDescription('Out of stock');
+    rerender(<PixelNumberInput label="Quantity" />);
+    expect(input).not.toHaveAttribute('aria-describedby');
+  });
+
+  it("keeps the consumer's aria-describedby and adds the message after it", () => {
+    const { getByRole } = render(
+      <>
+        <p id="qty-note">Ships in a week</p>
+        <PixelNumberInput id="qty" label="Quantity" aria-describedby="qty-note" error="Out of stock" />
+      </>,
+    );
+    const input = getByRole('spinbutton', { name: 'Quantity' });
+    expect(input).toHaveAttribute('aria-describedby', 'qty-note qty-msg');
+    expect(input).toHaveAccessibleDescription('Ships in a week Out of stock');
+  });
+});

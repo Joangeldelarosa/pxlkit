@@ -13,6 +13,8 @@ import {
   autosizeTextarea,
   characterCountClasses,
   characterCountText,
+  fieldDescribedBy,
+  fieldMessageId,
   getStringLength,
   showCountMax,
   textareaClasses,
@@ -58,6 +60,7 @@ import { showCountAttribute } from './_internal/show-count';
     '[attr.required]': 'null',
     '[attr.readonly]': 'null',
     '[attr.aria-label]': 'null',
+    '[attr.aria-describedby]': 'null',
   },
   template: `
     <pxl-field-shell
@@ -66,6 +69,7 @@ import { showCountAttribute } from './_internal/show-count';
       [error]="error()"
       [surface]="effectiveSurface()"
       [htmlFor]="textareaId()"
+      [messageId]="messageId()"
     >
       <textarea
         #textarea
@@ -77,6 +81,7 @@ import { showCountAttribute } from './_internal/show-count';
         [attr.maxlength]="maxlength() ?? max() ?? null"
         [attr.aria-label]="ariaLabel() ?? null"
         [attr.aria-invalid]="error() ? true : null"
+        [attr.aria-describedby]="describedBy() ?? null"
         [required]="required()"
         [readOnly]="readonly()"
         [disabled]="isDisabled()"
@@ -134,6 +139,8 @@ export class PixelTextarea implements ControlValueAccessor {
   readonly readonly = input(false, { transform: booleanOr(false) });
   /** Accessible name of the textarea when no `label` is shown. */
   readonly ariaLabel = input<string | undefined>(undefined, { alias: 'aria-label' });
+  /** Ids of more elements that describe the textarea; its hint / error is added while one shows. */
+  readonly ariaDescribedby = input<string | undefined>(undefined, { alias: 'aria-describedby' });
 
   /** @internal */
   protected readonly form = new FormBridge<string>();
@@ -144,6 +151,12 @@ export class PixelTextarea implements ControlValueAccessor {
 
   /** @internal */
   protected readonly textareaId = computed(() => this.id() ?? this.generatedId);
+  /** @internal */
+  protected readonly messageId = computed(() => fieldMessageId(this.textareaId()));
+  /** @internal */
+  protected readonly describedBy = computed(() =>
+    fieldDescribedBy(this.textareaId(), { hint: this.hint(), error: this.error() }, this.ariaDescribedby()),
+  );
   /** @internal */
   protected readonly current = computed(() => this.value() ?? this.defaultValue() ?? '');
   /** @internal */

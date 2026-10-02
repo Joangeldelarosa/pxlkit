@@ -79,3 +79,29 @@ describe('PixelPasswordInput', () => {
     expect(ref.current!.type).toBe('password');
   });
 });
+
+describe('PixelPasswordInput — hint / error description (regression)', () => {
+  it('describes the input with the hint, then with the error, only while one shows', () => {
+    const { getByLabelText, rerender } = render(
+      <PixelPasswordInput label="Password" hint="At least 12 characters" />,
+    );
+    const input = getByLabelText('Password');
+    expect(input).toHaveAccessibleDescription('At least 12 characters');
+    rerender(<PixelPasswordInput label="Password" hint="At least 12 characters" error="Too short" />);
+    expect(input).toHaveAccessibleDescription('Too short');
+    rerender(<PixelPasswordInput label="Password" />);
+    expect(input).not.toHaveAttribute('aria-describedby');
+  });
+
+  it("keeps the consumer's aria-describedby and adds the message after it", () => {
+    const { getByLabelText } = render(
+      <>
+        <p id="pw-rules">Mix letters and digits</p>
+        <PixelPasswordInput id="pw" label="Password" aria-describedby="pw-rules" error="Too short" />
+      </>,
+    );
+    const input = getByLabelText('Password');
+    expect(input).toHaveAttribute('aria-describedby', 'pw-rules pw-msg');
+    expect(input).toHaveAccessibleDescription('Mix letters and digits Too short');
+  });
+});

@@ -80,4 +80,40 @@ describe('PixelTextarea', () => {
     expect(textarea.classes()).toEqual(expect.arrayContaining(['mine', 'min-h-24']));
     expect((wrapper.vm as unknown as { element: HTMLTextAreaElement }).element).toBe(textarea.element);
   });
+
+  it('describes the textarea with the hint or the error, after the ids passed to it', async () => {
+    const describedBy = ref<string | undefined>('bio-tips');
+    const hint = ref<string | undefined>('Markdown is supported');
+    const error = ref<string | undefined>();
+    const wrapper = mount(
+      defineComponent({
+        render: () =>
+          h(PixelTextarea, {
+            label: 'Bio', id: 'bio',
+            hint: hint.value,
+            error: error.value,
+            'aria-describedby': describedBy.value,
+          }),
+      }),
+      { attachTo: document.body },
+    );
+    const control = wrapper.find('textarea');
+    const message = () => document.getElementById('bio-msg')?.textContent;
+    expect(control.attributes('aria-describedby')).toBe('bio-tips bio-msg');
+    expect(message()).toBe('Markdown is supported');
+    error.value = 'Too long';
+    await nextTick();
+    expect(control.attributes('aria-describedby')).toBe('bio-tips bio-msg');
+    expect(message()).toBe('Too long');
+    hint.value = undefined;
+    error.value = undefined;
+    describedBy.value = 'bio-policy';
+    await nextTick();
+    expect(control.attributes('aria-describedby')).toBe('bio-policy');
+    expect(message()).toBeUndefined();
+    describedBy.value = undefined;
+    await nextTick();
+    expect(control.attributes()).not.toHaveProperty('aria-describedby');
+    wrapper.unmount();
+  });
 });

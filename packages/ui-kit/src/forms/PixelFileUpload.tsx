@@ -1,6 +1,7 @@
 'use client';
 
 import React, { forwardRef, useCallback, useId, useRef, useState } from 'react';
+import { fieldDescribedBy, fieldMessageId } from '@pxlkit/ui-kit-core';
 import {
   Size, Surface, cn,
   toneMap, focusRing, surfaceClasses, useEffectiveSurface,
@@ -199,7 +200,7 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
   const t = toneMap[tone];
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId} messageId={fieldMessageId(inputId)}>
       <div ref={ref} className={cn('space-y-3', className)} data-pxl-name={name || undefined}>
         {dropzone && (
           <div
@@ -207,7 +208,7 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
             role="button"
             tabIndex={disabled ? -1 : 0}
             aria-disabled={disabled || undefined}
-            aria-describedby={`${inputId}-msg`}
+            aria-describedby={fieldDescribedBy(inputId, { hint, error })}
             onClick={handleBrowse}
             onKeyDown={handleKeyDown}
             onDrop={handleDrop}
@@ -254,6 +255,7 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
           className="sr-only"
           tabIndex={dropzone ? -1 : 0}
           aria-hidden={dropzone || undefined}
+          aria-describedby={dropzone ? undefined : fieldDescribedBy(inputId, { hint, error })}
         />
 
         {!dropzone && (

@@ -303,15 +303,32 @@ describe('PxlOutlet', () => {
 
 describe('PixelFieldShell', () => {
   it("renders the DOM of the React kit's FieldShell", async () => {
-    const cases: Array<{ label?: string; hint?: string; error?: string; htmlFor?: string; surface?: 'linear' }> = [
+    const cases: Array<{
+      label?: string;
+      hint?: string;
+      error?: string;
+      htmlFor?: string;
+      messageId?: string;
+      surface?: 'linear';
+    }> = [
       { label: 'Email', hint: 'We never share it', htmlFor: 'email' },
       { label: 'Name', hint: 'hint', error: 'Required', surface: 'linear' },
       { hint: 'Only a hint' },
+      { label: 'Email', hint: 'We never share it', htmlFor: 'email', messageId: 'email-msg' },
+      { label: 'Email', hint: 'hint', error: 'Required', htmlFor: 'email', messageId: 'email-msg' },
+      { label: 'Email', htmlFor: 'email', messageId: 'email-msg' },
     ];
     @Component({
       imports: [PixelFieldShell],
       template: `
-        <pxl-field-shell [label]="field().label" [hint]="field().hint" [error]="field().error" [htmlFor]="field().htmlFor" [surface]="field().surface">
+        <pxl-field-shell
+          [label]="field().label"
+          [hint]="field().hint"
+          [error]="field().error"
+          [htmlFor]="field().htmlFor"
+          [messageId]="field().messageId"
+          [surface]="field().surface"
+        >
           <input id="email" />
         </pxl-field-shell>
       `,
@@ -328,6 +345,33 @@ describe('PixelFieldShell', () => {
       await fixture.whenStable();
       expect(canonicalDom(fixture.nativeElement as HTMLElement, angularDomRules)).toBe(expected);
     }
+  });
+
+  it('gives the hint, or the error replacing it, the message id', async () => {
+    @Component({
+      imports: [PixelFieldShell],
+      template: `<pxl-field-shell [hint]="hint()" [error]="error()" [messageId]="messageId()" />`,
+    })
+    class Host {
+      readonly hint = signal<string | undefined>('We never share it');
+      readonly error = signal<string | undefined>(undefined);
+      readonly messageId = signal<string | undefined>('email-msg');
+    }
+    const fixture = await render(Host);
+    const root = fixture.nativeElement as HTMLElement;
+    const message = () => root.querySelector('#email-msg')?.textContent;
+    expect(message()).toBe('We never share it');
+    fixture.componentInstance.error.set('Required');
+    await fixture.whenStable();
+    expect(message()).toBe('Required');
+    fixture.componentInstance.hint.set(undefined);
+    fixture.componentInstance.error.set(undefined);
+    await fixture.whenStable();
+    expect(message()).toBeUndefined();
+    fixture.componentInstance.hint.set('We never share it');
+    fixture.componentInstance.messageId.set(undefined);
+    await fixture.whenStable();
+    expect(root.querySelector('pxl-field-shell span')!.hasAttribute('id')).toBe(false);
   });
 });
 

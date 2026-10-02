@@ -4,6 +4,8 @@ import type { ControlValueAccessor } from '@angular/forms';
 import {
   characterCountClasses,
   characterCountText,
+  fieldDescribedBy,
+  fieldMessageId,
   getStringLength,
   inputClasses,
   inputControlClasses,
@@ -55,6 +57,7 @@ import { showCountAttribute } from './_internal/show-count';
     '[attr.required]': 'null',
     '[attr.readonly]': 'null',
     '[attr.aria-label]': 'null',
+    '[attr.aria-describedby]': 'null',
   },
   template: `
     <pxl-field-shell
@@ -63,6 +66,7 @@ import { showCountAttribute } from './_internal/show-count';
       [error]="error()"
       [surface]="effectiveSurface()"
       [htmlFor]="inputId()"
+      [messageId]="messageId()"
     >
       @if (addonLeft() || addonRight()) {
         <span [class]="parts().addons">
@@ -98,7 +102,7 @@ import { showCountAttribute } from './_internal/show-count';
           [attr.maxlength]="maxlength() ?? max() ?? null"
           [attr.aria-label]="ariaLabel() ?? null"
           [attr.aria-invalid]="error() ? true : null"
-          [attr.aria-describedby]="error() || hint() ? inputId() + '-msg' : null"
+          [attr.aria-describedby]="describedBy() ?? null"
           [required]="required()"
           [readOnly]="readonly()"
           [disabled]="isDisabled() || loading()"
@@ -192,6 +196,8 @@ export class PixelInput implements ControlValueAccessor {
   readonly readonly = input(false, { transform: booleanOr(false) });
   /** Accessible name of the input when no `label` is shown. */
   readonly ariaLabel = input<string | undefined>(undefined, { alias: 'aria-label' });
+  /** Ids of more elements that describe the input; its hint / error is added while one shows. */
+  readonly ariaDescribedby = input<string | undefined>(undefined, { alias: 'aria-describedby' });
   /** The clear button was pressed. */
   readonly clear = output<void>();
 
@@ -203,6 +209,12 @@ export class PixelInput implements ControlValueAccessor {
 
   /** @internal */
   protected readonly inputId = computed(() => this.id() ?? this.generatedId);
+  /** @internal */
+  protected readonly messageId = computed(() => fieldMessageId(this.inputId()));
+  /** @internal */
+  protected readonly describedBy = computed(() =>
+    fieldDescribedBy(this.inputId(), { hint: this.hint(), error: this.error() }, this.ariaDescribedby()),
+  );
   /** @internal */
   protected readonly current = computed(() => String(this.value() ?? this.defaultValue() ?? ''));
   /** @internal */

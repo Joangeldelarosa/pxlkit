@@ -45,7 +45,7 @@ export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputD
         <li><code>textbox</code></li>
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">The visibility toggle is a real &lt;button type=&quot;button&quot;&gt; with an aria-label that mirrors the current state, and exposes aria-pressed so screen readers announce whether the password is currently visible. The input sets aria-invalid when an error is present and FieldShell wires aria-describedby to the hint/error message.</p>
+      <p className="docs-aria-notes">The visibility toggle is a real &lt;button type=&quot;button&quot;&gt; with an aria-label that mirrors the current state, and exposes aria-pressed so screen readers announce whether the password is currently visible. The input sets aria-invalid when an error is present, and its aria-describedby points at the hint/error message while one shows, after any ids you pass.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

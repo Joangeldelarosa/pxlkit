@@ -107,6 +107,7 @@ export function FieldShell({
   error,
   surface: surfaceProp,
   htmlFor,
+  messageId,
   children,
 }: {
   label?: string;
@@ -118,6 +119,11 @@ export function FieldShell({
    * real `<label htmlFor>`; without it the text renders as a plain span.
    */
   htmlFor?: string;
+  /**
+   * Id of the hint / error text, for the control's `aria-describedby`
+   * (`fieldMessageId` / `fieldDescribedBy` from the core).
+   */
+  messageId?: string;
   children: React.ReactNode;
 }) {
   // Resolve like every other surface-aware component: prop wins, then the
@@ -144,9 +150,9 @@ export function FieldShell({
         ))}
       {children}
       {error ? (
-        <span className={text.error}>{error}</span>
+        <span id={messageId} className={text.error}>{error}</span>
       ) : hint ? (
-        <span className={text.hint}>{hint}</span>
+        <span id={messageId} className={text.hint}>{hint}</span>
       ) : null}
     </div>
   );

@@ -144,19 +144,64 @@ describe('PixelNumberInput', () => {
   it('puts native attributes on the input, not on its host', async () => {
     @Component({
       imports: [PixelNumberInput],
-      template: `<pxl-number-input id="qty" name="qty" placeholder="0" required readonly aria-label="Quantity" />`,
+      template: `
+        <pxl-number-input
+          id="qty"
+          name="qty"
+          placeholder="0"
+          required
+          readonly
+          aria-label="Quantity"
+          aria-describedby="qty-help"
+        />
+      `,
     })
     class Host {}
     const fixture = TestBed.createComponent(Host);
     await fixture.whenStable();
     const host = fixture.nativeElement.querySelector('pxl-number-input') as HTMLElement;
     const input = inputOf(fixture.nativeElement);
-    for (const name of ['id', 'name', 'required', 'readonly', 'aria-label']) expect(host.hasAttribute(name)).toBe(false);
+    for (const name of ['id', 'name', 'required', 'readonly', 'aria-label', 'aria-describedby']) {
+      expect(host.hasAttribute(name)).toBe(false);
+    }
     expect(input.id).toBe('qty');
     expect(input.hasAttribute('name')).toBe(false);
     expect(input.placeholder).toBe('0');
     expect(input.required).toBe(true);
     expect(input.readOnly).toBe(true);
     expect(input.getAttribute('aria-label')).toBe('Quantity');
+    expect(input.getAttribute('aria-describedby')).toBe('qty-help');
+  });
+
+  it('describes the spinbutton with the hint or the error, after the ids passed to it', async () => {
+    @Component({
+      imports: [PixelNumberInput],
+      template: `<pxl-number-input id="qty" label="Quantity" [hint]="hint()" [error]="error()" [aria-describedby]="describedBy()" />`,
+    })
+    class Host {
+      readonly hint = signal<string | undefined>('Up to 10 per order');
+      readonly error = signal<string | undefined>(undefined);
+      readonly describedBy = signal<string | undefined>('qty-note');
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const control = inputOf(root);
+    const message = () => root.querySelector('#qty-msg')?.textContent;
+    expect(control.getAttribute('aria-describedby')).toBe('qty-note qty-msg');
+    expect(message()).toBe('Up to 10 per order');
+    fixture.componentInstance.error.set('Out of stock');
+    await fixture.whenStable();
+    expect(control.getAttribute('aria-describedby')).toBe('qty-note qty-msg');
+    expect(message()).toBe('Out of stock');
+    fixture.componentInstance.hint.set(undefined);
+    fixture.componentInstance.error.set(undefined);
+    fixture.componentInstance.describedBy.set('qty-policy');
+    await fixture.whenStable();
+    expect(control.getAttribute('aria-describedby')).toBe('qty-policy');
+    expect(message()).toBeUndefined();
+    fixture.componentInstance.describedBy.set(undefined);
+    await fixture.whenStable();
+    expect(control.hasAttribute('aria-describedby')).toBe(false);
   });
 });

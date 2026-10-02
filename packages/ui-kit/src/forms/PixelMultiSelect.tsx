@@ -10,6 +10,7 @@ import React, {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
 } from 'react';
+import { fieldDescribedBy, fieldMessageId } from '@pxlkit/ui-kit-core';
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -190,7 +191,7 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
     const showClear = clearable && value.length > 0;
 
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId} messageId={fieldMessageId(triggerId)}>
         {name &&
           value.map((v) => (
             <input key={v} type="hidden" name={name} value={v} />
@@ -216,6 +217,7 @@ export const PixelMultiSelect = forwardRef<HTMLButtonElement, PixelMultiSelectPr
               aria-expanded={open}
               aria-activedescendant={open ? activeId : undefined}
               aria-invalid={error ? true : undefined}
+              aria-describedby={fieldDescribedBy(triggerId, { hint, error })}
               onKeyDown={navigate}
               className={cn(
                 'flex w-full items-center justify-between gap-2 px-3 outline-none',

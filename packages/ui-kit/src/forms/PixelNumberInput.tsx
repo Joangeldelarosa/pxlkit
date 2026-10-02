@@ -3,6 +3,8 @@
 import React, { forwardRef, useCallback, useEffect, useId, useRef, useState } from 'react';
 import {
   clampNumber,
+  fieldDescribedBy,
+  fieldMessageId,
   formatNumberInput,
   numberInputAtLimit,
   numberInputClasses,
@@ -77,6 +79,7 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
       onBlur,
       onFocus,
       onKeyDown,
+      'aria-describedby': ariaDescribedBy,
       ...rest
     },
     ref,
@@ -189,7 +192,7 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
     });
 
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId} messageId={fieldMessageId(inputId)}>
         <span className={c.shell}>
           {prefix && (
             <span aria-hidden className={c.prefix}>
@@ -206,6 +209,7 @@ export const PixelNumberInput = forwardRef<HTMLInputElement, PixelNumberInputPro
             aria-valuemax={typeof max === 'number' ? max : undefined}
             aria-valuenow={typeof current === 'number' ? current : undefined}
             aria-invalid={error ? true : undefined}
+            aria-describedby={fieldDescribedBy(inputId, { hint, error }, ariaDescribedBy)}
             disabled={disabled}
             placeholder={placeholder}
             value={display}

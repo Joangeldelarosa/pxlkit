@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, input, model, signal, viewChild } from '@angular/core';
 import type { ControlValueAccessor } from '@angular/forms';
 import {
+  fieldDescribedBy,
+  fieldMessageId,
   selectClasses,
   selectKeydown,
   selectListboxId,
@@ -58,6 +60,7 @@ import type { Option } from './option';
       [error]="error()"
       [surface]="effectiveSurface()"
       [htmlFor]="triggerId()"
+      [messageId]="messageId()"
     >
       <div #container [class]="classes().container">
         @if (name()) {
@@ -74,7 +77,7 @@ import type { Option } from './option';
           [attr.aria-disabled]="isDisabled()"
           [attr.aria-required]="required() || null"
           [attr.aria-invalid]="error() ? true : null"
-          [attr.aria-describedby]="ariaDescribedby() ?? null"
+          [attr.aria-describedby]="describedBy() ?? null"
           [disabled]="isDisabled()"
           [class]="classes().trigger"
           (click)="toggle()"
@@ -147,7 +150,7 @@ export class PixelSelect implements ControlValueAccessor {
   readonly required = input(false, { transform: booleanOr(false) });
   /** `id` of the trigger; generated when left out. */
   readonly id = input<string>();
-  /** Ids of the elements that describe the trigger. */
+  /** Ids of more elements that describe the trigger; its hint / error is added while one shows. */
   readonly ariaDescribedby = input<string | undefined>(undefined, { alias: 'aria-describedby' });
 
   /** @internal */
@@ -163,6 +166,12 @@ export class PixelSelect implements ControlValueAccessor {
 
   /** @internal */
   protected readonly triggerId = computed(() => this.id() ?? this.generatedId);
+  /** @internal */
+  protected readonly messageId = computed(() => fieldMessageId(this.triggerId()));
+  /** @internal */
+  protected readonly describedBy = computed(() =>
+    fieldDescribedBy(this.triggerId(), { hint: this.hint(), error: this.error() }, this.ariaDescribedby()),
+  );
   /** @internal */
   protected readonly current = computed(() => this.value() ?? this.defaultValue() ?? '');
   /** @internal */

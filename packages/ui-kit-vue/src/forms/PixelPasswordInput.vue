@@ -1,6 +1,13 @@
 <script setup lang="ts">
-import { computed, ref, useId, useTemplateRef } from 'vue';
-import { passwordInputClasses, type Size, type Surface, type Tone } from '@pxlkit/ui-kit-core';
+import { computed, ref, useAttrs, useId, useTemplateRef } from 'vue';
+import {
+  fieldDescribedBy,
+  fieldMessageId,
+  passwordInputClasses,
+  type Size,
+  type Surface,
+  type Tone,
+} from '@pxlkit/ui-kit-core';
 import FieldShell from '../_internal/FieldShell.vue';
 import { useControllableState } from '../composables/controllable.js';
 import { useEffectiveSurface } from '../composables/surface.js';
@@ -61,6 +68,11 @@ const emit = defineEmits<{
 const surface = useEffectiveSurface(() => props.surface);
 const generatedId = useId();
 const inputId = computed(() => props.id ?? `pxl-password-${generatedId}`);
+const attrs = useAttrs();
+// Attributes are not reactive: the consumer's `aria-describedby` is read while
+// rendering, and the hint / error is added to it while one shows.
+const describedBy = () =>
+  fieldDescribedBy(inputId.value, props, attrs['aria-describedby'] as string | undefined);
 const input = useTemplateRef<HTMLInputElement>('input');
 const visible = ref(false);
 
@@ -90,7 +102,14 @@ defineExpose({
 </script>
 
 <template>
-  <FieldShell :label="label" :hint="hint" :error="error" :surface="surface" :html-for="inputId">
+  <FieldShell
+    :label="label"
+    :hint="hint"
+    :error="error"
+    :surface="surface"
+    :html-for="inputId"
+    :message-id="fieldMessageId(inputId)"
+  >
     <span :class="classes.shell">
       <input
         :id="inputId"
@@ -101,6 +120,7 @@ defineExpose({
         :disabled="disabled"
         :class="classes.input"
         v-bind="$attrs"
+        :aria-describedby="describedBy()"
         @input="onInput"
       />
       <button

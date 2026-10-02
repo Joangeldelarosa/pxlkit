@@ -30,7 +30,7 @@ export default defineManifest({
       { key: 'Space', does: 'Opens the native file picker', when: 'dropzone has focus' },
     ],
     notes:
-      'Dropzone exposes role="button" with tabIndex 0 (or -1 when disabled) and aria-describedby pointing at the hint/error message. The hidden <input type="file"> is aria-hidden while the dropzone is active.',
+      'Dropzone exposes role="button" with tabIndex 0 (or -1 when disabled) and, while a hint or error shows, aria-describedby pointing at it. The hidden <input type="file"> is aria-hidden while the dropzone is active; without the dropzone the input itself carries that aria-describedby.',
   },
   related: ['PixelInput', 'PixelTextarea', 'PixelForm'],
   apiStability: 'stable',

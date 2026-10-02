@@ -167,3 +167,29 @@ describe('PixelSelect — states & wiring', () => {
     expect(ref.current).toBe(trigger);
   });
 });
+
+describe('PixelSelect — hint / error description (regression)', () => {
+  it('describes the trigger with the hint, then with the error, only while one shows', () => {
+    const { getByRole, rerender } = render(
+      <PixelSelect options={OPTIONS} label="Color" hint="Used for the badge" />,
+    );
+    const trigger = getByRole('combobox');
+    expect(trigger).toHaveAccessibleDescription('Used for the badge');
+    rerender(<PixelSelect options={OPTIONS} label="Color" hint="Used for the badge" error="Required field" />);
+    expect(trigger).toHaveAccessibleDescription('Required field');
+    rerender(<PixelSelect options={OPTIONS} label="Color" />);
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+  });
+
+  it("keeps the consumer's aria-describedby and adds the message after it", () => {
+    const { getByRole } = render(
+      <>
+        <p id="color-note">Shown on your profile</p>
+        <PixelSelect options={OPTIONS} id="color" aria-describedby="color-note" error="Required field" />
+      </>,
+    );
+    const trigger = getByRole('combobox');
+    expect(trigger).toHaveAttribute('aria-describedby', 'color-note color-msg');
+    expect(trigger).toHaveAccessibleDescription('Shown on your profile Required field');
+  });
+});

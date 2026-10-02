@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, useId, useTemplateRef, watch } from 'vue';
+import { computed, onMounted, useAttrs, useId, useTemplateRef, watch } from 'vue';
 import {
   autosizeTextarea,
   characterCountClasses,
   characterCountText,
+  fieldDescribedBy,
+  fieldMessageId,
   getStringLength,
   showCountMax,
   textareaClasses,
@@ -73,6 +75,11 @@ const emit = defineEmits<{
 const surface = useEffectiveSurface(() => props.surface);
 const generatedId = useId();
 const textareaId = computed(() => props.id ?? `pxl-textarea-${generatedId}`);
+const attrs = useAttrs();
+// Attributes are not reactive: the consumer's `aria-describedby` is read while
+// rendering, and the hint / error is added to it while one shows.
+const describedBy = () =>
+  fieldDescribedBy(textareaId.value, props, attrs['aria-describedby'] as string | undefined);
 const textarea = useTemplateRef<HTMLTextAreaElement>('textarea');
 
 const [value, setValue] = useControllableState<string>({
@@ -108,7 +115,14 @@ defineExpose({
 </script>
 
 <template>
-  <FieldShell :label="label" :hint="hint" :error="error" :surface="surface" :html-for="textareaId">
+  <FieldShell
+    :label="label"
+    :hint="hint"
+    :error="error"
+    :surface="surface"
+    :html-for="textareaId"
+    :message-id="fieldMessageId(textareaId)"
+  >
     <textarea
       :id="textareaId"
       ref="textarea"
@@ -118,6 +132,7 @@ defineExpose({
       :maxlength="max"
       :class="classes"
       v-bind="$attrs"
+      :aria-describedby="describedBy()"
       @input="onInput"
     />
     <span v-if="showCount" aria-live="polite" :class="characterCountClasses(surface, length, max)">

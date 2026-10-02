@@ -28,10 +28,20 @@ describe('PixelGlyph', () => {
 
 describe('FieldShell', () => {
   it('renders the DOM of the React kit\'s FieldShell', async () => {
-    const cases: Array<{ label?: string; hint?: string; error?: string; htmlFor?: string; surface?: 'linear' }> = [
+    const cases: Array<{
+      label?: string;
+      hint?: string;
+      error?: string;
+      htmlFor?: string;
+      messageId?: string;
+      surface?: 'linear';
+    }> = [
       { label: 'Email', hint: 'We never share it', htmlFor: 'email' },
       { label: 'Name', hint: 'hint', error: 'Required', surface: 'linear' },
       { hint: 'Only a hint' },
+      { label: 'Email', hint: 'We never share it', htmlFor: 'email', messageId: 'email-msg' },
+      { label: 'Email', hint: 'hint', error: 'Required', htmlFor: 'email', messageId: 'email-msg' },
+      { label: 'Email', htmlFor: 'email', messageId: 'email-msg' },
     ];
     for (const props of cases) {
       const react = await mountReact(() => createElement(ReactFieldShell, props, createElement('input', { id: 'email' })));
@@ -50,6 +60,17 @@ describe('FieldShell', () => {
     });
     expect(wrapper.find('label').attributes('for')).toBe('email');
     expect(wrapper.text()).toContain('We never share it');
+  });
+
+  it('gives the hint, or the error replacing it, the message id', async () => {
+    const wrapper = mount(FieldShell, { props: { hint: 'We never share it', messageId: 'email-msg' } });
+    expect(wrapper.find('#email-msg').text()).toBe('We never share it');
+    await wrapper.setProps({ error: 'Required' });
+    expect(wrapper.find('#email-msg').text()).toBe('Required');
+    await wrapper.setProps({ hint: undefined, error: undefined });
+    expect(wrapper.find('#email-msg').exists()).toBe(false);
+    await wrapper.setProps({ hint: 'We never share it', messageId: undefined });
+    expect(wrapper.find('span').attributes()).not.toHaveProperty('id');
   });
 
   it('falls back to a span label and lets the error replace the hint', () => {

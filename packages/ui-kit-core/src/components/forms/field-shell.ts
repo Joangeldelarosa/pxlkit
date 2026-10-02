@@ -19,3 +19,28 @@ export function fieldShellTextClasses(surface: Surface): FieldShellTextClasses {
     error: cn('text-xs text-retro-red', font),
   };
 }
+
+/** The message a field shows under its control: the error, else the hint. */
+export interface FieldMessage {
+  hint?: string;
+  error?: string;
+}
+
+/** Id of a field's hint / error text, derived from its control's id. */
+export function fieldMessageId(controlId: string): string {
+  return `${controlId}-msg`;
+}
+
+/**
+ * `aria-describedby` of a field's control: the ids the consumer passed, then
+ * the field's hint / error text while one is shown. Undefined when there is
+ * neither, so the control never points at an element that is not rendered.
+ */
+export function fieldDescribedBy(
+  controlId: string,
+  { hint, error }: FieldMessage,
+  describedBy?: string,
+): string | undefined {
+  const ids = [describedBy?.trim(), error || hint ? fieldMessageId(controlId) : undefined].filter(Boolean);
+  return ids.length > 0 ? ids.join(' ') : undefined;
+}

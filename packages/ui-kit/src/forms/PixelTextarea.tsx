@@ -7,6 +7,8 @@ import {
   autosizeTextarea,
   characterCountClasses,
   characterCountText,
+  fieldDescribedBy,
+  fieldMessageId,
   showCountMax,
   textareaClasses,
 } from '@pxlkit/ui-kit-core';
@@ -53,6 +55,7 @@ export const PixelTextarea = forwardRef<HTMLTextAreaElement, PixelTextareaProps>
     value,
     defaultValue,
     onChange,
+    'aria-describedby': ariaDescribedBy,
     ...rest
   },
   ref,
@@ -103,11 +106,12 @@ export const PixelTextarea = forwardRef<HTMLTextAreaElement, PixelTextareaProps>
   const max = showCountMax(showCount);
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={textareaId}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={textareaId} messageId={fieldMessageId(textareaId)}>
       <textarea
         id={textareaId}
         ref={setRefs}
         aria-invalid={error ? true : undefined}
+        aria-describedby={fieldDescribedBy(textareaId, { hint, error }, ariaDescribedBy)}
         value={isControlled ? (value as string | number) : undefined}
         defaultValue={!isControlled ? defaultValue : undefined}
         onChange={handleChange}

@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, ref, useId, useTemplateRef } from 'vue';
+import { computed, ref, useAttrs, useId, useTemplateRef } from 'vue';
 import {
+  fieldDescribedBy,
+  fieldMessageId,
   selectClasses,
   selectKeydown,
   selectListboxId,
@@ -83,6 +85,11 @@ const emit = defineEmits<{
 const surface = useEffectiveSurface(() => props.surface);
 const generatedId = useId();
 const triggerId = computed(() => props.id ?? `pxl-select-${generatedId}`);
+const attrs = useAttrs();
+// Attributes are not reactive: the consumer's `aria-describedby` is read while
+// rendering, and the hint / error is added to it while one shows.
+const describedBy = () =>
+  fieldDescribedBy(triggerId.value, props, attrs['aria-describedby'] as string | undefined);
 const container = useTemplateRef<HTMLDivElement>('container');
 const trigger = useTemplateRef<HTMLButtonElement>('trigger');
 const open = ref(false);
@@ -161,7 +168,14 @@ defineExpose({
 </script>
 
 <template>
-  <FieldShell :label="label" :hint="hint" :error="error" :surface="surface" :html-for="triggerId">
+  <FieldShell
+    :label="label"
+    :hint="hint"
+    :error="error"
+    :surface="surface"
+    :html-for="triggerId"
+    :message-id="fieldMessageId(triggerId)"
+  >
     <div ref="container" :class="classes.container">
       <input v-if="name" type="hidden" :name="name" :value="value" :required="required" />
       <button
@@ -177,6 +191,7 @@ defineExpose({
         :aria-disabled="disabled"
         :aria-required="required || undefined"
         :aria-invalid="error ? true : undefined"
+        :aria-describedby="describedBy()"
         :disabled="disabled"
         :class="classes.trigger"
         @click="toggle"

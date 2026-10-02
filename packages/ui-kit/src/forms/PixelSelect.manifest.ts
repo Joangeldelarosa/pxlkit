@@ -53,7 +53,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Closes the listbox and moves focus to the next focusable element.' },
     ],
     notes:
-      'Trigger is a `<button role="combobox">` paired with a `role="listbox"` popup containing `role="option"` children. Provide an accessible name via `label` or `aria-describedby`; `error` automatically sets `aria-invalid`.',
+      'Trigger is a `<button role="combobox">` paired with a `role="listbox"` popup containing `role="option"` children. Provide an accessible name via `label`; the hint/error it shows is linked through `aria-describedby`, after any ids you pass, and `error` automatically sets `aria-invalid`.',
   },
   related: ['PixelCombobox', 'PixelMultiSelect', 'PixelDropdown'],
   apiStability: 'stable',

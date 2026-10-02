@@ -126,3 +126,17 @@ describe('PixelCombobox', () => {
     expect(getByText('No fruits')).toBeTruthy();
   });
 });
+
+describe('PixelCombobox — hint / error description', () => {
+  it('describes the trigger with the hint, then with the error, only while one shows', () => {
+    const { getByRole, rerender } = render(
+      <PixelCombobox options={fruitOptions} label="Fruit" hint="Pick one you like" />,
+    );
+    const trigger = getByRole('combobox');
+    expect(trigger).toHaveAccessibleDescription('Pick one you like');
+    rerender(<PixelCombobox options={fruitOptions} label="Fruit" hint="Pick one you like" error="Required" />);
+    expect(trigger).toHaveAccessibleDescription('Required');
+    rerender(<PixelCombobox options={fruitOptions} label="Fruit" />);
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+  });
+});

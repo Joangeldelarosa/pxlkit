@@ -44,7 +44,7 @@ export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps)
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Sets `aria-invalid` when `error` is provided and links the hint/error text via `aria-describedby`. The clear button is `tabIndex=&#123;-1&#125;` so keyboard users edit the value directly instead of tabbing through it.</p>
+      <p className="docs-aria-notes">Sets `aria-invalid` when `error` is provided and links the hint/error text it shows via `aria-describedby`, after any ids you pass (none while neither shows). The clear button is `tabIndex=&#123;-1&#125;` so keyboard users edit the value directly instead of tabbing through it.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

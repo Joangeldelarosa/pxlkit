@@ -4,6 +4,8 @@
 
 import React, { forwardRef, useId, useRef, useState } from 'react';
 import {
+  fieldDescribedBy,
+  fieldMessageId,
   selectClasses,
   selectKeydown,
   selectListboxId,
@@ -49,7 +51,7 @@ export interface PixelSelectProps {
   required?: boolean;
   /** DOM `id` forwarded to the trigger. */
   id?: string;
-  /** `aria-describedby` forwarded to the trigger. */
+  /** `aria-describedby` of the trigger; the hint / error is added while it shows. */
   'aria-describedby'?: string;
 }
 
@@ -110,7 +112,7 @@ export const PixelSelect = forwardRef<HTMLButtonElement, PixelSelectProps>(funct
   const activeOptionId = open && options[highlighted] ? selectOptionId(triggerId, highlighted) : undefined;
 
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId} messageId={fieldMessageId(triggerId)}>
       <div ref={containerRef} className={c.container}>
         {name && <input type="hidden" name={name} value={value} required={required} />}
         <button
@@ -125,7 +127,7 @@ export const PixelSelect = forwardRef<HTMLButtonElement, PixelSelectProps>(funct
           aria-disabled={disabled}
           aria-required={required || undefined}
           aria-invalid={error ? true : undefined}
-          aria-describedby={ariaDescribedBy}
+          aria-describedby={fieldDescribedBy(triggerId, { hint, error }, ariaDescribedBy)}
           disabled={disabled}
           className={c.trigger}
           onClick={() => !disabled && setOpen(!open)}

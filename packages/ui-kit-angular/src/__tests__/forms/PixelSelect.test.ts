@@ -150,4 +150,37 @@ describe('PixelSelect', () => {
     expect(trigger.getAttribute('aria-required')).toBe('true');
     expect((fixture.nativeElement.querySelector('input[type="hidden"]') as HTMLInputElement).name).toBe('color');
   });
+
+  it('describes the trigger with the hint or the error, after the ids passed to it', async () => {
+    @Component({
+      imports: [PixelSelect],
+      template: `<pxl-select id="color" label="Color" [options]="options" [hint]="hint()" [error]="error()" [aria-describedby]="describedBy()" />`,
+    })
+    class Host {
+      readonly hint = signal<string | undefined>('Used for the badge');
+      readonly error = signal<string | undefined>(undefined);
+      readonly describedBy = signal<string | undefined>('color-note');
+      readonly options = OPTIONS;
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const control = triggerOf(root);
+    const message = () => root.querySelector('#color-msg')?.textContent;
+    expect(control.getAttribute('aria-describedby')).toBe('color-note color-msg');
+    expect(message()).toBe('Used for the badge');
+    fixture.componentInstance.error.set('Required');
+    await fixture.whenStable();
+    expect(control.getAttribute('aria-describedby')).toBe('color-note color-msg');
+    expect(message()).toBe('Required');
+    fixture.componentInstance.hint.set(undefined);
+    fixture.componentInstance.error.set(undefined);
+    fixture.componentInstance.describedBy.set('color-policy');
+    await fixture.whenStable();
+    expect(control.getAttribute('aria-describedby')).toBe('color-policy');
+    expect(message()).toBeUndefined();
+    fixture.componentInstance.describedBy.set(undefined);
+    await fixture.whenStable();
+    expect(control.hasAttribute('aria-describedby')).toBe(false);
+  });
 });

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { fieldDescribedBy, fieldMessageId } from '@pxlkit/ui-kit-core';
 import {
   Surface,
   cn,
@@ -213,7 +214,7 @@ export const PixelColorInput = forwardRef<HTMLButtonElement, PixelColorInputProp
     };
 
     return (
-      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
+      <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId} messageId={fieldMessageId(inputId)}>
         <span className="relative block">
           <PixelPopover
             open={open}
@@ -232,6 +233,7 @@ export const PixelColorInput = forwardRef<HTMLButtonElement, PixelColorInputProp
                 type="button"
                 aria-label={label ?? 'Color'}
                 aria-invalid={error ? true : undefined}
+                aria-describedby={fieldDescribedBy(inputId, { hint, error })}
                 className={cn(
                   inputBase,
                   s.font,

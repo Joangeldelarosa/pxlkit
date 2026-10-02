@@ -25,9 +25,9 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
     }
     <ng-content />
     @if (error()) {
-      <span [class]="text().error">{{ error() }}</span>
+      <span [attr.id]="messageId() ?? null" [class]="text().error">{{ error() }}</span>
     } @else if (hint()) {
-      <span [class]="text().hint">{{ hint() }}</span>
+      <span [attr.id]="messageId() ?? null" [class]="text().hint">{{ hint() }}</span>
     }
   `,
 })
@@ -41,6 +41,11 @@ export class PixelFieldShell {
    * real `<label for>`; without it the text renders as a plain span.
    */
   readonly htmlFor = input<string>();
+  /**
+   * Id of the hint / error text, for the control's `aria-describedby`
+   * (`fieldMessageId` / `fieldDescribedBy` from the core).
+   */
+  readonly messageId = input<string>();
 
   private readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
   /** @internal */

@@ -118,4 +118,40 @@ describe('PixelInput', () => {
     const wrapper = mount(PixelInput);
     expect((wrapper.vm as unknown as { element: HTMLInputElement }).element).toBe(wrapper.find('input').element);
   });
+
+  it('describes the input with the hint or the error, after the ids passed to it', async () => {
+    const describedBy = ref<string | undefined>('email-rules');
+    const hint = ref<string | undefined>('We never share it');
+    const error = ref<string | undefined>();
+    const wrapper = mount(
+      defineComponent({
+        render: () =>
+          h(PixelInput, {
+            label: 'Email', id: 'email',
+            hint: hint.value,
+            error: error.value,
+            'aria-describedby': describedBy.value,
+          }),
+      }),
+      { attachTo: document.body },
+    );
+    const control = wrapper.find('input');
+    const message = () => document.getElementById('email-msg')?.textContent;
+    expect(control.attributes('aria-describedby')).toBe('email-rules email-msg');
+    expect(message()).toBe('We never share it');
+    error.value = 'Enter a valid email';
+    await nextTick();
+    expect(control.attributes('aria-describedby')).toBe('email-rules email-msg');
+    expect(message()).toBe('Enter a valid email');
+    hint.value = undefined;
+    error.value = undefined;
+    describedBy.value = 'email-policy';
+    await nextTick();
+    expect(control.attributes('aria-describedby')).toBe('email-policy');
+    expect(message()).toBeUndefined();
+    describedBy.value = undefined;
+    await nextTick();
+    expect(control.attributes()).not.toHaveProperty('aria-describedby');
+    wrapper.unmount();
+  });
 });

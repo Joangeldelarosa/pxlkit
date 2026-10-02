@@ -80,10 +80,48 @@ describe('PixelSelect', () => {
     const trigger = wrapper.find('[role="combobox"]');
     expect(wrapper.find('label').attributes('for')).toBe('color');
     expect(trigger.attributes('id')).toBe('color');
-    expect(trigger.attributes('aria-describedby')).toBe('color-help');
+    // The error shows, so its message follows the ids passed in.
+    expect(trigger.attributes('aria-describedby')).toBe('color-help color-msg');
     expect(trigger.attributes('aria-invalid')).toBe('true');
     expect(trigger.attributes('aria-required')).toBe('true');
     expect(trigger.classes()).toContain('mine');
     expect((wrapper.vm as unknown as { element: HTMLButtonElement }).element).toBe(trigger.element);
+  });
+
+  it('describes the trigger with the hint or the error, after the ids passed to it', async () => {
+    const describedBy = ref<string | undefined>('color-note');
+    const hint = ref<string | undefined>('Used for the badge');
+    const error = ref<string | undefined>();
+    const wrapper = mount(
+      defineComponent({
+        render: () =>
+          h(PixelSelect, {
+            options: OPTIONS,
+            label: 'Color',
+            id: 'color',
+            hint: hint.value,
+            error: error.value,
+            'aria-describedby': describedBy.value,
+          }),
+      }),
+      { attachTo: document.body },
+    );
+    const control = wrapper.find('[role="combobox"]');
+    const message = () => document.getElementById('color-msg')?.textContent;
+    expect(control.attributes('aria-describedby')).toBe('color-note color-msg');
+    expect(message()).toBe('Used for the badge');
+    error.value = 'Required';
+    await nextTick();
+    expect(control.attributes('aria-describedby')).toBe('color-note color-msg');
+    expect(message()).toBe('Required');
+    hint.value = undefined;
+    error.value = undefined;
+    describedBy.value = 'color-policy';
+    await nextTick();
+    expect(control.attributes('aria-describedby')).toBe('color-policy');
+    expect(message()).toBeUndefined();
+    describedBy.value = undefined;
+    await nextTick();
+    expect(control.attributes()).not.toHaveProperty('aria-describedby');
   });
 });

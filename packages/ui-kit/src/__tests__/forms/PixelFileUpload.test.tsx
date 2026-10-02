@@ -167,3 +167,23 @@ describe('PixelFileUpload — single file-dialog activation (FieldShell label re
     expect(input.closest('label')).toBeNull();
   });
 });
+
+describe('PixelFileUpload — hint / error description (regression)', () => {
+  // The dropzone always pointed aria-describedby at `<id>-msg`, an id no
+  // element had.
+  it('describes the dropzone with the hint, then with the error, only while one shows', () => {
+    const { container, rerender } = render(<PixelFileUpload label="Attachments" hint="PDF, up to 5 MB" />);
+    const dropzone = getDropzone(container);
+    expect(dropzone).toHaveAccessibleDescription('PDF, up to 5 MB');
+    expect(getInput(container)).not.toHaveAttribute('aria-describedby');
+    rerender(<PixelFileUpload label="Attachments" hint="PDF, up to 5 MB" error="File too large" />);
+    expect(dropzone).toHaveAccessibleDescription('File too large');
+    rerender(<PixelFileUpload label="Attachments" />);
+    expect(dropzone).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('describes the file input itself when there is no dropzone', () => {
+    const { container } = render(<PixelFileUpload label="Attachments" hint="PDF, up to 5 MB" dropzone={false} />);
+    expect(getInput(container)).toHaveAccessibleDescription('PDF, up to 5 MB');
+  });
+});

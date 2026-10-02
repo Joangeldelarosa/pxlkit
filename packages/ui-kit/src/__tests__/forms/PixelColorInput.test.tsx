@@ -84,3 +84,15 @@ describe('PixelColorInput', () => {
     expect(hidden.value).toBe('#112233');
   });
 });
+
+describe('PixelColorInput — hint / error description', () => {
+  it('describes the trigger with the hint, then with the error, only while one shows', () => {
+    const { getByRole, rerender } = render(<PixelColorInput label="Accent" hint="Used for links" />);
+    const trigger = getByRole('button', { name: 'Accent' });
+    expect(trigger).toHaveAccessibleDescription('Used for links');
+    rerender(<PixelColorInput label="Accent" hint="Used for links" error="Too little contrast" />);
+    expect(trigger).toHaveAccessibleDescription('Too little contrast');
+    rerender(<PixelColorInput label="Accent" />);
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+  });
+});

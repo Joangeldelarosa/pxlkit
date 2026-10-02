@@ -138,3 +138,17 @@ describe('PixelDateRangePicker', () => {
     expect(to!.value).toBe(toISO(value.to));
   });
 });
+
+describe('PixelDateRangePicker — hint / error description', () => {
+  it('describes the trigger with the hint, then with the error, only while one shows', () => {
+    const { getByTestId, rerender } = render(
+      <PixelDateRangePicker label="Stay" hint="Up to two weeks" data-testid="trigger" />,
+    );
+    const trigger = getByTestId('trigger');
+    expect(trigger).toHaveAccessibleDescription('Up to two weeks');
+    rerender(<PixelDateRangePicker label="Stay" hint="Up to two weeks" error="Pick both dates" data-testid="trigger" />);
+    expect(trigger).toHaveAccessibleDescription('Pick both dates');
+    rerender(<PixelDateRangePicker label="Stay" data-testid="trigger" />);
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+  });
+});

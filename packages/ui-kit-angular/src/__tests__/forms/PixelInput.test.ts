@@ -170,6 +170,7 @@ describe('PixelInput', () => {
           minlength="3"
           readonly
           aria-label="Work email"
+          aria-describedby="mail-help"
           [showCount]="{ max: 40 }"
         />
       `,
@@ -179,7 +180,7 @@ describe('PixelInput', () => {
     await fixture.whenStable();
     const host = fixture.nativeElement.querySelector('pxl-input') as HTMLElement;
     const input = inputOf(fixture.nativeElement);
-    for (const name of ['id', 'name', 'aria-label', 'readonly']) expect(host.hasAttribute(name)).toBe(false);
+    for (const name of ['id', 'name', 'aria-label', 'aria-describedby', 'readonly']) expect(host.hasAttribute(name)).toBe(false);
     expect(input.id).toBe('mail');
     expect(input.name).toBe('mail');
     expect(input.type).toBe('email');
@@ -190,5 +191,38 @@ describe('PixelInput', () => {
     expect(input.maxLength).toBe(40);
     expect(input.readOnly).toBe(true);
     expect(input.getAttribute('aria-label')).toBe('Work email');
+    expect(input.getAttribute('aria-describedby')).toBe('mail-help');
+  });
+
+  it('describes the input with the hint or the error, after the ids passed to it', async () => {
+    @Component({
+      imports: [PixelInput],
+      template: `<pxl-input id="email" label="Email" [hint]="hint()" [error]="error()" [aria-describedby]="describedBy()" />`,
+    })
+    class Host {
+      readonly hint = signal<string | undefined>('We never share it');
+      readonly error = signal<string | undefined>(undefined);
+      readonly describedBy = signal<string | undefined>('email-rules');
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const control = inputOf(root);
+    const message = () => root.querySelector('#email-msg')?.textContent;
+    expect(control.getAttribute('aria-describedby')).toBe('email-rules email-msg');
+    expect(message()).toBe('We never share it');
+    fixture.componentInstance.error.set('Enter a valid email');
+    await fixture.whenStable();
+    expect(control.getAttribute('aria-describedby')).toBe('email-rules email-msg');
+    expect(message()).toBe('Enter a valid email');
+    fixture.componentInstance.hint.set(undefined);
+    fixture.componentInstance.error.set(undefined);
+    fixture.componentInstance.describedBy.set('email-policy');
+    await fixture.whenStable();
+    expect(control.getAttribute('aria-describedby')).toBe('email-policy');
+    expect(message()).toBeUndefined();
+    fixture.componentInstance.describedBy.set(undefined);
+    await fixture.whenStable();
+    expect(control.hasAttribute('aria-describedby')).toBe(false);
   });
 });

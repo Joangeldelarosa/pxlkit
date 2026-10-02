@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, useId, useTemplateRef, watch } from 'vue';
+import { computed, ref, useAttrs, useId, useTemplateRef, watch } from 'vue';
 import {
   clampNumber,
+  fieldDescribedBy,
+  fieldMessageId,
   formatNumberInput,
   numberInputAtLimit,
   numberInputClasses,
@@ -106,6 +108,11 @@ const emit = defineEmits<{
 const surface = useEffectiveSurface(() => props.surface);
 const generatedId = useId();
 const inputId = computed(() => props.id ?? `pxl-number-${generatedId}`);
+const attrs = useAttrs();
+// Attributes are not reactive: the consumer's `aria-describedby` is read while
+// rendering, and the hint / error is added to it while one shows.
+const describedBy = () =>
+  fieldDescribedBy(inputId.value, props, attrs['aria-describedby'] as string | undefined);
 const input = useTemplateRef<HTMLInputElement>('input');
 
 const [current, setCurrent] = useControllableState<number | undefined>({
@@ -196,7 +203,14 @@ defineExpose({
 </script>
 
 <template>
-  <FieldShell :label="label" :hint="hint" :error="error" :surface="surface" :html-for="inputId">
+  <FieldShell
+    :label="label"
+    :hint="hint"
+    :error="error"
+    :surface="surface"
+    :html-for="inputId"
+    :message-id="fieldMessageId(inputId)"
+  >
     <span :class="classes.shell">
       <span v-if="prefix" aria-hidden="true" :class="classes.prefix">{{ prefix }}</span>
       <input
@@ -214,6 +228,7 @@ defineExpose({
         :value="display"
         :class="classes.input"
         v-bind="$attrs"
+        :aria-describedby="describedBy()"
         @input="onInput"
         @blur="onBlur"
         @focus="onFocus"

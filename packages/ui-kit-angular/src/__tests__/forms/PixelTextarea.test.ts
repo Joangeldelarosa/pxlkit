@@ -118,7 +118,17 @@ describe('PixelTextarea', () => {
     @Component({
       imports: [PixelTextarea],
       template: `
-        <pxl-textarea id="bio" name="bio" placeholder="About you" rows="6" minlength="10" required readonly aria-label="Bio" />
+        <pxl-textarea
+          id="bio"
+          name="bio"
+          placeholder="About you"
+          rows="6"
+          minlength="10"
+          required
+          readonly
+          aria-label="Bio"
+          aria-describedby="bio-help"
+        />
       `,
     })
     class Host {}
@@ -126,7 +136,9 @@ describe('PixelTextarea', () => {
     await fixture.whenStable();
     const host = fixture.nativeElement.querySelector('pxl-textarea') as HTMLElement;
     const textarea = textareaOf(fixture.nativeElement);
-    for (const name of ['id', 'name', 'required', 'readonly', 'aria-label']) expect(host.hasAttribute(name)).toBe(false);
+    for (const name of ['id', 'name', 'required', 'readonly', 'aria-label', 'aria-describedby']) {
+      expect(host.hasAttribute(name)).toBe(false);
+    }
     expect(textarea.id).toBe('bio');
     expect(textarea.name).toBe('bio');
     expect(textarea.placeholder).toBe('About you');
@@ -135,5 +147,38 @@ describe('PixelTextarea', () => {
     expect(textarea.required).toBe(true);
     expect(textarea.readOnly).toBe(true);
     expect(textarea.getAttribute('aria-label')).toBe('Bio');
+    expect(textarea.getAttribute('aria-describedby')).toBe('bio-help');
+  });
+
+  it('describes the textarea with the hint or the error, after the ids passed to it', async () => {
+    @Component({
+      imports: [PixelTextarea],
+      template: `<pxl-textarea id="bio" label="Bio" [hint]="hint()" [error]="error()" [aria-describedby]="describedBy()" />`,
+    })
+    class Host {
+      readonly hint = signal<string | undefined>('Markdown is supported');
+      readonly error = signal<string | undefined>(undefined);
+      readonly describedBy = signal<string | undefined>('bio-tips');
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const control = textareaOf(root);
+    const message = () => root.querySelector('#bio-msg')?.textContent;
+    expect(control.getAttribute('aria-describedby')).toBe('bio-tips bio-msg');
+    expect(message()).toBe('Markdown is supported');
+    fixture.componentInstance.error.set('Too long');
+    await fixture.whenStable();
+    expect(control.getAttribute('aria-describedby')).toBe('bio-tips bio-msg');
+    expect(message()).toBe('Too long');
+    fixture.componentInstance.hint.set(undefined);
+    fixture.componentInstance.error.set(undefined);
+    fixture.componentInstance.describedBy.set('bio-policy');
+    await fixture.whenStable();
+    expect(control.getAttribute('aria-describedby')).toBe('bio-policy');
+    expect(message()).toBeUndefined();
+    fixture.componentInstance.describedBy.set(undefined);
+    await fixture.whenStable();
+    expect(control.hasAttribute('aria-describedby')).toBe(false);
   });
 });

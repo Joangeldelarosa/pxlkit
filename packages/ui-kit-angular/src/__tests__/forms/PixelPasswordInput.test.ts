@@ -115,6 +115,7 @@ describe('PixelPasswordInput', () => {
           maxlength="64"
           required
           aria-label="New password"
+          aria-describedby="pw-help"
         />
       `,
     })
@@ -123,7 +124,7 @@ describe('PixelPasswordInput', () => {
     await fixture.whenStable();
     const host = fixture.nativeElement.querySelector('pxl-password-input') as HTMLElement;
     const input = inputOf(fixture.nativeElement);
-    for (const name of ['id', 'name', 'required', 'aria-label']) expect(host.hasAttribute(name)).toBe(false);
+    for (const name of ['id', 'name', 'required', 'aria-label', 'aria-describedby']) expect(host.hasAttribute(name)).toBe(false);
     expect(input.id).toBe('pw');
     expect(input.name).toBe('pw');
     expect(input.placeholder).toBe('Secret');
@@ -132,5 +133,38 @@ describe('PixelPasswordInput', () => {
     expect(input.maxLength).toBe(64);
     expect(input.required).toBe(true);
     expect(input.getAttribute('aria-label')).toBe('New password');
+    expect(input.getAttribute('aria-describedby')).toBe('pw-help');
+  });
+
+  it('describes the input with the hint or the error, after the ids passed to it', async () => {
+    @Component({
+      imports: [PixelPasswordInput],
+      template: `<pxl-password-input id="pw" label="Password" [hint]="hint()" [error]="error()" [aria-describedby]="describedBy()" />`,
+    })
+    class Host {
+      readonly hint = signal<string | undefined>('At least 12 characters');
+      readonly error = signal<string | undefined>(undefined);
+      readonly describedBy = signal<string | undefined>('pw-rules');
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const control = inputOf(root);
+    const message = () => root.querySelector('#pw-msg')?.textContent;
+    expect(control.getAttribute('aria-describedby')).toBe('pw-rules pw-msg');
+    expect(message()).toBe('At least 12 characters');
+    fixture.componentInstance.error.set('Too short');
+    await fixture.whenStable();
+    expect(control.getAttribute('aria-describedby')).toBe('pw-rules pw-msg');
+    expect(message()).toBe('Too short');
+    fixture.componentInstance.hint.set(undefined);
+    fixture.componentInstance.error.set(undefined);
+    fixture.componentInstance.describedBy.set('pw-policy');
+    await fixture.whenStable();
+    expect(control.getAttribute('aria-describedby')).toBe('pw-policy');
+    expect(message()).toBeUndefined();
+    fixture.componentInstance.describedBy.set(undefined);
+    await fixture.whenStable();
+    expect(control.hasAttribute('aria-describedby')).toBe(false);
   });
 });

@@ -53,7 +53,7 @@ export default defineManifest({
       { key: 'Enter', does: 'Submit the surrounding form (native browser behavior).' },
     ],
     notes:
-      'Sets `aria-invalid` when `error` is provided and links the hint/error text via `aria-describedby`. The clear button is `tabIndex={-1}` so keyboard users edit the value directly instead of tabbing through it.',
+      'Sets `aria-invalid` when `error` is provided and links the hint/error text it shows via `aria-describedby`, after any ids you pass (none while neither shows). The clear button is `tabIndex={-1}` so keyboard users edit the value directly instead of tabbing through it.',
   },
   related: [
     'PixelPasswordInput',

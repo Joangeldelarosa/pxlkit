@@ -152,7 +152,7 @@ export function Default() {
         <pre className="docs-code"><code>{`export function WithCustomStyling() {
   return (
     <PixelBareTextarea
-      className="w-full rounded border border-retro-line bg-retro-elev p-3 font-mono text-sm text-retro-text"
+      className="w-full rounded border border-retro-border bg-retro-card p-3 font-mono text-sm text-retro-text"
       placeholder="Escape-hatch: bring your own styles"
       rows={5}
       aria-label="Custom styled textarea"

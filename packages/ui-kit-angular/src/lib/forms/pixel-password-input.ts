@@ -1,6 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input, model, signal } from '@angular/core';
 import type { ControlValueAccessor } from '@angular/forms';
-import { passwordInputClasses, type Size, type Surface, type Tone } from '@pxlkit/ui-kit-core';
+import {
+  fieldDescribedBy,
+  fieldMessageId,
+  passwordInputClasses,
+  type Size,
+  type Surface,
+  type Tone,
+} from '@pxlkit/ui-kit-core';
 import { booleanOr, optionalNumber, withDefault } from '../_internal/coercion';
 import { PixelFieldShell } from '../_internal/field-shell';
 import { injectId } from '../_internal/ids';
@@ -37,6 +44,7 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
     '[attr.required]': 'null',
     '[attr.readonly]': 'null',
     '[attr.aria-label]': 'null',
+    '[attr.aria-describedby]': 'null',
   },
   template: `
     <pxl-field-shell
@@ -45,6 +53,7 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
       [error]="error()"
       [surface]="effectiveSurface()"
       [htmlFor]="inputId()"
+      [messageId]="messageId()"
     >
       <span [class]="classes().shell">
         <input
@@ -57,6 +66,7 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
           [attr.maxlength]="maxlength() ?? null"
           [attr.aria-label]="ariaLabel() ?? null"
           [attr.aria-invalid]="error() ? true : null"
+          [attr.aria-describedby]="describedBy() ?? null"
           [required]="required()"
           [readOnly]="readonly()"
           [disabled]="isDisabled()"
@@ -121,6 +131,8 @@ export class PixelPasswordInput implements ControlValueAccessor {
   readonly readonly = input(false, { transform: booleanOr(false) });
   /** Accessible name of the input when no `label` is shown. */
   readonly ariaLabel = input<string | undefined>(undefined, { alias: 'aria-label' });
+  /** Ids of more elements that describe the input; its hint / error is added while one shows. */
+  readonly ariaDescribedby = input<string | undefined>(undefined, { alias: 'aria-describedby' });
 
   /** @internal */
   protected readonly form = new FormBridge<string>();
@@ -132,6 +144,12 @@ export class PixelPasswordInput implements ControlValueAccessor {
 
   /** @internal */
   protected readonly inputId = computed(() => this.id() ?? this.generatedId);
+  /** @internal */
+  protected readonly messageId = computed(() => fieldMessageId(this.inputId()));
+  /** @internal */
+  protected readonly describedBy = computed(() =>
+    fieldDescribedBy(this.inputId(), { hint: this.hint(), error: this.error() }, this.ariaDescribedby()),
+  );
   /** @internal */
   protected readonly current = computed(() => this.value() ?? this.defaultValue() ?? '');
   /** @internal */

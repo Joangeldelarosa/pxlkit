@@ -105,6 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with `aria-activedescendant`, focus returned to the trigger, `menuitemcheckbox` /
   `menuitemradio` with `aria-checked`, a named menu), and `PixelTooltip` closes on Escape in
   every mode (WCAG 1.4.13) and describes the focused element.
+- `@pxlkit/ui-kit`: form fields' hints and errors are announced: `aria-describedby` pointed at a
+  message without an id (`PixelInput`) or was missing (ten other fields).
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined

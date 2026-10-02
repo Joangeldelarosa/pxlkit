@@ -130,3 +130,17 @@ describe('PixelDatePicker', () => {
     expect(hidden!.value).toBe(toISO(value));
   });
 });
+
+describe('PixelDatePicker — hint / error description', () => {
+  it('describes the trigger with the hint, then with the error, only while one shows', () => {
+    const { getByTestId, rerender } = render(
+      <PixelDatePicker label="Due" hint="Weekdays only" data-testid="trigger" />,
+    );
+    const trigger = getByTestId('trigger');
+    expect(trigger).toHaveAccessibleDescription('Weekdays only');
+    rerender(<PixelDatePicker label="Due" hint="Weekdays only" error="Pick a date" data-testid="trigger" />);
+    expect(trigger).toHaveAccessibleDescription('Pick a date');
+    rerender(<PixelDatePicker label="Due" data-testid="trigger" />);
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+  });
+});

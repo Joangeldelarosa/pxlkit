@@ -136,3 +136,17 @@ describe('PixelMultiSelect', () => {
     expect(values).toEqual(['a', 'b', 'c']);
   });
 });
+
+describe('PixelMultiSelect — hint / error description', () => {
+  it('describes the trigger with the hint, then with the error, only while one shows', () => {
+    const { getByRole, rerender } = render(
+      <PixelMultiSelect options={OPTIONS} label="Fruits" hint="Pick up to three" />,
+    );
+    const trigger = getByRole('combobox');
+    expect(trigger).toHaveAccessibleDescription('Pick up to three');
+    rerender(<PixelMultiSelect options={OPTIONS} label="Fruits" hint="Pick up to three" error="Too many" />);
+    expect(trigger).toHaveAccessibleDescription('Too many');
+    rerender(<PixelMultiSelect options={OPTIONS} label="Fruits" />);
+    expect(trigger).not.toHaveAttribute('aria-describedby');
+  });
+});

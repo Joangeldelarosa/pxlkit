@@ -3,7 +3,7 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef, useId, useState } from 'react';
-import { passwordInputClasses } from '@pxlkit/ui-kit-core';
+import { fieldDescribedBy, fieldMessageId, passwordInputClasses } from '@pxlkit/ui-kit-core';
 import {
   Tone, Size, Surface, cn,
   useEffectiveSurface,
@@ -35,6 +35,7 @@ export const PixelPasswordInput = forwardRef<HTMLInputElement, PixelPasswordInpu
     surface: surfaceProp,
     toggleLabels = ['Show', 'Hide'],
     className,
+    'aria-describedby': ariaDescribedBy,
     ...rest
   },
   ref,
@@ -45,13 +46,14 @@ export const PixelPasswordInput = forwardRef<HTMLInputElement, PixelPasswordInpu
   const reactId = useId();
   const inputId = rest.id ?? `pxl-password-${reactId}`;
   return (
-    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId}>
+    <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={inputId} messageId={fieldMessageId(inputId)}>
       <span className={c.shell}>
         <input
           id={inputId}
           ref={ref}
           type={visible ? 'text' : 'password'}
           aria-invalid={error ? true : undefined}
+          aria-describedby={fieldDescribedBy(inputId, { hint, error }, ariaDescribedBy)}
           className={cn(c.input, className)}
           {...rest}
         />

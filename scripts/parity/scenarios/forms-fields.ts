@@ -447,4 +447,91 @@ export const scenarios: ParityScenario[] = [
       { action: 'keydown', key: 'Enter' },
     ],
   },
+  // A field's control points aria-describedby at the hint or error it shows,
+  // and carries none while it shows neither.
+  {
+    component: 'PixelInput',
+    example: 'WithError',
+    name: 'describes the input with the error it shows',
+    steps: [
+      { action: 'focus', target: 'input' },
+      { action: 'input', target: 'input', value: 'hero@pxlkit.xyz' },
+    ],
+  },
+  {
+    component: 'PixelInput',
+    example: 'Sizes',
+    name: 'leaves the inputs undescribed while they show no hint or error',
+    steps: [{ action: 'focus', target: 'input', nth: 1 }],
+  },
+  {
+    component: 'PixelPasswordInput',
+    example: 'WithHint',
+    name: 'describes the input with the hint it shows, hidden or visible',
+    steps: [
+      { action: 'focus', target: 'input' },
+      { action: 'click', target: 'button' },
+    ],
+  },
+  {
+    component: 'PixelPasswordInput',
+    example: 'WithError',
+    name: 'describes the input with the error it shows',
+    steps: [
+      { action: 'focus', target: 'input' },
+      { action: 'input', target: 'input', value: 'abcdefgh1' },
+    ],
+  },
+  {
+    component: 'PixelPasswordInput',
+    example: 'Default',
+    name: 'leaves the input undescribed while it shows no hint or error',
+    steps: [{ action: 'focus', target: 'input' }],
+  },
+  {
+    component: 'PixelTextarea',
+    example: 'WithError',
+    name: 'describes the textarea with the error it shows',
+    steps: [
+      { action: 'focus', target: 'textarea' },
+      { action: 'input', target: 'textarea', value: 'Lovely pixels' },
+    ],
+  },
+  {
+    component: 'PixelTextarea',
+    example: 'Surfaces',
+    name: 'leaves the textareas undescribed while they show no hint or error',
+    steps: [{ action: 'focus', target: 'textarea', nth: 1 }],
+  },
+  {
+    component: 'PixelNumberInput',
+    example: 'WithError',
+    name: 'describes the spinbutton with the error it shows',
+    steps: [
+      { action: 'focus', target: spinbutton },
+      { action: 'blur', target: spinbutton },
+    ],
+  },
+  {
+    component: 'PixelNumberInput',
+    example: 'ThousandsSeparator',
+    name: 'leaves the spinbutton undescribed while it shows no hint or error',
+    steps: [{ action: 'focus', target: spinbutton }],
+  },
+  {
+    component: 'PixelSelect',
+    example: 'WithError',
+    name: 'describes the trigger with the error it shows, open or closed',
+    steps: [
+      { action: 'click', target: combobox },
+      { action: 'keydown', key: 'ArrowDown' },
+      { action: 'keydown', key: 'Escape' },
+    ],
+  },
+  {
+    component: 'PixelSelect',
+    example: 'Sizes',
+    name: 'leaves the triggers undescribed while they show no hint or error',
+    steps: [{ action: 'focus', target: combobox, nth: 1 }],
+  },
 ];
