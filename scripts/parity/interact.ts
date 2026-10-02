@@ -51,9 +51,10 @@ function resolve(target: string, nth = 0): HTMLElement {
   return found;
 }
 
-function pointer(type: string, init: MouseEventInit = {}): MouseEvent {
-  const Ctor = (globalThis.PointerEvent ?? MouseEvent) as typeof MouseEvent;
-  return new Ctor(type, { bubbles: true, cancelable: true, composed: true, button: 0, ...init });
+// The steps act for a mouse, as `hover` implies: pointer events say so.
+function pointer(type: string, init: PointerEventInit = {}): MouseEvent {
+  const Ctor = (globalThis.PointerEvent ?? MouseEvent) as typeof PointerEvent;
+  return new Ctor(type, { bubbles: true, cancelable: true, composed: true, button: 0, pointerType: 'mouse', ...init });
 }
 
 function mouse(type: string, init: MouseEventInit = {}): MouseEvent {
