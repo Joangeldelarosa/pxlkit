@@ -208,6 +208,15 @@ function componentsTable(manifests: ManifestRecord[]): string {
 export const COMPONENTS_START_MARKER = "<!-- COMPONENTS:START -->";
 export const COMPONENTS_END_MARKER = "<!-- COMPONENTS:END -->";
 
+export interface ComponentsBlockOptions {
+  /**
+   * Include the version each component first shipped in (default `true`).
+   * Off for the Vue and Angular ports: their components arrive with the
+   * port's first release, so the React manifest's `since` would misstate it.
+   */
+  since?: boolean;
+}
+
 /**
  * Render the auto-managed components block body (without the markers).
  *
@@ -215,22 +224,28 @@ export const COMPONENTS_END_MARKER = "<!-- COMPONENTS:END -->";
  * category. Free-text descriptions are excluded — they may contain backticked
  * PascalCase tokens that would violate the registry-consistency gates.
  */
-export function renderComponentsBlock(manifests: ManifestRecord[]): string {
+export function renderComponentsBlock(
+  manifests: ManifestRecord[],
+  { since = true }: ComponentsBlockOptions = {},
+): string {
   const rows = [...manifests].sort((a, b) =>
     a.manifest.name.localeCompare(b.manifest.name),
   );
   const lines: string[] = [
     "<!-- auto-generated from component manifests by scripts/build-docs/generate-readme-package.ts — edit the manifests, then run `npm run docs:build`. -->",
     "",
-    "| Component | Status | Since | Category |",
-    "| --- | --- | --- | --- |",
+    since ? "| Component | Status | Since | Category |" : "| Component | Status | Category |",
+    since ? "| --- | --- | --- | --- |" : "| --- | --- | --- |",
   ];
   for (const r of rows) {
     const m = r.manifest;
     const status = String(m.status ?? "—");
-    const since = String(m.since ?? "—");
     const category = String(m.category ?? "—");
-    lines.push(`| \`${m.name}\` | ${status} | ${since} | ${category} |`);
+    lines.push(
+      since
+        ? `| \`${m.name}\` | ${status} | ${String(m.since ?? "—")} | ${category} |`
+        : `| \`${m.name}\` | ${status} | ${category} |`,
+    );
   }
   return lines.join("\n");
 }
@@ -244,12 +259,13 @@ export function renderComponentsBlock(manifests: ManifestRecord[]): string {
 export function fillComponentsBlock(
   readme: string,
   manifests: ManifestRecord[],
+  options: ComponentsBlockOptions = {},
 ): string | null {
   const startIdx = readme.indexOf(COMPONENTS_START_MARKER);
   const endIdx = readme.indexOf(COMPONENTS_END_MARKER);
   if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) return null;
   const eol = readme.includes("\r\n") ? "\r\n" : "\n";
-  const block = renderComponentsBlock(manifests).split("\n").join(eol);
+  const block = renderComponentsBlock(manifests, options).split("\n").join(eol);
   const before = readme.slice(0, startIdx + COMPONENTS_START_MARKER.length);
   const after = readme.slice(endIdx);
   return `${before}${eol}${block}${eol}${after}`;
@@ -473,7 +489,7 @@ export async function generateReadmePackage(
     let inPlace = false;
     if (await fs.pathExists(readmePath)) {
       const existing = await fs.readFile(readmePath, "utf8");
-      const filled = fillComponentsBlock(existing, pkgManifests);
+      const filled = fillComponentsBlock(existing, pkgManifests, { since: !port });
       if (filled !== null) {
         outputs.push({ path: toPosix(readmePath), content: filled });
         inPlace = true;

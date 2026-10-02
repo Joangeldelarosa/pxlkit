@@ -213,6 +213,14 @@ describe("renderComponentsBlock", () => {
     const block = renderComponentsBlock(manifests);
     expect(block).not.toContain("description for");
   });
+
+  it("drops the Since column for a port, whose components all ship in its first release", () => {
+    const block = renderComponentsBlock(manifests, { since: false });
+    expect(block).toContain("| Component | Status | Category |");
+    expect(block).toContain("| --- | --- | --- |\n");
+    expect(block).toContain("| `PixelButton` | stable | actions |");
+    expect(block).not.toContain("1.0.0");
+  });
 });
 
 describe("fillComponentsBlock", () => {

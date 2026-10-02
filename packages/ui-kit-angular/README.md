@@ -107,31 +107,31 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 <!-- COMPONENTS:START -->
 <!-- auto-generated from component manifests by scripts/build-docs/generate-readme-package.ts — edit the manifests, then run `npm run docs:build`. -->
 
-| Component | Status | Since | Category |
-| --- | --- | --- | --- |
-| `PixelBadge` | stable | 1.0.0 | data |
-| `PixelBento` | stable | 1.7.0 | layout |
-| `PixelBentoCell` | stable | 1.7.0 | layout |
-| `PixelBox` | stable | 1.6.0 | layout |
-| `PixelButton` | stable | 1.0.0 | actions |
-| `PixelCenter` | stable | 1.6.0 | layout |
-| `PixelCluster` | stable | 1.6.0 | layout |
-| `PixelContainer` | stable | 1.6.0 | layout |
-| `PixelDivider` | stable | 1.6.0 | layout |
-| `PixelEqualHeightGrid` | stable | 1.6.0 | layout |
-| `PixelGrid` | stable | 1.6.0 | layout |
-| `PixelModal` | stable | 1.0.0 | overlays |
-| `PixelPopover` | stable | 1.8.0 | overlay-foundation |
-| `PixelPortal` | stable | 1.8.0 | overlay-foundation |
-| `PixelScrollArea` | stable | 1.9.0 | layout |
-| `PixelSection` | stable | 1.6.0 | layout |
-| `PixelSectionHeader` | stable | 1.6.0 | layout |
-| `PixelStack` | stable | 1.6.0 | layout |
-| `PixelSwitch` | stable | 1.0.0 | forms |
-| `PixelTabs` | stable | 1.0.0 | navigation |
-| `PixelTwoColumn` | stable | 1.6.0 | layout |
-| `PxlKitLocaleProvider` | stable | 1.6.0 | overlay-foundation |
-| `PxlKitSurfaceProvider` | stable | 1.6.0 | overlay-foundation |
+| Component | Status | Category |
+| --- | --- | --- |
+| `PixelBadge` | stable | data |
+| `PixelBento` | stable | layout |
+| `PixelBentoCell` | stable | layout |
+| `PixelBox` | stable | layout |
+| `PixelButton` | stable | actions |
+| `PixelCenter` | stable | layout |
+| `PixelCluster` | stable | layout |
+| `PixelContainer` | stable | layout |
+| `PixelDivider` | stable | layout |
+| `PixelEqualHeightGrid` | stable | layout |
+| `PixelGrid` | stable | layout |
+| `PixelModal` | stable | overlays |
+| `PixelPopover` | stable | overlay-foundation |
+| `PixelPortal` | stable | overlay-foundation |
+| `PixelScrollArea` | stable | layout |
+| `PixelSection` | stable | layout |
+| `PixelSectionHeader` | stable | layout |
+| `PixelStack` | stable | layout |
+| `PixelSwitch` | stable | forms |
+| `PixelTabs` | stable | navigation |
+| `PixelTwoColumn` | stable | layout |
+| `PxlKitLocaleProvider` | stable | overlay-foundation |
+| `PxlKitSurfaceProvider` | stable | overlay-foundation |
 <!-- COMPONENTS:END -->
 
 ## Documentation
