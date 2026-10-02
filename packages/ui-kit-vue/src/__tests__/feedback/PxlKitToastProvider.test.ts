@@ -156,12 +156,17 @@ describe('PxlKitToastProvider', () => {
 
   it('removes a toast from its dismiss button and once its duration has passed', async () => {
     const { api } = await harness();
+    // Neither counts down yet, so a slow machine cannot expire one early.
     api().toast({ title: 'manual', duration: 0 });
-    api().toast({ title: 'timed', duration: 50 });
+    const timed = api().toast({ title: 'timed', duration: 0 });
     await settle();
-    cards()[0]!.querySelector<HTMLButtonElement>('button[aria-label="Dismiss notification"]')!.click();
+    cards()
+      .find((card) => card.querySelector('p')!.textContent === 'manual')!
+      .querySelector<HTMLButtonElement>('button[aria-label="Dismiss notification"]')!
+      .click();
     await settle();
     expect(titles()).toEqual(['timed']);
+    api().update(timed, { duration: 50 });
     await vi.waitFor(() => expect(cards()).toHaveLength(0));
   });
 

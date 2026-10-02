@@ -38,6 +38,7 @@ async function render<T>(Component: Type<T>) {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 describe('PixelToast', () => {
@@ -92,12 +93,13 @@ describe('PixelToast', () => {
 
   it('dismisses once its duration has passed, shrinking its bar meanwhile', async () => {
     const { host, settle } = await render(Host);
-    host.toast.set({ id: 't', title: 'Saved', duration: 60 });
+    // Long enough that a slow machine cannot get past it before the checks.
+    host.toast.set({ id: 't', title: 'Saved', duration: 1000 });
     await settle();
     expect(bar().style.width).toBe('0%');
-    expect(bar().style.transitionDuration).toBe('60ms');
+    expect(bar().style.transitionDuration).toBe('1000ms');
     expect(host.dismissed).toBe(0);
-    await vi.waitFor(() => expect(host.dismissed).toBe(1));
+    await vi.waitFor(() => expect(host.dismissed).toBe(1), { timeout: 5000 });
   });
 
   it('holds still until both the pointer and focus have left, losing no time meanwhile', async () => {
@@ -105,7 +107,7 @@ describe('PixelToast', () => {
     @Component({
       imports: [PixelToast],
       template: `
-        <pxl-toast-card [toast]="{ id: 't', title: 'Deleted', duration: 400, action: undo }" (dismiss)="dismissed = dismissed + 1" />
+        <pxl-toast-card [toast]="{ id: 't', title: 'Deleted', duration: 2000, action: undo }" (dismiss)="dismissed = dismissed + 1" />
         <ng-template #undo><button type="button" id="undo">Undo</button></ng-template>
       `,
     })
@@ -114,9 +116,11 @@ describe('PixelToast', () => {
     }
     const { host, settle } = await render(Held);
     const undo = document.getElementById('undo')!;
-    vi.advanceTimersByTime(100);
+    // The clock runs on fake time; the long duration keeps the real
+    // countdown from running out before the hover holds it.
+    vi.advanceTimersByTime(500);
     card().dispatchEvent(new MouseEvent('mouseenter'));
-    vi.advanceTimersByTime(200);
+    vi.advanceTimersByTime(1000);
     undo.focus();
     card().dispatchEvent(new MouseEvent('mouseleave'));
     await settle();
@@ -126,8 +130,8 @@ describe('PixelToast', () => {
 
     undo.blur();
     await settle();
-    expect(bar().style.transitionDuration).toBe('300ms');
-    await vi.waitFor(() => expect(host.dismissed).toBe(1));
+    expect(bar().style.transitionDuration).toBe('1500ms');
+    await vi.waitFor(() => expect(host.dismissed).toBe(1), { timeout: 5000 });
   });
 
   it('counts down the new duration once a loading toast settles, held if hovered meanwhile', async () => {
@@ -147,11 +151,16 @@ describe('PixelToast', () => {
   });
 
   it('stops its timer when destroyed', async () => {
+    // Watched rather than waited for: the countdown is cleared on destroy.
+    const started = vi.spyOn(globalThis, 'setTimeout');
+    const cleared = vi.spyOn(globalThis, 'clearTimeout');
     const { fixture, host, settle } = await render(Host);
-    host.toast.set({ id: 't', title: 'Saved', duration: 40 });
+    host.toast.set({ id: 't', title: 'Saved', duration: 60_000 });
     await settle();
+    const countdown = started.mock.calls.findIndex(([, delay]) => (delay ?? 0) > 59_000);
+    expect(countdown).toBeGreaterThanOrEqual(0);
     fixture.destroy();
-    await wait(100);
+    expect(cleared).toHaveBeenCalledWith(started.mock.results[countdown]!.value);
     expect(host.dismissed).toBe(0);
   });
 });
