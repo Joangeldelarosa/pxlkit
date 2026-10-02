@@ -101,13 +101,26 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | Component | Status | Since | Category |
 | --- | --- | --- | --- |
 | `PixelBadge` | stable | 1.0.0 | data |
+| `PixelBento` | stable | 1.7.0 | layout |
+| `PixelBentoCell` | stable | 1.7.0 | layout |
+| `PixelBox` | stable | 1.6.0 | layout |
 | `PixelButton` | stable | 1.0.0 | actions |
+| `PixelCenter` | stable | 1.6.0 | layout |
+| `PixelCluster` | stable | 1.6.0 | layout |
+| `PixelContainer` | stable | 1.6.0 | layout |
+| `PixelDivider` | stable | 1.6.0 | layout |
+| `PixelEqualHeightGrid` | stable | 1.6.0 | layout |
+| `PixelGrid` | stable | 1.6.0 | layout |
 | `PixelModal` | stable | 1.0.0 | overlays |
 | `PixelPopover` | stable | 1.8.0 | overlay-foundation |
 | `PixelPortal` | stable | 1.8.0 | overlay-foundation |
+| `PixelScrollArea` | stable | 1.9.0 | layout |
+| `PixelSection` | stable | 1.6.0 | layout |
+| `PixelSectionHeader` | stable | 1.6.0 | layout |
 | `PixelStack` | stable | 1.6.0 | layout |
 | `PixelSwitch` | stable | 1.0.0 | forms |
 | `PixelTabs` | stable | 1.0.0 | navigation |
+| `PixelTwoColumn` | stable | 1.6.0 | layout |
 | `PxlKitLocaleProvider` | stable | 1.6.0 | overlay-foundation |
 | `PxlKitSurfaceProvider` | stable | 1.6.0 | overlay-foundation |
 <!-- COMPONENTS:END -->

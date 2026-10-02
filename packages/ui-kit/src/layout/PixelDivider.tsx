@@ -7,7 +7,8 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React from 'react';
-import { cn, Surface, Tone, surfaceClasses, toneMap, useEffectiveSurface } from '../common';
+import { dividerClasses, type DividerSpacing } from '@pxlkit/ui-kit-core';
+import { cn, Surface, Tone, useEffectiveSurface } from '../common';
 
 export interface PixelDividerProps {
   /** Optional centered label between two rules. */
@@ -15,7 +16,7 @@ export interface PixelDividerProps {
   /** Color tone of the label text. */
   tone?: Tone;
   /** Symmetric vertical padding. */
-  spacing?: 'none' | 'sm' | 'md' | 'lg';
+  spacing?: DividerSpacing;
   className?: string;
   /** Surface variant. Falls back to nearest <PxlKitSurface>. */
   surface?: Surface;
@@ -29,27 +30,25 @@ export function PixelDivider({
   surface: surfaceProp,
 }: PixelDividerProps) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const spacingClass = spacing === 'lg' ? 'py-10' : spacing === 'md' ? 'py-6' : spacing === 'sm' ? 'py-3' : '';
-  const rule = surface === 'pixel' ? 'border-t-2 border-dotted' : 'border-t';
+  const c = dividerClasses(surface, spacing, tone);
 
   if (!label) {
-    return <hr className={cn(rule, 'border-retro-border/40', spacingClass, className)} />;
+    return <hr className={cn(c.rule, className)} />;
   }
   return (
     <div
       role="separator"
       aria-orientation="horizontal"
       aria-label={label}
-      className={cn('flex items-center gap-3', spacingClass, className)}
+      className={cn(c.separator, className)}
     >
-      <hr aria-hidden="true" className={cn(rule, 'flex-1 border-retro-border/40')} />
-      <span className={cn('text-[10px] uppercase tracking-wider inline-flex items-center gap-1.5', surface === 'pixel' ? 'font-pixel' : s.fontDisplay, toneMap[tone].text)}>
+      <hr aria-hidden="true" className={c.line} />
+      <span className={c.label}>
         {surface === 'pixel' && <span aria-hidden className="opacity-60">◆</span>}
         {label}
         {surface === 'pixel' && <span aria-hidden className="opacity-60">◆</span>}
       </span>
-      <hr aria-hidden="true" className={cn(rule, 'flex-1 border-retro-border/40')} />
+      <hr aria-hidden="true" className={c.line} />
     </div>
   );
 }

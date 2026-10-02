@@ -11,6 +11,8 @@
 - `PixelPopover` returns focus to the trigger when its content closes while holding focus — on Escape, on an action inside it, or when the parent closes it — instead of letting focus fall to `<body>`; after a press outside, focus follows the pointer. This fixes focus in the components built on it: `PixelDatePicker`, `PixelDateRangePicker`, `PixelCombobox`, `PixelMultiSelect`, `PixelColorInput` and `PixelBadgeGroup`. The popover docs gain an "Interactive content" example.
 - `font-mono` text — and `code`, `kbd`, `samp` and `pre` — renders in JetBrains Mono, as `PXLKIT_FONTS` declares. The theme never defined `--font-mono`, so monospace text fell back to the system stack although `buildGoogleFontsUrl()` loads JetBrains Mono.
 - The `PxlKitLocaleProvider` docs no longer say it loads fonts: it exposes `fontsUrl` for the app to load (see the setup guide).
+- `PixelGrid`: `colGap={0}` and `rowGap={0}` set a zero gap. Zero counted as unset, so `gap-x-0` and `gap-y-0` were unreachable and `colGap={0}` fell back to the uniform `gap`.
+- The `PixelEqualHeightGrid` examples show what the component does — footers lined up across a row: their card dropped the class the grid gives each item.
 
 ## 2.1.1 — 2026-08-08
 

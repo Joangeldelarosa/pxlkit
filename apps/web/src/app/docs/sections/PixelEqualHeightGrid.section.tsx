@@ -44,11 +44,14 @@ export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightG
     </section>
     <section aria-labelledby="pixel-equal-height-grid-usage">
       <h3 id="pixel-equal-height-grid-usage">Usage</h3>
-      <pre className="docs-code"><code>{`import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+      <pre className="docs-code"><code>{`import { cn } from '@pxlkit/ui-kit';
+import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
 
-function Card({ title, body }: { title: string; body: string }) {
+// PixelEqualHeightGrid lays out the rows of each item through its
+// className, so the card passes it on to its root.
+function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
-    <div className="border border-retro-border p-4">
+    <div className={cn('border border-retro-border p-4', className)}>
       <h3 className="text-sm font-semibold text-retro-text">{title}</h3>
       <p className="text-sm text-retro-muted">{body}</p>
       <div className="mt-2 text-xs text-retro-muted">Footer</div>

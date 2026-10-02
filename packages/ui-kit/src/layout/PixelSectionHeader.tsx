@@ -1,55 +1,26 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
-import { rhythm, tone, ToneKey } from '../tokens';
-
-const titleSize = {
-  sm: 'text-xl sm:text-2xl',
-  md: 'text-2xl sm:text-3xl',
-  lg: 'text-3xl sm:text-4xl lg:text-5xl',
-} as const;
-
-const eyebrowSize = {
-  sm: 'text-[10px]',
-  md: 'text-xs',
-  lg: 'text-xs sm:text-sm',
-} as const;
-
-const descriptionSize = {
-  sm: 'text-sm',
-  md: 'text-base',
-  lg: 'text-base sm:text-lg',
-} as const;
-
-const blockSpacing = {
-  tight: {
-    eyebrowToTitle: 'mt-2',
-    titleToDescription: 'mt-2',
-    descriptionToActions: 'mt-4',
-  },
-  normal: {
-    eyebrowToTitle: rhythm.eyebrowToHeadline,
-    titleToDescription: rhythm.headlineToSubline,
-    descriptionToActions: rhythm.sublineToCtas,
-  },
-  loose: {
-    eyebrowToTitle: 'mt-6',
-    titleToDescription: 'mt-5',
-    descriptionToActions: 'mt-10',
-  },
-} as const;
+import {
+  sectionHeaderClasses,
+  type SectionHeaderAlign,
+  type SectionHeaderLevel,
+  type SectionHeaderSize,
+  type SectionHeaderSpacing,
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ToneKey } from '../tokens';
 
 export interface PixelSectionHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
   eyebrow?: string;
   title: string;
   titleTone?: ToneKey;
   description?: string;
-  align?: 'start' | 'center';
-  size?: 'sm' | 'md' | 'lg';
-  spacing?: 'tight' | 'normal' | 'loose';
+  align?: SectionHeaderAlign;
+  size?: SectionHeaderSize;
+  spacing?: SectionHeaderSpacing;
   actions?: React.ReactNode;
-  as?: 'h1' | 'h2' | 'h3' | 'h4';
+  as?: SectionHeaderLevel;
   surface?: Surface;
 }
 
@@ -72,75 +43,29 @@ export const PixelSectionHeader = forwardRef<HTMLElement, PixelSectionHeaderProp
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
+    const c = sectionHeaderClasses(surface, { titleTone, align, size, spacing, eyebrow: Boolean(eyebrow) });
     const Heading = as as 'h2';
-    const sp = blockSpacing[spacing];
-    const titleColor = titleTone ? tone[titleTone].text : 'text-retro-text';
-    const eyebrowColor = titleTone ? tone[titleTone].text : 'text-retro-muted';
 
     return (
       <header
         ref={ref as React.Ref<HTMLElement>}
-        className={cn('w-full', className)}
+        className={cn(c.header, className)}
         {...rest}
       >
-        <div
-          className={cn(
-            'flex flex-col',
-            align === 'center' && 'mx-auto text-center items-center max-w-3xl',
-          )}
-        >
+        <div className={c.stack}>
           {eyebrow && (
-            <span
-              aria-hidden="true"
-              className={cn(
-                eyebrowSize[size],
-                s.fontDisplay,
-                'uppercase tracking-[0.18em]',
-                eyebrowColor,
-              )}
-            >
+            <span aria-hidden="true" className={c.eyebrow}>
               {eyebrow}
             </span>
           )}
-          <Heading
-            className={cn(
-              titleSize[size],
-              s.fontDisplay,
-              'font-bold leading-tight',
-              titleColor,
-              eyebrow && sp.eyebrowToTitle,
-            )}
-          >
+          <Heading className={c.title}>
             {eyebrow && (
               <span className="sr-only">{`${eyebrow}: `}</span>
             )}
             {title}
           </Heading>
-          {description && (
-            <p
-              className={cn(
-                descriptionSize[size],
-                s.font,
-                'text-retro-muted leading-relaxed max-w-prose',
-                sp.titleToDescription,
-                align === 'center' && 'mx-auto',
-              )}
-            >
-              {description}
-            </p>
-          )}
-          {actions && (
-            <div
-              className={cn(
-                'flex flex-wrap gap-3',
-                sp.descriptionToActions,
-                align === 'center' && 'justify-center',
-              )}
-            >
-              {actions}
-            </div>
-          )}
+          {description && <p className={c.description}>{description}</p>}
+          {actions && <div className={c.actions}>{actions}</div>}
         </div>
       </header>
     );

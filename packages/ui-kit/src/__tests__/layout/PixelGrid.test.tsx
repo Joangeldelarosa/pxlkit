@@ -35,4 +35,13 @@ describe('PixelGrid', () => {
     const el = getByTestId('grid');
     expect(el.className).toContain('gap-6');
   });
+
+  it('colGap={0} / rowGap={0} set a zero gap instead of falling back to gap', () => {
+    const { getByTestId, rerender } = render(<PixelGrid data-testid="grid" colGap={0} />);
+    const el = getByTestId('grid');
+    expect(el.className.split(' ')).toContain('gap-x-0');
+    expect(el.className.split(' ')).not.toContain('gap-4');
+    rerender(<PixelGrid data-testid="grid" colGap={8} rowGap={0} />);
+    expect(el.className.split(' ')).toEqual(expect.arrayContaining(['gap-x-8', 'gap-y-0']));
+  });
 });
