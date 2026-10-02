@@ -359,7 +359,7 @@ function defaultRepoRoot(): string {
 
 async function main(): Promise<void> {
   const flags = parseFlags(process.argv.slice(2));
-  const logger = createLogger(flags.verbose);
+  const logger = createLogger(flags.verbose, { stderr: flags.json });
   const report = await runAudit({
     repoRoot: flags.repoRoot,
     logger,

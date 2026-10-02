@@ -47,13 +47,18 @@ export interface AuditContext {
   logger: Logger;
 }
 
-export function createLogger(verbose = false): Logger {
+/**
+ * The console logger. With `stderr`, info and debug lines go to stderr as
+ * well — for `--json`, whose stdout must carry the report alone.
+ */
+export function createLogger(verbose = false, { stderr = false }: { stderr?: boolean } = {}): Logger {
+  const out = stderr ? console.error : console.log;
   return {
-    info: (msg) => console.log(pc.cyan('info'), msg),
+    info: (msg) => out(pc.cyan('info'), msg),
     warn: (msg) => console.warn(pc.yellow('warn'), msg),
     error: (msg) => console.error(pc.red('error'), msg),
     debug: (msg) => {
-      if (verbose) console.log(pc.dim('debug'), pc.dim(msg));
+      if (verbose) out(pc.dim('debug'), pc.dim(msg));
     },
   };
 }
