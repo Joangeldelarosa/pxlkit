@@ -3,14 +3,25 @@
  */
 import type { Type } from '@angular/core';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
+import { elapse } from '../../../../scripts/parity/clock';
 import type { Mounted } from '../../../../scripts/parity/react';
+
+/**
+ * Waits for the application to be stable. On simulated time, change
+ * detection that Angular scheduled on a timer runs only as the clock moves:
+ * run what is due until nothing is pending.
+ */
+async function stable(fixture: ComponentFixture<unknown>): Promise<void> {
+  for (let round = 0; round < 100 && !fixture.isStable(); round++) await elapse(0);
+  await fixture.whenStable();
+}
 
 async function settle(fixture: ComponentFixture<unknown>): Promise<void> {
   fixture.detectChanges();
-  await fixture.whenStable();
-  await new Promise((done) => setTimeout(done, 0));
+  await stable(fixture);
+  await elapse(0);
   fixture.detectChanges();
-  await fixture.whenStable();
+  await stable(fixture);
 }
 
 /** Mount an Angular example (in the current TestBed) into the document. */

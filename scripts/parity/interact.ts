@@ -5,6 +5,8 @@
  * see them.
  */
 
+import { elapse } from './clock';
+
 export type ParityStep =
   | { action: 'click' | 'pointerdown' | 'hover' | 'unhover' | 'focus' | 'blur'; target: string; nth?: number }
   /** A failed resource load, as an `<img>` whose source cannot be fetched reports it. */
@@ -23,17 +25,12 @@ export type ParityStep =
   | { action: 'input'; target: string; value: string; nth?: number }
   | { action: 'select'; target: string; value: string; nth?: number }
   /**
-   * Lets real time pass, for components driven by timers. A wait that
-   * expects a timer to have fired should outlast it by a wide margin (about
-   * 500 ms): on a loaded machine timers fire late, never early, and the two
-   * frameworks being compared may each fire them at a different point.
+   * Lets `ms` of simulated time pass (see `clock.ts`), for components driven
+   * by timers: every timeout, interval and animation frame due by then runs,
+   * in each framework at the same step. To see a timer fire, wait at least
+   * its delay; no margin is needed.
    */
   | { action: 'wait'; ms: number };
-
-/** The real time a scenario's `wait` steps take on one rendering. */
-export function waitedMs(steps: readonly ParityStep[]): number {
-  return steps.reduce((ms, step) => (step.action === 'wait' ? ms + step.ms : ms), 0);
-}
 
 export interface ParityScenario {
   /** Component name, as in its manifest. */
@@ -70,6 +67,10 @@ function setNativeValue(element: HTMLInputElement | HTMLTextAreaElement | HTMLSe
 
 /** Perform one step, then let the framework settle. */
 export async function perform(step: ParityStep, flush: () => Promise<void>): Promise<void> {
+  // A reader acts a moment after the page settled. Vue ignores an event as
+  // old as its listener (one attached while the event was propagating), and
+  // on a clock that never moved every event would look that old.
+  await elapse(1);
   switch (step.action) {
     case 'click': {
       const el = resolve(step.target, step.nth);
@@ -143,7 +144,7 @@ export async function perform(step: ParityStep, flush: () => Promise<void>): Pro
       break;
     }
     case 'wait':
-      await new Promise((done) => setTimeout(done, step.ms));
+      await elapse(step.ms);
       break;
   }
   await flush();

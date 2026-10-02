@@ -3,11 +3,12 @@
  */
 import { createApp, createSSRApp, nextTick, type Component } from 'vue';
 import { renderToString } from 'vue/server-renderer';
+import { elapse } from '../../../../scripts/parity/clock';
 import type { Mounted } from '../../../../scripts/parity/react';
 
 async function settle(): Promise<void> {
   await nextTick();
-  await new Promise((done) => setTimeout(done, 0));
+  await elapse(0);
   await nextTick();
 }
 

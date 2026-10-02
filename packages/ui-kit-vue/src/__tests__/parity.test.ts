@@ -6,7 +6,8 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { reactExamples } from '../../../../scripts/parity/catalog';
 import { canonicalPage } from '../../../../scripts/parity/canonical';
-import { perform, waitedMs } from '../../../../scripts/parity/interact';
+import { useRealTime, useSimulatedTime } from '../../../../scripts/parity/clock';
+import { perform } from '../../../../scripts/parity/interact';
 import { mountReact, type Mounted } from '../../../../scripts/parity/react';
 import { scenarios } from '../../../../scripts/parity/scenarios';
 import { loadKit, vueExamples } from './examples';
@@ -16,6 +17,8 @@ const unwrap = (element: Element) => element.hasAttribute('data-parity-root');
 const snapshot = () => canonicalPage(document, { unwrap });
 
 async function record(mount: () => Promise<Mounted>, steps: Parameters<typeof perform>[0][] = []): Promise<string[]> {
+  // Each rendering runs on its own simulated clock: see clock.ts.
+  useSimulatedTime();
   const mounted = await mount();
   try {
     const states = [snapshot()];
@@ -26,6 +29,7 @@ async function record(mount: () => Promise<Mounted>, steps: Parameters<typeof pe
     return states;
   } finally {
     await mounted.unmount();
+    useRealTime();
   }
 }
 
@@ -61,9 +65,7 @@ describe('React ↔ Vue parity — interactions', () => {
       it.todo(title);
       continue;
     }
-    // The scenario runs once per framework, so its waits count twice, on
-    // top of the suite's default limit for the steps themselves.
-    it(title, { timeout: 15_000 + 2 * waitedMs(scenario.steps) }, async () => {
+    it(title, async () => {
       const react = await record(() => mountReact(reference.Component), scenario.steps);
       const Example = await vue.load();
       const ported = await record(() => mountVue(Example), scenario.steps);

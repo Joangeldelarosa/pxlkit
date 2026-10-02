@@ -4,6 +4,7 @@
 import { act, createElement, type ComponentType } from 'react';
 import { createRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
+import { elapse } from './clock';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -21,13 +22,13 @@ export interface Mounted {
 }
 
 /**
- * Settle React: run pending updates and effects, then wait one task so
- * promise chains started by them (Floating UI positioning, focus return)
- * finish and their updates render too.
+ * Settle React: run pending updates and effects, then the timers due now and
+ * one task's worth of promise chains (Floating UI positioning, focus return),
+ * so their updates render too.
  */
 function settle(): Promise<void> {
   return act(async () => {
-    await new Promise((done) => setTimeout(done, 0));
+    await elapse(0);
   });
 }
 
