@@ -1,7 +1,8 @@
 import React, { useId, useState } from 'react';
+import { collapsibleClasses, collapsibleIds } from '@pxlkit/ui-kit-core';
 import {
-  Tone, Surface, cn,
-  surfaceClasses, useEffectiveSurface,
+  Tone, Surface,
+  useEffectiveSurface,
   ChevronDownIcon,
 } from '../common';
 import { PixelButton } from '../actions';
@@ -34,16 +35,15 @@ export function PixelCollapsible({
   bordered = false,
 }: PixelCollapsibleProps) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   const [open, setOpen] = useState(defaultOpen);
+  const classes = collapsibleClasses(surface, { bordered, open });
   /* Stable trigger/content ids for the disclosure aria wiring — same
      pattern as PixelAccordion (aria-expanded + aria-controls on the
      trigger, aria-labelledby back-reference on the content region). */
   const baseId = useId();
-  const triggerId = `${baseId}-trigger`;
-  const contentId = `${baseId}-content`;
+  const { trigger: triggerId, content: contentId } = collapsibleIds(baseId);
   return (
-    <div className={cn(bordered && s.border, bordered && s.radius, bordered && 'border-retro-border')}>
+    <div className={classes.root}>
       <PixelButton
         id={triggerId}
         type="button"
@@ -54,13 +54,13 @@ export function PixelCollapsible({
         aria-expanded={open}
         aria-controls={contentId}
         onClick={() => setOpen((v) => !v)}
-        iconRight={<ChevronDownIcon className={cn('transition-transform', open && 'rotate-180')} />}
-        className="h-auto px-1.5 py-0.5 text-xs"
+        iconRight={<ChevronDownIcon className={classes.chevron} />}
+        className={classes.trigger}
       >
         {label}
       </PixelButton>
       {open && (
-        <div id={contentId} aria-labelledby={triggerId} className="mt-2">
+        <div id={contentId} aria-labelledby={triggerId} className={classes.content}>
           {children}
         </div>
       )}

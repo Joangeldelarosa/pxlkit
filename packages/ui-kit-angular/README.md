@@ -109,17 +109,26 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 
 | Component | Status | Category |
 | --- | --- | --- |
+| `PixelAvatar` | stable | data |
+| `PixelAvatarGroup` | stable | data |
 | `PixelBadge` | stable | data |
+| `PixelBadgeGroup` | stable | data |
 | `PixelBento` | stable | layout |
 | `PixelBentoCell` | stable | layout |
 | `PixelBox` | stable | layout |
 | `PixelButton` | stable | actions |
 | `PixelCenter` | stable | layout |
+| `PixelChip` | stable | data |
+| `PixelChipGroup` | stable | data |
 | `PixelCluster` | stable | layout |
+| `PixelCodeInline` | stable | data |
+| `PixelCollapsible` | stable | data |
+| `PixelColorSwatch` | stable | data |
 | `PixelContainer` | stable | layout |
 | `PixelDivider` | stable | layout |
 | `PixelEqualHeightGrid` | stable | layout |
 | `PixelGrid` | stable | layout |
+| `PixelKbd` | stable | data |
 | `PixelModal` | stable | overlays |
 | `PixelPopover` | stable | overlay-foundation |
 | `PixelPortal` | stable | overlay-foundation |
@@ -129,6 +138,8 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelStack` | stable | layout |
 | `PixelSwitch` | stable | forms |
 | `PixelTabs` | stable | navigation |
+| `PixelTextLink` | stable | data |
+| `PixelTimeline` | stable | data |
 | `PixelTwoColumn` | stable | layout |
 | `PxlKitLocaleProvider` | stable | overlay-foundation |
 | `PxlKitSurfaceProvider` | stable | overlay-foundation |

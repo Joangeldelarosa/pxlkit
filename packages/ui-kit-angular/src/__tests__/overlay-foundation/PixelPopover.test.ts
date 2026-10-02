@@ -251,6 +251,52 @@ describe('PixelPopover', () => {
     expect(host.open()).toBe(true);
   });
 
+  it('points the trigger at the open panel with aria-controls, and only while it is open', async () => {
+    @Component({
+      imports: PARTS,
+      template: `
+        <pxl-popover [(open)]="open">
+          <button type="button" pxlPopoverTrigger data-testid="trigger">open</button>
+          <div *pxlPopoverContent data-testid="content">hello</div>
+        </pxl-popover>
+      `,
+    })
+    class Host {
+      readonly open = signal(false);
+    }
+    const { settle } = await render(Host);
+    expect(trigger().hasAttribute('aria-controls')).toBe(false);
+    trigger().click();
+    await settle();
+    expect(panel()!.id).not.toBe('');
+    expect(trigger().getAttribute('aria-controls')).toBe(panel()!.id);
+    trigger().click();
+    await settle();
+    expect(panel()).toBeNull();
+    expect(trigger().hasAttribute('aria-controls')).toBe(false);
+  });
+
+  it("keeps the panel's own id and the trigger's own aria-controls", async () => {
+    @Component({
+      imports: PARTS,
+      template: `
+        <pxl-popover [open]="true">
+          <button type="button" pxlPopoverTrigger data-testid="trigger">open</button>
+          <div *pxlPopoverContent id="details" data-testid="content">hello</div>
+        </pxl-popover>
+        <pxl-popover [open]="true">
+          <button type="button" pxlPopoverTrigger data-testid="own" aria-controls="listbox">open</button>
+          <div *pxlPopoverContent>hello</div>
+        </pxl-popover>
+      `,
+    })
+    class Host {}
+    await render(Host);
+    expect(panel()!.id).toBe('details');
+    expect(trigger().getAttribute('aria-controls')).toBe('details');
+    expect(document.querySelector('[data-testid="own"]')!.getAttribute('aria-controls')).toBe('listbox');
+  });
+
   it('explains when a part is used outside a <pxl-popover>', () => {
     @Component({ imports: PARTS, template: '<button type="button" pxlPopoverTrigger>open</button>' })
     class Host {}

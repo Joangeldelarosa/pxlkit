@@ -89,6 +89,7 @@ export class PixelPopover {
 
   private readonly trigger = signal<HTMLElement | null>(null);
   private readonly content = signal<HTMLElement | null>(null);
+  private readonly contentId = signal<string | null>(null);
   private readonly position = signal({ x: 0, y: 0 });
   // True while a press outside is closing the popover: focus then follows the
   // pointer instead of returning to the trigger.
@@ -105,6 +106,7 @@ export class PixelPopover {
       const { x, y } = this.position();
       return floatingStyles(this.content(), x, y);
     }),
+    contentId: this.contentId.asReadonly(),
     setOpen: (open) => this.open.set(open),
     setTrigger: (element) => this.trigger.set(element),
     setContent: (element) => {
@@ -114,6 +116,7 @@ export class PixelPopover {
       }
       this.content.set(element);
     },
+    setContentId: (id) => this.contentId.set(id),
   };
 
   constructor() {

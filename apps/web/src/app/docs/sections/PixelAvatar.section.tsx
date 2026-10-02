@@ -44,7 +44,7 @@ export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProp
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
       </ul>
-      <p className="docs-aria-notes">Avatar is a presentational identity badge. The user name is exposed via `title`; when `status` is set the status word is appended into the accessible name (no live region — status dots are not transient announcements). When `src` is provided the inner &lt;img&gt; uses the same accessible name as its alt text.</p>
+      <p className="docs-aria-notes">Avatar is a presentational identity badge. The user name is exposed via `title`; when `status` is set the frame becomes role=&quot;img&quot; named by the user name plus the status word (no live region — status dots are not transient announcements). When `src` is provided the inner &lt;img&gt; uses the same accessible name as its alt text.</p>
     </section>
     <section aria-labelledby="pixel-avatar-usage">
       <h3 id="pixel-avatar-usage">Usage</h3>

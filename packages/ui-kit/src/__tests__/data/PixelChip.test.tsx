@@ -1,6 +1,8 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent, screen } from '@testing-library/react';
+import { act, render, fireEvent, screen } from '@testing-library/react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { PixelChip } from '../../data/PixelChip';
 
 /* Extracted from __tests__/data/PixelBadgeChipUpgrade.test.tsx (additive
@@ -193,5 +195,56 @@ describe('PixelChip — deletable + onDelete', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Remove x' }));
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onRemove).not.toHaveBeenCalled();
+  });
+});
+
+// Regression: a chip that was both clickable and deletable nested the delete
+// <button> inside its own <button> — invalid HTML, which the parser splits, so
+// its server markup could not hydrate. The label and the X are now sibling
+// buttons in a <span> frame.
+describe('PixelChip — clickable and deletable', () => {
+  it('renders the label and the X as sibling buttons in a frame', () => {
+    const { container } = render(
+      <PixelChip label="Tag" className="extra" data-testid="action" onClick={() => {}} onDelete={() => {}} />,
+    );
+    const frame = container.firstElementChild as HTMLElement;
+    expect(frame.tagName).toBe('SPAN');
+    expect(frame.className).toContain('extra');
+    expect(container.querySelector('button button')).toBeNull();
+    const [action, remove] = Array.from(frame.children) as HTMLElement[];
+    expect(action!.tagName).toBe('BUTTON');
+    expect(action!.hasAttribute('data-chip-action')).toBe(true);
+    expect(action!.getAttribute('data-testid')).toBe('action');
+    expect(action!.textContent).toBe('Tag');
+    expect(remove!.getAttribute('aria-label')).toBe('Remove Tag');
+  });
+
+  it('activates the label button and the X separately, with the ref on the label button', () => {
+    const onClick = vi.fn();
+    const onDelete = vi.fn();
+    const ref = React.createRef<HTMLElement>();
+    render(<PixelChip ref={ref} label="Tag" onClick={onClick} onDelete={onDelete} />);
+    const action = screen.getByRole('button', { name: 'Tag' });
+    fireEvent.click(action);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole('button', { name: 'Remove Tag' }));
+    expect(onDelete).toHaveBeenCalledTimes(1);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(ref.current).toBe(action);
+  });
+
+  it('hydrates its own server markup without an error', async () => {
+    const chip = <PixelChip label="Tag" onClick={() => {}} onDelete={() => {}} />;
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(chip);
+    document.body.appendChild(container);
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const onRecoverableError = vi.fn();
+    const root = await act(async () => hydrateRoot(container, chip, { onRecoverableError }));
+    expect(error).not.toHaveBeenCalled();
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    error.mockRestore();
+    act(() => root.unmount());
+    container.remove();
   });
 });

@@ -5,13 +5,21 @@ import React, {
   forwardRef,
   isValidElement,
   useCallback,
-  useMemo,
   useRef,
 } from 'react';
 import {
+  chipGroupClasses,
+  chipGroupItemClasses,
+  chipGroupKeyAction,
+  chipGroupMove,
+  chipGroupRole,
+  chipGroupTabStop,
+  toggleChipSelection,
+  type ChipGroupMove,
+} from '@pxlkit/ui-kit-core';
+import {
   Surface,
   cn,
-  surfaceClasses,
   useEffectiveSurface,
 } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
@@ -59,69 +67,38 @@ export const PixelChipGroup = forwardRef<HTMLDivElement, PixelChipGroupProps>(
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
     const [value, setValue] = useControllableState<string[]>({
       value: valueProp,
       defaultValue: defaultValue ?? [],
       onChange,
     });
+    const selection = value ?? [];
 
-    const toggle = (chipValue: string) => {
-      const current = value ?? [];
-      const isSelected = current.includes(chipValue);
-      let next: string[];
-      if (multiple) {
-        next = isSelected
-          ? current.filter((v) => v !== chipValue)
-          : [...current, chipValue];
-      } else {
-        next = isSelected ? [] : [chipValue];
-      }
-      setValue(next);
-    };
+    const toggle = (chipValue: string) => setValue(toggleChipSelection(selection, chipValue, multiple));
 
     const items = Children.toArray(children).filter(isValidElement);
 
-    // Collect ordered radio values for roving tabindex + arrow nav (single mode).
-    const radioValues = useMemo(() => {
-      const out: string[] = [];
-      for (const child of items) {
-        const el = child as React.ReactElement<ChipChildProps>;
-        const v = el.props?.value;
-        if (typeof v === 'string') out.push(v);
-      }
-      return out;
-    }, [items]);
+    // Ordered radio values for roving tabindex + arrow nav (single mode).
+    const radioValues: string[] = [];
+    for (const child of items) {
+      const v = (child as React.ReactElement<ChipChildProps>).props?.value;
+      if (typeof v === 'string') radioValues.push(v);
+    }
 
     const btnRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
     const setBtnRef = useCallback((val: string, el: HTMLButtonElement | null) => {
       if (el) btnRefs.current.set(val, el);
       else btnRefs.current.delete(val);
     }, []);
-    const selectedRadio = !multiple ? ((value ?? [])[0] ?? null) : null;
-    const focusableRadio = selectedRadio ?? radioValues[0] ?? null;
+    const focusableRadio = multiple ? undefined : chipGroupTabStop(radioValues, selection);
 
-    const moveRadio = useCallback(
-      (current: string, direction: 1 | -1 | 'first' | 'last') => {
-        if (radioValues.length === 0) return;
-        let nextIdx: number;
-        if (direction === 'first') nextIdx = 0;
-        else if (direction === 'last') nextIdx = radioValues.length - 1;
-        else {
-          const idx = radioValues.indexOf(current);
-          if (idx === -1) return;
-          nextIdx = Math.max(0, Math.min(radioValues.length - 1, idx + direction));
-        }
-        const nextVal = radioValues[nextIdx];
-        btnRefs.current.get(nextVal)?.focus();
-        // In radiogroup pattern, arrow key both focuses AND selects.
-        toggle(nextVal);
-      },
-      // toggle is stable across renders of the same value/onChange combo; we
-      // re-create the callback per radio order/value change anyway.
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [radioValues],
-    );
+    // In the radiogroup pattern an arrow key both focuses AND selects.
+    const moveRadio = (current: string, direction: ChipGroupMove) => {
+      const move = chipGroupMove(radioValues, selection, current, direction);
+      if (!move) return;
+      btnRefs.current.get(move.focus)?.focus();
+      if (move.selection) setValue(move.selection);
+    };
 
     const ariaLabel = (rest as { 'aria-label'?: string })['aria-label'];
     const ariaLabelledBy = (rest as { 'aria-labelledby'?: string })['aria-labelledby'];
@@ -130,8 +107,8 @@ export const PixelChipGroup = forwardRef<HTMLDivElement, PixelChipGroupProps>(
     return (
       <div
         ref={ref}
-        role={multiple ? (hasName ? 'group' : undefined) : 'radiogroup'}
-        className={cn('inline-flex flex-row flex-wrap items-center gap-1.5', className)}
+        role={chipGroupRole(multiple, hasName)}
+        className={cn(chipGroupClasses, className)}
         {...rest}
       >
         {items.map((child, idx) => {
@@ -144,29 +121,14 @@ export const PixelChipGroup = forwardRef<HTMLDivElement, PixelChipGroupProps>(
               </React.Fragment>
             );
           }
-          const selected = (value ?? []).includes(chipValue);
+          const selected = selection.includes(chipValue);
           const handleClick = () => toggle(chipValue);
           const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              toggle(chipValue);
-              return;
-            }
-            if (!multiple) {
-              switch (e.key) {
-                case 'ArrowRight':
-                case 'ArrowDown':
-                  e.preventDefault(); moveRadio(chipValue, 1); return;
-                case 'ArrowLeft':
-                case 'ArrowUp':
-                  e.preventDefault(); moveRadio(chipValue, -1); return;
-                case 'Home':
-                  e.preventDefault(); moveRadio(chipValue, 'first'); return;
-                case 'End':
-                  e.preventDefault(); moveRadio(chipValue, 'last'); return;
-                default: return;
-              }
-            }
+            const action = chipGroupKeyAction(e.key, multiple);
+            if (action === undefined) return;
+            e.preventDefault();
+            if (action === 'toggle') toggle(chipValue);
+            else moveRadio(chipValue, action);
           };
           // Single-mode roving tabindex: only the selected (or first) radio is
           // Tab-reachable; others -1.
@@ -185,14 +147,7 @@ export const PixelChipGroup = forwardRef<HTMLDivElement, PixelChipGroupProps>(
               data-selected={selected ? 'true' : 'false'}
               onClick={handleClick}
               onKeyDown={handleKeyDown}
-              className={cn(
-                // Full UA reset — the inner chip paints its own surface.
-                'bg-transparent border-0 p-0 m-0 font-inherit text-inherit cursor-pointer',
-                'inline-flex items-center transition-colors',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60',
-                s.radius,
-                selected && 'ring-2 ring-retro-cyan/60',
-              )}
+              className={chipGroupItemClasses(surface, selected)}
             >
               {el}
             </button>

@@ -4,12 +4,19 @@ import React, {
   Children,
   forwardRef,
   isValidElement,
+  useId,
   useState,
 } from 'react';
 import {
+  badgeGroupClasses,
+  badgeGroupOverflowClasses,
+  badgeGroupTriggerClasses,
+  badgeGroupTriggerLabel,
+  groupOverflow,
+} from '@pxlkit/ui-kit-core';
+import {
   Surface,
   cn,
-  surfaceClasses,
   useEffectiveSurface,
 } from '../common';
 import { PixelPopover } from '../overlay-foundation/PixelPopover';
@@ -41,16 +48,14 @@ export const PixelBadgeGroup = forwardRef<HTMLDivElement, PixelBadgeGroupProps>(
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
     const [open, setOpen] = useState(false);
+    // The "+N" button names the popover it opens.
+    const triggerId = useId();
 
     const items = Children.toArray(children).filter(isValidElement);
-    const count = items.length;
-    const overflowing = count > max;
-    const visibleCount = overflowing ? Math.max(0, max - 1) : count;
+    const { visible: visibleCount, hidden: remainder } = groupOverflow(items.length, max);
     const visible = items.slice(0, visibleCount);
     const hidden = items.slice(visibleCount);
-    const remainder = hidden.length;
 
     const ariaLabel = (rest as { 'aria-label'?: string })['aria-label'];
     const ariaLabelledBy = (rest as { 'aria-labelledby'?: string })['aria-labelledby'];
@@ -60,7 +65,7 @@ export const PixelBadgeGroup = forwardRef<HTMLDivElement, PixelBadgeGroupProps>(
       <div
         ref={ref}
         role={hasName ? 'group' : undefined}
-        className={cn('inline-flex flex-row flex-wrap items-center gap-1.5', className)}
+        className={cn(badgeGroupClasses, className)}
         {...rest}
       >
         {visible.map((child, idx) => (
@@ -68,7 +73,7 @@ export const PixelBadgeGroup = forwardRef<HTMLDivElement, PixelBadgeGroupProps>(
             {child}
           </React.Fragment>
         ))}
-        {overflowing && (
+        {remainder > 0 && (
           <PixelPopover
             open={open}
             onOpenChange={setOpen}
@@ -79,22 +84,15 @@ export const PixelBadgeGroup = forwardRef<HTMLDivElement, PixelBadgeGroupProps>(
             <PixelPopover.Trigger>
               <button
                 type="button"
-                aria-label={`Show ${remainder} more`}
-                className={cn(
-                  'inline-flex items-center px-2.5 py-1 text-[11px] leading-none',
-                  'bg-retro-surface/40 text-retro-text border-retro-border',
-                  'transition-colors hover:bg-retro-surface/70',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60',
-                  s.border,
-                  s.radiusFull,
-                  s.font,
-                )}
+                id={triggerId}
+                aria-label={badgeGroupTriggerLabel(remainder)}
+                className={badgeGroupTriggerClasses(surface)}
               >
                 {`+${remainder}`}
               </button>
             </PixelPopover.Trigger>
-            <PixelPopover.Content surface={surface}>
-              <div className="flex flex-row flex-wrap items-center gap-1.5 max-w-xs">
+            <PixelPopover.Content surface={surface} aria-labelledby={triggerId}>
+              <div className={badgeGroupOverflowClasses}>
                 {hidden.map((child, idx) => (
                   <React.Fragment key={(child as React.ReactElement).key ?? idx}>
                     {child}

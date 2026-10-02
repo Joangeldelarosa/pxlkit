@@ -45,7 +45,7 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
         <li><code>group</code></li>
         <li><code>disclosure</code></li>
       </ul>
-      <p className="docs-aria-notes">Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled &quot;group&quot; announcement. The overflow button carries aria-label=&quot;Show N more&quot;, aria-expanded, aria-haspopup=&quot;dialog&quot;, and aria-controls wired by PixelPopover.</p>
+      <p className="docs-aria-notes">Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled &quot;group&quot; announcement. The overflow button carries aria-label=&quot;Show N more&quot;, aria-expanded, aria-haspopup=&quot;dialog&quot;, and aria-controls wired by PixelPopover; it also names the popover dialog through aria-labelledby.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

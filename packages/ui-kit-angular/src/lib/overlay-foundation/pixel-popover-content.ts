@@ -15,6 +15,7 @@ import {
   type EmbeddedViewRef,
 } from '@angular/core';
 import { POPOVER_Z_INDEX, popoverContentClasses, type Surface } from '@pxlkit/ui-kit-core';
+import { injectId } from '../_internal/ids';
 import { injectPopoverContext } from './popover-context';
 
 /** camelCase → kebab-case CSS property name. */
@@ -24,9 +25,10 @@ const cssProperty = (key: string) => key.replace(/[A-Z]/g, (letter) => `-${lette
  * The floating panel of a `<pxl-popover>`: the element it is placed on is
  * rendered into `<body>` while the popover is open, anchored to the trigger,
  * and receives the panel classes and the dialog role (an own `role` wins).
- * Its own inline style keys win over the positioning. Pair it with
- * `aria-labelledby` for its accessible name; pass a surface to override the
- * popover's.
+ * The trigger points at it with `aria-controls`: the panel keeps an own `id`,
+ * or gets a generated one. Its own inline style keys win over the
+ * positioning. Pair it with `aria-labelledby` for its accessible name; pass a
+ * surface to override the popover's.
  *
  * @example
  * <div *pxlPopoverContent aria-labelledby="details-title">…</div>
@@ -45,6 +47,7 @@ export class PixelPopoverContent {
   private readonly anchor = inject(ViewContainerRef);
   private readonly document = inject(DOCUMENT);
   private readonly renderer = inject(Renderer2);
+  private readonly generatedId = injectId();
   // Only rendered in the browser after the first render, so the server and
   // hydration markup never contain the panel.
   private readonly rendered = signal(false);
@@ -82,8 +85,11 @@ export class PixelPopoverContent {
       role: !!panel?.hasAttribute('role'),
     };
     this.applied = { classes: [], style: new Set() };
+    if (panel && !panel.id) this.renderer.setAttribute(panel, 'id', this.generatedId);
     this.panel.set(panel);
     this.context.setContent(panel);
+    // The trigger controls the panel while it is on the page.
+    this.context.setContentId(panel?.id ?? null);
   }
 
   private hide(): void {
@@ -91,6 +97,7 @@ export class PixelPopoverContent {
     if (!view) return;
     this.view = null;
     this.panel.set(null);
+    this.context.setContentId(null);
     // Still on the page here, so focus can be handed back once it is gone.
     this.context.setContent(null);
     // Destroying the view removes its nodes wherever they are.

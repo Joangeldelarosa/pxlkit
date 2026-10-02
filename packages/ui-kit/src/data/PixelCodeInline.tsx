@@ -1,8 +1,6 @@
 import React from 'react';
-import {
-  Tone, Surface, cn,
-  toneMap, surfaceClasses, useEffectiveSurface,
-} from '../common';
+import { codeInlineClasses } from '@pxlkit/ui-kit-core';
+import { Tone, Surface, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelCodeInline — inline <code> with tone tinting.
@@ -23,9 +21,8 @@ export function PixelCodeInline({
   surface: surfaceProp,
 }: PixelCodeInlineProps) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   return (
-    <code className={cn('px-1.5 py-0.5 text-xs break-words box-decoration-clone', s.border, s.radius, s.font, toneMap[tone].border, toneMap[tone].soft, toneMap[tone].text)}>
+    <code className={codeInlineClasses(surface, tone)}>
       {children}
     </code>
   );

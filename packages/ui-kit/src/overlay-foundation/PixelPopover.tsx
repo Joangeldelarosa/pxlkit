@@ -6,6 +6,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -45,6 +46,9 @@ interface PopoverContextValue {
   pressOutsideRef: React.MutableRefObject<boolean>;
   haspopup: PopoverHasPopup;
   role: PopoverRole;
+  /** Id of the content while it is on the page, for the trigger's aria-controls. */
+  contentId: string | null;
+  setContentId: (id: string | null) => void;
 }
 
 const PopoverContext = createContext<PopoverContextValue | null>(null);
@@ -105,6 +109,7 @@ function PixelPopoverRoot({
   const contentRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const pressOutsideRef = useRef(false);
+  const [contentId, setContentId] = useState<string | null>(null);
 
   const placement = toPlacement(side, align);
 
@@ -172,8 +177,10 @@ function PixelPopoverRoot({
       pressOutsideRef,
       haspopup,
       role,
+      contentId,
+      setContentId,
     }),
-    [open, setOpen, refs, floatingStyles, side, align, surface, haspopup, role],
+    [open, setOpen, refs, floatingStyles, side, align, surface, haspopup, role, contentId],
   );
 
   return (
@@ -219,16 +226,20 @@ const PixelPopoverTrigger = forwardRef<HTMLElement, PixelPopoverTriggerProps>(
       }
     };
 
-    // Respect any aria-haspopup the child has already set (combobox/menu
-    // patterns set their own); only inject the context default when absent.
+    // Respect any aria-haspopup / aria-controls the child has already set
+    // (combobox/menu patterns set their own); only inject the context values
+    // when absent. aria-controls points at the content only while it is on
+    // the page.
     const childProps = child.props as React.HTMLAttributes<HTMLElement>;
     const childHasPopup = childProps['aria-haspopup'];
     const resolvedHasPopup = childHasPopup ?? ctx.haspopup;
+    const resolvedControls = childProps['aria-controls'] ?? ctx.contentId ?? undefined;
 
     return React.cloneElement(child, {
       onClick: handleClick,
       'aria-expanded': ctx.open,
       'aria-haspopup': resolvedHasPopup,
+      'aria-controls': resolvedControls,
       ref: setRef,
     } as React.HTMLAttributes<HTMLElement> & { ref: React.Ref<HTMLElement> });
   },
@@ -275,9 +286,18 @@ function PopoverContentPortal({
   children,
   surface: surfaceProp,
   style,
+  id: idProp,
   ...rest
 }: PopoverContentPortalProps) {
-  const { contentRef, triggerRef, pressOutsideRef } = ctx;
+  const { contentRef, triggerRef, pressOutsideRef, setContentId } = ctx;
+  const generatedId = useId();
+  const id = idProp ?? generatedId;
+
+  // The trigger controls the content while it is on the page.
+  useLayoutEffect(() => {
+    setContentId(id);
+    return () => setContentId(null);
+  }, [setContentId, id]);
 
   // Focus return: content that closes while holding focus hands it back to
   // the trigger — unless a press outside closed it, then focus follows the
@@ -309,6 +329,7 @@ function PopoverContentPortal({
   return createPortal(
     <div
       ref={setRefs}
+      id={id}
       role={contentRole}
       style={{ ...ctx.floatingStyles, zIndex: POPOVER_Z_INDEX, ...style }}
       className={cn(popoverContentClasses(surface), className)}

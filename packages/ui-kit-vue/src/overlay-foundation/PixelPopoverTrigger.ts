@@ -5,8 +5,9 @@ import { usePopoverContext } from './_internal/popover-context.js';
 /**
  * Makes its single child element the trigger of the enclosing `PixelPopover`:
  * a click toggles the popover (unless a click listener of the child calls
- * `preventDefault()`), and the element advertises `aria-expanded` and
- * `aria-haspopup` — an `aria-haspopup` already set on the child wins.
+ * `preventDefault()`), and the element advertises `aria-expanded`,
+ * `aria-haspopup` and, while the content is open, `aria-controls` — an
+ * `aria-haspopup` or `aria-controls` already set on the child wins.
  */
 export default defineComponent({
   name: 'PixelPopoverTrigger',
@@ -16,7 +17,7 @@ export default defineComponent({
     return () => {
       const child = singleElementChild(slots.default?.());
       if (!child) return null;
-      const ownHasPopup = (child.props as Record<string, unknown> | null)?.['aria-haspopup'];
+      const own = child.props as Record<string, unknown> | null;
       return cloneVNode(
         child,
         {
@@ -25,7 +26,8 @@ export default defineComponent({
             if (!event.defaultPrevented) context.setOpen(!context.open.value);
           },
           'aria-expanded': context.open.value,
-          'aria-haspopup': ownHasPopup ?? context.haspopup.value,
+          'aria-haspopup': own?.['aria-haspopup'] ?? context.haspopup.value,
+          'aria-controls': own?.['aria-controls'] ?? context.contentId.value ?? undefined,
           ref: context.setTrigger,
         },
         true,

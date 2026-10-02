@@ -44,7 +44,7 @@ export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>dialog</code></li>
       </ul>
-      <p className="docs-aria-notes">Content renders with role=&quot;dialog&quot; by default; pair with aria-labelledby on Content. Set role=&quot;none&quot; when an inner widget owns semantics. When the content closes while it holds focus, focus returns to the trigger; after a press outside, focus follows the pointer instead.</p>
+      <p className="docs-aria-notes">Content renders with role=&quot;dialog&quot; by default; pair with aria-labelledby on Content. Set role=&quot;none&quot; when an inner widget owns semantics. While the content is open, the trigger points at it with aria-controls (Content keeps the id it is given, or gets a generated one); a trigger that sets its own aria-controls keeps it. When the content closes while it holds focus, focus returns to the trigger; after a press outside, focus follows the pointer instead.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

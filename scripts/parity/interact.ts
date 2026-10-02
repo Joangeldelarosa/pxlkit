@@ -7,6 +7,8 @@
 
 export type ParityStep =
   | { action: 'click' | 'pointerdown' | 'hover' | 'unhover' | 'focus' | 'blur'; target: string; nth?: number }
+  /** A failed resource load, as an `<img>` whose source cannot be fetched reports it. */
+  | { action: 'error'; target: string; nth?: number }
   | {
       action: 'keydown';
       key: string;
@@ -94,6 +96,10 @@ export async function perform(step: ParityStep, flush: () => Promise<void>): Pro
       break;
     case 'blur':
       resolve(step.target, step.nth).blur();
+      break;
+    case 'error':
+      // Like the browser's, this `error` does not bubble.
+      resolve(step.target, step.nth).dispatchEvent(new Event('error'));
       break;
     case 'keydown': {
       const el = step.target ? resolve(step.target, step.nth) : ((document.activeElement as HTMLElement | null) ?? document.body);

@@ -67,6 +67,17 @@ describe('perform', () => {
     expect(selectEvents.map((s) => s.split(':')[0])).toEqual(['input', 'change']);
   });
 
+  it('fails a load like the browser: an error event on the target that does not bubble', async () => {
+    document.body.innerHTML = '<div id="frame"><img alt="a"><img alt="b"></div>';
+    const second = document.querySelectorAll('img')[1]!;
+    const onTarget = record(second, ['error']);
+    const onParent = record(document.getElementById('frame')!, ['error']);
+    await perform({ action: 'error', target: 'img', nth: 1 }, flush);
+    expect(onTarget).toEqual(['error:Event']);
+    expect(onParent).toEqual([]);
+    expect(flush).toHaveBeenCalledTimes(1);
+  });
+
   it('waits, and fails loudly on a missing target', async () => {
     vi.useFakeTimers();
     const done = perform({ action: 'wait', ms: 50 }, flush);

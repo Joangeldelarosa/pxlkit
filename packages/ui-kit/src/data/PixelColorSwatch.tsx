@@ -1,8 +1,6 @@
 import React from 'react';
-import {
-  Surface, cn,
-  surfaceClasses, useEffectiveSurface,
-} from '../common';
+import { colorSwatchClasses, colorSwatchFill } from '@pxlkit/ui-kit-core';
+import { Surface, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelColorSwatch — design token preview with CSS var label.
@@ -23,16 +21,16 @@ export function PixelColorSwatch({
   surface: surfaceProp,
 }: PixelColorSwatchProps) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
+  const classes = colorSwatchClasses(surface);
   return (
-    <div className="flex items-center gap-3">
+    <div className={classes.root}>
       <div
-        className={cn('h-8 w-8', s.border, s.radius, 'border-retro-border/50')}
-        style={{ backgroundColor: `var(${cssVar})` }}
+        className={classes.sample}
+        style={{ backgroundColor: colorSwatchFill(cssVar) }}
       />
       <div>
-        <p className={cn('text-xs text-retro-text', s.font)}>{name}</p>
-        <p className={cn('text-[10px] text-retro-muted', s.font)}>{cssVar}</p>
+        <p className={classes.name}>{name}</p>
+        <p className={classes.variable}>{cssVar}</p>
       </div>
     </div>
   );

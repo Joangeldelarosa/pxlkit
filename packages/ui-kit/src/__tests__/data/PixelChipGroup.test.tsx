@@ -64,4 +64,27 @@ describe('PixelChipGroup', () => {
     fireEvent.click(getByText('Bravo'));
     expect(onChange).toHaveBeenLastCalledWith([]);
   });
+
+  // Regression: arrow keys, Home and End toggled the chip they landed on, so
+  // at the ends (or on the selected chip) they cleared the selection instead
+  // of selecting.
+  it('single mode: arrows, Home and End select the chip they reach and never clear the selection', () => {
+    const onChange = vi.fn();
+    const { getByText } = render(
+      <PixelChipGroup value={['c']} onChange={onChange} aria-label="Letters">
+        <Chip value="a" label="Alpha" />
+        <Chip value="b" label="Bravo" />
+        <Chip value="c" label="Charlie" />
+      </PixelChipGroup>,
+    );
+    const charlie = getByText('Charlie').closest('button')!;
+    fireEvent.keyDown(charlie, { key: 'ArrowRight' });
+    fireEvent.keyDown(charlie, { key: 'End' });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(charlie);
+
+    fireEvent.keyDown(charlie, { key: 'Home' });
+    expect(onChange).toHaveBeenLastCalledWith(['a']);
+    expect(document.activeElement).toBe(getByText('Alpha').closest('button'));
+  });
 });

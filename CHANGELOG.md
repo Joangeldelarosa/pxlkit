@@ -90,6 +90,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dialog when they open — `PixelPortal` re-mounted its content after the first client
   render, dropping the focus the trap had set — and `PixelPopover` returns focus to its
   trigger when its content closes while holding focus.
+- `@pxlkit/ui-kit`: `PixelChipGroup` arrow keys select instead of toggling (they could clear
+  the group); a clickable, deletable `PixelChip` no longer nests a button in a button, which
+  broke hydration; `PixelAvatar` falls back to its initials when the image fails; avatars,
+  the avatar group's "+N" and `PixelBadgeGroup`'s dialog get valid accessible names; and
+  `PixelPopover` sets `aria-controls` on its trigger while open.
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
 - `@pxlkit/ui-kit`: `font-mono` text renders in JetBrains Mono. The theme never defined

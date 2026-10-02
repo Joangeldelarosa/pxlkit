@@ -180,6 +180,29 @@ describe('PixelPopover', () => {
     expect(content.value?.element?.textContent).toBe('hello');
   });
 
+  it('points the trigger at the open content with aria-controls, and only while it is open', async () => {
+    const wrapper = await mountHarness();
+    const trigger = wrapper.find('[data-testid="trigger"]');
+    expect(trigger.attributes('aria-controls')).toBeUndefined();
+    await trigger.trigger('click');
+    await settle();
+    expect(panel()!.id).not.toBe('');
+    expect(trigger.attributes('aria-controls')).toBe(panel()!.id);
+    await trigger.trigger('click');
+    await settle();
+    expect(panel()).toBeNull();
+    expect(trigger.attributes('aria-controls')).toBeUndefined();
+  });
+
+  it("keeps the content's own id and the trigger's own aria-controls", async () => {
+    const given = await mountHarness({ initial: true, content: { id: 'details' } });
+    expect(panel()!.id).toBe('details');
+    expect(given.find('[data-testid="trigger"]').attributes('aria-controls')).toBe('details');
+    given.unmount();
+    const own = await mountHarness({ initial: true, trigger: { 'aria-controls': 'listbox' } });
+    expect(own.find('[data-testid="trigger"]').attributes('aria-controls')).toBe('listbox');
+  });
+
   it('explains when a part is used outside a PixelPopover', () => {
     expect(() => mount(PixelPopoverContent)).toThrow('PixelPopoverContent must be used inside a <PixelPopover> root.');
   });

@@ -16,10 +16,13 @@ export interface PixelPopoverContext {
   readonly haspopup: Signal<PopoverHasPopup>;
   readonly role: Signal<PopoverRole>;
   readonly floatingStyles: Signal<FloatingStyles>;
+  /** Id of the content while it is on the page, for the trigger's `aria-controls`. */
+  readonly contentId: Signal<string | null>;
   setOpen(open: boolean): void;
   setTrigger(element: HTMLElement | null): void;
   /** The content panel; `null` right before it leaves the page. */
   setContent(element: HTMLElement | null): void;
+  setContentId(id: string | null): void;
 }
 
 export const PIXEL_POPOVER = new InjectionToken<PixelPopoverContext>('PIXEL_POPOVER');

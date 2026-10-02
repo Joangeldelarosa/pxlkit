@@ -33,7 +33,7 @@ export default defineManifest({
       { key: 'Escape', does: 'Closes the overflow popover.', when: 'overflow popover is open' },
     ],
     notes:
-      'Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled "group" announcement. The overflow button carries aria-label="Show N more", aria-expanded, aria-haspopup="dialog", and aria-controls wired by PixelPopover.',
+      'Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled "group" announcement. The overflow button carries aria-label="Show N more", aria-expanded, aria-haspopup="dialog", and aria-controls wired by PixelPopover; it also names the popover dialog through aria-labelledby.',
   },
   related: ['PixelBadge', 'PixelChipGroup', 'PixelPopover', 'PixelAvatarGroup'],
   apiStability: 'stable',

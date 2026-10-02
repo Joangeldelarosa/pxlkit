@@ -79,6 +79,7 @@ defineSlots<{ default?(): VNode[] }>();
 const surface = useEffectiveSurface(() => props.surface);
 const trigger = shallowRef<HTMLElement | null>(null);
 const content = shallowRef<HTMLElement | null>(null);
+const contentId = shallowRef<string | null>(null);
 const position = shallowRef({ x: 0, y: 0 });
 // True while a press outside is closing the popover: focus then follows the
 // pointer instead of returning to the trigger.
@@ -144,6 +145,10 @@ provide(PIXEL_POPOVER, {
   haspopup: computed(() => props.haspopup),
   role: computed(() => props.role),
   floatingStyles: computed(() => floatingStyles(content.value, position.value.x, position.value.y)),
+  contentId: computed(() => contentId.value),
+  setContentId(id) {
+    contentId.value = id;
+  },
   setTrigger(target) {
     trigger.value = refElement(target);
   },

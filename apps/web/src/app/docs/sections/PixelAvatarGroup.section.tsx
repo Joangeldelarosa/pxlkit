@@ -44,7 +44,7 @@ export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsS
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
       </ul>
-      <p className="docs-aria-notes">Provide aria-label or aria-labelledby summarizing the count (e.g. &quot;5 team members&quot;); without one, role=group is dropped so the cluster is treated as presentational. The &quot;+N&quot; overflow tile carries its own aria-label (&quot;N more users&quot;) so assistive tech announces the hidden count.</p>
+      <p className="docs-aria-notes">Provide aria-label or aria-labelledby summarizing the count (e.g. &quot;5 team members&quot;); without one, role=group is dropped so the cluster is treated as presentational. The &quot;+N&quot; overflow tile hides its visible &quot;+N&quot; from assistive tech and announces &quot;N more users&quot; through screen-reader-only text.</p>
     </section>
     <section aria-labelledby="pixel-avatar-group-usage">
       <h3 id="pixel-avatar-group-usage">Usage</h3>

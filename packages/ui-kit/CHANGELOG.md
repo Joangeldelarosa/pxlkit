@@ -13,6 +13,11 @@
 - The `PxlKitLocaleProvider` docs no longer say it loads fonts: it exposes `fontsUrl` for the app to load (see the setup guide).
 - `PixelGrid`: `colGap={0}` and `rowGap={0}` set a zero gap. Zero counted as unset, so `gap-x-0` and `gap-y-0` were unreachable and `colGap={0}` fell back to the uniform `gap`.
 - The `PixelEqualHeightGrid` examples show what the component does — footers lined up across a row: their card dropped the class the grid gives each item.
+- `PixelChipGroup` (single selection): arrow keys, Home and End select the chip they reach, as documented. They toggled it, so moving onto the selected chip at either end cleared the group.
+- `PixelChip` with both `onClick` and a delete handler renders valid HTML: the label and the × are sibling buttons inside a `<span>` frame, with the same look and click area. The × used to be a button inside the chip's button, which the HTML parser splits, so server-rendered chips failed to hydrate.
+- `PixelAvatar` falls back to the initials when its image fails to load, as `src` documents, and tries again when `src` changes.
+- `PixelAvatar` with a `status` exposes `role="img"` with its name, and the `PixelAvatarGroup` "+N" tile announces "N more users" through visually hidden text: both put `aria-label` on a plain `div`, which ARIA does not support.
+- `PixelPopover` sets `aria-controls` on its trigger while the content is open (a trigger that sets its own keeps it), and `PixelBadgeGroup` names its overflow dialog after the "+N" button.
 - `PixelScrollArea` draws its styled scrollbar. The stylesheet never defined the `.pxl-scroll-*` classes the component sets, so the browser's default scrollbar showed, `variant="hover"` behaved like `auto` and `scrollbarSize` had no effect.
 
 ## 2.1.1 — 2026-08-08

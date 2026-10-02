@@ -29,7 +29,7 @@ export default defineManifest({
       { key: 'Escape', does: 'Closes the popover when closeOnEscape is true and returns focus to the trigger' },
     ],
     notes:
-      'Content renders with role="dialog" by default; pair with aria-labelledby on Content. Set role="none" when an inner widget owns semantics. When the content closes while it holds focus, focus returns to the trigger; after a press outside, focus follows the pointer instead.',
+      'Content renders with role="dialog" by default; pair with aria-labelledby on Content. Set role="none" when an inner widget owns semantics. While the content is open, the trigger points at it with aria-controls (Content keeps the id it is given, or gets a generated one); a trigger that sets its own aria-controls keeps it. When the content closes while it holds focus, focus returns to the trigger; after a press outside, focus follows the pointer instead.',
   },
   related: ['PixelTooltip', 'PixelDropdown', 'PixelModal'],
   apiStability: 'stable',

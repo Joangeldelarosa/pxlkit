@@ -232,4 +232,48 @@ describe('PixelPopover', () => {
       expect(document.activeElement).toBe(outside);
     });
   });
+
+  describe('aria-controls', () => {
+    function Harness({ contentId, triggerControls }: { contentId?: string; triggerControls?: string }) {
+      const [open, setOpen] = useState(false);
+      return (
+        <PixelPopover open={open} onOpenChange={setOpen}>
+          <PixelPopover.Trigger>
+            <button data-testid="trigger" aria-controls={triggerControls}>open</button>
+          </PixelPopover.Trigger>
+          <PixelPopover.Content data-testid="content" id={contentId}>
+            hello
+          </PixelPopover.Content>
+        </PixelPopover>
+      );
+    }
+
+    it('points the trigger at the content only while the content is on the page', () => {
+      const { getByTestId, queryByTestId } = render(<Harness />);
+      const trigger = getByTestId('trigger');
+      expect(trigger.hasAttribute('aria-controls')).toBe(false);
+      fireEvent.click(trigger);
+      const content = getByTestId('content');
+      expect(content.id).not.toBe('');
+      expect(trigger.getAttribute('aria-controls')).toBe(content.id);
+      fireEvent.click(trigger);
+      expect(queryByTestId('content')).toBeNull();
+      expect(trigger.hasAttribute('aria-controls')).toBe(false);
+    });
+
+    it('keeps an id given to the content', () => {
+      const { getByTestId } = render(<Harness contentId="details" />);
+      fireEvent.click(getByTestId('trigger'));
+      expect(getByTestId('content').id).toBe('details');
+      expect(getByTestId('trigger').getAttribute('aria-controls')).toBe('details');
+    });
+
+    it("keeps the trigger's own aria-controls", () => {
+      const { getByTestId } = render(<Harness triggerControls="listbox" />);
+      const trigger = getByTestId('trigger');
+      fireEvent.click(trigger);
+      expect(getByTestId('content')).toBeTruthy();
+      expect(trigger.getAttribute('aria-controls')).toBe('listbox');
+    });
+  });
 });

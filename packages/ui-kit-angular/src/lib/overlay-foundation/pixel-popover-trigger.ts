@@ -4,8 +4,9 @@ import { injectPopoverContext } from './popover-context';
 /**
  * Makes its element the trigger of the enclosing `<pxl-popover>`: a click
  * toggles the popover (unless one of the element's own click listeners calls
- * `preventDefault()`), and the element advertises `aria-expanded` and
- * `aria-haspopup` — a static `aria-haspopup` on the element wins.
+ * `preventDefault()`), and the element advertises `aria-expanded`,
+ * `aria-haspopup` and, while the content is open, `aria-controls` — a static
+ * `aria-haspopup` or `aria-controls` on the element wins.
  *
  * @example
  * <button type="button" pxlPopoverTrigger>Details</button>
@@ -15,6 +16,7 @@ import { injectPopoverContext } from './popover-context';
   host: {
     '[attr.aria-expanded]': 'context.open()',
     '[attr.aria-haspopup]': 'ownHasPopup ?? context.haspopup()',
+    '[attr.aria-controls]': 'ownControls ?? context.contentId()',
   },
 })
 export class PixelPopoverTrigger implements OnInit {
@@ -22,6 +24,8 @@ export class PixelPopoverTrigger implements OnInit {
   protected readonly context = injectPopoverContext('PixelPopoverTrigger');
   /** @internal */
   protected readonly ownHasPopup = inject(new HostAttributeToken('aria-haspopup'), { optional: true });
+  /** @internal */
+  protected readonly ownControls = inject(new HostAttributeToken('aria-controls'), { optional: true });
 
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly renderer = inject(Renderer2);

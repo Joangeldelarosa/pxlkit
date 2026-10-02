@@ -50,4 +50,20 @@ describe('PixelBadgeGroup', () => {
     expect(getByText('D')).toBeTruthy();
     expect(getByText('E')).toBeTruthy();
   });
+
+  // Regression: the overflow dialog had no accessible name.
+  it('names the overflow dialog after its "+N" button, which controls it while open', () => {
+    const { getByLabelText, getByRole } = render(
+      <PixelBadgeGroup max={2}>
+        <PixelBadge>A</PixelBadge>
+        <PixelBadge>B</PixelBadge>
+        <PixelBadge>C</PixelBadge>
+      </PixelBadgeGroup>,
+    );
+    const trigger = getByLabelText('Show 2 more');
+    fireEvent.click(trigger);
+    const dialog = getByRole('dialog', { name: 'Show 2 more' });
+    expect(dialog.getAttribute('aria-labelledby')).toBe(trigger.id);
+    expect(trigger.getAttribute('aria-controls')).toBe(dialog.id);
+  });
 });

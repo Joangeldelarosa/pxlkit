@@ -19,6 +19,9 @@ export interface PixelPopoverContext {
   haspopup: ComputedRef<PopoverHasPopup>;
   role: ComputedRef<PopoverRole>;
   floatingStyles: ComputedRef<FloatingStyles>;
+  /** Id of the content while it is on the page, for the trigger's `aria-controls`. */
+  contentId: ComputedRef<string | null>;
+  setContentId(id: string | null): void;
   /** Function ref of the trigger element. */
   setTrigger(target: RefTarget): void;
   /** Function ref of the content panel. */
