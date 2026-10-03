@@ -279,6 +279,16 @@ import { PixelButton } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class WithIcons {}`,
+  'pixel-calendar-grid': `import { Component, signal } from '@angular/core';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCalendarGrid],
+  template: \`<pxl-calendar-grid [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal<Date | null>(null);
+}`,
   'pixel-card': `import { Component } from '@angular/core';
 import { PixelCard } from '@pxlkit/ui-kit-angular';
 
@@ -406,6 +416,16 @@ import { PixelCollapsible } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class Default {}`,
+  'pixel-color-input': `import { Component, signal } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Brand color" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal('#06b6d4');
+}`,
   'pixel-color-swatch': `import { Component } from '@angular/core';
 import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
 
@@ -414,6 +434,26 @@ import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';
   template: \`<pxl-color-swatch name="cyan" cssVar="--color-retro-cyan" />\`,
 })
 export class Default {}`,
+  'pixel-combobox': `import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`<pxl-combobox label="Fruit" [options]="fruits" placeholder="Pick a fruit" hint="Type to filter" />\`,
+})
+export class Default {
+  readonly fruits = FRUITS;
+}`,
   'pixel-command': `import { Component, signal } from '@angular/core';
 import { PixelCommand, type PixelCommandGroup } from '@pxlkit/ui-kit-angular';
 
@@ -494,6 +534,26 @@ const COLUMNS: ColumnDef<Row, unknown>[] = [
 export class Default {
   readonly rows = ROWS;
   readonly columns = COLUMNS;
+}`,
+  'pixel-date-picker': `import { Component, signal } from '@angular/core';
+import { PixelDatePicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDatePicker],
+  template: \`<pxl-date-picker label="Pick a date" placeholder="Select date" [(value)]="date" />\`,
+})
+export class Default {
+  readonly date = signal<Date | null>(null);
+}`,
+  'pixel-date-range-picker': `import { Component, signal } from '@angular/core';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDateRangePicker],
+  template: \`<pxl-date-range-picker label="Date range" placeholder="Select date range" [(value)]="range" />\`,
+})
+export class Default {
+  readonly range = signal<DateRangeValue>({});
 }`,
   'pixel-divider': `import { Component } from '@angular/core';
 import { PixelDivider } from '@pxlkit/ui-kit-angular';
@@ -894,6 +954,25 @@ import { PixelMouseParallax } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class Default {}`,
+  'pixel-multi-select': `import { Component, signal } from '@angular/core';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+@Component({
+  imports: [PixelMultiSelect],
+  template: \`<pxl-multi-select label="Frameworks" [options]="options" placeholder="Pick frameworks…" [(value)]="value" />\`,
+})
+export class Default {
+  readonly options = OPTIONS;
+  readonly value = signal(['react']);
+}`,
   'pixel-navigation-menu': `import { Component, TemplateRef, computed, viewChild } from '@angular/core';
 import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-angular';
 

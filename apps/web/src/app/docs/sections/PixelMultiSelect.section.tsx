@@ -46,7 +46,7 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
         <li><code>combobox</code></li>
         <li><code>listbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Trigger uses role=combobox with aria-controls/expanded/activedescendant. Listbox advertises aria-multiselectable. Chip remove targets carry aria-label for the screen reader.</p>
+      <p className="docs-aria-notes">Trigger uses role=combobox with aria-controls/expanded/activedescendant, and so does the search field while focus is in it. Listbox advertises aria-multiselectable and marks the chosen options aria-selected. The chips and their remove marks are hidden from assistive technology: the listbox, Backspace and Clear change the selection.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -78,8 +78,13 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
-            <td><kbd>Enter / Space</kbd></td>
+            <td><kbd>Enter</kbd></td>
             <td>Toggle highlighted option</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Space</kbd></td>
+            <td>Toggle highlighted option from the trigger; types a space in the search field</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
@@ -118,6 +123,42 @@ export function Default() {
     />
   );
 }`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+const value = ref(['react']);
+</script>
+
+<template>
+  <PixelMultiSelect v-model="value" label="Frameworks" :options="OPTIONS" placeholder="Pick frameworks…" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+@Component({
+  imports: [PixelMultiSelect],
+  template: \`<pxl-multi-select label="Frameworks" [options]="options" placeholder="Pick frameworks…" [(value)]="value" />\`,
+})
+export class Default {
+  readonly options = OPTIONS;
+  readonly value = signal(['react']);
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -149,6 +190,42 @@ export function Default() {
       placeholder="Pick frameworks…"
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+const value = ref(['react']);
+</script>
+
+<template>
+  <PixelMultiSelect v-model="value" label="Frameworks" :options="OPTIONS" placeholder="Pick frameworks…" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+@Component({
+  imports: [PixelMultiSelect],
+  template: \`<pxl-multi-select label="Frameworks" [options]="options" placeholder="Pick frameworks…" [(value)]="value" />\`,
+})
+export class Default {
+  readonly options = OPTIONS;
+  readonly value = signal(['react']);
 }`}
         />
       </article>
@@ -182,6 +259,44 @@ export function Searchable() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+const value = ref<string[]>([]);
+</script>
+
+<template>
+  <PixelMultiSelect v-model="value" label="Frameworks" hint="Type to filter" :options="OPTIONS" searchable clearable />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+@Component({
+  imports: [PixelMultiSelect],
+  template: \`
+    <pxl-multi-select label="Frameworks" hint="Type to filter" [options]="options" searchable clearable [(value)]="value" />
+  \`,
+})
+export class Searchable {
+  readonly options = OPTIONS;
+  readonly value = signal<string[]>([]);
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-max">
@@ -212,6 +327,42 @@ export function WithMax() {
       clearable
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+const value = ref(['react', 'vue']);
+</script>
+
+<template>
+  <PixelMultiSelect v-model="value" label="Pick up to 2" :options="OPTIONS" :max="2" clearable />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+
+@Component({
+  imports: [PixelMultiSelect],
+  template: \`<pxl-multi-select label="Pick up to 2" [options]="options" [max]="2" clearable [(value)]="value" />\`,
+})
+export class WithMax {
+  readonly options = OPTIONS;
+  readonly value = signal(['react', 'vue']);
 }`}
         />
       </article>

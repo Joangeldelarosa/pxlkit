@@ -118,6 +118,7 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | `PixelBox` | stable | layout |
 | `PixelBreadcrumb` | stable | navigation |
 | `PixelButton` | stable | actions |
+| `PixelCalendarGrid` | stable | forms |
 | `PixelCard` | stable | cards |
 | `PixelCarousel` | stable | data |
 | `PixelCenter` | stable | layout |
@@ -127,10 +128,14 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | `PixelCluster` | stable | layout |
 | `PixelCodeInline` | stable | data |
 | `PixelCollapsible` | stable | data |
+| `PixelColorInput` | stable | forms |
 | `PixelColorSwatch` | stable | data |
+| `PixelCombobox` | stable | forms |
 | `PixelCommand` | stable | overlays |
 | `PixelContainer` | stable | layout |
 | `PixelDataTable` | stable | data |
+| `PixelDatePicker` | stable | forms |
+| `PixelDateRangePicker` | stable | forms |
 | `PixelDivider` | stable | layout |
 | `PixelDrawer` | stable | overlays |
 | `PixelDropdown` | stable | overlays |
@@ -153,6 +158,7 @@ The React kit's hooks, as composables: `useDarkMode`, `useLocalStorage`, `useMed
 | `PixelMenubar` | stable | navigation |
 | `PixelModal` | stable | overlays |
 | `PixelMouseParallax` | stable | parallax |
+| `PixelMultiSelect` | stable | forms |
 | `PixelNavigationMenu` | stable | navigation |
 | `PixelNumberInput` | stable | forms |
 | `PixelOTPInput` | stable | forms |

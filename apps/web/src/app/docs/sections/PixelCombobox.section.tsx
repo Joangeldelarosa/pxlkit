@@ -79,7 +79,7 @@ export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSection
           </tr>
           <tr>
             <td><kbd>Enter</kbd></td>
-            <td>Commits the highlighted option and closes the listbox.</td>
+            <td>Opens the listbox when closed; commits the highlighted option and closes the listbox when open.</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
@@ -117,6 +117,43 @@ export function Default() {
     />
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <PixelCombobox label="Fruit" :options="FRUITS" placeholder="Pick a fruit" hint="Type to filter" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`<pxl-combobox label="Fruit" [options]="fruits" placeholder="Pick a fruit" hint="Type to filter" />\`,
+})
+export class Default {
+  readonly fruits = FRUITS;
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -148,6 +185,43 @@ export function Default() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <PixelCombobox label="Fruit" :options="FRUITS" placeholder="Pick a fruit" hint="Type to filter" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`<pxl-combobox label="Fruit" [options]="fruits" placeholder="Pick a fruit" hint="Type to filter" />\`,
+})
+export class Default {
+  readonly fruits = FRUITS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-uncontrolled">
@@ -175,6 +249,43 @@ export function Uncontrolled() {
       defaultValue="banana"
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <PixelCombobox label="Fruit" :options="FRUITS" default-value="banana" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`<pxl-combobox label="Fruit" [options]="fruits" defaultValue="banana" />\`,
+})
+export class Uncontrolled {
+  readonly fruits = FRUITS;
 }`}
         />
       </article>
@@ -207,6 +318,46 @@ export function Controlled() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+const value = ref('cherry');
+</script>
+
+<template>
+  <PixelCombobox v-model="value" label="Controlled fruit" :options="FRUITS" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`<pxl-combobox label="Controlled fruit" [options]="fruits" [(value)]="value" />\`,
+})
+export class Controlled {
+  readonly fruits = FRUITS;
+  readonly value = signal('cherry');
+}`}
         />
       </article>
       <article className="docs-example" id="example-grouped">
@@ -235,6 +386,45 @@ export function Grouped() {
       placeholder="Pick a country"
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const GROUPED = [
+  { value: 'us', label: 'United States', group: 'Americas' },
+  { value: 've', label: 'Venezuela', group: 'Americas' },
+  { value: 'mx', label: 'Mexico', group: 'Americas' },
+  { value: 'es', label: 'Spain', group: 'Europe' },
+  { value: 'fr', label: 'France', group: 'Europe' },
+  { value: 'de', label: 'Germany', group: 'Europe' },
+  { value: 'jp', label: 'Japan', group: 'Asia' },
+  { value: 'kr', label: 'South Korea', group: 'Asia' },
+];
+</script>
+
+<template>
+  <PixelCombobox label="Country" :options="GROUPED" placeholder="Pick a country" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const GROUPED = [
+  { value: 'us', label: 'United States', group: 'Americas' },
+  { value: 've', label: 'Venezuela', group: 'Americas' },
+  { value: 'mx', label: 'Mexico', group: 'Americas' },
+  { value: 'es', label: 'Spain', group: 'Europe' },
+  { value: 'fr', label: 'France', group: 'Europe' },
+  { value: 'de', label: 'Germany', group: 'Europe' },
+  { value: 'jp', label: 'Japan', group: 'Asia' },
+  { value: 'kr', label: 'South Korea', group: 'Asia' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`<pxl-combobox label="Country" [options]="countries" placeholder="Pick a country" />\`,
+})
+export class Grouped {
+  readonly countries = GROUPED;
 }`}
         />
       </article>
@@ -265,6 +455,43 @@ export function NotSearchable() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <PixelCombobox label="Fruit" :options="FRUITS" :searchable="false" placeholder="No filter" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`<pxl-combobox label="Fruit" [options]="fruits" [searchable]="false" placeholder="No filter" />\`,
+})
+export class NotSearchable {
+  readonly fruits = FRUITS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
@@ -293,6 +520,53 @@ export function Sizes() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelCombobox label="Small" :options="FRUITS" size="sm" placeholder="sm" />
+    <PixelCombobox label="Medium" :options="FRUITS" size="md" placeholder="md" />
+    <PixelCombobox label="Large" :options="FRUITS" size="lg" placeholder="lg" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-combobox label="Small" [options]="fruits" size="sm" placeholder="sm" />
+      <pxl-combobox label="Medium" [options]="fruits" size="md" placeholder="md" />
+      <pxl-combobox label="Large" [options]="fruits" size="lg" placeholder="lg" />
+    </div>
+  \`,
+})
+export class Sizes {
+  readonly fruits = FRUITS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
@@ -319,6 +593,51 @@ export function Surfaces() {
       <PixelCombobox label="Linear" options={FRUITS} surface="linear" placeholder="linear surface" />
     </div>
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelCombobox label="Pixel" :options="FRUITS" surface="pixel" placeholder="pixel surface" />
+    <PixelCombobox label="Linear" :options="FRUITS" surface="linear" placeholder="linear surface" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-combobox label="Pixel" [options]="fruits" surface="pixel" placeholder="pixel surface" />
+      <pxl-combobox label="Linear" [options]="fruits" surface="linear" placeholder="linear surface" />
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly fruits = FRUITS;
 }`}
         />
       </article>
@@ -349,6 +668,43 @@ export function Disabled() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <PixelCombobox label="Disabled" :options="FRUITS" default-value="apple" disabled />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`<pxl-combobox label="Disabled" [options]="fruits" defaultValue="apple" disabled />\`,
+})
+export class Disabled {
+  readonly fruits = FRUITS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-error">
@@ -377,6 +733,43 @@ export function WithError() {
       error="Please choose a fruit"
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <PixelCombobox label="Fruit" :options="FRUITS" placeholder="Pick one" error="Please choose a fruit" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`<pxl-combobox label="Fruit" [options]="fruits" placeholder="Pick one" error="Please choose a fruit" />\`,
+})
+export class WithError {
+  readonly fruits = FRUITS;
 }`}
         />
       </article>
@@ -410,6 +803,61 @@ export function WithFormName() {
     </form>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <form>
+    <PixelCombobox
+      label="Fruit"
+      :options="FRUITS"
+      name="fruit"
+      default-value="cherry"
+      hint="Value participates in native form submission"
+    />
+  </form>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`
+    <form>
+      <pxl-combobox
+        label="Fruit"
+        [options]="fruits"
+        name="fruit"
+        defaultValue="cherry"
+        hint="Value participates in native form submission"
+      />
+    </form>
+  \`,
+})
+export class WithFormName {
+  readonly fruits = FRUITS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-custom-empty-message">
@@ -438,6 +886,45 @@ export function CustomEmptyMessage() {
       emptyMessage="No fruits match your filter"
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <PixelCombobox label="Fruit" :options="FRUITS" placeholder="Type 'xyz'" empty-message="No fruits match your filter" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCombobox } from '@pxlkit/ui-kit-angular';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+
+@Component({
+  imports: [PixelCombobox],
+  template: \`
+    <pxl-combobox label="Fruit" [options]="fruits" placeholder="Type 'xyz'" emptyMessage="No fruits match your filter" />
+  \`,
+})
+export class CustomEmptyMessage {
+  readonly fruits = FRUITS;
 }`}
         />
       </article>

@@ -1,101 +1,47 @@
 'use client';
 
 import React, { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { fieldDescribedBy, fieldMessageId } from '@pxlkit/ui-kit-core';
+import {
+  calendarClasses,
+  calendarDayClasses,
+  calendarKeydown,
+  calendarLocale,
+  calendarTabStop,
+  calendarTitle,
+  calendarWeekdays,
+  calendarWeeks,
+  dateRangeText,
+  datePickerClasses,
+  fieldDescribedBy,
+  fieldMessageId,
+  isDayDisabled,
+  isDayInSpan,
+  isInMonth,
+  isSameDay,
+  orderDays,
+  pickDateRange,
+  rangeSpan,
+  shiftMonth,
+  startOfDay,
+  toIsoDate,
+  type CalendarDay,
+  type CalendarLocale,
+  type DateRangeValue,
+} from '@pxlkit/ui-kit-core';
 import {
   Surface,
-  cn,
-  surfaceClasses,
   useEffectiveSurface,
   FieldShell,
-  inputBase,
-  focusRing,
-  sizeHeight,
-  toneMap,
 } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
+import { usePxlKitLocale } from '../locale';
 import { PixelPopover } from '../overlay-foundation/PixelPopover';
 
-/* ──────────────────────────────────────────────────────────────────────────
-   Date helpers — pure, no deps.
-   ────────────────────────────────────────────────────────────────────────── */
-
-const MONTH_NAMES = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-const WEEKDAY_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-function startOfDay(d: Date): Date {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
-
-function sameDay(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
-}
-
-function toISO(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${dd}`;
-}
-
-function defaultFormat(d: Date): string {
-  return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-}
-
-function addMonths(year: number, month: number, delta: number): { year: number; month: number } {
-  const m = month + delta;
-  const y = year + Math.floor(m / 12);
-  const mm = ((m % 12) + 12) % 12;
-  return { year: y, month: mm };
-}
-
-interface DayCell {
-  date: Date;
-  inMonth: boolean;
-}
-
-function buildMonthGrid(year: number, month: number): DayCell[] {
-  const first = new Date(year, month, 1);
-  const firstWeekday = first.getDay();
-  const gridStart = new Date(year, month, 1 - firstWeekday);
-  const cells: DayCell[] = [];
-  for (let i = 0; i < 42; i++) {
-    const d = new Date(
-      gridStart.getFullYear(),
-      gridStart.getMonth(),
-      gridStart.getDate() + i,
-    );
-    cells.push({ date: d, inMonth: d.getMonth() === month });
-  }
-  return cells;
-}
+export type { DateRangeValue } from '@pxlkit/ui-kit-core';
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelDateRangePicker
    ────────────────────────────────────────────────────────────────────────── */
-
-export interface DateRangeValue {
-  from?: Date;
-  to?: Date;
-}
 
 export interface PixelDateRangePickerProps {
   value?: DateRangeValue;
@@ -120,6 +66,8 @@ export interface PixelDateRangePickerProps {
 interface CalendarPanelProps {
   year: number;
   month: number;
+  weeks: CalendarDay[][];
+  calendar: CalendarLocale;
   from?: Date;
   to?: Date;
   hover: Date | null;
@@ -132,15 +80,17 @@ interface CalendarPanelProps {
   onNext: () => void;
   panelId: string;
   surface: Surface;
-  focusedDate: Date;
+  /** The day that holds the tab stop of both panels. */
+  tabStop: CalendarDay | undefined;
   onFocusDate: (d: Date) => void;
-  onMoveFocus: (deltaDays: number) => void;
-  onJumpMonth: (delta: number) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
 }
 
 function CalendarPanel({
   year,
   month,
+  weeks,
+  calendar,
   from,
   to,
   hover,
@@ -153,145 +103,97 @@ function CalendarPanel({
   onNext,
   panelId,
   surface,
-  focusedDate,
+  tabStop,
   onFocusDate,
-  onMoveFocus,
-  onJumpMonth,
+  onKeyDown,
 }: CalendarPanelProps) {
-  const s = surfaceClasses(surface);
+  const classes = calendarClasses(surface);
   const today = startOfDay(new Date());
 
-  // Active "to" used for hover preview when only "from" is set.
-  const activeTo = to ?? (from && hover ? hover : undefined);
-  const rangeLo = from && activeTo ? (from <= activeTo ? from : activeTo) : null;
-  const rangeHi = from && activeTo ? (from <= activeTo ? activeTo : from) : null;
-
-  const cells = useMemo(() => buildMonthGrid(year, month), [year, month]);
-  const weekRows = useMemo<DayCell[][]>(() => {
-    const rows: DayCell[][] = [];
-    for (let i = 0; i < 6; i++) rows.push(cells.slice(i * 7, i * 7 + 7));
-    return rows;
-  }, [cells]);
-
-  const handleGridKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    switch (e.key) {
-      case 'ArrowLeft': e.preventDefault(); onMoveFocus(-1); return;
-      case 'ArrowRight': e.preventDefault(); onMoveFocus(1); return;
-      case 'ArrowUp': e.preventDefault(); onMoveFocus(-7); return;
-      case 'ArrowDown': e.preventDefault(); onMoveFocus(7); return;
-      case 'Home': e.preventDefault(); onMoveFocus(-focusedDate.getDay()); return;
-      case 'End': e.preventDefault(); onMoveFocus(6 - focusedDate.getDay()); return;
-      case 'PageUp': e.preventDefault(); onJumpMonth(-1); return;
-      case 'PageDown': e.preventDefault(); onJumpMonth(1); return;
-      case 'Enter':
-      case ' ':
-        e.preventDefault();
-        onPick(focusedDate);
-        return;
-      default: return;
-    }
-  };
+  // The span on show: the range, or from its start to the hovered day while
+  // only "from" is set.
+  const span = rangeSpan({ from, to, hover });
 
   return (
-    <div className="min-w-[16rem]">
-      <div className="mb-2 flex items-center justify-between">
+    <div className={classes.panel}>
+      <div className={classes.header}>
         {showPrev ? (
           <button
             type="button"
             aria-label="Previous month"
             onClick={onPrev}
-            className={cn(
-              'h-7 w-7 inline-flex items-center justify-center',
-              s.border,
-              s.radius,
-              'border-retro-border-strong hover:bg-retro-surface/60',
-            )}
+            className={classes.nav}
           >
             ‹
           </button>
         ) : (
-          <span className="h-7 w-7" aria-hidden />
+          <span className={classes.navSpacer} aria-hidden />
         )}
         <span
           id={panelId}
-          className={cn('text-xs font-semibold uppercase tracking-wider text-retro-text')}
+          className={classes.title}
           aria-live="polite"
         >
-          {MONTH_NAMES[month]} {year}
+          {calendarTitle(calendar, { year, month })}
         </span>
         {showNext ? (
           <button
             type="button"
             aria-label="Next month"
             onClick={onNext}
-            className={cn(
-              'h-7 w-7 inline-flex items-center justify-center',
-              s.border,
-              s.radius,
-              'border-retro-border-strong hover:bg-retro-surface/60',
-            )}
+            className={classes.nav}
           >
             ›
           </button>
         ) : (
-          <span className="h-7 w-7" aria-hidden />
+          <span className={classes.navSpacer} aria-hidden />
         )}
       </div>
 
       <div
         role="grid"
         aria-labelledby={panelId}
-        className="grid grid-cols-7 gap-0.5"
-        onKeyDown={handleGridKeyDown}
+        className={classes.grid}
+        onKeyDown={onKeyDown}
       >
-        {WEEKDAY_SHORT.map((wd) => (
-          <div
-            key={wd}
-            role="columnheader"
-            className="text-center text-[10px] uppercase text-retro-muted py-1"
-          >
-            {wd}
-          </div>
-        ))}
-        {weekRows.map((week, rowIdx) => (
-          <div key={`row-${rowIdx}`} role="row" className="contents">
+        {/* Column headers belong in a row, like the days below. */}
+        <div role="row" className={classes.row}>
+          {calendarWeekdays(calendar).map((wd) => (
+            <div key={wd} role="columnheader" className={classes.weekday}>
+              {wd}
+            </div>
+          ))}
+        </div>
+        {weeks.map((week, rowIdx) => (
+          <div key={`row-${rowIdx}`} role="row" className={classes.row}>
             {week.map((cell) => {
               const disabled = isDisabled(cell.date);
-              const isToday = sameDay(cell.date, today);
-              const isFrom = from ? sameDay(cell.date, from) : false;
-              const isTo = to ? sameDay(cell.date, to) : false;
+              const isToday = isSameDay(cell.date, today);
+              const isFrom = from ? isSameDay(cell.date, from) : false;
+              const isTo = to ? isSameDay(cell.date, to) : false;
               const isEdge = isFrom || isTo;
-              const isFocused = sameDay(cell.date, focusedDate);
-              const inRange =
-                rangeLo && rangeHi
-                  ? cell.date >= startOfDay(rangeLo) && cell.date <= startOfDay(rangeHi)
-                  : false;
-              const iso = toISO(cell.date);
               return (
                 <button
-                  key={iso}
+                  key={cell.iso}
                   type="button"
                   role="gridcell"
-                  aria-label={defaultFormat(cell.date)}
+                  aria-label={calendar.formatDay(cell.date)}
                   aria-selected={isEdge || undefined}
+                  aria-current={isToday ? 'date' : undefined}
                   aria-disabled={disabled || undefined}
                   disabled={disabled}
-                  tabIndex={isFocused ? 0 : -1}
+                  tabIndex={cell === tabStop ? 0 : -1}
                   onClick={() => onPick(cell.date)}
                   onMouseEnter={() => setHover(cell.date)}
                   onFocus={() => { setHover(cell.date); onFocusDate(cell.date); }}
-                  className={cn(
-                    'h-8 text-xs inline-flex items-center justify-center',
-                    s.radius,
-                    'motion-safe:transition-colors',
-                    !cell.inMonth && 'text-retro-muted/50',
-                    cell.inMonth && !isEdge && 'text-retro-text',
-                    inRange && !isEdge && cn(toneMap.cyan.soft, toneMap.cyan.text),
-                    isEdge && cn(toneMap.cyan.bg, toneMap.cyan.text, 'font-semibold'),
-                    isToday && !isEdge && cn(toneMap.cyan.border, 'border'),
-                    disabled && 'opacity-40 line-through cursor-not-allowed',
-                    !disabled && !isEdge && !inRange && 'hover:bg-retro-surface/60',
-                  )}
+                  className={calendarDayClasses(surface, {
+                    inMonth: cell.inMonth,
+                    selected: isEdge,
+                    today: isToday,
+                    disabled,
+                    inRange: isDayInSpan(cell.date, span),
+                    rangeSelected: true,
+                  })}
                 >
                   {cell.date.getDate()}
                 </button>
@@ -330,7 +232,8 @@ export const PixelDateRangePicker = forwardRef<
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
+  // Week start, month and weekday names follow the kit's locale.
+  const calendar = calendarLocale(usePxlKitLocale().locale);
 
   const [range, setRange] = useControllableState<DateRangeValue>({
     value,
@@ -351,116 +254,102 @@ export const PixelDateRangePicker = forwardRef<
   // Roving tabindex anchor for grid keyboard nav.
   const [focusedDate, setFocusedDate] = useState<Date>(() => startOfDay(initialAnchor));
   const shouldRefocusRef = useRef(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
-  // Jump view to range.from on each open.
-  useEffect(() => {
-    if (!open) return;
-    const anchor = range.from ?? new Date();
-    setViewYear(anchor.getFullYear());
-    setViewMonth(anchor.getMonth());
-    setFocusedDate(startOfDay(anchor));
-    setPendingFrom(null);
-    setHover(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  // After focusedDate change driven by keyboard nav, focus the matching cell.
-  useEffect(() => {
-    if (!shouldRefocusRef.current) return;
-    const iso = toISO(focusedDate);
-    // Two panels can render the same focused cell; first one wins.
-    const node = document.querySelector(
-      `[role="grid"] button[aria-label="${defaultFormat(focusedDate).replace(/"/g, '\\"')}"]`,
-    ) as HTMLButtonElement | null;
-    if (node) {
-      node.focus();
-      shouldRefocusRef.current = false;
-    }
-    // Hush unused-iso lint.
-    void iso;
-  }, [focusedDate]);
-
-  const moveFocusedDate = useCallback(
-    (deltaDays: number) => {
-      setFocusedDate((prev) => {
-        const next = new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + deltaDays);
+  // Each opening jumps the view to range.from and starts a new pick, set
+  // before the months first render so focus moves into them.
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (next) {
+        const anchor = range.from ?? new Date();
+        setViewYear(anchor.getFullYear());
+        setViewMonth(anchor.getMonth());
+        setFocusedDate(startOfDay(anchor));
+        setPendingFrom(null);
+        setHover(null);
         shouldRefocusRef.current = true;
-        // If next date leaves both visible months (left+right), shift the view.
-        const leftYM = viewYear * 12 + viewMonth;
-        const rightYM = leftYM + 1;
-        const nextYM = next.getFullYear() * 12 + next.getMonth();
-        const inLeft = nextYM === leftYM;
-        const inRight = numberOfMonths === 2 ? nextYM === rightYM : false;
-        if (!inLeft && !inRight) {
-          setViewYear(next.getFullYear());
-          setViewMonth(next.getMonth());
-        }
-        return next;
-      });
+      }
+      setOpen(next);
     },
-    [viewYear, viewMonth, numberOfMonths],
+    [range.from],
   );
 
-  const jumpFocusedMonth = useCallback(
-    (delta: number) => {
-      setFocusedDate((prev) => {
-        const next = new Date(prev.getFullYear(), prev.getMonth() + delta, prev.getDate());
-        shouldRefocusRef.current = true;
-        setViewYear(next.getFullYear());
-        setViewMonth(next.getMonth());
-        return next;
-      });
-    },
-    [],
+  const view = { year: viewYear, month: viewMonth };
+  const right = shiftMonth(view, 1);
+  const leftWeeks = useMemo(
+    () => calendarWeeks({ year: viewYear, month: viewMonth }, calendar.weekStartsOn),
+    [viewYear, viewMonth, calendar.weekStartsOn],
   );
-
-  const minStart = useMemo(() => (min ? startOfDay(min) : null), [min]);
-  const maxStart = useMemo(() => (max ? startOfDay(max) : null), [max]);
+  const rightWeeks = useMemo(
+    () => calendarWeeks(shiftMonth({ year: viewYear, month: viewMonth }, 1), calendar.weekStartsOn),
+    [viewYear, viewMonth, calendar.weekStartsOn],
+  );
 
   const isDisabled = useCallback(
-    (d: Date): boolean => {
-      const ds = startOfDay(d);
-      if (minStart && ds.getTime() < minStart.getTime()) return true;
-      if (maxStart && ds.getTime() > maxStart.getTime()) return true;
-      return false;
-    },
-    [minStart, maxStart],
+    (d: Date): boolean => isDayDisabled(d, { min, max }),
+    [min, max],
   );
+
+  // One day of the months on show is in the tab order: the focused one, or
+  // the left month's first enabled day while that one is not on show.
+  const tabStop = calendarTabStop(
+    numberOfMonths === 2 ? [...leftWeeks.flat(), ...rightWeeks.flat()] : leftWeeks.flat(),
+    focusedDate,
+    isDisabled,
+  );
+
+  // After opening or keyboard nav, focus the tab stop — in this picker's own
+  // popover, where a day shows once in each month it borders.
+  useEffect(() => {
+    if (!open || !shouldRefocusRef.current) return;
+    shouldRefocusRef.current = false;
+    contentRef.current?.querySelector<HTMLButtonElement>('[role="gridcell"][tabindex="0"]')?.focus();
+  }, [focusedDate, open, tabStop]);
 
   const handlePick = useCallback(
     (d: Date) => {
       if (isDisabled(d)) return;
-      const day = startOfDay(d);
-
-      if (pendingFrom == null) {
-        // First click → reset range to single-anchor.
-        setPendingFrom(day);
-        setRange({ from: day, to: undefined });
-        return;
-      }
-      // Second click → close range, auto-swap if needed.
-      let from = pendingFrom;
-      let to = day;
-      if (to.getTime() < from.getTime()) {
-        const tmp = from;
-        from = to;
-        to = tmp;
-      }
-      setRange({ from, to });
-      setPendingFrom(null);
+      // First click → reset range to single-anchor; second click → close
+      // range, auto-swap if needed.
+      const pick = pickDateRange(pendingFrom, d);
+      setRange(pick.range);
+      setPendingFrom(pick.pending);
+      if (pick.pending) return;
       setHover(null);
       setOpen(false);
     },
     [isDisabled, pendingFrom, setRange],
   );
 
+  const handleGridKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const action = calendarKeydown(e.key, focusedDate, {
+      weekStartsOn: calendar.weekStartsOn,
+      shiftKey: e.shiftKey,
+      isDisabled,
+    });
+    if (!action) return;
+    e.preventDefault();
+    if (action.select) {
+      handlePick(focusedDate);
+      return;
+    }
+    const next = action.focus;
+    if (!next) return;
+    shouldRefocusRef.current = true;
+    setFocusedDate(next);
+    // A page moves the left month to the new day's; a day or a week moves
+    // the view only when the new day leaves both visible months.
+    const paged = e.key === 'PageUp' || e.key === 'PageDown';
+    const visible = isInMonth(next, view) || (numberOfMonths === 2 && isInMonth(next, right));
+    if (paged || !visible) {
+      setViewYear(next.getFullYear());
+      setViewMonth(next.getMonth());
+    }
+  };
+
   const handlePreset = useCallback(
     (preset: { from: Date; to: Date }) => {
-      const from = startOfDay(preset.from);
-      const to = startOfDay(preset.to);
-      const ordered =
-        from.getTime() <= to.getTime() ? { from, to } : { from: to, to: from };
-      setRange(ordered);
+      setRange(orderDays(preset.from, preset.to));
       setPendingFrom(null);
       setHover(null);
       setOpen(false);
@@ -474,122 +363,123 @@ export const PixelDateRangePicker = forwardRef<
     setHover(null);
   }, [setRange]);
 
+  // The trigger's clear target turns into the ▾ mark once the range is gone:
+  // focus moves to the trigger it sits in rather than stay on a hidden mark.
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const setTriggerRef = useCallback(
+    (node: HTMLButtonElement | null) => {
+      triggerRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) ref.current = node;
+    },
+    [ref],
+  );
+  const clearFromTrigger = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    handleClear();
+    triggerRef.current?.focus();
+  };
+
   const goPrev = () => {
-    const next = addMonths(viewYear, viewMonth, -1);
+    const next = shiftMonth(view, -1);
     setViewYear(next.year);
     setViewMonth(next.month);
   };
   const goNext = () => {
-    const next = addMonths(viewYear, viewMonth, 1);
+    const next = shiftMonth(view, 1);
     setViewYear(next.year);
     setViewMonth(next.month);
   };
 
-  const triggerLabel = useMemo(() => {
-    if (range.from && range.to) {
-      return `${defaultFormat(range.from)} → ${defaultFormat(range.to)}`;
-    }
-    if (range.from) return `${defaultFormat(range.from)} → …`;
-    return placeholder;
-  }, [range, placeholder]);
+  const triggerLabel = dateRangeText(range, calendar.formatDay, placeholder);
 
   const isPlaceholder = !range.from && !range.to;
 
-  const triggerClasses = cn(
-    inputBase,
-    s.font,
-    s.border,
-    s.radius,
-    s.transition,
-    sizeHeight[size],
-    focusRing,
-    toneMap.neutral.ring,
-    error ? 'border-retro-red/60' : 'border-retro-border-strong',
-    'inline-flex items-center justify-between px-3 text-left',
-    isPlaceholder && 'text-retro-muted',
-  );
+  const classes = datePickerClasses(surface, { size, invalid: !!error, placeholder: isPlaceholder, months: numberOfMonths });
 
   const reactId = React.useId();
   const triggerId = id ?? `pxl-daterange-${reactId}`;
   const leftPanelId = `${reactId}-left`;
   const rightPanelId = `${reactId}-right`;
 
-  const right = addMonths(viewYear, viewMonth, 1);
   // "Display" range — show pending-from + hover preview while picking.
   const displayFrom = pendingFrom ?? range.from;
   const displayTo = pendingFrom ? undefined : range.to;
 
+  const panel = {
+    calendar,
+    from: displayFrom,
+    to: displayTo,
+    hover,
+    setHover,
+    onPick: handlePick,
+    isDisabled,
+    onPrev: goPrev,
+    onNext: goNext,
+    surface,
+    tabStop,
+    onFocusDate: setFocusedDate,
+    onKeyDown: handleGridKeyDown,
+  };
+
   return (
     <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId} messageId={fieldMessageId(triggerId)}>
-      <span className="relative block">
+      <span className={classes.anchor}>
         <PixelPopover
           open={open}
-          onOpenChange={setOpen}
+          onOpenChange={handleOpenChange}
           side="bottom"
           align="start"
           surface={surface}
         >
           <PixelPopover.Trigger>
             <button
-              ref={ref}
+              ref={setTriggerRef}
               type="button"
               id={triggerId}
               data-testid={dataTestId}
               aria-haspopup="dialog"
               aria-invalid={error ? true : undefined}
               aria-describedby={fieldDescribedBy(triggerId, { hint, error })}
-              className={triggerClasses}
+              className={classes.trigger}
             >
-              <span className="truncate">{triggerLabel}</span>
+              <span className={classes.value}>{triggerLabel}</span>
               {clearable && (range.from || range.to) ? (
                 <span
                   role="button"
                   tabIndex={0}
                   aria-label="Clear range"
-                  onClick={(e) => { e.stopPropagation(); handleClear(); }}
+                  onClick={clearFromTrigger}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      e.stopPropagation();
-                      handleClear();
+                      clearFromTrigger(e);
                     }
                   }}
-                  className="ml-2 text-retro-muted hover:text-retro-text text-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40 rounded-[2px]"
+                  className={classes.clearMark}
                 >
                   ×
                 </span>
               ) : (
-                <span aria-hidden className="ml-2 text-retro-muted text-xs">▾</span>
+                <span aria-hidden className={classes.mark}>▾</span>
               )}
             </button>
           </PixelPopover.Trigger>
 
           <PixelPopover.Content
+            ref={contentRef}
             surface={surface}
-            className={cn(
-              numberOfMonths === 2 ? 'w-[34rem] max-w-[calc(100vw-1rem)]' : 'w-[18rem]',
-              s.font,
-            )}
+            aria-label="Choose date range"
+            className={classes.content}
           >
             {presets && presets.length > 0 && (
-              <div
-                className={cn(
-                  'mb-2 flex flex-wrap gap-1 pb-2 border-b border-retro-border/60',
-                )}
-              >
+              <div className={classes.presets}>
                 {presets.map((p) => (
                   <button
                     key={p.label}
                     type="button"
                     onClick={() => handlePreset(p.value)}
-                    className={cn(
-                      'px-2 py-1 text-[11px] uppercase tracking-wide',
-                      s.border,
-                      s.radius,
-                      'border-retro-border-strong bg-retro-surface/40 text-retro-text',
-                      'hover:bg-retro-surface/70',
-                      s.transition,
-                    )}
+                    className={classes.preset}
                   >
                     {p.label}
                   </button>
@@ -597,68 +487,35 @@ export const PixelDateRangePicker = forwardRef<
               </div>
             )}
 
-            <div
-              className={cn(
-                'grid gap-4',
-                numberOfMonths === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1',
-              )}
-            >
+            <div className={classes.months}>
               <CalendarPanel
+                {...panel}
                 year={viewYear}
                 month={viewMonth}
-                from={displayFrom}
-                to={displayTo}
-                hover={hover}
-                setHover={setHover}
-                onPick={handlePick}
-                isDisabled={isDisabled}
+                weeks={leftWeeks}
                 showPrev
                 showNext={numberOfMonths === 1}
-                onPrev={goPrev}
-                onNext={goNext}
                 panelId={leftPanelId}
-                surface={surface}
-                focusedDate={focusedDate}
-                onFocusDate={setFocusedDate}
-                onMoveFocus={moveFocusedDate}
-                onJumpMonth={jumpFocusedMonth}
               />
               {numberOfMonths === 2 && (
                 <CalendarPanel
+                  {...panel}
                   year={right.year}
                   month={right.month}
-                  from={displayFrom}
-                  to={displayTo}
-                  hover={hover}
-                  setHover={setHover}
-                  onPick={handlePick}
-                  isDisabled={isDisabled}
+                  weeks={rightWeeks}
                   showPrev={false}
                   showNext
-                  onPrev={goPrev}
-                  onNext={goNext}
                   panelId={rightPanelId}
-                  surface={surface}
-                  focusedDate={focusedDate}
-                  onFocusDate={setFocusedDate}
-                  onMoveFocus={moveFocusedDate}
-                  onJumpMonth={jumpFocusedMonth}
                 />
               )}
             </div>
 
             {clearable && (range.from || range.to) && (
-              <div className="mt-2 pt-2 border-t border-retro-border/60 flex justify-end">
+              <div className={classes.footer}>
                 <button
                   type="button"
                   onClick={handleClear}
-                  className={cn(
-                    'px-2 py-1 text-[11px] uppercase tracking-wide',
-                    s.border,
-                    s.radius,
-                    'border-retro-border-strong text-retro-muted hover:text-retro-text',
-                    s.transition,
-                  )}
+                  className={classes.clear}
                 >
                   Clear
                 </button>
@@ -672,13 +529,13 @@ export const PixelDateRangePicker = forwardRef<
             <input
               type="hidden"
               name={`${name}.from`}
-              value={range.from ? toISO(range.from) : ''}
+              value={range.from ? toIsoDate(range.from) : ''}
               readOnly
             />
             <input
               type="hidden"
               name={`${name}.to`}
-              value={range.to ? toISO(range.to) : ''}
+              value={range.to ? toIsoDate(range.to) : ''}
               readOnly
             />
           </>

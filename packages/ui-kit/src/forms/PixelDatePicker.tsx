@@ -1,88 +1,32 @@
 'use client';
 
 import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { fieldDescribedBy, fieldMessageId } from '@pxlkit/ui-kit-core';
+import {
+  calendarClasses,
+  calendarDayClasses,
+  calendarKeydown,
+  calendarLocale,
+  calendarTabStop,
+  calendarTitle,
+  calendarWeekdays,
+  calendarWeeks,
+  datePickerClasses,
+  fieldDescribedBy,
+  fieldMessageId,
+  isDayDisabled,
+  isSameDay,
+  startOfDay,
+  toIsoDate,
+} from '@pxlkit/ui-kit-core';
 import {
   Surface,
   Size,
-  cn,
-  surfaceClasses,
   useEffectiveSurface,
   FieldShell,
-  inputBase,
-  focusRing,
-  sizeHeight,
-  toneMap,
 } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
+import { usePxlKitLocale } from '../locale';
 import { PixelPopover } from '../overlay-foundation/PixelPopover';
-
-/* ──────────────────────────────────────────────────────────────────────────
-   Date helpers — pure, no deps.
-   ────────────────────────────────────────────────────────────────────────── */
-
-const MONTH_NAMES = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-const WEEKDAY_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-function startOfDay(d: Date): Date {
-  const out = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  return out;
-}
-
-function sameDay(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
-}
-
-function toISO(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${dd}`;
-}
-
-function defaultFormat(d: Date): string {
-  return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-}
-
-interface DayCell {
-  date: Date;
-  inMonth: boolean;
-}
-
-function buildMonthGrid(year: number, month: number): DayCell[] {
-  const first = new Date(year, month, 1);
-  const firstWeekday = first.getDay(); // 0=Sun
-  // Start grid 'firstWeekday' days before the 1st of the month
-  const gridStart = new Date(year, month, 1 - firstWeekday);
-  const cells: DayCell[] = [];
-  for (let i = 0; i < 42; i++) {
-    const d = new Date(
-      gridStart.getFullYear(),
-      gridStart.getMonth(),
-      gridStart.getDate() + i,
-    );
-    cells.push({ date: d, inMonth: d.getMonth() === month });
-  }
-  return cells;
-}
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelDatePicker
@@ -121,7 +65,7 @@ export const PixelDatePicker = forwardRef<
     min,
     max,
     disabledDates,
-    format = defaultFormat,
+    format,
     placeholder = 'Select date',
     clearable = false,
     presets,
@@ -139,7 +83,9 @@ export const PixelDatePicker = forwardRef<
   const surface = useEffectiveSurface(surfaceProp);
   const reactId = useId();
   const triggerId = id ?? `pxl-date-${reactId}`;
-  const s = surfaceClasses(surface);
+  // Week start, month and weekday names follow the kit's locale.
+  const calendar = calendarLocale(usePxlKitLocale().locale);
+  const formatDate = format ?? calendar.formatDay;
 
   const [current, setCurrent] = useControllableState<Date | null>({
     value,
@@ -155,8 +101,7 @@ export const PixelDatePicker = forwardRef<
   const [viewMonth, setViewMonth] = useState(initialView.getMonth());
 
   // Keep view in sync with the controlled/uncontrolled value when it changes
-  // externally (consumer rerenders with a date in a different month) AND
-  // when the popover opens (jump to the value's month on each open).
+  // externally (consumer rerenders with a date in a different month).
   const currentTime = current ? current.getTime() : null;
   useEffect(() => {
     if (!current) return;
@@ -165,56 +110,54 @@ export const PixelDatePicker = forwardRef<
     // Only re-run when the date value's day-instant changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTime]);
-  useEffect(() => {
-    if (!open || !current) return;
-    setViewYear(current.getFullYear());
-    setViewMonth(current.getMonth());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
 
   // Roving tabindex anchor — the date that should currently own focus.
   const [focusedDate, setFocusedDate] = useState<Date>(() => current ?? new Date());
   const dayBtnRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const shouldRefocusRef = useRef(false);
 
-  // Reset focused day when reopening.
+  // Each opening shows the value's month with focus on its day (today's
+  // without a value), set before the grid first renders so focus moves in.
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (next) {
+        if (current) {
+          setViewYear(current.getFullYear());
+          setViewMonth(current.getMonth());
+        }
+        setFocusedDate(current ?? new Date());
+        shouldRefocusRef.current = true;
+      }
+      setOpen(next);
+    },
+    [current],
+  );
+
+  // A value cleared or replaced while open resets the focused day.
   useEffect(() => {
     if (open) {
       setFocusedDate(current ?? new Date());
     }
-  }, [open, current]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current]);
 
-  // After arrow nav, move actual DOM focus onto the new focusedDate cell.
-  useEffect(() => {
-    if (!open || !shouldRefocusRef.current) return;
-    const key = toISO(focusedDate);
-    const btn = dayBtnRefs.current.get(key);
-    if (btn) {
-      btn.focus();
-      shouldRefocusRef.current = false;
-    }
-  }, [focusedDate, open]);
-
-  const minStart = useMemo(() => (min ? startOfDay(min) : null), [min]);
-  const maxStart = useMemo(() => (max ? startOfDay(max) : null), [max]);
-
-  const isDisabled = (d: Date): boolean => {
-    const ds = startOfDay(d);
-    if (minStart && ds.getTime() < minStart.getTime()) return true;
-    if (maxStart && ds.getTime() > maxStart.getTime()) return true;
-    if (Array.isArray(disabledDates)) {
-      if (disabledDates.some((x) => sameDay(x, d))) return true;
-    } else if (typeof disabledDates === 'function') {
-      if (disabledDates(d)) return true;
-    }
-    return false;
-  };
+  const isDisabled = (d: Date): boolean => isDayDisabled(d, { min, max, disabledDates });
 
   const today = startOfDay(new Date());
-  const cells = useMemo(
-    () => buildMonthGrid(viewYear, viewMonth),
-    [viewYear, viewMonth],
+  const weeks = useMemo(
+    () => calendarWeeks({ year: viewYear, month: viewMonth }, calendar.weekStartsOn),
+    [viewYear, viewMonth, calendar.weekStartsOn],
   );
+  // One day of the grid is in the tab order: the focused one, or the
+  // month's first enabled day while that one is not on show.
+  const tabStop = calendarTabStop(weeks.flat(), focusedDate, isDisabled);
+
+  // After opening or arrow nav, move actual DOM focus onto the tab stop.
+  useEffect(() => {
+    if (!open || !shouldRefocusRef.current) return;
+    shouldRefocusRef.current = false;
+    if (tabStop) dayBtnRefs.current.get(tabStop.iso)?.focus();
+  }, [focusedDate, open, tabStop]);
 
   const pickDate = (d: Date) => {
     if (isDisabled(d)) return;
@@ -243,118 +186,37 @@ export const PixelDatePicker = forwardRef<
     }
   };
 
-  // Pre-split cells into 6 weeks of 7 days for explicit `role="row"` wrapping.
-  const weekRows = useMemo<DayCell[][]>(() => {
-    const rows: DayCell[][] = [];
-    for (let i = 0; i < 6; i++) rows.push(cells.slice(i * 7, i * 7 + 7));
-    return rows;
-  }, [cells]);
+  const moveFocus = (next: Date) => {
+    shouldRefocusRef.current = true;
+    setFocusedDate(next);
+    // Page the view to the new date's month so the cell exists.
+    setViewYear(next.getFullYear());
+    setViewMonth(next.getMonth());
+  };
 
-  const moveFocusedDate = useCallback(
-    (deltaDays: number) => {
-      setFocusedDate((prev) => {
-        const next = new Date(
-          prev.getFullYear(),
-          prev.getMonth(),
-          prev.getDate() + deltaDays,
-        );
-        shouldRefocusRef.current = true;
-        // Page the view to the new date's month so the cell exists.
-        setViewYear(next.getFullYear());
-        setViewMonth(next.getMonth());
-        return next;
-      });
-    },
-    [],
-  );
+  const handleGridKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const action = calendarKeydown(e.key, focusedDate, {
+      weekStartsOn: calendar.weekStartsOn,
+      shiftKey: e.shiftKey,
+      isDisabled,
+    });
+    if (!action) return;
+    e.preventDefault();
+    if (action.select) pickDate(focusedDate);
+    else if (action.focus) moveFocus(action.focus);
+  };
 
-  const jumpFocusedDate = useCallback(
-    (next: Date) => {
-      shouldRefocusRef.current = true;
-      setFocusedDate(next);
-      setViewYear(next.getFullYear());
-      setViewMonth(next.getMonth());
-    },
-    [],
-  );
-
-  const handleGridKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      switch (e.key) {
-        case 'ArrowLeft':
-          e.preventDefault();
-          moveFocusedDate(-1);
-          return;
-        case 'ArrowRight':
-          e.preventDefault();
-          moveFocusedDate(1);
-          return;
-        case 'ArrowUp':
-          e.preventDefault();
-          moveFocusedDate(-7);
-          return;
-        case 'ArrowDown':
-          e.preventDefault();
-          moveFocusedDate(7);
-          return;
-        case 'Home':
-          e.preventDefault();
-          moveFocusedDate(-focusedDate.getDay());
-          return;
-        case 'End':
-          e.preventDefault();
-          moveFocusedDate(6 - focusedDate.getDay());
-          return;
-        case 'PageUp': {
-          e.preventDefault();
-          jumpFocusedDate(
-            new Date(focusedDate.getFullYear(), focusedDate.getMonth() - 1, focusedDate.getDate()),
-          );
-          return;
-        }
-        case 'PageDown': {
-          e.preventDefault();
-          jumpFocusedDate(
-            new Date(focusedDate.getFullYear(), focusedDate.getMonth() + 1, focusedDate.getDate()),
-          );
-          return;
-        }
-        case 'Enter':
-        case ' ': {
-          e.preventDefault();
-          pickDate(focusedDate);
-          return;
-        }
-        default:
-          return;
-      }
-    },
-    [focusedDate, moveFocusedDate, jumpFocusedDate, pickDate],
-  );
-
-  const triggerText = current ? format(current) : placeholder;
-  const isPlaceholder = !current;
-
-  const triggerClasses = cn(
-    inputBase,
-    s.font,
-    s.border,
-    s.radius,
-    s.transition,
-    sizeHeight[size],
-    focusRing,
-    toneMap.neutral.ring,
-    error ? 'border-retro-red/60' : 'border-retro-border-strong',
-    'inline-flex items-center justify-between px-3 text-left',
-    isPlaceholder && 'text-retro-muted',
-  );
+  const triggerText = current ? formatDate(current) : placeholder;
+  const classes = datePickerClasses(surface, { size, invalid: !!error, placeholder: !current });
+  const grid = calendarClasses(surface);
+  const title = calendarTitle(calendar, { year: viewYear, month: viewMonth });
 
   return (
     <FieldShell label={label} hint={hint} error={error} surface={surface} htmlFor={triggerId} messageId={fieldMessageId(triggerId)}>
-      <span className="relative block">
+      <span className={classes.anchor}>
         <PixelPopover
           open={open}
-          onOpenChange={setOpen}
+          onOpenChange={handleOpenChange}
           side="bottom"
           align="start"
           surface={surface}
@@ -368,10 +230,10 @@ export const PixelDatePicker = forwardRef<
               aria-haspopup="dialog"
               aria-invalid={error ? true : undefined}
               aria-describedby={fieldDescribedBy(triggerId, { hint, error })}
-              className={triggerClasses}
+              className={classes.trigger}
             >
-              <span className="truncate">{triggerText}</span>
-              <span aria-hidden className="ml-2 text-retro-muted text-xs">
+              <span className={classes.value}>{triggerText}</span>
+              <span aria-hidden className={classes.mark}>
                 {current ? '×' : '▾'}
               </span>
             </button>
@@ -379,27 +241,17 @@ export const PixelDatePicker = forwardRef<
 
           <PixelPopover.Content
             surface={surface}
-            className={cn('w-[18rem]', s.font)}
+            aria-label="Choose date"
+            className={classes.content}
           >
             {presets && presets.length > 0 && (
-              <div
-                className={cn(
-                  'mb-2 flex flex-wrap gap-1 pb-2 border-b border-retro-border/60',
-                )}
-              >
+              <div className={classes.presets}>
                 {presets.map((p) => (
                   <button
                     key={p.label}
                     type="button"
                     onClick={() => pickDate(p.value)}
-                    className={cn(
-                      'px-2 py-1 text-[11px] uppercase tracking-wide',
-                      s.border,
-                      s.radius,
-                      'border-retro-border-strong bg-retro-surface/40 text-retro-text',
-                      'hover:bg-retro-surface/70',
-                      s.transition,
-                    )}
+                    className={classes.preset}
                   >
                     {p.label}
                   </button>
@@ -407,38 +259,23 @@ export const PixelDatePicker = forwardRef<
               </div>
             )}
 
-            <div className="mb-2 flex items-center justify-between">
+            <div className={grid.header}>
               <button
                 type="button"
                 aria-label="Previous month"
                 onClick={goPrev}
-                className={cn(
-                  'h-7 w-7 inline-flex items-center justify-center',
-                  s.border,
-                  s.radius,
-                  'border-retro-border-strong hover:bg-retro-surface/60',
-                )}
+                className={grid.nav}
               >
                 ‹
               </button>
-              <span
-                className={cn(
-                  'text-xs font-semibold uppercase tracking-wider text-retro-text',
-                )}
-                aria-live="polite"
-              >
-                {MONTH_NAMES[viewMonth]} {viewYear}
+              <span className={grid.title} aria-live="polite">
+                {title}
               </span>
               <button
                 type="button"
                 aria-label="Next month"
                 onClick={goNext}
-                className={cn(
-                  'h-7 w-7 inline-flex items-center justify-center',
-                  s.border,
-                  s.radius,
-                  'border-retro-border-strong hover:bg-retro-surface/60',
-                )}
+                className={grid.nav}
               >
                 ›
               </button>
@@ -446,54 +283,47 @@ export const PixelDatePicker = forwardRef<
 
             <div
               role="grid"
-              aria-label={`${MONTH_NAMES[viewMonth]} ${viewYear}`}
-              className="grid grid-cols-7 gap-0.5"
+              aria-label={title}
+              className={grid.grid}
               onKeyDown={handleGridKeyDown}
             >
-              {WEEKDAY_SHORT.map((wd) => (
-                <div
-                  key={wd}
-                  role="columnheader"
-                  className="text-center text-[10px] uppercase text-retro-muted py-1"
-                >
-                  {wd}
-                </div>
-              ))}
-              {weekRows.map((week, rowIdx) => (
-                <div key={`row-${rowIdx}`} role="row" className="contents">
+              {/* Column headers belong in a row, like the days below. */}
+              <div role="row" className={grid.row}>
+                {calendarWeekdays(calendar).map((wd) => (
+                  <div key={wd} role="columnheader" className={grid.weekday}>
+                    {wd}
+                  </div>
+                ))}
+              </div>
+              {weeks.map((week, rowIdx) => (
+                <div key={`row-${rowIdx}`} role="row" className={grid.row}>
                   {week.map((cell) => {
                     const disabled = isDisabled(cell.date);
-                    const isToday = sameDay(cell.date, today);
-                    const isSelected = current ? sameDay(cell.date, current) : false;
-                    const isFocused = sameDay(cell.date, focusedDate);
-                    const iso = toISO(cell.date);
+                    const isToday = isSameDay(cell.date, today);
+                    const isSelected = current ? isSameDay(cell.date, current) : false;
                     return (
                       <button
-                        key={iso}
+                        key={cell.iso}
                         ref={(node) => {
-                          if (node) dayBtnRefs.current.set(iso, node);
-                          else dayBtnRefs.current.delete(iso);
+                          if (node) dayBtnRefs.current.set(cell.iso, node);
+                          else dayBtnRefs.current.delete(cell.iso);
                         }}
                         type="button"
                         role="gridcell"
-                        aria-label={defaultFormat(cell.date)}
+                        aria-label={calendar.formatDay(cell.date)}
                         aria-selected={isSelected || undefined}
+                        aria-current={isToday ? 'date' : undefined}
                         aria-disabled={disabled || undefined}
                         disabled={disabled}
-                        tabIndex={isFocused ? 0 : -1}
+                        tabIndex={cell === tabStop ? 0 : -1}
                         onClick={() => pickDate(cell.date)}
                         onFocus={() => setFocusedDate(cell.date)}
-                        className={cn(
-                          'h-8 text-xs inline-flex items-center justify-center',
-                          s.radius,
-                          'motion-safe:transition-colors',
-                          !cell.inMonth && 'text-retro-muted/50',
-                          cell.inMonth && !isSelected && 'text-retro-text',
-                          isSelected && cn(toneMap.cyan.bg, toneMap.cyan.text, 'font-semibold'),
-                          isToday && !isSelected && cn(toneMap.cyan.border, 'border'),
-                          disabled && 'opacity-40 line-through cursor-not-allowed',
-                          !disabled && !isSelected && 'hover:bg-retro-surface/60',
-                        )}
+                        className={calendarDayClasses(surface, {
+                          inMonth: cell.inMonth,
+                          selected: isSelected,
+                          today: isToday,
+                          disabled,
+                        })}
                       >
                         {cell.date.getDate()}
                       </button>
@@ -504,17 +334,11 @@ export const PixelDatePicker = forwardRef<
             </div>
 
             {clearable && current && (
-              <div className="mt-2 pt-2 border-t border-retro-border/60 flex justify-end">
+              <div className={classes.footer}>
                 <button
                   type="button"
                   onClick={clear}
-                  className={cn(
-                    'px-2 py-1 text-[11px] uppercase tracking-wide',
-                    s.border,
-                    s.radius,
-                    'border-retro-border-strong text-retro-muted hover:text-retro-text',
-                    s.transition,
-                  )}
+                  className={classes.clear}
                 >
                   Clear
                 </button>
@@ -527,7 +351,7 @@ export const PixelDatePicker = forwardRef<
           <input
             type="hidden"
             name={name}
-            value={current ? toISO(current) : ''}
+            value={current ? toIsoDate(current) : ''}
             readOnly
           />
         )}

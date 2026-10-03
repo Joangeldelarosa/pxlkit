@@ -206,6 +206,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `role="status"` sat in an `aria-hidden` row, and rows with `onRowClick` take focus and
   activate with Enter or Space, as the manifest says; they were mouse-only. `PixelDataTable`'s
   rows-per-page select shows a page size other than 5, 10, 20 or 50 instead of the first option.
+- `@pxlkit/ui-kit`: `PixelCalendarGrid`, `PixelDatePicker` and `PixelDateRangePicker` follow the
+  WAI-ARIA date grid: PageUp / PageDown keep the day of the month (the last day of a shorter
+  month; from January 31 they reached March 3), Shift+PageUp / Shift+PageDown move a year,
+  moves skip disabled days instead of losing focus on them, exactly one day is in the tab order
+  (the grid dropped out of it after the month buttons, and the range picker had two), today
+  carries `aria-current="date"`, and the week start, month and weekday names follow
+  `PxlKitLocaleProvider`. The pickers' popovers are named dialogs that take focus as they open,
+  their weekday headers sit in a row, and the range picker keeps focus in its own popover and
+  on the trigger after its clear target.
+- `@pxlkit/ui-kit`: `PixelCombobox` opens on Enter instead of selecting the first option unseen;
+  `PixelMultiSelect`'s search field points `aria-activedescendant` and `aria-controls` at the
+  listbox, and Space types a space in it; `PixelColorInput` moves focus into its popover as it
+  opens.
 - Site: the component reference lists every manifest example. Five whose ids did not
   spell their export's name — four of `PixelInput`'s and `PixelBreadcrumb`'s
   `with-onclick` — were left out.

@@ -150,3 +150,27 @@ describe('PixelMultiSelect — hint / error description', () => {
     expect(trigger).not.toHaveAttribute('aria-describedby');
   });
 });
+
+describe('PixelMultiSelect — search field', () => {
+  it('points at the highlighted option while focus is in it', () => {
+    const { getByRole, getAllByRole } = render(<PixelMultiSelect options={OPTIONS} searchable />);
+    fireEvent.click(getByRole('combobox'));
+    const search = getByRole('searchbox', { name: 'Filter options' });
+    expect(document.activeElement).toBe(search);
+    expect(search).toHaveAttribute('aria-controls', getByRole('listbox').id);
+    fireEvent.keyDown(search, { key: 'ArrowDown' });
+    expect(search).toHaveAttribute('aria-activedescendant', getAllByRole('option')[1]!.id);
+  });
+
+  it('types a space instead of toggling the highlighted option', () => {
+    const onChange = vi.fn();
+    const { getByRole, getByPlaceholderText } = render(<PixelMultiSelect options={OPTIONS} searchable onChange={onChange} />);
+    fireEvent.click(getByRole('combobox'));
+    const search = getByPlaceholderText('Search…');
+    // Not prevented: the space goes into the field.
+    expect(fireEvent.keyDown(search, { key: ' ' })).toBe(true);
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.keyDown(search, { key: 'Enter' });
+    expect(onChange).toHaveBeenCalledWith(['a']);
+  });
+});

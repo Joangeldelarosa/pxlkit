@@ -47,7 +47,7 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
         <li><code>aria-label on day cells</code></li>
         <li><code>min/max enforced</code></li>
       </ul>
-      <p className="docs-aria-notes">Day cells expose aria-selected and aria-disabled; the calendar grid uses role=grid with explicit role=row wrappers and an aria-live month label.</p>
+      <p className="docs-aria-notes">Opening moves focus to the picked day, else today; Escape, Enter and a pick return it to the trigger. The popover is a dialog named &quot;Choose date&quot;. Day cells expose aria-selected, aria-current=&quot;date&quot; (today) and aria-disabled; the calendar grid uses role=grid with explicit role=row wrappers and an aria-live month label. Moves skip disabled days and stop at min/max.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -90,12 +90,22 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
           </tr>
           <tr>
             <td><kbd>PageUp</kbd></td>
-            <td>Move focus to the previous month</td>
+            <td>Move focus to the same day of the previous month (its last day when shorter)</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>PageDown</kbd></td>
-            <td>Move focus to the next month</td>
+            <td>Move focus to the same day of the next month (its last day when shorter)</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+PageUp</kbd></td>
+            <td>Move focus to the same day of the previous year</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+PageDown</kbd></td>
+            <td>Move focus to the same day of the next year</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
@@ -130,6 +140,26 @@ export function Default() {
     />
   );
 }`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDatePicker } from '@pxlkit/ui-kit-vue';
+
+const date = ref<Date | null>(null);
+</script>
+
+<template>
+  <PixelDatePicker v-model="date" label="Pick a date" placeholder="Select date" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelDatePicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDatePicker],
+  template: \`<pxl-date-picker label="Pick a date" placeholder="Select date" [(value)]="date" />\`,
+})
+export class Default {
+  readonly date = signal<Date | null>(null);
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -152,6 +182,26 @@ export function Default() {
       placeholder="Select date"
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDatePicker } from '@pxlkit/ui-kit-vue';
+
+const date = ref<Date | null>(null);
+</script>
+
+<template>
+  <PixelDatePicker v-model="date" label="Pick a date" placeholder="Select date" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDatePicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDatePicker],
+  template: \`<pxl-date-picker label="Pick a date" placeholder="Select date" [(value)]="date" />\`,
+})
+export class Default {
+  readonly date = signal<Date | null>(null);
 }`}
         />
       </article>
@@ -182,6 +232,40 @@ export function WithPresets() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDatePicker } from '@pxlkit/ui-kit-vue';
+
+const date = ref<Date | null>(null);
+const today = new Date();
+const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+const presets = [
+  { label: 'Today', value: today },
+  { label: 'Tomorrow', value: tomorrow },
+  { label: 'Next week', value: nextWeek },
+];
+</script>
+
+<template>
+  <PixelDatePicker v-model="date" label="Due date" clearable :presets="presets" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDatePicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDatePicker],
+  template: \`<pxl-date-picker label="Due date" clearable [presets]="presets" [(value)]="date" />\`,
+})
+export class WithPresets {
+  readonly date = signal<Date | null>(null);
+  private readonly today = new Date();
+  readonly presets = [
+    { label: 'Today', value: this.today },
+    { label: 'Tomorrow', value: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 1) },
+    { label: 'Next week', value: new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 7) },
+  ];
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-min-max">
@@ -207,6 +291,46 @@ export function WithMinMax() {
       max={max}
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDatePicker } from '@pxlkit/ui-kit-vue';
+
+const date = ref<Date | null>(null);
+const today = new Date();
+const min = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+const max = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+</script>
+
+<template>
+  <PixelDatePicker
+    v-model="date"
+    label="Within one month"
+    hint="Only the next 30 days are selectable"
+    :min="min"
+    :max="max"
+  />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDatePicker } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelDatePicker],
+  template: \`
+    <pxl-date-picker
+      label="Within one month"
+      hint="Only the next 30 days are selectable"
+      [min]="min"
+      [max]="max"
+      [(value)]="date"
+    />
+  \`,
+})
+export class WithMinMax {
+  readonly date = signal<Date | null>(null);
+  private readonly today = new Date();
+  readonly min = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate());
+  readonly max = new Date(this.today.getFullYear(), this.today.getMonth() + 1, this.today.getDate());
 }`}
         />
       </article>

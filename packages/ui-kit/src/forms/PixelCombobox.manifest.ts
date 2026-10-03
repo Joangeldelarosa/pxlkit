@@ -52,7 +52,7 @@ export default defineManifest({
       { key: 'ArrowUp', does: 'Opens the listbox when closed; moves highlight to the previous option when open.' },
       { key: 'Home', does: 'Highlights the first option in the filtered list.' },
       { key: 'End', does: 'Highlights the last option in the filtered list.' },
-      { key: 'Enter', does: 'Commits the highlighted option and closes the listbox.' },
+      { key: 'Enter', does: 'Opens the listbox when closed; commits the highlighted option and closes the listbox when open.' },
       { key: 'Escape', does: 'Closes the listbox without changing the selection.' },
     ],
     notes:

@@ -2,78 +2,25 @@
 
 import React, { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 import {
-  Surface,
-  cn,
-  surfaceClasses,
-  useEffectiveSurface,
-  toneMap,
-} from '../common';
+  calendarClasses,
+  calendarDayClasses,
+  calendarKeydown,
+  calendarLocale,
+  calendarTabStop,
+  calendarTitle,
+  calendarWeekdays,
+  calendarWeeks,
+  isDayDisabled,
+  isDayInSpan,
+  isInMonth,
+  isSameDay,
+  rangeSpan,
+  startOfDay,
+  toIsoDate,
+} from '@pxlkit/ui-kit-core';
+import { Surface, useEffectiveSurface } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
-
-/* ──────────────────────────────────────────────────────────────────────────
-   Date helpers — pure, no deps. (Mirror PixelDatePicker semantics.)
-   ────────────────────────────────────────────────────────────────────────── */
-
-const MONTH_NAMES = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-const WEEKDAY_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-function startOfDay(d: Date): Date {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
-
-function sameDay(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
-}
-
-function toISO(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${dd}`;
-}
-
-function formatDateLabel(d: Date): string {
-  return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-}
-
-interface DayCell {
-  date: Date;
-  inMonth: boolean;
-}
-
-function buildMonthGrid(year: number, month: number): DayCell[] {
-  const first = new Date(year, month, 1);
-  const firstWeekday = first.getDay();
-  const gridStart = new Date(year, month, 1 - firstWeekday);
-  const cells: DayCell[] = [];
-  for (let i = 0; i < 42; i++) {
-    const d = new Date(
-      gridStart.getFullYear(),
-      gridStart.getMonth(),
-      gridStart.getDate() + i,
-    );
-    cells.push({ date: d, inMonth: d.getMonth() === month });
-  }
-  return cells;
-}
+import { usePxlKitLocale } from '../locale';
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelCalendarGrid — standalone month grid.
@@ -115,7 +62,9 @@ export const PixelCalendarGrid = forwardRef<HTMLDivElement, PixelCalendarGridPro
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
+    const classes = calendarClasses(surface);
+    // Week start, month and weekday names follow the kit's locale.
+    const calendar = calendarLocale(usePxlKitLocale().locale);
     const [value, setValue] = useControllableState<Date | null | undefined>({
       value: valueProp,
       defaultValue: defaultValue ?? null,
@@ -130,6 +79,7 @@ export const PixelCalendarGrid = forwardRef<HTMLDivElement, PixelCalendarGridPro
     const viewDate = month ?? internalMonth;
     const viewYear = viewDate.getFullYear();
     const viewMonth = viewDate.getMonth();
+    const title = calendarTitle(calendar, { year: viewYear, month: viewMonth });
 
     const setView = useCallback(
       (next: Date) => {
@@ -147,40 +97,30 @@ export const PixelCalendarGrid = forwardRef<HTMLDivElement, PixelCalendarGridPro
       setView(new Date(viewYear, viewMonth + 1, 1));
     };
 
-    const minStart = useMemo(() => (minDate ? startOfDay(minDate) : null), [minDate]);
-    const maxStart = useMemo(() => (maxDate ? startOfDay(maxDate) : null), [maxDate]);
-
     const isDisabled = useCallback(
-      (d: Date): boolean => {
-        const ds = startOfDay(d);
-        if (minStart && ds.getTime() < minStart.getTime()) return true;
-        if (maxStart && ds.getTime() > maxStart.getTime()) return true;
-        if (Array.isArray(disabledDates)) {
-          if (disabledDates.some((x) => sameDay(x, d))) return true;
-        } else if (typeof disabledDates === 'function') {
-          if (disabledDates(d)) return true;
-        }
-        return false;
-      },
-      [minStart, maxStart, disabledDates],
+      (d: Date): boolean => isDayDisabled(d, { min: minDate, max: maxDate, disabledDates }),
+      [minDate, maxDate, disabledDates],
     );
 
     const today = useMemo(() => startOfDay(new Date()), []);
-    const cells = useMemo(
-      () => buildMonthGrid(viewYear, viewMonth),
-      [viewYear, viewMonth],
+    const weeks = useMemo(
+      () => calendarWeeks({ year: viewYear, month: viewMonth }, calendar.weekStartsOn),
+      [viewYear, viewMonth, calendar.weekStartsOn],
     );
 
     // Roving tabindex anchor.
     const [focusedDate, setFocusedDate] = useState<Date>(
       () => value ?? new Date(viewYear, viewMonth, 1),
     );
+    // One day of the grid is in the tab order: the focused one, or the
+    // month's first enabled day while that one is not on show.
+    const tabStop = calendarTabStop(weeks.flat(), focusedDate, isDisabled);
     const dayBtnRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
     const shouldRefocusRef = useRef(false);
 
     React.useEffect(() => {
       if (!shouldRefocusRef.current) return;
-      const key = toISO(focusedDate);
+      const key = toIsoDate(focusedDate);
       const btn = dayBtnRefs.current.get(key);
       if (btn) {
         btn.focus();
@@ -188,184 +128,55 @@ export const PixelCalendarGrid = forwardRef<HTMLDivElement, PixelCalendarGridPro
       }
     }, [focusedDate]);
 
-    const moveFocus = useCallback(
-      (deltaDays: number) => {
-        setFocusedDate((prev) => {
-          const next = new Date(
-            prev.getFullYear(),
-            prev.getMonth(),
-            prev.getDate() + deltaDays,
-          );
-          shouldRefocusRef.current = true;
-          if (
-            next.getFullYear() !== viewYear ||
-            next.getMonth() !== viewMonth
-          ) {
-            setView(new Date(next.getFullYear(), next.getMonth(), 1));
-          }
-          return next;
-        });
-      },
-      [viewYear, viewMonth, setView],
-    );
-
-    const jumpFocus = useCallback(
-      (next: Date) => {
-        shouldRefocusRef.current = true;
-        setFocusedDate(next);
-        if (
-          next.getFullYear() !== viewYear ||
-          next.getMonth() !== viewMonth
-        ) {
-          setView(new Date(next.getFullYear(), next.getMonth(), 1));
-        }
-      },
-      [viewYear, viewMonth, setView],
-    );
+    const moveFocus = (next: Date) => {
+      shouldRefocusRef.current = true;
+      setFocusedDate(next);
+      if (!isInMonth(next, { year: viewYear, month: viewMonth })) setView(next);
+    };
 
     const pickDate = (d: Date) => {
       if (isDisabled(d)) return;
       setValue(startOfDay(d));
     };
 
+    const handleGridKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      const action = calendarKeydown(e.key, focusedDate, {
+        weekStartsOn: calendar.weekStartsOn,
+        shiftKey: e.shiftKey,
+        isDisabled,
+      });
+      if (!action) return;
+      e.preventDefault();
+      if (action.select) pickDate(focusedDate);
+      else if (action.focus) moveFocus(action.focus);
+    };
+
     // Range preview math.
-    const previewBounds = useMemo<{ start: Date; end: Date } | null>(() => {
-      if (!rangePreview) return null;
-      const { from, to, hover } = rangePreview;
-      if (!from) return null;
-      const second = to ?? hover;
-      if (!second) return null;
-      const a = startOfDay(from);
-      const b = startOfDay(second);
-      const start = a.getTime() <= b.getTime() ? a : b;
-      const end = a.getTime() <= b.getTime() ? b : a;
-      return { start, end };
-    }, [rangePreview]);
-
-    const inRange = useCallback(
-      (d: Date): boolean => {
-        if (!previewBounds) return false;
-        const t = startOfDay(d).getTime();
-        return (
-          t >= previewBounds.start.getTime() && t <= previewBounds.end.getTime()
-        );
-      },
-      [previewBounds],
-    );
-
-    const isRangeEndpoint = useCallback(
-      (d: Date): boolean => {
-        if (!previewBounds) return false;
-        return (
-          sameDay(d, previewBounds.start) || sameDay(d, previewBounds.end)
-        );
-      },
-      [previewBounds],
-    );
-
-    const handleGridKeyDown = useCallback(
-      (e: React.KeyboardEvent<HTMLDivElement>) => {
-        switch (e.key) {
-          case 'ArrowLeft':
-            e.preventDefault();
-            moveFocus(-1);
-            return;
-          case 'ArrowRight':
-            e.preventDefault();
-            moveFocus(1);
-            return;
-          case 'ArrowUp':
-            e.preventDefault();
-            moveFocus(-7);
-            return;
-          case 'ArrowDown':
-            e.preventDefault();
-            moveFocus(7);
-            return;
-          case 'Home':
-            e.preventDefault();
-            moveFocus(-focusedDate.getDay());
-            return;
-          case 'End':
-            e.preventDefault();
-            moveFocus(6 - focusedDate.getDay());
-            return;
-          case 'PageUp':
-            e.preventDefault();
-            jumpFocus(
-              new Date(
-                focusedDate.getFullYear(),
-                focusedDate.getMonth() - 1,
-                focusedDate.getDate(),
-              ),
-            );
-            return;
-          case 'PageDown':
-            e.preventDefault();
-            jumpFocus(
-              new Date(
-                focusedDate.getFullYear(),
-                focusedDate.getMonth() + 1,
-                focusedDate.getDate(),
-              ),
-            );
-            return;
-          case 'Enter':
-          case ' ':
-            e.preventDefault();
-            pickDate(focusedDate);
-            return;
-          default:
-            return;
-        }
-      },
-      [focusedDate, moveFocus, jumpFocus],
-    );
-
-    const weekRows = useMemo<DayCell[][]>(() => {
-      const rows: DayCell[][] = [];
-      for (let i = 0; i < 6; i++) rows.push(cells.slice(i * 7, i * 7 + 7));
-      return rows;
-    }, [cells]);
+    const previewSpan = useMemo(() => (rangePreview ? rangeSpan(rangePreview) : null), [rangePreview]);
 
     return (
       <div
         ref={ref}
         data-testid={dataTestId}
-        className={cn('inline-block', s.font)}
+        className={classes.root}
       >
-        <div className="mb-2 flex items-center justify-between">
+        <div className={classes.header}>
           <button
             type="button"
             aria-label="Previous month"
             onClick={goPrev}
-            className={cn(
-              'h-7 w-7 inline-flex items-center justify-center',
-              s.border,
-              s.radius,
-              'border-retro-border-strong hover:bg-retro-surface/60',
-            )}
+            className={classes.nav}
           >
             ‹
           </button>
-          <span
-            className={cn(
-              'text-xs font-semibold uppercase tracking-wider text-retro-text',
-            )}
-            aria-live="polite"
-          >
-            {MONTH_NAMES[viewMonth]} {viewYear}
+          <span className={classes.title} aria-live="polite">
+            {title}
           </span>
           <button
             type="button"
             aria-label="Next month"
             onClick={goNext}
-            className={cn(
-              'h-7 w-7 inline-flex items-center justify-center',
-              s.border,
-              s.radius,
-              'border-retro-border-strong hover:bg-retro-surface/60',
-            )}
+            className={classes.nav}
           >
             ›
           </button>
@@ -373,76 +184,58 @@ export const PixelCalendarGrid = forwardRef<HTMLDivElement, PixelCalendarGridPro
 
         <div
           role="grid"
-          aria-label={`${MONTH_NAMES[viewMonth]} ${viewYear}`}
-          className="grid grid-cols-7 gap-0.5"
+          aria-label={title}
+          className={classes.grid}
           onKeyDown={handleGridKeyDown}
         >
           {/* role="grid" only allows row/rowgroup children, and columnheader
               cells must live inside a row — wrap the weekday header strip in
               its own display:contents row like the week rows below. */}
-          <div role="row" className="contents">
-            {WEEKDAY_SHORT.map((wd) => (
-              <div
-                key={wd}
-                role="columnheader"
-                className="text-center text-[10px] uppercase text-retro-muted py-1"
-              >
+          <div role="row" className={classes.row}>
+            {calendarWeekdays(calendar).map((wd) => (
+              <div key={wd} role="columnheader" className={classes.weekday}>
                 {wd}
               </div>
             ))}
           </div>
-          {weekRows.map((week, rowIdx) => (
-            <div key={`row-${rowIdx}`} role="row" className="contents">
+          {weeks.map((week, rowIdx) => (
+            <div key={`row-${rowIdx}`} role="row" className={classes.row}>
               {week.map((cell) => {
                 const disabled = isDisabled(cell.date);
-                const isToday = sameDay(cell.date, today);
-                const isSelected = value ? sameDay(cell.date, value) : false;
-                const isFocused = sameDay(cell.date, focusedDate);
-                const cellInRange = inRange(cell.date);
-                const cellEndpoint = isRangeEndpoint(cell.date);
-                const iso = toISO(cell.date);
+                const isToday = isSameDay(cell.date, today);
+                const isSelected = value ? isSameDay(cell.date, value) : false;
+                const cellInRange = isDayInSpan(cell.date, previewSpan);
+                const cellEndpoint =
+                  !!previewSpan && (isSameDay(cell.date, previewSpan.from) || isSameDay(cell.date, previewSpan.to));
                 return (
                   <button
-                    key={iso}
+                    key={cell.iso}
                     ref={(node) => {
-                      if (node) dayBtnRefs.current.set(iso, node);
-                      else dayBtnRefs.current.delete(iso);
+                      if (node) dayBtnRefs.current.set(cell.iso, node);
+                      else dayBtnRefs.current.delete(cell.iso);
                     }}
                     type="button"
                     role="gridcell"
-                    aria-label={formatDateLabel(cell.date)}
+                    aria-label={calendar.formatDay(cell.date)}
                     aria-selected={isSelected || undefined}
+                    aria-current={isToday ? 'date' : undefined}
                     aria-disabled={disabled || undefined}
                     disabled={disabled}
-                    tabIndex={isFocused ? 0 : -1}
+                    tabIndex={cell === tabStop ? 0 : -1}
                     data-in-range={cellInRange || undefined}
                     data-range-endpoint={cellEndpoint || undefined}
                     data-today={isToday || undefined}
                     data-out-of-month={!cell.inMonth || undefined}
                     onClick={() => pickDate(cell.date)}
                     onFocus={() => setFocusedDate(cell.date)}
-                    className={cn(
-                      'h-8 text-xs inline-flex items-center justify-center',
-                      s.radius,
-                      'motion-safe:transition-colors',
-                      !cell.inMonth && 'text-retro-muted/50',
-                      cell.inMonth && !isSelected && 'text-retro-text',
-                      cellInRange &&
-                        !isSelected &&
-                        !cellEndpoint &&
-                        cn(toneMap.cyan.soft, toneMap.cyan.text),
-                      cellEndpoint &&
-                        !isSelected &&
-                        cn(toneMap.cyan.bg, toneMap.cyan.text, 'font-semibold'),
-                      isSelected &&
-                        cn(toneMap.cyan.bg, toneMap.cyan.text, 'font-semibold'),
-                      isToday &&
-                        !isSelected &&
-                        !cellEndpoint &&
-                        cn(toneMap.cyan.border, 'border'),
-                      disabled && 'opacity-40 line-through cursor-not-allowed',
-                      !disabled && !isSelected && !cellEndpoint && 'hover:bg-retro-surface/60',
-                    )}
+                    className={calendarDayClasses(surface, {
+                      inMonth: cell.inMonth,
+                      selected: isSelected,
+                      today: isToday,
+                      disabled,
+                      rangeEnd: cellEndpoint,
+                      inRange: cellInRange,
+                    })}
                   >
                     {renderDay ? renderDay(cell.date) : cell.date.getDate()}
                   </button>

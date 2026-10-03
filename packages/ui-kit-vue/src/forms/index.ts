@@ -27,4 +27,15 @@ export {
 export { default as PixelFormItem } from './PixelFormItem.vue';
 export { default as PixelFormLabel, type PixelFormLabelProps } from './PixelFormLabel.vue';
 export { default as PixelFormMessage, type PixelFormMessageProps } from './PixelFormMessage.js';
+export { default as PixelCalendarGrid, type PixelCalendarGridProps } from './PixelCalendarGrid.vue';
+export { default as PixelDatePicker, type PixelDatePickerPreset, type PixelDatePickerProps } from './PixelDatePicker.vue';
+export {
+  default as PixelDateRangePicker,
+  type PixelDateRangePickerPreset,
+  type PixelDateRangePickerProps,
+} from './PixelDateRangePicker.vue';
+export type { DateRangeValue } from '@pxlkit/ui-kit-core';
+export { default as PixelCombobox, type PixelComboboxOption, type PixelComboboxProps } from './PixelCombobox.vue';
+export { default as PixelMultiSelect, type PixelMultiSelectOption, type PixelMultiSelectProps } from './PixelMultiSelect.vue';
+export { default as PixelColorInput, type PixelColorInputProps } from './PixelColorInput.vue';
 export type { Option } from './_internal/option.js';

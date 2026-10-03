@@ -241,6 +241,16 @@ import { PixelButton } from '@pxlkit/ui-kit-vue';
     </PixelButton>
   </div>
 </template>`,
+  'pixel-calendar-grid': `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelCalendarGrid } from '@pxlkit/ui-kit-vue';
+
+const value = ref<Date | null>(null);
+</script>
+
+<template>
+  <PixelCalendarGrid v-model="value" />
+</template>`,
   'pixel-card': `<script setup lang="ts">
 import { PixelCard } from '@pxlkit/ui-kit-vue';
 </script>
@@ -346,12 +356,39 @@ import { PixelCollapsible } from '@pxlkit/ui-kit-vue';
     <p class="text-xs text-retro-muted">Hidden content revealed when the header is toggled.</p>
   </PixelCollapsible>
 </template>`,
+  'pixel-color-input': `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('#06b6d4');
+</script>
+
+<template>
+  <PixelColorInput v-model="value" label="Brand color" />
+</template>`,
   'pixel-color-swatch': `<script setup lang="ts">
 import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';
 </script>
 
 <template>
   <PixelColorSwatch name="cyan" css-var="--color-retro-cyan" />
+</template>`,
+  'pixel-combobox': `<script setup lang="ts">
+import { PixelCombobox } from '@pxlkit/ui-kit-vue';
+
+const FRUITS = [
+  { value: 'apple', label: 'Apple' },
+  { value: 'banana', label: 'Banana' },
+  { value: 'cherry', label: 'Cherry' },
+  { value: 'date', label: 'Date' },
+  { value: 'elderberry', label: 'Elderberry' },
+  { value: 'fig', label: 'Fig' },
+  { value: 'grape', label: 'Grape' },
+];
+</script>
+
+<template>
+  <PixelCombobox label="Fruit" :options="FRUITS" placeholder="Pick a fruit" hint="Type to filter" />
 </template>`,
   'pixel-command': `<script setup lang="ts">
 import { ref } from 'vue';
@@ -417,6 +454,26 @@ const columns: ColumnDef<Row, unknown>[] = [
 
 <template>
   <PixelDataTable :data="rows" :columns="columns" />
+</template>`,
+  'pixel-date-picker': `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDatePicker } from '@pxlkit/ui-kit-vue';
+
+const date = ref<Date | null>(null);
+</script>
+
+<template>
+  <PixelDatePicker v-model="date" label="Pick a date" placeholder="Select date" />
+</template>`,
+  'pixel-date-range-picker': `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit-vue';
+
+const range = ref<DateRangeValue>({});
+</script>
+
+<template>
+  <PixelDateRangePicker v-model="range" label="Date range" placeholder="Select date range" />
 </template>`,
   'pixel-divider': `<script setup lang="ts">
 import { PixelDivider } from '@pxlkit/ui-kit-vue';
@@ -769,6 +826,23 @@ import { PixelMouseParallax } from '@pxlkit/ui-kit-vue';
       </div>
     </PixelMouseParallax>
   </div>
+</template>`,
+  'pixel-multi-select': `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';
+
+const OPTIONS = [
+  { value: 'react', label: 'React' },
+  { value: 'vue', label: 'Vue' },
+  { value: 'svelte', label: 'Svelte' },
+  { value: 'solid', label: 'Solid' },
+  { value: 'angular', label: 'Angular', disabled: true },
+];
+const value = ref(['react']);
+</script>
+
+<template>
+  <PixelMultiSelect v-model="value" label="Frameworks" :options="OPTIONS" placeholder="Pick frameworks…" />
 </template>`,
   'pixel-navigation-menu': `<script setup lang="ts">
 import { h } from 'vue';

@@ -104,6 +104,26 @@ export function Default() {
     />
   );
 }`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('#06b6d4');
+</script>
+
+<template>
+  <PixelColorInput v-model="value" label="Brand color" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Brand color" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal('#06b6d4');
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -125,6 +145,26 @@ export function Default() {
       onChange={setValue}
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('#06b6d4');
+</script>
+
+<template>
+  <PixelColorInput v-model="value" label="Brand color" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Brand color" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal('#06b6d4');
 }`}
         />
       </article>
@@ -148,6 +188,26 @@ export function RgbFormat() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('rgb(34, 197, 94)');
+</script>
+
+<template>
+  <PixelColorInput v-model="value" label="Accent color" format="rgb" hint="Stored as rgb()" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Accent color" format="rgb" hint="Stored as rgb()" [(value)]="value" />\`,
+})
+export class RgbFormat {
+  readonly value = signal('rgb(34, 197, 94)');
+}`}
         />
       </article>
       <article className="docs-example" id="example-custom-presets">
@@ -169,6 +229,28 @@ export function CustomPresets() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('#ef4444');
+const presets = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#a855f7'];
+</script>
+
+<template>
+  <PixelColorInput v-model="value" label="Theme tone" :presets="presets" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Theme tone" [presets]="presets" [(value)]="value" />\`,
+})
+export class CustomPresets {
+  readonly presets = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#a855f7'];
+  readonly value = signal('#ef4444');
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-error">
@@ -187,6 +269,21 @@ export function WithError() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelColorInput } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelColorInput label="Background" default-value="not-a-color" error="Invalid color value" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelColorInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelColorInput],
+  template: \`<pxl-color-input label="Background" defaultValue="not-a-color" error="Invalid color value" />\`,
+})
+export class WithError {}`}
         />
       </article>
     </section>

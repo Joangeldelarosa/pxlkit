@@ -140,3 +140,18 @@ describe('PixelCombobox — hint / error description', () => {
     expect(trigger).not.toHaveAttribute('aria-describedby');
   });
 });
+
+describe('PixelCombobox — closed trigger keyboard', () => {
+  it('opens with Enter, as with ArrowDown, without selecting an option', () => {
+    const onChange = vi.fn();
+    const { getByRole, queryByRole } = render(
+      <PixelCombobox options={fruitOptions} placeholder="Pick" onChange={onChange} />,
+    );
+    const trigger = getByRole('combobox');
+    fireEvent.keyDown(trigger, { key: 'Enter' });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(queryByRole('listbox')).toBeTruthy();
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(trigger.textContent).toContain('Pick');
+  });
+});

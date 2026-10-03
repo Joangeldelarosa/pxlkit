@@ -58,6 +58,16 @@
 - `PixelTable` and `PixelDataTable` announce "Loading data…": the `role="status"` sat in an `aria-hidden` row, so screen readers never heard it.
 - `PixelTable` and `PixelDataTable` rows with `onRowClick` are in the tab order, show focus, and activate with Enter or Space — a control inside the row keeps its own keys; they were mouse-only, although the manifest documented them as focusable.
 - `PixelDataTable`'s rows-per-page select shows the current page size when it is not 5, 10, 20 or 50; it showed the first option.
+- `PixelCalendarGrid`, `PixelDatePicker` and `PixelDateRangePicker`: PageUp / PageDown move to the same day of the previous / next month, or its last day when the month is shorter; from January 31, PageDown reached March 3. Shift+PageUp / Shift+PageDown move a year, as the WAI-ARIA date grid pattern does.
+- The three calendars mark today with `aria-current="date"`; it was marked only visually.
+- Arrow, Home, End and page moves in the three calendars skip disabled days, and stay put when every day that way is disabled (past `min` / `max`). Focus went to a disabled day, which cannot take it, and stayed behind or fell to `<body>` when the month changed.
+- Exactly one enabled day on show is in the calendars' tab order: after the month buttons the grid had none, so Tab skipped it, and the range picker had two for a day shown in both months.
+- The calendars' week start, month and weekday names and day labels follow `PxlKitLocaleProvider` (Turkish weeks start on Monday); they were always English.
+- `PixelDatePicker` and `PixelDateRangePicker` put their weekday headers in a row — they were children of `role="grid"`, which ARIA does not allow — and name their popovers "Choose date" and "Choose date range".
+- `PixelDatePicker`, `PixelDateRangePicker` and `PixelColorInput` move focus into the popover as it opens: to the picked day, the range start or today, and to the colour input's first field. The content is portaled to the end of `<body>`, out of the keyboard's reach.
+- `PixelDateRangePicker` moves focus within its own popover: it looked the day up across the page by its label, so focus could land in another calendar showing the same day. Clearing from the trigger leaves focus on the trigger instead of on the mark that takes the clear target's place.
+- `PixelCombobox`: Enter on the closed trigger opens the listbox; it selected the first option unseen.
+- `PixelMultiSelect`'s search field points `aria-activedescendant` and `aria-controls` at the listbox, as `PixelCombobox`'s does: screen readers heard nothing as the arrows moved. Space in it types a space; it toggled the highlighted option and was swallowed.
 
 ## 2.1.1 — 2026-08-08
 
