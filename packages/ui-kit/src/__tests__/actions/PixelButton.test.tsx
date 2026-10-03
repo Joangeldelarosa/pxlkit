@@ -119,6 +119,21 @@ describe('PixelButton — asChild', () => {
     expect(externalRef.current).toBe(a);
   });
 
+  it("hands the child's own ref the element without reading element.ref, which React 19 deprecates", () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const childRef = React.createRef<HTMLAnchorElement>();
+    const { getByTestId } = render(
+      <PixelButton asChild>
+        <a ref={childRef} href="/foo" data-testid="slot-link">
+          Go
+        </a>
+      </PixelButton>,
+    );
+    expect(childRef.current).toBe(getByTestId('slot-link'));
+    expect(error.mock.calls.flat().join('\n')).not.toMatch(/element\.ref/);
+    error.mockRestore();
+  });
+
   it('falls back to <button> when asChild is true but child is not a valid element', () => {
     const { getByRole } = render(<PixelButton asChild>plain text</PixelButton>);
     // text node isn't a valid React element → renders a button.

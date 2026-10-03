@@ -26,6 +26,7 @@ import {
 } from '@pxlkit/ui-kit-core';
 import { Surface, cn, useEffectiveSurface } from '../common';
 import { useEscape } from '../hooks/useEscape';
+import { elementRef } from '../utils/element-ref';
 
 type PopoverSide = FloatingSide;
 type PopoverAlign = FloatingAlign;
@@ -215,7 +216,7 @@ const PixelPopoverTrigger = forwardRef<HTMLElement, PixelPopoverTriggerProps>(
     const setRef = (node: HTMLElement | null) => {
       ctx.refs.setReference(node);
       ctx.triggerRef.current = node;
-      const original = (child as { ref?: React.Ref<HTMLElement> }).ref;
+      const original = elementRef<HTMLElement>(child);
       if (typeof original === 'function') original(node);
       else if (original && typeof original === 'object') {
         (original as React.MutableRefObject<HTMLElement | null>).current = node;

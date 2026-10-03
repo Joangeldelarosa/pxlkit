@@ -55,6 +55,26 @@ describe('PixelPopover', () => {
     expect(onOpenChange).toHaveBeenCalledWith(true);
   });
 
+  it("hands the trigger's own ref the element without reading element.ref, which React 19 deprecates", () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const triggerRef = React.createRef<HTMLButtonElement>();
+    const { getByTestId } = render(
+      <PixelPopover open={false} onOpenChange={() => {}}>
+        <PixelPopover.Trigger>
+          <button ref={triggerRef} data-testid="trigger">
+            open
+          </button>
+        </PixelPopover.Trigger>
+        <PixelPopover.Content>
+          <span>hello</span>
+        </PixelPopover.Content>
+      </PixelPopover>,
+    );
+    expect(triggerRef.current).toBe(getByTestId('trigger'));
+    expect(error.mock.calls.flat().join('\n')).not.toMatch(/element\.ref/);
+    error.mockRestore();
+  });
+
   it('ignores a click dispatched to a disabled trigger', () => {
     const onOpenChange = vi.fn();
     const { getByTestId } = render(

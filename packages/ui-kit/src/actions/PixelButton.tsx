@@ -4,6 +4,7 @@ import {
   Tone, Size, Surface, Variant, cn,
   toneMap, sizeClass, focusRing, surfaceClasses, useEffectiveSurface,
 } from '../common';
+import { elementRef } from '../utils/element-ref';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelButton — versatile button with tones, sizes, icon slots, loading,
@@ -150,7 +151,7 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
         childProps.onClick?.(e);
         onClick?.(e as unknown as React.MouseEvent<HTMLButtonElement>);
       },
-      ref: mergeRefs(ref as React.Ref<HTMLElement>, (child as unknown as { ref?: React.Ref<HTMLElement> }).ref ?? null),
+      ref: mergeRefs(ref as React.Ref<HTMLElement>, elementRef<HTMLElement>(child) ?? null),
     } as Partial<typeof childProps> & { ref?: React.Ref<HTMLElement> });
   }
 

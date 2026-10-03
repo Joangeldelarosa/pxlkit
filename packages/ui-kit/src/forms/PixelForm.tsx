@@ -27,6 +27,7 @@ import {
   Surface, cn,
   useEffectiveSurface,
 } from '../common';
+import { elementRef } from '../utils/element-ref';
 
 export type { UseFormReturn, FieldValues } from 'react-hook-form';
 export type { FieldPath as Path } from 'react-hook-form';
@@ -198,12 +199,6 @@ function mergeRefs<T>(...refs: Array<React.Ref<T> | undefined>): React.RefCallba
       else if (r) (r as React.MutableRefObject<T | null>).current = node;
     }
   };
-}
-
-/** The ref an element was created with: a prop since React 19, a field of the element before. */
-function elementRef<T>(element: React.ReactElement): React.Ref<T> | undefined {
-  const props = element.props as { ref?: React.Ref<T> };
-  return 'ref' in props ? props.ref : (element as unknown as { ref?: React.Ref<T> }).ref;
 }
 
 export const PixelFormControl = forwardRef<HTMLElement, PixelFormControlProps>(function PixelFormControl(

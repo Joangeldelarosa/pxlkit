@@ -238,6 +238,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   picker's clear button sits beside its trigger, over its end; the multi-select is a field
   of chips with "Remove …" buttons, the combobox and a clear button, each in the tab order —
   in every kit.
+- `@pxlkit/ui-kit`: `PixelButton asChild` and `PixelPopover.Trigger` no longer make React 19 log
+  "Accessing element.ref was removed in React 19": they read a child's `ref` from its props, as
+  React 19 passes it.
 - Site: the component reference lists every manifest example. Five whose ids did not
   spell their export's name — four of `PixelInput`'s and `PixelBreadcrumb`'s
   `with-onclick` — were left out.
