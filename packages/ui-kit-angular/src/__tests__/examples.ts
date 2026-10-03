@@ -11,9 +11,24 @@ import type { Type } from '@angular/core';
 
 const loaders = import.meta.glob<Record<string, unknown>>('../../examples/*/*.examples.ts');
 
-/** `pixel-button` → `PixelButton`, `pxl-kit-toast-provider` → `PxlKitToastProvider`. */
+/**
+ * The React kit's components by the kebab-case name their Angular example
+ * file takes (scripts/build-docs/_lib/ports.ts names them so): read from the
+ * manifests' file names, without loading a manifest.
+ */
+const reactComponents = new Map(
+  Object.keys(import.meta.glob('../../../ui-kit/src/*/*.manifest.ts')).map((path) => {
+    const name = /([^/]+)\.manifest\.ts$/.exec(path)![1]!;
+    return [name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase(), name];
+  }),
+);
+
+/**
+ * The component an example file is named after: `pixel-button` →
+ * `PixelButton`, `pixel-otpinput` → `PixelOTPInput`.
+ */
 export function componentName(file: string): string {
-  return file.replace(/(^|-)([a-z0-9])/g, (_m, _dash, char: string) => char.toUpperCase());
+  return reactComponents.get(file) ?? file.replace(/(^|-)([a-z0-9])/g, (_m, _dash, char: string) => char.toUpperCase());
 }
 
 export interface AngularExample {

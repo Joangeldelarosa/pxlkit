@@ -143,8 +143,10 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelEqualHeightGrid` | stable | layout |
 | `PixelFadeIn` | stable | animations |
 | `PixelFeatureCard` | stable | cards |
+| `PixelFileUpload` | stable | forms |
 | `PixelFlicker` | stable | animations |
 | `PixelFloat` | stable | animations |
+| `PixelForm` | stable | forms |
 | `PixelGlitch` | stable | animations |
 | `PixelGrid` | stable | layout |
 | `PixelHeroMedia` | stable | hero |
@@ -158,6 +160,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelMouseParallax` | stable | parallax |
 | `PixelNavigationMenu` | stable | navigation |
 | `PixelNumberInput` | stable | forms |
+| `PixelOTPInput` | stable | forms |
 | `PixelPagination` | stable | navigation |
 | `PixelParallaxGroup` | stable | parallax |
 | `PixelParallaxLayer` | stable | parallax |
@@ -180,6 +183,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelSidebar` | stable | navigation |
 | `PixelSkeleton` | stable | feedback |
 | `PixelSlideIn` | stable | animations |
+| `PixelSlider` | stable | forms |
 | `PixelSpinner` | stable | feedback |
 | `PixelSplitButton` | stable | actions |
 | `PixelStack` | stable | layout |
@@ -195,6 +199,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelTimeline` | stable | data |
 | `PixelToast` | stable | feedback |
 | `PixelToggle` | stable | forms |
+| `PixelToggleGroup` | stable | forms |
 | `PixelTooltip` | stable | overlays |
 | `PixelTwoColumn` | stable | layout |
 | `PixelTypewriter` | stable | animations |

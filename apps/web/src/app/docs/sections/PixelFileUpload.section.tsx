@@ -93,6 +93,44 @@ export function Default() {
     />
   );
 }`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelFileUpload } from '@pxlkit/ui-kit-vue';
+
+const files = ref<File[]>([]);
+</script>
+
+<template>
+  <PixelFileUpload
+    v-model="files"
+    label="Upload files"
+    hint="PNG or JPG, up to 5 MB each"
+    accept="image/*"
+    multiple
+    :max-size="5 * 1024 * 1024"
+    :max-files="5"
+  />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelFileUpload } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFileUpload],
+  template: \`
+    <pxl-file-upload
+      label="Upload files"
+      hint="PNG or JPG, up to 5 MB each"
+      [(value)]="files"
+      accept="image/*"
+      multiple
+      [maxSize]="5 * 1024 * 1024"
+      [maxFiles]="5"
+    />
+  \`,
+})
+export class Default {
+  readonly files = signal<File[]>([]);
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -120,6 +158,44 @@ export function Default() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelFileUpload } from '@pxlkit/ui-kit-vue';
+
+const files = ref<File[]>([]);
+</script>
+
+<template>
+  <PixelFileUpload
+    v-model="files"
+    label="Upload files"
+    hint="PNG or JPG, up to 5 MB each"
+    accept="image/*"
+    multiple
+    :max-size="5 * 1024 * 1024"
+    :max-files="5"
+  />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelFileUpload } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFileUpload],
+  template: \`
+    <pxl-file-upload
+      label="Upload files"
+      hint="PNG or JPG, up to 5 MB each"
+      [(value)]="files"
+      accept="image/*"
+      multiple
+      [maxSize]="5 * 1024 * 1024"
+      [maxFiles]="5"
+    />
+  \`,
+})
+export class Default {
+  readonly files = signal<File[]>([]);
+}`}
         />
       </article>
       <article className="docs-example" id="example-button-mode">
@@ -141,6 +217,26 @@ export function ButtonMode() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelFileUpload } from '@pxlkit/ui-kit-vue';
+
+const files = ref<File[]>([]);
+</script>
+
+<template>
+  <PixelFileUpload v-model="files" label="Choose a file" :dropzone="false" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelFileUpload } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFileUpload],
+  template: \`<pxl-file-upload label="Choose a file" [(value)]="files" [dropzone]="false" />\`,
+})
+export class ButtonMode {
+  readonly files = signal<File[]>([]);
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-error">
@@ -159,6 +255,21 @@ export function WithError() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFileUpload } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFileUpload label="Attachments" error="At least one file is required" accept=".pdf,.doc,.docx" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFileUpload } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFileUpload],
+  template: \`<pxl-file-upload label="Attachments" error="At least one file is required" accept=".pdf,.doc,.docx" />\`,
+})
+export class WithError {}`}
         />
       </article>
     </section>

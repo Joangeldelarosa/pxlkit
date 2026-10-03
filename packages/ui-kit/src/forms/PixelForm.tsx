@@ -14,8 +14,18 @@ import {
   type UseFormReturn,
 } from 'react-hook-form';
 import {
+  formClasses,
+  formControlDescribedBy,
+  formDescriptionClasses,
+  formItemClasses,
+  formItemIds,
+  formLabelClasses,
+  formMessageClasses,
+  type FormItemIds,
+} from '@pxlkit/ui-kit-core';
+import {
   Surface, cn,
-  surfaceClasses, useEffectiveSurface,
+  useEffectiveSurface,
 } from '../common';
 
 export type { UseFormReturn, FieldValues } from 'react-hook-form';
@@ -27,14 +37,8 @@ export type { FieldPath as Path } from 'react-hook-form';
    Item generates linked ids + aria-* automatically.
    ────────────────────────────────────────────────────────────────────────── */
 
-interface PixelFormItemCtxValue {
-  /** id of the Control element */
-  id: string;
-  /** id of the Description element (may not be rendered) */
-  descriptionId: string;
-  /** id of the Message element (may not be rendered) */
-  messageId: string;
-}
+/** The ids of the Control, the Description and the Message (the latter two may not be rendered). */
+type PixelFormItemCtxValue = FormItemIds;
 const PixelFormItemContext = createContext<PixelFormItemCtxValue | null>(null);
 
 function useItemCtx(): PixelFormItemCtxValue {
@@ -70,14 +74,13 @@ function PixelFormRootInner<T extends FieldValues>(
   ref: React.Ref<HTMLFormElement>,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   return (
     <FormProvider {...form}>
       <form
         ref={ref}
         noValidate
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('space-y-4', s.font, className)}
+        className={cn(formClasses(surface), className)}
       >
         {children}
       </form>
@@ -138,17 +141,10 @@ export const PixelFormItem = forwardRef<HTMLDivElement, PixelFormItemProps>(func
   ref,
 ) {
   const baseId = useId();
-  const value = useMemo<PixelFormItemCtxValue>(
-    () => ({
-      id: `${baseId}-control`,
-      descriptionId: `${baseId}-description`,
-      messageId: `${baseId}-message`,
-    }),
-    [baseId],
-  );
+  const value = useMemo<PixelFormItemCtxValue>(() => formItemIds(baseId), [baseId]);
   return (
     <PixelFormItemContext.Provider value={value}>
-      <div ref={ref} className={cn('space-y-1.5', className)} {...rest}>
+      <div ref={ref} className={cn(formItemClasses, className)} {...rest}>
         {children}
       </div>
     </PixelFormItemContext.Provider>
@@ -169,12 +165,11 @@ export const PixelFormLabel = forwardRef<HTMLLabelElement, PixelFormLabelProps>(
 ) {
   const { id } = useItemCtx();
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   return (
     <label
       ref={ref}
       htmlFor={id}
-      className={cn('block text-xs text-retro-muted', s.font, className)}
+      className={cn(formLabelClasses(surface), className)}
       {...rest}
     >
       {children}
@@ -196,23 +191,43 @@ interface ControlChildProps {
   'aria-invalid'?: boolean | 'true' | 'false';
 }
 
+function mergeRefs<T>(...refs: Array<React.Ref<T> | undefined>): React.RefCallback<T> {
+  return (node) => {
+    for (const r of refs) {
+      if (typeof r === 'function') r(node);
+      else if (r) (r as React.MutableRefObject<T | null>).current = node;
+    }
+  };
+}
+
+/** The ref an element was created with: a prop since React 19, a field of the element before. */
+function elementRef<T>(element: React.ReactElement): React.Ref<T> | undefined {
+  const props = element.props as { ref?: React.Ref<T> };
+  return 'ref' in props ? props.ref : (element as unknown as { ref?: React.Ref<T> }).ref;
+}
+
 export const PixelFormControl = forwardRef<HTMLElement, PixelFormControlProps>(function PixelFormControl(
   { children },
   ref,
 ) {
-  const { id, descriptionId, messageId } = useItemCtx();
+  const ids = useItemCtx();
   const name = useFieldName();
   const formCtx = useFormContext();
   const error = name && formCtx ? (formCtx.getFieldState(name, formCtx.formState).error ?? undefined) : undefined;
   const hasError = !!error;
-  const describedBy = [descriptionId, hasError ? messageId : null].filter(Boolean).join(' ');
 
   const child = React.Children.only(children) as React.ReactElement<ControlChildProps>;
+  // The child keeps its own ref beside the Control's: with `{...field}` it is
+  // React Hook Form's `field.ref`, through which the form focuses the first
+  // invalid field on submit and serves `setFocus`. A Control given no ref
+  // receives `null`, which alone would replace it.
+  const childRef = elementRef<HTMLElement>(child);
+  const mergedRef = React.useMemo(() => mergeRefs(ref as React.Ref<HTMLElement>, childRef), [ref, childRef]);
   return React.cloneElement(child, {
-    id,
-    'aria-describedby': describedBy || undefined,
+    id: ids.id,
+    'aria-describedby': formControlDescribedBy(ids, hasError),
     'aria-invalid': hasError ? 'true' : undefined,
-    ref: ref as React.Ref<HTMLElement>,
+    ref: mergedRef,
   } as ControlChildProps & { ref?: React.Ref<HTMLElement> });
 });
 PixelFormControl.displayName = 'PixelForm.Control';
@@ -230,12 +245,11 @@ export const PixelFormDescription = forwardRef<HTMLParagraphElement, PixelFormDe
 ) {
   const { descriptionId } = useItemCtx();
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   return (
     <p
       ref={ref}
       id={descriptionId}
-      className={cn('text-xs text-retro-muted', s.font, className)}
+      className={cn(formDescriptionClasses(surface), className)}
       {...rest}
     >
       {children}
@@ -261,14 +275,13 @@ export const PixelFormMessage = forwardRef<HTMLParagraphElement, PixelFormMessag
   const error = name && formCtx ? (formCtx.getFieldState(name, formCtx.formState).error ?? undefined) : undefined;
   const body = children ?? error?.message;
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
   if (body == null || body === false || body === '') return null;
   return (
     <p
       ref={ref}
       id={messageId}
       role={error ? 'alert' : undefined}
-      className={cn('text-xs', error ? 'text-retro-red' : 'text-retro-muted', s.font, className)}
+      className={cn(formMessageClasses(surface, !!error), className)}
       {...rest}
     >
       {body}

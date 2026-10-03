@@ -217,6 +217,7 @@ const FRAMEWORK_IDIOMS: FrameworkIdiom[] = [
   { react: 'value + onChange', vue: 'v-model', angular: '[(value)]; form controls also take ngModel and formControlName' },
   { react: 'open + onOpenChange, checked + onChange', vue: 'v-model:open, v-model:checked', angular: '[(open)], [(checked)]' },
   { react: 'other callbacks: onClose', vue: 'events: @close', angular: 'outputs: (closed) — past tense where the present would shadow a DOM event' },
+  { react: '<PixelForm.Root form={useForm()}> on React Hook Form', vue: '<PixelForm :form="useForm()"> on VeeValidate', angular: '<form [pxlForm]="group"> on reactive forms' },
   { react: 'className', vue: 'class', angular: 'class' },
   { react: '<PxlKitSurfaceProvider surface>', vue: '<PxlKitSurfaceProvider surface>', angular: 'providePxlKitSurface() for the app, pxlKitSurface="…" on an element' },
 ];

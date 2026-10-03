@@ -104,6 +104,26 @@ export function Default() {
   const [value, setValue] = React.useState('')
   return <PixelOTPInput length={6} value={value} onChange={setValue} />
 }`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="6" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal('');
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -119,6 +139,26 @@ import { PixelOTPInput } from '@pxlkit/ui-kit';
 export function Default() {
   const [value, setValue] = React.useState('')
   return <PixelOTPInput length={6} value={value} onChange={setValue} />
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="6" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal('');
 }`}
         />
       </article>
@@ -141,6 +181,26 @@ export function Numeric4() {
     />
   )
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="4" type="numeric" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="4" type="numeric" [(value)]="value" />\`,
+})
+export class Numeric4 {
+  readonly value = signal('');
+}`}
         />
       </article>
       <article className="docs-example" id="example-alphanumeric">
@@ -161,6 +221,26 @@ export function Alphanumeric() {
       onChange={setValue}
     />
   )
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6" type="alphanumeric" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="6" type="alphanumeric" [(value)]="value" />\`,
+})
+export class Alphanumeric {
+  readonly value = signal('');
 }`}
         />
       </article>
@@ -183,6 +263,26 @@ export function Masked() {
     />
   )
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6" mask />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="6" mask [(value)]="value" />\`,
+})
+export class Masked {
+  readonly value = signal('');
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-separator">
@@ -203,6 +303,31 @@ export function WithSeparator() {
       onChange={setValue}
     />
   )
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6">
+    <template #separator><span>-</span></template>
+  </PixelOTPInput>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`
+    <pxl-otp-input [length]="6" [separator]="dash" [(value)]="value" />
+    <ng-template #dash><span>-</span></ng-template>
+  \`,
+})
+export class WithSeparator {
+  readonly value = signal('');
 }`}
         />
       </article>

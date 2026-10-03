@@ -112,6 +112,26 @@ export function Default() {
     />
   );
 }`}
+        vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref(40);
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Volume" />
+</template>`}
+        angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Volume" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal(40);
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -134,6 +154,26 @@ export function Default() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref(40);
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Volume" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Volume" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal(40);
+}`}
         />
       </article>
       <article className="docs-example" id="example-range">
@@ -153,6 +193,26 @@ export function Range() {
       onChange={setValue}
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref<[number, number]>([20, 80]);
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Price range" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Price range" [(value)]="value" />\`,
+})
+export class Range {
+  readonly value = signal<[number, number]>([20, 80]);
 }`}
         />
       </article>
@@ -184,6 +244,56 @@ export function Tones() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const neutral = ref(40);
+const green = ref(50);
+const cyan = ref(60);
+const gold = ref(70);
+const red = ref(30);
+const purple = ref(45);
+const pink = ref(55);
+</script>
+
+<template>
+  <div class="space-y-4">
+    <PixelSlider v-model="neutral" label="Neutral" tone="neutral" />
+    <PixelSlider v-model="green" label="Green" tone="green" />
+    <PixelSlider v-model="cyan" label="Cyan" tone="cyan" />
+    <PixelSlider v-model="gold" label="Gold" tone="gold" />
+    <PixelSlider v-model="red" label="Red" tone="red" />
+    <PixelSlider v-model="purple" label="Purple" tone="purple" />
+    <PixelSlider v-model="pink" label="Pink" tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`
+    <div class="space-y-4">
+      <pxl-slider label="Neutral" tone="neutral" [(value)]="neutral" />
+      <pxl-slider label="Green" tone="green" [(value)]="green" />
+      <pxl-slider label="Cyan" tone="cyan" [(value)]="cyan" />
+      <pxl-slider label="Gold" tone="gold" [(value)]="gold" />
+      <pxl-slider label="Red" tone="red" [(value)]="red" />
+      <pxl-slider label="Purple" tone="purple" [(value)]="purple" />
+      <pxl-slider label="Pink" tone="pink" [(value)]="pink" />
+    </div>
+  \`,
+})
+export class Tones {
+  readonly neutral = signal(40);
+  readonly green = signal(50);
+  readonly cyan = signal(60);
+  readonly gold = signal(70);
+  readonly red = signal(30);
+  readonly purple = signal(45);
+  readonly pink = signal(55);
+}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
@@ -203,6 +313,36 @@ export function Surfaces() {
       <PixelSlider label="Linear surface" surface="linear" value={linear} onChange={setLinear} />
     </div>
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const pixel = ref(40);
+const linear = ref(60);
+</script>
+
+<template>
+  <div class="space-y-4">
+    <PixelSlider v-model="pixel" label="Pixel surface" surface="pixel" />
+    <PixelSlider v-model="linear" label="Linear surface" surface="linear" />
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`
+    <div class="space-y-4">
+      <pxl-slider label="Pixel surface" surface="pixel" [(value)]="pixel" />
+      <pxl-slider label="Linear surface" surface="linear" [(value)]="linear" />
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly pixel = signal(40);
+  readonly linear = signal(60);
 }`}
         />
       </article>
@@ -227,6 +367,26 @@ export function WithMinMax() {
       onChange={setValue}
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref(75);
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Brightness" :min="0" :max="200" :step="5" show-min-max />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Brightness" [min]="0" [max]="200" [step]="5" showMinMax [(value)]="value" />\`,
+})
+export class WithMinMax {
+  readonly value = signal(75);
 }`}
         />
       </article>
@@ -255,6 +415,40 @@ export function WithMarks() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref(50);
+const marks = [
+  { value: 0, label: 'Low' },
+  { value: 25, label: 'Med' },
+  { value: 50, label: 'High' },
+  { value: 75, label: 'Ultra' },
+  { value: 100, label: 'Max' },
+];
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Quality" :marks="marks" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider, type PixelSliderMark } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Quality" [(value)]="value" [marks]="marks" />\`,
+})
+export class WithMarks {
+  readonly value = signal(50);
+  readonly marks: PixelSliderMark[] = [
+    { value: 0, label: 'Low' },
+    { value: 25, label: 'Med' },
+    { value: 50, label: 'High' },
+    { value: 75, label: 'Ultra' },
+    { value: 100, label: 'Max' },
+  ];
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-ticks">
@@ -279,6 +473,26 @@ export function WithTicks() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref(40);
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Step ticks" :min="0" :max="100" :step="10" ticks />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Step ticks" [min]="0" [max]="100" [step]="10" ticks [(value)]="value" />\`,
+})
+export class WithTicks {
+  readonly value = signal(40);
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-tooltip">
@@ -299,6 +513,26 @@ export function WithTooltip() {
       showTooltip="always"
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref(60);
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Always tooltip" show-tooltip="always" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Always tooltip" [(value)]="value" showTooltip="always" />\`,
+})
+export class WithTooltip {
+  readonly value = signal(60);
 }`}
         />
       </article>
@@ -321,6 +555,26 @@ export function TooltipOnDrag() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref(35);
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Drag tooltip" show-tooltip="drag" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Drag tooltip" [(value)]="value" showTooltip="drag" />\`,
+})
+export class TooltipOnDrag {
+  readonly value = signal(35);
+}`}
         />
       </article>
       <article className="docs-example" id="example-disabled">
@@ -340,6 +594,21 @@ export function Disabled() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelSlider label="Disabled" :model-value="50" disabled />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Disabled" [value]="50" disabled />\`,
+})
+export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-required">
@@ -361,6 +630,26 @@ export function Required() {
       name="setting"
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref(30);
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Required setting" required name="setting" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Required setting" [(value)]="value" required name="setting" />\`,
+})
+export class Required {
+  readonly value = signal(30);
 }`}
         />
       </article>
@@ -388,6 +677,38 @@ export function RangeWithMarks() {
       ]}
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref<[number, number]>([30, 70]);
+const marks = [
+  { value: 0, label: '0' },
+  { value: 50, label: '50' },
+  { value: 100, label: '100' },
+];
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Filter range" show-min-max show-tooltip="always" :marks="marks" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSlider, type PixelSliderMark } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`
+    <pxl-slider label="Filter range" [(value)]="value" showMinMax showTooltip="always" [marks]="marks" />
+  \`,
+})
+export class RangeWithMarks {
+  readonly value = signal<[number, number]>([30, 70]);
+  readonly marks: PixelSliderMark[] = [
+    { value: 0, label: '0' },
+    { value: 50, label: '50' },
+    { value: 100, label: '100' },
+  ];
 }`}
         />
       </article>

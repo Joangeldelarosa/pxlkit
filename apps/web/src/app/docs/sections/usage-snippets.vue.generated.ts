@@ -439,6 +439,24 @@ import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
     description="Push every keystroke to peers via WebSockets — under 50ms p95."
   />
 </template>`,
+  'pixel-file-upload': `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelFileUpload } from '@pxlkit/ui-kit-vue';
+
+const files = ref<File[]>([]);
+</script>
+
+<template>
+  <PixelFileUpload
+    v-model="files"
+    label="Upload files"
+    hint="PNG or JPG, up to 5 MB each"
+    accept="image/*"
+    multiple
+    :max-size="5 * 1024 * 1024"
+    :max-files="5"
+  />
+</template>`,
   'pixel-flicker': `<script setup lang="ts">
 import { PixelFlicker } from '@pxlkit/ui-kit-vue';
 </script>
@@ -456,6 +474,65 @@ import { PixelFloat } from '@pxlkit/ui-kit-vue';
   <PixelFloat>
     <span>Float</span>
   </PixelFloat>
+</template>`,
+  'pixel-form': `<script setup lang="ts">
+import { useForm } from 'vee-validate';
+import {
+  PixelForm,
+  PixelFormControl,
+  PixelFormDescription,
+  PixelFormField,
+  PixelFormItem,
+  PixelFormLabel,
+  PixelFormMessage,
+  PixelInput,
+} from '@pxlkit/ui-kit-vue';
+
+interface DefaultValues {
+  username: string;
+  email: string;
+}
+
+const form = useForm<DefaultValues>({
+  initialValues: { username: '', email: '' },
+});
+
+const rules = {
+  username: [(value: string) => !!value || 'Username is required'],
+  email: [
+    (value: string) => !!value || 'Email is required',
+    (value: string) => /.+@.+\\..+/.test(value) || 'Enter a valid email',
+  ],
+};
+
+function onSubmit(data: DefaultValues) {
+  console.log('submit', data);
+}
+</script>
+
+<template>
+  <PixelForm :form="form" @submit="onSubmit">
+    <PixelFormField v-slot="{ field }" name="username" :rules="rules.username">
+      <PixelFormItem>
+        <PixelFormLabel>Username</PixelFormLabel>
+        <PixelFormControl>
+          <PixelInput placeholder="pxlhero" v-bind="field" />
+        </PixelFormControl>
+        <PixelFormDescription>Your retro alias.</PixelFormDescription>
+        <PixelFormMessage />
+      </PixelFormItem>
+    </PixelFormField>
+
+    <PixelFormField v-slot="{ field }" name="email" :rules="rules.email">
+      <PixelFormItem>
+        <PixelFormLabel>Email</PixelFormLabel>
+        <PixelFormControl>
+          <PixelInput type="email" placeholder="hero@pxlkit.xyz" v-bind="field" />
+        </PixelFormControl>
+        <PixelFormMessage />
+      </PixelFormItem>
+    </PixelFormField>
+  </PixelForm>
 </template>`,
   'pixel-glitch': `<script setup lang="ts">
 import { PixelGlitch } from '@pxlkit/ui-kit-vue';
@@ -647,6 +724,16 @@ const value = ref(5);
 
 <template>
   <PixelNumberInput v-model="value" label="Quantity" :min="0" :max="100" />
+</template>`,
+  'pixel-otp-input': `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelOTPInput } from '@pxlkit/ui-kit-vue';
+
+const value = ref('');
+</script>
+
+<template>
+  <PixelOTPInput v-model="value" :length="6" />
 </template>`,
   'pixel-pagination': `<script setup lang="ts">
 import { ref } from 'vue';
@@ -908,6 +995,16 @@ import { PixelSlideIn } from '@pxlkit/ui-kit-vue';
     <div style="padding: 16px; background: #111; color: #fff">Slides in from below on mount</div>
   </PixelSlideIn>
 </template>`,
+  'pixel-slider': `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSlider } from '@pxlkit/ui-kit-vue';
+
+const value = ref(40);
+</script>
+
+<template>
+  <PixelSlider v-model="value" label="Volume" />
+</template>`,
   'pixel-spinner': `<script setup lang="ts">
 import { PixelSpinner } from '@pxlkit/ui-kit-vue';
 </script>
@@ -1072,6 +1169,20 @@ const pressed = ref(false);
 
 <template>
   <PixelToggle v-model:pressed="pressed" value="bold">Bold</PixelToggle>
+</template>`,
+  'pixel-toggle-group': `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-vue';
+
+const value = ref('left');
+</script>
+
+<template>
+  <PixelToggleGroup v-model="value" type="single" aria-label="Text alignment">
+    <PixelToggle value="left">Left</PixelToggle>
+    <PixelToggle value="center">Center</PixelToggle>
+    <PixelToggle value="right">Right</PixelToggle>
+  </PixelToggleGroup>
 </template>`,
   'pixel-tooltip': `<script setup lang="ts">
 import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-vue';

@@ -52,6 +52,7 @@
 - `PixelAccordion` and `PixelCollapsible` no longer put `aria-labelledby` on their panels: both deliberately give the panel no `region` role, and an element without a role cannot take a name (axe `aria-prohibited-attr`).
 - The legacy `.pixel-border` utility draws its 2 px outer border. Its shadow read `--color-retro-border-base`, a variable the theme never defined, so the browser dropped the whole declaration.
 - `PixelScrollArea` draws its styled scrollbar. The stylesheet never defined the `.pxl-scroll-*` classes the component sets, so the browser's default scrollbar showed, `variant="hover"` behaved like `auto` and `scrollbarSize` had no effect.
+- `PixelForm.Control` keeps its child's `ref` beside its own. It replaced it — with `null` when the Control had no ref — so React Hook Form, whose `field.ref` reaches the control through `{...field}`, could not focus the first invalid field on submit, and `setFocus()` did nothing.
 
 ## 2.1.1 — 2026-08-08
 

@@ -190,6 +190,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   variables that were never defined (`--color-retro-border-base`, `--color-retro-green-base`).
 - `@pxlkit/ui-kit`: `PixelScrollArea` draws its styled scrollbar — no stylesheet defined
   the `.pxl-scroll-*` classes it sets, so `variant="hover"` and `scrollbarSize` did nothing.
+- `@pxlkit/ui-kit`: `PixelForm.Control` keeps its child's `ref` beside its own. It replaced
+  it — with `null` when the Control had no ref — so React Hook Form, whose `field.ref` reaches
+  the control through `{...field}`, could not focus the first invalid field on submit, and
+  `setFocus()` did nothing.
 - Site: the component reference lists every manifest example. Five whose ids did not
   spell their export's name — four of `PixelInput`'s and `PixelBreadcrumb`'s
   `with-onclick` — were left out.

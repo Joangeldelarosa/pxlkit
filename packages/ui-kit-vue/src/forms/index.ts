@@ -11,4 +11,20 @@ export { default as PixelSegmented, type PixelSegmentedProps } from './PixelSegm
 export { default as PixelSelect, type PixelSelectProps } from './PixelSelect.vue';
 export { default as PixelTextarea, type PixelTextareaProps } from './PixelTextarea.vue';
 export { default as PixelToggle, type PixelToggleProps } from './PixelToggle.vue';
+export { default as PixelToggleGroup, type PixelToggleGroupProps, type ToggleGroupValue } from './PixelToggleGroup.vue';
+export { default as PixelSlider, type PixelSliderMark, type PixelSliderProps } from './PixelSlider.vue';
+export { default as PixelOTPInput, type PixelOTPInputProps } from './PixelOTPInput.vue';
+export { default as PixelFileUpload, type PixelFileUploadProps } from './PixelFileUpload.vue';
+export { default as PixelForm, type PixelFormProps } from './PixelForm.vue';
+export { default as PixelFormControl } from './PixelFormControl.js';
+export { default as PixelFormDescription, type PixelFormDescriptionProps } from './PixelFormDescription.vue';
+export {
+  default as PixelFormField,
+  type PixelFormFieldBinding,
+  type PixelFormFieldProps,
+  type PixelFormFieldState,
+} from './PixelFormField.vue';
+export { default as PixelFormItem } from './PixelFormItem.vue';
+export { default as PixelFormLabel, type PixelFormLabelProps } from './PixelFormLabel.vue';
+export { default as PixelFormMessage, type PixelFormMessageProps } from './PixelFormMessage.js';
 export type { Option } from './_internal/option.js';

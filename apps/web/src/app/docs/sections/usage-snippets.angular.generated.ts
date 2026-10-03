@@ -520,6 +520,26 @@ import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class Default {}`,
+  'pixel-file-upload': `import { Component, signal } from '@angular/core';
+import { PixelFileUpload } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFileUpload],
+  template: \`
+    <pxl-file-upload
+      label="Upload files"
+      hint="PNG or JPG, up to 5 MB each"
+      [(value)]="files"
+      accept="image/*"
+      multiple
+      [maxSize]="5 * 1024 * 1024"
+      [maxFiles]="5"
+    />
+  \`,
+})
+export class Default {
+  readonly files = signal<File[]>([]);
+}`,
   'pixel-flicker': `import { Component } from '@angular/core';
 import { PixelFlicker } from '@pxlkit/ui-kit-angular';
 
@@ -544,6 +564,53 @@ import { PixelFloat } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class Default {}`,
+  'pixel-form': `import { Component } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { PixelForm, PixelFormControl, PixelFormDescription, PixelFormField, PixelFormItem, PixelFormLabel, PixelFormMessage, PixelInput } from '@pxlkit/ui-kit-angular';
+
+interface DefaultValues {
+  username: string;
+  email: string;
+}
+
+@Component({
+  imports: [
+    PixelForm,
+    PixelFormControl,
+    PixelFormDescription,
+    PixelFormField,
+    PixelFormItem,
+    PixelFormLabel,
+    PixelFormMessage,
+    PixelInput,
+  ],
+  template: \`
+    <form [pxlForm]="form" (submitted)="onSubmit($event)">
+      <pxl-form-item pxlFormField="username" [messages]="{ required: 'Username is required' }">
+        <label pxlFormLabel>Username</label>
+        <pxl-input pxlFormControl name="username" placeholder="pxlhero" />
+        <p pxlFormDescription>Your retro alias.</p>
+        <pxl-form-message />
+      </pxl-form-item>
+
+      <pxl-form-item pxlFormField="email" [messages]="{ required: 'Email is required', pattern: 'Enter a valid email' }">
+        <label pxlFormLabel>Email</label>
+        <pxl-input pxlFormControl name="email" type="email" placeholder="hero@pxlkit.xyz" />
+        <pxl-form-message />
+      </pxl-form-item>
+    </form>
+  \`,
+})
+export class Default {
+  readonly form = new FormGroup({
+    username: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.pattern(/.+@.+\\..+/)] }),
+  });
+
+  onSubmit(data: Partial<DefaultValues>) {
+    console.log('submit', data);
+  }
+}`,
   'pixel-glitch': `import { Component } from '@angular/core';
 import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
 
@@ -763,6 +830,16 @@ import { PixelNumberInput } from '@pxlkit/ui-kit-angular';
 })
 export class Default {
   readonly value = signal(5);
+}`,
+  'pixel-otp-input': `import { Component, signal } from '@angular/core';
+import { PixelOTPInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelOTPInput],
+  template: \`<pxl-otp-input [length]="6" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal('');
 }`,
   'pixel-pagination': `import { Component, signal } from '@angular/core';
 import { PixelPagination } from '@pxlkit/ui-kit-angular';
@@ -1078,6 +1155,16 @@ import { PixelSlideIn } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class Default {}`,
+  'pixel-slider': `import { Component, signal } from '@angular/core';
+import { PixelSlider } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSlider],
+  template: \`<pxl-slider label="Volume" [(value)]="value" />\`,
+})
+export class Default {
+  readonly value = signal(40);
+}`,
   'pixel-spinner': `import { Component } from '@angular/core';
 import { PixelSpinner } from '@pxlkit/ui-kit-angular';
 
@@ -1273,6 +1360,22 @@ import { PixelToggle } from '@pxlkit/ui-kit-angular';
 })
 export class Default {
   readonly pressed = signal(false);
+}`,
+  'pixel-toggle-group': `import { Component, signal } from '@angular/core';
+import { PixelToggle, PixelToggleGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelToggle, PixelToggleGroup],
+  template: \`
+    <pxl-toggle-group type="single" [(value)]="value" aria-label="Text alignment">
+      <button pxlToggle value="left">Left</button>
+      <button pxlToggle value="center">Center</button>
+      <button pxlToggle value="right">Right</button>
+    </pxl-toggle-group>
+  \`,
+})
+export class Default {
+  readonly value = signal('left');
 }`,
   'pixel-tooltip': `import { Component } from '@angular/core';
 import { PixelButton, PixelTooltip } from '@pxlkit/ui-kit-angular';

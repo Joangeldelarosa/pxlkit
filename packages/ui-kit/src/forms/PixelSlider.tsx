@@ -6,11 +6,29 @@
 
 import React, { forwardRef, useCallback, useMemo, useRef, useState } from 'react';
 import {
-  Tone, Surface, cn,
-  toneMap, focusRing, surfaceClasses, useEffectiveSurface,
+  isSliderRange,
+  moveSliderThumb,
+  nearestSliderThumb,
+  sliderClasses,
+  sliderFill,
+  sliderKeyValue,
+  sliderPercent,
+  sliderThumbLabel,
+  sliderThumbLeft,
+  sliderThumbValues,
+  sliderTicks,
+  sliderTooltipVisible,
+  sliderValueAt,
+  sliderValueText,
+  type SliderThumb,
+  type SliderTooltipMode,
+} from '@pxlkit/ui-kit-core';
+import {
+  Tone, Surface,
+  useEffectiveSurface,
 } from '../common';
 
-export type PixelSliderTooltip = 'always' | 'drag' | 'never';
+export type PixelSliderTooltip = SliderTooltipMode;
 
 /** A labeled mark on the track. */
 export interface PixelSliderMark {
@@ -76,10 +94,6 @@ export interface PixelSliderRangeProps extends PixelSliderBaseProps {
 /** Public prop bag for {@link PixelSlider}. */
 export type PixelSliderProps = PixelSliderSingleProps | PixelSliderRangeProps;
 
-function isRangeValue(v: number | [number, number]): v is [number, number] {
-  return Array.isArray(v);
-}
-
 export const PixelSlider = forwardRef<HTMLDivElement, PixelSliderProps>(function PixelSlider(
   {
     label,
@@ -97,64 +111,35 @@ export const PixelSlider = forwardRef<HTMLDivElement, PixelSliderProps>(function
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
+  const c = sliderClasses(surface, { tone, disabled });
   const trackRef = useRef<HTMLDivElement>(null);
 
-  const range = isRangeValue(value);
-  const v0 = range ? (value as [number, number])[0] : (value as number);
-  const v1 = range ? (value as [number, number])[1] : (value as number);
+  const range = isSliderRange(value);
+  const [v0, v1] = sliderThumbValues(value);
 
   // Which thumb is being dragged (0 = single/lower, 1 = upper). null = idle.
-  const draggingIdx = useRef<0 | 1 | null>(null);
-  const [activeIdx, setActiveIdx] = useState<0 | 1 | null>(null);
+  const draggingIdx = useRef<SliderThumb | null>(null);
+  const [activeIdx, setActiveIdx] = useState<SliderThumb | null>(null);
 
-  const clamp = useCallback(
-    (n: number) => Math.max(min, Math.min(max, n)),
-    [min, max],
-  );
-
-  const stepRound = useCallback(
-    (n: number) => Math.round(n / step) * step,
-    [step],
-  );
-
+  // In a range the moved thumb stops at the other one: lower stays ≤ upper.
   const emit = useCallback(
-    (idx: 0 | 1, next: number) => {
-      const clamped = clamp(stepRound(next));
-      if (!range) {
-        (onChange as (n: number) => void)(clamped);
-        return;
-      }
-      // Range — ensure lower stays ≤ upper.
-      const lo = idx === 0 ? Math.min(clamped, v1) : v0;
-      const hi = idx === 1 ? Math.max(clamped, v0) : v1;
-      (onChange as (n: [number, number]) => void)([lo, hi]);
-    },
-    [clamp, stepRound, range, onChange, v0, v1],
-  );
-
-  const positionRatio = useCallback(
-    (clientX: number) => {
-      const track = trackRef.current;
-      if (!track) return 0;
-      const rect = track.getBoundingClientRect();
-      return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    },
-    [],
+    (idx: SliderThumb, next: number) =>
+      (onChange as (n: number | [number, number]) => void)(moveSliderThumb(value, idx, next, { min, max, step })),
+    [onChange, value, min, max, step],
   );
 
   const valueFromClientX = useCallback(
-    (clientX: number) => min + positionRatio(clientX) * (max - min),
-    [min, max, positionRatio],
+    (clientX: number) => {
+      const track = trackRef.current;
+      if (!track) return min;
+      return sliderValueAt(clientX, track.getBoundingClientRect(), min, max);
+    },
+    [min, max],
   );
 
   const pickNearestIdx = useCallback(
-    (clientX: number): 0 | 1 => {
-      if (!range) return 0;
-      const v = valueFromClientX(clientX);
-      return Math.abs(v - v0) <= Math.abs(v - v1) ? 0 : 1;
-    },
-    [range, v0, v1, valueFromClientX],
+    (clientX: number): SliderThumb => (range ? nearestSliderThumb(value, valueFromClientX(clientX)) : 0),
+    [range, value, valueFromClientX],
   );
 
   const handlePointerDown = useCallback(
@@ -185,37 +170,21 @@ export const PixelSlider = forwardRef<HTMLDivElement, PixelSliderProps>(function
     setActiveIdx(null);
   }, []);
 
-  const makeKeyDown = (idx: 0 | 1) =>
+  const makeKeyDown = (idx: SliderThumb) =>
     (e: React.KeyboardEvent) => {
       if (disabled) return;
-      const current = idx === 0 ? v0 : v1;
-      let next = current;
-      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = Math.min(max, current + step);
-      else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = Math.max(min, current - step);
-      else if (e.key === 'Home') next = min;
-      else if (e.key === 'End') next = max;
-      else if (e.key === 'PageUp') next = Math.min(max, current + step * 10);
-      else if (e.key === 'PageDown') next = Math.max(min, current - step * 10);
-      else return;
+      const next = sliderKeyValue(e.key, idx === 0 ? v0 : v1, { min, max, step });
+      if (next === undefined) return;
       e.preventDefault();
       emit(idx, next);
     };
 
-  const pctOf = (n: number) =>
-    Math.max(0, Math.min(100, ((n - min) / (max - min)) * 100));
+  const pctOf = (n: number) => sliderPercent(n, min, max);
   const p0 = pctOf(v0);
   const p1 = pctOf(v1);
-  const fillLeft = range ? Math.min(p0, p1) : 0;
-  const fillRight = range ? Math.max(p0, p1) : p0;
-  const fillWidth = fillRight - fillLeft;
+  const fill = sliderFill(value, min, max);
 
-  const thumbVisible = (idx: 0 | 1) => {
-    if (showTooltip === 'always') return true;
-    if (showTooltip === 'never') return false;
-    return activeIdx === idx;
-  };
-
-  const renderThumb = (idx: 0 | 1, pct: number, val: number) => (
+  const renderThumb = (idx: SliderThumb, pct: number, val: number) => (
     <React.Fragment key={idx}>
       <div
         role="slider"
@@ -223,29 +192,20 @@ export const PixelSlider = forwardRef<HTMLDivElement, PixelSliderProps>(function
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={val}
-        aria-label={range ? `${label} ${idx === 0 ? 'minimum' : 'maximum'}` : label}
+        aria-label={sliderThumbLabel(label, range, idx)}
         aria-disabled={disabled}
         aria-required={range ? undefined : required || undefined}
         id={idx === 0 ? id : undefined}
         onKeyDown={makeKeyDown(idx)}
         onFocus={() => setActiveIdx(idx)}
         onBlur={() => setActiveIdx((cur) => (cur === idx ? null : cur))}
-        className={cn(
-          'absolute top-1/2 h-4 w-4 -translate-y-1/2 border-2 bg-retro-bg shadow-md transition-shadow outline-none',
-          surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full',
-          !disabled && 'group-hover:shadow-[0_0_0_3px_rgba(0,0,0,.15)]',
-          focusRing, toneMap[tone].ring,
-          toneMap[tone].border,
-        )}
-        style={{ left: `calc(${pct}% - 8px)` }}
+        className={c.thumb}
+        style={{ left: sliderThumbLeft(pct) }}
       >
-        {thumbVisible(idx) && (
+        {sliderTooltipVisible(showTooltip, activeIdx, idx) && (
           <span
             role="tooltip"
-            className={cn(
-              'pointer-events-none absolute left-1/2 -top-7 -translate-x-1/2 whitespace-nowrap px-1.5 py-0.5 text-[10px] text-retro-text bg-retro-bg',
-              s.font, s.border, s.radius, 'border-retro-border-strong',
-            )}
+            className={c.tooltip}
           >
             {val}
           </span>
@@ -256,50 +216,33 @@ export const PixelSlider = forwardRef<HTMLDivElement, PixelSliderProps>(function
 
   // Tick positions — every step inside [min,max]. Cap at 50 to avoid
   // pathological DOM bloat when step is too small.
-  const tickValues = useMemo(() => {
-    if (!ticks) return [];
-    const out: number[] = [];
-    const count = Math.floor((max - min) / step);
-    if (count <= 0) return out;
-    const limit = Math.min(count, 50);
-    for (let i = 0; i <= limit; i++) {
-      out.push(min + (i * (max - min)) / limit);
-    }
-    return out;
-  }, [ticks, min, max, step]);
+  const tickValues = useMemo(
+    () => (ticks ? sliderTicks({ min, max, step }) : []),
+    [ticks, min, max, step],
+  );
 
   const trackBody = (
     <div
       ref={trackRef}
       role={range ? 'group' : undefined}
       aria-label={range ? label : undefined}
-      className={cn(
-        'group relative h-2.5 outline-none touch-none border border-retro-border-strong bg-retro-surface/50',
-        surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full',
-        disabled ? 'cursor-not-allowed' : 'cursor-pointer',
-      )}
+      className={c.track}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
     >
       <div
-        className={cn(
-          'absolute inset-y-0 transition-[width]',
-          surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full',
-          toneMap[tone].bg,
-        )}
-        style={{ left: `${fillLeft}%`, width: `${fillWidth}%`, opacity: 0.8 }}
+        className={c.fill}
+        style={{ left: `${fill.left}%`, width: `${fill.width}%`, opacity: 0.8 }}
       />
       {renderThumb(0, p0, v0)}
       {range && renderThumb(1, p1, v1)}
     </div>
   );
 
-  const valueLabel = range ? `${v0} – ${v1}` : `${v0}`;
-
   return (
-    <div ref={ref} className={cn('space-y-2', disabled && 'opacity-50')}>
+    <div ref={ref} className={c.root}>
       {name && (
         range ? (
           <>
@@ -310,29 +253,29 @@ export const PixelSlider = forwardRef<HTMLDivElement, PixelSliderProps>(function
           <input type="hidden" name={name} value={v0} required={required} />
         )
       )}
-      <div className={cn('flex items-center justify-between text-xs text-retro-muted', s.font)}>
+      <div className={c.header}>
         <span>{label}</span>
-        <span className={toneMap[tone].text}>{valueLabel}</span>
+        <span className={c.value}>{sliderValueText(value)}</span>
       </div>
       {trackBody}
       {ticks && tickValues.length > 0 && (
-        <div className="relative h-2" aria-hidden>
+        <div className={c.ticks} aria-hidden>
           {tickValues.map((tv, i) => (
             <span
               key={i}
               data-testid="pxl-slider-tick"
-              className={cn('absolute top-0 h-1.5 w-px bg-retro-muted/40')}
+              className={c.tick}
               style={{ left: `${pctOf(tv)}%` }}
             />
           ))}
         </div>
       )}
       {marks && marks.length > 0 && (
-        <div className="relative h-4" data-testid="pxl-slider-marks">
+        <div className={c.marks} data-testid="pxl-slider-marks">
           {marks.map((m, i) => (
             <span
               key={i}
-              className={cn('absolute top-0 -translate-x-1/2 text-[10px] text-retro-muted', s.font)}
+              className={c.mark}
               style={{ left: `${pctOf(m.value)}%` }}
             >
               {m.label}
@@ -341,7 +284,7 @@ export const PixelSlider = forwardRef<HTMLDivElement, PixelSliderProps>(function
         </div>
       )}
       {showMinMax && (
-        <div className={cn('flex justify-between text-[10px] text-retro-muted/50', s.font)}>
+        <div className={c.bounds}>
           <span>{min}</span>
           <span>{max}</span>
         </div>

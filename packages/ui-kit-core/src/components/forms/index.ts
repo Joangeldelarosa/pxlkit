@@ -10,3 +10,8 @@ export * from './segmented';
 export * from './select';
 export * from './textarea';
 export * from './toggle';
+export * from './toggle-group';
+export * from './slider';
+export * from './otp-input';
+export * from './file-upload';
+export * from './form';
