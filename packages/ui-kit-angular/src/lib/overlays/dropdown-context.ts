@@ -4,6 +4,7 @@ import {
   ElementRef,
   InjectionToken,
   Injector,
+  NgZone,
   afterNextRender,
   afterRenderEffect,
   computed,
@@ -131,6 +132,10 @@ export function createDropdownRoot(state: {
     close();
   };
 
+  // Letters typed before a pause add up into one search. The pause only
+  // forgets them: its timer runs outside the zone, so a zone.js application
+  // stays stable meanwhile and checks nothing when it ends.
+  const zone = inject(NgZone);
   let typed = '';
   let typeaheadTimer: ReturnType<typeof setTimeout> | undefined;
   const typeahead = (key: string) => {
@@ -142,9 +147,11 @@ export function createDropdownRoot(state: {
       typed,
     );
     if (match) highlighted.set(match);
-    typeaheadTimer = setTimeout(() => {
-      typed = '';
-    }, DROPDOWN_TYPEAHEAD_RESET_MS);
+    typeaheadTimer = zone.runOutsideAngular(() =>
+      setTimeout(() => {
+        typed = '';
+      }, DROPDOWN_TYPEAHEAD_RESET_MS),
+    );
   };
   inject(DestroyRef).onDestroy(() => clearTimeout(typeaheadTimer));
 

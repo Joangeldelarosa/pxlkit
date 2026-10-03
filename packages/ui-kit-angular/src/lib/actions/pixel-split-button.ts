@@ -4,6 +4,7 @@ import {
   DOCUMENT,
   DestroyRef,
   ElementRef,
+  NgZone,
   afterRenderEffect,
   computed,
   inject,
@@ -140,6 +141,7 @@ export class PixelSplitButton {
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly document = inject(DOCUMENT);
+  private readonly zone = inject(NgZone);
   private readonly toggle = viewChild.required<ElementRef<HTMLButtonElement>>('toggle');
   private readonly menu = viewChild<ElementRef<HTMLElement>>('menu');
   private readonly values = computed(() => this.options().map((option) => option.value));
@@ -290,8 +292,13 @@ export class PixelSplitButton {
       this.typed,
     );
     if (match) this.highlighted.set(match);
-    this.typeaheadTimer = setTimeout(() => {
-      this.typed = '';
-    }, DROPDOWN_TYPEAHEAD_RESET_MS);
+    // Letters typed before a pause add up into one search. The pause only
+    // forgets them: its timer runs outside the zone, so a zone.js
+    // application stays stable meanwhile and checks nothing when it ends.
+    this.typeaheadTimer = this.zone.runOutsideAngular(() =>
+      setTimeout(() => {
+        this.typed = '';
+      }, DROPDOWN_TYPEAHEAD_RESET_MS),
+    );
   }
 }

@@ -7,12 +7,14 @@
  * they actually close or move what they anchor. Moving focus as they open —
  * into the combobox's and the command palette's search field, to the alert
  * dialog's Cancel — adds none either, nor does the frame after which a pasted
- * passcode moves focus on.
+ * passcode moves focus on, nor the pause after which the dropdown menu and the
+ * split button forget the letters typed into them.
  */
 import { ApplicationRef, Component, NgZone, provideZoneChangeDetection, type DoCheck } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { DROPDOWN_TYPEAHEAD_RESET_MS } from '@pxlkit/ui-kit-core';
 import {
   PixelAlertDialog,
   PixelButton,
@@ -28,6 +30,7 @@ import {
   PixelPopover,
   PixelPopoverContent,
   PixelPopoverTrigger,
+  PixelSplitButton,
   PixelSwitch,
   PixelTabs,
   PixelTabsList,
@@ -60,6 +63,7 @@ import {
     PixelDropdownTrigger,
     PixelDropdownContent,
     PixelDropdownItem,
+    PixelSplitButton,
   ],
   template: `
     <button pxlButton id="count" (click)="count = count + 1">Clicked {{ count }}</button>
@@ -98,9 +102,13 @@ import {
       <output id="tip">{{ tip }}</output>
       <pxl-dropdown-root [(open)]="menu">
         <pxl-dropdown-trigger id="menu-trigger">Menu</pxl-dropdown-trigger>
-        <div *pxlDropdownContent><button pxlDropdownItem value="copy">Copy</button></div>
+        <div *pxlDropdownContent>
+          <button pxlDropdownItem value="copy">Copy</button>
+          <button pxlDropdownItem value="open">Open</button>
+        </div>
       </pxl-dropdown-root>
       <output id="menu">{{ menu }}</output>
+      <pxl-split-button id="share" label="Share" [options]="links" />
     </div>
   `,
 })
@@ -124,6 +132,10 @@ class ZoneApp implements DoCheck {
   readonly remove = () => {};
   command = false;
   readonly commands = [{ heading: 'Go to', items: [{ id: 'home', label: 'Home', onSelect: () => {} }] }];
+  readonly links = [
+    { value: 'copy', label: 'Copy link' },
+    { value: 'open', label: 'Open link' },
+  ];
   /** Times the root view was checked — once per app-wide change detection. */
   checks = 0;
 
@@ -147,13 +159,13 @@ describe('@pxlkit/ui-kit-angular in a zone.js application', () => {
 
   /**
    * App-wide checks from `act` until the application is stable again, past
-   * the next frame and anything it sets off.
+   * the next frame and anything it sets off. It must be stable within `ms`.
    */
-  async function checksOf(app: ZoneApp, act: () => void): Promise<number> {
+  async function checksOf(app: ZoneApp, act: () => void, ms = 5000): Promise<number> {
     await appRef!.whenStable();
     const before = app.checks;
     act();
-    expect(await stableWithin(5000)).toBe(true);
+    expect(await stableWithin(ms)).toBe(true);
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
     await sleep(10);
     await appRef!.whenStable();
@@ -169,6 +181,37 @@ describe('@pxlkit/ui-kit-angular in a zone.js application', () => {
   async function escape(): Promise<void> {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     await appRef!.whenStable();
+  }
+
+  /**
+   * Opens a menu whose items start with "Copy" and "Open" and types into it.
+   * A letter that moves nothing costs what an arrow key that moves nothing
+   * costs, the app stable at once: the pause after which the menu forgets
+   * the letters is timed outside the zone, and ends at no app-wide check.
+   * Letters typed before it add up into one search.
+   */
+  async function typeIntoMenu(app: ZoneApp, opener: string): Promise<void> {
+    await open($(opener)!);
+    const menu = $('[role="menu"]')!;
+    expect(document.activeElement).toBe(menu);
+    const highlighted = () => document.getElementById(menu.getAttribute('aria-activedescendant')!)!.textContent!.trim();
+    key(menu, 'ArrowDown');
+    await appRef!.whenStable();
+    expect(highlighted()).toMatch(/^Copy/);
+    // ArrowUp stays on the first item, and "c" finds the item highlighted.
+    const atOnce = DROPDOWN_TYPEAHEAD_RESET_MS / 2;
+    const arrow = await checksOf(app, () => key(menu, 'ArrowUp'), atOnce);
+    expect(await checksOf(app, () => key(menu, 'c'), atOnce)).toBe(arrow);
+    expect(highlighted()).toMatch(/^Copy/);
+    const checks = app.checks;
+    await sleep(DROPDOWN_TYPEAHEAD_RESET_MS + 100);
+    expect(app.checks).toBe(checks);
+    // The "c" is forgotten, and "o" and "p" add up: "op" finds "Open", where
+    // "cop" or "p" alone would find "Copy".
+    key(menu, 'o');
+    key(menu, 'p');
+    await appRef!.whenStable();
+    expect(highlighted()).toMatch(/^Open/);
   }
 
   /** Click and wait for the popover the click opens to be anchored. */
@@ -332,6 +375,16 @@ describe('@pxlkit/ui-kit-angular in a zone.js application', () => {
     expect(await checksOf(app, () => paste(cells[0]!, '123456'))).toBe(rejected + focusing);
     expect(cells.map((cell) => cell.value).join('')).toBe('123456');
     expect(document.activeElement).toBe(cells[5]);
+  });
+
+  it('forgets the letters typed into the dropdown menu at no app-wide check, a letter costing what an arrow key does', async () => {
+    const app = await bootstrap();
+    await typeIntoMenu(app, '#menu-trigger');
+  });
+
+  it('forgets the letters typed into the split button menu at no app-wide check, a letter costing what an arrow key does', async () => {
+    const app = await bootstrap();
+    await typeIntoMenu(app, '#share [aria-haspopup="menu"]');
   });
 
   it('opens the combobox, filters it and picks an option, rendering a plain field', async () => {
