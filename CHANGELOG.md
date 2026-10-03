@@ -194,6 +194,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it — with `null` when the Control had no ref — so React Hook Form, whose `field.ref` reaches
   the control through `{...field}`, could not focus the first invalid field on submit, and
   `setFocus()` did nothing.
+- `@pxlkit/ui-kit`: `PixelSlider` counts its steps from `min`, as a native range input does:
+  with `min={5}` and `step={10}` it takes 5, 15, 25… where it snapped to multiples of 10, so
+  a key press from 5 jumped to 20. Decimal steps give exact values (`0.3`, not
+  `0.30000000000000004`), a `max` that is not on a step tops out at the last step before it,
+  and the ticks sit on the steps.
 - Site: the component reference lists every manifest example. Five whose ids did not
   spell their export's name — four of `PixelInput`'s and `PixelBreadcrumb`'s
   `with-onclick` — were left out.

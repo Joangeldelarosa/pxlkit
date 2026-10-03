@@ -23,6 +23,37 @@ describe('PixelSlider — single mode (regression)', () => {
     expect(onChange).toHaveBeenCalledWith(51);
     expect(typeof onChange.mock.calls[0][0]).toBe('number');
   });
+
+  it('steps from the minimum, and keeps decimal steps exact', () => {
+    const onChange = vi.fn();
+    function Wrap({ min, max, step, initial }: { min: number; max: number; step: number; initial: number }) {
+      const [v, setV] = useState(initial);
+      return (
+        <PixelSlider
+          label="Level"
+          min={min}
+          max={max}
+          step={step}
+          value={v}
+          onChange={(n: number) => { onChange(n); setV(n); }}
+        />
+      );
+    }
+    const { container, unmount } = render(<Wrap min={5} max={95} step={10} initial={5} />);
+    const thumb = container.querySelector('[role="slider"]')!;
+    fireEvent.keyDown(thumb, { key: 'ArrowRight' });
+    fireEvent.keyDown(thumb, { key: 'ArrowRight' });
+    expect(onChange.mock.calls.map(([n]) => n)).toEqual([15, 25]);
+    unmount();
+
+    onChange.mockClear();
+    const decimal = render(<Wrap min={0} max={1} step={0.1} initial={0.1} />);
+    const decimalThumb = decimal.container.querySelector('[role="slider"]')!;
+    fireEvent.keyDown(decimalThumb, { key: 'ArrowRight' });
+    fireEvent.keyDown(decimalThumb, { key: 'ArrowRight' });
+    expect(onChange.mock.calls.map(([n]) => n)).toEqual([0.2, 0.3]);
+    expect(decimalThumb.getAttribute('aria-valuenow')).toBe('0.3');
+  });
 });
 
 describe('PixelSlider — range mode', () => {

@@ -49,7 +49,7 @@ export interface PixelSliderProps<T extends SliderValue = number> {
   min?: number;
   /** Highest value. */
   max?: number;
-  /** Values snap to multiples of the step. */
+  /** Distance between two values, counted from `min`: the slider takes `min`, `min + step`… up to `max`. */
   step?: number;
   /** Disables dragging and the keys and greys out the track. */
   disabled?: boolean;

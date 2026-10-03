@@ -155,7 +155,7 @@ export class PixelSlider implements ControlValueAccessor {
   readonly min = input(0, { transform: numberOr(0) });
   /** Highest value. */
   readonly max = input(100, { transform: numberOr(100) });
-  /** Values snap to multiples of the step. */
+  /** Distance between two values, counted from `min`: the slider takes `min`, `min + step`… up to `max`. */
   readonly step = input(1, { transform: numberOr(1) });
   /** Disables dragging and the keys and greys out the track. */
   readonly disabled = input(false, { transform: booleanOr(false) });

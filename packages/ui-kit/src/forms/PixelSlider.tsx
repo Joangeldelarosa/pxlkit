@@ -46,7 +46,10 @@ interface PixelSliderBaseProps {
   min?: number;
   /** Maximum value. Default: `100`. */
   max?: number;
-  /** Step granularity. Default: `1`. */
+  /**
+   * Distance between two values, counted from `min`: the slider takes `min`,
+   * `min + step`, `min + 2 * step`… up to `max`. Default: `1`.
+   */
   step?: number;
   /** Disables interaction + grays out the track. */
   disabled?: boolean;

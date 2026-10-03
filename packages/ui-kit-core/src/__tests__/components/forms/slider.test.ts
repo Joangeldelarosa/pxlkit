@@ -31,14 +31,47 @@ describe('slider value math', () => {
     expect(sliderThumbValues(40)).toEqual([40, 40]);
   });
 
-  it('snaps to multiples of the step, then clamps to the bounds', () => {
+  it('snaps to the nearest step within the bounds', () => {
     expect(snapSliderValue(42.4, bounds)).toBe(42);
     expect(snapSliderValue(42.5, bounds)).toBe(43);
     expect(snapSliderValue(73, { min: 0, max: 200, step: 5 })).toBe(75);
     expect(snapSliderValue(-12, bounds)).toBe(0);
     expect(snapSliderValue(140, bounds)).toBe(100);
-    // Multiples of the step from zero, not from the minimum.
-    expect(snapSliderValue(13, { min: 5, max: 100, step: 10 })).toBe(10);
+  });
+
+  it('counts the steps from the minimum', () => {
+    const fromFive = { min: 5, max: 95, step: 10 };
+    expect(snapSliderValue(13, fromFive)).toBe(15);
+    expect(snapSliderValue(9, fromFive)).toBe(5);
+    expect(snapSliderValue(91, fromFive)).toBe(95);
+    expect(snapSliderValue(-3, { min: -10, max: 10, step: 4 })).toBe(-2);
+    // A key press moves exactly one step.
+    expect(moveSliderThumb(5, 0, sliderKeyValue('ArrowRight', 5, fromFive)!, fromFive)).toBe(15);
+    expect(moveSliderThumb([5, 95], 1, sliderKeyValue('ArrowLeft', 95, fromFive)!, fromFive)).toEqual([5, 85]);
+  });
+
+  it('tops out at the last step when the maximum is not on one', () => {
+    const offGrid = { min: 0, max: 11, step: 3 };
+    expect(snapSliderValue(11, offGrid)).toBe(9);
+    expect(snapSliderValue(10.6, offGrid)).toBe(9);
+    expect(moveSliderThumb(6, 0, sliderKeyValue('End', 6, offGrid)!, offGrid)).toBe(9);
+    expect(moveSliderThumb(9, 0, sliderKeyValue('ArrowRight', 9, offGrid)!, offGrid)).toBe(9);
+  });
+
+  it('gives decimal steps without floating-point noise', () => {
+    const tenths = { min: 0, max: 1, step: 0.1 };
+    expect(snapSliderValue(0.1 + 0.2, tenths)).toBe(0.3);
+    expect(moveSliderThumb(0.2, 0, sliderKeyValue('ArrowRight', 0.2, tenths)!, tenths)).toBe(0.3);
+    expect(moveSliderThumb(0.7, 0, sliderKeyValue('ArrowRight', 0.7, tenths)!, tenths)).toBe(0.8);
+    expect(snapSliderValue(1, tenths)).toBe(1);
+    expect(snapSliderValue(0.333, { min: 0.05, max: 1, step: 0.1 })).toBe(0.35);
+    expect(snapSliderValue(0.5, { min: 0, max: 1, step: 1e-7 })).toBe(0.5);
+    expect(snapSliderValue(2.6, { min: 0, max: 0.3, step: 0.1 })).toBe(0.3);
+  });
+
+  it('only clamps without a positive step', () => {
+    expect(snapSliderValue(42.4, { min: 0, max: 100, step: 0 })).toBe(42.4);
+    expect(snapSliderValue(140, { min: 0, max: 100, step: -1 })).toBe(100);
   });
 
   it('moves a single thumb to the snapped value', () => {
@@ -102,7 +135,15 @@ describe('slider value math', () => {
     const dense = sliderTicks({ min: 0, max: 1000, step: 1 });
     expect(dense).toHaveLength(51);
     expect(dense[1]).toBe(20);
+    expect(dense[50]).toBe(1000);
     expect(sliderTicks({ min: 0, max: 10, step: 20 })).toEqual([]);
+    expect(sliderTicks({ min: 0, max: 10, step: 0 })).toHaveLength(51);
+  });
+
+  it('puts the ticks on the steps from the minimum, up to the last one', () => {
+    expect(sliderTicks({ min: 5, max: 35, step: 10 })).toEqual([5, 15, 25, 35]);
+    expect(sliderTicks({ min: 0, max: 11, step: 3 })).toEqual([0, 3, 6, 9]);
+    expect(sliderTicks({ min: 0, max: 0.5, step: 0.1 })).toEqual([0, 0.1, 0.2, 0.3, 0.4, 0.5]);
   });
 
   it('labels the value, the thumbs and when a thumb shows its value', () => {

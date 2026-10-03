@@ -53,6 +53,7 @@
 - The legacy `.pixel-border` utility draws its 2 px outer border. Its shadow read `--color-retro-border-base`, a variable the theme never defined, so the browser dropped the whole declaration.
 - `PixelScrollArea` draws its styled scrollbar. The stylesheet never defined the `.pxl-scroll-*` classes the component sets, so the browser's default scrollbar showed, `variant="hover"` behaved like `auto` and `scrollbarSize` had no effect.
 - `PixelForm.Control` keeps its child's `ref` beside its own. It replaced it — with `null` when the Control had no ref — so React Hook Form, whose `field.ref` reaches the control through `{...field}`, could not focus the first invalid field on submit, and `setFocus()` did nothing.
+- `PixelSlider` counts its steps from `min`, as a native range input does: with `min={5}` and `step={10}` it takes 5, 15, 25… where it snapped to multiples of 10, so a key press from 5 jumped to 20. Decimal steps give exact values (`0.3`, not `0.30000000000000004`), a `max` that is not on a step tops out at the last step before it, and the ticks sit on the steps.
 
 ## 2.1.1 — 2026-08-08
 

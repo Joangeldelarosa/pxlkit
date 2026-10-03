@@ -30,9 +30,30 @@ export function sliderThumbValues(value: SliderValue): [number, number] {
   return isSliderRange(value) ? [value[0], value[1]] : [value, value];
 }
 
-/** `value` rounded to the nearest multiple of `step`, then kept within `[min, max]`. */
-export function snapSliderValue(value: number, { min, max, step }: SliderBounds): number {
-  return Math.max(min, Math.min(max, Math.round(value / step) * step));
+/** Decimal places of a number as JavaScript writes it: 2 for `0.25`, 7 for `1e-7`. */
+function decimalPlaces(n: number): number {
+  const [mantissa = '', exponent = '0'] = String(n).toLowerCase().split('e');
+  return Math.max(0, (mantissa.split('.')[1]?.length ?? 0) - Number(exponent));
+}
+
+/** The number of whole steps from `min` to `max` (a hair of float error forgiven). */
+function stepCount({ min, max, step }: SliderBounds): number {
+  return Math.floor((max - min) / step + 1e-9);
+}
+
+/**
+ * `value` at the nearest of the steps counted from `min` — `min`,
+ * `min + step`, `min + 2 × step`… — within `[min, max]`; when `max` is not on
+ * a step, the last step before it is the top. Rounded to the decimals of
+ * `min` and `step`, so steps of `0.1` give `0.3`, not `0.30000000000000004`.
+ */
+export function snapSliderValue(value: number, bounds: SliderBounds): number {
+  const { min, max, step } = bounds;
+  const clamped = Math.max(min, Math.min(max, value));
+  if (!(step > 0)) return clamped;
+  const steps = Math.max(0, Math.min(Math.round((clamped - min) / step), stepCount(bounds)));
+  const decimals = Math.min(100, Math.max(decimalPlaces(min), decimalPlaces(step)));
+  return Number((min + steps * step).toFixed(decimals));
 }
 
 /**
@@ -100,14 +121,16 @@ export function sliderFill(value: SliderValue, min: number, max: number): { left
 }
 
 /**
- * Values of the tick marks: one per step from `min` to `max`, at most 51 —
- * a step too small for its range gets 50 even intervals instead.
+ * Values of the tick marks: one on each step from `min` (see
+ * {@link snapSliderValue}), at most 51 — a step too small for its range gets
+ * 50 even intervals from `min` to `max` instead.
  */
-export function sliderTicks({ min, max, step }: SliderBounds): number[] {
-  const count = Math.floor((max - min) / step);
-  if (count <= 0) return [];
-  const limit = Math.min(count, 50);
-  return Array.from({ length: limit + 1 }, (_, i) => min + (i * (max - min)) / limit);
+export function sliderTicks(bounds: SliderBounds): number[] {
+  const { min, max } = bounds;
+  const count = stepCount(bounds);
+  if (!(count > 0)) return [];
+  if (count > 50) return Array.from({ length: 51 }, (_, i) => min + (i * (max - min)) / 50);
+  return Array.from({ length: count + 1 }, (_, i) => snapSliderValue(min + i * bounds.step, bounds));
 }
 
 /** The value shown next to the label: `40`, or `20 – 80` for a range. */
