@@ -64,6 +64,26 @@ export class Default {
   readonly open = signal(false);
   readonly save = () => this.open.set(false);
 }`,
+  'pixel-area-chart': `import { Component } from '@angular/core';
+import { PixelAreaChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelAreaChart],
+  template: \`<svg pxlAreaChart [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
+}`,
   'pixel-avatar': `import { Component } from '@angular/core';
 import { PixelAvatar } from '@pxlkit/ui-kit-angular';
 
@@ -108,6 +128,26 @@ import { PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit
   \`,
 })
 export class Default {}`,
+  'pixel-bar-chart': `import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`<svg pxlBarChart [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
+}`,
   'pixel-bare-button': `import { Component } from '@angular/core';
 import { PixelBareButton } from '@pxlkit/ui-kit-angular';
 
@@ -252,6 +292,30 @@ import { PixelCard } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class WithFooter {}`,
+  'pixel-carousel': `import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Featured items">
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class Default {
+  readonly slides = [
+    { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Slide 3', tone: 'rgba(34,197,94,0.15)' },
+  ];
+}`,
   'pixel-center': `import { Component } from '@angular/core';
 import { PixelCenter } from '@pxlkit/ui-kit-angular';
 
@@ -397,6 +461,40 @@ import { PixelContainer } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class Default {}`,
+  'pixel-data-table': `import { Component } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" />\`,
+})
+export class Default {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
+}`,
   'pixel-divider': `import { Component } from '@angular/core';
 import { PixelDivider } from '@pxlkit/ui-kit-angular';
 
@@ -1165,6 +1263,26 @@ import { PixelSlider } from '@pxlkit/ui-kit-angular';
 export class Default {
   readonly value = signal(40);
 }`,
+  'pixel-sparkline': `import { Component } from '@angular/core';
+import { PixelSparkline, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelSparkline],
+  template: \`<svg pxlSparkline [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
+}`,
   'pixel-spinner': `import { Component } from '@angular/core';
 import { PixelSpinner } from '@pxlkit/ui-kit-angular';
 
@@ -1265,6 +1383,36 @@ import { PixelSwitch } from '@pxlkit/ui-kit-angular';
 })
 export class Default {
   readonly on = signal(false);
+}`,
+  'pixel-table': `import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" />\`,
+})
+export class Default {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
 }`,
   'pixel-tabs': `import { Component, TemplateRef, computed, viewChild } from '@angular/core';
 import { PixelTabs, type TabItem } from '@pxlkit/ui-kit-angular';

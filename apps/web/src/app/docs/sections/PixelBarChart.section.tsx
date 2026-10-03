@@ -67,6 +67,43 @@ const sample = [
 export function Default() {
   return <PixelBarChart data={sample} />;
 }`}
+        vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelBarChart :data="sample" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`<svg pxlBarChart [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -90,6 +127,43 @@ const sample = [
 
 export function Default() {
   return <PixelBarChart data={sample} />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelBarChart :data="sample" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`<svg pxlBarChart [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
 }`}
         />
       </article>
@@ -122,6 +196,59 @@ export function Tones() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-end gap-4">
+    <PixelBarChart :data="sample" tone="cyan" />
+    <PixelBarChart :data="sample" tone="green" />
+    <PixelBarChart :data="sample" tone="gold" />
+    <PixelBarChart :data="sample" tone="red" />
+    <PixelBarChart :data="sample" tone="purple" />
+    <PixelBarChart :data="sample" tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`
+    <div class="flex flex-wrap items-end gap-4">
+      <svg pxlBarChart [data]="sample" tone="cyan"></svg>
+      <svg pxlBarChart [data]="sample" tone="green"></svg>
+      <svg pxlBarChart [data]="sample" tone="gold"></svg>
+      <svg pxlBarChart [data]="sample" tone="red"></svg>
+      <svg pxlBarChart [data]="sample" tone="purple"></svg>
+      <svg pxlBarChart [data]="sample" tone="pink"></svg>
+    </div>
+  \`,
+})
+export class Tones {
+  readonly sample = SAMPLE;
+}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
@@ -150,6 +277,53 @@ export function Sizes() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-end gap-4">
+    <PixelBarChart :data="sample" size="sm" tone="cyan" />
+    <PixelBarChart :data="sample" size="md" tone="cyan" />
+    <PixelBarChart :data="sample" size="lg" tone="cyan" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`
+    <div class="flex flex-wrap items-end gap-4">
+      <svg pxlBarChart [data]="sample" size="sm" tone="cyan"></svg>
+      <svg pxlBarChart [data]="sample" size="md" tone="cyan"></svg>
+      <svg pxlBarChart [data]="sample" size="lg" tone="cyan"></svg>
+    </div>
+  \`,
+})
+export class Sizes {
+  readonly sample = SAMPLE;
+}`}
         />
       </article>
       <article className="docs-example" id="example-horizontal">
@@ -172,6 +346,43 @@ const sample = [
 export function Horizontal() {
   return <PixelBarChart data={sample} orientation="horizontal" tone="green" />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelBarChart :data="sample" orientation="horizontal" tone="green" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`<svg pxlBarChart [data]="sample" orientation="horizontal" tone="green"></svg>\`,
+})
+export class Horizontal {
+  readonly sample = SAMPLE;
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-values">
@@ -193,6 +404,43 @@ const sample = [
 
 export function WithValues() {
   return <PixelBarChart data={sample} tone="gold" showValues />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelBarChart :data="sample" tone="gold" show-values />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`<svg pxlBarChart [data]="sample" tone="gold" showValues></svg>\`,
+})
+export class WithValues {
+  readonly sample = SAMPLE;
 }`}
         />
       </article>
@@ -220,6 +468,51 @@ export function Surfaces() {
       <PixelBarChart data={sample} surface="linear" tone="purple" />
     </div>
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-end gap-4">
+    <PixelBarChart :data="sample" surface="pixel" tone="purple" />
+    <PixelBarChart :data="sample" surface="linear" tone="purple" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBarChart, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelBarChart],
+  template: \`
+    <div class="flex flex-wrap items-end gap-4">
+      <svg pxlBarChart [data]="sample" surface="pixel" tone="purple"></svg>
+      <svg pxlBarChart [data]="sample" surface="linear" tone="purple"></svg>
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly sample = SAMPLE;
 }`}
         />
       </article>

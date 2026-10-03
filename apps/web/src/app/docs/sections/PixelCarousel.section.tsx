@@ -117,6 +117,49 @@ export function Default() {
     </PixelCarousel>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Slide 3', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Featured items">
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Featured items">
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class Default {
+  readonly slides = [
+    { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Slide 3', tone: 'rgba(34,197,94,0.15)' },
+  ];
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -154,6 +197,49 @@ export function Default() {
     </PixelCarousel>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Slide 3', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Featured items">
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Featured items">
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class Default {
+  readonly slides = [
+    { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Slide 3', tone: 'rgba(34,197,94,0.15)' },
+  ];
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-dots">
@@ -189,6 +275,49 @@ export function WithDots() {
     </PixelCarousel>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'One', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Two', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Three', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Featured items with dots" show-dots>
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Featured items with dots" showDots>
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class WithDots {
+  readonly slides = [
+    { label: 'One', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Two', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Three', tone: 'rgba(34,197,94,0.15)' },
+  ];
+}`}
         />
       </article>
       <article className="docs-example" id="example-looping">
@@ -223,6 +352,49 @@ export function Looping() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Alpha', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Beta', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Gamma', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Looping carousel" :opts="{ loop: true }" show-dots>
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Looping carousel" [opts]="{ loop: true }" showDots>
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class Looping {
+  readonly slides = [
+    { label: 'Alpha', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Beta', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Gamma', tone: 'rgba(34,197,94,0.15)' },
+  ];
 }`}
         />
       </article>
@@ -261,6 +433,53 @@ export function Vertical() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Top', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Middle', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Bottom', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <div style="height: 240px">
+    <PixelCarousel aria-label="Vertical carousel" orientation="vertical" show-dots>
+      <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+        <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+          <span class="text-xs">{{ slide.label }}</span>
+        </div>
+      </PixelCarouselItem>
+    </PixelCarousel>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <div style="height: 240px">
+      <pxl-carousel aria-label="Vertical carousel" orientation="vertical" showDots>
+        @for (slide of slides; track slide.label) {
+          <pxl-carousel-item>
+            <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+              <span class="text-xs">{{ slide.label }}</span>
+            </div>
+          </pxl-carousel-item>
+        }
+      </pxl-carousel>
+    </div>
+  \`,
+})
+export class Vertical {
+  readonly slides = [
+    { label: 'Top', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Middle', tone: 'rgba(168,85,247,0.15)' },
+    { label: 'Bottom', tone: 'rgba(34,197,94,0.15)' },
+  ];
+}`}
         />
       </article>
       <article className="docs-example" id="example-linear-surface">
@@ -292,6 +511,47 @@ export function LinearSurface() {
       </PixelCarousel.Item>
     </PixelCarousel>
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Linear surface carousel" surface="linear" show-dots>
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCarousel, PixelCarouselItem],
+  template: \`
+    <pxl-carousel aria-label="Linear surface carousel" surface="linear" showDots>
+      @for (slide of slides; track slide.label) {
+        <pxl-carousel-item>
+          <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" [style.background]="slide.tone">
+            <span class="text-xs">{{ slide.label }}</span>
+          </div>
+        </pxl-carousel-item>
+      }
+    </pxl-carousel>
+  \`,
+})
+export class LinearSurface {
+  readonly slides = [
+    { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+    { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+  ];
 }`}
         />
       </article>

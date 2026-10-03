@@ -1,17 +1,18 @@
 'use client';
 
 import React, { forwardRef, useMemo } from 'react';
-import { cn, Surface, surfaceClasses, useEffectiveSurface } from '../common';
-import { tone as toneTokens, ToneKey } from '../tokens';
 import {
+  areaChartClasses,
+  areaChartGeometry,
+  areaChartGlow,
+  areaChartStroke,
+  chartShapeRendering,
+  describeChart,
   type ChartSize,
   type PixelChartDataPoint,
-  describeChart,
-  fillClassMap,
-  normalize,
-  sizeMap,
-  strokeClassMap,
-} from './PixelChartPrimitives';
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ToneKey } from '../tokens';
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelAreaChart — filled polygon. Optional smoothing only changes the
@@ -44,24 +45,11 @@ export const PixelAreaChart = forwardRef<SVGSVGElement, PixelAreaChartProps>(fun
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const { width, height } = sizeMap[size];
-  const padX = 2;
-  const padY = 4;
-
-  const points = useMemo(() => normalize(data, width, height, padX, padY), [data, width, height]);
-  const linePoints = points.map(p => `${p.px.toFixed(2)},${p.py.toFixed(2)}`).join(' ');
-  // close polygon down to baseline so it fills as an area
-  const baselineY = (height - padY).toFixed(2);
-  const first = points[0];
-  const last = points[points.length - 1];
-  const polygonPoints =
-    points.length > 0
-      ? `${first.px.toFixed(2)},${baselineY} ${linePoints} ${last.px.toFixed(2)},${baselineY}`
-      : '';
+  const { width, height, polygon } = useMemo(() => areaChartGeometry(data, size), [data, size]);
+  const stroke = areaChartStroke(surface, smooth);
+  const classes = areaChartClasses(surface, { tone, bordered });
 
   const label = ariaLabel ?? describeChart('area chart', data);
-  const t = toneTokens[tone];
 
   return (
     <svg
@@ -72,18 +60,18 @@ export const PixelAreaChart = forwardRef<SVGSVGElement, PixelAreaChartProps>(fun
       height={height}
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
-      shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible max-w-full', bordered && s.border, bordered && s.radius, bordered && 'border-retro-border', className)}
-      data-tone-glow={t.glow}
+      shapeRendering={chartShapeRendering(surface)}
+      className={cn(classes.root, className)}
+      data-tone-glow={areaChartGlow(tone)}
       data-smooth={smooth || undefined}
       {...rest}
     >
-      {polygonPoints && (
+      {polygon && (
         <polygon
-          points={polygonPoints}
-          strokeWidth={surface === 'pixel' ? 2 : 1.5}
-          strokeLinejoin={smooth && surface !== 'pixel' ? 'round' : 'miter'}
-          className={cn(strokeClassMap[tone], fillClassMap[tone], 'opacity-90')}
+          points={polygon}
+          strokeWidth={stroke.width}
+          strokeLinejoin={stroke.linejoin}
+          className={classes.polygon}
           fillOpacity={0.25}
         />
       )}

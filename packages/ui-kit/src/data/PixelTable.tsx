@@ -1,8 +1,34 @@
 import React from 'react';
 import {
-  Surface, cn,
-  surfaceClasses, useEffectiveSurface, focusRing,
-} from '../common';
+  TABLE_EMPTY_LABEL,
+  TABLE_LOADING_LABEL,
+  TABLE_SELECT_ALL_LABEL,
+  TABLE_SELECT_LABEL,
+  TABLE_SKELETON_ROWS,
+  TABLE_SORT_GLYPHS,
+  nextTableSort,
+  sortTableRows,
+  tableAriaSort,
+  tableCellClasses,
+  tableCheckboxClasses,
+  tableClasses,
+  tableColumnWidth,
+  tableHeadCellClasses,
+  tableRowActivationKey,
+  tableRowClasses,
+  tableRowId,
+  tableRowSelectLabel,
+  tableSelectionSummary,
+  tableSortGlyphClasses,
+  tableSortLabel,
+  toggleTableRow,
+  type PixelTableAlign,
+  type PixelTableDensity,
+  type PixelTableSelection,
+  type PixelTableSortDir,
+  type PixelTableSortState,
+} from '@pxlkit/ui-kit-core';
+import { Surface, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelTable — data table with striped rows + hover highlight.
@@ -15,10 +41,13 @@ import {
    rendering exactly as before.
    ───────────────────────────────────────────────────────────────────────── */
 
-export type PixelTableDensity = 'compact' | 'normal' | 'comfortable';
-export type PixelTableSortDir = 'asc' | 'desc';
-export type PixelTableAlign = 'left' | 'center' | 'right';
-export type PixelTableSelection = 'single' | 'multi';
+export type {
+  PixelTableAlign,
+  PixelTableDensity,
+  PixelTableSelection,
+  PixelTableSortDir,
+  PixelTableSortState,
+} from '@pxlkit/ui-kit-core';
 
 export interface PixelTableColumn<Row = Record<string, React.ReactNode>> {
   /** Stable column id; also the lookup key into a row when `render` is absent. */
@@ -35,11 +64,6 @@ export interface PixelTableColumn<Row = Record<string, React.ReactNode>> {
   width?: number | string;
   /** Custom cell renderer. Overrides the `row[key]` lookup. */
   render?: (row: Row, idx: number) => React.ReactNode;
-}
-
-export interface PixelTableSortState {
-  key: string;
-  dir: PixelTableSortDir;
 }
 
 export interface PixelTableProps<Row = Record<string, React.ReactNode>> {
@@ -71,7 +95,7 @@ export interface PixelTableProps<Row = Record<string, React.ReactNode>> {
   loading?: boolean;
   /** Rendered inside a full-width cell when `data` is empty. */
   emptyState?: React.ReactNode;
-  /** Called when a body row is clicked. Renders the row with `cursor-pointer`. */
+  /** Called when a body row is clicked, or on Enter / Space on it. Renders it focusable, with `cursor-pointer`. */
   onRowClick?: (row: Row, idx: number) => void;
   /** Cell padding scale. Defaults to `'normal'`. */
   density?: PixelTableDensity;
@@ -79,35 +103,16 @@ export interface PixelTableProps<Row = Record<string, React.ReactNode>> {
   bordered?: boolean;
 }
 
-const tableCellPad: Record<PixelTableDensity, string> = {
-  compact: 'px-3 py-1',
-  normal: 'px-4 py-2.5',
-  comfortable: 'px-4 py-4',
-};
-
-const alignClass: Record<PixelTableAlign, string> = {
-  left: 'text-left',
-  center: 'text-center',
-  right: 'text-right',
-};
-
 function PixelTableSortIcons({ dir }: { dir: PixelTableSortDir | null }) {
   return (
     <span aria-hidden className="inline-flex flex-col leading-none ml-1">
-      <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className={cn('h-2 w-2', dir === 'asc' ? 'text-retro-text' : 'text-retro-muted/50')}>
-        <rect x="3" y="2" width="2" height="1" />
-        <rect x="2" y="3" width="1" height="1" />
-        <rect x="5" y="3" width="1" height="1" />
-        <rect x="1" y="4" width="1" height="1" />
-        <rect x="6" y="4" width="1" height="1" />
-      </svg>
-      <svg viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className={cn('h-2 w-2 -mt-0.5', dir === 'desc' ? 'text-retro-text' : 'text-retro-muted/50')}>
-        <rect x="1" y="2" width="1" height="1" />
-        <rect x="6" y="2" width="1" height="1" />
-        <rect x="2" y="3" width="1" height="1" />
-        <rect x="5" y="3" width="1" height="1" />
-        <rect x="3" y="4" width="2" height="1" />
-      </svg>
+      {(['asc', 'desc'] as const).map((glyph) => (
+        <svg key={glyph} viewBox="0 0 8 8" shapeRendering="crispEdges" fill="currentColor" className={tableSortGlyphClasses(glyph, dir)}>
+          {TABLE_SORT_GLYPHS[glyph].map(([x, y, width, height]) => (
+            <rect key={`${x}-${y}`} x={x} y={y} width={width} height={height} />
+          ))}
+        </svg>
+      ))}
     </span>
   );
 }
@@ -132,9 +137,15 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
   bordered = true,
 }: PixelTableProps<Row>) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const padCls = tableCellPad[density];
   const hasSelection = selection !== undefined;
+  const options = {
+    density,
+    bordered,
+    stickyHeader: !!stickyHeader,
+    stickyFirstColumn: !!stickyFirstColumn,
+    selectable: hasSelection,
+  };
+  const classes = tableClasses(surface, options);
   // Internal selection fallback for uncontrolled mode.
   const [internalSelected, setInternalSelected] = React.useState<string[]>([]);
   const effectiveSelectedIds = selectedIds ?? internalSelected;
@@ -149,45 +160,26 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
   };
 
   const resolveRowId = React.useCallback(
-    (row: Row, idx: number): string => {
-      if (getRowId) return getRowId(row, idx);
-      const r = row as unknown as Record<string, unknown>;
-      if (r && typeof r === 'object' && r.id != null) return String(r.id);
-      return String(idx);
-    },
+    (row: Row, idx: number): string => tableRowId(row, idx, getRowId),
     [getRowId],
   );
 
   const totalColCount = columns.length + (hasSelection ? 1 : 0);
 
-  // Apply sort to rows when a sortable column is active. We sort by the raw
-  // row[key] value (numbers compare numerically, otherwise localeCompare).
+  // Apply sort to rows when a sortable column is active (see sortTableRows).
   // Original order preserved when no sort is active.
-  const sortedData = React.useMemo(() => {
-    if (!effectiveSort) return data;
-    const col = columns.find((c) => c.key === effectiveSort.key);
-    if (!col || !col.sortable) return data;
-    const indexed = data.map((row, idx) => ({ row, idx }));
-    indexed.sort((a, b) => {
-      const av = (a.row as unknown as Record<string, unknown>)[effectiveSort.key];
-      const bv = (b.row as unknown as Record<string, unknown>)[effectiveSort.key];
-      let cmp = 0;
-      if (av == null && bv == null) cmp = 0;
-      else if (av == null) cmp = -1;
-      else if (bv == null) cmp = 1;
-      else if (typeof av === 'number' && typeof bv === 'number') cmp = av - bv;
-      else cmp = String(av).localeCompare(String(bv), undefined, { numeric: true });
-      return effectiveSort.dir === 'asc' ? cmp : -cmp;
-    });
-    return indexed.map((i) => i.row);
-  }, [data, columns, effectiveSort]);
+  const sortedData = React.useMemo(
+    () => sortTableRows(data, columns, effectiveSort),
+    [data, columns, effectiveSort],
+  );
 
   const allRowIds = React.useMemo(
     () => sortedData.map((row, idx) => resolveRowId(row, idx)),
     [sortedData, resolveRowId],
   );
-  const allSelected = hasSelection && allRowIds.length > 0 && allRowIds.every((id) => selectedSet.has(id));
-  const someSelected = hasSelection && !allSelected && allRowIds.some((id) => selectedSet.has(id));
+  const summary = tableSelectionSummary(allRowIds, selectedSet);
+  const allSelected = hasSelection && summary.all;
+  const someSelected = hasSelection && summary.some;
 
   const headerCheckboxRef = React.useRef<HTMLInputElement | null>(null);
   React.useEffect(() => {
@@ -203,27 +195,15 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
 
   const toggleOne = (id: string) => {
     if (!hasSelection) return;
-    if (selection === 'single') {
-      commitSelection(selectedSet.has(id) ? [] : [id]);
-      return;
-    }
-    const next = new Set(selectedSet);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    commitSelection(Array.from(next));
+    commitSelection(toggleTableRow(selection, selectedSet, id));
   };
 
   const handleSortClick = (col: PixelTableColumn<Row>) => {
     if (!col.sortable) return;
-    const isActive = effectiveSort?.key === col.key;
-    const nextDir: PixelTableSortDir = isActive && effectiveSort?.dir === 'asc' ? 'desc' : 'asc';
-    const next: PixelTableSortState = { key: col.key, dir: nextDir };
+    const next = nextTableSort(effectiveSort, col.key);
     if (sort === undefined) setInternalSort(next);
     onSortChange?.(next);
   };
-
-  const stickyFirstHeadCls = stickyFirstColumn ? 'sticky left-0 z-20 bg-retro-surface/80 backdrop-blur-sm' : '';
-  const stickyFirstBodyCls = stickyFirstColumn ? 'sticky left-0 z-10 bg-retro-bg' : '';
 
   const renderCellContent = (col: PixelTableColumn<Row>, row: Row, idx: number): React.ReactNode => {
     if (col.render) return col.render(row, idx);
@@ -232,65 +212,49 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
   };
 
   return (
-    <div className={cn('overflow-x-auto', bordered && s.border, bordered && s.radius, bordered && 'border-retro-border')}>
-      <table className={cn('w-full text-left text-sm', s.font)}>
+    <div className={classes.wrapper}>
+      <table className={classes.table}>
         <thead
-          className={cn(
-            stickyHeader && 'sticky top-0 z-10',
-          )}
+          className={classes.head}
         >
-          <tr className={cn('bg-retro-surface/60', surface === 'pixel' ? 'border-b-2 border-retro-border' : 'border-b border-retro-border')}>
+          <tr className={classes.headRow}>
             {hasSelection && (
               <th
                 scope="col"
-                className={cn('whitespace-nowrap text-xs font-semibold text-retro-muted w-10', padCls, stickyFirstColumn && stickyFirstHeadCls)}
+                className={classes.selectHead}
               >
                 {selection === 'multi' ? (
                   <input
                     ref={headerCheckboxRef}
                     type="checkbox"
-                    aria-label="Select all rows"
+                    aria-label={TABLE_SELECT_ALL_LABEL}
                     checked={allSelected}
                     onChange={toggleAll}
-                    className={cn('h-4 w-4', focusRing)}
+                    className={tableCheckboxClasses}
                   />
                 ) : (
-                  <span className="sr-only">Select</span>
+                  <span className="sr-only">{TABLE_SELECT_LABEL}</span>
                 )}
               </th>
             )}
             {columns.map((col, colIdx) => {
               const isSorted = effectiveSort?.key === col.key;
-              const ariaSort: React.AriaAttributes['aria-sort'] = col.sortable
-                ? (isSorted ? (effectiveSort!.dir === 'asc' ? 'ascending' : 'descending') : 'none')
-                : undefined;
-              const headerStyle: React.CSSProperties | undefined = col.width != null
-                ? { width: typeof col.width === 'number' ? `${col.width}px` : col.width }
-                : undefined;
-              const headerStickyCls = stickyFirstColumn && !hasSelection && colIdx === 0 ? stickyFirstHeadCls : '';
+              const width = tableColumnWidth(col.width);
+              const headerStyle: React.CSSProperties | undefined = width ? { width } : undefined;
               return (
                 <th
                   key={col.key}
                   scope="col"
-                  aria-sort={ariaSort}
+                  aria-sort={tableAriaSort(col, effectiveSort)}
                   style={headerStyle}
-                  className={cn(
-                    'whitespace-nowrap text-xs font-semibold text-retro-muted',
-                    padCls,
-                    col.align && alignClass[col.align],
-                    headerStickyCls,
-                    col.className,
-                  )}
+                  className={tableHeadCellClasses(col, colIdx, options)}
                 >
                   {col.sortable ? (
                     <button
                       type="button"
                       onClick={() => handleSortClick(col)}
-                      aria-label={`Sort by ${typeof col.header === 'string' ? col.header : col.key}`}
-                      className={cn(
-                        'inline-flex items-center text-retro-muted hover:text-retro-text outline-none',
-                        focusRing,
-                      )}
+                      aria-label={tableSortLabel(col.header, col.key)}
+                      className={classes.sortButton}
                     >
                       <span>{col.header}</span>
                       <PixelTableSortIcons dir={isSorted ? effectiveSort!.dir : null} />
@@ -305,24 +269,21 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
         </thead>
         <tbody aria-busy={loading || undefined}>
           {loading && (
-            <tr aria-hidden className="sr-only">
+            <tr className="sr-only">
               <td colSpan={totalColCount}>
-                <span role="status" aria-live="polite">Loading data…</span>
+                <span role="status" aria-live="polite">{TABLE_LOADING_LABEL}</span>
               </td>
             </tr>
           )}
           {loading ? (
-            Array.from({ length: 5 }).map((_, i) => (
-              <tr key={`sk-${i}`} className="border-b border-retro-border/20">
+            Array.from({ length: TABLE_SKELETON_ROWS }).map((_, i) => (
+              <tr key={`sk-${i}`} className={classes.skeletonRow}>
                 {Array.from({ length: totalColCount }).map((_, j) => (
-                  <td key={`sk-${i}-${j}`} className={padCls}>
+                  <td key={`sk-${i}-${j}`} className={classes.skeletonCell}>
                     <div
                       data-skeleton
                       aria-hidden
-                      className={cn(
-                        'h-3 w-full motion-safe:animate-pulse bg-retro-surface/60',
-                        surface === 'pixel' ? 'rounded-none' : 'rounded',
-                      )}
+                      className={classes.skeleton}
                     />
                   </td>
                 ))}
@@ -330,8 +291,8 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
             ))
           ) : sortedData.length === 0 ? (
             <tr>
-              <td colSpan={totalColCount} className={cn('text-center text-retro-muted', padCls)}>
-                {emptyState ?? <span>No data.</span>}
+              <td colSpan={totalColCount} className={classes.emptyCell}>
+                {emptyState ?? <span>{TABLE_EMPTY_LABEL}</span>}
               </td>
             </tr>
           ) : (
@@ -343,44 +304,39 @@ export function PixelTable<Row = Record<string, React.ReactNode>>({
                   key={rowId}
                   data-row-id={rowId}
                   data-selected={isSelected || undefined}
+                  // A clickable row is reachable and activates from the keyboard
+                  // too; the keys of a control inside it stay the control's.
+                  tabIndex={onRowClick ? 0 : undefined}
                   onClick={onRowClick ? () => onRowClick(row, idx) : undefined}
-                  className={cn(
-                    'border-b border-retro-border/20 transition-colors hover:bg-retro-surface/30',
-                    striped && idx % 2 === 1 && 'bg-retro-surface/15',
-                    onRowClick && 'cursor-pointer',
-                    isSelected && 'bg-retro-surface/40',
-                  )}
+                  onKeyDown={onRowClick ? (e) => {
+                    if (e.target !== e.currentTarget || !tableRowActivationKey(e.key)) return;
+                    e.preventDefault();
+                    onRowClick(row, idx);
+                  } : undefined}
+                  className={tableRowClasses({ index: idx, striped, clickable: !!onRowClick, selected: isSelected })}
                 >
                   {hasSelection && (
                     <td
-                      className={cn('text-retro-text w-10', padCls, stickyFirstColumn && stickyFirstBodyCls)}
+                      className={classes.selectCell}
                       onClick={(e) => e.stopPropagation()}
                     >
                       <input
                         type="checkbox"
-                        aria-label={`Select row ${rowId}`}
+                        aria-label={tableRowSelectLabel(rowId)}
                         checked={isSelected}
                         onChange={() => toggleOne(rowId)}
-                        className={cn('h-4 w-4', focusRing)}
+                        className={tableCheckboxClasses}
                       />
                     </td>
                   )}
                   {columns.map((col, colIdx) => {
-                    const cellStickyCls = stickyFirstColumn && !hasSelection && colIdx === 0 ? stickyFirstBodyCls : '';
-                    const cellStyle: React.CSSProperties | undefined = col.width != null
-                      ? { width: typeof col.width === 'number' ? `${col.width}px` : col.width }
-                      : undefined;
+                    const width = tableColumnWidth(col.width);
+                    const cellStyle: React.CSSProperties | undefined = width ? { width } : undefined;
                     return (
                       <td
                         key={col.key}
                         style={cellStyle}
-                        className={cn(
-                          'text-retro-text',
-                          padCls,
-                          col.align && alignClass[col.align],
-                          cellStickyCls,
-                          col.className,
-                        )}
+                        className={tableCellClasses(col, colIdx, options)}
                       >
                         {renderCellContent(col, row, idx)}
                       </td>

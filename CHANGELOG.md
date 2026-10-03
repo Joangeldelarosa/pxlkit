@@ -199,6 +199,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a key press from 5 jumped to 20. Decimal steps give exact values (`0.3`, not
   `0.30000000000000004`), a `max` that is not on a step tops out at the last step before it,
   and the ticks sit on the steps.
+- `@pxlkit/ui-kit`: `PixelCarousel` renders where Embla cannot run — no `matchMedia`,
+  `IntersectionObserver` or `ResizeObserver` (jsdom test suites, old WebViews) — staying on
+  its first slide; it threw on mount.
+- `@pxlkit/ui-kit`: `PixelTable` and `PixelDataTable` announce their loading status, whose
+  `role="status"` sat in an `aria-hidden` row, and rows with `onRowClick` take focus and
+  activate with Enter or Space, as the manifest says; they were mouse-only. `PixelDataTable`'s
+  rows-per-page select shows a page size other than 5, 10, 20 or 50 instead of the first option.
 - Site: the component reference lists every manifest example. Five whose ids did not
   spell their export's name — four of `PixelInput`'s and `PixelBreadcrumb`'s
   `with-onclick` — were left out.

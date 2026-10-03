@@ -52,6 +52,23 @@ const open = ref(false);
     />
   </div>
 </template>`,
+  'pixel-area-chart': `<script setup lang="ts">
+import { PixelAreaChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelAreaChart :data="sample" />
+</template>`,
   'pixel-avatar': `<script setup lang="ts">
 import { PixelAvatar } from '@pxlkit/ui-kit-vue';
 </script>
@@ -87,6 +104,23 @@ import { PixelBadge, PixelBadgeGroup } from '@pxlkit/ui-kit-vue';
     <PixelBadge tone="green">typescript</PixelBadge>
     <PixelBadge tone="gold">design</PixelBadge>
   </PixelBadgeGroup>
+</template>`,
+  'pixel-bar-chart': `<script setup lang="ts">
+import { PixelBarChart } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelBarChart :data="sample" />
 </template>`,
   'pixel-bare-button': `<script setup lang="ts">
 import { PixelBareButton } from '@pxlkit/ui-kit-vue';
@@ -219,6 +253,25 @@ import { PixelCard } from '@pxlkit/ui-kit-vue';
     </template>
   </PixelCard>
 </template>`,
+  'pixel-carousel': `<script setup lang="ts">
+import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';
+
+const slides = [
+  { label: 'Slide 1', tone: 'rgba(14,165,233,0.15)' },
+  { label: 'Slide 2', tone: 'rgba(168,85,247,0.15)' },
+  { label: 'Slide 3', tone: 'rgba(34,197,94,0.15)' },
+];
+</script>
+
+<template>
+  <PixelCarousel aria-label="Featured items">
+    <PixelCarouselItem v-for="slide in slides" :key="slide.label">
+      <div class="flex h-32 items-center justify-center border border-retro-border bg-retro-surface text-retro-text" :style="{ background: slide.tone }">
+        <span class="text-xs">{{ slide.label }}</span>
+      </div>
+    </PixelCarouselItem>
+  </PixelCarousel>
+</template>`,
   'pixel-center': `<script setup lang="ts">
 import { PixelCenter } from '@pxlkit/ui-kit-vue';
 </script>
@@ -339,6 +392,31 @@ import { PixelContainer } from '@pxlkit/ui-kit-vue';
   <PixelContainer>
     <p class="text-sm text-retro-muted">Default container — section landmark, xl max-width, lg rhythm.</p>
   </PixelContainer>
+</template>`,
+  'pixel-data-table': `<script setup lang="ts">
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+</script>
+
+<template>
+  <PixelDataTable :data="rows" :columns="columns" />
 </template>`,
   'pixel-divider': `<script setup lang="ts">
 import { PixelDivider } from '@pxlkit/ui-kit-vue';
@@ -1005,6 +1083,23 @@ const value = ref(40);
 <template>
   <PixelSlider v-model="value" label="Volume" />
 </template>`,
+  'pixel-sparkline': `<script setup lang="ts">
+import { PixelSparkline } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelSparkline :data="sample" />
+</template>`,
   'pixel-spinner': `<script setup lang="ts">
 import { PixelSpinner } from '@pxlkit/ui-kit-vue';
 </script>
@@ -1091,6 +1186,25 @@ const on = ref(false);
 
 <template>
   <PixelSwitch v-model:checked="on" label="Enable notifications" />
+</template>`,
+  'pixel-table': `<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="rows" />
 </template>`,
   'pixel-tabs': `<script setup lang="ts">
 import { h } from 'vue';

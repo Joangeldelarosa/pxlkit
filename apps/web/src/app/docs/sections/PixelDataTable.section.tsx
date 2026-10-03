@@ -58,17 +58,17 @@ export function PixelDataTableDocsSection({ className }: PixelDataTableDocsSecti
         <tbody>
           <tr>
             <td><kbd>Enter</kbd></td>
-            <td>Activates a sortable column header button to cycle sort direction</td>
+            <td>Activates a sortable column header button to cycle sort direction, or the focused clickable row (onRowClick)</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>Space</kbd></td>
-            <td>Toggles the selection checkbox when focused in the selection column</td>
+            <td>Toggles the selection checkbox when focused in the selection column, or activates the focused clickable row</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>Tab</kbd></td>
-            <td>Moves focus between sort buttons, selection checkboxes and pagination controls</td>
+            <td>Moves focus between sort buttons, selection checkboxes, clickable rows and pagination controls</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
         </tbody>
@@ -107,6 +107,65 @@ const columns: ColumnDef<Row, unknown>[] = [
 export function Default() {
   return <PixelDataTable<Row> data={rows} columns={columns} />;
 }`}
+        vue={`<script setup lang="ts">
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+</script>
+
+<template>
+  <PixelDataTable :data="rows" :columns="columns" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" />\`,
+})
+export class Default {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -144,6 +203,65 @@ const columns: ColumnDef<Row, unknown>[] = [
 export function Default() {
   return <PixelDataTable<Row> data={rows} columns={columns} />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+</script>
+
+<template>
+  <PixelDataTable :data="rows" :columns="columns" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" />\`,
+})
+export class Default {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
@@ -179,6 +297,65 @@ const columns: ColumnDef<Row, unknown>[] = [
 export function PixelSurface() {
   return <PixelDataTable<Row> data={rows} columns={columns} surface="pixel" />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+</script>
+
+<template>
+  <PixelDataTable :data="rows" :columns="columns" surface="pixel" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" surface="pixel" />\`,
+})
+export class PixelSurface {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-linear-surface">
@@ -213,6 +390,65 @@ const columns: ColumnDef<Row, unknown>[] = [
 
 export function LinearSurface() {
   return <PixelDataTable<Row> data={rows} columns={columns} surface="linear" />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+</script>
+
+<template>
+  <PixelDataTable :data="rows" :columns="columns" surface="linear" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" surface="linear" />\`,
+})
+export class LinearSurface {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
 }`}
         />
       </article>
@@ -260,6 +496,69 @@ export function Sortable() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+const sorting = ref([{ id: 'name', desc: false }]);
+</script>
+
+<template>
+  <PixelDataTable v-model:sorting="sorting" :data="rows" :columns="columns" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" [(sorting)]="sorting" />\`,
+})
+export class Sortable {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
+  readonly sorting = signal([{ id: 'name', desc: false }]);
+}`}
         />
       </article>
       <article className="docs-example" id="example-row-selection">
@@ -303,6 +602,69 @@ export function RowSelection() {
       onRowSelectionChange={setSelection}
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+const selection = ref<Record<string, boolean>>({});
+</script>
+
+<template>
+  <PixelDataTable v-model:row-selection="selection" :data="rows" :columns="columns" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" [(rowSelection)]="selection" />\`,
+})
+export class RowSelection {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
+  readonly selection = signal<Record<string, boolean>>({});
 }`}
         />
       </article>
@@ -348,6 +710,69 @@ export function Pagination() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+const pagination = ref({ pageIndex: 0, pageSize: 2 });
+</script>
+
+<template>
+  <PixelDataTable v-model:pagination="pagination" :data="rows" :columns="columns" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" [(pagination)]="pagination" />\`,
+})
+export class Pagination {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
+  readonly pagination = signal({ pageIndex: 0, pageSize: 2 });
+}`}
         />
       </article>
       <article className="docs-example" id="example-compact-density">
@@ -382,6 +807,65 @@ const columns: ColumnDef<Row, unknown>[] = [
 
 export function CompactDensity() {
   return <PixelDataTable<Row> data={rows} columns={columns} density="compact" />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+</script>
+
+<template>
+  <PixelDataTable :data="rows" :columns="columns" density="compact" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" density="compact" />\`,
+})
+export class CompactDensity {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
 }`}
         />
       </article>
@@ -418,6 +902,65 @@ const columns: ColumnDef<Row, unknown>[] = [
 export function ComfortableDensity() {
   return <PixelDataTable<Row> data={rows} columns={columns} density="comfortable" />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+</script>
+
+<template>
+  <PixelDataTable :data="rows" :columns="columns" density="comfortable" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" density="comfortable" />\`,
+})
+export class ComfortableDensity {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-loading">
@@ -444,6 +987,48 @@ const columns: ColumnDef<Row, unknown>[] = [
 
 export function Loading() {
   return <PixelDataTable<Row> data={[]} columns={columns} loading />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+</script>
+
+<template>
+  <PixelDataTable :data="[]" :columns="columns" loading />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="[]" [columns]="columns" loading />\`,
+})
+export class Loading {
+  readonly columns = COLUMNS;
 }`}
         />
       </article>
@@ -477,6 +1062,53 @@ export function Empty() {
       emptyState={<span>No records found.</span>}
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+</script>
+
+<template>
+  <PixelDataTable :data="[]" :columns="columns">
+    <template #empty-state><span>No records found.</span></template>
+  </PixelDataTable>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`
+    <pxl-data-table [data]="[]" [columns]="columns" [emptyState]="empty" />
+    <ng-template #empty><span>No records found.</span></ng-template>
+  \`,
+})
+export class Empty {
+  readonly columns = COLUMNS;
 }`}
         />
       </article>
@@ -512,6 +1144,65 @@ const columns: ColumnDef<Row, unknown>[] = [
 
 export function StickyHeader() {
   return <PixelDataTable<Row> data={rows} columns={columns} stickyHeader />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+</script>
+
+<template>
+  <PixelDataTable :data="rows" :columns="columns" sticky-header />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`<pxl-data-table [data]="rows" [columns]="columns" stickyHeader />\`,
+})
+export class StickyHeader {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
 }`}
         />
       </article>
@@ -558,6 +1249,77 @@ export function ClickableRows() {
       <p>Last clicked: {last || 'none'}</p>
     </div>
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const columns: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+const last = ref('');
+</script>
+
+<template>
+  <div>
+    <PixelDataTable :data="rows" :columns="columns" @row-click="(row) => (last = row.name)" />
+    <p>Last clicked: {{ last || 'none' }}</p>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelDataTable, createColumnHelper, type ColumnDef } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+  { id: '4', name: 'Dan', role: 'Engineer', status: 'active' },
+  { id: '5', name: 'Eve', role: 'Designer', status: 'idle' },
+];
+
+const ch = createColumnHelper<Row>();
+
+const COLUMNS: ColumnDef<Row, unknown>[] = [
+  ch.accessor('name', { header: 'Name' }) as ColumnDef<Row, unknown>,
+  ch.accessor('role', { header: 'Role' }) as ColumnDef<Row, unknown>,
+  ch.accessor('status', { header: 'Status' }) as ColumnDef<Row, unknown>,
+];
+
+@Component({
+  imports: [PixelDataTable],
+  template: \`
+    <div>
+      <pxl-data-table [data]="rows" [columns]="columns" clickableRows (rowClick)="last.set($event.name)" />
+      <p>Last clicked: {{ last() || 'none' }}</p>
+    </div>
+  \`,
+})
+export class ClickableRows {
+  readonly rows = ROWS;
+  readonly columns = COLUMNS;
+  readonly last = signal('');
 }`}
         />
       </article>

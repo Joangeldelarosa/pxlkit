@@ -1,16 +1,17 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, surfaceClasses, useEffectiveSurface } from '../common';
-import { ToneKey } from '../tokens';
 import {
+  barChartClasses,
+  barChartGeometry,
+  chartShapeRendering,
+  describeChart,
+  type BarChartOrientation,
   type ChartSize,
   type PixelChartDataPoint,
-  barSizeMap,
-  describeChart,
-  fillClassMap,
-  textFillClassMap,
-} from './PixelChartPrimitives';
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ToneKey } from '../tokens';
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelBarChart — one rect per point. Vertical (default) or horizontal.
@@ -21,7 +22,7 @@ export interface PixelBarChartProps extends React.SVGAttributes<SVGSVGElement> {
   data: PixelChartDataPoint[];
   tone?: ToneKey;
   size?: ChartSize;
-  orientation?: 'vertical' | 'horizontal';
+  orientation?: BarChartOrientation;
   showValues?: boolean;
   surface?: Surface;
   /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
@@ -44,36 +45,8 @@ export const PixelBarChart = forwardRef<SVGSVGElement, PixelBarChartProps>(funct
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const { width, height } = barSizeMap[size];
-
-  const ys = data.map(d => d.y);
-  const yMin = Math.min(0, ...(ys.length ? ys : [0]));
-  const yMax = Math.max(0, ...(ys.length ? ys : [0]));
-  const yRange = yMax - yMin || 1;
-
-  const gap = surface === 'pixel' ? 2 : 1;
-  const isVertical = orientation === 'vertical';
-  const padX = 4;
-  const padY = showValues ? 14 : 4;
-  const innerW = width - padX * 2;
-  const innerH = height - padY * 2;
-  const count = data.length || 1;
-
-  const bars = data.map((d, i) => {
-    if (isVertical) {
-      const bw = (innerW - gap * (count - 1)) / count;
-      const bh = ((d.y - yMin) / yRange) * innerH;
-      const bx = padX + i * (bw + gap);
-      const by = padY + (innerH - bh);
-      return { x: bx, y: by, width: bw, height: Math.max(bh, surface === 'pixel' ? 2 : 1), raw: d };
-    }
-    const bh = (innerH - gap * (count - 1)) / count;
-    const bw = ((d.y - yMin) / yRange) * innerW;
-    const bx = padX;
-    const by = padY + i * (bh + gap);
-    return { x: bx, y: by, width: Math.max(bw, surface === 'pixel' ? 2 : 1), height: bh, raw: d };
-  });
+  const { width, height, bars, radius, labelAnchor } = barChartGeometry(data, surface, { size, orientation, showValues });
+  const classes = barChartClasses(surface, { tone, bordered });
 
   const label = ariaLabel ?? describeChart('bar chart', data);
 
@@ -85,8 +58,8 @@ export const PixelBarChart = forwardRef<SVGSVGElement, PixelBarChartProps>(funct
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible max-w-full h-auto', bordered && s.border, bordered && s.radius, bordered && 'border-retro-border', className)}
+      shapeRendering={chartShapeRendering(surface)}
+      className={cn(classes.root, className)}
       {...rest}
     >
       {bars.map((b, i) => (
@@ -96,20 +69,20 @@ export const PixelBarChart = forwardRef<SVGSVGElement, PixelBarChartProps>(funct
           y={b.y}
           width={b.width}
           height={b.height}
-          rx={surface === 'pixel' ? 0 : 2}
-          ry={surface === 'pixel' ? 0 : 2}
-          className={cn(fillClassMap[tone])}
+          rx={radius}
+          ry={radius}
+          className={classes.bar}
         />
       ))}
       {showValues &&
         bars.map((b, i) => (
           <text
             key={`v-${i}`}
-            x={isVertical ? b.x + b.width / 2 : b.x + b.width + 4}
-            y={isVertical ? b.y - 4 : b.y + b.height / 2 + 3}
-            textAnchor={isVertical ? 'middle' : 'start'}
+            x={b.labelX}
+            y={b.labelY}
+            textAnchor={labelAnchor}
             fontSize={9}
-            className={cn(textFillClassMap[tone])}
+            className={classes.value}
           >
             {b.raw.y}
           </text>

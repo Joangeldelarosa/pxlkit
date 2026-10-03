@@ -67,6 +67,43 @@ const sample = [
 export function Default() {
   return <PixelSparkline data={sample} />;
 }`}
+        vue={`<script setup lang="ts">
+import { PixelSparkline } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelSparkline :data="sample" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSparkline, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelSparkline],
+  template: \`<svg pxlSparkline [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -90,6 +127,43 @@ const sample = [
 
 export function Default() {
   return <PixelSparkline data={sample} />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSparkline } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelSparkline :data="sample" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSparkline, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelSparkline],
+  template: \`<svg pxlSparkline [data]="sample"></svg>\`,
+})
+export class Default {
+  readonly sample = SAMPLE;
 }`}
         />
       </article>
@@ -122,6 +196,59 @@ export function Tones() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelSparkline } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-4">
+    <PixelSparkline :data="sample" tone="cyan" />
+    <PixelSparkline :data="sample" tone="green" />
+    <PixelSparkline :data="sample" tone="gold" />
+    <PixelSparkline :data="sample" tone="red" />
+    <PixelSparkline :data="sample" tone="purple" />
+    <PixelSparkline :data="sample" tone="pink" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSparkline, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelSparkline],
+  template: \`
+    <div class="flex flex-wrap items-center gap-4">
+      <svg pxlSparkline [data]="sample" tone="cyan"></svg>
+      <svg pxlSparkline [data]="sample" tone="green"></svg>
+      <svg pxlSparkline [data]="sample" tone="gold"></svg>
+      <svg pxlSparkline [data]="sample" tone="red"></svg>
+      <svg pxlSparkline [data]="sample" tone="purple"></svg>
+      <svg pxlSparkline [data]="sample" tone="pink"></svg>
+    </div>
+  \`,
+})
+export class Tones {
+  readonly sample = SAMPLE;
+}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
@@ -150,6 +277,53 @@ export function Sizes() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelSparkline } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-4">
+    <PixelSparkline :data="sample" size="sm" tone="cyan" />
+    <PixelSparkline :data="sample" size="md" tone="cyan" />
+    <PixelSparkline :data="sample" size="lg" tone="cyan" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSparkline, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelSparkline],
+  template: \`
+    <div class="flex flex-wrap items-center gap-4">
+      <svg pxlSparkline [data]="sample" size="sm" tone="cyan"></svg>
+      <svg pxlSparkline [data]="sample" size="md" tone="cyan"></svg>
+      <svg pxlSparkline [data]="sample" size="lg" tone="cyan"></svg>
+    </div>
+  \`,
+})
+export class Sizes {
+  readonly sample = SAMPLE;
+}`}
         />
       </article>
       <article className="docs-example" id="example-with-area">
@@ -171,6 +345,43 @@ const sample = [
 
 export function WithArea() {
   return <PixelSparkline data={sample} tone="green" showArea />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSparkline } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <PixelSparkline :data="sample" tone="green" show-area />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSparkline, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelSparkline],
+  template: \`<svg pxlSparkline [data]="sample" tone="green" showArea></svg>\`,
+})
+export class WithArea {
+  readonly sample = SAMPLE;
 }`}
         />
       </article>
@@ -198,6 +409,51 @@ export function Surfaces() {
       <PixelSparkline data={sample} surface="linear" tone="purple" />
     </div>
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSparkline } from '@pxlkit/ui-kit-vue';
+
+const sample = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap items-center gap-4">
+    <PixelSparkline :data="sample" surface="pixel" tone="purple" />
+    <PixelSparkline :data="sample" surface="linear" tone="purple" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSparkline, type PixelChartDataPoint } from '@pxlkit/ui-kit-angular';
+
+const SAMPLE: PixelChartDataPoint[] = [
+  { x: 'Mon', y: 12 },
+  { x: 'Tue', y: 18 },
+  { x: 'Wed', y: 9 },
+  { x: 'Thu', y: 24 },
+  { x: 'Fri', y: 16 },
+  { x: 'Sat', y: 21 },
+  { x: 'Sun', y: 14 },
+];
+
+@Component({
+  imports: [PixelSparkline],
+  template: \`
+    <div class="flex flex-wrap items-center gap-4">
+      <svg pxlSparkline [data]="sample" surface="pixel" tone="purple"></svg>
+      <svg pxlSparkline [data]="sample" surface="linear" tone="purple"></svg>
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly sample = SAMPLE;
 }`}
         />
       </article>

@@ -47,9 +47,9 @@ export default defineManifest({
     wcag: '2.1 AA',
     patterns: ['table'],
     keyboard: [
-      { key: 'Enter', does: 'Activates a sortable column header button to cycle sort direction' },
-      { key: 'Space', does: 'Toggles the selection checkbox when focused in the selection column' },
-      { key: 'Tab', does: 'Moves focus between sort buttons, selection checkboxes and pagination controls' },
+      { key: 'Enter', does: 'Activates a sortable column header button to cycle sort direction, or the focused clickable row (onRowClick)' },
+      { key: 'Space', does: 'Toggles the selection checkbox when focused in the selection column, or activates the focused clickable row' },
+      { key: 'Tab', does: 'Moves focus between sort buttons, selection checkboxes, clickable rows and pagination controls' },
     ],
     notes:
       'Renders semantic <table>, <thead>, <tbody>, <th scope="col"> and aria-sort on sortable column headers. Row selection checkboxes carry aria-label "Select row {id}" and a header checkbox labelled "Select all rows" with indeterminate state. Loading body exposes aria-busy and a role="status" with aria-live="polite" announcement. Pagination buttons declare aria-label and the page counter is announced with aria-live.',

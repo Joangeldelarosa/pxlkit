@@ -54,6 +54,10 @@
 - `PixelScrollArea` draws its styled scrollbar. The stylesheet never defined the `.pxl-scroll-*` classes the component sets, so the browser's default scrollbar showed, `variant="hover"` behaved like `auto` and `scrollbarSize` had no effect.
 - `PixelForm.Control` keeps its child's `ref` beside its own. It replaced it — with `null` when the Control had no ref — so React Hook Form, whose `field.ref` reaches the control through `{...field}`, could not focus the first invalid field on submit, and `setFocus()` did nothing.
 - `PixelSlider` counts its steps from `min`, as a native range input does: with `min={5}` and `step={10}` it takes 5, 15, 25… where it snapped to multiples of 10, so a key press from 5 jumped to 20. Decimal steps give exact values (`0.3`, not `0.30000000000000004`), a `max` that is not on a step tops out at the last step before it, and the ticks sit on the steps.
+- `PixelCarousel` renders where Embla cannot run (no `matchMedia`, `IntersectionObserver` or `ResizeObserver`: jsdom test suites, old WebViews), staying on its first slide; it threw on mount and unmounted the page.
+- `PixelTable` and `PixelDataTable` announce "Loading data…": the `role="status"` sat in an `aria-hidden` row, so screen readers never heard it.
+- `PixelTable` and `PixelDataTable` rows with `onRowClick` are in the tab order, show focus, and activate with Enter or Space — a control inside the row keeps its own keys; they were mouse-only, although the manifest documented them as focusable.
+- `PixelDataTable`'s rows-per-page select shows the current page size when it is not 5, 10, 20 or 50; it showed the first option.
 
 ## 2.1.1 — 2026-08-08
 

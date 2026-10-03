@@ -290,6 +290,12 @@ describe('PixelTable — loading state', () => {
     expect(skels.length).toBe(10);
   });
 
+  it('exposes its loading status to assistive technology (no aria-hidden around it)', () => {
+    const cols = [{ key: 'a', header: 'A' }];
+    render(<PixelTable columns={cols} data={[]} loading />);
+    expect(screen.getByRole('status')).toHaveTextContent('Loading data…');
+  });
+
   it('does not render the empty-state message while loading', () => {
     const cols = [{ key: 'a', header: 'A' }];
     const { container } = render(
@@ -327,6 +333,30 @@ describe('PixelTable — row click', () => {
     fireEvent.click(trs[1]);
     expect(onClick).toHaveBeenCalledWith({ n: 'b' }, 1);
     expect(trs[1].className).toContain('cursor-pointer');
+  });
+});
+
+describe('PixelTable — keyboard on clickable rows', () => {
+  it('makes clickable rows focusable and activates them with Enter and Space, not from a control inside', () => {
+    const cols = [{ key: 'n', header: 'N' }];
+    const rows = [{ id: 'r1', n: 'a' }, { id: 'r2', n: 'b' }];
+    const onClick = vi.fn();
+    const { container } = render(
+      <PixelTable columns={cols} data={rows} selection="multi" onRowClick={onClick} />,
+    );
+    const trs = container.querySelectorAll('tbody tr');
+    expect(trs[1].getAttribute('tabindex')).toBe('0');
+    expect(fireEvent.keyDown(trs[1], { key: 'Enter' })).toBe(false);
+    fireEvent.keyDown(trs[0], { key: ' ' });
+    fireEvent.keyDown(trs[0], { key: 'a' });
+    fireEvent.keyDown(trs[0].querySelector('input')!, { key: 'Enter' });
+    expect(onClick.mock.calls).toEqual([[rows[1], 1], [rows[0], 0]]);
+  });
+
+  it('keeps rows out of the tab order without onRowClick', () => {
+    const cols = [{ key: 'n', header: 'N' }];
+    const { container } = render(<PixelTable columns={cols} data={[{ n: 'a' }]} />);
+    expect(container.querySelector('tbody tr')!.hasAttribute('tabindex')).toBe(false);
   });
 });
 

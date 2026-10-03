@@ -9,7 +9,6 @@ import {
   type RowSelectionState,
   type VisibilityState,
   type OnChangeFn,
-  type Updater,
   type Row,
   type Table as TanStackTable,
   type ColumnHelper,
@@ -37,12 +36,35 @@ export type {
 export type PixelDataTableInstance<TData> = TanStackTable<TData>;
 export { createColumnHelper };
 import {
-  Surface, cn,
-  surfaceClasses, useEffectiveSurface,
-  focusRing,
-} from '../common';
+  DATA_TABLE_NEXT_PAGE_LABEL,
+  DATA_TABLE_PAGE_SIZE_LABEL,
+  DATA_TABLE_PREVIOUS_PAGE_LABEL,
+  DATA_TABLE_SELECT_COLUMN,
+  TABLE_EMPTY_LABEL,
+  TABLE_LOADING_LABEL,
+  TABLE_SELECT_ALL_LABEL,
+  TABLE_SORT_GLYPHS,
+  dataTableAriaSort,
+  dataTableClasses,
+  dataTableColumnFilters,
+  dataTableFilterRecord,
+  dataTablePageNumber,
+  dataTablePageRange,
+  dataTablePageSizes,
+  dataTablePaginationClasses,
+  dataTableRowClasses,
+  dataTableSkeletonRows,
+  dataTableSortGlyphClasses,
+  resolveDataTableUpdater,
+  tableCheckboxClasses,
+  tableRowActivationKey,
+  tableRowSelectLabel,
+  tableSortLabel,
+  type PixelDataTableDensity,
+} from '@pxlkit/ui-kit-core';
+import { Surface, cn, useEffectiveSurface } from '../common';
 
-export type PixelDataTableDensity = 'compact' | 'normal' | 'comfortable';
+export type { PixelDataTableDensity } from '@pxlkit/ui-kit-core';
 
 export interface PixelDataTableProps<TData, TValue = unknown> {
   data: TData[];
@@ -69,36 +91,12 @@ export interface PixelDataTableProps<TData, TValue = unknown> {
   bordered?: boolean;
 }
 
-const cellPad: Record<PixelDataTableDensity, string> = {
-  compact: 'px-3 py-1',
-  normal: 'px-4 py-2.5',
-  comfortable: 'px-4 py-4',
-};
-
-function resolveUpdater<T>(updater: Updater<T>, prev: T): T {
-  return typeof updater === 'function' ? (updater as (p: T) => T)(prev) : updater;
-}
-
-function ChevronUp({ className }: { className?: string }) {
+function SortGlyph({ dir, active }: { dir: 'asc' | 'desc'; active: false | 'asc' | 'desc' }) {
   return (
-    <svg aria-hidden viewBox="0 0 8 8" className={cn('h-2 w-2', className)} shapeRendering="crispEdges" fill="currentColor">
-      <rect x="3" y="2" width="2" height="1" />
-      <rect x="2" y="3" width="1" height="1" />
-      <rect x="5" y="3" width="1" height="1" />
-      <rect x="1" y="4" width="1" height="1" />
-      <rect x="6" y="4" width="1" height="1" />
-    </svg>
-  );
-}
-
-function ChevronDown({ className }: { className?: string }) {
-  return (
-    <svg aria-hidden viewBox="0 0 8 8" className={cn('h-2 w-2', className)} shapeRendering="crispEdges" fill="currentColor">
-      <rect x="1" y="2" width="1" height="1" />
-      <rect x="6" y="2" width="1" height="1" />
-      <rect x="2" y="3" width="1" height="1" />
-      <rect x="5" y="3" width="1" height="1" />
-      <rect x="3" y="4" width="2" height="1" />
+    <svg aria-hidden viewBox="0 0 8 8" className={dataTableSortGlyphClasses(dir, active)} shapeRendering="crispEdges" fill="currentColor">
+      {TABLE_SORT_GLYPHS[dir].map(([x, y, width, height]) => (
+        <rect key={`${x}-${y}`} x={x} y={y} width={width} height={height} />
+      ))}
     </svg>
   );
 }
@@ -130,35 +128,35 @@ function PixelDataTableInner<TData, TValue = unknown>(
   ref: React.Ref<HTMLDivElement>,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
+  const classes = dataTableClasses(surface, { density, bordered, stickyHeader });
 
   // Merge a selection column when row selection is enabled.
   const hasRowSelection = rowSelection !== undefined;
   const mergedColumns = useMemo<ColumnDef<TData, TValue>[]>(() => {
     if (!hasRowSelection) return columns;
     const selectionCol: ColumnDef<TData, TValue> = {
-      id: '__select__',
+      id: DATA_TABLE_SELECT_COLUMN,
       enableSorting: false,
       header: ({ table }) => (
         <input
           type="checkbox"
-          aria-label="Select all rows"
+          aria-label={TABLE_SELECT_ALL_LABEL}
           checked={table.getIsAllPageRowsSelected()}
           ref={(el) => {
             if (el) el.indeterminate = table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected();
           }}
           onChange={table.getToggleAllPageRowsSelectedHandler()}
-          className={cn('h-4 w-4', focusRing)}
+          className={tableCheckboxClasses}
         />
       ),
       cell: ({ row }) => (
         <input
           type="checkbox"
-          aria-label={`Select row ${row.id}`}
+          aria-label={tableRowSelectLabel(row.id)}
           checked={row.getIsSelected()}
           disabled={!row.getCanSelect()}
           onChange={row.getToggleSelectedHandler()}
-          className={cn('h-4 w-4', focusRing)}
+          className={tableCheckboxClasses}
         />
       ),
     };
@@ -179,36 +177,34 @@ function PixelDataTableInner<TData, TValue = unknown>(
   const sortingState: SortingState = (sorting as SortingState | undefined) ?? internalSorting;
   const filteringState: ColumnFiltersState = useMemo(() => {
     if (!filtering) return internalFiltering;
-    return Object.entries(filtering).map(([id, value]) => ({ id, value }));
+    return dataTableColumnFilters(filtering);
   }, [filtering, internalFiltering]);
   const paginationState: PaginationState = pagination ?? internalPagination;
   const rowSelectionState: RowSelectionState = rowSelection ?? internalRowSelection;
   const visibilityState: VisibilityState = columnVisibility ?? internalVisibility;
 
   const handleSorting: OnChangeFn<SortingState> = (updater) => {
-    const next = resolveUpdater(updater, sortingState);
+    const next = resolveDataTableUpdater(updater, sortingState);
     if (sorting === undefined) setInternalSorting(next);
     onSortingChange?.(next.map((sv) => ({ id: sv.id, desc: sv.desc })));
   };
   const handleFilters: OnChangeFn<ColumnFiltersState> = (updater) => {
-    const next = resolveUpdater(updater, filteringState);
+    const next = resolveDataTableUpdater(updater, filteringState);
     if (filtering === undefined) setInternalFiltering(next);
-    const dict: Record<string, string> = {};
-    for (const f of next) dict[f.id] = String(f.value ?? '');
-    onFilteringChange?.(dict);
+    onFilteringChange?.(dataTableFilterRecord(next));
   };
   const handlePagination: OnChangeFn<PaginationState> = (updater) => {
-    const next = resolveUpdater(updater, paginationState);
+    const next = resolveDataTableUpdater(updater, paginationState);
     if (pagination === undefined) setInternalPagination(next);
     onPaginationChange?.({ pageIndex: next.pageIndex, pageSize: next.pageSize });
   };
   const handleRowSelection: OnChangeFn<RowSelectionState> = (updater) => {
-    const next = resolveUpdater(updater, rowSelectionState);
+    const next = resolveDataTableUpdater(updater, rowSelectionState);
     if (rowSelection === undefined) setInternalRowSelection(next);
     onRowSelectionChange?.(next);
   };
   const handleVisibility: OnChangeFn<VisibilityState> = (updater) => {
-    const next = resolveUpdater(updater, visibilityState);
+    const next = resolveDataTableUpdater(updater, visibilityState);
     if (columnVisibility === undefined) setInternalVisibility(next);
     onColumnVisibilityChange?.(next);
   };
@@ -245,63 +241,40 @@ function PixelDataTableInner<TData, TValue = unknown>(
   const headerGroups = table.getHeaderGroups();
   const rows = table.getRowModel().rows;
   const visibleColCount = mergedColumns.length;
-  const skeletonRowCount = paginationState.pageSize > 0 ? Math.min(paginationState.pageSize, 5) : 5;
+  const skeletonRowCount = dataTableSkeletonRows(paginationState.pageSize);
 
   return (
     <div
       ref={ref}
-      className={cn(
-        'overflow-x-auto',
-        bordered && s.border,
-        bordered && s.radius,
-        bordered && 'border-retro-border',
-        className,
-      )}
+      className={cn(classes.wrapper, className)}
     >
-      <table className={cn('w-full text-left text-sm', s.font)}>
+      <table className={classes.table}>
         <thead
-          className={cn(
-            'bg-retro-surface/60',
-            surface === 'pixel' ? 'border-b-2 border-retro-border' : 'border-b border-retro-border',
-            stickyHeader && 'sticky top-0 z-10',
-          )}
+          className={classes.head}
         >
           {headerGroups.map((hg) => (
             <tr key={hg.id}>
               {hg.headers.map((header) => {
                 const canSort = header.column.getCanSort();
                 const sortDir = header.column.getIsSorted();
-                const label = typeof header.column.columnDef.header === 'string'
-                  ? header.column.columnDef.header
-                  : header.column.id;
                 return (
                   <th
                     key={header.id}
                     scope="col"
-                    aria-sort={
-                      sortDir === 'asc' ? 'ascending'
-                        : sortDir === 'desc' ? 'descending'
-                          : canSort ? 'none' : undefined
-                    }
-                    className={cn(
-                      'whitespace-nowrap text-xs font-semibold text-retro-muted',
-                      cellPad[density],
-                    )}
+                    aria-sort={dataTableAriaSort(sortDir, canSort)}
+                    className={classes.headCell}
                   >
                     {header.isPlaceholder ? null : canSort ? (
                       <button
                         type="button"
                         onClick={header.column.getToggleSortingHandler()}
-                        aria-label={`Sort by ${label}`}
-                        className={cn(
-                          'inline-flex items-center gap-1 text-left text-retro-muted hover:text-retro-text outline-none',
-                          focusRing, s.transition,
-                        )}
+                        aria-label={tableSortLabel(header.column.columnDef.header, header.column.id)}
+                        className={classes.sortButton}
                       >
                         <span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
                         <span aria-hidden className="inline-flex flex-col leading-none">
-                          <ChevronUp className={cn('text-retro-muted/50', sortDir === 'asc' && 'text-retro-text')} />
-                          <ChevronDown className={cn('text-retro-muted/50 -mt-0.5', sortDir === 'desc' && 'text-retro-text')} />
+                          <SortGlyph dir="asc" active={sortDir} />
+                          <SortGlyph dir="desc" active={sortDir} />
                         </span>
                       </button>
                     ) : (
@@ -315,24 +288,21 @@ function PixelDataTableInner<TData, TValue = unknown>(
         </thead>
         <tbody aria-busy={loading || undefined}>
           {loading && (
-            <tr aria-hidden className="sr-only">
+            <tr className="sr-only">
               <td colSpan={visibleColCount}>
-                <span role="status" aria-live="polite">Loading data…</span>
+                <span role="status" aria-live="polite">{TABLE_LOADING_LABEL}</span>
               </td>
             </tr>
           )}
           {loading ? (
             Array.from({ length: skeletonRowCount }).map((_, i) => (
-              <tr key={`sk-${i}`} className="border-b border-retro-border/20">
+              <tr key={`sk-${i}`} className={classes.skeletonRow}>
                 {Array.from({ length: visibleColCount }).map((_, j) => (
-                  <td key={`sk-${i}-${j}`} className={cn(cellPad[density])}>
+                  <td key={`sk-${i}-${j}`} className={classes.skeletonCell}>
                     <div
                       data-skeleton
                       aria-hidden
-                      className={cn(
-                        'h-3 w-full motion-safe:animate-pulse bg-retro-surface/60',
-                        surface === 'pixel' ? 'rounded-none' : 'rounded',
-                      )}
+                      className={classes.skeleton}
                     />
                   </td>
                 ))}
@@ -340,8 +310,8 @@ function PixelDataTableInner<TData, TValue = unknown>(
             ))
           ) : rows.length === 0 ? (
             <tr>
-              <td colSpan={visibleColCount} className={cn('text-center text-retro-muted', cellPad[density])}>
-                {emptyState ?? <span>No data.</span>}
+              <td colSpan={visibleColCount} className={classes.emptyCell}>
+                {emptyState ?? <span>{TABLE_EMPTY_LABEL}</span>}
               </td>
             </tr>
           ) : (
@@ -352,19 +322,21 @@ function PixelDataTableInner<TData, TValue = unknown>(
                   key={row.id}
                   data-row-id={row.id}
                   data-selected={isSelected || undefined}
+                  // A clickable row is reachable and activates from the keyboard
+                  // too; the keys of a control inside it stay the control's.
+                  tabIndex={onRowClick ? 0 : undefined}
                   onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-                  className={cn(
-                    'border-b border-retro-border/20 transition-colors',
-                    onRowClick && 'cursor-pointer',
-                    idx % 2 === 1 && 'bg-retro-surface/15',
-                    'hover:bg-retro-surface/30',
-                    isSelected && 'bg-retro-surface/40',
-                  )}
+                  onKeyDown={onRowClick ? (e) => {
+                    if (e.target !== e.currentTarget || !tableRowActivationKey(e.key)) return;
+                    e.preventDefault();
+                    onRowClick(row.original);
+                  } : undefined}
+                  className={dataTableRowClasses({ index: idx, clickable: !!onRowClick, selected: isSelected })}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td
                       key={cell.id}
-                      className={cn('text-retro-text', cellPad[density])}
+                      className={classes.cell}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
@@ -419,29 +391,23 @@ function PixelDataTablePagination({
   onNext,
   onPageSizeChange,
 }: PaginationBarProps) {
-  const s = surfaceClasses(surface);
-  const start = totalRows === 0 ? 0 : pageIndex * pageSize + 1;
-  const end = Math.min(totalRows, (pageIndex + 1) * pageSize);
-  const sizeOptions = [5, 10, 20, 50];
+  const classes = dataTablePaginationClasses(surface);
+  const { start, end } = dataTablePageRange(pageIndex, pageSize, totalRows);
+  // The current size is offered too when it is not a standard one, so the
+  // select shows it (a select shows its first option for a value it lacks).
+  const sizeOptions = dataTablePageSizes(pageSize);
   return (
     <div
-      className={cn(
-        'flex flex-wrap items-center justify-between gap-3 px-4 py-2 text-xs text-retro-muted',
-        s.font,
-        surface === 'pixel' ? 'border-t-2 border-retro-border' : 'border-t border-retro-border',
-      )}
+      className={classes.bar}
     >
       <div className="flex items-center gap-2">
         <label className="flex items-center gap-1">
-          <span>Rows per page</span>
+          <span>{DATA_TABLE_PAGE_SIZE_LABEL}</span>
           <select
-            aria-label="Rows per page"
+            aria-label={DATA_TABLE_PAGE_SIZE_LABEL}
             value={pageSize}
             onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className={cn(
-              'bg-retro-surface/40 px-1 py-0.5 text-retro-text outline-none',
-              s.border, s.radius, focusRing, 'border-retro-border-strong',
-            )}
+            className={classes.pageSizeSelect}
           >
             {sizeOptions.map((opt) => (
               <option key={opt} value={opt}>{opt}</option>
@@ -457,26 +423,20 @@ function PixelDataTablePagination({
           type="button"
           onClick={onPrev}
           disabled={!canPrev}
-          aria-label="Previous page"
-          className={cn(
-            'px-2 py-1 text-retro-text outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-            s.border, s.radius, focusRing, 'border-retro-border-strong hover:bg-retro-surface/40',
-          )}
+          aria-label={DATA_TABLE_PREVIOUS_PAGE_LABEL}
+          className={classes.pageButton}
         >
           Prev
         </button>
         <span aria-live="polite">
-          Page {pageCount === 0 ? 0 : pageIndex + 1} of {pageCount}
+          Page {dataTablePageNumber(pageIndex, pageCount)} of {pageCount}
         </span>
         <button
           type="button"
           onClick={onNext}
           disabled={!canNext}
-          aria-label="Next page"
-          className={cn(
-            'px-2 py-1 text-retro-text outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-            s.border, s.radius, focusRing, 'border-retro-border-strong hover:bg-retro-surface/40',
-          )}
+          aria-label={DATA_TABLE_NEXT_PAGE_LABEL}
+          className={classes.pageButton}
         >
           Next
         </button>

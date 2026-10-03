@@ -1,17 +1,17 @@
 'use client';
 
 import React, { forwardRef, useMemo } from 'react';
-import { cn, Surface, surfaceClasses, useEffectiveSurface } from '../common';
-import { ToneKey } from '../tokens';
 import {
+  chartShapeRendering,
+  describeChart,
+  sparklineClasses,
+  sparklineGeometry,
+  sparklineStroke,
   type ChartSize,
   type PixelChartDataPoint,
-  describeChart,
-  fillClassMap,
-  normalize,
-  sizeMap,
-  strokeClassMap,
-} from './PixelChartPrimitives';
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ToneKey } from '../tokens';
 
 /* ──────────────────────────────────────────────────────────────────────────
    PixelSparkline — polyline trend line. Optional filled area underneath.
@@ -42,17 +42,9 @@ export const PixelSparkline = forwardRef<SVGSVGElement, PixelSparklineProps>(fun
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const { width, height } = sizeMap[size];
-  const padX = 2;
-  const padY = 4;
-
-  const points = useMemo(() => normalize(data, width, height, padX, padY), [data, width, height]);
-  const polylinePoints = points.map(p => `${p.px.toFixed(2)},${p.py.toFixed(2)}`).join(' ');
-  const areaPoints =
-    points.length > 1
-      ? `${points[0].px.toFixed(2)},${(height - padY).toFixed(2)} ${polylinePoints} ${points[points.length - 1].px.toFixed(2)},${(height - padY).toFixed(2)}`
-      : '';
+  const { width, height, line, area } = useMemo(() => sparklineGeometry(data, size), [data, size]);
+  const stroke = sparklineStroke(surface);
+  const classes = sparklineClasses(surface, { tone, bordered });
 
   const label = ariaLabel ?? describeChart('sparkline', data);
 
@@ -65,24 +57,24 @@ export const PixelSparkline = forwardRef<SVGSVGElement, PixelSparklineProps>(fun
       height={height}
       viewBox={`0 0 ${width} ${height}`}
       preserveAspectRatio="none"
-      shapeRendering={surface === 'pixel' ? 'crispEdges' : 'geometricPrecision'}
-      className={cn('overflow-visible max-w-full', bordered && s.border, bordered && s.radius, bordered && 'border-retro-border', className)}
+      shapeRendering={chartShapeRendering(surface)}
+      className={cn(classes.root, className)}
       {...rest}
     >
-      {showArea && areaPoints && (
+      {showArea && area && (
         <polygon
-          points={areaPoints}
-          className={cn(fillClassMap[tone], 'opacity-20')}
+          points={area}
+          className={classes.area}
           stroke="none"
         />
       )}
       <polyline
-        points={polylinePoints}
+        points={line}
         fill="none"
-        strokeWidth={surface === 'pixel' ? 2 : 1.5}
-        strokeLinejoin={surface === 'pixel' ? 'miter' : 'round'}
-        strokeLinecap={surface === 'pixel' ? 'square' : 'round'}
-        className={cn(strokeClassMap[tone])}
+        strokeWidth={stroke.width}
+        strokeLinejoin={stroke.linejoin}
+        strokeLinecap={stroke.linecap}
+        className={classes.line}
       />
     </svg>
   );

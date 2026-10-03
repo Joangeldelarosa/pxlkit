@@ -51,8 +51,8 @@ export default defineManifest({
     wcag: '2.1 AA',
     patterns: ['table'],
     keyboard: [
-      { key: 'Enter', does: 'Activates a sortable column header button or toggles row selection when the row is focused' },
-      { key: 'Space', does: 'Toggles the selection checkbox in the selection column' },
+      { key: 'Enter', does: 'Activates a sortable column header button, or the focused clickable row (onRowClick)' },
+      { key: 'Space', does: 'Toggles the selection checkbox in the selection column, or activates the focused clickable row' },
       { key: 'Tab', does: 'Moves focus between header sort buttons, selection checkboxes and clickable rows' },
     ],
     notes:

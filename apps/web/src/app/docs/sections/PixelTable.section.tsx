@@ -58,12 +58,12 @@ export function PixelTableDocsSection({ className }: PixelTableDocsSectionProps)
         <tbody>
           <tr>
             <td><kbd>Enter</kbd></td>
-            <td>Activates a sortable column header button or toggles row selection when the row is focused</td>
+            <td>Activates a sortable column header button, or the focused clickable row (onRowClick)</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>Space</kbd></td>
-            <td>Toggles the selection checkbox in the selection column</td>
+            <td>Toggles the selection checkbox in the selection column, or activates the focused clickable row</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
@@ -103,6 +103,55 @@ const baseColumns = [
 export function Default() {
   return <PixelTable<Row> columns={baseColumns} data={rows} />;
 }`}
+        vue={`<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="rows" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" />\`,
+})
+export class Default {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -136,6 +185,55 @@ const baseColumns = [
 export function Default() {
   return <PixelTable<Row> columns={baseColumns} data={rows} />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="rows" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" />\`,
+})
+export class Default {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-striped">
@@ -166,6 +264,55 @@ const baseColumns = [
 
 export function Striped() {
   return <PixelTable<Row> columns={baseColumns} data={rows} striped />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="rows" striped />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" striped />\`,
+})
+export class Striped {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
 }`}
         />
       </article>
@@ -198,6 +345,55 @@ const baseColumns = [
 export function PixelSurface() {
   return <PixelTable<Row> columns={baseColumns} data={rows} surface="pixel" />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="rows" surface="pixel" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" surface="pixel" />\`,
+})
+export class PixelSurface {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-linear-surface">
@@ -228,6 +424,55 @@ const baseColumns = [
 
 export function LinearSurface() {
   return <PixelTable<Row> columns={baseColumns} data={rows} surface="linear" />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="rows" surface="linear" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" surface="linear" />\`,
+})
+export class LinearSurface {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
 }`}
         />
       </article>
@@ -267,6 +512,57 @@ export function Sortable() {
       onSortChange={setSort}
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelTable, type PixelTableSortState } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name', sortable: true },
+  { key: 'role', header: 'Role', sortable: true },
+  { key: 'status', header: 'Status' },
+];
+
+const sort = ref<PixelTableSortState>({ key: 'name', dir: 'asc' });
+</script>
+
+<template>
+  <PixelTable v-model:sort="sort" :columns="columns" :data="rows" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelTable, type PixelTableColumn, type PixelTableSortState } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" [(sort)]="sort" />\`,
+})
+export class Sortable {
+  readonly columns: PixelTableColumn<Row>[] = [
+    { key: 'name', header: 'Name', sortable: true },
+    { key: 'role', header: 'Role', sortable: true },
+    { key: 'status', header: 'Status' },
+  ];
+  readonly rows = ROWS;
+  readonly sort = signal<PixelTableSortState>({ key: 'name', dir: 'asc' });
 }`}
         />
       </article>
@@ -309,6 +605,59 @@ export function SingleSelection() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+const selected = ref(['1']);
+</script>
+
+<template>
+  <PixelTable v-model:selected-ids="selected" :columns="columns" :data="rows" selection="single" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" selection="single" [(selectedIds)]="selected" />\`,
+})
+export class SingleSelection {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
+  readonly selected = signal(['1']);
+}`}
         />
       </article>
       <article className="docs-example" id="example-multi-selection">
@@ -350,6 +699,59 @@ export function MultiSelection() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+const selected = ref<string[]>([]);
+</script>
+
+<template>
+  <PixelTable v-model:selected-ids="selected" :columns="columns" :data="rows" selection="multi" />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" selection="multi" [(selectedIds)]="selected" />\`,
+})
+export class MultiSelection {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
+  readonly selected = signal<string[]>([]);
+}`}
         />
       </article>
       <article className="docs-example" id="example-compact-density">
@@ -380,6 +782,55 @@ const baseColumns = [
 
 export function CompactDensity() {
   return <PixelTable<Row> columns={baseColumns} data={rows} density="compact" />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="rows" density="compact" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" density="compact" />\`,
+})
+export class CompactDensity {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
 }`}
         />
       </article>
@@ -412,6 +863,55 @@ const baseColumns = [
 export function ComfortableDensity() {
   return <PixelTable<Row> columns={baseColumns} data={rows} density="comfortable" />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="rows" density="comfortable" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" density="comfortable" />\`,
+})
+export class ComfortableDensity {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-loading">
@@ -436,6 +936,42 @@ const baseColumns = [
 
 export function Loading() {
   return <PixelTable<Row> columns={baseColumns} data={[]} loading />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="[]" loading />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="[]" loading />\`,
+})
+export class Loading {
+  readonly columns = COLUMNS;
 }`}
         />
       </article>
@@ -468,6 +1004,47 @@ export function Empty() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="[]">
+    <template #empty-state><span>No records found.</span></template>
+  </PixelTable>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`
+    <pxl-table [columns]="columns" [data]="[]" [emptyState]="empty" />
+    <ng-template #empty><span>No records found.</span></ng-template>
+  \`,
+})
+export class Empty {
+  readonly columns = COLUMNS;
+}`}
         />
       </article>
       <article className="docs-example" id="example-sticky-header">
@@ -498,6 +1075,55 @@ const baseColumns = [
 
 export function StickyHeader() {
   return <PixelTable<Row> columns={baseColumns} data={rows} stickyHeader />;
+}`}
+          vue={`<script setup lang="ts">
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="rows" sticky-header />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`<pxl-table [columns]="columns" [data]="rows" stickyHeader />\`,
+})
+export class StickyHeader {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
 }`}
         />
       </article>
@@ -533,6 +1159,62 @@ export function CustomRender() {
     },
   ];
   return <PixelTable<Row> columns={columns} data={rows} />;
+}`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-vue';
+
+type Row = { id: string; name: string; role: string; status: string };
+
+const rows: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (row) => h('span', { style: { textTransform: 'uppercase' } }, row.status),
+  },
+];
+</script>
+
+<template>
+  <PixelTable :columns="columns" :data="rows" />
+</template>`}
+          angular={`import { Component, TemplateRef, computed, viewChild } from '@angular/core';
+import { PixelTable, type PixelTableCellContext, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`
+    <pxl-table [columns]="columns()" [data]="rows" />
+    <ng-template #status let-row><span style="text-transform: uppercase">{{ row.status }}</span></ng-template>
+  \`,
+})
+export class CustomRender {
+  private readonly status = viewChild.required<TemplateRef<PixelTableCellContext<Row>>>('status');
+  readonly rows = ROWS;
+  readonly columns = computed<PixelTableColumn<Row>[]>(() => [
+    { key: 'name', header: 'Name' },
+    { key: 'status', header: 'Status', render: () => this.status() },
+  ]);
 }`}
         />
       </article>
@@ -575,6 +1257,67 @@ export function ClickableRows() {
       <p>Last clicked: {last || 'none'}</p>
     </div>
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelTable } from '@pxlkit/ui-kit-vue';
+
+const rows = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const columns = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+const last = ref('');
+</script>
+
+<template>
+  <div>
+    <PixelTable :columns="columns" :data="rows" @row-click="(row) => (last = row.name)" />
+    <p>Last clicked: {{ last || 'none' }}</p>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelTable, type PixelTableColumn } from '@pxlkit/ui-kit-angular';
+
+interface Row {
+  id: string;
+  name: string;
+  role: string;
+  status: string;
+}
+
+const ROWS: Row[] = [
+  { id: '1', name: 'Alice', role: 'Engineer', status: 'active' },
+  { id: '2', name: 'Bob', role: 'Designer', status: 'idle' },
+  { id: '3', name: 'Carol', role: 'PM', status: 'active' },
+];
+
+const COLUMNS: PixelTableColumn<Row>[] = [
+  { key: 'name', header: 'Name' },
+  { key: 'role', header: 'Role' },
+  { key: 'status', header: 'Status' },
+];
+
+@Component({
+  imports: [PixelTable],
+  template: \`
+    <div>
+      <pxl-table [columns]="columns" [data]="rows" clickableRows (rowClick)="last.set($event.row.name)" />
+      <p>Last clicked: {{ last() || 'none' }}</p>
+    </div>
+  \`,
+})
+export class ClickableRows {
+  readonly columns = COLUMNS;
+  readonly rows = ROWS;
+  readonly last = signal('');
 }`}
         />
       </article>

@@ -112,10 +112,12 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelAccordion` | stable | navigation |
 | `PixelAlert` | stable | feedback |
 | `PixelAlertDialog` | stable | overlays |
+| `PixelAreaChart` | stable | data |
 | `PixelAvatar` | stable | data |
 | `PixelAvatarGroup` | stable | data |
 | `PixelBadge` | stable | data |
 | `PixelBadgeGroup` | stable | data |
+| `PixelBarChart` | stable | data |
 | `PixelBareButton` | stable | actions |
 | `PixelBareInput` | stable | forms |
 | `PixelBareTextarea` | stable | forms |
@@ -126,6 +128,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelBreadcrumb` | stable | navigation |
 | `PixelButton` | stable | actions |
 | `PixelCard` | stable | cards |
+| `PixelCarousel` | stable | data |
 | `PixelCenter` | stable | layout |
 | `PixelCheckbox` | stable | forms |
 | `PixelChip` | stable | data |
@@ -136,6 +139,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelColorSwatch` | stable | data |
 | `PixelCommand` | stable | overlays |
 | `PixelContainer` | stable | layout |
+| `PixelDataTable` | stable | data |
 | `PixelDivider` | stable | layout |
 | `PixelDrawer` | stable | overlays |
 | `PixelDropdown` | stable | overlays |
@@ -184,6 +188,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelSkeleton` | stable | feedback |
 | `PixelSlideIn` | stable | animations |
 | `PixelSlider` | stable | forms |
+| `PixelSparkline` | stable | data |
 | `PixelSpinner` | stable | feedback |
 | `PixelSplitButton` | stable | actions |
 | `PixelStack` | stable | layout |
@@ -192,6 +197,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelStatGroup` | stable | data |
 | `PixelStepper` | stable | navigation |
 | `PixelSwitch` | stable | forms |
+| `PixelTable` | stable | data |
 | `PixelTabs` | stable | navigation |
 | `PixelTestimonialCard` | stable | cards |
 | `PixelTextarea` | stable | forms |
