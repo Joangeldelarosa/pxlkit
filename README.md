@@ -585,20 +585,20 @@ The sidebar follows the kit's categories — **UI Kit / Actions, Animations, Car
 | --- | --- | --- | --- |
 | [`apps/web`](./apps/web) | `@pxlkit/web` _(private)_ | `1.3.0` | _(no description)_ |
 | [`packages/angular`](./packages/angular) | [`@pxlkit/angular`](https://www.npmjs.com/package/@pxlkit/angular) | `0.1.0` | Angular standalone components for Pxlkit pixel art icons: static, animated and 3D parallax icons plus pixel toasts, on the shared rendering engine |
-| [`packages/core`](./packages/core) | [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | `1.3.4` | Pixel art rendering engine for Pxlkit: framework-agnostic core (SVG renderer, animation player, 3D parallax) plus React components, utilities and types |
-| [`packages/effects`](./packages/effects) | [`@pxlkit/effects`](https://www.npmjs.com/package/@pxlkit/effects) | `1.2.3` | Animated visual effect pixel art icons — 12 icons for explosions, radar ping, flame, shockwave, signals, particles, glows, and VFX animations |
-| [`packages/feedback`](./packages/feedback) | [`@pxlkit/feedback`](https://www.npmjs.com/package/@pxlkit/feedback) | `1.2.5` | Feedback and notification pixel art icon pack — 33 icons for alerts, status indicators, checkmarks, shields, bugs, badges, and toast notifications |
-| [`packages/gamification`](./packages/gamification) | [`@pxlkit/gamification`](https://www.npmjs.com/package/@pxlkit/gamification) | `1.2.4` | Gamification icon pack — 51 pixel art icons for RPG games, achievements, rewards, trophies, swords, potions, coins, stars, and gaming UI |
-| [`packages/parallax`](./packages/parallax) | [`@pxlkit/parallax`](https://www.npmjs.com/package/@pxlkit/parallax) | `1.2.3` | Multi-layer 3D parallax pixel art icons — 10 interactive depth-based mouse-tracking icons with configurable perspective and layer separation |
-| [`packages/social`](./packages/social) | [`@pxlkit/social`](https://www.npmjs.com/package/@pxlkit/social) | `1.2.4` | Social and media pixel art icon pack — 43 icons for community, emojis, messaging, hearts, shares, users, reactions, and social media UI |
-| [`packages/ui`](./packages/ui) | [`@pxlkit/ui`](https://www.npmjs.com/package/@pxlkit/ui) | `1.2.5` | UI & interface pixel art icon pack — 41 icons for tools, controls, navigation, editor elements, home, search, settings, menus, and layout |
-| [`packages/ui-kit`](./packages/ui-kit) | [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | `2.1.1` | Production-grade React UI kit with retro-future aesthetic: 111 production-ready components, WCAG 2.1 AA, surface system (pixel/linear), dark mode, 30-gate coherence audit, full SSOT documentation. |
+| [`packages/core`](./packages/core) | [`@pxlkit/core`](https://www.npmjs.com/package/@pxlkit/core) | `1.4.0` | Pixel art rendering engine for Pxlkit: framework-agnostic core (SVG renderer, animation player, 3D parallax) plus React components, utilities and types |
+| [`packages/effects`](./packages/effects) | [`@pxlkit/effects`](https://www.npmjs.com/package/@pxlkit/effects) | `1.2.4` | Animated visual effect pixel art icons — 12 icons for explosions, radar ping, flame, shockwave, signals, particles, glows, and VFX animations |
+| [`packages/feedback`](./packages/feedback) | [`@pxlkit/feedback`](https://www.npmjs.com/package/@pxlkit/feedback) | `1.2.6` | Feedback and notification pixel art icon pack — 33 icons for alerts, status indicators, checkmarks, shields, bugs, badges, and toast notifications |
+| [`packages/gamification`](./packages/gamification) | [`@pxlkit/gamification`](https://www.npmjs.com/package/@pxlkit/gamification) | `1.2.5` | Gamification icon pack — 51 pixel art icons for RPG games, achievements, rewards, trophies, swords, potions, coins, stars, and gaming UI |
+| [`packages/parallax`](./packages/parallax) | [`@pxlkit/parallax`](https://www.npmjs.com/package/@pxlkit/parallax) | `1.2.4` | Multi-layer 3D parallax pixel art icons — 10 interactive depth-based mouse-tracking icons with configurable perspective and layer separation |
+| [`packages/social`](./packages/social) | [`@pxlkit/social`](https://www.npmjs.com/package/@pxlkit/social) | `1.2.5` | Social and media pixel art icon pack — 43 icons for community, emojis, messaging, hearts, shares, users, reactions, and social media UI |
+| [`packages/ui`](./packages/ui) | [`@pxlkit/ui`](https://www.npmjs.com/package/@pxlkit/ui) | `1.2.6` | UI & interface pixel art icon pack — 41 icons for tools, controls, navigation, editor elements, home, search, settings, menus, and layout |
+| [`packages/ui-kit`](./packages/ui-kit) | [`@pxlkit/ui-kit`](https://www.npmjs.com/package/@pxlkit/ui-kit) | `2.2.0` | Production-grade React UI kit with retro-future aesthetic: 111 production-ready components, WCAG 2.1 AA, surface system (pixel/linear), dark mode, 30-gate coherence audit, full SSOT documentation. |
 | [`packages/ui-kit-angular`](./packages/ui-kit-angular) | [`@pxlkit/ui-kit-angular`](https://www.npmjs.com/package/@pxlkit/ui-kit-angular) | `2.2.0` | Angular retro UI kit: the Pxlkit components as standalone, signal-based components with the same markup, theme and behaviour as the React kit |
 | [`packages/ui-kit-core`](./packages/ui-kit-core) | [`@pxlkit/ui-kit-core`](https://www.npmjs.com/package/@pxlkit/ui-kit-core) | `2.2.0` | Framework-agnostic core of the Pxlkit retro UI kit: design tokens, Tailwind theme, class recipes and DOM behaviour for React, Vue and Angular components |
 | [`packages/ui-kit-vue`](./packages/ui-kit-vue) | [`@pxlkit/ui-kit-vue`](https://www.npmjs.com/package/@pxlkit/ui-kit-vue) | `2.2.0` | Vue 3 retro UI kit: the Pxlkit components with the same markup, theme and behaviour as the React kit, built on @pxlkit/ui-kit-core |
-| [`packages/voxel`](./packages/voxel) | [`@pxlkit/voxel`](https://www.npmjs.com/package/@pxlkit/voxel) | `0.1.4` | MIT-licensed 3D voxel toolkit for React — voxel utility primitives (pxlToVoxels, upscaleGrid) plus types. The full procedural-world engine (biomes, chunks, day/night cycles, highways, tunnels) lives in the showcase app at pxlkit.xyz/explore and ships in the v1 package. |
+| [`packages/voxel`](./packages/voxel) | [`@pxlkit/voxel`](https://www.npmjs.com/package/@pxlkit/voxel) | `0.1.5` | MIT-licensed 3D voxel toolkit for React — voxel utility primitives (pxlToVoxels, upscaleGrid) plus types. The full procedural-world engine (biomes, chunks, day/night cycles, highways, tunnels) lives in the showcase app at pxlkit.xyz/explore and ships in the v1 package. |
 | [`packages/vue`](./packages/vue) | [`@pxlkit/vue`](https://www.npmjs.com/package/@pxlkit/vue) | `0.1.0` | Vue 3 components for Pxlkit pixel art icons: static, animated and 3D parallax icons plus pixel toasts, on the shared framework-agnostic engine |
-| [`packages/weather`](./packages/weather) | [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | `1.2.4` | Weather and nature pixel art icon pack — 36 icons for sun, rain, clouds, moon phases, temperature, storms, snow, and climate UI |
+| [`packages/weather`](./packages/weather) | [`@pxlkit/weather`](https://www.npmjs.com/package/@pxlkit/weather) | `1.2.5` | Weather and nature pixel art icon pack — 36 icons for sun, rain, clouds, moon phases, temperature, storms, snow, and climate UI |
 <!-- WORKSPACES:END -->
 
 ## Automated npm Publishing (CI/CD)
@@ -618,7 +618,7 @@ The workflow (`.github/workflows/publish.yml`) runs on:
 1. **Quality gate** — installs, builds, type-checks, runs all tests, and validates icons
 2. **Publish** (only if quality gate passes) — compares each package's local version against the npm registry and publishes only the packages whose version has changed. Packages already at the same version on npm are safely skipped.
 
-> `@pxlkit/core` is always published first because other packages depend on it.
+> Packages publish in dependency order: `@pxlkit/core` first, then the icon packs, the icon components (`@pxlkit/vue`, `@pxlkit/angular`), and `@pxlkit/ui-kit-core` before the three kits built on it.
 
 ### Setup
 
@@ -661,7 +661,10 @@ git push origin main --follow-tags
 | `@pxlkit/core` | `packages/core` |
 | `@pxlkit/vue` | `packages/vue` |
 | `@pxlkit/angular` | `packages/angular` |
+| `@pxlkit/ui-kit-core` | `packages/ui-kit-core` |
 | `@pxlkit/ui-kit` | `packages/ui-kit` |
+| `@pxlkit/ui-kit-vue` | `packages/ui-kit-vue` |
+| `@pxlkit/ui-kit-angular` | `packages/ui-kit-angular` |
 | `@pxlkit/voxel` | `packages/voxel` |
 | `@pxlkit/gamification` | `packages/gamification` |
 | `@pxlkit/feedback` | `packages/feedback` |

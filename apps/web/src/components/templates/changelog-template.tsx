@@ -33,6 +33,81 @@ interface Release {
 
 const RELEASES: Release[] = [
   {
+    version: '2.2.0',
+    date: '2026-10-03',
+    title: 'The UI kit in Vue and Angular',
+    changes: [
+      {
+        category: 'Added',
+        title: '@pxlkit/ui-kit-vue and @pxlkit/ui-kit-angular',
+        detail:
+          'Every component of the kit for Vue 3.5 and Angular 20–22: the same markup, classes and behaviour as React, verified example by example against it on mount, on the server, after hydration and after scripted interactions.',
+      },
+      {
+        category: 'Added',
+        title: '@pxlkit/ui-kit-core',
+        detail:
+          'The framework-neutral core the three kits share: design tokens, the Tailwind CSS v4 theme, class recipes, keyboard and date logic, focus trap, scroll lock and floating positioning.',
+      },
+      {
+        category: 'Added',
+        title: '@pxlkit/vue, @pxlkit/angular and @pxlkit/core/vanilla',
+        detail:
+          'The icon, animated, parallax and toast components for Vue and Angular, on a React-free entry of @pxlkit/core that the icon packs now build on too.',
+      },
+      {
+        category: 'Added',
+        title: 'Docs and Storybooks in three frameworks',
+        detail:
+          'Every example on /docs and /ui-kit in React, Vue and Angular, and Storybooks for the Vue and Angular kits beside the React one, on Storybook 10.',
+      },
+      {
+        category: 'Fixed',
+        title: 'Keyboard focus shows on the pixel surface',
+        detail:
+          'The cut corners clipped the focus ring, so most pixel controls showed no keyboard focus: they now light up their edge inside their corners, and focus also shows in high-contrast (forced-colors) mode.',
+      },
+      {
+        category: 'Fixed',
+        title: 'Accessibility and behaviour fixes the ports surfaced',
+        detail:
+          'Focus moved into dialogs and pickers, menus and menu buttons on the WAI-ARIA patterns, the calendars on the date grid pattern, clickable table rows from the keyboard, announced toasts and loading states, and more — see CHANGELOG.md.',
+      },
+    ],
+  },
+  {
+    version: '2.1.1',
+    date: '2026-08-08',
+    title: 'Bordered surface-token fix',
+    changes: [
+      {
+        category: 'Fixed',
+        title: 'bordered pairs the border width with the surface colour',
+        detail:
+          'PixelCenter, PixelTwoColumn, PixelScrollArea, PixelCollapsible and the three charts emit border-retro-border with the border width, instead of an inherited colour.',
+      },
+    ],
+  },
+  {
+    version: '2.1.0',
+    date: '2026-07-06',
+    title: 'Responsive hardening + dogfooding pass',
+    changes: [
+      {
+        category: 'Added',
+        title: 'Card and chip upgrades',
+        detail:
+          'Headerless PixelCard, PixelPricingCard descriptionLines, priceBadge and highlighted features, PixelStatCard valueTone and centred alignment, PixelStatGroup gap, PixelChip value.',
+      },
+      {
+        category: 'Fixed',
+        title: 'Mobile responsiveness across the kit',
+        detail:
+          'Grids collapse on small screens, charts clamp to their container, popovers and menus clamp to the viewport, long tokens wrap, and flex and grid children shrink.',
+      },
+    ],
+  },
+  {
     version: '2.0.0',
     date: '2026-05-31',
     title: 'Ola 5 — Polish + Cinematic Hero + Sidebar Overhaul',

@@ -2,7 +2,7 @@
 
 <!-- This file is hand-maintained — add an entry at the top for each release. -->
 
-## 2.2.0 — unreleased
+## 2.2.0 — 2026-10-03
 
 ### Added
 

@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@pxlkit/angular": "^0.1.0",
-    "@pxlkit/gamification": "^1.2.4",
+    "@pxlkit/gamification": "^1.2.5",
     "@pxlkit/ui-kit-core": "^2.2.0",
     "@tanstack/angular-table": "^8.21.4",
     "embla-carousel": "^8.6.0"

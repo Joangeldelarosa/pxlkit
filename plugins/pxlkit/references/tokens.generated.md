@@ -1,8 +1,8 @@
-<!-- GENERATED from @pxlkit/ui-kit v2.1.1 — do not edit; run npm run docs:build -->
+<!-- GENERATED from @pxlkit/ui-kit v2.2.0 — do not edit; run npm run docs:build -->
 
 # Tokens & theming
 
-Design tokens of `@pxlkit/ui-kit` v2.1.1, parsed from the shipped sources.
+Design tokens of `@pxlkit/ui-kit` v2.2.0, parsed from the shipped sources.
 
 Read "The two tone scales" before writing any component code: `tone` and
 `toneMap` are the one pair in this kit that can be confused without a type

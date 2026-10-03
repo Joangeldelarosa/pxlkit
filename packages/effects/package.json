@@ -1,6 +1,6 @@
 {
   "name": "@pxlkit/effects",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Animated visual effect pixel art icons \u2014 12 icons for explosions, radar ping, flame, shockwave, signals, particles, glows, and VFX animations",
   "author": {
     "name": "Joangel De La Rosa",
@@ -32,7 +32,7 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.2.3"
+    "@pxlkit/core": "^1.4.0"
   },
   "devDependencies": {
     "tsup": "^8.5.0",

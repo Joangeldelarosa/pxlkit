@@ -1,6 +1,6 @@
 {
   "name": "@pxlkit/voxel",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "MIT-licensed 3D voxel toolkit for React \u2014 voxel utility primitives (pxlToVoxels, upscaleGrid) plus types. The full procedural-world engine (biomes, chunks, day/night cycles, highways, tunnels) lives in the showcase app at pxlkit.xyz/explore and ships in the v1 package.",
   "author": {
     "name": "Joangel De La Rosa",
@@ -29,7 +29,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.2.3"
+    "@pxlkit/core": "^1.4.0"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

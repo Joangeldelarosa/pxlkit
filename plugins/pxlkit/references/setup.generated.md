@@ -1,8 +1,8 @@
-<!-- GENERATED from @pxlkit/ui-kit v2.1.1 — do not edit; run npm run docs:build -->
+<!-- GENERATED from @pxlkit/ui-kit v2.2.0 — do not edit; run npm run docs:build -->
 
 # Setup
 
-Wiring `@pxlkit/ui-kit` v2.1.1 into a real app: one stylesheet import, the
+Wiring `@pxlkit/ui-kit` v2.2.0 into a real app: one stylesheet import, the
 providers, and three framework variants — pick the one that matches your app.
 
 Read the Tailwind section even if the rest looks obvious: a stylesheet Tailwind
@@ -11,9 +11,9 @@ never processes is the one setup mistake that fails silently.
 ## Install
 
 ```bash
-npm  install @pxlkit/ui-kit@2.1.1
-pnpm add     @pxlkit/ui-kit@2.1.1
-yarn add     @pxlkit/ui-kit@2.1.1
+npm  install @pxlkit/ui-kit@2.2.0
+pnpm add     @pxlkit/ui-kit@2.2.0
+yarn add     @pxlkit/ui-kit@2.2.0
 ```
 
 Peer dependencies: `react` and `react-dom` at `^18.2.0 || ^19.0.0`. Tailwind CSS

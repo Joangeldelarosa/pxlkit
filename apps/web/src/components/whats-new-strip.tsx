@@ -27,6 +27,10 @@ const categoryTone: Record<string, 'cyan' | 'green' | 'purple' | 'gold' | 'red' 
   feedback: 'gold',
   layout: 'green',
   forms: 'red',
+  vue: 'green',
+  angular: 'red',
+  core: 'cyan',
+  icons: 'gold',
 };
 
 function toneFor(category: string) {

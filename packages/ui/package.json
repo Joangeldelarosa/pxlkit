@@ -1,6 +1,6 @@
 {
   "name": "@pxlkit/ui",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "UI & interface pixel art icon pack \u2014 41 icons for tools, controls, navigation, editor elements, home, search, settings, menus, and layout",
   "author": {
     "name": "Joangel De La Rosa",
@@ -29,7 +29,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@pxlkit/core": "^1.2.3"
+    "@pxlkit/core": "^1.4.0"
   },
   "devDependencies": {
     "tsup": "^8.0.0",

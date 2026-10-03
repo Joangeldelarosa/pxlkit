@@ -95,13 +95,13 @@ const staggerContainer = {
 /** Derived from the icon data already bundled for the hero + showcase. */
 const TOTAL_ICON_COUNT = ALL_ICONS.length + ParallaxPack.length;
 
-/* v2.1.0 highlights — API upgrades from the responsive-hardening + dogfooding release. */
+/* v2.2.0 highlights — the UI kit and the icon components in Vue and Angular. */
 const WHATS_NEW_ITEMS: WhatsNewItem[] = [
-  { name: 'PixelCard', category: 'cards', href: '/ui-kit#pixel-card', isNew: true },
-  { name: 'PixelPricingCard', category: 'cards', href: '/ui-kit#pixel-pricing-card', isNew: true },
-  { name: 'PixelStatCard', category: 'cards', href: '/ui-kit#pixel-stat-card', isNew: true },
-  { name: 'PixelStatGroup', category: 'data', href: '/ui-kit#pixel-stat-group', isNew: true },
-  { name: 'PixelChip', category: 'data', href: '/ui-kit#pixel-chip', isNew: true },
+  { name: '@pxlkit/ui-kit-vue', category: 'vue', href: '/ui-kit#getting-started', isNew: true },
+  { name: '@pxlkit/ui-kit-angular', category: 'angular', href: '/ui-kit#getting-started', isNew: true },
+  { name: '@pxlkit/ui-kit-core', category: 'core', href: '/ui-kit#getting-started', isNew: true },
+  { name: '@pxlkit/vue', category: 'icons', href: '/docs#react-component', isNew: true },
+  { name: '@pxlkit/angular', category: 'icons', href: '/docs#react-component', isNew: true },
 ];
 
 export function LandingPageClient() {
