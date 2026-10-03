@@ -61,6 +61,26 @@ const Glyph = () => (
 export function Default() {
   return <PixelIconFrame icon={<Glyph />} />;
 }`}
+        vue={`<script setup lang="ts">
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelIconFrame>
+    <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+  </PixelIconFrame>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <pxl-icon-frame [icon]="glyph" />
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -79,6 +99,26 @@ const Glyph = () => (
 export function Default() {
   return <PixelIconFrame icon={<Glyph />} />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelIconFrame>
+    <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+  </PixelIconFrame>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <pxl-icon-frame [icon]="glyph" />
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
@@ -105,6 +145,38 @@ export function Tones() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelIconFrame, type ToneKey } from '@pxlkit/ui-kit-vue';
+
+const tones: ToneKey[] = ['neutral', 'cyan', 'green', 'gold', 'red', 'purple', 'pink'];
+</script>
+
+<template>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap">
+    <PixelIconFrame v-for="tone in tones" :key="tone" :tone="tone">
+      <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+    </PixelIconFrame>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <div style="display: flex; gap: 12px; flex-wrap: wrap">
+      <pxl-icon-frame [icon]="glyph" tone="neutral" />
+      <pxl-icon-frame [icon]="glyph" tone="cyan" />
+      <pxl-icon-frame [icon]="glyph" tone="green" />
+      <pxl-icon-frame [icon]="glyph" tone="gold" />
+      <pxl-icon-frame [icon]="glyph" tone="red" />
+      <pxl-icon-frame [icon]="glyph" tone="purple" />
+      <pxl-icon-frame [icon]="glyph" tone="pink" />
+    </div>
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
@@ -129,6 +201,36 @@ export function Sizes() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+
+const sizes = [48, 56, 64, 80, 112] as const;
+</script>
+
+<template>
+  <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+    <PixelIconFrame v-for="size in sizes" :key="size" :size="size">
+      <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+    </PixelIconFrame>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+      <pxl-icon-frame [icon]="glyph" [size]="48" />
+      <pxl-icon-frame [icon]="glyph" [size]="56" />
+      <pxl-icon-frame [icon]="glyph" [size]="64" />
+      <pxl-icon-frame [icon]="glyph" [size]="80" />
+      <pxl-icon-frame [icon]="glyph" [size]="112" />
+    </div>
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-shapes">
@@ -151,6 +253,34 @@ export function Shapes() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+
+const shapes = ['square', 'rounded', 'circle'] as const;
+</script>
+
+<template>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap">
+    <PixelIconFrame v-for="shape in shapes" :key="shape" :shape="shape">
+      <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+    </PixelIconFrame>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <div style="display: flex; gap: 12px; flex-wrap: wrap">
+      <pxl-icon-frame [icon]="glyph" shape="square" />
+      <pxl-icon-frame [icon]="glyph" shape="rounded" />
+      <pxl-icon-frame [icon]="glyph" shape="circle" />
+    </div>
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Shapes {}`}
         />
       </article>
       <article className="docs-example" id="example-with-accent">
@@ -177,6 +307,35 @@ export function WithAccent() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { h } from 'vue';
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+
+const dot = () =>
+  h('span', {
+    style: { width: '6px', height: '6px', borderRadius: '9999px', background: 'currentColor', display: 'inline-block' },
+  });
+</script>
+
+<template>
+  <PixelIconFrame tone="cyan" :accent="{ icon: dot, position: 'top-right' }">
+    <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+  </PixelIconFrame>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <pxl-icon-frame [icon]="glyph" tone="cyan" [accent]="{ icon: dot, position: 'top-right' }" />
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+    <ng-template #dot>
+      <span style="width: 6px; height: 6px; border-radius: 9999px; background: currentColor; display: inline-block"></span>
+    </ng-template>
+  \`,
+})
+export class WithAccent {}`}
         />
       </article>
     </section>

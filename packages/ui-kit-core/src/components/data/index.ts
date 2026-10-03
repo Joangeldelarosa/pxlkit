@@ -9,5 +9,6 @@ export * from './collapsible';
 export * from './color-swatch';
 export * from './group-overflow';
 export * from './kbd';
+export * from './stat-group';
 export * from './text-link';
 export * from './timeline';

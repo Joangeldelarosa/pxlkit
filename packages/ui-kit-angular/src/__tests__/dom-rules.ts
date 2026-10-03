@@ -157,4 +157,33 @@ export function ignoreAttribute(element: Element, name: string): boolean {
   return names.has(name.toLowerCase());
 }
 
-export const angularDomRules: CanonicalOptions = { hostTags: HOST_TAGS, ignoreAttribute };
+/** The layout of a `<pxl-icon>` box, which React's PxlKitIcon sets on its `<img>`. */
+const ICON_BOX_LAYOUT = ['display', 'vertical-align', 'flex-shrink'];
+
+/**
+ * `@pxlkit/angular`'s `<pxl-icon>` draws a box around the `<img>` React's
+ * PxlKitIcon renders bare, the one structural difference between the icon
+ * packages (their own parity suite compares box by box): read the box as
+ * that image. The image keeps its attributes and its `image-rendering`, and
+ * takes the box's layout and the box's own meaningful attributes; the box's
+ * size is the image's `width` and `height`, and is kept only where it is not.
+ */
+export function substitute(element: Element): Element | undefined {
+  if (element.tagName.toLowerCase() !== 'pxl-icon' || element.children.length !== 1) return undefined;
+  const box = element as HTMLElement;
+  const image = box.firstElementChild as HTMLElement;
+  if (image.tagName.toLowerCase() !== 'img') return undefined;
+  const bare = image.cloneNode() as HTMLElement;
+  bare.removeAttribute('style');
+  for (const { name, value } of Array.from(box.attributes)) {
+    if (name !== 'style' && meaningful(box, name)) bare.setAttribute(name, value);
+  }
+  for (const property of ICON_BOX_LAYOUT) bare.style.setProperty(property, box.style.getPropertyValue(property));
+  bare.style.setProperty('image-rendering', image.style.getPropertyValue('image-rendering'));
+  for (const side of ['width', 'height'] as const) {
+    if (box.style[side] !== `${image.getAttribute(side)}px`) bare.style[side] = box.style[side];
+  }
+  return bare;
+}
+
+export const angularDomRules: CanonicalOptions = { hostTags: HOST_TAGS, ignoreAttribute, substitute };

@@ -124,6 +124,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelBox` | stable | layout |
 | `PixelBreadcrumb` | stable | navigation |
 | `PixelButton` | stable | actions |
+| `PixelCard` | stable | cards |
 | `PixelCenter` | stable | layout |
 | `PixelCheckbox` | stable | forms |
 | `PixelChip` | stable | data |
@@ -140,10 +141,12 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelEmptyState` | stable | feedback |
 | `PixelEqualHeightGrid` | stable | layout |
 | `PixelFadeIn` | stable | animations |
+| `PixelFeatureCard` | stable | cards |
 | `PixelFlicker` | stable | animations |
 | `PixelFloat` | stable | animations |
 | `PixelGlitch` | stable | animations |
 | `PixelGrid` | stable | layout |
+| `PixelIconFrame` | stable | cards |
 | `PixelInput` | stable | forms |
 | `PixelInputGroup` | stable | forms |
 | `PixelKbd` | stable | data |
@@ -155,9 +158,11 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelPasswordInput` | stable | forms |
 | `PixelPopover` | stable | overlay-foundation |
 | `PixelPortal` | stable | overlay-foundation |
+| `PixelPricingCard` | stable | cards |
 | `PixelProgress` | stable | feedback |
 | `PixelPulse` | stable | animations |
 | `PixelRadioGroup` | stable | forms |
+| `PixelRibbon` | stable | cards |
 | `PixelRotate` | stable | animations |
 | `PixelScrollArea` | stable | layout |
 | `PixelSection` | stable | layout |
@@ -171,9 +176,13 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelSlideIn` | stable | animations |
 | `PixelSpinner` | stable | feedback |
 | `PixelStack` | stable | layout |
+| `PixelStarRating` | stable | cards |
+| `PixelStatCard` | stable | cards |
+| `PixelStatGroup` | stable | data |
 | `PixelStepper` | stable | navigation |
 | `PixelSwitch` | stable | forms |
 | `PixelTabs` | stable | navigation |
+| `PixelTestimonialCard` | stable | cards |
 | `PixelTextarea` | stable | forms |
 | `PixelTextLink` | stable | data |
 | `PixelTimeline` | stable | data |

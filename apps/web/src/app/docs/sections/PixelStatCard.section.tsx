@@ -57,6 +57,21 @@ export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSection
 export function Default() {
   return <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
 }`}
+        vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`<pxl-stat-card label="Revenue" value="$12,480" trend="+8.2% vs last week" />\`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -71,6 +86,21 @@ export function Default() {
 export function Default() {
   return <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
 }`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`<pxl-stat-card label="Revenue" value="$12,480" trend="+8.2% vs last week" />\`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
@@ -93,6 +123,39 @@ export function Tones() {
     </div>
   )
 }`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelStatCard label="Active" value="1,204" tone="green" trend="+3.1%" />
+    <PixelStatCard label="Pending" value="48" tone="gold" trend="2 overdue" />
+    <PixelStatCard label="Cancelled" value="12" tone="red" trend="-1 vs ayer" />
+    <PixelStatCard label="Sessions" value="3.2k" tone="cyan" trend="+220 hoy" />
+    <PixelStatCard label="Members" value="89" tone="purple" />
+    <PixelStatCard label="Likes" value="412" tone="pink" />
+    <PixelStatCard label="Drafts" value="7" tone="neutral" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-stat-card label="Active" value="1,204" tone="green" trend="+3.1%" />
+      <pxl-stat-card label="Pending" value="48" tone="gold" trend="2 overdue" />
+      <pxl-stat-card label="Cancelled" value="12" tone="red" trend="-1 vs ayer" />
+      <pxl-stat-card label="Sessions" value="3.2k" tone="cyan" trend="+220 hoy" />
+      <pxl-stat-card label="Members" value="89" tone="purple" />
+      <pxl-stat-card label="Likes" value="412" tone="pink" />
+      <pxl-stat-card label="Drafts" value="7" tone="neutral" />
+    </div>
+  \`,
+})
+export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
@@ -111,6 +174,31 @@ export function Sizes() {
     </div>
   )
 }`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-col gap-3">
+    <PixelStatCard label="Small" value="$1,200" size="sm" trend="+2%" tone="cyan" />
+    <PixelStatCard label="Medium" value="$8,400" size="md" trend="+5%" tone="gold" />
+    <PixelStatCard label="Large" value="$24,900" size="lg" trend="+11%" tone="green" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`
+    <div class="flex flex-col gap-3">
+      <pxl-stat-card label="Small" value="$1,200" size="sm" trend="+2%" tone="cyan" />
+      <pxl-stat-card label="Medium" value="$8,400" size="md" trend="+5%" tone="gold" />
+      <pxl-stat-card label="Large" value="$24,900" size="lg" trend="+11%" tone="green" />
+    </div>
+  \`,
+})
+export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
@@ -128,6 +216,29 @@ export function Surfaces() {
     </div>
   )
 }`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelStatCard label="Pixel" value="$4,200" surface="pixel" tone="gold" trend="+6%" />
+    <PixelStatCard label="Linear" value="$4,200" surface="linear" tone="gold" trend="+6%" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-stat-card label="Pixel" value="$4,200" surface="pixel" tone="gold" trend="+6%" />
+      <pxl-stat-card label="Linear" value="$4,200" surface="linear" tone="gold" trend="+6%" />
+    </div>
+  \`,
+})
+export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-icon-positions">
@@ -154,6 +265,42 @@ export function IconPositions() {
     </div>
   )
 }`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelStatCard label="Top" value="$1,200" icon-position="top" tone="cyan">
+      <template #icon><span aria-hidden="true">$</span></template>
+    </PixelStatCard>
+    <PixelStatCard label="Left" value="$1,200" icon-position="left" tone="green">
+      <template #icon><span aria-hidden="true">$</span></template>
+    </PixelStatCard>
+    <PixelStatCard label="Right" value="$1,200" icon-position="right" tone="purple">
+      <template #icon><span aria-hidden="true">$</span></template>
+    </PixelStatCard>
+    <PixelStatCard label="Bottom-left" value="$1,200" icon-position="bottom-left" tone="gold">
+      <template #icon><span aria-hidden="true">$</span></template>
+    </PixelStatCard>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-stat-card label="Top" value="$1,200" [icon]="dot" iconPosition="top" tone="cyan" />
+      <pxl-stat-card label="Left" value="$1,200" [icon]="dot" iconPosition="left" tone="green" />
+      <pxl-stat-card label="Right" value="$1,200" [icon]="dot" iconPosition="right" tone="purple" />
+      <pxl-stat-card label="Bottom-left" value="$1,200" [icon]="dot" iconPosition="bottom-left" tone="gold" />
+    </div>
+    <ng-template #dot><span aria-hidden="true">$</span></ng-template>
+  \`,
+})
+export class IconPositions {}`}
         />
       </article>
       <article className="docs-example" id="example-without-trend">
@@ -166,6 +313,21 @@ export function IconPositions() {
 export function WithoutTrend() {
   return <PixelStatCard label="Total users" value="12,480" tone="cyan" />
 }`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatCard label="Total users" value="12,480" tone="cyan" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`<pxl-stat-card label="Total users" value="12,480" tone="cyan" />\`,
+})
+export class WithoutTrend {}`}
         />
       </article>
       <article className="docs-example" id="example-toned-value-centered">
@@ -183,6 +345,29 @@ export function TonedValueCentered() {
     </div>
   )
 }`}
+          vue={`<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelStatCard label="Uptime" value="99.98%" tone="green" value-tone align="center" />
+    <PixelStatCard label="Error rate" value="0.02%" tone="red" value-tone align="center" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-stat-card label="Uptime" value="99.98%" tone="green" valueTone align="center" />
+      <pxl-stat-card label="Error rate" value="0.02%" tone="red" valueTone align="center" />
+    </div>
+  \`,
+})
+export class TonedValueCentered {}`}
         />
       </article>
     </section>

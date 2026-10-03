@@ -43,6 +43,12 @@ export interface CanonicalOptions {
    * DOM, where React and Vue consume props.
    */
   ignoreAttribute?: (element: Element, name: string) => boolean;
+  /**
+   * The element to serialise in place of one the port renders differently
+   * from React by design — another package's component whose host wraps the
+   * element React renders bare — or `undefined` for the element itself.
+   */
+  substitute?: (element: Element) => Element | undefined;
 }
 
 const FRAMEWORK_ATTRIBUTE = /^(data-v-|_ngcontent-|_nghost-|ng-reflect-|ng-version$|ngh$|ng-server-context$)/;
@@ -211,7 +217,7 @@ function canonicalChildren(parent: Node, ctx: Context): CanonicalNode[] {
       continue;
     }
     flushText();
-    out.push(canonicalElement(child, ctx));
+    out.push(canonicalElement(ctx.options.substitute?.(child) ?? child, ctx));
   }
   flushText();
   return out;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { fireEvent, render } from '@testing-library/react';
 import { PixelFeatureCard } from '../../cards/PixelFeatureCard';
 
 describe('PixelFeatureCard', () => {
@@ -92,6 +92,54 @@ describe('PixelFeatureCard', () => {
     expect(el.getAttribute('role')).toBe('button');
     expect(el.getAttribute('tabindex')).toBe('0');
     expect(el.className).toContain('focus-visible:ring-2');
+  });
+
+  it('Enter and Space activate onClick on the interactive non-href card', () => {
+    const onClick = vi.fn();
+    const { getByTestId } = render(
+      <PixelFeatureCard data-testid="card" title="Hi" interactive onClick={onClick} />,
+    );
+    const card = getByTestId('card');
+    fireEvent.keyDown(card, { key: 'Enter' });
+    fireEvent.keyDown(card, { key: ' ' });
+    fireEvent.keyDown(card, { key: 'a' });
+    expect(onClick).toHaveBeenCalledTimes(2);
+  });
+
+  // Regression: an onKeyDown of the card's own replaced the activation
+  // handler, so Enter and Space no longer activated an interactive card.
+  it('runs its own onKeyDown first, which can keep Enter from activating the card', () => {
+    const onClick = vi.fn();
+    const onKeyDown = vi.fn();
+    const { getByTestId, rerender } = render(
+      <PixelFeatureCard data-testid="card" title="Hi" interactive onClick={onClick} onKeyDown={onKeyDown} />,
+    );
+    fireEvent.keyDown(getByTestId('card'), { key: 'Enter' });
+    expect(onKeyDown).toHaveBeenCalledTimes(1);
+    expect(onClick).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <PixelFeatureCard
+        data-testid="card"
+        title="Hi"
+        interactive
+        onClick={onClick}
+        onKeyDown={(e) => e.preventDefault()}
+      />,
+    );
+    fireEvent.keyDown(getByTestId('card'), { key: 'Enter' });
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('forwards onKeyDown to the article and the link', () => {
+    const onKeyDown = vi.fn();
+    const { getByTestId, rerender } = render(
+      <PixelFeatureCard data-testid="card" title="Hi" onKeyDown={onKeyDown} />,
+    );
+    fireEvent.keyDown(getByTestId('card'), { key: 'Enter' });
+    rerender(<PixelFeatureCard data-testid="card" title="Hi" href="/foo" onKeyDown={onKeyDown} />);
+    fireEvent.keyDown(getByTestId('card'), { key: 'Enter' });
+    expect(onKeyDown).toHaveBeenCalledTimes(2);
   });
 
   it('href anchor variant carries the focus-visible ring', () => {

@@ -176,6 +176,15 @@ import { PixelButton } from '@pxlkit/ui-kit-vue';
 <template>
   <PixelButton>Click me</PixelButton>
 </template>`,
+  'pixel-card': `<script setup lang="ts">
+import { PixelCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelCard title="Project Atlas">
+    <p>Compact dossier on the Atlas migration. Status nominal.</p>
+  </PixelCard>
+</template>`,
   'pixel-center': `<script setup lang="ts">
 import { PixelCenter } from '@pxlkit/ui-kit-vue';
 </script>
@@ -376,6 +385,16 @@ import { PixelFadeIn } from '@pxlkit/ui-kit-vue';
     <div style="padding: 16px; background: #111; color: #fff">Fades in on mount</div>
   </PixelFadeIn>
 </template>`,
+  'pixel-feature-card': `<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    title="Realtime sync"
+    description="Push every keystroke to peers via WebSockets — under 50ms p95."
+  />
+</template>`,
   'pixel-flicker': `<script setup lang="ts">
 import { PixelFlicker } from '@pxlkit/ui-kit-vue';
 </script>
@@ -415,6 +434,15 @@ const cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
       {{ cell }}
     </div>
   </PixelGrid>
+</template>`,
+  'pixel-icon-frame': `<script setup lang="ts">
+import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelIconFrame>
+    <template #icon><span style="font-family: monospace; font-weight: 700">&gt;_</span></template>
+  </PixelIconFrame>
 </template>`,
   'pixel-input': `<script setup lang="ts">
 import { PixelInput } from '@pxlkit/ui-kit-vue';
@@ -578,6 +606,24 @@ import { PixelPortal } from '@pxlkit/ui-kit-vue';
     <div>Portaled content (renders into document.body after mount)</div>
   </PixelPortal>
 </template>`,
+  'pixel-pricing-card': `<script setup lang="ts">
+import { PixelPricingCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelPricingCard
+    tone="cyan"
+    name="Starter"
+    description="Everything you need to ship your first project."
+    :price="{ amount: '$19', period: '/mo' }"
+    :features="[
+      { label: '10 projects' },
+      { label: 'Basic analytics' },
+      { label: 'Email support' },
+      { label: 'Priority support', included: false },
+    ]"
+  />
+</template>`,
   'pixel-progress': `<script setup lang="ts">
 import { PixelProgress } from '@pxlkit/ui-kit-vue';
 </script>
@@ -608,6 +654,16 @@ const value = ref('free');
 
 <template>
   <PixelRadioGroup v-model="value" label="Plan" :options="PLANS" />
+</template>`,
+  'pixel-ribbon': `<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+    <div>Card content</div>
+    <PixelRibbon>New</PixelRibbon>
+  </div>
 </template>`,
   'pixel-rotate': `<script setup lang="ts">
 import { PixelRotate } from '@pxlkit/ui-kit-vue';
@@ -766,6 +822,31 @@ import { PixelStack } from '@pxlkit/ui-kit-vue';
     <div class="text-sm text-retro-muted">Third item</div>
   </PixelStack>
 </template>`,
+  'pixel-star-rating': `<script setup lang="ts">
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="4" />
+</template>`,
+  'pixel-stat-card': `<script setup lang="ts">
+import { PixelStatCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
+</template>`,
+  'pixel-stat-group': `<script setup lang="ts">
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStatGroup aria-label="Key metrics">
+    <PixelStatCard label="Users" value="1,284" />
+    <PixelStatCard label="Revenue" value="$12.4k" />
+    <PixelStatCard label="Active" value="312" />
+  </PixelStatGroup>
+</template>`,
   'pixel-stepper': `<script setup lang="ts">
 import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';
 </script>
@@ -800,6 +881,20 @@ const items: TabItem[] = [
 
 <template>
   <PixelTabs :items="items" default-value="overview" />
+</template>`,
+  'pixel-testimonial-card': `<script setup lang="ts">
+import { PixelTestimonialCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelTestimonialCard
+    quote="pxlkit dropped the polish ceiling. Our marketing site felt like a product launch in a week."
+    name="Marisol Quintero"
+    role="Head of Design"
+    company="Northbeam"
+    :stars="5"
+    verified
+  />
 </template>`,
   'pixel-text-link': `<script setup lang="ts">
 import { PixelTextLink } from '@pxlkit/ui-kit-vue';

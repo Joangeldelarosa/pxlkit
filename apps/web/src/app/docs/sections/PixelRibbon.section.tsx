@@ -71,6 +71,29 @@ export function Default() {
     </Container>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+    <div>Card content</div>
+    <PixelRibbon>New</PixelRibbon>
+  </div>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <pxl-ribbon>New</pxl-ribbon>
+    </div>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -99,6 +122,29 @@ export function Default() {
     </Container>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+    <div>Card content</div>
+    <PixelRibbon>New</PixelRibbon>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <pxl-ribbon>New</pxl-ribbon>
+    </div>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-corner-tilted">
@@ -127,6 +173,29 @@ export function CornerTilted() {
     </Container>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+    <div>Card content</div>
+    <PixelRibbon position="corner-tr" tone="red">Hot</PixelRibbon>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <pxl-ribbon position="corner-tr" tone="red">Hot</pxl-ribbon>
+    </div>
+  \`,
+})
+export class CornerTilted {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
@@ -161,6 +230,49 @@ export function Tones() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-6">
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <PixelRibbon tone="green">Free</PixelRibbon>
+    </div>
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <PixelRibbon tone="cyan">Beta</PixelRibbon>
+    </div>
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <PixelRibbon tone="purple">Pro</PixelRibbon>
+    </div>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="flex flex-wrap gap-6">
+      <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+        <div>Card content</div>
+        <pxl-ribbon tone="green">Free</pxl-ribbon>
+      </div>
+      <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+        <div>Card content</div>
+        <pxl-ribbon tone="cyan">Beta</pxl-ribbon>
+      </div>
+      <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+        <div>Card content</div>
+        <pxl-ribbon tone="purple">Pro</pxl-ribbon>
+      </div>
+    </div>
+  \`,
+})
+export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-position-left">
@@ -189,6 +301,29 @@ export function PositionLeft() {
     </Container>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelRibbon } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+    <div>Card content</div>
+    <PixelRibbon position="top-left" offset="lg" tone="gold">Sale</PixelRibbon>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <pxl-ribbon position="top-left" offset="lg" tone="gold">Sale</pxl-ribbon>
+    </div>
+  \`,
+})
+export class PositionLeft {}`}
         />
       </article>
     </section>

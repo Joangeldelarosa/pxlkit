@@ -8,6 +8,7 @@ export { PixelCodeInline } from './pixel-code-inline';
 export { PixelCollapsible } from './pixel-collapsible';
 export { PixelColorSwatch } from './pixel-color-swatch';
 export { PixelKbd } from './pixel-kbd';
+export { PixelStatGroup } from './pixel-stat-group';
 export { PixelTextLink } from './pixel-text-link';
 export { PixelTimeline } from './pixel-timeline';
 export { PixelTimelineItem } from './pixel-timeline-item';

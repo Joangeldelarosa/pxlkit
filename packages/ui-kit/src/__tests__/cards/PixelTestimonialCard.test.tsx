@@ -52,6 +52,17 @@ describe('PixelTestimonialCard', () => {
     expect(badge).toBeTruthy();
   });
 
+  // Regression: the badge carried its aria-label as a plain span, a generic
+  // element ARIA 1.2 does not allow to be named (axe: aria-prohibited-attr).
+  it('names the verified badge as an image', () => {
+    const { container } = render(
+      <PixelTestimonialCard quote="Good stuff." name="Ada Lovelace" verified />,
+    );
+    const badge = container.querySelector('[data-pxl-verified]')!;
+    expect(badge.getAttribute('role')).toBe('img');
+    expect(badge.getAttribute('aria-label')).toBe('Verified');
+  });
+
   it('quoteSize="long" applies min-h-[9em]', () => {
     const { container } = render(
       <PixelTestimonialCard

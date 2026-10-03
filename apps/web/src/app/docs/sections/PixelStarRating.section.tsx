@@ -80,6 +80,21 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
 export function Default() {
   return <PixelStarRating value={4} />;
 }`}
+        vue={`<script setup lang="ts">
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="4" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [value]="4" />\`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -94,6 +109,21 @@ export function Default() {
 export function Default() {
   return <PixelStarRating value={4} />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="4" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [value]="4" />\`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-with-count">
@@ -106,6 +136,21 @@ export function Default() {
 export function WithCount() {
   return <PixelStarRating value={3} max={5} showCount />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="3" :max="5" show-count />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [value]="3" [max]="5" showCount />\`,
+})
+export class WithCount {}`}
         />
       </article>
       <article className="docs-example" id="example-green-tone">
@@ -118,6 +163,21 @@ export function WithCount() {
 export function GreenTone() {
   return <PixelStarRating value={5} tone="green" size="lg" />;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="5" tone="green" size="lg" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [value]="5" tone="green" size="lg" />\`,
+})
+export class GreenTone {}`}
         />
       </article>
       <article className="docs-example" id="example-interactive">
@@ -131,6 +191,26 @@ import { PixelStarRating } from '@pxlkit/ui-kit';
 export function Interactive() {
   const [rating, setRating] = React.useState(3);
   return <PixelStarRating value={rating} interactive onChange={setRating} />;
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+
+const rating = ref(3);
+</script>
+
+<template>
+  <PixelStarRating v-model="rating" interactive />
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [(value)]="rating" interactive />\`,
+})
+export class Interactive {
+  readonly rating = signal(3);
 }`}
         />
       </article>
@@ -152,6 +232,34 @@ export function CustomIcon() {
       }
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { Heart } from '@pxlkit/gamification';
+import { PxlKitIcon } from '@pxlkit/vue';
+import { PixelStarRating } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelStarRating :model-value="3">
+    <template #star-icon>
+      <PxlKitIcon :icon="Heart" :size="20" appearance="solid" color="#EF4444" />
+    </template>
+  </PixelStarRating>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PxlKitIcon } from '@pxlkit/angular';
+import { Heart } from '@pxlkit/gamification';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating, PxlKitIcon],
+  template: \`
+    <pxl-star-rating [value]="3" [starIcon]="heart" />
+    <ng-template #heart><pxl-icon [icon]="heartIcon" [size]="20" appearance="solid" color="#EF4444" /></ng-template>
+  \`,
+})
+export class CustomIcon {
+  readonly heartIcon = Heart;
 }`}
         />
       </article>

@@ -90,6 +90,29 @@ export function Default() {
     />
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    title="Realtime sync"
+    description="Push every keystroke to peers via WebSockets — under 50ms p95."
+  />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      title="Realtime sync"
+      description="Push every keystroke to peers via WebSockets — under 50ms p95."
+    />
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -109,6 +132,29 @@ export function Default() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    title="Realtime sync"
+    description="Push every keystroke to peers via WebSockets — under 50ms p95."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      title="Realtime sync"
+      description="Push every keystroke to peers via WebSockets — under 50ms p95."
+    />
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-with-icon">
@@ -134,6 +180,43 @@ export function WithIcon() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    title="Pixel-perfect"
+    description="Crisp edges on every retina ratio thanks to shape-rendering: crispEdges."
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      [icon]="icon"
+      title="Pixel-perfect"
+      description="Crisp edges on every retina ratio thanks to shape-rendering: crispEdges."
+    />
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class WithIcon {}`}
         />
       </article>
       <article className="docs-example" id="example-with-badge">
@@ -160,6 +243,45 @@ export function WithBadge() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    :badge="{ label: 'NEW', tone: 'gold' }"
+    title="AI Companion"
+    description="A built-in copilot that learns your codebase as you ship it."
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      [icon]="icon"
+      [badge]="{ label: 'NEW', tone: 'gold' }"
+      title="AI Companion"
+      description="A built-in copilot that learns your codebase as you ship it."
+    />
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class WithBadge {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
@@ -186,6 +308,56 @@ export function Tones() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard, type ToneKey } from '@pxlkit/ui-kit-vue';
+
+const cards: { tone: ToneKey; title: string }[] = [
+  { tone: 'cyan', title: 'Cyan' },
+  { tone: 'green', title: 'Green' },
+  { tone: 'gold', title: 'Gold' },
+  { tone: 'purple', title: 'Purple' },
+];
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelFeatureCard
+      v-for="card in cards"
+      :key="card.tone"
+      :tone="card.tone"
+      :title="card.title"
+      description="Tinted icon frame."
+    >
+      <template #icon>
+        <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+          <rect x="3" y="0" width="2" height="8" />
+          <rect x="0" y="3" width="8" height="2" />
+        </svg>
+      </template>
+    </PixelFeatureCard>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-feature-card [icon]="icon" tone="cyan" title="Cyan" description="Tinted icon frame." />
+      <pxl-feature-card [icon]="icon" tone="green" title="Green" description="Tinted icon frame." />
+      <pxl-feature-card [icon]="icon" tone="gold" title="Gold" description="Tinted icon frame." />
+      <pxl-feature-card [icon]="icon" tone="purple" title="Purple" description="Tinted icon frame." />
+    </div>
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
@@ -210,6 +382,52 @@ export function Surfaces() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard, type Surface } from '@pxlkit/ui-kit-vue';
+
+const cards: { surface: Surface; title: string; description: string }[] = [
+  { surface: 'pixel', title: 'Pixel', description: 'Thick border + offset shadow.' },
+  { surface: 'linear', title: 'Linear', description: 'Soft border + smooth radius.' },
+];
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelFeatureCard
+      v-for="card in cards"
+      :key="card.surface"
+      :surface="card.surface"
+      :title="card.title"
+      :description="card.description"
+    >
+      <template #icon>
+        <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+          <rect x="3" y="0" width="2" height="8" />
+          <rect x="0" y="3" width="8" height="2" />
+        </svg>
+      </template>
+    </PixelFeatureCard>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-feature-card surface="pixel" [icon]="icon" title="Pixel" description="Thick border + offset shadow." />
+      <pxl-feature-card surface="linear" [icon]="icon" title="Linear" description="Soft border + smooth radius." />
+    </div>
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-horizontal">
@@ -236,6 +454,45 @@ export function Horizontal() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    orientation="horizontal"
+    title="Horizontal layout"
+    description="Icon sits to the left of the title and description."
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      orientation="horizontal"
+      [icon]="icon"
+      title="Horizontal layout"
+      description="Icon sits to the left of the title and description."
+    />
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Horizontal {}`}
         />
       </article>
       <article className="docs-example" id="example-interactive">
@@ -262,6 +519,56 @@ export function Interactive() {
       description="Press Enter or Space to activate via keyboard."
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+
+function activate() {
+  alert('feature clicked');
+}
+</script>
+
+<template>
+  <PixelFeatureCard
+    interactive
+    title="Click me"
+    description="Press Enter or Space to activate via keyboard."
+    @click="activate"
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <div
+      pxlFeatureCard
+      interactive
+      [icon]="icon"
+      title="Click me"
+      description="Press Enter or Space to activate via keyboard."
+      (click)="activate()"
+    ></div>
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class Interactive {
+  activate(): void {
+    alert('feature clicked');
+  }
 }`}
         />
       </article>
@@ -291,6 +598,50 @@ export function AsLink() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    href="https://example.com"
+    target="_blank"
+    rel="noopener noreferrer"
+    title="Read the docs"
+    description="Root renders as <a href> when href is provided."
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <a
+      pxlFeatureCard
+      href="https://example.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      [icon]="icon"
+      title="Read the docs"
+      description="Root renders as <a href> when href is provided."
+    ></a>
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class AsLink {}`}
         />
       </article>
       <article className="docs-example" id="example-with-footer">
@@ -317,6 +668,45 @@ export function WithFooter() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard title="Realtime sync" description="Push every keystroke to peers via WebSockets.">
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+    <template #footer>
+      <span class="text-xs text-retro-muted">Learn more →</span>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      [icon]="icon"
+      title="Realtime sync"
+      description="Push every keystroke to peers via WebSockets."
+      [footer]="more"
+    />
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+    <ng-template #more><span class="text-xs text-retro-muted">Learn more →</span></ng-template>
+  \`,
+})
+export class WithFooter {}`}
         />
       </article>
       <article className="docs-example" id="example-clamped-description">
@@ -343,6 +733,45 @@ export function ClampedDescription() {
     />
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelFeatureCard
+    title="Long Description"
+    description="This description is intentionally long to demonstrate the line-clamp behavior. It will be truncated to the configured number of lines with an ellipsis, while maintaining a minimum height so cards stay aligned in a grid."
+    :description-lines="2"
+  >
+    <template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </template>
+  </PixelFeatureCard>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      [icon]="icon"
+      title="Long Description"
+      description="This description is intentionally long to demonstrate the line-clamp behavior. It will be truncated to the configured number of lines with an ellipsis, while maintaining a minimum height so cards stay aligned in a grid."
+      [descriptionLines]="2"
+    />
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class ClampedDescription {}`}
         />
       </article>
       <article className="docs-example" id="example-icon-sizes">
@@ -367,6 +796,52 @@ export function IconSizes() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';
+
+const cards = [
+  { iconSize: 48, title: 'Small', description: '48px icon frame.' },
+  { iconSize: 80, title: 'Large', description: '80px icon frame.' },
+] as const;
+</script>
+
+<template>
+  <div class="grid grid-cols-2 gap-3">
+    <PixelFeatureCard
+      v-for="card in cards"
+      :key="card.iconSize"
+      :icon-size="card.iconSize"
+      :title="card.title"
+      :description="card.description"
+    >
+      <template #icon>
+        <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+          <rect x="3" y="0" width="2" height="8" />
+          <rect x="0" y="3" width="8" height="2" />
+        </svg>
+      </template>
+    </PixelFeatureCard>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <div class="grid grid-cols-2 gap-3">
+      <pxl-feature-card [icon]="icon" [iconSize]="48" title="Small" description="48px icon frame." />
+      <pxl-feature-card [icon]="icon" [iconSize]="80" title="Large" description="80px icon frame." />
+    </div>
+    <ng-template #icon>
+      <svg viewBox="0 0 8 8" shape-rendering="crispEdges" fill="currentColor" class="h-4 w-4">
+        <rect x="3" y="0" width="2" height="8" />
+        <rect x="0" y="3" width="8" height="2" />
+      </svg>
+    </ng-template>
+  \`,
+})
+export class IconSizes {}`}
         />
       </article>
     </section>

@@ -209,6 +209,18 @@ import { PixelButton } from '@pxlkit/ui-kit-angular';
   template: \`<button pxlButton>Click me</button>\`,
 })
 export class Default {}`,
+  'pixel-card': `import { Component } from '@angular/core';
+import { PixelCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelCard],
+  template: \`
+    <pxl-card title="Project Atlas">
+      <p>Compact dossier on the Atlas migration. Status nominal.</p>
+    </pxl-card>
+  \`,
+})
+export class Default {}`,
   'pixel-center': `import { Component } from '@angular/core';
 import { PixelCenter } from '@pxlkit/ui-kit-angular';
 
@@ -449,6 +461,19 @@ import { PixelFadeIn } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class Default {}`,
+  'pixel-feature-card': `import { Component } from '@angular/core';
+import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelFeatureCard],
+  template: \`
+    <pxl-feature-card
+      title="Realtime sync"
+      description="Push every keystroke to peers via WebSockets — under 50ms p95."
+    />
+  \`,
+})
+export class Default {}`,
   'pixel-flicker': `import { Component } from '@angular/core';
 import { PixelFlicker } from '@pxlkit/ui-kit-angular';
 
@@ -501,6 +526,17 @@ import { PixelGrid } from '@pxlkit/ui-kit-angular';
 export class Default {
   readonly cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
 }`,
+  'pixel-icon-frame': `import { Component } from '@angular/core';
+import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelIconFrame],
+  template: \`
+    <pxl-icon-frame [icon]="glyph" />
+    <ng-template #glyph><span style="font-family: monospace; font-weight: 700">&gt;_</span></ng-template>
+  \`,
+})
+export class Default {}`,
   'pixel-input': `import { Component } from '@angular/core';
 import { PixelInput } from '@pxlkit/ui-kit-angular';
 
@@ -673,6 +709,27 @@ import { PixelPortal } from '@pxlkit/ui-kit-angular';
   template: \`<div *pxlPortal>Portaled content (renders into document.body after mount)</div>\`,
 })
 export class Default {}`,
+  'pixel-pricing-card': `import { Component } from '@angular/core';
+import { PixelPricingCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelPricingCard],
+  template: \`
+    <pxl-pricing-card
+      tone="cyan"
+      name="Starter"
+      description="Everything you need to ship your first project."
+      [price]="{ amount: '$19', period: '/mo' }"
+      [features]="[
+        { label: '10 projects' },
+        { label: 'Basic analytics' },
+        { label: 'Email support' },
+        { label: 'Priority support', included: false },
+      ]"
+    />
+  \`,
+})
+export class Default {}`,
   'pixel-progress': `import { Component } from '@angular/core';
 import { PixelProgress } from '@pxlkit/ui-kit-angular';
 
@@ -710,6 +767,19 @@ export class Default {
   readonly plans = PLANS;
   readonly value = signal('free');
 }`,
+  'pixel-ribbon': `import { Component } from '@angular/core';
+import { PixelRibbon } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelRibbon],
+  template: \`
+    <div class="relative inline-block border-2 border-retro-border bg-retro-bg/60 p-8 text-retro-text">
+      <div>Card content</div>
+      <pxl-ribbon>New</pxl-ribbon>
+    </div>
+  \`,
+})
+export class Default {}`,
   'pixel-rotate': `import { Component } from '@angular/core';
 import { PixelRotate } from '@pxlkit/ui-kit-angular';
 
@@ -907,6 +977,36 @@ import { PixelStack } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class Default {}`,
+  'pixel-star-rating': `import { Component } from '@angular/core';
+import { PixelStarRating } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStarRating],
+  template: \`<pxl-star-rating [value]="4" />\`,
+})
+export class Default {}`,
+  'pixel-stat-card': `import { Component } from '@angular/core';
+import { PixelStatCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard],
+  template: \`<pxl-stat-card label="Revenue" value="$12,480" trend="+8.2% vs last week" />\`,
+})
+export class Default {}`,
+  'pixel-stat-group': `import { Component } from '@angular/core';
+import { PixelStatCard, PixelStatGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelStatCard, PixelStatGroup],
+  template: \`
+    <pxl-stat-group aria-label="Key metrics">
+      <pxl-stat-card label="Users" value="1,284" />
+      <pxl-stat-card label="Revenue" value="$12.4k" />
+      <pxl-stat-card label="Active" value="312" />
+    </pxl-stat-group>
+  \`,
+})
+export class Default {}`,
   'pixel-stepper': `import { Component } from '@angular/core';
 import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';
 
@@ -953,6 +1053,23 @@ export class Default {
     { id: 'settings', label: 'Settings', content: this.settings() },
   ]);
 }`,
+  'pixel-testimonial-card': `import { Component } from '@angular/core';
+import { PixelTestimonialCard } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelTestimonialCard],
+  template: \`
+    <pxl-testimonial-card
+      quote="pxlkit dropped the polish ceiling. Our marketing site felt like a product launch in a week."
+      name="Marisol Quintero"
+      role="Head of Design"
+      company="Northbeam"
+      [stars]="5"
+      verified
+    />
+  \`,
+})
+export class Default {}`,
   'pixel-text-link': `import { Component } from '@angular/core';
 import { PixelTextLink } from '@pxlkit/ui-kit-angular';
 

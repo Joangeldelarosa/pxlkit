@@ -129,6 +129,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@pxlkit/ui-kit`: `PixelStepper` steps get valid roles and names (clickable steps are buttons,
   the others read their position and state as hidden text), and `PixelAccordion` /
   `PixelCollapsible` panels drop an `aria-labelledby` that ARIA does not allow without a role.
+- `@pxlkit/ui-kit`: a link `PixelCard` (`href`) passes `onKeyDown` to its `<a>`, which it
+  dropped; a consumer's `onKeyDown` on an interactive `PixelFeatureCard` runs first and can
+  keep Enter and Space from activating it, instead of replacing the card's own handler; and
+  `PixelTestimonialCard`'s verified badge is an image named "Verified" — an `aria-label` on a
+  plain `<span>`, which ARIA does not allow.
 - `@pxlkit/ui-kit`: `PixelNavigationMenu` follows the WAI-ARIA disclosure navigation
   pattern — a `<nav>` with a list of links and `<button aria-expanded aria-controls>`
   disclosures — instead of application-menu roles (`menubar`, `menuitem`, `menu`) whose

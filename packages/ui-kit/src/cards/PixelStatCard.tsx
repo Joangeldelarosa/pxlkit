@@ -1,8 +1,10 @@
 import React from 'react';
 import {
-  Tone, Surface, cn,
-  toneMap, surfaceClasses, useEffectiveSurface,
-} from '../common';
+  statCardClasses,
+  type PixelStatCardIconPosition,
+  type PixelStatCardSize,
+} from '@pxlkit/ui-kit-core';
+import { Tone, Surface, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelStatCard — compact metric card.
@@ -12,8 +14,7 @@ import {
    where the icon renders. Defaults preserve the legacy layout.
    ───────────────────────────────────────────────────────────────────────── */
 
-export type PixelStatCardSize = 'sm' | 'md' | 'lg';
-export type PixelStatCardIconPosition = 'left' | 'right' | 'top' | 'bottom-left';
+export type { PixelStatCardIconPosition, PixelStatCardSize } from '@pxlkit/ui-kit-core';
 
 export interface PixelStatCardProps {
   /** Caption rendered above the value. */
@@ -53,43 +54,20 @@ export function PixelStatCard({
   align = 'start',
   bordered = true,
 }: PixelStatCardProps) {
-  const centered = align === 'center';
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
+  const classes = statCardClasses(surface, { tone, size, iconPosition, valueTone, align, bordered });
 
-  const padding = size === 'sm' ? 'p-3' : size === 'lg' ? 'p-6' : 'p-4';
-  const labelSize = size === 'sm' ? 'text-[10px]' : size === 'lg' ? 'text-sm' : 'text-xs';
-  const valueSize =
-    surface === 'pixel'
-      ? (size === 'sm' ? 'text-xs font-pixel' : size === 'lg' ? 'text-lg font-pixel' : 'text-sm font-pixel')
-      : (size === 'sm' ? 'text-sm font-semibold' : size === 'lg' ? 'text-2xl font-semibold' : 'text-base font-semibold');
-  const trendSize = size === 'sm' ? 'text-[10px]' : size === 'lg' ? 'text-sm' : 'text-xs';
-  const iconBoxSize = size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-lg' : 'text-sm';
-  const valueGap = size === 'sm' ? 'mt-1.5' : size === 'lg' ? 'mt-3' : 'mt-2';
-  const trendGap = size === 'sm' ? 'mt-1.5' : size === 'lg' ? 'mt-3' : 'mt-2';
-
-  const labelEl = <p className={cn(labelSize, 'text-retro-muted', s.font)}>{label}</p>;
-  const valueEl = <p className={cn(valueTone ? toneMap[tone].text : 'text-retro-text', valueSize)}>{value}</p>;
-  const iconEl = icon ? (
-    <span className={cn('inline-flex items-center justify-center shrink-0', iconBoxSize, toneMap[tone].text)}>{icon}</span>
-  ) : null;
-  const trendEl = trend ? <p className={cn(trendGap, trendSize, 'text-retro-muted', s.font)}>{trend}</p> : null;
-
-  const baseClass = cn(
-    padding,
-    centered && 'text-center',
-    bordered && s.border,
-    bordered && s.radiusLg,
-    bordered && toneMap[tone].border,
-    bordered && toneMap[tone].soft,
-  );
+  const labelEl = <p className={classes.label}>{label}</p>;
+  const valueEl = <p className={classes.value}>{value}</p>;
+  const iconEl = icon ? <span className={classes.icon}>{icon}</span> : null;
+  const trendEl = trend ? <p className={classes.trend}>{trend}</p> : null;
 
   if (iconPosition === 'right') {
     return (
-      <div className={cn(baseClass, 'grid grid-cols-[1fr_auto] items-center gap-3')}>
-        <div className="min-w-0">
+      <div className={classes.root}>
+        <div className={classes.content}>
           {labelEl}
-          <div className={valueGap}>{valueEl}</div>
+          <div className={classes.valueRow}>{valueEl}</div>
           {trendEl}
         </div>
         {iconEl}
@@ -99,11 +77,11 @@ export function PixelStatCard({
 
   if (iconPosition === 'left') {
     return (
-      <div className={cn(baseClass, 'flex items-center gap-3')}>
+      <div className={classes.root}>
         {iconEl}
-        <div className="min-w-0 flex-1">
+        <div className={classes.content}>
           {labelEl}
-          <div className={valueGap}>{valueEl}</div>
+          <div className={classes.valueRow}>{valueEl}</div>
           {trendEl}
         </div>
       </div>
@@ -112,22 +90,18 @@ export function PixelStatCard({
 
   if (iconPosition === 'bottom-left') {
     return (
-      <div className={cn(baseClass, 'relative overflow-hidden')}>
-        <div className="mb-3 flex items-center justify-between">{labelEl}</div>
+      <div className={classes.root}>
+        <div className={classes.header}>{labelEl}</div>
         {valueEl}
         {trendEl}
-        {iconEl && (
-          <span className={cn('absolute bottom-0 left-0 inline-flex max-w-full items-center justify-center', padding, iconBoxSize, toneMap[tone].text)}>
-            {icon}
-          </span>
-        )}
+        {iconEl && <span className={classes.cornerIcon}>{icon}</span>}
       </div>
     );
   }
 
   return (
-    <div className={baseClass}>
-      <div className={cn('mb-3 flex items-center', centered ? 'justify-center gap-2' : 'justify-between')}>
+    <div className={classes.root}>
+      <div className={classes.header}>
         {labelEl}
         {iconEl}
       </div>

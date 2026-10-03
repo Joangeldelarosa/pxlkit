@@ -8,6 +8,7 @@ export { default as PixelCodeInline, type PixelCodeInlineProps } from './PixelCo
 export { default as PixelCollapsible, type PixelCollapsibleProps } from './PixelCollapsible.vue';
 export { default as PixelColorSwatch, type PixelColorSwatchProps } from './PixelColorSwatch.vue';
 export { default as PixelKbd, type PixelKbdProps } from './PixelKbd.vue';
+export { default as PixelStatGroup, type PixelStatGroupProps } from './PixelStatGroup.vue';
 export { default as PixelTextLink, type PixelTextLinkProps } from './PixelTextLink.vue';
 export { default as PixelTimeline, type PixelTimelineProps } from './PixelTimeline.js';
 export { default as PixelTimelineItem, type PixelTimelineItemProps } from './PixelTimelineItem.vue';

@@ -1,9 +1,13 @@
 import React, { forwardRef } from 'react';
 import {
-  Surface, cn,
-  surfaceClasses, useEffectiveSurface,
-} from '../common';
-import { tone as toneTokens, ToneKey } from '../tokens';
+  cardBodyClasses,
+  cardClasses,
+  cardFooterClasses,
+  cardHeaderClasses,
+  isCardActivationKey,
+} from '@pxlkit/ui-kit-core';
+import { Surface, cn, useEffectiveSurface } from '../common';
+import { ToneKey } from '../tokens';
 import { PixelRibbon } from './PixelRibbon';
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -15,19 +19,6 @@ import { PixelRibbon } from './PixelRibbon';
    render via href, and a padding scale. Existing call sites continue to
    work unchanged.
    ───────────────────────────────────────────────────────────────────────── */
-
-const paddingMap = {
-  none: 'p-0',
-  sm: 'p-2',
-  md: 'p-3',
-  lg: 'p-6',
-} as const;
-
-const lineClampMap = {
-  2: 'line-clamp-2 min-h-[2em]',
-  3: 'line-clamp-3 min-h-[3em]',
-  4: 'line-clamp-4 min-h-[4em]',
-} as const;
 
 export interface PixelCardProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
   /** Heading rendered inside the auto-generated header. Omit for a headerless container/well card. */
@@ -79,10 +70,7 @@ type CardRoot = HTMLAnchorElement | HTMLElement;
 
 function CardHeader({ children, className, ...rest }: React.HTMLAttributes<HTMLElement>) {
   return (
-    <header
-      className={cn('mb-3 flex items-center gap-2 border-b border-retro-border/30 pb-3', className)}
-      {...rest}
-    >
+    <header className={cn(cardHeaderClasses, className)} {...rest}>
       {children}
     </header>
   );
@@ -91,7 +79,7 @@ CardHeader.displayName = 'PixelCard.Header';
 
 function CardBody({ children, className, ...rest }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('flex-1 text-sm text-retro-muted', className)} {...rest}>
+    <div className={cn(cardBodyClasses, className)} {...rest}>
       {children}
     </div>
   );
@@ -100,10 +88,7 @@ CardBody.displayName = 'PixelCard.Body';
 
 function CardFooter({ children, className, ...rest }: React.HTMLAttributes<HTMLElement>) {
   return (
-    <footer
-      className={cn('mt-auto border-t border-retro-border/30 pt-3', className)}
-      {...rest}
-    >
+    <footer className={cn(cardFooterClasses, className)} {...rest}>
       {children}
     </footer>
   );
@@ -150,33 +135,27 @@ const PixelCardImpl = forwardRef<CardRoot, PixelCardProps>(function PixelCard(
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const t = tone ? toneTokens[tone] : null;
-  const padCls = padding ? paddingMap[padding] : 'p-4';
   const hasMedia = !!media;
   const hasBadge = !!badge;
   const hasExplicitHeader = childrenContainCardHeader(children);
-
-  const rootCls = cn(
-    'relative flex flex-col transition-all',
-    bordered && 'bg-retro-surface/60',
-    bordered && s.border,
-    bordered && s.radiusLg,
-    bordered && (t ? t.border : 'border-retro-border/40 hover:border-retro-border/60'),
-    bordered && (t ? t.soft : null),
-    (hasMedia || hasBadge) && 'overflow-hidden',
-    interactive && 'cursor-pointer hover:-translate-y-[2px] hover:shadow-lg',
-    (interactive || href) && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
-    href && 'no-underline text-inherit',
-    !hasMedia && padCls,
-    className,
-  );
+  const classes = cardClasses(surface, {
+    tone,
+    padding,
+    bordered,
+    interactive: !!interactive,
+    link: !!href,
+    media: hasMedia,
+    badge: hasBadge,
+    description: !!description,
+    descriptionLines,
+  });
+  const rootCls = cn(classes.root, className);
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLElement> = (e) => {
     onKeyDown?.(e);
     if (e.defaultPrevented) return;
     if (!interactive || href) return;
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (isCardActivationKey(e.key)) {
       e.preventDefault();
       onClick?.(e as unknown as React.MouseEvent<HTMLElement>);
     }
@@ -184,7 +163,7 @@ const PixelCardImpl = forwardRef<CardRoot, PixelCardProps>(function PixelCard(
 
   const inner = (
     <>
-      {hasMedia && <div className="-m-0 overflow-hidden">{media}</div>}
+      {hasMedia && <div className={classes.media}>{media}</div>}
       {hasBadge && (
         <PixelRibbon
           position="top-right"
@@ -194,29 +173,18 @@ const PixelCardImpl = forwardRef<CardRoot, PixelCardProps>(function PixelCard(
           {badge!.label}
         </PixelRibbon>
       )}
-      <div className={cn(hasMedia && padCls, 'flex flex-1 flex-col')}>
+      <div className={classes.content}>
         {!hasExplicitHeader && title !== undefined && (
-          <header className={cn('flex items-center gap-2 border-b border-retro-border/30 pb-3', description ? 'mb-2' : 'mb-3')}>
-            {icon && <span className="inline-flex items-center justify-center shrink-0">{icon}</span>}
-            <h4 className={cn('text-sm font-semibold text-retro-text', s.font)}>{title}</h4>
+          <header className={classes.header}>
+            {icon && <span className={classes.icon}>{icon}</span>}
+            <h4 className={classes.title}>{title}</h4>
           </header>
         )}
-        {description && (
-          <p
-            className={cn(
-              'mb-3 text-sm text-retro-muted',
-              descriptionLines ? lineClampMap[descriptionLines] : null,
-            )}
-          >
-            {description}
-          </p>
-        )}
+        {description && <p className={classes.description}>{description}</p>}
         {children !== undefined && children !== null && (
-          <div className="text-sm text-retro-muted">{children}</div>
+          <div className={classes.body}>{children}</div>
         )}
-        {footer && (
-          <footer className="mt-4 border-t border-retro-border/30 pt-3">{footer}</footer>
-        )}
+        {footer && <footer className={classes.footer}>{footer}</footer>}
       </div>
     </>
   );
@@ -230,6 +198,7 @@ const PixelCardImpl = forwardRef<CardRoot, PixelCardProps>(function PixelCard(
         rel={rel}
         className={rootCls}
         onClick={onClick as React.MouseEventHandler<HTMLAnchorElement> | undefined}
+        onKeyDown={onKeyDown}
         {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
       >
         {inner}

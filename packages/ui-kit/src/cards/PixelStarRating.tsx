@@ -4,49 +4,21 @@ import React, { forwardRef, type ReactNode } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Star } from '@pxlkit/gamification';
 import {
-  Surface,
-  cn,
-  surfaceClasses,
-  useEffectiveSurface,
-} from '../common';
+  STAR_RATING_ICON_LABEL,
+  STAR_RATING_MUTED_COLOR,
+  starRatingButtonLabel,
+  starRatingClasses,
+  starRatingLabel,
+  starRatingSizes,
+  starRatingStarClasses,
+  starRatingStars,
+  starRatingToneColors,
+  starRatingValue,
+  type StarRatingSize as StarSize,
+  type StarRatingTone as StarTone,
+} from '@pxlkit/ui-kit-core';
+import { Surface, cn, useEffectiveSurface } from '../common';
 import { useControllableState } from '../hooks/useControllableState';
-
-type StarSize = 'sm' | 'md' | 'lg';
-type StarTone = 'gold' | 'green';
-
-/**
- * Pixel sizes (in CSS px) for the gamification Star rendered via
- * {@link PxlKitIcon}. PxlKitIcon takes a numeric `size` prop, not Tailwind
- * classes — both filled and outlined states render the SAME gamification
- * Star glyph at this size, so silhouettes match pixel-for-pixel.
- */
-const sizePxMap: Record<StarSize, number> = {
-  sm: 16,
-  md: 20,
-  lg: 24,
-};
-
-const toneFill: Record<StarTone, string> = {
-  gold: 'text-retro-gold',
-  green: 'text-retro-green',
-};
-
-/**
- * Solid-mode hex resolution for {@link PxlKitIcon}. The icon renders as
- * `<img>` (isolated context) so `currentColor` is not honoured — we MUST
- * pass an explicit hex to preserve the `tone` prop across surfaces.
- * Values sourced from styles.css dark-mode tokens.
- */
-const toneHex: Record<StarTone, string> = {
-  gold: '#FFD700',
-  green: '#00FF88',
-};
-
-/**
- * Muted hex for the OUTLINED (empty) state. Paired with wrapper opacity-40
- * to produce a dim grey star that shares geometry with the filled glyph.
- */
-const MUTED_HEX = '#4A4A55';
 
 export interface PixelStarRatingProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
@@ -105,15 +77,14 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
     const [internalValue, setInternalValue] = useControllableState<number>({
       value,
       defaultValue: defaultValue ?? 0,
       onChange,
     });
-    const safe = Math.max(0, Math.min(max, Math.round(internalValue ?? 0)));
-    const px = sizePxMap[size];
-    const fillClass = toneFill[tone];
+    const safe = starRatingValue(internalValue, max);
+    const px = starRatingSizes[size];
+    const classes = starRatingClasses(surface);
 
     function renderGlyph(filled: boolean): ReactNode {
       if (typeof starIcon === 'function') {
@@ -128,44 +99,38 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
             icon={Star}
             size={px}
             appearance="solid"
-            color={toneHex[tone]}
-            aria-label="star"
+            color={starRatingToneColors[tone]}
+            aria-label={STAR_RATING_ICON_LABEL}
           />
         );
       }
       return (
-        <span className="opacity-40 inline-flex">
+        <span className={classes.muted}>
           <PxlKitIcon
             icon={Star}
             size={px}
             appearance="solid"
-            color={MUTED_HEX}
-            aria-label="star"
+            color={STAR_RATING_MUTED_COLOR}
+            aria-label={STAR_RATING_ICON_LABEL}
           />
         </span>
       );
     }
 
-    const stars = Array.from({ length: max }).map((_, i) => {
-      const filled = i < safe;
+    const stars = starRatingStars(safe, max).map(({ value: starValue, filled }) => {
       const status = filled ? 'filled' : 'outlined';
-      const colorClass = filled ? fillClass : '';
+      const className = starRatingStarClasses(surface, { interactive, filled, tone });
 
       if (interactive) {
         return (
           <button
-            key={i}
+            key={starValue}
             type="button"
             data-pxl-star={status}
-            aria-label={`Rate ${i + 1} of ${max}`}
+            aria-label={starRatingButtonLabel(starValue, max)}
             aria-pressed={filled}
-            onClick={() => setInternalValue(i + 1)}
-            className={cn(
-              'cursor-pointer inline-flex items-center justify-center bg-transparent border-0 p-0',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
-              colorClass,
-              s.transition,
-            )}
+            onClick={() => setInternalValue(starValue)}
+            className={className}
           >
             {renderGlyph(filled)}
           </button>
@@ -173,11 +138,7 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
       }
 
       return (
-        <span
-          key={i}
-          data-pxl-star={status}
-          className={cn('inline-flex items-center justify-center', colorClass)}
-        >
+        <span key={starValue} data-pxl-star={status} className={className}>
           {renderGlyph(filled)}
         </span>
       );
@@ -187,15 +148,13 @@ export const PixelStarRating = forwardRef<HTMLDivElement, PixelStarRatingProps>(
       <div
         ref={ref}
         role={interactive ? 'group' : 'img'}
-        aria-label={
-          interactive ? `Rating, ${safe} of ${max}` : `${safe} out of ${max}`
-        }
-        className={cn('inline-flex items-center gap-1', s.font, className)}
+        aria-label={starRatingLabel(safe, max, interactive)}
+        className={cn(classes.root, className)}
         {...rest}
       >
-        <span className="inline-flex items-center gap-0.5">{stars}</span>
+        <span className={classes.stars}>{stars}</span>
         {showCount && (
-          <span className={cn('ml-1 text-xs text-retro-muted', s.font)}>
+          <span className={classes.count}>
             {safe}/{max}
           </span>
         )}

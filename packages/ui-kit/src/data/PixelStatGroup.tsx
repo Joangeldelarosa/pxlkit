@@ -1,19 +1,9 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
-import { tone as toneTokens, ToneKey, stackGap, StackGapKey } from '../tokens';
-
-type Layout = 'row' | 'grid';
-
-const colsMap: Record<number, string> = {
-  1: 'grid-cols-1',
-  2: 'grid-cols-2',
-  3: 'grid-cols-1 sm:grid-cols-3',
-  4: 'grid-cols-2 sm:grid-cols-4',
-  5: 'grid-cols-2 sm:grid-cols-5',
-  6: 'grid-cols-2 sm:grid-cols-6',
-};
+import { statGroupClasses, statGroupRole, type StatGroupLayout as Layout } from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ToneKey, StackGapKey } from '../tokens';
 
 export interface PixelStatGroupProps extends React.HTMLAttributes<HTMLDivElement> {
   layout?: Layout;
@@ -45,14 +35,6 @@ export const PixelStatGroup = forwardRef<HTMLDivElement, PixelStatGroupProps>(fu
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const t = toneTokens[tone];
-
-  const layoutClass =
-    layout === 'row'
-      ? cn('flex flex-row divide-x overflow-x-auto', t.border)
-      : cn('grid', colsMap[columns] ?? colsMap[3], gap !== undefined && stackGap[gap]);
-
   const ariaLabel = (rest as { 'aria-label'?: string })['aria-label'];
   const ariaLabelledBy = (rest as { 'aria-labelledby'?: string })['aria-labelledby'];
   const hasName = !!(ariaLabel || ariaLabelledBy);
@@ -60,15 +42,8 @@ export const PixelStatGroup = forwardRef<HTMLDivElement, PixelStatGroupProps>(fu
   return (
     <div
       ref={ref}
-      role={hasName ? 'group' : undefined}
-      className={cn(
-        layoutClass,
-        bordered && s.border,
-        bordered && s.radiusLg,
-        bordered && t.border,
-        bordered && 'bg-retro-surface/40',
-        className,
-      )}
+      role={statGroupRole(hasName)}
+      className={cn(statGroupClasses(surface, { layout, columns, gap, tone, bordered }), className)}
       {...rest}
     >
       {children}

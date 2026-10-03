@@ -76,6 +76,19 @@ describe('canonicalHtml', () => {
   });
 });
 
+describe('canonicalHtml substitute', () => {
+  it('serialises the element substitute gives in place of the one rendered, and the rest as rendered', () => {
+    const substitute = (element: Element) => {
+      if (element.tagName !== 'X-BOX') return undefined;
+      const bare = document.createElement('b');
+      bare.textContent = element.textContent;
+      return bare;
+    };
+    same('<p><x-box>one</x-box><i>two</i></p>', '<p><b>one</b><i>two</i></p>', { substitute });
+    differ('<p><x-box>one</x-box></p>', '<p><b>one</b></p>');
+  });
+});
+
 describe('canonicalDom', () => {
   it('marks the focused element, but never <body>', () => {
     document.body.innerHTML = '<button>a</button><button>b</button>';
