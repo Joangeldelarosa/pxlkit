@@ -106,4 +106,5 @@ The canonical DOM compares classes as sets, styles declaration by declaration, f
 - [ ] Every manifest example ported in both frameworks.
 - [ ] Parity scenarios for every interaction; parity, SSR and hydration suites green in both kits.
 - [ ] Framework-specific API tests.
+- [ ] `npm run docs:build` run: it writes the component's reference section in the three frameworks, the ports' README tables and the component's Vue and Angular stories (`stories/`), which `npm run storybook:vue` and `npm run storybook:angular` show.
 - [ ] `npm run lint` and `npm test` green at the repository root.
