@@ -61,6 +61,23 @@ describe('PixelColorInput', () => {
     expect(trigger().disabled).toBe(true);
   });
 
+  it('stays shut while its form control is disabled, whatever clicks the trigger', async () => {
+    @Component({
+      imports: [PixelColorInput, ReactiveFormsModule],
+      template: `<pxl-color-input label="Brand" [formControl]="control" />`,
+    })
+    class Host {
+      readonly control = new FormControl({ value: '#06b6d4', disabled: true });
+    }
+    const { settle } = await render(Host);
+    expect(trigger().disabled).toBe(true);
+    // A click a script dispatches still reaches the listeners of a disabled button.
+    trigger().dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await settle();
+    expect(document.querySelector('[aria-label="Color picker"]')).toBeNull();
+    expect(trigger().getAttribute('aria-expanded')).toBe('false');
+  });
+
   it('works with ngModel: commits a complete hex only, and discards a partial one on blur', async () => {
     @Component({
       imports: [PixelColorInput, FormsModule],

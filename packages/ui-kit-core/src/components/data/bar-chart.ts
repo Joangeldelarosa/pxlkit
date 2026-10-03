@@ -10,6 +10,7 @@ import {
   chartFillClasses,
   chartFrameClasses,
   chartTextFillClasses,
+  chartValues,
   type ChartSize,
   type PixelChartDataPoint,
 } from './chart';
@@ -47,7 +48,9 @@ export interface BarChartOptions {
 /**
  * The bars in SVG coordinates. The scale spans min(0, …values)..max(0,
  * …values), so bars grow from the zero line's side; a bar is never thinner
- * than 2 px (pixel) or 1 px (linear), so a zero still shows.
+ * than 2 px (pixel) or 1 px (linear), so a zero still shows. Every point has
+ * a slot, in order; a point whose `y` is not finite gets no bar, and its slot
+ * stays empty.
  */
 export function barChartGeometry(
   data: readonly PixelChartDataPoint[],
@@ -55,9 +58,9 @@ export function barChartGeometry(
   { size, orientation, showValues }: BarChartOptions,
 ): BarChartGeometry {
   const { width, height } = barChartSizes[size];
-  const ys = data.map((d) => d.y);
-  const yMin = Math.min(0, ...(ys.length ? ys : [0]));
-  const yMax = Math.max(0, ...(ys.length ? ys : [0]));
+  const ys = chartValues(data);
+  const yMin = Math.min(0, ...ys);
+  const yMax = Math.max(0, ...ys);
   const yRange = yMax - yMin || 1;
 
   const pixel = surface === 'pixel';
@@ -70,20 +73,21 @@ export function barChartGeometry(
   const innerH = height - padY * 2;
   const count = data.length || 1;
 
-  const bars = data.map((d, i): BarChartBar => {
+  const bars = data.flatMap((d, i): BarChartBar[] => {
+    if (!Number.isFinite(d.y)) return [];
     if (vertical) {
       const bw = (innerW - gap * (count - 1)) / count;
       const bh = ((d.y - yMin) / yRange) * innerH;
       const x = padX + i * (bw + gap);
       const y = padY + (innerH - bh);
       const barHeight = Math.max(bh, minimum);
-      return { x, y, width: bw, height: barHeight, raw: d, labelX: x + bw / 2, labelY: y - 4 };
+      return [{ x, y, width: bw, height: barHeight, raw: d, labelX: x + bw / 2, labelY: y - 4 }];
     }
     const bh = (innerH - gap * (count - 1)) / count;
     const bw = ((d.y - yMin) / yRange) * innerW;
     const y = padY + i * (bh + gap);
     const barWidth = Math.max(bw, minimum);
-    return { x: padX, y, width: barWidth, height: bh, raw: d, labelX: padX + barWidth + 4, labelY: y + bh / 2 + 3 };
+    return [{ x: padX, y, width: barWidth, height: bh, raw: d, labelX: padX + barWidth + 4, labelY: y + bh / 2 + 3 }];
   });
 
   return { width, height, bars, radius: pixel ? 0 : 2, labelAnchor: vertical ? 'middle' : 'start' };

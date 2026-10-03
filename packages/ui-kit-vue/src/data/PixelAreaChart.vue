@@ -25,7 +25,7 @@ import { useEffectiveSurface } from '../composables/surface.js';
  * <PixelAreaChart :data="[{ x: 'Mon', y: 12 }, { x: 'Tue', y: 18 }]" smooth tone="green" />
  */
 export interface PixelAreaChartProps {
-  /** The series. Points are spread evenly; `x` only labels them. */
+  /** The series. Points are spread evenly; `x` only labels them, and one whose `y` is not finite is left out. */
   data: PixelChartDataPoint[];
   /** Colour of the outline and the fill. */
   tone?: ToneKey;

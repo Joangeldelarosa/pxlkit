@@ -45,7 +45,7 @@ export function PixelBarChartDocsSection({ className }: PixelBarChartDocsSection
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
       </ul>
-      <p className="docs-aria-notes">The SVG renders as role=&quot;img&quot; with an auto-derived aria-label summarizing the series (kind, count, min..max range). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden &lt;table&gt; sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.</p>
+      <p className="docs-aria-notes">The SVG renders as role=&quot;img&quot; with an auto-derived aria-label summarizing the series (kind, point count and min..max range of its finite values — a point whose y is NaN or ±Infinity is left out of the chart and of the summary, which reads &quot;bar chart, no data&quot; when no value is finite). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden &lt;table&gt; sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.</p>
     </section>
     <section aria-labelledby="pixel-bar-chart-usage">
       <h3 id="pixel-bar-chart-usage">Usage</h3>

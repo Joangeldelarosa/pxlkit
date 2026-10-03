@@ -95,6 +95,18 @@ describe('PixelPopover', () => {
     expect(wrapper.find('button').attributes('aria-expanded')).toBe('false');
   });
 
+  it('ignores clicks on a disabled trigger element, as React does', async () => {
+    const wrapper = await mountHarness({ trigger: { disabled: true } });
+    // A click a script dispatches still reaches the listeners of a disabled button.
+    wrapper.find('[data-testid="trigger"]').element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await settle();
+    expect(panel()).toBeNull();
+    await wrapper.setProps({ trigger: { disabled: false } });
+    await wrapper.find('[data-testid="trigger"]').trigger('click');
+    await settle();
+    expect(panel()).not.toBeNull();
+  });
+
   it('lets a click listener of the trigger element cancel the toggle', async () => {
     const wrapper = await mountHarness({ trigger: { onClick: (event: MouseEvent) => event.preventDefault() } });
     await wrapper.find('[data-testid="trigger"]').trigger('click');

@@ -26,6 +26,17 @@ describe('sparkline', () => {
     expect(sparklineGeometry([], 'md')).toEqual({ width: 240, height: 60, line: '', area: '' });
   });
 
+  it('draws the line and the area across a value that is not finite, from the first plotted point to the last', () => {
+    expect(sparklineGeometry(series(Number.NaN, 10, Infinity, 30), 'md')).toEqual({
+      width: 240,
+      height: 60,
+      line: '80.67,56.00 238.00,4.00',
+      area: '80.67,56.00 80.67,56.00 238.00,4.00 238.00,56.00',
+    });
+    expect(sparklineGeometry(series(Number.NaN, 4), 'md')).toEqual({ width: 240, height: 60, line: '238.00,56.00', area: '' });
+    expect(sparklineGeometry(series(Number.NaN), 'md')).toEqual({ width: 240, height: 60, line: '', area: '' });
+  });
+
   it('strokes square on the pixel surface and round on the linear one', () => {
     expect(sparklineStroke('pixel')).toEqual({ width: 2, linejoin: 'miter', linecap: 'square' });
     expect(sparklineStroke('linear')).toEqual({ width: 1.5, linejoin: 'round', linecap: 'round' });

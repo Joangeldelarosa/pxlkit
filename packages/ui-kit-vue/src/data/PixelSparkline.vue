@@ -23,7 +23,7 @@ import { useEffectiveSurface } from '../composables/surface.js';
  * <PixelSparkline :data="[{ x: 'Mon', y: 12 }, { x: 'Tue', y: 18 }]" tone="green" show-area />
  */
 export interface PixelSparklineProps {
-  /** The series. Points are spread evenly; `x` only labels them. */
+  /** The series. Points are spread evenly; `x` only labels them, and one whose `y` is not finite is left out. */
   data: PixelChartDataPoint[];
   /** Colour of the line and the area. */
   tone?: ToneKey;

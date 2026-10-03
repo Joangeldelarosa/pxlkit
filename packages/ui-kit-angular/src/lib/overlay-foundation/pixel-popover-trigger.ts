@@ -6,7 +6,8 @@ import { injectPopoverContext } from './popover-context';
  * toggles the popover (unless one of the element's own click listeners calls
  * `preventDefault()`), and the element advertises `aria-expanded`,
  * `aria-haspopup` and, while the content is open, `aria-controls` — a static
- * `aria-haspopup` or `aria-controls` on the element wins.
+ * `aria-haspopup` or `aria-controls` on the element wins. A disabled trigger
+ * ignores clicks, as React does with a click dispatched to a disabled button.
  *
  * @example
  * <button type="button" pxlPopoverTrigger>Details</button>
@@ -40,7 +41,8 @@ export class PixelPopoverTrigger implements OnInit {
     // Listening from ngOnInit registers this listener after the element's own
     // (click) bindings, so they run first and can cancel the toggle.
     const unlisten = this.renderer.listen(this.element, 'click', (event: MouseEvent) => {
-      if (!event.defaultPrevented) this.context.setOpen(!this.context.open());
+      if (event.defaultPrevented || (this.element as HTMLButtonElement).disabled) return;
+      this.context.setOpen(!this.context.open());
     });
     this.destroyRef.onDestroy(unlisten);
   }

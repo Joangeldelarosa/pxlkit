@@ -79,4 +79,30 @@ describe('PixelSparkline', () => {
     );
     expect(svg.querySelector('polyline')!.getAttribute('stroke-linecap')).toBe('round');
   });
+
+  it('leaves out values that are not finite: they draw nothing and the summary skips them', async () => {
+    @Component({
+      imports: [PixelSparkline],
+      template: `<svg pxlSparkline [data]="data()" showArea></svg>`,
+    })
+    class Host {
+      readonly data = signal<PixelChartDataPoint[]>([
+        { x: 0, y: 10 },
+        { x: 1, y: Number.NaN },
+        { x: 2, y: 30 },
+        { x: 3, y: Infinity },
+      ]);
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const svg = (fixture.nativeElement as HTMLElement).querySelector('svg')!;
+    expect(svg.querySelector('polyline')!.getAttribute('points')).toBe('2.00,56.00 159.33,4.00');
+    expect(svg.querySelector('polygon')!.getAttribute('points')).toBe('2.00,56.00 2.00,56.00 159.33,4.00 159.33,56.00');
+    expect(svg.getAttribute('aria-label')).toBe('sparkline with 2 points, range 10 to 30');
+    fixture.componentInstance.data.set([{ x: 0, y: Number.NaN }]);
+    await fixture.whenStable();
+    expect(svg.querySelector('polyline')!.getAttribute('points')).toBe('');
+    expect(svg.querySelector('polygon')).toBeNull();
+    expect(svg.getAttribute('aria-label')).toBe('sparkline, no data');
+  });
 });

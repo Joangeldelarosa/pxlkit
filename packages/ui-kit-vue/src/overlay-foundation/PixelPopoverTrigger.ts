@@ -7,7 +7,9 @@ import { usePopoverContext } from './_internal/popover-context.js';
  * a click toggles the popover (unless a click listener of the child calls
  * `preventDefault()`), and the element advertises `aria-expanded`,
  * `aria-haspopup` and, while the content is open, `aria-controls` — an
- * `aria-haspopup` or `aria-controls` already set on the child wins.
+ * `aria-haspopup` or `aria-controls` already set on the child wins. A
+ * disabled trigger ignores clicks, as React does with a click dispatched to a
+ * disabled button.
  */
 export default defineComponent({
   name: 'PixelPopoverTrigger',
@@ -23,7 +25,8 @@ export default defineComponent({
         {
           // Merged after the child's own click listener, so it runs second.
           onClick: (event: MouseEvent) => {
-            if (!event.defaultPrevented) context.setOpen(!context.open.value);
+            if (event.defaultPrevented || (event.currentTarget as HTMLButtonElement).disabled) return;
+            context.setOpen(!context.open.value);
           },
           'aria-expanded': context.open.value,
           'aria-haspopup': own?.['aria-haspopup'] ?? context.haspopup.value,

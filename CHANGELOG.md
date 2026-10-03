@@ -214,6 +214,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `role="status"` sat in an `aria-hidden` row, and rows with `onRowClick` take focus and
   activate with Enter or Space, as the manifest says; they were mouse-only. `PixelDataTable`'s
   rows-per-page select shows a page size other than 5, 10, 20 or 50 instead of the first option.
+- `@pxlkit/ui-kit`: `PixelDataTable` no longer throws when `pagination` is bound and then
+  unbound — it shows every row again, without the pagination bar — and `PixelSparkline`,
+  `PixelAreaChart` and `PixelBarChart` leave out values that are not finite numbers instead of
+  drawing nothing and reading "range NaN to NaN": the other points keep their places, and the
+  summary counts and ranges the finite ones.
 - `@pxlkit/ui-kit`: `PixelCalendarGrid`, `PixelDatePicker` and `PixelDateRangePicker` follow the
   WAI-ARIA date grid: PageUp / PageDown keep the day of the month (the last day of a shorter
   month; from January 31 they reached March 3), Shift+PageUp / Shift+PageDown move a year,

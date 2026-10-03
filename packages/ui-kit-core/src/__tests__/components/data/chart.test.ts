@@ -8,6 +8,7 @@ import {
   chartSizes,
   chartStrokeClasses,
   chartTextFillClasses,
+  chartValues,
   describeChart,
   normalizeChartPoints,
   surfaceClasses,
@@ -62,17 +63,33 @@ describe('chart primitives', () => {
     expect(normalizeChartPoints(series(-10, 0, 10), 240, 60, 2, 4).map(({ py }) => py)).toEqual([56, 30, 4]);
   });
 
-  it('has no points without data, and NaN coordinates for a series holding NaN', () => {
+  it('has no points without data', () => {
     expect(normalizeChartPoints([], 240, 60, 2, 4)).toEqual([]);
     expect(chartPointList([])).toBe('');
-    expect(chartPointList(normalizeChartPoints(series(Number.NaN, 1), 240, 60, 2, 4))).toBe('2.00,NaN 238.00,NaN');
+  });
+
+  it('leaves out values that are not finite, the other points keeping the x of their index', () => {
+    const points = normalizeChartPoints(series(10, Number.NaN, 30, Infinity, 20), 240, 60, 2, 4);
+    expect(points.map(({ px, py }) => [px, py])).toEqual([
+      [2, 56],
+      [120, 4],
+      [238, 30],
+    ]);
+    expect(points.map(({ raw }) => raw.x)).toEqual([0, 2, 4]);
+    expect(chartPointList(normalizeChartPoints(series(-Infinity, 7), 240, 60, 2, 4))).toBe('238.00,56.00');
+    expect(normalizeChartPoints(series(Number.NaN, Infinity), 240, 60, 2, 4)).toEqual([]);
+    expect(chartValues(series(1, Number.NaN, -Infinity, 0, Infinity))).toEqual([1, 0]);
   });
 
   it('describes a chart by kind, point count and range', () => {
     expect(describeChart('sparkline', series(3, -2, 8))).toBe('sparkline with 3 points, range -2 to 8');
     expect(describeChart('bar chart', series(4))).toBe('bar chart with 1 points, range 4 to 4');
     expect(describeChart('area chart', [])).toBe('area chart, no data');
-    expect(describeChart('sparkline', series(Number.NaN, 1))).toBe('sparkline with 2 points, range NaN to NaN');
+  });
+
+  it('counts and ranges the finite values only, and has no data without one', () => {
+    expect(describeChart('sparkline', series(Number.NaN, 1, Infinity, 5))).toBe('sparkline with 2 points, range 1 to 5');
+    expect(describeChart('bar chart', series(Number.NaN, -Infinity))).toBe('bar chart, no data');
   });
 
   it('renders crisp edges on the pixel surface only, and frames a chart only when bordered', () => {

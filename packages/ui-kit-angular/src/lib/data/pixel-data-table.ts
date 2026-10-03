@@ -372,7 +372,7 @@ export class PixelDataTable<TData, TValue = unknown> implements OnInit {
       state: {
         sorting: this.sortingState(),
         columnFilters: this.filtersState(),
-        pagination: this.paginationEnabled() ? this.paginationState() : undefined,
+        pagination: this.paginationState(),
         rowSelection: this.rowSelectionState(),
         columnVisibility: this.visibilityState(),
       },
@@ -388,8 +388,14 @@ export class PixelDataTable<TData, TValue = unknown> implements OnInit {
       getCoreRowModel: this.coreRowModel,
       getSortedRowModel: this.sortedRowModel,
       getFilteredRowModel: this.filteredRowModel,
-      getPaginationRowModel: this.paginationEnabled() ? this.paginationRowModel : undefined,
-      manualPagination: false,
+      // The table pages, with its pagination bar, once `pagination` is bound.
+      // TanStack keeps a pagination row model it was given once, and reads the
+      // page from its state whenever it applies it, so both are always passed:
+      // unbound, the table pages manually — not at all — and still resets to
+      // the first page, as it does bound.
+      getPaginationRowModel: this.paginationRowModel,
+      manualPagination: !this.paginationEnabled(),
+      autoResetPageIndex: true,
     };
   }
 

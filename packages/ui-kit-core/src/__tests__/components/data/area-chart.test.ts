@@ -27,6 +27,13 @@ describe('area chart', () => {
     expect(areaChartGeometry([], 'lg')).toEqual({ width: 360, height: 96, polygon: '' });
   });
 
+  it('closes the area across a value that is not finite, from the first plotted point to the last', () => {
+    expect(areaChartGeometry(series(10, Number.NaN, 30, -Infinity), 'md').polygon).toBe(
+      '2.00,56.00 2.00,56.00 159.33,4.00 159.33,56.00',
+    );
+    expect(areaChartGeometry(series(Infinity, Number.NaN), 'md').polygon).toBe('');
+  });
+
   it('rounds the joins only when smooth on the linear surface', () => {
     expect(areaChartStroke('pixel', false)).toEqual({ width: 2, linejoin: 'miter' });
     expect(areaChartStroke('pixel', true)).toEqual({ width: 2, linejoin: 'miter' });

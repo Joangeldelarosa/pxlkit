@@ -42,4 +42,20 @@ describe('PixelBarChart', () => {
     expect(wrapper.attributes('data-testid')).toBe('bars');
     expect(wrapper.classes()).toEqual(expect.arrayContaining(['h-auto', 'w-full']));
   });
+
+  it('leaves the slot of a value that is not finite empty, without a bar or a label', () => {
+    const gappy = [
+      { x: 'a', y: 4 },
+      { x: 'b', y: Number.NaN },
+      { x: 'c', y: 2 },
+      { x: 'd', y: Infinity },
+    ];
+    const wrapper = mount(PixelBarChart, { props: { data: gappy, size: 'sm', showValues: true } });
+    expect(wrapper.findAll('rect').map((rect) => ['x', 'y', 'width', 'height'].map((name) => rect.attributes(name)))).toEqual([
+      ['4', '14', '36.5', '36'],
+      ['81', '32', '36.5', '18'],
+    ]);
+    expect(wrapper.findAll('text').map((text) => text.text())).toEqual(['4', '2']);
+    expect(wrapper.attributes('aria-label')).toBe('bar chart with 2 points, range 2 to 4');
+  });
 });

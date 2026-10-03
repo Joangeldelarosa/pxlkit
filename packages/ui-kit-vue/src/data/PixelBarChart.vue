@@ -23,7 +23,7 @@ import { useEffectiveSurface } from '../composables/surface.js';
  * <PixelBarChart :data="[{ x: 'Mon', y: 12 }, { x: 'Tue', y: 18 }]" orientation="horizontal" show-values />
  */
 export interface PixelBarChartProps {
-  /** The series, one bar per point. */
+  /** The series, one bar per point; one whose `y` is not finite leaves its slot empty. */
   data: PixelChartDataPoint[];
   /** Colour of the bars and their labels. */
   tone?: ToneKey;

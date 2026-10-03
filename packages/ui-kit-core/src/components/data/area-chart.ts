@@ -20,11 +20,15 @@ import {
 export interface AreaChartGeometry {
   width: number;
   height: number;
-  /** `points` of the area: the line, closed down to the baseline; empty without data. */
+  /** `points` of the area: the line, closed down to the baseline; empty without a plotted point. */
   polygon: string;
 }
 
-/** The area chart's size and the points of its polygon. */
+/**
+ * The area chart's size and the points of its polygon. Points without a
+ * finite value are left out (see `normalizeChartPoints`): the area spans the
+ * plotted ones.
+ */
 export function areaChartGeometry(data: readonly PixelChartDataPoint[], size: ChartSize): AreaChartGeometry {
   const { width, height } = chartSizes[size];
   const points = normalizeChartPoints(data, width, height, LINE_CHART_PADDING.x, LINE_CHART_PADDING.y);

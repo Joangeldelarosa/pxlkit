@@ -60,7 +60,7 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
   `,
 })
 export class PixelBarChart {
-  /** The series, one bar per point. */
+  /** The series, one bar per point; one whose `y` is not finite leaves its slot empty. */
   readonly data = input.required<PixelChartDataPoint[]>();
   /** Colour of the bars and their labels. */
   readonly tone = input<ToneKey, ToneKey | undefined>('cyan', { transform: withDefault<ToneKey>('cyan') });

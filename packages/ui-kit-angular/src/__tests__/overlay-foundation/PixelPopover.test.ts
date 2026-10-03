@@ -84,6 +84,72 @@ describe('PixelPopover', () => {
     expect(panel()).toBeNull();
   });
 
+  it('ignores clicks on a disabled trigger, as React does', async () => {
+    @Component({
+      imports: PARTS,
+      template: `
+        <pxl-popover [(open)]="open">
+          <button type="button" pxlPopoverTrigger data-testid="trigger" [disabled]="disabled()">open</button>
+          <div *pxlPopoverContent data-testid="content">hello</div>
+        </pxl-popover>
+      `,
+    })
+    class Host {
+      readonly open = signal(false);
+      readonly disabled = signal(true);
+    }
+    const { host, settle } = await render(Host);
+    // A click a script dispatches still reaches the listeners of a disabled button.
+    trigger().dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await settle();
+    expect(host.open()).toBe(false);
+    expect(panel()).toBeNull();
+    host.disabled.set(false);
+    await settle();
+    trigger().click();
+    await settle();
+    expect(host.open()).toBe(true);
+    expect(panel()).not.toBeNull();
+  });
+
+  it('shows what its parent binds: the trigger, Escape and a press outside only ask for a change', async () => {
+    @Component({
+      imports: PARTS,
+      template: `
+        <pxl-popover [open]="open()" (openChange)="requests.push($event)">
+          <button type="button" pxlPopoverTrigger data-testid="trigger">open</button>
+          <div *pxlPopoverContent data-testid="content">hello</div>
+        </pxl-popover>
+        <button type="button" data-testid="outside">outside</button>
+      `,
+    })
+    class Host {
+      readonly open = signal(false);
+      readonly requests: boolean[] = [];
+    }
+    const { host, settle } = await render(Host);
+    trigger().click();
+    await settle();
+    expect(host.requests).toEqual([true]);
+    expect(panel()).toBeNull();
+    expect(trigger().getAttribute('aria-expanded')).toBe('false');
+
+    host.open.set(true);
+    await settle();
+    escape();
+    pointerDown(document.querySelector('[data-testid="outside"]')!);
+    trigger().click();
+    await settle();
+    expect(host.requests).toEqual([true, false, false, false]);
+    expect(panel()).not.toBeNull();
+    expect(trigger().getAttribute('aria-expanded')).toBe('true');
+
+    host.open.set(false);
+    await settle();
+    expect(panel()).toBeNull();
+    expect(trigger().getAttribute('aria-expanded')).toBe('false');
+  });
+
   it("keeps the trigger's own aria-haspopup", async () => {
     @Component({
       imports: PARTS,

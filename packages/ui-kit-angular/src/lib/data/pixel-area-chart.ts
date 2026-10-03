@@ -52,7 +52,7 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
   `,
 })
 export class PixelAreaChart {
-  /** The series. Points are spread evenly; `x` only labels them. */
+  /** The series. Points are spread evenly; `x` only labels them, and one whose `y` is not finite is left out. */
   readonly data = input.required<PixelChartDataPoint[]>();
   /** Colour of the outline and the fill. */
   readonly tone = input<ToneKey, ToneKey | undefined>('cyan', { transform: withDefault<ToneKey>('cyan') });

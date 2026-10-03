@@ -209,9 +209,11 @@ function PixelDataTableInner<TData, TValue = unknown>(
     onColumnVisibilityChange?.(next);
   };
 
-  // Enable pagination when EITHER controlled prop OR internal pagination should be used.
-  // Default: pagination on if data > pageSize (matches user expectation of an interactive
-  // table). To stay backwards-compatible we only enable when consumer opts in OR provides data.
+  // The table pages, with its pagination bar, once `pagination` is bound.
+  // TanStack keeps a pagination row model it was given once, and reads the
+  // page from its state whenever it applies it, so both are always passed:
+  // unbound, the table pages manually — not at all — and still reports its
+  // resets to the first page, as it does bound.
   const paginationEnabled = pagination !== undefined;
 
   const table = useReactTable<TData>({
@@ -220,7 +222,7 @@ function PixelDataTableInner<TData, TValue = unknown>(
     state: {
       sorting: sortingState,
       columnFilters: filteringState,
-      pagination: paginationEnabled ? paginationState : undefined,
+      pagination: paginationState,
       rowSelection: rowSelectionState,
       columnVisibility: visibilityState,
     },
@@ -234,8 +236,9 @@ function PixelDataTableInner<TData, TValue = unknown>(
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: paginationEnabled ? getPaginationRowModel() : undefined,
-    manualPagination: false,
+    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: !paginationEnabled,
+    autoResetPageIndex: true,
   });
 
   const headerGroups = table.getHeaderGroups();

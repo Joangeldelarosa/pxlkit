@@ -50,4 +50,20 @@ describe('PixelAreaChart', () => {
     const polygon = container.querySelector('polygon');
     expect(polygon?.getAttribute('class') ?? '').toMatch(/retro-cyan/);
   });
+
+  it('leaves out values that are not finite: they draw nothing and the summary skips them', () => {
+    const data = [
+      { x: 0, y: 10 },
+      { x: 1, y: Number.NaN },
+      { x: 2, y: 30 },
+      { x: 3, y: -Infinity },
+    ];
+    const { container, rerender } = render(<PixelAreaChart data={data} />);
+    const svg = container.querySelector('svg')!;
+    expect(container.querySelector('polygon')!.getAttribute('points')).toBe('2.00,56.00 2.00,56.00 159.33,4.00 159.33,56.00');
+    expect(svg.getAttribute('aria-label')).toBe('area chart with 2 points, range 10 to 30');
+    rerender(<PixelAreaChart data={[{ x: 0, y: Infinity }]} />);
+    expect(container.querySelector('polygon')).toBeNull();
+    expect(svg.getAttribute('aria-label')).toBe('area chart, no data');
+  });
 });

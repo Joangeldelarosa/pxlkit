@@ -46,4 +46,21 @@ describe('PixelSparkline', () => {
     expect(svg.classes()).toEqual(expect.arrayContaining(['overflow-visible', 'border', 'rounded-md', 'w-full']));
     expect(svg.find('polyline').attributes('stroke-linecap')).toBe('round');
   });
+
+  it('leaves out values that are not finite: they draw nothing and the summary skips them', async () => {
+    const gappy = [
+      { x: 0, y: 10 },
+      { x: 1, y: Number.NaN },
+      { x: 2, y: 30 },
+      { x: 3, y: Infinity },
+    ];
+    const wrapper = mount(PixelSparkline, { props: { data: gappy, showArea: true } });
+    expect(wrapper.find('polyline').attributes('points')).toBe('2.00,56.00 159.33,4.00');
+    expect(wrapper.find('polygon').attributes('points')).toBe('2.00,56.00 2.00,56.00 159.33,4.00 159.33,56.00');
+    expect(wrapper.attributes('aria-label')).toBe('sparkline with 2 points, range 10 to 30');
+    await wrapper.setProps({ data: [{ x: 0, y: Number.NaN }] });
+    expect(wrapper.find('polyline').attributes('points')).toBe('');
+    expect(wrapper.find('polygon').exists()).toBe(false);
+    expect(wrapper.attributes('aria-label')).toBe('sparkline, no data');
+  });
 });

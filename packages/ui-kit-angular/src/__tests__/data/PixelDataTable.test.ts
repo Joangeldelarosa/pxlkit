@@ -20,6 +20,7 @@ const PEOPLE: Person[] = [
   { id: 'p2', name: 'Linus', age: 54 },
   { id: 'p3', name: 'Grace', age: 85 },
 ];
+const MANY: Person[] = Array.from({ length: 12 }, (_, index) => ({ id: `p${index}`, name: `P${index}`, age: 20 + index }));
 const helper = createColumnHelper<Person>();
 const COLUMNS = [helper.accessor('name', { header: 'Name' }), helper.accessor('age', { header: 'Age' })] as ColumnDef<
   Person,
@@ -148,6 +149,50 @@ describe('PixelDataTable', () => {
     host.pagination.set({ pageIndex: 0, pageSize: 1 });
     await fixture.whenStable();
     expect(root.querySelectorAll('tbody tr')).toHaveLength(1);
+  });
+
+  it('shows every row without the pagination bar once pagination is unbound, and pages again once bound', async () => {
+    @Component({
+      imports: [PixelDataTable],
+      template: `<pxl-data-table [data]="people" [columns]="columns" [pagination]="pagination()" />`,
+    })
+    class Host {
+      readonly people = MANY;
+      readonly columns = COLUMNS;
+      readonly pagination = signal<{ pageIndex: number; pageSize: number } | undefined>({ pageIndex: 1, pageSize: 5 });
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(names(root)).toEqual(['P5', 'P6', 'P7', 'P8', 'P9']);
+    fixture.componentInstance.pagination.set(undefined);
+    await fixture.whenStable();
+    expect(names(root)).toHaveLength(12);
+    expect(root.querySelector('select')).toBeNull();
+    fixture.componentInstance.pagination.set({ pageIndex: 2, pageSize: 5 });
+    await fixture.whenStable();
+    expect(names(root)).toEqual(['P10', 'P11']);
+    expect(root.querySelector('select')).not.toBeNull();
+  });
+
+  it('keeps its own resets to the first page to itself while pagination is unbound, showing every row', async () => {
+    @Component({
+      imports: [PixelDataTable],
+      template: `<pxl-data-table [data]="people" [columns]="columns" (paginationChange)="pages.push($event)" />`,
+    })
+    class Host {
+      readonly people = MANY;
+      readonly columns = COLUMNS;
+      readonly pages: unknown[] = [];
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    button(root, 'Sort by Age').click();
+    await fixture.whenStable();
+    expect(names(root)).toEqual(MANY.map((person) => person.name).reverse());
+    expect(root.querySelector('select')).toBeNull();
+    expect(fixture.componentInstance.pages).toEqual([]);
   });
 
   it('filters by a bound filtering record, and reports filters its columns set from a header template', async () => {

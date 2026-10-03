@@ -42,7 +42,7 @@ Keep the React component name, prop names, defaults and class strings. Where a f
 
 ### Controlled and uncontrolled state
 
-Form-like components support both, as in React. In Vue, `useControllableState` keeps the local value while the prop is `undefined`, so a controlled prop must default to `undefined` — for booleans, `{ type: Boolean, default: undefined }`, or Vue casts a missing boolean to `false`. In Angular, `model()` holds the state; a form control also implements `ControlValueAccessor` through `FormBridge` and `provideValueAccessor`.
+Form-like components support both, as in React. In Vue, `useControllableState` keeps the local value while the prop is `undefined`, so a controlled prop must default to `undefined` — for booleans, `{ type: Boolean, default: undefined }`, or Vue casts a missing boolean to `false`. In Angular, `model()` holds the state; a form control also implements `ControlValueAccessor` through `FormBridge` and `provideValueAccessor`. A controlled-only prop whose parent may refuse a change (`PixelPopover`'s `open`) is an `input()` with an `xChange` `output()`: `[(x)]` still binds it, and the component never sets it itself. A listener that runs outside the zone emits inside `NgZone.run`, so a zone.js application renders the parent's answer.
 
 ## Vue
 

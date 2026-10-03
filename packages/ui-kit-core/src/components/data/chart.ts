@@ -6,7 +6,13 @@
 import { cn, surfaceClasses, type Surface } from '../../common';
 import type { ToneKey } from '../../tokens';
 
-/** One point of a chart series. Points are spread evenly: `x` only labels one. */
+/**
+ * One point of a chart series. Points are spread evenly: `x` only labels one.
+ * A point whose `y` is not a finite number (`NaN`, `±Infinity`) is left out:
+ * it draws nothing and its place stays empty — the other points keep theirs,
+ * so a line runs straight across the gap and the bar chart leaves a slot
+ * free — and the scale and the summary take the finite values only.
+ */
 export interface PixelChartDataPoint {
   x: number | string;
   y: number;
@@ -77,10 +83,17 @@ export interface ChartPoint {
   raw: PixelChartDataPoint;
 }
 
+/** The values a series plots: its `y`s that are finite numbers. */
+export function chartValues(data: readonly PixelChartDataPoint[]): number[] {
+  return data.map((d) => d.y).filter((y) => Number.isFinite(y));
+}
+
 /**
  * The points in SVG coordinates. X follows the index, so string labels still
  * spread evenly; Y scales the series' own min..max into the padded height
- * (top is the max), and a flat series sits on the baseline.
+ * (top is the max), and a flat series sits on the baseline. A point whose `y`
+ * is not finite has no coordinates: it is left out, and the others keep the
+ * x of their index.
  */
 export function normalizeChartPoints(
   data: readonly PixelChartDataPoint[],
@@ -89,18 +102,19 @@ export function normalizeChartPoints(
   padX: number,
   padY: number,
 ): ChartPoint[] {
-  if (!data.length) return [];
-  const ys = data.map((d) => d.y);
+  const ys = chartValues(data);
+  if (!ys.length) return [];
   const yMin = Math.min(...ys);
   const yMax = Math.max(...ys);
   const yRange = yMax - yMin || 1;
   const innerW = width - padX * 2;
   const innerH = height - padY * 2;
   const step = data.length === 1 ? 0 : innerW / (data.length - 1);
-  return data.map((d, i) => {
+  return data.flatMap((d, i) => {
+    if (!Number.isFinite(d.y)) return [];
     const px = padX + step * i;
     const py = padY + (innerH - ((d.y - yMin) / yRange) * innerH);
-    return { px, py, raw: d };
+    return [{ px, py, raw: d }];
   });
 }
 
@@ -111,13 +125,16 @@ export function chartPointList(points: readonly ChartPoint[]): string {
 
 export type ChartKind = 'sparkline' | 'bar chart' | 'area chart';
 
-/** The chart's default accessible name: its kind, point count and value range. */
+/**
+ * The chart's default accessible name: its kind, point count and value range,
+ * of the finite values only — a series without one has no data.
+ */
 export function describeChart(kind: ChartKind, data: readonly PixelChartDataPoint[]): string {
-  if (!data.length) return `${kind}, no data`;
-  const ys = data.map((d) => d.y);
+  const ys = chartValues(data);
+  if (!ys.length) return `${kind}, no data`;
   const min = Math.min(...ys);
   const max = Math.max(...ys);
-  return `${kind} with ${data.length} points, range ${min} to ${max}`;
+  return `${kind} with ${ys.length} points, range ${min} to ${max}`;
 }
 
 /** `shape-rendering` of a chart: crisp pixel edges, or smooth ones on the linear surface. */

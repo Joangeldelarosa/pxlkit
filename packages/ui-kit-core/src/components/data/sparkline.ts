@@ -21,11 +21,15 @@ export interface SparklineGeometry {
   height: number;
   /** `points` of the line. */
   line: string;
-  /** `points` of the area under the line, down to the baseline; empty below two points. */
+  /** `points` of the area under the line, down to the baseline; empty below two plotted points. */
   area: string;
 }
 
-/** The sparkline's size and the points of its line and area. */
+/**
+ * The sparkline's size and the points of its line and area. Points without a
+ * finite value are left out (see `normalizeChartPoints`): the line and the
+ * area span the plotted ones.
+ */
 export function sparklineGeometry(data: readonly PixelChartDataPoint[], size: ChartSize): SparklineGeometry {
   const { width, height } = chartSizes[size];
   const points = normalizeChartPoints(data, width, height, LINE_CHART_PADDING.x, LINE_CHART_PADDING.y);

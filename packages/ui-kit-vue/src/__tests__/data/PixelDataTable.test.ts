@@ -111,6 +111,31 @@ describe('PixelDataTable', () => {
     expect(wrapper.findAll('tbody tr')).toHaveLength(1);
   });
 
+  it('shows every row without the pagination bar once pagination is unbound, and pages again once bound', async () => {
+    const many = Array.from({ length: 12 }, (_, index) => ({ id: `p${index}`, name: `P${index}`, age: 20 + index }));
+    const pagination = ref<{ pageIndex: number; pageSize: number } | undefined>({ pageIndex: 1, pageSize: 5 });
+    const wrapper = bound(() => ({ data: many, pagination: pagination.value }));
+    expect(names(wrapper)).toEqual(['P5', 'P6', 'P7', 'P8', 'P9']);
+    pagination.value = undefined;
+    await flushPromises();
+    expect(names(wrapper)).toHaveLength(12);
+    expect(wrapper.find('select').exists()).toBe(false);
+    pagination.value = { pageIndex: 2, pageSize: 5 };
+    await flushPromises();
+    expect(names(wrapper)).toEqual(['P10', 'P11']);
+    expect(wrapper.find('select').exists()).toBe(true);
+  });
+
+  it('reports its own resets to the first page while pagination is unbound, showing every row', async () => {
+    const wrapper = mount(PersonTable, { props: { data: people, columns }, attachTo });
+    // TanStack resets the page in a microtask, from its second row model on.
+    await flushPromises();
+    await wrapper.get('button[aria-label="Sort by Age"]').trigger('click');
+    await flushPromises();
+    expect(wrapper.emitted('update:pagination')).toEqual([[{ pageIndex: 0, pageSize: 10 }]]);
+    expect(wrapper.findAll('tbody tr')).toHaveLength(3);
+  });
+
   it('filters by a bound filtering record, and reports filters its columns set', async () => {
     const filtering = ref<Record<string, string>>({ name: 'a' });
     const filterable = [

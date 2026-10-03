@@ -2,13 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
+  NgZone,
   PLATFORM_ID,
   afterRenderEffect,
   computed,
   effect,
   inject,
   input,
-  model,
+  output,
   signal,
   untracked,
 } from '@angular/core';
@@ -37,6 +38,8 @@ import { injectEffectiveSurface } from './pxl-kit-surface-provider';
  * the element that opens it and `*pxlPopoverContent` on the panel; bind the
  * open state with `[(open)]`. Escape and a press outside close it, and
  * content that closes while it holds focus hands focus back to the trigger.
+ * Those changes are requests (`(openChange)`): the popover shows what its
+ * parent binds, so a parent that keeps its value keeps the popover as it is.
  *
  * The host is layout-neutral (`display: contents`).
  *
@@ -59,7 +62,7 @@ import { injectEffectiveSurface } from './pxl-kit-surface-provider';
 })
 export class PixelPopover {
   /** Whether the popover is open (`[(open)]`). */
-  readonly open = model.required<boolean>();
+  readonly open = input.required<boolean>();
   /** Side of the trigger the content opens on; flips when there is no room. */
   readonly side = input<PopoverSide, PopoverSide | undefined>('bottom', { transform: withDefault<PopoverSide>('bottom') });
   /** Alignment of the content along that side. */
@@ -86,18 +89,25 @@ export class PixelPopover {
    * (e.g. a listbox inside a combobox).
    */
   readonly role = input<PopoverRole, PopoverRole | undefined>('dialog', { transform: withDefault<PopoverRole>('dialog') });
+  /**
+   * The open state the trigger, Escape or a press outside asks for; the
+   * popover shows it once `open` changes to it, as `[(open)]` does.
+   */
+  readonly openChange = output<boolean>();
 
   private readonly trigger = signal<HTMLElement | null>(null);
   private readonly content = signal<HTMLElement | null>(null);
   private readonly contentId = signal<string | null>(null);
-  private readonly position = signal({ x: 0, y: 0 });
+  // Compared by value: re-measuring on a scroll that leaves the content where
+  // it was must not render again.
+  private readonly position = signal({ x: 0, y: 0 }, { equal: (a, b) => a.x === b.x && a.y === b.y });
   // True while a press outside is closing the popover: focus then follows the
   // pointer instead of returning to the trigger.
   private pressOutside = false;
 
   /** @internal */
   readonly context: PixelPopoverContext = {
-    open: this.open.asReadonly(),
+    open: this.open,
     side: this.side,
     surface: injectEffectiveSurface(() => this.surface()),
     haspopup: this.haspopup,
@@ -107,7 +117,7 @@ export class PixelPopover {
       return floatingStyles(this.content(), x, y);
     }),
     contentId: this.contentId.asReadonly(),
-    setOpen: (open) => this.open.set(open),
+    setOpen: (open) => this.openChange.emit(open),
     setTrigger: (element) => this.trigger.set(element),
     setContent: (element) => {
       const previous = untracked(this.content);
@@ -122,8 +132,11 @@ export class PixelPopover {
   constructor() {
     if (!isPlatformBrowser(inject(PLATFORM_ID))) return;
     const document = inject(DOCUMENT);
+    const zone = inject(NgZone);
 
     // Keep the content anchored to the trigger while both are on the page.
+    // Its scroll and resize listeners run outside the zone, so a zone.js
+    // application renders only when the content actually moves.
     effect((onCleanup) => {
       const reference = this.trigger();
       const floating = this.content();
@@ -131,17 +144,22 @@ export class PixelPopover {
       const placement = toPlacement(this.side(), this.align());
       const middleware = anchoredMiddleware(this.sideOffset());
       onCleanup(
-        anchorFloating(reference, floating, { placement, middleware }, ({ x, y }) => this.position.set({ x, y })),
+        zone.runOutsideAngular(() =>
+          anchorFloating(reference, floating, { placement, middleware }, ({ x, y }) => this.position.set({ x, y })),
+        ),
       );
     });
 
-    // Dismissal listeners, attached while open.
+    // Dismissal listeners, attached while open. They run outside the zone,
+    // so a zone.js application stays stable while they let events pass; a
+    // dismissal is asked for inside it, so the parent's handler renders.
+    const dismiss = () => zone.run(() => this.openChange.emit(false));
     afterRenderEffect((onCleanup) => {
       if (!this.open()) return;
       this.pressOutside = false;
       const view = document.defaultView;
       const onKeydown = (event: KeyboardEvent) => {
-        if (event.key === 'Escape' && this.closeOnEscape()) this.open.set(false);
+        if (event.key === 'Escape' && this.closeOnEscape()) dismiss();
       };
       // The trigger sits outside the content panel, so both are excluded —
       // otherwise a trigger press would close the popover and its click reopen it.
@@ -151,7 +169,7 @@ export class PixelPopover {
         if (untracked(this.content)?.contains(target)) return;
         if (untracked(this.trigger)?.contains(target)) return;
         this.pressOutside = true;
-        this.open.set(false);
+        dismiss();
       };
       // A press outside that did not close the popover (the parent kept it
       // open) ends with the pointer release.

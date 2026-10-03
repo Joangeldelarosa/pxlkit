@@ -55,6 +55,24 @@ describe('PixelPopover', () => {
     expect(onOpenChange).toHaveBeenCalledWith(true);
   });
 
+  it('ignores a click dispatched to a disabled trigger', () => {
+    const onOpenChange = vi.fn();
+    const { getByTestId } = render(
+      <PixelPopover open={false} onOpenChange={onOpenChange}>
+        <PixelPopover.Trigger>
+          <button data-testid="trigger" disabled>open</button>
+        </PixelPopover.Trigger>
+        <PixelPopover.Content data-testid="content">
+          <span>hello</span>
+        </PixelPopover.Content>
+      </PixelPopover>,
+    );
+    act(() => {
+      getByTestId('trigger').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
   it('Escape calls onOpenChange(false) when closeOnEscape=true (default)', () => {
     const onOpenChange = vi.fn();
     render(

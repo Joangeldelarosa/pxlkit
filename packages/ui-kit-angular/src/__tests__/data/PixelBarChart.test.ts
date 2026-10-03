@@ -54,4 +54,30 @@ describe('PixelBarChart', () => {
     expect(svg.querySelector('rect')!.getAttribute('rx')).toBe('2');
     expect(svg.getAttribute('shape-rendering')).toBe('geometricPrecision');
   });
+
+  it('leaves the slot of a value that is not finite empty, without a bar or a label', async () => {
+    @Component({
+      imports: [PixelBarChart],
+      template: `<svg pxlBarChart [data]="data" size="sm" showValues></svg>`,
+    })
+    class Host {
+      readonly data: PixelChartDataPoint[] = [
+        { x: 'a', y: 4 },
+        { x: 'b', y: Number.NaN },
+        { x: 'c', y: 2 },
+        { x: 'd', y: Infinity },
+      ];
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const svg = (fixture.nativeElement as HTMLElement).querySelector('svg')!;
+    expect(
+      Array.from(svg.querySelectorAll('rect'), (rect) => ['x', 'y', 'width', 'height'].map((name) => rect.getAttribute(name))),
+    ).toEqual([
+      ['4', '14', '36.5', '36'],
+      ['81', '32', '36.5', '18'],
+    ]);
+    expect(Array.from(svg.querySelectorAll('text'), (text) => text.textContent)).toEqual(['4', '2']);
+    expect(svg.getAttribute('aria-label')).toBe('bar chart with 2 points, range 2 to 4');
+  });
 });

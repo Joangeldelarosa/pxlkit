@@ -9,9 +9,18 @@
  */
 import { vi } from 'vitest';
 
-/** Starts the fake clock (at the current wall-clock time, so `Date` stays plausible). */
+/**
+ * Where every recording's clock starts: the wall-clock time the harness was
+ * loaded at, taken once per run. Starting each recording at the wall-clock
+ * time of its own start, a run that crossed midnight between the React
+ * recording of a date example and the port's saw two different days.
+ */
+const start = Date.now();
+
+/** Starts the fake clock, at the run's start time (a plausible `Date`, the same for every recording). */
 export function useSimulatedTime(): void {
   vi.useFakeTimers({
+    now: start,
     toFake: [
       'setTimeout',
       'clearTimeout',

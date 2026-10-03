@@ -63,6 +63,23 @@ describe('PixelDatePicker', () => {
     expect(trigger().disabled).toBe(true);
   });
 
+  it('stays shut while its form control is disabled, whatever clicks the trigger', async () => {
+    @Component({
+      imports: [PixelDatePicker, ReactiveFormsModule],
+      template: `<pxl-date-picker label="Due" [formControl]="control" />`,
+    })
+    class Host {
+      readonly control = new FormControl<Date | null>({ value: null, disabled: true });
+    }
+    const { settle } = await render(Host);
+    expect(trigger().disabled).toBe(true);
+    // A click a script dispatches still reaches the listeners of a disabled button.
+    trigger().dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await settle();
+    expect(document.querySelector('[role="grid"]')).toBeNull();
+    expect(trigger().getAttribute('aria-expanded')).toBe('false');
+  });
+
   it('works with ngModel from the keyboard, and closes on Escape with focus back on the trigger', async () => {
     @Component({
       imports: [PixelDatePicker, FormsModule],

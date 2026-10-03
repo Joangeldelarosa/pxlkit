@@ -186,7 +186,6 @@ const selectionColumn: ColumnDef<TData, TValue> = {
     }),
 };
 const columns = computed(() => (hasRowSelection.value ? [selectionColumn, ...props.columns] : props.columns));
-const paginationRowModel = getPaginationRowModel<TData>();
 
 const table = useVueTable<TData>({
   get data() {
@@ -203,7 +202,7 @@ const table = useVueTable<TData>({
       return filters.value;
     },
     get pagination() {
-      return paginationEnabled.value ? pagination.value : undefined;
+      return pagination.value;
     },
     get rowSelection() {
       return rowSelection.value;
@@ -227,10 +226,16 @@ const table = useVueTable<TData>({
   getCoreRowModel: getCoreRowModel(),
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
-  get getPaginationRowModel() {
-    return paginationEnabled.value ? paginationRowModel : undefined;
+  // The table pages, with its pagination bar, once `pagination` is bound.
+  // TanStack keeps a pagination row model it was given once, and reads the
+  // page from its state whenever it applies it, so both are always passed:
+  // unbound, the table pages manually — not at all — and still reports its
+  // resets to the first page, as it does bound.
+  getPaginationRowModel: getPaginationRowModel(),
+  get manualPagination() {
+    return !paginationEnabled.value;
   },
-  manualPagination: false,
+  autoResetPageIndex: true,
 });
 
 const skeletonRows = computed(() => dataTableSkeletonRows(pagination.value.pageSize));
