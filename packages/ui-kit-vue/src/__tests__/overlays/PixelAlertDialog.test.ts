@@ -190,4 +190,26 @@ describe('PixelAlertDialog', () => {
     await settle();
     expect(instance.value?.element).toBe(dialog());
   });
+
+  it('shows what its parent binds: a refused cancel or confirmation keeps it open, until the parent closes it', async () => {
+    const requests: boolean[] = [];
+    const onAction = vi.fn();
+    const { open } = harness({ onAction, 'onUpdate:open': (next: boolean) => requests.push(next) });
+    await settle();
+    buttons()[0]!.click();
+    escape();
+    backdrop().click();
+    buttons()[1]!.click();
+    await settle();
+    expect(requests).toEqual([false, false, false, false]);
+    expect(onAction).toHaveBeenCalledTimes(1);
+    expect(dialog()).not.toBeNull();
+    expect(document.body.style.overflow).toBe('hidden');
+    open.value = false;
+    await settle();
+    expect(dialog()).toBeNull();
+    open.value = true;
+    await settle();
+    expect(dialog()).not.toBeNull();
+  });
 });

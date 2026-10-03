@@ -83,7 +83,8 @@ describe('chart primitives', () => {
 
   it('describes a chart by kind, point count and range', () => {
     expect(describeChart('sparkline', series(3, -2, 8))).toBe('sparkline with 3 points, range -2 to 8');
-    expect(describeChart('bar chart', series(4))).toBe('bar chart with 1 points, range 4 to 4');
+    expect(describeChart('bar chart', series(4))).toBe('bar chart with 1 point, range 4 to 4');
+    expect(describeChart('area chart', series(Number.NaN, 2))).toBe('area chart with 1 point, range 2 to 2');
     expect(describeChart('area chart', [])).toBe('area chart, no data');
   });
 

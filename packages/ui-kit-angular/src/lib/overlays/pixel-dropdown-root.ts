@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, model, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output, ViewEncapsulation } from '@angular/core';
 import { dropdownRootClasses, type Surface } from '@pxlkit/ui-kit-core';
 import { booleanOr } from '../_internal/coercion';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
+import { injectOpenState } from './_internal/open-state';
 import { PIXEL_DROPDOWN, createDropdownRoot } from './dropdown-context';
 
 /**
@@ -14,7 +15,9 @@ import { PIXEL_DROPDOWN, createDropdownRoot } from './dropdown-context';
  * item by its label. Escape, choosing an item and Tab close the menu with
  * focus back on the trigger; a press outside closes it too, and focus follows
  * the pointer. Bind `[(open)]` to control it, or leave it uncontrolled with
- * `defaultOpen`.
+ * `defaultOpen`. Controlled, it shows what its parent binds: every change is
+ * only asked for (`(openChange)`), so a parent that keeps its value keeps the
+ * menu as it is.
  *
  * @example
  * <pxl-dropdown-root>
@@ -37,21 +40,22 @@ import { PIXEL_DROPDOWN, createDropdownRoot } from './dropdown-context';
 })
 export class PixelDropdownRoot {
   /** Whether the menu is open (`[(open)]`); leave unset for an uncontrolled menu. */
-  readonly open = model<boolean | undefined>(undefined);
+  readonly open = input<boolean | undefined>(undefined);
   /** Initial open state while uncontrolled. */
   readonly defaultOpen = input(false, { transform: booleanOr(false) });
   /** Surface override for the trigger and the menu; defaults to the nearest provider. */
   readonly surface = input<Surface>();
+  /** Every open state the menu asks for (the trigger and its keys, Escape, a press outside, an item), for `[(open)]`. */
+  readonly openChange = output<boolean>();
 
-  // Like React's uncontrolled state, the default is read once, then kept.
-  private seed: boolean | undefined;
+  private readonly state = injectOpenState(this.open, this.openChange, this.defaultOpen);
 
   /** @internal */
   protected readonly rootClasses = dropdownRootClasses;
   /** @internal Shared with the trigger, the menu and its items. */
   readonly context = createDropdownRoot({
-    open: computed(() => this.open() ?? (this.seed ??= this.defaultOpen())),
-    setOpen: (open) => this.open.set(open),
+    open: this.state.open,
+    setOpen: (open) => this.state.request(open),
     surface: injectEffectiveSurface(() => this.surface()),
   });
 }

@@ -2,9 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  NgZone,
   computed,
+  inject,
   input,
-  model,
   output,
   signal,
   viewChild,
@@ -26,13 +27,16 @@ import { injectPxlKitLocale } from '../overlay-foundation/pxl-kit-locale-provide
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 import { injectEscape, injectFocusTrap, injectScrollLock } from '../utilities/dom';
 import { injectReducedMotion } from '../utilities/media-query';
+import { injectOpenState } from './_internal/open-state';
 
 /**
  * Centered modal dialog with a title bar, optional description and footer,
  * surface-aware chrome (the pixel surface draws an old-school window), focus
  * trap, scroll lock and Escape / backdrop dismissal. Bind it with
  * `[(open)]`, or pass `[open]` and listen to `(closed)`; the body is the
- * projected content.
+ * projected content. It shows what its parent binds: the close button,
+ * Escape and the backdrop only ask to close, so a parent that keeps it open
+ * keeps it as it is.
  *
  * The host is layout-neutral (`display: contents`); the dialog renders into
  * `document.body`.
@@ -109,7 +113,7 @@ import { injectReducedMotion } from '../utilities/media-query';
 })
 export class PixelModal {
   /** Whether the modal is visible (`[(open)]`). */
-  readonly open = model.required<boolean>();
+  readonly open = input.required<boolean>();
   /** Title shown in the header; it names the dialog. */
   readonly title = input.required<string>();
   /** Width preset. */
@@ -129,8 +133,13 @@ export class PixelModal {
   readonly asyncClose = input<() => Promise<void>>();
   /** Portal target; `document.body` when left out. */
   readonly container = input<HTMLElement | null>();
+  /** `false` when the modal asks to close (close button, Escape, backdrop), for `[(open)]`. */
+  readonly openChange = output<boolean>();
   /** The user asked to close the modal (close button, Escape, backdrop). */
   readonly closed = output<void>();
+
+  private readonly state = injectOpenState(this.open, this.openChange);
+  private readonly zone = inject(NgZone);
 
   /** @internal */
   protected readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
@@ -188,7 +197,11 @@ export class PixelModal {
   }
 
   private close(): void {
-    this.open.set(false);
-    this.closed.emit();
+    // `(closed)` goes with the request, inside the zone (see injectOpenState):
+    // Escape is heard outside it.
+    this.zone.run(() => {
+      this.state.request(false);
+      this.closed.emit();
+    });
   }
 }

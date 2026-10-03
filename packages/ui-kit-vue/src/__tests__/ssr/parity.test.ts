@@ -5,9 +5,10 @@
  * pages look the same before hydration.
  */
 import { JSDOM } from 'jsdom';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { reactExamples } from '../../../../../scripts/parity/catalog';
 import { canonicalHtml } from '../../../../../scripts/parity/canonical';
+import { useRealTime, useRunDate } from '../../../../../scripts/parity/clock';
 import { reactServerHtml } from '../../../../../scripts/parity/react';
 import { LOAD_KIT_TIMEOUT, loadKit, vueExamples } from '../examples';
 import { vueServerHtml } from '../vue';
@@ -15,6 +16,11 @@ import { vueServerHtml } from '../vue';
 const { document } = new JSDOM('').window;
 
 beforeAll(loadKit, LOAD_KIT_TIMEOUT);
+
+// Both renders run on the real clock: they see the run's start time (see
+// clock.ts), so a date example shows the same day in each.
+beforeEach(useRunDate);
+afterEach(useRealTime);
 
 describe('React ↔ Vue parity — server rendering', () => {
   for (const example of reactExamples()) {

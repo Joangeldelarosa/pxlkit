@@ -176,4 +176,25 @@ describe('PixelModal — hardening', () => {
     });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it('shows what its parent passes: a refused close keeps it open and locking the page, until the parent closes it', () => {
+    const onClose = vi.fn();
+    const modal = (open: boolean) => (
+      <PixelModal open={open} title="Keep" onClose={onClose}>
+        <button type="button">inside</button>
+      </PixelModal>
+    );
+    const { rerender } = render(modal(true));
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.click(document.querySelector('[data-pxl-overlay-backdrop]')!);
+    expect(onClose).toHaveBeenCalledTimes(3);
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(document.body.style.overflow).toBe('hidden');
+    rerender(modal(false));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.body.style.overflow).toBe('');
+    rerender(modal(true));
+    expect(screen.getByRole('dialog')).toBeTruthy();
+  });
 });

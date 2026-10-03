@@ -7,7 +7,7 @@ import {
   effect,
   inject,
   input,
-  model,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -29,6 +29,7 @@ import { PxlOutlet, type PxlContent } from '../_internal/outlet';
 import { PixelPortal } from '../overlay-foundation/pixel-portal';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 import { injectEscape, injectEventListener, injectFocusTrap, injectScrollLock } from '../utilities/dom';
+import { injectOpenState } from './_internal/open-state';
 
 /** A command of the palette. An `icon` template receives the command as its context (`let-item`). */
 export interface PixelCommandItem {
@@ -53,7 +54,9 @@ export interface PixelCommandGroup {
  * Command palette: a search field over grouped commands, with a global
  * shortcut (`mod+k` by default) that toggles it, keyboard navigation (arrows
  * wrap, Home / End, Enter runs the highlighted command), focus trap, scroll
- * lock and Escape / backdrop dismissal. Bind it with `[(open)]`.
+ * lock and Escape / backdrop dismissal. Bind it with `[(open)]`. It shows what
+ * its parent binds: the shortcut, Escape and the backdrop only ask for a
+ * change, so a parent that keeps its value keeps the palette as it is.
  *
  * The host is layout-neutral (`display: contents`); the palette renders into
  * `document.body`.
@@ -70,7 +73,7 @@ export interface PixelCommandGroup {
     @if (open()) {
       <ng-template pxlPortal>
         <div [class]="layerClasses" aria-hidden="false">
-          <div aria-hidden="true" data-pxl-overlay-backdrop="" [class]="backdropClasses" (click)="open.set(false)"></div>
+          <div aria-hidden="true" data-pxl-overlay-backdrop="" [class]="backdropClasses" (click)="close()"></div>
           <div #panel role="dialog" aria-modal="true" aria-label="Command palette" [class]="classes().panel">
             <div [class]="classes().search">
               <span aria-hidden="true" [class]="classes().prompt">&gt;</span>
@@ -129,7 +132,7 @@ export interface PixelCommandGroup {
 })
 export class PixelCommand {
   /** Whether the palette is visible (`[(open)]`). */
-  readonly open = model.required<boolean>();
+  readonly open = input.required<boolean>();
   /** Global shortcut that toggles the palette, such as `mod+k` (Cmd or Ctrl + K). */
   readonly shortcut = input<string, string | undefined>('mod+k', { transform: withDefault('mod+k') });
   /** Placeholder of the search field. */
@@ -142,7 +145,10 @@ export class PixelCommand {
   readonly groups = input.required<PixelCommandGroup[]>();
   /** Surface override; defaults to the nearest provider. */
   readonly surface = input<Surface>();
+  /** The open state the palette asks for: its shortcut toggles it; Escape and the backdrop close it. */
+  readonly openChange = output<boolean>();
 
+  private readonly state = injectOpenState(this.open, this.openChange);
   private readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
   private readonly field = viewChild<ElementRef<HTMLInputElement>>('field');
@@ -193,10 +199,10 @@ export class PixelCommand {
       const shortcut = this.parsedShortcut();
       if (!shortcut || !matchesCommandShortcut(event, shortcut)) return;
       event.preventDefault();
-      this.open.set(!this.open());
+      this.state.request(!this.open());
     });
     injectEscape(
-      () => this.open.set(false),
+      () => this.close(),
       () => this.open(),
     );
     injectScrollLock(() => this.open());
@@ -204,6 +210,11 @@ export class PixelCommand {
       () => this.open(),
       () => this.panel()?.nativeElement,
     );
+  }
+
+  /** @internal */
+  protected close(): void {
+    this.state.request(false);
   }
 
   /** @internal */

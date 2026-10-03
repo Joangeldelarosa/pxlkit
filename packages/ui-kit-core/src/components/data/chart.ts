@@ -134,7 +134,7 @@ export function describeChart(kind: ChartKind, data: readonly PixelChartDataPoin
   if (!ys.length) return `${kind}, no data`;
   const min = Math.min(...ys);
   const max = Math.max(...ys);
-  return `${kind} with ${ys.length} points, range ${min} to ${max}`;
+  return `${kind} with ${ys.length} ${ys.length === 1 ? 'point' : 'points'}, range ${min} to ${max}`;
 }
 
 /** `shape-rendering` of a chart: crisp pixel edges, or smooth ones on the linear surface. */

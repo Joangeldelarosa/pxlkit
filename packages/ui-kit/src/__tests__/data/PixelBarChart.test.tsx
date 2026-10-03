@@ -78,4 +78,9 @@ describe('PixelBarChart', () => {
     expect(Array.from(container.querySelectorAll('text'), (text) => text.textContent)).toEqual(['4', '2']);
     expect(container.querySelector('svg')!.getAttribute('aria-label')).toBe('bar chart with 2 points, range 2 to 4');
   });
+
+  it('names a chart of one value in the singular', () => {
+    const { container } = render(<PixelBarChart data={[{ x: 'a', y: 3 }]} />);
+    expect(container.querySelector('svg')!.getAttribute('aria-label')).toBe('bar chart with 1 point, range 3 to 3');
+  });
 });

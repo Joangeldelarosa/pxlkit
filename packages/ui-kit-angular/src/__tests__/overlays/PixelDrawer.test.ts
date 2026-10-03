@@ -25,6 +25,36 @@ async function render<T>(Host: Type<T>) {
 }
 
 describe('PixelDrawer', () => {
+  it('shows what its parent binds: a refused close keeps it open and locking the page, until the parent closes it', async () => {
+    @Component({
+      imports: [PixelDrawer],
+      template: `
+        <pxl-drawer [open]="open()" title="Settings" (openChange)="requests.push($event)">
+          <button type="button">inside</button>
+        </pxl-drawer>
+      `,
+    })
+    class Host {
+      readonly open = signal(true);
+      readonly requests: boolean[] = [];
+    }
+    const { fixture, host, settle } = await render(Host);
+    escape();
+    backdrop()!.click();
+    await settle();
+    expect(host.requests).toEqual([false, false]);
+    expect(dialog()).not.toBeNull();
+    expect(dialog()!.contains(document.activeElement)).toBe(true);
+    expect(document.body.style.overflow).toBe('hidden');
+    host.open.set(false);
+    await settle();
+    expect(dialog()).toBeNull();
+    host.open.set(true);
+    await settle();
+    expect(dialog()).not.toBeNull();
+    fixture.destroy();
+  });
+
   it('closes an [(open)] binding on Escape and on the backdrop, unless dismissOnOverlay is off', async () => {
     @Component({
       imports: [PixelDrawer],

@@ -2,12 +2,19 @@
  * Every Vue example hydrates its own server-rendered markup without a
  * mismatch: no warnings, and every server-rendered element is kept.
  */
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createSSRApp, nextTick } from 'vue';
+import { useRealTime, useRunDate } from '../../../../scripts/parity/clock';
 import { LOAD_KIT_TIMEOUT, loadKit, vueExamples } from './examples';
 import { vueServerHtml } from './vue';
 
+// The server render and the client's run on the real clock: they see the
+// run's start time (see clock.ts), so a date example shows the same day in
+// each.
+beforeEach(useRunDate);
+
 afterEach(() => {
+  useRealTime();
   vi.restoreAllMocks();
 });
 

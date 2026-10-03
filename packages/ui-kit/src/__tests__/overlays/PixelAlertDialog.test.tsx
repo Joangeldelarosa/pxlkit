@@ -155,4 +155,25 @@ describe('PixelAlertDialog', () => {
       window.matchMedia = original;
     }
   });
+
+  it('shows what its parent passes: a refused cancel or confirmation keeps it open, until the parent closes it', () => {
+    const onOpenChange = vi.fn();
+    const onAction = vi.fn();
+    const dialog = (open: boolean) => (
+      <PixelAlertDialog open={open} onOpenChange={onOpenChange} title="Delete file?" onAction={onAction} />
+    );
+    const { rerender, getByRole, queryByRole } = render(dialog(true));
+    fireEvent.click(getByRole('button', { name: 'Cancel' }));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.click(document.querySelector('[data-pxl-overlay-backdrop]')!);
+    fireEvent.click(getByRole('button', { name: 'Confirm' }));
+    expect(onOpenChange.mock.calls).toEqual([[false], [false], [false], [false]]);
+    expect(onAction).toHaveBeenCalledTimes(1);
+    expect(queryByRole('alertdialog')).toBeTruthy();
+    expect(document.body.style.overflow).toBe('hidden');
+    rerender(dialog(false));
+    expect(queryByRole('alertdialog')).toBeNull();
+    rerender(dialog(true));
+    expect(queryByRole('alertdialog')).toBeTruthy();
+  });
 });

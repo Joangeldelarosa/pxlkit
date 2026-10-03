@@ -129,4 +129,22 @@ describe('PixelDrawer', () => {
     expect(body!.getAttribute('data-testid')).toBe('body');
     expect(footer!.className).toContain('border-t-2');
   });
+
+  it('shows what its parent binds: a refused close keeps it open and locking the page, until the parent closes it', async () => {
+    const requests: boolean[] = [];
+    const { open } = harness({ 'onUpdate:open': (next: boolean) => requests.push(next) });
+    await settle();
+    escape();
+    backdrop()!.click();
+    await settle();
+    expect(requests).toEqual([false, false]);
+    expect(dialog()).not.toBeNull();
+    expect(document.body.style.overflow).toBe('hidden');
+    open.value = false;
+    await settle();
+    expect(dialog()).toBeNull();
+    open.value = true;
+    await settle();
+    expect(dialog()).not.toBeNull();
+  });
 });

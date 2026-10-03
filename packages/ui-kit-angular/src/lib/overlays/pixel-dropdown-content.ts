@@ -1,6 +1,7 @@
 import {
   DestroyRef,
   Directive,
+  NgZone,
   PLATFORM_ID,
   Renderer2,
   TemplateRef,
@@ -43,7 +44,9 @@ export class PixelDropdownContent {
   private readonly renderer = inject(Renderer2);
   private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly panel = signal<HTMLElement | null>(null);
-  private readonly coords = signal({ x: 0, y: 0 });
+  // Compared by value: re-measuring on a scroll that leaves the menu where it
+  // was must not render again.
+  private readonly coords = signal({ x: 0, y: 0 }, { equal: (a, b) => a.x === b.x && a.y === b.y });
   private view: EmbeddedViewRef<unknown> | null = null;
   private unlisten: (() => void) | null = null;
   /** Classes the panel declares itself, and the ones applied to it. */
@@ -71,12 +74,19 @@ export class PixelDropdownContent {
       else this.renderer.removeAttribute(panel, 'aria-activedescendant');
     });
     if (this.browser) {
-      // Keep the menu anchored to the root while it is open.
+      // Keep the menu anchored to the root while it is open. Its scroll and
+      // resize listeners run outside the zone, so a zone.js application
+      // renders only when the menu actually moves.
+      const zone = inject(NgZone);
       effect((onCleanup) => {
         const panel = this.panel();
         if (!panel) return;
         const options = { placement: DROPDOWN_PLACEMENT, middleware: dropdownMiddleware() };
-        onCleanup(anchorFloating(this.context.root, panel, options, ({ x, y }) => this.coords.set({ x, y })));
+        onCleanup(
+          zone.runOutsideAngular(() =>
+            anchorFloating(this.context.root, panel, options, ({ x, y }) => this.coords.set({ x, y })),
+          ),
+        );
       });
     }
     inject(DestroyRef).onDestroy(() => this.hide());

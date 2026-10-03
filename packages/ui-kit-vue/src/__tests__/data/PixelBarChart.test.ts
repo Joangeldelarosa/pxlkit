@@ -58,4 +58,9 @@ describe('PixelBarChart', () => {
     expect(wrapper.findAll('text').map((text) => text.text())).toEqual(['4', '2']);
     expect(wrapper.attributes('aria-label')).toBe('bar chart with 2 points, range 2 to 4');
   });
+
+  it('names a chart of one value in the singular', () => {
+    const wrapper = mount(PixelBarChart, { props: { data: [{ x: 'a', y: 3 }] } });
+    expect(wrapper.attributes('aria-label')).toBe('bar chart with 1 point, range 3 to 3');
+  });
 });

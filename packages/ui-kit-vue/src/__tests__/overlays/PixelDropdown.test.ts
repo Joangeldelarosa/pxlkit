@@ -291,4 +291,45 @@ describe('PixelDropdown', () => {
   it('explains when a part is used outside a root', () => {
     expect(() => mount(PixelDropdownTrigger)).toThrow('PixelDropdownTrigger must be used inside a <PixelDropdownRoot>');
   });
+
+  it('shows what its parent binds: the trigger, Escape, a press outside and an item only ask, and it asks again after a refusal', async () => {
+    const open = ref(false);
+    const requests: boolean[] = [];
+    let accept = false;
+    mount(
+      defineComponent({
+        setup: () => () =>
+          h(
+            PixelDropdownRoot,
+            {
+              open: open.value,
+              'onUpdate:open': (next: boolean) => {
+                requests.push(next);
+                if (accept) open.value = next;
+              },
+            },
+            () => parts(),
+          ),
+      }),
+      { attachTo: document.body },
+    );
+    await nextTick();
+    trigger().click();
+    trigger().click();
+    await nextTick();
+    expect(requests).toEqual([true, true]);
+    expect(menu()).toBeNull();
+    accept = true;
+    trigger().click();
+    await nextTick();
+    await nextTick();
+    expect(menu()).not.toBeNull();
+    accept = false;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    items()[0]!.click();
+    await nextTick();
+    expect(requests).toEqual([true, true, true, false, false, false]);
+    expect(menu()).not.toBeNull();
+  });
 });

@@ -4,9 +4,10 @@
  * server-rendered pages look the same before hydration.
  */
 import { JSDOM } from 'jsdom';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { reactExamples } from '../../../../../scripts/parity/catalog';
 import { canonicalDom, canonicalHtml } from '../../../../../scripts/parity/canonical';
+import { useRealTime, useRunDate } from '../../../../../scripts/parity/clock';
 import { reactServerHtml } from '../../../../../scripts/parity/react';
 import { angularDomRules } from '../dom-rules';
 import { angularExamples, LOAD_KIT_TIMEOUT, loadKit } from '../examples';
@@ -15,6 +16,11 @@ import { ROOT_TAG, angularServerPage } from '../server';
 const parser = new JSDOM('').window.document;
 
 beforeAll(loadKit, LOAD_KIT_TIMEOUT);
+
+// Both renders run on the real clock: they see the run's start time (see
+// clock.ts), so a date example shows the same day in each.
+beforeEach(useRunDate);
+afterEach(useRealTime);
 
 describe('React ↔ Angular parity — server rendering', () => {
   for (const example of reactExamples()) {

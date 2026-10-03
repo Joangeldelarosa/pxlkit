@@ -26,6 +26,40 @@ async function render<T>(Host: Type<T>) {
 }
 
 describe('PixelModal', () => {
+  it('shows what its parent binds: a refused close keeps it open, trapped and locking the page, until the parent closes it', async () => {
+    @Component({
+      imports: [PixelModal],
+      template: `
+        <pxl-modal [open]="open()" title="Keep" (openChange)="requests.push($event)" (closed)="closed = closed + 1">
+          <button type="button">inside</button>
+        </pxl-modal>
+      `,
+    })
+    class Host {
+      readonly open = signal(true);
+      readonly requests: boolean[] = [];
+      closed = 0;
+    }
+    const { fixture, host, settle } = await render(Host);
+    closeButton().click();
+    escape();
+    backdrop().click();
+    await settle();
+    expect(host.requests).toEqual([false, false, false]);
+    expect(host.closed).toBe(3);
+    expect(dialog()).not.toBeNull();
+    expect(dialog()!.contains(document.activeElement)).toBe(true);
+    expect(document.body.style.overflow).toBe('hidden');
+    host.open.set(false);
+    await settle();
+    expect(dialog()).toBeNull();
+    expect(document.body.style.overflow).toBe('');
+    host.open.set(true);
+    await settle();
+    expect(dialog()).not.toBeNull();
+    fixture.destroy();
+  });
+
   it('closes an [(open)] binding and emits (closed) from the button, Escape and the backdrop', async () => {
     @Component({
       imports: [PixelModal],

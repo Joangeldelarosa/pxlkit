@@ -121,4 +121,28 @@ describe('PixelModal', () => {
     await settle();
     expect(document.body.style.overflow).toBe('');
   });
+
+  it('shows what its parent binds: a refused close keeps it open and locking the page, until the parent closes it', async () => {
+    const requests: boolean[] = [];
+    const { open, onClose } = harness(
+      { 'onUpdate:open': (next: boolean) => requests.push(next) },
+      { default: () => h('button', { type: 'button' }, 'inside') },
+    );
+    await settle();
+    closeButton().click();
+    escape();
+    document.querySelector<HTMLElement>('[data-pxl-overlay-backdrop]')!.click();
+    await settle();
+    expect(requests).toEqual([false, false, false]);
+    expect(onClose).toHaveBeenCalledTimes(3);
+    expect(dialog()).not.toBeNull();
+    expect(document.body.style.overflow).toBe('hidden');
+    open.value = false;
+    await settle();
+    expect(dialog()).toBeNull();
+    expect(document.body.style.overflow).toBe('');
+    open.value = true;
+    await settle();
+    expect(dialog()).not.toBeNull();
+  });
 });

@@ -50,7 +50,7 @@ describe('PixelBarChart', () => {
     const fixture = TestBed.createComponent(Host);
     await fixture.whenStable();
     const svg = (fixture.nativeElement as HTMLElement).querySelector('svg')!;
-    expect(svg.getAttribute('aria-label')).toBe('bar chart with 1 points, range 3 to 3');
+    expect(svg.getAttribute('aria-label')).toBe('bar chart with 1 point, range 3 to 3');
     expect(svg.querySelector('rect')!.getAttribute('rx')).toBe('2');
     expect(svg.getAttribute('shape-rendering')).toBe('geometricPrecision');
   });

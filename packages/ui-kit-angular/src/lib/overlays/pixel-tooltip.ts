@@ -4,13 +4,14 @@ import {
   DOCUMENT,
   DestroyRef,
   ElementRef,
+  NgZone,
   PLATFORM_ID,
   afterRenderEffect,
   computed,
   effect,
   inject,
   input,
-  model,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -35,6 +36,7 @@ import { PxlOutlet, type PxlContent } from '../_internal/outlet';
 import { PixelPortal } from '../overlay-foundation/pixel-portal';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 import { injectEscape, injectEventListener } from '../utilities/dom';
+import { injectOpenState } from './_internal/open-state';
 
 /**
  * Floating hint anchored to the projected trigger, rendered into `<body>`
@@ -44,6 +46,9 @@ import { injectEscape, injectEventListener } from '../utilities/dom';
  * on hover or focus stays closed until the pointer or focus has left the
  * trigger — and a click tooltip also closes on a press outside. Bind
  * `[(open)]` to control it, or leave it uncontrolled with `defaultOpen`.
+ * Controlled, it shows what its parent binds: every change is only asked
+ * for (`(openChange)`), so a parent that keeps its value keeps the tooltip as
+ * it is.
  *
  * The host is layout-neutral (`display: contents`).
  *
@@ -95,7 +100,7 @@ export class PixelTooltip {
    */
   readonly delay = input<TooltipDelay>();
   /** Whether the tooltip is open (`[(open)]`); leave unset for an uncontrolled tooltip. */
-  readonly open = model<boolean | undefined>(undefined);
+  readonly open = input<boolean | undefined>(undefined);
   /** Initial open state while uncontrolled. */
   readonly defaultOpen = input(false, { transform: booleanOr(false) });
   /** What opens it: `hover` (and focus), `focus` only, or `click` to toggle. */
@@ -104,14 +109,17 @@ export class PixelTooltip {
   });
   /** Gap between the trigger and the tooltip, in px. */
   readonly sideOffset = input(8, { transform: numberOr(8) });
+  /** Every open state the tooltip asks for (hover, focus, a click, Escape, a press outside), for `[(open)]`. */
+  readonly openChange = output<boolean>();
 
+  private readonly state = injectOpenState(this.open, this.openChange, this.defaultOpen);
   private readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
   private readonly wrapper = viewChild.required<ElementRef<HTMLElement>>('wrapper');
   private readonly tip = viewChild<ElementRef<HTMLElement>>('tip');
   private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
-  private readonly coords = signal({ x: 0, y: 0 });
-  // Like React's uncontrolled state, the default is read once, then kept.
-  private seed: boolean | undefined;
+  // Compared by value: re-measuring on a scroll that leaves the tooltip where
+  // it was must not render again.
+  private readonly coords = signal({ x: 0, y: 0 }, { equal: (a, b) => a.x === b.x && a.y === b.y });
   private openTimer: ReturnType<typeof setTimeout> | undefined;
   private closeTimer: ReturnType<typeof setTimeout> | undefined;
   // Set when Escape dismisses the tooltip: hover and focus leave it closed
@@ -123,7 +131,7 @@ export class PixelTooltip {
   /** @internal */
   protected readonly triggerClasses = tooltipTriggerClasses;
   /** @internal */
-  protected readonly isOpen = computed(() => this.open() ?? (this.seed ??= this.defaultOpen()));
+  protected readonly isOpen = this.state.open;
   /** @internal */
   protected readonly body = computed(() => this.content() ?? this.label());
   /** @internal */
@@ -144,7 +152,7 @@ export class PixelTooltip {
       () => {
         this.clearTimers();
         if (this.trigger() !== 'click') this.dismissed = true;
-        if (this.isOpen()) this.open.set(false);
+        if (this.isOpen()) this.state.request(false);
       },
       () => this.isOpen() || this.openTimer !== undefined,
     );
@@ -156,20 +164,25 @@ export class PixelTooltip {
         const target = event.target as Node | null;
         if (this.trigger() !== 'click' || !this.isOpen() || !target) return;
         if (this.wrapper().nativeElement.contains(target) || this.tip()?.nativeElement.contains(target)) return;
-        this.open.set(false);
+        this.state.request(false);
       },
       () => document,
     );
     if (!this.browser) return;
-    // Keep the tooltip anchored to the trigger while it is on the page.
+    // Keep the tooltip anchored to the trigger while it is on the page. Its
+    // scroll and resize listeners run outside the zone, so a zone.js
+    // application renders only when the tooltip actually moves.
+    const zone = inject(NgZone);
     effect((onCleanup) => {
       const floating = this.tip()?.nativeElement;
       if (!floating) return;
       const placement = this.position();
       const middleware = anchoredMiddleware(this.sideOffset());
       onCleanup(
-        anchorFloating(this.wrapper().nativeElement, floating, { placement, middleware }, ({ x, y }) =>
-          this.coords.set({ x, y }),
+        zone.runOutsideAngular(() =>
+          anchorFloating(this.wrapper().nativeElement, floating, { placement, middleware }, ({ x, y }) =>
+            this.coords.set({ x, y }),
+          ),
         ),
       );
     });
@@ -201,7 +214,7 @@ export class PixelTooltip {
   protected onClick(): void {
     if (this.trigger() !== 'click') return;
     this.clearTimers();
-    this.open.set(!this.isOpen());
+    this.state.request(!this.isOpen());
   }
 
   private enter(): void {
@@ -218,12 +231,12 @@ export class PixelTooltip {
     const delays = resolveTooltipDelays(this.delay());
     const wait = open ? delays.open : delays.close;
     if (wait <= 0) {
-      this.open.set(open);
+      this.state.request(open);
       return;
     }
     const timer = setTimeout(() => {
       this.openTimer = this.closeTimer = undefined;
-      this.open.set(open);
+      this.state.request(open);
     }, wait);
     if (open) this.openTimer = timer;
     else this.closeTimer = timer;

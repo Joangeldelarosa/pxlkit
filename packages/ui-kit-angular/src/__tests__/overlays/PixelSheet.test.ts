@@ -26,6 +26,36 @@ async function render<T>(Host: Type<T>) {
 }
 
 describe('PixelSheet', () => {
+  it('shows what its parent binds: a refused close keeps it open and locking the page, until the parent closes it', async () => {
+    @Component({
+      imports: [PixelSheet],
+      template: `
+        <pxl-sheet [open]="open()" title="Actions" (openChange)="requests.push($event)">
+          <button type="button">inside</button>
+        </pxl-sheet>
+      `,
+    })
+    class Host {
+      readonly open = signal(true);
+      readonly requests: boolean[] = [];
+    }
+    const { fixture, host, settle } = await render(Host);
+    escape();
+    document.querySelector<HTMLElement>('[data-pxl-overlay-backdrop]')!.click();
+    await settle();
+    expect(host.requests).toEqual([false, false]);
+    expect(dialog()).not.toBeNull();
+    expect(dialog()!.contains(document.activeElement)).toBe(true);
+    expect(document.body.style.overflow).toBe('hidden');
+    host.open.set(false);
+    await settle();
+    expect(dialog()).toBeNull();
+    host.open.set(true);
+    await settle();
+    expect(dialog()).not.toBeNull();
+    fixture.destroy();
+  });
+
   it('closes an [(open)] binding on Escape and on the backdrop', async () => {
     @Component({
       imports: [PixelSheet],

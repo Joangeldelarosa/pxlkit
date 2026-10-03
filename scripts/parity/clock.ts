@@ -34,6 +34,16 @@ export function useSimulatedTime(): void {
   });
 }
 
+/**
+ * Fixes `Date` at the run's start time and leaves the timers real, for the
+ * renders that run on the real clock — server rendering, hydration — so the
+ * two renders compared (React's and the port's, the server's and the
+ * client's) see the same instant, across midnight too.
+ */
+export function useRunDate(): void {
+  vi.useFakeTimers({ now: start, toFake: ['Date'] });
+}
+
 /** Back to real timers. */
 export function useRealTime(): void {
   vi.useRealTimers();

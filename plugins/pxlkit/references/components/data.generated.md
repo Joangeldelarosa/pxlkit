@@ -36,7 +36,7 @@
 
 ### PixelBarChart
 - stable · since 1.9.0
-- Pure-SVG bar chart that renders one rect per data point, in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.
+- Pure-SVG bar chart that renders one rect per data point (none for a value that is not finite), in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.
 - Tone-aware fills via retro-* token classes — matches the rest of the kit. · Three sizes (sm/md/lg) with sensible inner padding and gap math. · Vertical or horizontal orientation with auto-normalized [yMin..yMax] scale. · Optional inline value labels above (vertical) or after (horizontal) each bar. · Surface-aware: pixel uses crispEdges + square corners, linear smooths to rx=2.
 - related: PixelSparkline, PixelAreaChart, PixelStatGroup, PixelDataTable
 

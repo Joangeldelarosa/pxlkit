@@ -27,6 +27,39 @@ async function render<T>(Host: Type<T>) {
 }
 
 describe('PixelAlertDialog', () => {
+  it('shows what its parent binds: a refused cancel or confirmation keeps it open, until the parent closes it', async () => {
+    @Component({
+      imports: [PixelAlertDialog],
+      template: `<pxl-alert-dialog [open]="open()" title="Delete file?" [onAction]="action" (openChange)="requests.push($event)" />`,
+    })
+    class Host {
+      readonly open = signal(true);
+      readonly requests: boolean[] = [];
+      actions = 0;
+      readonly action = () => {
+        this.actions++;
+      };
+    }
+    const { fixture, host, settle } = await render(Host);
+    buttons()[0]!.click();
+    escape();
+    backdrop().click();
+    buttons()[1]!.click();
+    await settle();
+    expect(host.requests).toEqual([false, false, false, false]);
+    expect(host.actions).toBe(1);
+    expect(dialog()).not.toBeNull();
+    expect(dialog()!.contains(document.activeElement)).toBe(true);
+    expect(document.body.style.overflow).toBe('hidden');
+    host.open.set(false);
+    await settle();
+    expect(dialog()).toBeNull();
+    host.open.set(true);
+    await settle();
+    expect(dialog()).not.toBeNull();
+    fixture.destroy();
+  });
+
   it('closes an [(open)] binding from Cancel, Escape and the backdrop, with focus starting on Cancel', async () => {
     @Component({
       imports: [PixelAlertDialog],

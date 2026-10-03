@@ -6,6 +6,7 @@ import { provideZonelessChangeDetection, type ApplicationRef } from '@angular/co
 import { TestBed } from '@angular/core/testing';
 import { bootstrapApplication, provideClientHydration } from '@angular/platform-browser';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useRealTime, useRunDate } from '../../../../scripts/parity/clock';
 import { angularExamples, LOAD_KIT_TIMEOUT, loadKit } from './examples';
 import { ROOT_TAG, angularServerPage, rootFor } from './server';
 
@@ -17,11 +18,16 @@ describe('Angular examples hydrate cleanly', () => {
   beforeEach(() => {
     // These tests bootstrap real applications, not TestBed fixtures.
     TestBed.resetTestingModule();
+    // The server render and the client's run on the real clock: they see
+    // the run's start time (see clock.ts), so a date example shows the same
+    // day in each.
+    useRunDate();
   });
 
   afterEach(() => {
     appRef?.destroy();
     appRef = undefined;
+    useRealTime();
     vi.restoreAllMocks();
   });
 

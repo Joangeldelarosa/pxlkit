@@ -7,7 +7,7 @@ import {
   effect,
   inject,
   input,
-  model,
+  output,
   signal,
   viewChild,
 } from '@angular/core';
@@ -24,13 +24,16 @@ import { PixelPortal } from '../overlay-foundation/pixel-portal';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 import { injectEscape, injectFocusTrap, injectScrollLock } from '../utilities/dom';
 import { injectReducedMotion } from '../utilities/media-query';
+import { injectOpenState } from './_internal/open-state';
 
 /**
  * Modal confirmation dialog (`role="alertdialog"`) for destructive or
  * irreversible actions. Focus starts on Cancel; the dialog traps focus, locks
  * page scrolling and closes on Escape and on the backdrop. An action that
  * returns a promise keeps the dialog open, with a busy action button, until
- * it settles. Bind it with `[(open)]`.
+ * it settles. Bind it with `[(open)]`. It shows what its parent binds: Cancel,
+ * Escape, the backdrop and a completed action only ask to close, so a parent
+ * that keeps it open keeps it as it is.
  *
  * The host is layout-neutral (`display: contents`); the dialog renders into
  * `document.body`.
@@ -112,7 +115,7 @@ import { injectReducedMotion } from '../utilities/media-query';
 })
 export class PixelAlertDialog {
   /** Whether the dialog is visible (`[(open)]`). */
-  readonly open = model.required<boolean>();
+  readonly open = input.required<boolean>();
   /** Title; it names the dialog. */
   readonly title = input.required<string>();
   /** Text under the title, wired via `aria-describedby`. */
@@ -137,7 +140,10 @@ export class PixelAlertDialog {
   readonly destructive = input(false, { transform: booleanOr(false) });
   /** Surface override; defaults to the nearest provider. */
   readonly surface = input<Surface>();
+  /** `false` when the dialog asks to close (Cancel, Escape, backdrop, a completed action), for `[(open)]`. */
+  readonly openChange = output<boolean>();
 
+  private readonly state = injectOpenState(this.open, this.openChange);
   /** @internal */
   protected readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
   private readonly reducedMotion = injectReducedMotion();
@@ -185,7 +191,7 @@ export class PixelAlertDialog {
 
   /** @internal */
   protected cancel(): void {
-    if (!this.pending()) this.open.set(false);
+    if (!this.pending()) this.state.request(false);
   }
 
   /** @internal */
@@ -203,7 +209,7 @@ export class PixelAlertDialog {
       return;
     }
     if (!result || typeof (result as Promise<void>).then !== 'function') {
-      this.open.set(false);
+      this.state.request(false);
       return;
     }
     void this.await(result, onError);
@@ -213,7 +219,7 @@ export class PixelAlertDialog {
     this.pending.set(true);
     try {
       await result;
-      this.open.set(false);
+      this.state.request(false);
     } catch (error) {
       if (onError) onError(error);
       else console.error('[PixelAlertDialog] onAction rejected:', error);

@@ -164,4 +164,23 @@ describe('PixelCommand', () => {
     await settle();
     expect(palette.value?.element).toBe(dialog());
   });
+
+  it('shows what its parent binds: its shortcut, Escape and the backdrop only ask', async () => {
+    const requests: boolean[] = [];
+    const { open } = harness({ 'onUpdate:open': (next: boolean) => requests.push(next) });
+    await settle();
+    key('k', { ctrlKey: true });
+    key('k', { ctrlKey: true });
+    await settle();
+    expect(requests).toEqual([true, true]);
+    expect(dialog()).toBeNull();
+    open.value = true;
+    await settle();
+    key('Escape');
+    document.querySelector<HTMLElement>('[data-pxl-overlay-backdrop]')!.click();
+    await settle();
+    expect(requests).toEqual([true, true, false, false]);
+    expect(dialog()).not.toBeNull();
+    expect(document.body.style.overflow).toBe('hidden');
+  });
 });

@@ -20,7 +20,7 @@ const meta: Meta = {
   parameters: {
     controls: { disable: true },
     docs: {
-      description: { component: 'Pure-SVG bar chart that renders one rect per data point, in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.' },
+      description: { component: 'Pure-SVG bar chart that renders one rect per data point (none for a value that is not finite), in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.' },
     },
   },
 };

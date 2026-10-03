@@ -31,6 +31,44 @@ async function render<T>(Host: Type<T>) {
 }
 
 describe('PixelCommand', () => {
+  it('shows what its parent binds: its shortcut, Escape and the backdrop only ask, and it asks again after a refusal', async () => {
+    @Component({
+      imports: [PixelCommand],
+      template: `<pxl-command [open]="open()" [groups]="groups" (openChange)="ask($event)" />`,
+    })
+    class Host {
+      readonly open = signal(false);
+      readonly groups = groupsOf(() => {});
+      readonly requests: boolean[] = [];
+      accept = false;
+      ask(open: boolean): void {
+        this.requests.push(open);
+        if (this.accept) this.open.set(open);
+      }
+    }
+    const { fixture, host, settle } = await render(Host);
+    key('k', { ctrlKey: true });
+    await settle();
+    key('k', { ctrlKey: true });
+    await settle();
+    expect(host.requests).toEqual([true, true]);
+    expect(dialog()).toBeNull();
+    expect(document.body.style.overflow).toBe('');
+    host.accept = true;
+    key('k', { ctrlKey: true });
+    await settle();
+    expect(dialog()).not.toBeNull();
+    expect(document.activeElement).toBe(field());
+    host.accept = false;
+    key('Escape');
+    document.querySelector<HTMLElement>('[data-pxl-overlay-backdrop]')!.click();
+    await settle();
+    expect(host.requests).toEqual([true, true, true, false, false]);
+    expect(dialog()).not.toBeNull();
+    expect(document.body.style.overflow).toBe('hidden');
+    fixture.destroy();
+  });
+
   it('toggles an [(open)] binding with its shortcut, focusing the search field, and closes on Escape and the backdrop', async () => {
     @Component({
       imports: [PixelCommand],

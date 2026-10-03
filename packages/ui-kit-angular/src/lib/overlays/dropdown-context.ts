@@ -153,9 +153,12 @@ export function createDropdownRoot(state: {
     if (next) highlighted.set(next);
   };
 
+  // A press outside asks to close only while the menu is open, so presses on
+  // the rest of the page cost nothing.
   injectClickOutside(
     () => root,
     () => {
+      if (!state.open()) return;
       pressOutside = true;
       close();
     },

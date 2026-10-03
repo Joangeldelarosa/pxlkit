@@ -200,4 +200,23 @@ describe('PixelTooltip', () => {
     await nextTick();
     expect(instance.value?.element).toBe(wrapperOf());
   });
+
+  it('shows what its parent binds: a click, Escape and a press outside only ask, and it asks again after a refusal', async () => {
+    const requests: boolean[] = [];
+    const { open } = harness({ trigger: 'click', 'onUpdate:open': (next: boolean) => requests.push(next) });
+    await nextTick();
+    const button = wrapperOf().querySelector('button')!;
+    button.click();
+    button.click();
+    await nextTick();
+    expect(requests).toEqual([true, true]);
+    expect(tooltip()).toBeNull();
+    open.value = true;
+    await nextTick();
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    await nextTick();
+    expect(requests).toEqual([true, true, false, false]);
+    expect(tooltip()).not.toBeNull();
+  });
 });

@@ -273,4 +273,23 @@ describe('PixelTooltip — floating-ui upgrade', () => {
     expect(tooltip()).toBeNull();
     expect(onOpenChange).not.toHaveBeenCalled();
   });
+
+  it('shows what its parent passes: a click, Escape and a press outside only ask, and it asks again after a refusal', () => {
+    const onOpenChange = vi.fn();
+    const tip = (open: boolean) => (
+      <PixelTooltip open={open} onOpenChange={onOpenChange} trigger="click" label="Tip">
+        <button type="button">trigger</button>
+      </PixelTooltip>
+    );
+    const { rerender, getByRole } = render(tip(false));
+    fireEvent.click(getByRole('button', { name: 'trigger' }));
+    fireEvent.click(getByRole('button', { name: 'trigger' }));
+    expect(onOpenChange.mock.calls).toEqual([[true], [true]]);
+    expect(document.querySelector('[role="tooltip"]')).toBeNull();
+    rerender(tip(true));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.pointerDown(document.body);
+    expect(onOpenChange.mock.calls).toEqual([[true], [true], [false], [false]]);
+    expect(document.querySelector('[role="tooltip"]')).toBeTruthy();
+  });
 });

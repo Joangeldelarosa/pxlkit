@@ -61,6 +61,54 @@ afterEach(() => {
 });
 
 describe('PixelTooltip', () => {
+  it('shows what its parent binds: a click, hover, Escape and a press outside only ask, and it asks again after a refusal', async () => {
+    @Component({
+      imports: [PixelTooltip],
+      template: `
+        <pxl-tooltip [open]="open()" label="Tip" [trigger]="trigger()" [delay]="{ open: 40, close: 40 }" (openChange)="ask($event)">
+          <button type="button">trigger</button>
+        </pxl-tooltip>
+      `,
+    })
+    class Host {
+      readonly open = signal(false);
+      readonly trigger = signal<TooltipTrigger>('click');
+      readonly requests: boolean[] = [];
+      accept = false;
+      ask(open: boolean): void {
+        this.requests.push(open);
+        if (this.accept) this.open.set(open);
+      }
+    }
+    const { fixture, host, settle } = await render(Host);
+    button().click();
+    await settle();
+    button().click();
+    await settle();
+    expect(host.requests).toEqual([true, true]);
+    expect(tooltip()).toBeNull();
+    host.accept = true;
+    button().click();
+    await settle();
+    expect(tooltip()).not.toBeNull();
+    host.accept = false;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    await settle();
+    expect(host.requests).toEqual([true, true, true, false, false]);
+    expect(tooltip()).not.toBeNull();
+
+    host.open.set(false);
+    host.trigger.set('hover');
+    await settle();
+    wrapper().dispatchEvent(new MouseEvent('mouseenter'));
+    await wait(40);
+    await settle();
+    expect(host.requests).toEqual([true, true, true, false, false, true]);
+    expect(tooltip()).toBeNull();
+    fixture.destroy();
+  });
+
   it('opens an [(open)] binding after the hover delay and closes it after the leave delay', async () => {
     const { fixture, host, settle } = await render(Bound);
     wrapper().dispatchEvent(new MouseEvent('mouseenter'));

@@ -439,4 +439,40 @@ describe('PixelDropdown — Ola 4a upgrade', () => {
     expect(radios.map((item) => item.getAttribute('aria-checked'))).toEqual(['true', 'false']);
     expect(screen.queryAllByRole('menuitem')).toHaveLength(0);
   });
+
+  it('shows what its parent passes: the trigger, Escape, a press outside and an item only ask, and it asks again after a refusal', () => {
+    const requests: boolean[] = [];
+    function Harness({ accept }: { accept: boolean }) {
+      const [open, setOpen] = useState(false);
+      return (
+        <PixelDropdown.Root
+          open={open}
+          onOpenChange={(next) => {
+            requests.push(next);
+            if (accept) setOpen(next);
+          }}
+        >
+          <PixelDropdown.Trigger>Menu</PixelDropdown.Trigger>
+          <PixelDropdown.Content>
+            <PixelDropdown.Item value="copy" onSelect={() => {}}>Copy</PixelDropdown.Item>
+          </PixelDropdown.Content>
+        </PixelDropdown.Root>
+      );
+    }
+    const { rerender } = render(<Harness accept={false} />);
+    const trigger = screen.getByRole('button', { name: /menu/i });
+    fireEvent.click(trigger);
+    fireEvent.click(trigger);
+    expect(requests).toEqual([true, true]);
+    expect(screen.queryByRole('menu')).toBeNull();
+    rerender(<Harness accept />);
+    fireEvent.click(trigger);
+    expect(screen.getByRole('menu')).toBeTruthy();
+    rerender(<Harness accept={false} />);
+    fireEvent.keyDown(window, { key: 'Escape' });
+    fireEvent.pointerDown(document.body);
+    fireEvent.click(screen.getByRole('menuitem', { name: /copy/i }));
+    expect(requests).toEqual([true, true, true, false, false, false]);
+    expect(screen.getByRole('menu')).toBeTruthy();
+  });
 });

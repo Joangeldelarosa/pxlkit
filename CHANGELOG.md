@@ -218,7 +218,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   unbound — it shows every row again, without the pagination bar — and `PixelSparkline`,
   `PixelAreaChart` and `PixelBarChart` leave out values that are not finite numbers instead of
   drawing nothing and reading "range NaN to NaN": the other points keep their places, and the
-  summary counts and ranges the finite ones.
+  summary counts and ranges the finite ones, reading "1 point" for one where it read "1 points".
 - `@pxlkit/ui-kit`: `PixelCalendarGrid`, `PixelDatePicker` and `PixelDateRangePicker` follow the
   WAI-ARIA date grid: PageUp / PageDown keep the day of the month (the last day of a shorter
   month; from January 31 they reached March 3), Shift+PageUp / Shift+PageDown move a year,

@@ -5,7 +5,7 @@ import {
   computed,
   effect,
   input,
-  model,
+  output,
   viewChild,
 } from '@angular/core';
 import {
@@ -21,13 +21,15 @@ import { injectId } from '../_internal/ids';
 import { PixelPortal } from '../overlay-foundation/pixel-portal';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 import { injectEscape, injectFocusTrap, injectScrollLock } from '../utilities/dom';
+import { injectOpenState } from './_internal/open-state';
 
 /**
  * Modal panel anchored to an edge of the viewport (right, left, top or
  * bottom), with focus trap, scroll lock and Escape / backdrop dismissal.
  * Compose its content from `<pxl-drawer-header>`, `<pxl-drawer-body>` and
  * `<pxl-drawer-footer>`. Name it with `title` or `ariaLabel`. Bind it with
- * `[(open)]`.
+ * `[(open)]`. It shows what its parent binds: Escape and the backdrop only
+ * ask to close, so a parent that keeps it open keeps it as it is.
  *
  * The host is layout-neutral (`display: contents`); the drawer renders into
  * `document.body`.
@@ -90,7 +92,7 @@ import { injectEscape, injectFocusTrap, injectScrollLock } from '../utilities/do
 })
 export class PixelDrawer {
   /** Whether the drawer is visible (`[(open)]`). */
-  readonly open = model.required<boolean>();
+  readonly open = input.required<boolean>();
   /** Edge of the viewport the drawer is anchored to. */
   readonly side = input<DrawerSide, DrawerSide | undefined>('right', { transform: withDefault<DrawerSide>('right') });
   /** Width (left / right) or height (top / bottom) preset. */
@@ -111,7 +113,10 @@ export class PixelDrawer {
   readonly surface = input<Surface>();
   /** Portal target; `document.body` when left out. */
   readonly container = input<HTMLElement | null>();
+  /** `false` when the drawer asks to close (Escape, backdrop), for `[(open)]`. */
+  readonly openChange = output<boolean>();
 
+  private readonly state = injectOpenState(this.open, this.openChange);
   private readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
 
@@ -133,7 +138,7 @@ export class PixelDrawer {
     );
     injectScrollLock(() => this.open());
     injectEscape(
-      () => this.open.set(false),
+      () => this.state.request(false),
       () => this.open(),
     );
     effect(() => {
@@ -145,6 +150,6 @@ export class PixelDrawer {
 
   /** @internal */
   protected onBackdropClick(): void {
-    if (this.dismissOnOverlay()) this.open.set(false);
+    if (this.dismissOnOverlay()) this.state.request(false);
   }
 }

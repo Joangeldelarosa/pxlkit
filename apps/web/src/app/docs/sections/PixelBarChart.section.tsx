@@ -22,7 +22,7 @@ export function PixelBarChartDocsSection({ className }: PixelBarChartDocsSection
   return (
     <section aria-labelledby={'pixel-bar-chart-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bar-chart-heading'>PixelBarChart</h2>
-      <p className="docs-lead">Pure-SVG bar chart that renders one rect per data point, in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.</p>
+      <p className="docs-lead">Pure-SVG bar chart that renders one rect per data point (none for a value that is not finite), in vertical (default) or horizontal orientation, with crisp pixel edges or smoothed linear corners.</p>
       <ul className="docs-highlights">
         <li>Tone-aware fills via retro-* token classes — matches the rest of the kit.</li>
         <li>Three sizes (sm/md/lg) with sensible inner padding and gap math.</li>

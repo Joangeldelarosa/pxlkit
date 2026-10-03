@@ -40,6 +40,50 @@ async function render<T>(Host: Type<T>) {
 }
 
 describe('PixelDropdown', () => {
+  it('shows what its parent binds: the trigger, Escape, a press outside and an item only ask, and it asks again after a refusal', async () => {
+    @Component({
+      imports: PARTS,
+      template: `
+        <pxl-dropdown-root [open]="open()" (openChange)="ask($event)">
+          <pxl-dropdown-trigger>Menu</pxl-dropdown-trigger>
+          <div *pxlDropdownContent><button pxlDropdownItem value="copy">Copy</button></div>
+        </pxl-dropdown-root>
+      `,
+    })
+    class Host {
+      readonly open = signal(false);
+      readonly requests: boolean[] = [];
+      accept = false;
+      ask(open: boolean): void {
+        this.requests.push(open);
+        if (this.accept) this.open.set(open);
+      }
+    }
+    const { fixture, host, settle } = await render(Host);
+    trigger().click();
+    await settle();
+    trigger().click();
+    key('ArrowDown');
+    await settle();
+    expect(host.requests).toEqual([true, true, true]);
+    expect(menu()).toBeNull();
+    expect(trigger().getAttribute('aria-expanded')).toBe('false');
+    host.accept = true;
+    trigger().click();
+    await settle();
+    expect(menu()).not.toBeNull();
+    expect(document.activeElement).toBe(menu());
+    host.accept = false;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    items()[0]!.click();
+    await settle();
+    expect(host.requests).toEqual([true, true, true, true, false, false, false]);
+    expect(menu()).not.toBeNull();
+    expect(trigger().getAttribute('aria-expanded')).toBe('true');
+    fixture.destroy();
+  });
+
   it('toggles an [(open)] binding from the trigger, advertising the menu, and opens on the first item from ArrowDown and on the last from ArrowUp', async () => {
     @Component({
       imports: PARTS,

@@ -2,17 +2,22 @@
  * zone.js applications — still the default of Angular 20 projects. State set
  * by the kit's events lands in plain (non-signal) fields and is rendered, and
  * the page-wide listeners of the popover and of the components built on it
- * (the combobox, the date picker) run outside the Angular zone, so they add
- * no app-wide change detection until they actually close or move it.
+ * (the combobox, the date picker), of the tooltip and of the dropdown run
+ * outside the Angular zone, so they add no app-wide change detection until
+ * they actually close or move what they anchor.
  */
 import { ApplicationRef, Component, NgZone, provideZoneChangeDetection, type DoCheck } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   PixelButton,
   PixelCombobox,
   PixelDatePicker,
+  PixelDropdownContent,
+  PixelDropdownItem,
+  PixelDropdownRoot,
+  PixelDropdownTrigger,
   PixelModal,
   PixelPopover,
   PixelPopoverContent,
@@ -22,6 +27,7 @@ import {
   PixelTabsList,
   PixelTabsPanel,
   PixelTabsTrigger,
+  PixelTooltip,
 } from '@pxlkit/ui-kit-angular';
 
 @Component({
@@ -40,6 +46,11 @@ import {
     PixelModal,
     PixelCombobox,
     PixelDatePicker,
+    PixelTooltip,
+    PixelDropdownRoot,
+    PixelDropdownTrigger,
+    PixelDropdownContent,
+    PixelDropdownItem,
   ],
   template: `
     <button pxlButton id="count" (click)="count = count + 1">Clicked {{ count }}</button>
@@ -68,6 +79,13 @@ import {
       <output id="fruit">{{ fruit }}</output>
       <pxl-date-picker id="due-picker" label="Due" [(ngModel)]="due" />
       <output id="due">{{ due?.toDateString() }}</output>
+      <pxl-tooltip label="Tip" trigger="click" [(open)]="tip"><button type="button" id="tip-trigger">Hint</button></pxl-tooltip>
+      <output id="tip">{{ tip }}</output>
+      <pxl-dropdown-root [(open)]="menu">
+        <pxl-dropdown-trigger id="menu-trigger">Menu</pxl-dropdown-trigger>
+        <div *pxlDropdownContent><button pxlDropdownItem value="copy">Copy</button></div>
+      </pxl-dropdown-root>
+      <output id="menu">{{ menu }}</output>
     </div>
   `,
 })
@@ -85,6 +103,8 @@ class ZoneApp implements DoCheck {
   ];
   fruit: string | undefined = undefined;
   due: Date | null = new Date(2026, 5, 15);
+  tip = false;
+  menu = false;
   /** Times the root view was checked — once per app-wide change detection. */
   checks = 0;
 
@@ -140,6 +160,7 @@ describe('@pxlkit/ui-kit-angular in a zone.js application', () => {
   afterEach(() => {
     appRef?.destroy();
     appRef = undefined;
+    vi.restoreAllMocks();
     document.body.innerHTML = '';
   });
 
@@ -286,5 +307,39 @@ describe('@pxlkit/ui-kit-angular in a zone.js application', () => {
       expect($(inside)).toBeNull();
       expect(document.activeElement).toBe($(trigger));
     }
+  });
+
+  it('keeps the listeners of the tooltip and the dropdown outside the zone until they move or close what they anchor', async () => {
+    const app = await bootstrap();
+    const escape = () => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    const pressOutside = () => $('#outside')!.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    for (const [trigger, inside, anchor, close] of [
+      ['#tip-trigger', '[role="tooltip"]', () => $('#tip-trigger')!.parentElement!, escape],
+      ['#menu-trigger', '[role="menu"]', () => $('pxl-dropdown-root')!, pressOutside],
+    ] as const) {
+      await open($(trigger)!);
+      expect(await stableWithin(5000)).toBe(true);
+      const checksBefore = app.checks;
+      ignoredEvents($(inside)!);
+      await sleep(10);
+      expect(app.checks - checksBefore).toBe(0);
+
+      // The anchor moves: the next scroll re-anchors the content, which renders.
+      const placed = $(inside)!.style.transform;
+      vi.spyOn(anchor(), 'getBoundingClientRect').mockReturnValue({
+        x: 120, y: 80, left: 120, top: 80, right: 180, bottom: 100, width: 60, height: 20,
+      } as DOMRect);
+      $('#scroller')!.dispatchEvent(new Event('scroll'));
+      await sleep(0);
+      await appRef!.whenStable();
+      expect($(inside)!.style.transform).not.toBe(placed);
+
+      // It closes from its page-wide listener, rendering the plain field.
+      close();
+      await appRef!.whenStable();
+      expect($(inside)).toBeNull();
+    }
+    expect([app.tip, app.menu]).toEqual([false, false]);
+    expect([$('#tip')!.textContent, $('#menu')!.textContent]).toEqual(['false', 'false']);
   });
 });

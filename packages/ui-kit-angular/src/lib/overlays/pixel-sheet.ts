@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, input, model, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, input, output, viewChild } from '@angular/core';
 import {
   overlayBackdropClasses,
   sheetClasses,
@@ -12,12 +12,15 @@ import { injectId } from '../_internal/ids';
 import { PixelPortal } from '../overlay-foundation/pixel-portal';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 import { injectEscape, injectFocusTrap, injectScrollLock } from '../utilities/dom';
+import { injectOpenState } from './_internal/open-state';
 
 /**
  * Mobile-first modal sheet docked to the bottom or the top of the viewport,
  * with focus trap, scroll lock, Escape / backdrop dismissal and an optional
  * (decorative) drag handle. Name it with `title` or `ariaLabel`. Bind it with
- * `[(open)]`; the body is the projected content.
+ * `[(open)]`; the body is the projected content. It shows what its parent
+ * binds: Escape and the backdrop only ask to close, so a parent that keeps it
+ * open keeps it as it is.
  *
  * The host is layout-neutral (`display: contents`); the sheet renders into
  * `document.body`.
@@ -40,7 +43,7 @@ import { injectEscape, injectFocusTrap, injectScrollLock } from '../utilities/do
     @if (open()) {
       <ng-template pxlPortal>
         <div [class]="layerClasses" data-pixel-sheet="">
-          <div aria-hidden="true" data-pxl-overlay-backdrop="" [class]="backdropClasses" (click)="open.set(false)"></div>
+          <div aria-hidden="true" data-pxl-overlay-backdrop="" [class]="backdropClasses" (click)="close()"></div>
           <div
             #panel
             role="dialog"
@@ -77,7 +80,7 @@ import { injectEscape, injectFocusTrap, injectScrollLock } from '../utilities/do
 })
 export class PixelSheet {
   /** Whether the sheet is visible (`[(open)]`). */
-  readonly open = model.required<boolean>();
+  readonly open = input.required<boolean>();
   /** Edge of the viewport the sheet is docked to. */
   readonly side = input<SheetSide, SheetSide | undefined>('bottom', { transform: withDefault<SheetSide>('bottom') });
   /** Height preset. */
@@ -92,7 +95,10 @@ export class PixelSheet {
   readonly description = input<string>();
   /** Accessible name when there is no `title` — every dialog needs one (WCAG 4.1.2). */
   readonly ariaLabel = input<string>();
+  /** `false` when the sheet asks to close (Escape, backdrop), for `[(open)]`. */
+  readonly openChange = output<boolean>();
 
+  private readonly state = injectOpenState(this.open, this.openChange);
   private readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
 
@@ -114,7 +120,7 @@ export class PixelSheet {
     );
     injectScrollLock(() => this.open());
     injectEscape(
-      () => this.open.set(false),
+      () => this.close(),
       () => this.open(),
     );
     effect(() => {
@@ -122,5 +128,10 @@ export class PixelSheet {
         console.warn('[PixelSheet] role="dialog" has no accessible name. Pass either `title` or `aria-label`.');
       }
     });
+  }
+
+  /** @internal */
+  protected close(): void {
+    this.state.request(false);
   }
 }
