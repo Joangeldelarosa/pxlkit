@@ -1,4 +1,4 @@
-import type { Preview } from '@storybook/react';
+import type { Preview } from '@storybook/react-vite';
 import '../packages/ui-kit/styles.css';
 import './preview.css';
 
@@ -10,21 +10,23 @@ if (typeof document !== 'undefined') {
 const preview: Preview = {
   parameters: {
     backgrounds: {
-      default: 'dark',
-      values: [
-        { name: 'dark', value: '#0A0A0F' },
-        { name: 'light', value: '#F2F0EB' },
-        { name: 'mid', value: '#2a2a3e' },
-      ],
+      options: {
+        dark: { name: 'dark', value: '#0A0A0F' },
+        light: { name: 'light', value: '#F2F0EB' },
+        mid: { name: 'mid', value: '#2a2a3e' },
+      },
     },
     viewport: {
-      viewports: {
+      options: {
         mobile: { name: 'Mobile', styles: { width: '375px', height: '667px' } },
         tablet: { name: 'Tablet', styles: { width: '768px', height: '1024px' } },
         desktop: { name: 'Desktop', styles: { width: '1280px', height: '800px' } },
       },
     },
     layout: 'padded',
+  },
+  initialGlobals: {
+    backgrounds: { value: 'dark' },
   },
 };
 

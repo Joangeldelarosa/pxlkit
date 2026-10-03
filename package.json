@@ -49,12 +49,11 @@
     "audit": "npm run audit:coherence --workspace=@pxlkit/ui-kit"
   },
   "devDependencies": {
-    "@storybook/addon-a11y": "^8.6.18",
-    "@storybook/addon-essentials": "^8.6.18",
-    "@storybook/addon-interactions": "^8.6.18",
-    "@storybook/react-vite": "^8.6.18",
+    "@storybook/addon-a11y": "^10.6.1",
+    "@storybook/addon-docs": "^10.6.1",
+    "@storybook/react-vite": "^10.6.1",
     "@tailwindcss/vite": "^4.3.0",
-    "storybook": "^8.6.18",
+    "storybook": "^10.6.1",
     "turbo": "^2.4.0",
     "typescript": "^5.7.0"
   },

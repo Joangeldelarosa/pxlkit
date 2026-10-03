@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PixelButton, PxlKitButton, PixelSplitButton } from './actions';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { Trophy, FireSword, Crown, Star } from '@pxlkit/gamification';

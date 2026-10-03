@@ -138,6 +138,16 @@ describe("renderStoryStub", () => {
     );
   });
 
+  it("imports the Storybook types from the framework package, not the renderer", () => {
+    // Storybook 9+ ships `@storybook/react` only as a transitive dependency
+    // of the framework; the repo declares `@storybook/react-vite`.
+    const out = renderStoryStub(stub);
+    expect(out).toContain(
+      `import type { Meta, StoryObj } from '@storybook/react-vite';`,
+    );
+    expect(out).not.toContain(`from '@storybook/react';`);
+  });
+
   it("exposes the storybook title and autodocs tag at the meta level", () => {
     const out = renderStoryStub(stub);
     expect(out).toContain(`title: 'UI Kit / Cards / PixelFeatureCard'`);
