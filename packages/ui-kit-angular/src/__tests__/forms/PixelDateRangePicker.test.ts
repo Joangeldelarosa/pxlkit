@@ -1,8 +1,8 @@
 /**
  * <pxl-date-range-picker> as an Angular form control, a two-way binding and
- * an uncontrolled picker; presets, clearing from the trigger and the popover,
- * form serialisation and native attributes. Rendering and the shared
- * interactions are covered against React by the parity suite.
+ * an uncontrolled picker; presets, clearing with the button over the trigger
+ * and from the popover, form serialisation and native attributes. Rendering
+ * and the shared interactions are covered against React by the parity suite.
  */
 import { Component, signal, type Type } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
@@ -16,6 +16,7 @@ const button = (text: string) =>
   Array.from(document.querySelectorAll<HTMLButtonElement>('button')).find((element) => element.textContent?.trim() === text)!;
 const key = (name: string) =>
   document.activeElement!.dispatchEvent(new KeyboardEvent('keydown', { key: name, bubbles: true, cancelable: true }));
+const clearButton = () => document.querySelector<HTMLButtonElement>('button[aria-label="Clear range"]');
 
 async function render<T>(Host: Type<T>) {
   const fixture = TestBed.createComponent(Host);
@@ -83,7 +84,7 @@ describe('PixelDateRangePicker', () => {
     expect(host.range).toEqual({ from: new Date(2026, 9, 29), to: new Date(2026, 10, 5) });
   });
 
-  it('follows a two-way bound signal, picks presets, submits both days and clears from the trigger', async () => {
+  it('follows a two-way bound signal, picks presets, submits both days and clears with the button over the trigger', async () => {
     @Component({
       imports: [PixelDateRangePicker],
       template: `<pxl-date-range-picker name="stay" clearable [presets]="presets" [(value)]="range" />`,
@@ -108,16 +109,50 @@ describe('PixelDateRangePicker', () => {
       ['stay.from', '2026-03-21'],
       ['stay.to', '2026-04-30'],
     ]);
-    const clear = document.querySelector<HTMLElement>('[aria-label="Clear range"]')!;
+    const clear = clearButton()!;
+    expect(clear.type).toBe('button');
+    // Beside the trigger, in the span that anchors both.
+    expect(clear.parentElement!.contains(trigger())).toBe(true);
+    expect(trigger().querySelector('button, [role="button"], [tabindex]')).toBeNull();
+    expect(trigger().classList).toContain('pr-7');
+    // Enter on the focused button, which the browser follows with a click.
     clear.focus();
-    clear.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+    key('Enter');
+    clear.click();
     await settle();
     expect(host.range()).toEqual({});
+    expect(clearButton()).toBeNull();
     expect(document.activeElement).toBe(trigger());
+    expect(trigger().classList).toContain('px-3');
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     host.range.set({ from: new Date(2026, 6, 1) });
     await settle();
     expect(trigger().textContent).toContain('July 1, 2026 → …');
+  });
+
+  it('closes the open popover when its clear button is pressed, focusing the trigger, and disables the button with the form control', async () => {
+    @Component({
+      imports: [PixelDateRangePicker, ReactiveFormsModule],
+      template: `<pxl-date-range-picker clearable [formControl]="control" />`,
+    })
+    class Host {
+      readonly control = new FormControl<DateRangeValue>({ from: new Date(2026, 0, 2), to: new Date(2026, 0, 4) });
+    }
+    const { host, settle } = await render(Host);
+    trigger().click();
+    await settle();
+    expect(document.querySelector('[role="dialog"]')).not.toBeNull();
+    clearButton()!.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    clearButton()!.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    clearButton()!.click();
+    await settle();
+    expect(host.control.value).toEqual({});
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(trigger());
+    host.control.setValue({ from: new Date(2026, 0, 2) });
+    host.control.disable();
+    await settle();
+    expect(clearButton()!.disabled).toBe(true);
   });
 
   it('keeps its own range while uncontrolled and clears it from the popover', async () => {

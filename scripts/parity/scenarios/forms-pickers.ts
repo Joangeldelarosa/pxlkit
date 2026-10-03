@@ -1,4 +1,4 @@
-import type { ParityScenario } from '../interact';
+import type { ParityScenario, ParityStep } from '../interact';
 
 const day = '[role="gridcell"]';
 const tabStop = '[role="gridcell"][tabindex="0"]';
@@ -10,6 +10,20 @@ const previous = '[aria-label="Previous month"]';
 const next = '[aria-label="Next month"]';
 const preset = '[role="dialog"] .flex-wrap button';
 const swatch = '[aria-label="Color presets"] button';
+const clearRange = 'button[aria-label="Clear range"]';
+const clearSelection = 'button[aria-label="Clear selection"]';
+// A multi-select's field: the chips and the combobox, then the clear button and the chevron.
+const field = 'div:has(> span > [role="combobox"])';
+const chevron = `${field} > span:last-child > svg`;
+const remove = (label: string) => `button[aria-label="Remove ${label}"]`;
+const chipLabel = (label: string) => `span:has(+ ${remove(label)})`;
+// The steps' keys do not click a focused button, as a browser's do: Enter on
+// a native button plays as the key, then the click it causes.
+const pressEnter = (target: string): ParityStep[] => [
+  { action: 'focus', target },
+  { action: 'keydown', key: 'Enter' },
+  { action: 'click', target },
+];
 
 export const scenarios: ParityScenario[] = [
   // PixelCalendarGrid — the APG date grid, inline.
@@ -255,19 +269,43 @@ export const scenarios: ParityScenario[] = [
   {
     component: 'PixelDateRangePicker',
     example: 'WithPresets',
-    name: 'picks a preset, then clears it from the trigger and from the popover',
+    name: 'picks a preset, then clears it with the button over the trigger, focusing the trigger, and from the popover',
     steps: [
       { action: 'click', target: trigger },
       { action: 'click', target: preset, nth: 1 },
-      { action: 'click', target: '[aria-label="Clear range"]' },
+      { action: 'click', target: clearRange },
       { action: 'click', target: trigger },
       { action: 'click', target: preset, nth: 2 },
-      { action: 'focus', target: '[aria-label="Clear range"]' },
-      { action: 'keydown', key: 'Enter' },
       { action: 'click', target: trigger },
       { action: 'click', target: day, nth: 3 },
       { action: 'click', target: '[role="dialog"] .justify-end button' },
       { action: 'keydown', key: 'Escape' },
+    ],
+  },
+  {
+    component: 'PixelDateRangePicker',
+    example: 'WithPresets',
+    name: 'clears from the keyboard with the button over the trigger, focusing the trigger without opening the popover',
+    steps: [
+      { action: 'click', target: trigger },
+      { action: 'click', target: preset, nth: 0 },
+      ...pressEnter(clearRange),
+    ],
+  },
+  {
+    component: 'PixelDateRangePicker',
+    example: 'SingleMonth',
+    name: 'closes the open popover when the button over the trigger clears the range, focusing the trigger',
+    steps: [
+      { action: 'click', target: trigger },
+      { action: 'click', target: day, nth: 10 },
+      { action: 'click', target: day, nth: 12 },
+      { action: 'click', target: trigger },
+      { action: 'click', target: clearRange },
+      { action: 'click', target: trigger },
+      { action: 'click', target: day, nth: 15 },
+      { action: 'focus', target: clearRange },
+      { action: 'click', target: clearRange },
     ],
   },
   {
@@ -469,7 +507,67 @@ export const scenarios: ParityScenario[] = [
       { action: 'keydown', key: 'Enter', target: combobox },
       { action: 'click', target: '[data-pxl-chip-remove]', nth: 0 },
       { action: 'click', target: option, nth: 2 },
-      { action: 'click', target: '[aria-label="Clear selection"]' },
+      { action: 'click', target: clearSelection },
+      { action: 'keydown', key: 'Escape' },
+    ],
+  },
+  {
+    component: 'PixelMultiSelect',
+    example: 'WithMax',
+    name: "removes chips and clears with their buttons, the listbox staying open and each button handing its focus on to the next chip's button, then to the combobox",
+    steps: [
+      { action: 'click', target: combobox },
+      { action: 'click', target: remove('React') },
+      { action: 'click', target: remove('Vue') },
+      { action: 'click', target: option, nth: 0 },
+      { action: 'click', target: option, nth: 3 },
+      { action: 'click', target: remove('Solid') },
+      { action: 'click', target: clearSelection },
+      { action: 'keydown', key: 'Escape' },
+    ],
+  },
+  {
+    component: 'PixelMultiSelect',
+    example: 'WithMax',
+    name: "removes chips and clears from the keyboard, focus moving on to the next chip's button, then to the combobox",
+    steps: [
+      ...pressEnter(remove('React')),
+      // Keys on a remove button stay there.
+      { action: 'keydown', key: 'Backspace' },
+      ...pressEnter(remove('Vue')),
+      { action: 'keydown', key: 'ArrowDown' },
+      { action: 'keydown', key: 'Enter' },
+      { action: 'keydown', key: 'ArrowDown' },
+      { action: 'keydown', key: 'Enter' },
+      { action: 'keydown', key: 'Escape' },
+      ...pressEnter(remove('Vue')),
+      ...pressEnter(clearSelection),
+    ],
+  },
+  {
+    component: 'PixelMultiSelect',
+    example: 'Default',
+    name: 'opens and closes the listbox from a press anywhere on the field, focusing the combobox',
+    steps: [
+      { action: 'click', target: field },
+      { action: 'pointerdown', target: field },
+      { action: 'click', target: option, nth: 1 },
+      { action: 'click', target: chevron },
+      { action: 'blur', target: combobox },
+      { action: 'click', target: chipLabel('React') },
+      { action: 'pointerdown', target: 'body' },
+    ],
+  },
+  {
+    component: 'PixelMultiSelect',
+    example: 'Searchable',
+    name: 'hands focus back to the combobox when Escape closes the listbox from the search field',
+    steps: [
+      { action: 'click', target: combobox },
+      { action: 'input', target: search, value: 'v' },
+      { action: 'keydown', key: 'Escape' },
+      { action: 'keydown', key: 'ArrowDown' },
+      { action: 'keydown', key: 'Enter' },
       { action: 'keydown', key: 'Escape' },
     ],
   },

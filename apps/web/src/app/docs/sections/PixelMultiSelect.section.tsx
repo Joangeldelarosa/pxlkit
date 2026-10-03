@@ -46,7 +46,7 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
         <li><code>combobox</code></li>
         <li><code>listbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Trigger uses role=combobox with aria-controls/expanded/activedescendant, and so does the search field while focus is in it. Listbox advertises aria-multiselectable and marks the chosen options aria-selected. The chips and their remove marks are hidden from assistive technology: the listbox, Backspace and Clear change the selection.</p>
+      <p className="docs-aria-notes">The field holds, side by side, the chips — each a label and a native button named after it (&quot;Remove Apple&quot;) — the combobox and, when clearable, a native &quot;Clear selection&quot; button: a button cannot contain a button, so none sits inside another, and each is a tab stop in reading order. The combobox (role=combobox, named by the label) has aria-controls/expanded/activedescendant, and so does the search field while focus is in it; it reads the selected labels as its value. A remove or clear button that holds focus hands it on as it goes; under the pointer they leave focus where it is. A press elsewhere on the field opens or closes the listbox and focuses the combobox; the popover anchors to the field. Listbox advertises aria-multiselectable and marks the chosen options aria-selected.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -57,6 +57,11 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Move through the field: each chip&#39;s remove button, the combobox, then the clear button</td>
+            <td><span className="docs-muted">—</span></td>
+          </tr>
           <tr>
             <td><kbd>ArrowDown</kbd></td>
             <td>Open popover or move highlight down</td>
@@ -84,13 +89,28 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
           </tr>
           <tr>
             <td><kbd>Space</kbd></td>
-            <td>Toggle highlighted option from the trigger; types a space in the search field</td>
+            <td>Toggle highlighted option from the combobox; types a space in the search field</td>
             <td><span className="docs-muted">—</span></td>
           </tr>
           <tr>
             <td><kbd>Backspace</kbd></td>
             <td>Remove last selected chip when query is empty</td>
             <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Escape</kbd></td>
+            <td>Close the popover; from the search field, focus returns to the combobox</td>
+            <td>popover open</td>
+          </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Remove the chip and focus the next chip&#39;s remove button, else the combobox</td>
+            <td>remove button focused</td>
+          </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Clear the selection and focus the combobox</td>
+            <td>clear button focused</td>
           </tr>
         </tbody>
       </table>

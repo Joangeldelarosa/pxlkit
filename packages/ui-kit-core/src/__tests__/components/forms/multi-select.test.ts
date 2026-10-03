@@ -1,12 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import {
-  focusRing,
-  inputBase,
   isMultiSelectFull,
   multiSelectCheckClasses,
   multiSelectClasses,
   multiSelectKeydown,
   multiSelectOptionClasses,
+  passMultiSelectFocus,
   sizeHeight,
   surfaceClasses,
   toggleMultiSelectValue,
@@ -82,14 +81,68 @@ describe('multi-select keyboard', () => {
   });
 });
 
+describe('multi-select focus', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  function field() {
+    document.body.innerHTML = `
+      <div>
+        <span id="values">
+          <span>Apple <button id="apple" type="button">×</button></span>
+          <span>Banana <button id="banana" type="button">×</button></span>
+          <button id="combobox" type="button" role="combobox"></button>
+        </span>
+        <button id="clear" type="button">×</button>
+      </div>`;
+    const element = (id: string) => document.getElementById(id)!;
+    return { element, values: element('values'), combobox: element('combobox') };
+  }
+
+  it("hands a chip's focus to the next chip's remove button, then to the combobox", () => {
+    const { element, values, combobox } = field();
+    element('apple').focus();
+    passMultiSelectFocus(element('apple'), values, combobox);
+    expect(document.activeElement).toBe(element('banana'));
+    passMultiSelectFocus(element('banana'), values, combobox);
+    expect(document.activeElement).toBe(combobox);
+  });
+
+  it("hands the clear button's focus to the combobox", () => {
+    const { element, values, combobox } = field();
+    element('clear').focus();
+    passMultiSelectFocus(element('clear'), values, combobox);
+    expect(document.activeElement).toBe(combobox);
+    element('clear').focus();
+    passMultiSelectFocus(element('clear'), null, combobox);
+    expect(document.activeElement).toBe(combobox);
+  });
+
+  it('moves nothing when the button pressed does not hold focus', () => {
+    const { element, values, combobox } = field();
+    element('banana').focus();
+    passMultiSelectFocus(element('apple'), values, combobox);
+    expect(document.activeElement).toBe(element('banana'));
+    passMultiSelectFocus(element('clear'), values, combobox);
+    expect(document.activeElement).toBe(element('banana'));
+  });
+});
+
 describe('multi-select recipes', () => {
-  it('composes the trigger from the surface and size, red with an error', () => {
+  it('draws the field from the surface and size, red with an error, with the focus of the combobox inside', () => {
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
-      expect(multiSelectClasses(surface, { size: 'sm', invalid: false, open: false }).trigger).toBe(
-        `flex w-full items-center justify-between gap-2 px-3 outline-none ${inputBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} ${focusRing} ${toneMap.neutral.ring} border-retro-border-strong`,
+      expect(multiSelectClasses(surface, { size: 'sm', invalid: false, open: false }).field).toBe(
+        [
+          'flex w-full cursor-default select-none items-center justify-between gap-2 px-3',
+          'border bg-retro-surface/40 focus-within:bg-retro-surface/70 text-retro-text font-mono transition-all',
+          'has-[[role=combobox]:focus-visible]:ring-2 has-[[role=combobox]:focus-visible]:ring-offset-2 has-[[role=combobox]:focus-visible]:ring-offset-retro-bg has-[[role=combobox]:focus-visible]:ring-retro-border/60',
+          'has-[[role=combobox]:disabled]:opacity-50 has-[[role=combobox]:disabled]:cursor-not-allowed',
+          `${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} border-retro-border-strong`,
+        ].join(' '),
       );
-      expect(multiSelectClasses(surface, { size: 'md', invalid: true, open: false }).trigger).toContain('border-retro-red/60');
+      expect(multiSelectClasses(surface, { size: 'md', invalid: true, open: false }).field).toContain('border-retro-red/60');
       expect(multiSelectClasses(surface, { size: 'md', invalid: false, open: false }).chip).toBe(
         `inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] ${s.border} ${s.radiusFull} ${toneMap.neutral.border} ${toneMap.neutral.soft} text-retro-text`,
       );
@@ -107,13 +160,21 @@ describe('multi-select recipes', () => {
     expect(linear.footer).toBe('mt-1 px-2 py-1 text-[10px] text-retro-muted font-sans border-t-2 border-retro-border border-t');
     expect(linear.input).toBe('w-full bg-transparent text-xs text-retro-text outline-none placeholder:text-retro-muted font-sans');
     expect(linear.empty).toBe('px-3 py-2 text-center text-xs text-retro-muted font-sans');
-    expect([linear.values, linear.placeholder, linear.content, linear.listbox, linear.actions]).toEqual([
+    expect([linear.values, linear.trigger, linear.placeholder, linear.content, linear.listbox, linear.actions]).toEqual([
       'flex min-w-0 flex-1 flex-wrap items-center gap-1',
+      'flex min-w-0 flex-1 items-center self-stretch text-left outline-none',
       'truncate text-retro-muted',
       'p-1 w-[var(--pxl-multiselect-w,16rem)]',
       'max-h-60 overflow-y-auto',
       'ml-1 flex shrink-0 items-center gap-1',
     ]);
+  });
+
+  it('gives the remove and clear buttons a focus ring of their own', () => {
+    const ring = 'rounded-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40';
+    const classes = multiSelectClasses('pixel', { size: 'md', invalid: false, open: false });
+    expect(classes.chipRemove).toBe(`inline-flex shrink-0 items-center text-retro-muted hover:text-retro-text cursor-pointer ${ring}`);
+    expect(classes.clear).toBe(`inline-flex items-center text-retro-muted hover:text-retro-text cursor-pointer ${ring}`);
   });
 
   it('tints selected options, shades the highlighted one and dims disabled ones', () => {

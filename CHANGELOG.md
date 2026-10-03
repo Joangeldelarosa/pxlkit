@@ -232,6 +232,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `PixelMultiSelect`'s search field points `aria-activedescendant` and `aria-controls` at the
   listbox, and Space types a space in it; `PixelColorInput` moves focus into its popover as it
   opens.
+- `@pxlkit/ui-kit`: `PixelDateRangePicker` and `PixelMultiSelect` no longer put controls
+  inside their trigger button, where assistive technology never reaches them (axe
+  `nested-interactive`) and the keyboard could not reach a chip's remove mark. The range
+  picker's clear button sits beside its trigger, over its end; the multi-select is a field
+  of chips with "Remove …" buttons, the combobox and a clear button, each in the tab order —
+  in every kit.
 - Site: the component reference lists every manifest example. Five whose ids did not
   spell their export's name — four of `PixelInput`'s and `PixelBreadcrumb`'s
   `with-onclick` — were left out.

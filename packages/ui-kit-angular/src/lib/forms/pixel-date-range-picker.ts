@@ -63,8 +63,8 @@ export interface PixelDateRangePickerPreset {
  * Focus moves to the range's start (today without one) as it opens; the
  * months take the arrows (by day and week), Home / End (the week), PageUp /
  * PageDown (the month, the year with Shift) and Enter / Space to pick.
- * Presets pick a whole range; `clearable` adds a clear target to the trigger
- * and a Clear button under the months. The week and names follow
+ * Presets pick a whole range; `clearable` adds a clear button over the
+ * trigger's end and a Clear button under the months. The week and names follow
  * `<pxl-locale-provider>`. Bind the range with `[(value)]`, use it as a form
  * control (`ngModel`, `formControlName`), or leave it uncontrolled with
  * `defaultValue`; with a `name`, hidden inputs submit `name.from` and
@@ -121,17 +121,7 @@ export interface PixelDateRangePickerPreset {
             (blur)="form.touched()"
           >
             <span [class]="classes().value">{{ text() }}</span>
-            @if (showClear()) {
-              <!-- A focusable span, as a <button> cannot nest in the trigger. -->
-              <span
-                role="button"
-                tabindex="0"
-                aria-label="Clear range"
-                [class]="classes().clearMark"
-                (click)="clearFromTrigger($event)"
-                (keydown)="onClearKeydown($event)"
-              >×</span>
-            } @else {
+            @if (!showClear()) {
               <span aria-hidden="true" [class]="classes().mark">▾</span>
             }
           </button>
@@ -198,6 +188,16 @@ export interface PixelDateRangePickerPreset {
             }
           </div>
         </pxl-popover>
+        @if (showClear()) {
+          <!-- Beside the trigger, as a button cannot hold another: laid over its end. -->
+          <button
+            type="button"
+            aria-label="Clear range"
+            [disabled]="form.disabled()"
+            [class]="classes().clearButton"
+            (click)="clearFromButton()"
+          >×</button>
+        }
         @if (name(); as name) {
           <input type="hidden" [attr.name]="name + '.from'" [value]="hiddenValues().from" readonly />
           <input type="hidden" [attr.name]="name + '.to'" [value]="hiddenValues().to" readonly />
@@ -233,7 +233,7 @@ export class PixelDateRangePicker implements ControlValueAccessor {
   readonly placeholder = input<string, string | undefined>('Select date range', {
     transform: withDefault('Select date range'),
   });
-  /** Adds a clear target to the trigger and a Clear button under the months while a range is set. */
+  /** Adds a clear button over the trigger's end and a Clear button under the months while a range is set. */
   readonly clearable = input(false, { transform: booleanOr(false) });
   /** Form field name — hidden inputs submit `name.from` and `name.to` as `YYYY-MM-DD`. */
   readonly name = input<string>();
@@ -295,6 +295,7 @@ export class PixelDateRangePicker implements ControlValueAccessor {
       invalid: !!this.error(),
       placeholder: !this.current().from && !this.current().to,
       months: this.numberOfMonths(),
+      clearButton: this.showClear(),
     }),
   );
   /** @internal */
@@ -399,21 +400,12 @@ export class PixelDateRangePicker implements ControlValueAccessor {
   }
 
   /**
-   * @internal The trigger's clear target turns into the ▾ mark once the range
-   * is gone: focus moves to the trigger it sits in rather than stay on a
-   * hidden mark.
+   * @internal The clear button over the trigger goes with the range: focus
+   * moves on to the trigger rather than fall to `<body>`.
    */
-  protected clearFromTrigger(event: Event): void {
-    event.stopPropagation();
+  protected clearFromButton(): void {
     this.clear();
     this.trigger().nativeElement.focus();
-  }
-
-  /** @internal */
-  protected onClearKeydown(event: KeyboardEvent): void {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    this.clearFromTrigger(event);
   }
 
   /** @internal */

@@ -1,4 +1,5 @@
 import React from 'react';
+import { renderToString } from 'react-dom/server';
 import { describe, it, expect, vi } from 'vitest';
 import { act, render, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { PixelCalendarGrid } from '../../forms/PixelCalendarGrid';
@@ -237,16 +238,6 @@ describe('PixelDateRangePicker — calendar dialog', () => {
     expect(onChange).toHaveBeenLastCalledWith({ from: new Date(2026, 9, 31), to: undefined });
   });
 
-  it('hands focus to the trigger when its clear target clears the range', () => {
-    const onChange = vi.fn();
-    render(<PixelDateRangePicker defaultValue={range} clearable onChange={onChange} data-testid="trigger" />);
-    const clear = screen.getByRole('button', { name: 'Clear range' });
-    act(() => clear.focus());
-    fireEvent.keyDown(clear, { key: 'Enter' });
-    expect(onChange).toHaveBeenLastCalledWith({});
-    expect(screen.queryByRole('button', { name: 'Clear range' })).toBeNull();
-    expect(document.activeElement).toBe(screen.getByTestId('trigger'));
-  });
 
   it('takes its week, names and default format from the locale', () => {
     render(
@@ -261,5 +252,66 @@ describe('PixelDateRangePicker — calendar dialog', () => {
     }
     expect(screen.getAllByRole('grid')[1]).toHaveAccessibleName('Kasım 2026');
     expect(focused()).toBe('29 Ekim 2026');
+  });
+});
+
+describe('PixelDateRangePicker — clear button', () => {
+  const range = { from: new Date(2026, 9, 29), to: new Date(2026, 10, 3) };
+  // Enter on a focused button: the browser follows the key with a click.
+  const pressEnter = (element: HTMLElement) => {
+    act(() => element.focus());
+    fireEvent.keyDown(element, { key: 'Enter' });
+    fireEvent.click(element);
+  };
+
+  it('is a button of its own beside the trigger, laid over its end, which keeps room for it', () => {
+    const { container } = render(<PixelDateRangePicker defaultValue={range} clearable data-testid="trigger" />);
+    const trigger = screen.getByTestId('trigger');
+    const clear = screen.getByRole('button', { name: 'Clear range' });
+    expect(clear.tagName).toBe('BUTTON');
+    expect(clear).toHaveAttribute('type', 'button');
+    expect(clear.parentElement).toBe(trigger.parentElement);
+    expect(clear).toHaveClass('absolute');
+    expect(trigger).toHaveClass('pr-7');
+    expect(trigger.querySelector('button, [role="button"], [tabindex]')).toBeNull();
+    // Only the ▾ mark gives way to it.
+    expect(trigger.querySelector('[aria-hidden]')).toBeNull();
+    expect(container.querySelectorAll('button')).toHaveLength(2);
+  });
+
+  it('renders on the server with no control inside another', () => {
+    const page = new DOMParser().parseFromString(
+      renderToString(<PixelDateRangePicker defaultValue={range} clearable data-testid="trigger" />),
+      'text/html',
+    );
+    const trigger = page.querySelector('[data-testid="trigger"]')!;
+    expect(trigger.querySelector('button, [role="button"], [tabindex]')).toBeNull();
+    expect(trigger.parentElement!.querySelector(':scope > button[aria-label="Clear range"]')).not.toBeNull();
+  });
+
+  it('clears from the keyboard, handing focus to the trigger without opening the popover', () => {
+    const onChange = vi.fn();
+    render(<PixelDateRangePicker defaultValue={range} clearable onChange={onChange} data-testid="trigger" />);
+    pressEnter(screen.getByRole('button', { name: 'Clear range' }));
+    expect(onChange).toHaveBeenLastCalledWith({});
+    expect(screen.queryByRole('button', { name: 'Clear range' })).toBeNull();
+    expect(document.activeElement).toBe(screen.getByTestId('trigger'));
+    expect(screen.getByTestId('trigger')).toHaveClass('px-3');
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('clears under the pointer, closing an open popover, with focus on the trigger', async () => {
+    const onChange = vi.fn();
+    render(<PixelDateRangePicker defaultValue={range} clearable onChange={onChange} data-testid="trigger" />);
+    fireEvent.click(screen.getByTestId('trigger'));
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    const clear = screen.getByRole('button', { name: 'Clear range' });
+    fireEvent.pointerDown(clear);
+    fireEvent.mouseDown(clear);
+    fireEvent.pointerUp(clear);
+    fireEvent.click(clear);
+    expect(onChange).toHaveBeenLastCalledWith({});
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(document.activeElement).toBe(screen.getByTestId('trigger'));
   });
 });

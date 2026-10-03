@@ -8,12 +8,27 @@ describe('date picker recipes', () => {
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
       expect(datePickerClasses(surface, { size: 'sm', invalid: false, placeholder: false }).trigger).toBe(
-        `${inputBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} ${focusRing} ${toneMap.neutral.ring} border-retro-border-strong inline-flex items-center justify-between px-3 text-left`,
+        `${inputBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} ${focusRing} ${toneMap.neutral.ring} border-retro-border-strong inline-flex items-center justify-between text-left px-3`,
       );
       expect(datePickerClasses(surface, { size: 'lg', invalid: true, placeholder: true }).trigger).toContain(
-        `${sizeHeight.lg} ${focusRing} ${toneMap.neutral.ring} border-retro-red/60 inline-flex items-center justify-between px-3 text-left text-retro-muted`,
+        `${sizeHeight.lg} ${focusRing} ${toneMap.neutral.ring} border-retro-red/60 inline-flex items-center justify-between text-left px-3 text-retro-muted`,
       );
     }
+  });
+
+  it("keeps room at the trigger's end for a range picker's clear button, laid over it where the mark would be", () => {
+    const pixel = datePickerClasses('pixel', { size: 'md', invalid: false, placeholder: false, clearButton: true });
+    const linear = datePickerClasses('linear', { size: 'md', invalid: false, placeholder: false, clearButton: true });
+    expect(pixel.trigger).toContain('inline-flex items-center justify-between text-left pl-3 pr-7');
+    expect(pixel.trigger).not.toContain('px-3');
+    const button =
+      'text-retro-muted hover:text-retro-text text-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40 rounded-[2px]';
+    expect(pixel.clearButton).toBe(
+      `absolute top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center right-1.5 ${button} font-mono`,
+    );
+    expect(linear.clearButton).toBe(
+      `absolute top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center right-1 ${button} font-sans`,
+    );
   });
 
   it('sizes the popover for one month or two side by side', () => {
@@ -25,7 +40,7 @@ describe('date picker recipes', () => {
     expect(two.months).toBe('grid gap-4 grid-cols-1 sm:grid-cols-2');
   });
 
-  it('styles the presets, the clear button and the marks after the trigger text', () => {
+  it('styles the presets, the clear button and the mark after the trigger text', () => {
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
       const c = datePickerClasses(surface, { size: 'md', invalid: false, placeholder: false });
@@ -42,7 +57,6 @@ describe('date picker recipes', () => {
         'mb-2 flex flex-wrap gap-1 pb-2 border-b border-retro-border/60',
         'mt-2 pt-2 border-t border-retro-border/60 flex justify-end',
       ]);
-      expect(c.clearMark).toContain('cursor-pointer focus-visible:outline-none');
     }
   });
 });

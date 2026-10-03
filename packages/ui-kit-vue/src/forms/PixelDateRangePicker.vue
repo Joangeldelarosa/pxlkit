@@ -50,12 +50,12 @@ export interface PixelDateRangePickerPreset {
  * moves to the range's start (today without one) as it opens; the months
  * take the arrows (by day and week), Home / End (the week), PageUp /
  * PageDown (the month, the year with Shift) and Enter / Space to pick.
- * Presets pick a whole range; `clearable` adds a clear target to the trigger
- * and a Clear button under the months. The week and names follow
+ * Presets pick a whole range; `clearable` adds a clear button over the
+ * trigger's end and a Clear button under the months. The week and names follow
  * `PxlKitLocaleProvider`. Bind the range with `v-model`, or leave it
  * uncontrolled with `default-value`; with a `name`, hidden inputs submit
  * `name.from` and `name.to` as `YYYY-MM-DD`. Extra attributes and listeners
- * go to the trigger.
+ * go to the trigger, and a `disabled` one disables the clear button too.
  *
  * @example
  * <PixelDateRangePicker v-model="stay" label="Stay" :number-of-months="1" />
@@ -85,7 +85,7 @@ export interface PixelDateRangePickerProps {
   error?: string;
   /** Text shown while no range is picked. */
   placeholder?: string;
-  /** Adds a clear target to the trigger and a Clear button under the months while a range is set. */
+  /** Adds a clear button over the trigger's end and a Clear button under the months while a range is set. */
   clearable?: boolean;
   /** Form field name — hidden inputs submit `name.from` and `name.to` as `YYYY-MM-DD`. */
   name?: string;
@@ -131,6 +131,8 @@ const describedBy = () =>
   fieldDescribedBy(triggerId.value, props, attrs['aria-describedby'] as string | undefined);
 const trigger = useTemplateRef<HTMLButtonElement>('trigger');
 const monthsElement = useTemplateRef<HTMLElement>('months');
+// A `disabled` attribute disables the trigger, and with it the clear button.
+const disabled = () => !!attrs.disabled || attrs.disabled === '';
 
 const [range, setRange] = useControllableState<DateRangeValue>({
   value: () => props.modelValue,
@@ -202,17 +204,18 @@ const cellsOf = (weeks: CalendarDay[][]) =>
     }),
   );
 
+const showClear = computed(() => props.clearable && !!(range.value.from || range.value.to));
 const classes = computed(() =>
   datePickerClasses(surface.value, {
     size: props.size,
     invalid: !!props.error,
     placeholder: !range.value.from && !range.value.to,
     months: props.numberOfMonths,
+    clearButton: showClear.value,
   }),
 );
 const gridClasses = computed(() => calendarClasses(surface.value));
 const text = computed(() => dateRangeText(range.value, calendar.value.formatDay, props.placeholder));
-const showClear = computed(() => props.clearable && !!(range.value.from || range.value.to));
 
 // Focus the tab stop — in this picker's own months, where a day shows once
 // in each month it borders.
@@ -259,18 +262,11 @@ function clear() {
   hover.value = null;
 }
 
-// The trigger's clear target turns into the ▾ mark once the range is gone:
-// focus moves to the trigger it sits in rather than stay on a hidden mark.
-function clearFromTrigger(event: Event) {
-  event.stopPropagation();
+// The clear button over the trigger goes with the range: focus moves on to
+// the trigger rather than fall to <body>.
+function clearFromButton() {
   clear();
   trigger.value?.focus();
-}
-
-function onClearKeydown(event: KeyboardEvent) {
-  if (event.key !== 'Enter' && event.key !== ' ') return;
-  event.preventDefault();
-  clearFromTrigger(event);
 }
 
 function showMonth(count: number) {
@@ -333,19 +329,7 @@ defineExpose({
             :class="classes.trigger"
           >
             <span :class="classes.value">{{ text }}</span>
-            <!-- A focusable span, as a <button> cannot nest in the trigger. -->
-            <span
-              v-if="showClear"
-              role="button"
-              tabindex="0"
-              aria-label="Clear range"
-              :class="classes.clearMark"
-              @click="clearFromTrigger"
-              @keydown="onClearKeydown"
-            >
-              ×
-            </span>
-            <span v-else aria-hidden="true" :class="classes.mark">▾</span>
+            <span v-if="!showClear" aria-hidden="true" :class="classes.mark">▾</span>
           </button>
         </PixelPopoverTrigger>
         <PixelPopoverContent :surface="surface" aria-label="Choose date range" :class="classes.content">
@@ -424,6 +408,17 @@ defineExpose({
           </div>
         </PixelPopoverContent>
       </PixelPopover>
+      <!-- Beside the trigger, as a button cannot hold another: laid over its end. -->
+      <button
+        v-if="showClear"
+        type="button"
+        aria-label="Clear range"
+        :disabled="disabled()"
+        :class="classes.clearButton"
+        @click="clearFromButton"
+      >
+        ×
+      </button>
       <template v-if="name">
         <input type="hidden" :name="`${name}.from`" :value="range.from ? toIsoDate(range.from) : ''" readonly />
         <input type="hidden" :name="`${name}.to`" :value="range.to ? toIsoDate(range.to) : ''" readonly />

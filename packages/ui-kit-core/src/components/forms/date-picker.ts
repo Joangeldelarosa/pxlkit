@@ -15,6 +15,8 @@ export interface DatePickerClassOptions {
   placeholder: boolean;
   /** Months the popover shows side by side: a range picker shows two by default. */
   months?: 1 | 2;
+  /** A range picker's clear button lies over the trigger's end, which keeps room for it. */
+  clearButton?: boolean;
 }
 
 export interface DatePickerClasses {
@@ -23,10 +25,13 @@ export interface DatePickerClasses {
   trigger: string;
   /** The trigger's text. */
   value: string;
-  /** The ▾ (or ×) after it. */
+  /** The ▾ after it. */
   mark: string;
-  /** A range picker's clear target in place of the mark. */
-  clearMark: string;
+  /**
+   * A range picker's clear button: beside the trigger, as a button cannot
+   * hold another, and laid over the trigger's end in place of the mark.
+   */
+  clearButton: string;
   content: string;
   presets: string;
   preset: string;
@@ -39,7 +44,7 @@ export interface DatePickerClasses {
 /** Classes of the parts of a date picker, or of a date range picker. */
 export function datePickerClasses(
   surface: Surface,
-  { size, invalid, placeholder, months = 1 }: DatePickerClassOptions,
+  { size, invalid, placeholder, months = 1, clearButton = false }: DatePickerClassOptions,
 ): DatePickerClasses {
   const s = surfaceClasses(surface);
   const button = 'px-2 py-1 text-[11px] uppercase tracking-wide';
@@ -55,13 +60,20 @@ export function datePickerClasses(
       focusRing,
       toneMap.neutral.ring,
       fieldBorderClass(invalid),
-      'inline-flex items-center justify-between px-3 text-left',
+      'inline-flex items-center justify-between text-left',
+      // Room for the clear button over its end: the text stops short of it.
+      clearButton ? 'pl-3 pr-7' : 'px-3',
       placeholder && 'text-retro-muted',
     ),
     value: 'truncate',
     mark: 'ml-2 text-retro-muted text-xs',
-    clearMark:
-      'ml-2 text-retro-muted hover:text-retro-text text-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40 rounded-[2px]',
+    clearButton: cn(
+      'absolute top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center',
+      // Its × where the mark would be: 12px in from the trigger's border.
+      surface === 'linear' ? 'right-1' : 'right-1.5',
+      'text-retro-muted hover:text-retro-text text-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40 rounded-[2px]',
+      s.font,
+    ),
     content: cn(months === 2 ? 'w-[34rem] max-w-[calc(100vw-1rem)]' : 'w-[18rem]', s.font),
     presets: 'mb-2 flex flex-wrap gap-1 pb-2 border-b border-retro-border/60',
     preset: cn(

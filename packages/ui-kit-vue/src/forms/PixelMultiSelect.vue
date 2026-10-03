@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useAttrs, useId, useTemplateRef, watch } from 'vue';
 import {
+  chipDeleteLabel,
   clampHighlight,
   comboboxListboxId,
   comboboxOptionId,
@@ -12,6 +13,7 @@ import {
   multiSelectClasses,
   multiSelectKeydown,
   multiSelectOptionClasses,
+  passMultiSelectFocus,
   toggleMultiSelectValue,
   type Size,
   type Surface,
@@ -23,7 +25,7 @@ import { useControllableState } from '../composables/controllable.js';
 import { useEffectiveSurface } from '../composables/surface.js';
 import PixelPopover from '../overlay-foundation/PixelPopover.vue';
 import PixelPopoverContent from '../overlay-foundation/PixelPopoverContent.vue';
-import PixelPopoverTrigger from '../overlay-foundation/PixelPopoverTrigger.js';
+import { ListboxField } from './_internal/ListboxField.js';
 
 /** One choice of a multi-select. */
 export interface PixelMultiSelectOption {
@@ -36,17 +38,19 @@ export interface PixelMultiSelectOption {
 }
 
 /**
- * Multi-value combobox: the picked options show as chips in the trigger, and
- * the listbox (`aria-multiselectable`) in a popover toggles them, up to an
- * optional `max` with a count under the list. The arrows, Enter and Space
- * open it; the arrows move the highlight round the options, Home / End to
- * the ends, Enter or Space toggles the highlighted option (Space only from
- * the trigger: it types in the search field) and Backspace removes the last
+ * Multi-value combobox: the picked options show as chips before the combobox
+ * in its field, each with a remove button, and the listbox
+ * (`aria-multiselectable`) in a popover toggles them, up to an optional `max`
+ * with a count under the list. A press on the field, the arrows, Enter and
+ * Space open it; the arrows move the highlight round the options, Home / End
+ * to the ends, Enter or Space toggles the highlighted option (Space only from
+ * the combobox: it types in the search field) and Backspace removes the last
  * chip while the search is empty. `searchable` adds a search field that
- * takes focus; `clearable` a clear target. Bind the values with `v-model`,
+ * takes focus; `clearable` a clear button. Bind the values with `v-model`,
  * or leave them uncontrolled with `default-value`; with a `name`, one hidden
  * input per value submits them (`FormData.getAll(name)`). Extra attributes
- * and listeners go to the trigger.
+ * and listeners go to the combobox, and a `disabled` one disables the whole
+ * field.
  *
  * @example
  * <PixelMultiSelect v-model="stack" label="Frameworks" :options="frameworks" :max="3" />
@@ -64,7 +68,7 @@ export interface PixelMultiSelectProps {
   max?: number;
   /** Text shown while nothing is selected. */
   placeholder?: string;
-  /** Shows a target that clears the selection while there is one. */
+  /** Shows a button that clears the selection while there is one. */
   clearable?: boolean;
   /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
@@ -115,7 +119,10 @@ const attrs = useAttrs();
 const describedBy = () =>
   fieldDescribedBy(triggerId.value, props, attrs['aria-describedby'] as string | undefined);
 const trigger = useTemplateRef<HTMLButtonElement>('trigger');
+const valuesElement = useTemplateRef<HTMLElement>('values');
 const search = useTemplateRef<HTMLInputElement>('search');
+// A `disabled` attribute disables the combobox, and with it the field's buttons.
+const disabled = () => !!attrs.disabled || attrs.disabled === '';
 
 const [value, setValue] = useControllableState<string[]>({
   value: () => props.modelValue,
@@ -172,8 +179,14 @@ function onOptionClick(option: PixelMultiSelectOption) {
   if (!isOptionDisabled(option)) toggle(option.value);
 }
 
-// The trigger and the search field share the keys; Space types in the field.
+// The combobox and the search field share the keys; Space types in the field.
 function onKeydown(event: KeyboardEvent, inSearch = false) {
+  // Escape closes the popover, which hands focus back to the field: it cannot
+  // take it, so focus leaves the search field for the combobox.
+  if (event.key === 'Escape' && inSearch) {
+    trigger.value?.focus();
+    return;
+  }
   const action = multiSelectKeydown(event.key, {
     open: open.value,
     highlighted: highlighted.value,
@@ -189,6 +202,27 @@ function onKeydown(event: KeyboardEvent, inSearch = false) {
   else if (action.kind === 'highlight') highlighted.value = action.index;
   else if (action.kind === 'toggle') toggle(filtered.value[action.index]!.value);
   else if (action.kind === 'removeLast') toggle(value.value[value.value.length - 1]!);
+}
+
+// A press on the field focuses the combobox, which takes the keys.
+function onFieldClick(event: MouseEvent) {
+  if (disabled()) event.preventDefault();
+  else if (!event.defaultPrevented) trigger.value?.focus();
+}
+
+// The remove and clear buttons leave focus where it is under the pointer, as
+// the options do, and keep the field from toggling the listbox; one that
+// holds focus hands it on as it goes.
+function removeChip(event: MouseEvent, option: string) {
+  event.preventDefault();
+  passMultiSelectFocus(event.currentTarget as HTMLElement, valuesElement.value, trigger.value);
+  toggle(option);
+}
+
+function clearSelection(event: MouseEvent) {
+  event.preventDefault();
+  passMultiSelectFocus(event.currentTarget as HTMLElement, valuesElement.value, trigger.value);
+  setValue([]);
 }
 
 function onSearch(event: Event) {
@@ -223,65 +257,65 @@ defineExpose({
       haspopup="listbox"
       role="none"
     >
-      <PixelPopoverTrigger>
-        <button
-          v-bind="$attrs"
-          :id="triggerId"
-          ref="trigger"
-          type="button"
-          role="combobox"
-          :aria-controls="listboxId"
-          aria-haspopup="listbox"
-          :aria-expanded="open"
-          :aria-activedescendant="open ? activeId : undefined"
-          :aria-invalid="error ? true : undefined"
-          :aria-describedby="describedBy()"
-          :class="classes.trigger"
-          @keydown="onKeydown($event)"
-        >
-          <span :class="classes.values">
-            <span v-if="selectedOptions.length === 0" :class="classes.placeholder">{{ placeholder }}</span>
-            <template v-else>
-              <span v-for="option in selectedOptions" :key="option.value" :class="classes.chip">
-                <span v-if="option.icon" :class="classes.icon"><RenderNode :node="option.icon" /></span>
-                <span :class="classes.chipLabel">{{ option.label }}</span>
-                <!-- A span, as a <button> cannot nest in the trigger: pointer and click
-                     stop here, so the trigger does not toggle the popover. Backspace
-                     removes the last chip from the keyboard. -->
-                <span
-                  role="img"
-                  :aria-label="`${option.label} chip`"
-                  :data-pxl-chip-remove="option.value"
-                  aria-hidden="true"
-                  :class="classes.chipRemove"
-                  @pointerdown.prevent.stop
-                  @click.prevent.stop="toggle(option.value)"
-                >
-                  <PixelGlyph name="close" :class="classes.chipRemoveGlyph" />
-                  <span class="sr-only">Remove {{ option.label }}</span>
-                </span>
-              </span>
-            </template>
+      <!-- The chips, the combobox and the clear button sit side by side in the
+           field, as a button cannot hold another. -->
+      <ListboxField>
+        <div :class="classes.field" @click="onFieldClick">
+          <span ref="values" :class="classes.values">
+            <span v-for="option in selectedOptions" :key="option.value" :class="classes.chip">
+              <span v-if="option.icon" :class="classes.icon"><RenderNode :node="option.icon" /></span>
+              <span :class="classes.chipLabel">{{ option.label }}</span>
+              <button
+                type="button"
+                :aria-label="chipDeleteLabel(option.label)"
+                :data-pxl-chip-remove="option.value"
+                :disabled="disabled()"
+                :class="classes.chipRemove"
+                @mousedown.prevent
+                @click="removeChip($event, option.value)"
+              >
+                <PixelGlyph name="close" :class="classes.chipRemoveGlyph" />
+              </button>
+            </span>
+            <button
+              v-bind="$attrs"
+              :id="triggerId"
+              ref="trigger"
+              type="button"
+              role="combobox"
+              :aria-controls="listboxId"
+              aria-haspopup="listbox"
+              :aria-expanded="open"
+              :aria-activedescendant="open ? activeId : undefined"
+              :aria-invalid="error ? true : undefined"
+              :aria-describedby="describedBy()"
+              :class="classes.trigger"
+              @keydown="onKeydown($event)"
+            >
+              <!-- The placeholder, or the value the chips before it show. -->
+              <span v-if="selectedOptions.length === 0" :class="classes.placeholder">{{ placeholder }}</span>
+              <span v-else class="sr-only">{{ selectedOptions.map((option) => option.label).join(', ') }}</span>
+            </button>
           </span>
           <span :class="classes.actions">
-            <span
+            <button
               v-if="showClear"
-              role="button"
-              tabindex="-1"
+              type="button"
               aria-label="Clear selection"
+              :disabled="disabled()"
               :class="classes.clear"
-              @pointerdown.prevent.stop
-              @click.prevent.stop="setValue([])"
+              @mousedown.prevent
+              @click="clearSelection"
             >
               <PixelGlyph name="close" :class="classes.clearGlyph" />
-            </span>
+            </button>
             <PixelGlyph name="chevronDown" :class="classes.chevron" />
           </span>
-        </button>
-      </PixelPopoverTrigger>
+        </div>
+      </ListboxField>
       <PixelPopoverContent :class="classes.content" style="min-width: 220px">
         <div v-if="searchable" :class="classes.search">
-          <!-- Focus sits here while open: it carries the active option, as the trigger does. -->
+          <!-- Focus sits here while open: it carries the active option, as the combobox does. -->
           <input
             ref="search"
             type="text"

@@ -363,8 +363,8 @@ export const PixelDateRangePicker = forwardRef<
     setHover(null);
   }, [setRange]);
 
-  // The trigger's clear target turns into the ▾ mark once the range is gone:
-  // focus moves to the trigger it sits in rather than stay on a hidden mark.
+  // The clear button over the trigger goes with the range: focus moves on to
+  // the trigger rather than fall to <body>.
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const setTriggerRef = useCallback(
     (node: HTMLButtonElement | null) => {
@@ -374,8 +374,7 @@ export const PixelDateRangePicker = forwardRef<
     },
     [ref],
   );
-  const clearFromTrigger = (e: React.SyntheticEvent) => {
-    e.stopPropagation();
+  const clearFromButton = () => {
     handleClear();
     triggerRef.current?.focus();
   };
@@ -394,8 +393,15 @@ export const PixelDateRangePicker = forwardRef<
   const triggerLabel = dateRangeText(range, calendar.formatDay, placeholder);
 
   const isPlaceholder = !range.from && !range.to;
+  const showClear = clearable && !isPlaceholder;
 
-  const classes = datePickerClasses(surface, { size, invalid: !!error, placeholder: isPlaceholder, months: numberOfMonths });
+  const classes = datePickerClasses(surface, {
+    size,
+    invalid: !!error,
+    placeholder: isPlaceholder,
+    months: numberOfMonths,
+    clearButton: showClear,
+  });
 
   const reactId = React.useId();
   const triggerId = id ?? `pxl-daterange-${reactId}`;
@@ -444,25 +450,7 @@ export const PixelDateRangePicker = forwardRef<
               className={classes.trigger}
             >
               <span className={classes.value}>{triggerLabel}</span>
-              {clearable && (range.from || range.to) ? (
-                <span
-                  role="button"
-                  tabIndex={0}
-                  aria-label="Clear range"
-                  onClick={clearFromTrigger}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      clearFromTrigger(e);
-                    }
-                  }}
-                  className={classes.clearMark}
-                >
-                  ×
-                </span>
-              ) : (
-                <span aria-hidden className={classes.mark}>▾</span>
-              )}
+              {!showClear && <span aria-hidden className={classes.mark}>▾</span>}
             </button>
           </PixelPopover.Trigger>
 
@@ -510,7 +498,7 @@ export const PixelDateRangePicker = forwardRef<
               )}
             </div>
 
-            {clearable && (range.from || range.to) && (
+            {showClear && (
               <div className={classes.footer}>
                 <button
                   type="button"
@@ -523,6 +511,18 @@ export const PixelDateRangePicker = forwardRef<
             )}
           </PixelPopover.Content>
         </PixelPopover>
+
+        {/* Beside the trigger, as a button cannot hold another: laid over its end. */}
+        {showClear && (
+          <button
+            type="button"
+            aria-label="Clear range"
+            onClick={clearFromButton}
+            className={classes.clearButton}
+          >
+            ×
+          </button>
+        )}
 
         {name && (
           <>

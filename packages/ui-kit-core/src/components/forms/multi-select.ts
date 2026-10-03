@@ -1,10 +1,12 @@
 /**
  * PixelMultiSelect — a combobox that picks several values: the picked ones
- * show as chips in the trigger, the listbox in a popover toggles them, up to
- * an optional `max`. The toggle and its cap, what each key does, and the
- * class recipes; the search filter is PixelCombobox's.
+ * show as chips in the field, each with a remove button, before the
+ * combobox, and the listbox in a popover toggles them, up to an optional
+ * `max`. The toggle and its cap, what each key does, where focus goes as a
+ * button leaves, and the class recipes; the search filter is PixelCombobox's.
  */
-import { cn, focusRing, inputBase, sizeHeight, surfaceClasses, toneMap, type Size, type Surface } from '../../common';
+import { cn, sizeHeight, surfaceClasses, toneMap, type Size, type Surface } from '../../common';
+import { getFocusableElements } from '../../dom/focus-trap';
 import { cycleHighlight } from './combobox';
 import { fieldBorderClass } from './input';
 
@@ -47,10 +49,10 @@ export type MultiSelectKeyAction =
   | { kind: 'none' };
 
 /**
- * What a key pressed on the trigger or in the search field does. The arrows,
+ * What a key pressed on the combobox or in the search field does. The arrows,
  * Enter and Space open a closed listbox; open, the arrows move the highlight
  * round the listed options, and Enter and Space toggle the highlighted one
- * (Space only from the trigger). Home and End move the highlight to the
+ * (Space only from the combobox). Home and End move the highlight to the
  * first and last option, and Backspace with an empty search removes the last
  * value picked. The default action of every key handled is prevented; `null`
  * for the others — Enter on an option that cannot be toggled included.
@@ -81,6 +83,25 @@ export function multiSelectKeydown(key: string, state: MultiSelectKeyState): Mul
   }
 }
 
+/**
+ * Call as a chip's remove button or the clear button is pressed, before the
+ * selection changes. A button that holds focus hands it on rather than let it
+ * fall to `<body>` as the button goes: a chip's to the next control of
+ * `values` — the next chip's remove button, or the combobox after the last
+ * chip — and the clear button to the `combobox`. A press that left focus
+ * where it was, as a pointer's does, moves nothing.
+ */
+export function passMultiSelectFocus(
+  button: HTMLElement,
+  values: HTMLElement | null | undefined,
+  combobox: HTMLElement | null | undefined,
+): void {
+  if (button.ownerDocument.activeElement !== button) return;
+  const controls = values ? getFocusableElements(values) : [];
+  const index = controls.indexOf(button);
+  (index < 0 ? combobox : controls[index + 1])?.focus();
+}
+
 export interface MultiSelectClassOptions {
   size: Size;
   /** The field shows an error. */
@@ -89,20 +110,28 @@ export interface MultiSelectClassOptions {
 }
 
 export interface MultiSelectClasses {
-  trigger: string;
-  /** The chips, or the placeholder. */
+  /**
+   * The field around the chips, the combobox and the buttons: it draws the
+   * control, and the combobox's focus ring while that has keyboard focus.
+   */
+  field: string;
+  /** The chips, then the combobox. */
   values: string;
+  /** The combobox: the rest of the row after the chips. */
+  trigger: string;
+  /** The combobox's text while nothing is selected. */
   placeholder: string;
   chip: string;
   /** An option's icon, on its chip or in the listbox. */
   icon: string;
   /** A chip's label. */
   chipLabel: string;
-  /** A chip's × target. */
+  /** A chip's remove button. */
   chipRemove: string;
   chipRemoveGlyph: string;
-  /** The clear target and the chevron. */
+  /** The clear button and the chevron. */
   actions: string;
+  /** The clear button. */
   clear: string;
   clearGlyph: string;
   chevron: string;
@@ -120,23 +149,31 @@ export interface MultiSelectClasses {
   footer: string;
 }
 
+// The chips' remove buttons and the clear button sit inside the field, which
+// draws the combobox's focus: each shows its own.
+const buttonFocusRing = 'rounded-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40';
+
 /** Classes of every part of a multi-select but its options. */
 export function multiSelectClasses(surface: Surface, { size, invalid, open }: MultiSelectClassOptions): MultiSelectClasses {
   const s = surfaceClasses(surface);
   return {
-    trigger: cn(
-      'flex w-full items-center justify-between gap-2 px-3 outline-none',
-      inputBase,
+    // A text field's look (`inputBase`, `focusRing`), with its focus states
+    // taken from the controls inside: Tailwind only generates the classes it
+    // finds verbatim, so they are spelled out.
+    field: cn(
+      'flex w-full cursor-default select-none items-center justify-between gap-2 px-3',
+      'border bg-retro-surface/40 focus-within:bg-retro-surface/70 text-retro-text font-mono transition-all',
+      'has-[[role=combobox]:focus-visible]:ring-2 has-[[role=combobox]:focus-visible]:ring-offset-2 has-[[role=combobox]:focus-visible]:ring-offset-retro-bg has-[[role=combobox]:focus-visible]:ring-retro-border/60',
+      'has-[[role=combobox]:disabled]:opacity-50 has-[[role=combobox]:disabled]:cursor-not-allowed',
       s.font,
       s.border,
       s.radius,
       s.transition,
       sizeHeight[size],
-      focusRing,
-      toneMap.neutral.ring,
       fieldBorderClass(invalid),
     ),
     values: 'flex min-w-0 flex-1 flex-wrap items-center gap-1',
+    trigger: 'flex min-w-0 flex-1 items-center self-stretch text-left outline-none',
     placeholder: 'truncate text-retro-muted',
     chip: cn(
       'inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px]',
@@ -148,10 +185,10 @@ export function multiSelectClasses(surface: Surface, { size, invalid, open }: Mu
     ),
     icon: 'opacity-80',
     chipLabel: 'truncate',
-    chipRemove: 'inline-flex shrink-0 items-center text-retro-muted hover:text-retro-text cursor-pointer',
+    chipRemove: cn('inline-flex shrink-0 items-center text-retro-muted hover:text-retro-text cursor-pointer', buttonFocusRing),
     chipRemoveGlyph: 'h-2 w-2',
     actions: 'ml-1 flex shrink-0 items-center gap-1',
-    clear: 'inline-flex items-center text-retro-muted hover:text-retro-text cursor-pointer',
+    clear: cn('inline-flex items-center text-retro-muted hover:text-retro-text cursor-pointer', buttonFocusRing),
     clearGlyph: 'h-3 w-3',
     chevron: cn('text-retro-muted transition-transform', open && 'rotate-180'),
     content: 'p-1 w-[var(--pxl-multiselect-w,16rem)]',

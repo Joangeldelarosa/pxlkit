@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import type { ControlValueAccessor } from '@angular/forms';
 import {
+  chipDeleteLabel,
   clampHighlight,
   comboboxListboxId,
   comboboxOptionId,
@@ -24,6 +25,7 @@ import {
   multiSelectClasses,
   multiSelectKeydown,
   multiSelectOptionClasses,
+  passMultiSelectFocus,
   toggleMultiSelectValue,
   type Size,
   type Surface,
@@ -37,7 +39,7 @@ import { FormBridge, provideValueAccessor } from '../_internal/value-accessor';
 import { PixelPopover } from '../overlay-foundation/pixel-popover';
 import { PixelPopoverContent } from '../overlay-foundation/pixel-popover-content';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
-import { PixelListboxTrigger } from './_internal/listbox-trigger';
+import { PixelListboxField } from './_internal/listbox-field';
 
 /** One choice of a multi-select. */
 export interface PixelMultiSelectOption {
@@ -50,16 +52,18 @@ export interface PixelMultiSelectOption {
 }
 
 /**
- * Multi-value combobox: the picked options show as chips in the trigger, and
- * the listbox (`aria-multiselectable`) in a popover toggles them, up to an
- * optional `max` with a count under the list. The arrows, Enter and Space
- * open it; the arrows move the highlight round the options, Home / End to
- * the ends, Enter or Space toggles the highlighted option (Space only from
- * the trigger: it types in the search field) and Backspace removes the last
+ * Multi-value combobox: the picked options show as chips before the combobox
+ * in its field, each with a remove button, and the listbox
+ * (`aria-multiselectable`) in a popover toggles them, up to an optional `max`
+ * with a count under the list. A press on the field, the arrows, Enter and
+ * Space open it; the arrows move the highlight round the options, Home / End
+ * to the ends, Enter or Space toggles the highlighted option (Space only from
+ * the combobox: it types in the search field) and Backspace removes the last
  * chip while the search is empty. `searchable` adds a search field that takes
- * focus; `clearable` a clear target. Bind the values with `[(value)]`, use it
- * as a form control (`ngModel`, `formControlName`), or leave it uncontrolled
- * with `defaultValue`; with a `name`, one hidden input per value submits them.
+ * focus; `clearable` a clear button. Bind the values with `[(value)]`, use it
+ * as a form control (`ngModel`, `formControlName`; a disabled form control
+ * disables the whole field), or leave it uncontrolled with `defaultValue`;
+ * with a `name`, one hidden input per value submits them.
  *
  * The host is layout-neutral (`display: contents`).
  *
@@ -68,7 +72,7 @@ export interface PixelMultiSelectOption {
  */
 @Component({
   selector: 'pxl-multi-select',
-  imports: [PixelFieldShell, PixelGlyph, PixelListboxTrigger, PixelPopover, PixelPopoverContent, PxlOutlet],
+  imports: [PixelFieldShell, PixelGlyph, PixelListboxField, PixelPopover, PixelPopoverContent, PxlOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideValueAccessor(() => PixelMultiSelect)],
   host: {
@@ -103,70 +107,73 @@ export interface PixelMultiSelectOption {
         haspopup="listbox"
         role="none"
       >
-        <button
-          pxlListboxTrigger
-          type="button"
-          role="combobox"
-          [id]="triggerId()"
-          [attr.aria-controls]="listboxId"
-          aria-haspopup="listbox"
-          [attr.aria-activedescendant]="open() ? activeId() : null"
-          [attr.aria-invalid]="error() ? true : null"
-          [attr.aria-describedby]="describedBy() ?? null"
-          [disabled]="form.disabled()"
-          [class]="classes().trigger"
-          (keydown)="onKeydown($event)"
-          (blur)="form.touched()"
-        >
-          <span [class]="classes().values">
-            @if (selectedOptions().length === 0) {
-              <span [class]="classes().placeholder">{{ placeholder() }}</span>
-            } @else {
-              @for (option of selectedOptions(); track option.value) {
-                <span [class]="classes().chip">
-                  @if (option.icon; as icon) {
-                    <span [class]="classes().icon"><ng-container *pxlOutlet="icon; let text">{{ text }}</ng-container></span>
-                  }
-                  <span [class]="classes().chipLabel">{{ option.label }}</span>
-                  <!-- A span, as a <button> cannot nest in the trigger: pointer and click
-                       stop here, so the trigger does not toggle the popover. Backspace
-                       removes the last chip from the keyboard. -->
-                  <span
-                    role="img"
-                    [attr.aria-label]="option.label + ' chip'"
-                    [attr.data-pxl-chip-remove]="option.value"
-                    aria-hidden="true"
-                    [class]="classes().chipRemove"
-                    (pointerdown)="$event.preventDefault(); $event.stopPropagation()"
-                    (click)="$event.preventDefault(); $event.stopPropagation(); toggle(option.value)"
-                  >
-                    <svg pxlGlyph="close" [class]="classes().chipRemoveGlyph"></svg>
-                    <span class="sr-only">Remove {{ option.label }}</span>
-                  </span>
-                </span>
-              }
+        <!-- The chips, the combobox and the clear button sit side by side in the
+             field, as a button cannot hold another. -->
+        <div pxlListboxField [class]="classes().field" (click)="onFieldClick($event)">
+          <span #values [class]="classes().values">
+            @for (option of selectedOptions(); track option.value) {
+              <span [class]="classes().chip">
+                @if (option.icon; as icon) {
+                  <span [class]="classes().icon"><ng-container *pxlOutlet="icon; let text">{{ text }}</ng-container></span>
+                }
+                <span [class]="classes().chipLabel">{{ option.label }}</span>
+                <button
+                  type="button"
+                  [attr.aria-label]="removeLabel(option.label)"
+                  [attr.data-pxl-chip-remove]="option.value"
+                  [disabled]="form.disabled()"
+                  [class]="classes().chipRemove"
+                  (mousedown)="$event.preventDefault()"
+                  (click)="removeChip($event, option.value)"
+                >
+                  <svg pxlGlyph="close" [class]="classes().chipRemoveGlyph"></svg>
+                </button>
+              </span>
             }
+            <button
+              #trigger
+              type="button"
+              role="combobox"
+              [id]="triggerId()"
+              [attr.aria-controls]="listboxId"
+              aria-haspopup="listbox"
+              [attr.aria-expanded]="open()"
+              [attr.aria-activedescendant]="open() ? activeId() : null"
+              [attr.aria-invalid]="error() ? true : null"
+              [attr.aria-describedby]="describedBy() ?? null"
+              [disabled]="form.disabled()"
+              [class]="classes().trigger"
+              (keydown)="onKeydown($event)"
+              (blur)="form.touched()"
+            >
+              <!-- The placeholder, or the value the chips before it show. -->
+              @if (selectedOptions().length === 0) {
+                <span [class]="classes().placeholder">{{ placeholder() }}</span>
+              } @else {
+                <span class="sr-only">{{ selectedLabels() }}</span>
+              }
+            </button>
           </span>
           <span [class]="classes().actions">
             @if (showClear()) {
-              <span
-                role="button"
-                tabindex="-1"
+              <button
+                type="button"
                 aria-label="Clear selection"
+                [disabled]="form.disabled()"
                 [class]="classes().clear"
-                (pointerdown)="$event.preventDefault(); $event.stopPropagation()"
-                (click)="$event.preventDefault(); $event.stopPropagation(); setValue([])"
+                (mousedown)="$event.preventDefault()"
+                (click)="clearSelection($event)"
               >
                 <svg pxlGlyph="close" [class]="classes().clearGlyph"></svg>
-              </span>
+              </button>
             }
             <svg pxlGlyph="chevronDown" [class]="classes().chevron"></svg>
           </span>
-        </button>
+        </div>
         <div *pxlPopoverContent [class]="classes().content" style="min-width: 220px">
           @if (searchable()) {
             <div [class]="classes().search">
-              <!-- Focus sits here while open: it carries the active option, as the trigger does. -->
+              <!-- Focus sits here while open: it carries the active option, as the combobox does. -->
               <input
                 #search
                 type="text"
@@ -233,7 +240,7 @@ export class PixelMultiSelect implements ControlValueAccessor {
   readonly max = input<number | undefined, unknown>(undefined, { transform: optionalNumber });
   /** Text shown while nothing is selected. */
   readonly placeholder = input<string, string | undefined>('Select…', { transform: withDefault('Select…') });
-  /** Shows a target that clears the selection while there is one. */
+  /** Shows a button that clears the selection while there is one. */
   readonly clearable = input(false, { transform: booleanOr(false) });
   /** Surface override; defaults to the nearest provider. */
   readonly surface = input<Surface>();
@@ -257,6 +264,8 @@ export class PixelMultiSelect implements ControlValueAccessor {
   /** @internal */
   protected readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
   private readonly generatedId = injectId();
+  private readonly trigger = viewChild.required<ElementRef<HTMLButtonElement>>('trigger');
+  private readonly valuesElement = viewChild.required<ElementRef<HTMLElement>>('values');
   private readonly search = viewChild<ElementRef<HTMLInputElement>>('search');
 
   /** @internal */
@@ -293,8 +302,12 @@ export class PixelMultiSelect implements ControlValueAccessor {
     const option = this.filtered()[this.highlighted()];
     return option ? this.optionId(option.value) : null;
   });
+  /** @internal The combobox's value, which the chips before it show. */
+  protected readonly selectedLabels = computed(() => this.selectedOptions().map((option) => option.label).join(', '));
   /** @internal */
   protected readonly showClear = computed(() => this.clearable() && this.current().length > 0);
+  /** @internal */
+  protected readonly removeLabel = chipDeleteLabel;
   /** @internal */
   protected readonly classes = computed(() =>
     multiSelectClasses(this.effectiveSurface(), { size: this.size(), invalid: !!this.error(), open: this.open() }),
@@ -365,8 +378,14 @@ export class PixelMultiSelect implements ControlValueAccessor {
     if (!this.isOptionDisabled(option)) this.toggle(option.value);
   }
 
-  /** @internal The trigger and the search field share the keys; Space types in the field. */
+  /** @internal The combobox and the search field share the keys; Space types in the field. */
   protected onKeydown(event: KeyboardEvent, inSearch = false): void {
+    // Escape closes the popover, which hands focus back to the field: it
+    // cannot take it, so focus leaves the search field for the combobox.
+    if (event.key === 'Escape' && inSearch) {
+      this.trigger().nativeElement.focus();
+      return;
+    }
     const filtered = this.filtered();
     const current = this.current();
     const action = multiSelectKeydown(event.key, {
@@ -384,6 +403,34 @@ export class PixelMultiSelect implements ControlValueAccessor {
     else if (action.kind === 'highlight') this.highlighted.set(action.index);
     else if (action.kind === 'toggle') this.toggle(filtered[action.index]!.value);
     else if (action.kind === 'removeLast') this.toggle(current[current.length - 1]!);
+  }
+
+  /** @internal A press on the field focuses the combobox, which takes the keys. */
+  protected onFieldClick(event: MouseEvent): void {
+    if (this.form.disabled()) event.preventDefault();
+    else if (!event.defaultPrevented) this.trigger().nativeElement.focus();
+  }
+
+  /**
+   * @internal The remove and clear buttons leave focus where it is under the
+   * pointer, as the options do, and keep the field from toggling the
+   * listbox; one that holds focus hands it on as it goes.
+   */
+  protected removeChip(event: MouseEvent, value: string): void {
+    event.preventDefault();
+    this.passFocus(event);
+    this.toggle(value);
+  }
+
+  /** @internal */
+  protected clearSelection(event: MouseEvent): void {
+    event.preventDefault();
+    this.passFocus(event);
+    this.setValue([]);
+  }
+
+  private passFocus(event: MouseEvent): void {
+    passMultiSelectFocus(event.currentTarget as HTMLElement, this.valuesElement().nativeElement, this.trigger().nativeElement);
   }
 
   /** @internal */
@@ -407,7 +454,7 @@ export class PixelMultiSelect implements ControlValueAccessor {
     this.form.registerOnTouched(fn);
   }
 
-  /** @internal ControlValueAccessor: the trigger is disabled with the form control. */
+  /** @internal ControlValueAccessor: the field is disabled with the form control. */
   setDisabledState(disabled: boolean): void {
     this.form.disabled.set(disabled);
   }

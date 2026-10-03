@@ -47,8 +47,9 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
         <li><code>aria-label on day cells</code></li>
         <li><code>start/end announced</code></li>
         <li><code>presets keyboard-reachable</code></li>
+        <li><code>clear button beside the trigger</code></li>
       </ul>
-      <p className="docs-aria-notes">Opening moves focus to the range start, else today; Escape, a preset and picking the end return it to the trigger. The popover is a dialog named &quot;Choose date range&quot;. Each calendar panel uses role=grid with a labelled aria-live month header; day cells expose aria-selected for range edges, aria-current=&quot;date&quot; for today and aria-disabled for out-of-bound days, and one day of the two months is in the tab order. Presets render as native buttons reachable via Tab.</p>
+      <p className="docs-aria-notes">Opening moves focus to the range start, else today; Escape, a preset and picking the end return it to the trigger. The popover is a dialog named &quot;Choose date range&quot;. Each calendar panel uses role=grid with a labelled aria-live month header; day cells expose aria-selected for range edges, aria-current=&quot;date&quot; for today and aria-disabled for out-of-bound days, and one day of the two months is in the tab order. Presets render as native buttons reachable via Tab. With clearable and a range set, a native &quot;Clear range&quot; button lies over the end of the trigger, beside it rather than inside (a button cannot contain a button): it is the next tab stop, clears the range, closes an open popover and moves focus to the trigger.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -118,6 +119,16 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
             <td><kbd>Space</kbd></td>
             <td>Select the focused day (start, then end)</td>
             <td><span className="docs-muted">—</span></td>
+          </tr>
+          <tr>
+            <td><kbd>Tab</kbd></td>
+            <td>Move from the trigger to its clear button while a range is set</td>
+            <td>clearable</td>
+          </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Clear the range and focus the trigger, without opening the popover</td>
+            <td>clear button focused</td>
           </tr>
         </tbody>
       </table>
