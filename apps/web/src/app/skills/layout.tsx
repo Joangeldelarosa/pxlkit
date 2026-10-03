@@ -98,7 +98,7 @@ function JsonLd() {
   return (
     <script
       type="application/ld+json"
-      // eslint-disable-next-line react/no-danger -- static, locally constructed JSON-LD
+      // Static, locally constructed JSON-LD.
       dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
     />
   );

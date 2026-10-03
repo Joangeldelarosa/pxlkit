@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/readme-hero.png" alt="Pxlkit — Retro React UI Kit, Licensed Pixel Art Icons & MIT Voxel Engine" width="900" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/readme-hero.png" alt="Pxlkit — Retro UI Kit for React, Vue and Angular, Licensed Pixel Art Icons & MIT Voxel Engine" width="900" />
 </p>
 
 <h1 align="center">Pxlkit</h1>
 
 <p align="center">
   <strong>Bring retro aesthetics to the modern web — in React, Vue and Angular — and build 3D voxel games with React.</strong><br/>
-  Pxlkit is a comprehensive source-available toolkit featuring 226+ pixel art SVG icons across 7 themed packs that render natively in React, Vue and Angular (12 npm packages total including the code packages), 111 retro React UI components, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel toolkit on Three.js &amp; React Three Fiber. The showcase app at <a href="https://pxlkit.xyz/explore">pxlkit.xyz/explore</a> ships procedural world generation, biomes, day/night cycles, and chunk-based terrain streaming.
+  Pxlkit is a comprehensive source-available toolkit featuring 226+ pixel art SVG icons across 7 themed packs that render natively in React, Vue and Angular (15 npm packages total including the code packages), a retro UI kit of 111 components for React, Vue and Angular, interactive 3D parallax icons, animated SVGs, a visual icon builder, toast notifications, and <strong>@pxlkit/voxel</strong> — an MIT-licensed 3D voxel toolkit on Three.js &amp; React Three Fiber. The showcase app at <a href="https://pxlkit.xyz/explore">pxlkit.xyz/explore</a> ships procedural world generation, biomes, day/night cycles, and chunk-based terrain streaming.
 </p>
 
 <p align="center">
@@ -25,7 +25,7 @@
 
 ## Overview
 
-**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into 7 themed packs, a framework-agnostic rendering engine with **React, Vue and Angular** components, a retro React UI kit with **111 components**, a **3D voxel toolkit** (with a procedural world engine running live at `/explore`), and a Next.js 15 showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. Browse and visually edit them at the [official website](https://pxlkit.xyz).
+**[Pxlkit.xyz](https://pxlkit.xyz)** is a monorepo containing **226+ pixel art icons** organized into 7 themed packs, a framework-agnostic rendering engine with **React, Vue and Angular** components, a retro UI kit of **111 components** for **React, Vue and Angular**, a **3D voxel toolkit** (with a procedural world engine running live at `/explore`), and a Next.js 15 showcase website. Every icon is a 16×16 character grid mapped to a color palette — designed to be hand-editable, AI-generatable, and version-control friendly. Browse and visually edit them at the [official website](https://pxlkit.xyz).
 
 ```
 pxlkit/
@@ -33,7 +33,10 @@ pxlkit/
 │   ├── core/           → Rendering engine, types, utilities + React components
 │   ├── vue/            → Vue 3 components on the same engine
 │   ├── angular/        → Angular standalone components on the same engine
-│   ├── ui-kit/         → 111 retro pixel art React UI components
+│   ├── ui-kit-core/    → UI kit core: tokens, Tailwind v4 theme, class recipes, DOM behaviour
+│   ├── ui-kit/         → 111 retro pixel art UI components for React
+│   ├── ui-kit-vue/     → The same 111 components for Vue 3
+│   ├── ui-kit-angular/ → The same 111 components for Angular
 │   ├── gamification/   → 51 icons — RPG, achievements, rewards
 │   ├── feedback/       → 33 icons — alerts, status, notifications
 │   ├── social/         → 43 icons — community, emojis, messaging
@@ -60,7 +63,7 @@ See [`CHANGELOG.md`](./CHANGELOG.md) for the full release history.
 
 ## Licensing Model
 
-- `@pxlkit/core`, `@pxlkit/vue`, `@pxlkit/angular`, `@pxlkit/ui-kit`, and `@pxlkit/voxel` are MIT-licensed code packages.
+- `@pxlkit/core`, `@pxlkit/vue`, `@pxlkit/angular`, `@pxlkit/ui-kit`, `@pxlkit/ui-kit-core`, `@pxlkit/ui-kit-vue`, `@pxlkit/ui-kit-angular`, and `@pxlkit/voxel` are MIT-licensed code packages.
 - The icon-pack packages and visual assets are source-available under [`LICENSE-ASSETS`](./LICENSE-ASSETS): free with attribution, with paid no-attribution terms in [`COMMERCIAL_TERMS`](./COMMERCIAL_TERMS).
 - The `Pxlkit` name, logos, and brand presentation are covered by [`TRADEMARK_POLICY`](./TRADEMARK_POLICY).
 - Third-party software and hosted fonts are listed in [`THIRD_PARTY_NOTICES`](./THIRD_PARTY_NOTICES).
@@ -276,6 +279,65 @@ import { PxlKitIcon, AnimatedPxlKitIcon, isAnimatedIcon } from "@pxlkit/core";
 }
 ```
 
+## UI Kit
+
+111 retro UI components — buttons, inputs, selects, date pickers, modals, toasts, tables, charts, layout primitives, animations — in three editions with the same markup, Tailwind CSS v4 theme and behaviour:
+
+| Framework | Package | In your templates |
+| --- | --- | --- |
+| React 18 / 19 | [`@pxlkit/ui-kit`](./packages/ui-kit) | `<PixelButton tone="green">` |
+| Vue 3.5+ | [`@pxlkit/ui-kit-vue`](./packages/ui-kit-vue) | `<PixelButton tone="green">` — slots, `v-model`, events |
+| Angular 20–22 | [`@pxlkit/ui-kit-angular`](./packages/ui-kit-angular) | `<button pxlButton tone="green">`, `<pxl-modal>` — standalone, signal-based; form controls work with `ngModel` and reactive forms |
+
+The three kits share [`@pxlkit/ui-kit-core`](./packages/ui-kit-core): the design tokens, the theme stylesheet, the class recipes and the DOM behaviour (focus traps, scroll lock, floating positioning). A parity suite renders every documented example in React and in each port and compares the DOM — on mount, on the server and after every step of scripted interactions — so the three behave alike: keyboard handling, focus management and ARIA included.
+
+```bash
+npm install @pxlkit/ui-kit tailwindcss           # React
+npm install @pxlkit/ui-kit-vue tailwindcss       # Vue
+npm install @pxlkit/ui-kit-angular tailwindcss   # Angular
+```
+
+Each kit's stylesheet brings Tailwind CSS v4, the Pxlkit theme and the kit's class names, so it takes the place of `@import "tailwindcss"` in the stylesheet Tailwind processes:
+
+```css
+@import "@pxlkit/ui-kit/styles.css";          /* or @pxlkit/ui-kit-vue, @pxlkit/ui-kit-angular */
+```
+
+```tsx
+// React
+import { PixelButton } from "@pxlkit/ui-kit";
+
+<PixelButton tone="green" onClick={save}>Save</PixelButton>;
+```
+
+```vue
+<!-- Vue -->
+<script setup lang="ts">
+import { PixelButton } from "@pxlkit/ui-kit-vue";
+</script>
+
+<template>
+  <PixelButton tone="green" @click="save">Save</PixelButton>
+</template>
+```
+
+```ts
+// Angular
+import { Component } from "@angular/core";
+import { PixelButton } from "@pxlkit/ui-kit-angular";
+
+@Component({
+  selector: "app-save",
+  imports: [PixelButton],
+  template: `<button pxlButton tone="green" (click)="save()">Save</button>`,
+})
+export class Save {
+  save() {}
+}
+```
+
+Every component's props, accessibility notes and examples — in all three frameworks — are on [pxlkit.xyz/docs](https://pxlkit.xyz/docs), with live demos on [pxlkit.xyz/ui-kit](https://pxlkit.xyz/ui-kit). The kits' READMEs map the React API to Vue and Angular.
+
 ## How Icons Work
 
 Every icon is a **16×16 character grid** paired with a **palette** that maps single characters to hex colors. The `.` character is always transparent.
@@ -440,6 +502,10 @@ packages/
       utils/            → gridToPixels, gridToSvg, colorUtils, validateIconData
   vue/                  → @pxlkit/vue — Vue 3 components on the engine
   angular/              → @pxlkit/angular — Angular standalone components on the engine (ng-packagr)
+  ui-kit-core/          → @pxlkit/ui-kit-core — tokens, styles.css (Tailwind v4 theme), class recipes, DOM behaviour
+  ui-kit/               → @pxlkit/ui-kit — the React kit: components, manifests, examples (the docs' source)
+  ui-kit-vue/           → @pxlkit/ui-kit-vue — the Vue kit, with every manifest example as a single-file component
+  ui-kit-angular/       → @pxlkit/ui-kit-angular — the Angular kit (ng-packagr), with every example as a component
   gamification/         → @pxlkit/gamification
     src/icons/          → One .ts file per icon (trophy.ts, sword.ts, ...)
     src/index.ts        → Re-exports + GamificationPack
@@ -516,8 +582,8 @@ Sidebar categories:
 | **Monorepo**   | npm workspaces + Turborepo                                   |
 | **Build**      | tsup (ESM + CJS) · ng-packagr (Angular Package Format)       |
 | **Language**   | TypeScript 5.7 (strict)                                      |
-| **Components** | React ≥ 18 · Vue ≥ 3.3 · Angular 20–22                       |
-| **Web App**    | Next.js 15 · React 19 · Tailwind CSS 3.4 · Framer Motion 11 |
+| **Components** | React ≥ 18 · Vue ≥ 3.3 (UI kit: ≥ 3.5) · Angular 20–22      |
+| **Web App**    | Next.js 15 · React 19 · Tailwind CSS 4 · Framer Motion 11   |
 | **3D Engine**  | Three.js · React Three Fiber · @react-three/drei             |
 | **Engine**     | Node.js ≥ 20                                                 |
 
@@ -657,7 +723,7 @@ Contributions are welcome! Whether it's new icons, bug fixes, or documentation i
 Pxlkit now uses a split licensing model:
 
 - [LICENSE](./LICENSE) — repo-wide licensing overview
-- [LICENSE-CODE](./LICENSE-CODE) — MIT license for code packages like `@pxlkit/core`, `@pxlkit/vue`, `@pxlkit/angular`, `@pxlkit/ui-kit`, and `@pxlkit/voxel`
+- [LICENSE-CODE](./LICENSE-CODE) — MIT license for code packages like `@pxlkit/core`, `@pxlkit/vue`, `@pxlkit/angular`, the UI kits (`@pxlkit/ui-kit`, `@pxlkit/ui-kit-vue`, `@pxlkit/ui-kit-angular`, `@pxlkit/ui-kit-core`), and `@pxlkit/voxel`
 - [LICENSE-ASSETS](./LICENSE-ASSETS) — source-available terms for icon packs and visual assets
 - [COMMERCIAL_TERMS](./COMMERCIAL_TERMS) — paid no-attribution terms for icon/assets usage
 - [TRADEMARK_POLICY](./TRADEMARK_POLICY) — rules for the Pxlkit name, logo, and branding

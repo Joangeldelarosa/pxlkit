@@ -212,7 +212,8 @@ export const OUT_OF_SCOPE = [
   'The voxel engine and anything 3D',
   'The web icon builder',
   'Storybook generation',
-  'Frameworks without React (Vue, Svelte, Astro without React)',
+  'Vue and Angular projects — the skills write React with @pxlkit/ui-kit',
+  'Svelte, and Astro without React',
 ];
 
 export const REQUIREMENTS = [

@@ -47,6 +47,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   of how React props read in Vue and Angular; its toast sections show the kit's toast card and
   a playground on the kit's provider, and `/docs` documents the icon components' `PixelToast`.
   Snippets merge the imports that end up from the same package.
+- **The site and the README for three frameworks.** The README documents the UI kit in React,
+  Vue and Angular and maps the new packages; the site's titles, descriptions, keywords,
+  structured data (every npm package, `@pxlkit/vue`, `@pxlkit/angular` and the three UI kit
+  packages included), web manifest, Open Graph image and landing copy say React, Vue and
+  Angular; the landing FAQ answers whether Pxlkit works with Vue or Angular; `/icons` gives each
+  icon's code in the three frameworks; and `/skills` says the plugin writes React.
 - **`@pxlkit/core/vanilla` and the shared rendering engine.** A React-free entry point
   exports the icon data model, every utility and the engine the three frameworks build on:
   `renderIconSvg` / `renderIconDataUri`, `createAnimatedIconPlayer`,
@@ -197,6 +203,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   runbook now describes what the release actually does.
 - Site: the copy button of the code blocks shows when it takes keyboard focus; it only
   appeared on hover.
+- Site: section titles read "… | Pxlkit" once — the root layout's title template added a
+  second suffix to the titles that carried their own — and the Open Graph image and frame
+  showed 54 components instead of the kit's count.
 
 ## [ui-kit 2.1.1] - 2026-08-08 — Bordered surface-token fix
 

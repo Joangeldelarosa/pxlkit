@@ -3,12 +3,12 @@ import Script from 'next/script';
 import { UI_KIT_VERSION } from '@/lib/pxlkit-version';
 import { UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 
-const UI_KIT_TITLE = `${UI_COMPONENTS_COUNT} Retro Pixel-Art React Components — UI Kit with Live Demos | Pxlkit`;
+const UI_KIT_TITLE = `${UI_COMPONENTS_COUNT} Retro Pixel-Art Components for React, Vue & Angular — UI Kit with Live Demos`;
 
 export const metadata: Metadata = {
   title: UI_KIT_TITLE,
   description:
-    `Production-ready retro React UI kit: ${UI_COMPONENTS_COUNT} pixel-art components — buttons, forms, modals, tables, animations, parallax & more. TypeScript, Tailwind CSS. MIT-licensed.`,
+    `Production-ready retro UI kit for React, Vue and Angular: ${UI_COMPONENTS_COUNT} pixel-art components — buttons, forms, modals, tables, animations, parallax & more. TypeScript, Tailwind CSS. MIT-licensed.`,
   keywords: [
     'react ui kit',
     'react component library',
@@ -84,14 +84,14 @@ export const metadata: Metadata = {
     type: 'website',
     title: UI_KIT_TITLE,
     description:
-      `${UI_COMPONENTS_COUNT} hand-crafted retro React components: buttons, forms, modals, tables, toast notifications, animations, parallax, locale support, and more. TypeScript-first, Tailwind-powered, zero native UI. MIT-licensed and free to use.`,
+      `${UI_COMPONENTS_COUNT} hand-crafted retro components for React, Vue and Angular: buttons, forms, modals, tables, toast notifications, animations, parallax, locale support, and more — the same markup and behaviour in every framework. TypeScript-first, Tailwind-powered, zero native UI. MIT-licensed and free to use.`,
     url: 'https://pxlkit.xyz/ui-kit',
     images: [
       {
         url: '/og-image.png',
         width: 1280,
         height: 640,
-        alt: `Pxlkit UI Kit — ${UI_COMPONENTS_COUNT} retro pixel-art React components with live demos`,
+        alt: `Pxlkit UI Kit — ${UI_COMPONENTS_COUNT} retro pixel-art components for React, Vue and Angular, with live demos`,
       },
     ],
   },
@@ -99,7 +99,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: UI_KIT_TITLE,
     description:
-      `Production-ready retro pixel-art React UI kit: ${UI_COMPONENTS_COUNT} components with live demos. TypeScript, Tailwind CSS, tree-shakeable. MIT-licensed.`,
+      `Production-ready retro pixel-art UI kit for React, Vue and Angular: ${UI_COMPONENTS_COUNT} components with live demos. TypeScript, Tailwind CSS, tree-shakeable. MIT-licensed.`,
     images: ['/og-twitter.png'],
   },
   alternates: {

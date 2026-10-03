@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Docs — Installation Guide, Component API & TypeScript Reference | Pxlkit',
+  title: 'Docs — Installation Guide, Component API & TypeScript Reference',
   description:
-    'Get started with Pxlkit: installation guides, component API reference, icon usage docs, TypeScript types & design tokens for the retro React UI kit.',
+    'Get started with Pxlkit in React, Vue or Angular: installation guides, component API reference, icon usage docs, TypeScript types & design tokens for the retro UI kit.',
   keywords: [
     'pxlkit documentation',
     'pxlkit docs',
@@ -69,9 +69,9 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: 'website',
-    title: 'Docs — Installation Guide, Component API & TypeScript Reference | Pxlkit',
+    title: 'Docs — Installation Guide, Component API & TypeScript Reference',
     description:
-      'Complete documentation for Pxlkit: installation guides, component API reference, icon usage, TypeScript types, and design tokens for the retro React UI kit & 226+ icons.',
+      'Complete documentation for Pxlkit: installation guides, component API reference with code in React, Vue and Angular, icon usage, TypeScript types, and design tokens for the retro UI kit & 226+ icons.',
     url: 'https://pxlkit.xyz/docs',
     images: [
       {
@@ -84,9 +84,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Docs — Installation Guide, Component API & TypeScript Reference | Pxlkit',
+    title: 'Docs — Installation Guide, Component API & TypeScript Reference',
     description:
-      'Full Pxlkit docs: installation, component API, icon usage, TypeScript types & design tokens. Get started with the retro React UI kit in minutes.',
+      'Full Pxlkit docs: installation, component API, icon usage, TypeScript types & design tokens. Get started with the retro UI kit in React, Vue or Angular in minutes.',
     images: ['/og-twitter.png'],
   },
   alternates: {

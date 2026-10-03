@@ -21,11 +21,11 @@ export interface LandingFaqItem {
 export const LANDING_FAQS: LandingFaqItem[] = [
   {
     q: 'Is Pxlkit really free?',
-    a: 'Yes. The code packages (UI kit, core, voxel) are MIT-licensed and free forever. The icon packs are free with a small attribution link. Paid licenses only remove the icon/asset attribution requirement.',
+    a: 'Yes. The code packages (the UI kits for React, Vue and Angular, the icon components, voxel) are MIT-licensed and free forever. The icon packs are free with a small attribution link. Paid licenses only remove the icon/asset attribution requirement.',
   },
   {
-    q: 'What React components does the UI kit include?',
-    a: `${UI_COMPONENTS_COUNT} production-ready components: buttons, inputs, selects, switches, sliders, cards, modals, data tables, charts, calendars, steppers, sidebars, timelines, toasts, command palettes, and more. All TypeScript-first, Tailwind-powered, and fully themed.`,
+    q: 'What components does the UI kit include?',
+    a: `${UI_COMPONENTS_COUNT} production-ready components: buttons, inputs, selects, switches, sliders, cards, modals, data tables, charts, calendars, steppers, sidebars, timelines, toasts, command palettes, and more — the same in React, Vue and Angular. All TypeScript-first, Tailwind-powered, and fully themed.`,
   },
   {
     q: 'What templates are included?',
@@ -33,7 +33,11 @@ export const LANDING_FAQS: LandingFaqItem[] = [
   },
   {
     q: 'Does Pxlkit work with Next.js?',
-    a: 'Yes. Pxlkit is built for React with TypeScript and integrates seamlessly with Next.js, Vite, Create React App, Remix, and any React setup.',
+    a: 'Yes. The React kit is built with TypeScript and integrates seamlessly with Next.js, Vite, Remix, and any React 18 or 19 setup.',
+  },
+  {
+    q: 'Does Pxlkit work with Vue or Angular?',
+    a: `Yes. @pxlkit/ui-kit-vue (Vue 3, with Vite or Nuxt) and @pxlkit/ui-kit-angular (Angular 20–22, standalone components, zoneless or with zone.js) are the same ${UI_COMPONENTS_COUNT}-component kit: the same markup, theme and keyboard behaviour, checked against React by parity tests. @pxlkit/vue and @pxlkit/angular render the icons, and the icon packs are plain data that work in all three.`,
   },
   {
     q: 'Will it slow down my app?',

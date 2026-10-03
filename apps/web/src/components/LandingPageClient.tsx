@@ -626,7 +626,7 @@ const FEATURES: FeatureRow[] = [
   {
     icon: Package,
     title: 'Skip the design-system sprint',
-    description: `${UI_COMPONENTS_COUNT} accessible React primitives — buttons, inputs, DataTable, Stepper, Calendar, Sidebar, Timeline, Charts — wired to the same surface/tone/density contract. Drop them in and theme once.`,
+    description: `${UI_COMPONENTS_COUNT} accessible primitives for React, Vue and Angular — buttons, inputs, DataTable, Stepper, Calendar, Sidebar, Timeline, Charts — wired to the same surface/tone/density contract. Drop them in and theme once.`,
     tone: 'green',
   },
   {
@@ -1134,7 +1134,7 @@ function PricingPreview() {
       price: 'Free',
       suffix: 'perfect for: side projects, OSS, prototypes',
       color: 'green' as const,
-      features: [`${ICON_COUNT_LABEL} pixel art icons`, `${ICON_PACK_COUNT} thematic packs`, `${UI_COMPONENTS_COUNT} React components`, 'All section templates', 'Asset attribution required'],
+      features: [`${ICON_COUNT_LABEL} pixel art icons`, `${ICON_PACK_COUNT} thematic packs`, `${UI_COMPONENTS_COUNT} components for React, Vue & Angular`, 'All section templates', 'Asset attribution required'],
     },
     {
       name: 'Indie',

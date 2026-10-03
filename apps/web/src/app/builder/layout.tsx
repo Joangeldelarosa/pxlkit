@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG | Pxlkit',
+  title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG',
   description:
     'Design pixel art icons on a 16×16 grid. Export as React component, SVG or data URI. Free browser-based editor, no signup needed. Real-time preview.',
   keywords: [
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: 'website',
-    title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG | Pxlkit',
+    title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG',
     description:
       'Design pixel art icons on a 16×16 grid and export as React component, SVG, or data URI. Free, fast, and browser-based. No signup required.',
     url: 'https://pxlkit.xyz/builder',
@@ -85,7 +85,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG | Pxlkit',
+    title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG',
     description:
       'Create custom pixel art icons on a 16×16 grid. Export as React component, SVG, or data URI. Free, browser-based, no signup required.',
     images: ['/og/builder.png'],

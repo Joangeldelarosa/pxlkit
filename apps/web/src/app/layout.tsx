@@ -11,9 +11,37 @@ import { Analytics } from "@vercel/analytics/next";
 /* ─── SEO Constants ─── */
 const SITE_NAME = 'Pxlkit';
 const SITE_URL = 'https://pxlkit.xyz';
-const SITE_TAGLINE = `Retro React UI Kit — Pixel-Art Components, Ready-Made Templates & ${ICON_COUNT_LABEL} SVG Icons`;
+const SITE_TAGLINE = `Retro UI Kit for React, Vue & Angular — Pixel-Art Components, Templates & ${ICON_COUNT_LABEL} SVG Icons`;
 const SITE_DESCRIPTION =
-  `${UI_COMPONENTS_COUNT} retro pixel-art React components, ${ICON_COUNT_LABEL} SVG icons across ${ICON_PACK_COUNT} themed packs, section variants & ${PAGE_TEMPLATE_COUNT} full-page templates. TypeScript-first, Tailwind CSS, tree-shakeable. Open-source UI kit.`;
+  `${UI_COMPONENTS_COUNT} retro pixel-art components for React, Vue and Angular, ${ICON_COUNT_LABEL} SVG icons across ${ICON_PACK_COUNT} themed packs, section variants & ${PAGE_TEMPLATE_COUNT} full-page React templates. TypeScript-first, Tailwind CSS, tree-shakeable. Open-source UI kit.`;
+
+/** The npm packages, in the order the structured data lists them. */
+const NPM_PACKAGES: ReadonlyArray<{ name: string; description: string }> = [
+  {
+    name: '@pxlkit/ui-kit',
+    description: `${UI_COMPONENTS_COUNT} retro pixel-art UI components for React — buttons, inputs, modals, data tables, charts, calendars, selects, animations, parallax, locale support, and more`,
+  },
+  { name: '@pxlkit/ui-kit-vue', description: `The same ${UI_COMPONENTS_COUNT} retro UI components for Vue 3` },
+  {
+    name: '@pxlkit/ui-kit-angular',
+    description: `The same ${UI_COMPONENTS_COUNT} retro UI components for Angular — standalone, signal-based, with reactive forms support`,
+  },
+  {
+    name: '@pxlkit/ui-kit-core',
+    description: 'Framework-neutral core of the UI kits: design tokens, Tailwind CSS v4 theme, class recipes and DOM behaviour',
+  },
+  { name: '@pxlkit/core', description: 'Pixel-art rendering engine, SVG utilities and the React icon components' },
+  { name: '@pxlkit/vue', description: 'Vue 3 icon components: static, animated and 3D parallax icons, and pixel toasts' },
+  { name: '@pxlkit/angular', description: 'Angular icon components: static, animated and 3D parallax icons, and pixel toasts' },
+  { name: '@pxlkit/ui', description: '41 interface control and navigation pixel icons' },
+  { name: '@pxlkit/gamification', description: '51 RPG, achievement, and reward pixel icons' },
+  { name: '@pxlkit/social', description: '43 community, emoji, and messaging pixel icons' },
+  { name: '@pxlkit/weather', description: '36 climate, moon, and nature pixel icons' },
+  { name: '@pxlkit/feedback', description: '33 alert, status, and notification pixel icons' },
+  { name: '@pxlkit/effects', description: '12 animated VFX and particle pixel icons' },
+  { name: '@pxlkit/parallax', description: '10 multi-layer 3D parallax pixel icons' },
+  { name: '@pxlkit/voxel', description: 'Coming soon — 3D voxel game engine with procedural world generation' },
+];
 
 export const viewport: Viewport = {
   themeColor: [
@@ -38,6 +66,8 @@ export const metadata: Metadata = {
     'pxlkit',
     'pixel art react',
     'retro react ui kit',
+    'retro vue ui kit',
+    'retro angular ui kit',
     'pixel art ui kit',
     'retro design system',
     'nostalgic ui kit',
@@ -93,6 +123,20 @@ export const metadata: Metadata = {
     'retro form components',
     'react ui library',
     'zero native browser ui',
+    /* ── Vue & Angular ── */
+    'vue ui kit',
+    'vue 3 component library',
+    'vue pixel art components',
+    'nuxt ui kit',
+    'tailwind vue components',
+    'vue icons',
+    'angular ui kit',
+    'angular component library',
+    'angular standalone components',
+    'angular signals components',
+    'angular pixel art components',
+    'tailwind angular components',
+    'angular icons',
     /* ── Templates & Sections ── */
     'react landing page template',
     'react hero section',
@@ -267,12 +311,12 @@ const JSON_LD = {
     {
       '@type': 'SoftwareApplication',
       '@id': `${SITE_URL}/#ui-kit`,
-      name: `${SITE_NAME} — Retro React UI Kit & Templates`,
+      name: `${SITE_NAME} — Retro UI Kit for React, Vue & Angular`,
       applicationCategory: 'DeveloperApplication',
-      applicationSubCategory: 'React Component Library',
+      applicationSubCategory: 'UI Component Library',
       operatingSystem: 'Web',
       description:
-        `Open-source retro React UI kit with ${UI_COMPONENTS_COUNT} pixel-art components, ${ICON_COUNT_LABEL} SVG icons across ${ICON_PACK_COUNT} themed packs, section variants and ${PAGE_TEMPLATE_COUNT} full-page templates (dashboard, landing, portfolio, ecommerce, docs, changelog). TypeScript-first, Tailwind CSS-powered, tree-shakeable.`,
+        `Open-source retro UI kit with ${UI_COMPONENTS_COUNT} pixel-art components for React, Vue and Angular, ${ICON_COUNT_LABEL} SVG icons across ${ICON_PACK_COUNT} themed packs, section variants and ${PAGE_TEMPLATE_COUNT} full-page React templates (dashboard, landing, portfolio, ecommerce, docs, changelog). TypeScript-first, Tailwind CSS-powered, tree-shakeable.`,
       url: SITE_URL,
       author: { '@id': `${SITE_URL}/#organization` },
       license: 'https://github.com/Joangeldelarosa/pxlkit/blob/main/LICENSE',
@@ -300,10 +344,11 @@ const JSON_LD = {
         },
       ],
       softwareVersion: UI_KIT_VERSION,
-      programmingLanguage: ['TypeScript', 'React', 'JavaScript'],
-      downloadUrl: 'https://www.npmjs.com/package/@pxlkit/core',
+      programmingLanguage: ['TypeScript', 'React', 'Vue', 'Angular', 'JavaScript'],
+      downloadUrl: 'https://www.npmjs.com/package/@pxlkit/ui-kit',
       featureList: [
-        `${UI_COMPONENTS_COUNT} retro pixel-art UI components`,
+        `${UI_COMPONENTS_COUNT} retro pixel-art UI components for React, Vue and Angular`,
+        'The same markup, theme and behaviour in every framework, checked by parity tests',
         `${ICON_COUNT_LABEL} hand-crafted SVG icons across ${ICON_PACK_COUNT} packs`,
         'Section variants — hero, pricing, CTA, testimonial, FAQ, features, header & footer',
         '6 complete page templates — dashboard, landing, portfolio, ecommerce, docs, changelog',
@@ -335,80 +380,15 @@ const JSON_LD = {
     {
       '@type': 'ItemList',
       name: 'Pxlkit npm Packages',
-      description: 'React UI kit, template, and icon packages in the Pxlkit ecosystem',
-      numberOfItems: 10,
-      itemListElement: [
-        {
-          '@type': 'ListItem',
-          position: 1,
-          name: '@pxlkit/ui-kit',
-          url: 'https://www.npmjs.com/package/@pxlkit/ui-kit',
-          description: `${UI_COMPONENTS_COUNT} retro pixel-art React UI components — buttons, inputs, modals, data tables, charts, calendars, selects, animations, parallax, locale support, and more`,
-        },
-        {
-          '@type': 'ListItem',
-          position: 2,
-          name: '@pxlkit/core',
-          url: 'https://www.npmjs.com/package/@pxlkit/core',
-          description: 'Core rendering engine, React components, and SVG utilities',
-        },
-        {
-          '@type': 'ListItem',
-          position: 3,
-          name: '@pxlkit/ui',
-          url: 'https://www.npmjs.com/package/@pxlkit/ui',
-          description: '41 interface control and navigation pixel icons',
-        },
-        {
-          '@type': 'ListItem',
-          position: 4,
-          name: '@pxlkit/gamification',
-          url: 'https://www.npmjs.com/package/@pxlkit/gamification',
-          description: '51 RPG, achievement, and reward pixel icons',
-        },
-        {
-          '@type': 'ListItem',
-          position: 5,
-          name: '@pxlkit/social',
-          url: 'https://www.npmjs.com/package/@pxlkit/social',
-          description: '43 community, emoji, and messaging pixel icons',
-        },
-        {
-          '@type': 'ListItem',
-          position: 6,
-          name: '@pxlkit/weather',
-          url: 'https://www.npmjs.com/package/@pxlkit/weather',
-          description: '36 climate, moon, and nature pixel icons',
-        },
-        {
-          '@type': 'ListItem',
-          position: 7,
-          name: '@pxlkit/feedback',
-          url: 'https://www.npmjs.com/package/@pxlkit/feedback',
-          description: '33 alert, status, and notification pixel icons',
-        },
-        {
-          '@type': 'ListItem',
-          position: 8,
-          name: '@pxlkit/effects',
-          url: 'https://www.npmjs.com/package/@pxlkit/effects',
-          description: '12 animated VFX and particle pixel icons',
-        },
-        {
-          '@type': 'ListItem',
-          position: 9,
-          name: '@pxlkit/parallax',
-          url: 'https://www.npmjs.com/package/@pxlkit/parallax',
-          description: '10 multi-layer 3D parallax pixel icons',
-        },
-        {
-          '@type': 'ListItem',
-          position: 10,
-          name: '@pxlkit/voxel',
-          url: 'https://www.npmjs.com/package/@pxlkit/voxel',
-          description: 'Coming soon — 3D voxel game engine with procedural world generation',
-        },
-      ],
+      description: 'UI kit (React, Vue, Angular), icon and voxel packages in the Pxlkit ecosystem',
+      numberOfItems: NPM_PACKAGES.length,
+      itemListElement: NPM_PACKAGES.map(({ name, description }, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name,
+        url: `https://www.npmjs.com/package/${name}`,
+        description,
+      })),
     },
     /* ── FAQPage — mirrors the visible landing FAQ verbatim (SSoT: lib/landing-faq.ts) ── */
     {

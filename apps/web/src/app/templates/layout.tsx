@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Ready-to-Use Retro Templates & Sections — Copy-Paste React Components | Pxlkit',
+  title: 'Ready-to-Use Retro Templates & Sections — Copy-Paste React Components',
   description:
     'Copy-paste retro React templates: section variants across 8 categories (hero, header, footer, CTA, pricing, testimonials, FAQ, features) plus 6 full page layouts. Pixel-art styled, Tailwind CSS powered.',
   keywords: [
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: 'website',
-    title: 'Ready-to-Use Retro Templates & Sections — Copy-Paste React Components | Pxlkit',
+    title: 'Ready-to-Use Retro Templates & Sections — Copy-Paste React Components',
     description:
       'Copy-paste retro React templates: hero sections, pricing tables, CTAs, testimonials, headers, footers & 6 full page layouts. Pixel-art styled, Tailwind CSS powered.',
     url: 'https://pxlkit.xyz/templates',
@@ -84,7 +84,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ready-to-Use Retro Templates & Sections — Copy-Paste React Components | Pxlkit',
+    title: 'Ready-to-Use Retro Templates & Sections — Copy-Paste React Components',
     description:
       'Ship faster with copy-paste retro React templates: hero sections, pricing tables, CTAs, testimonials & full pages. Pixel-art styled.',
     images: ['/og-twitter.png'],

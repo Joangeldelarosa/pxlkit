@@ -15,19 +15,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/ToastProvider';
 import type { ToastTone } from '@/components/ToastProvider';
 import { PixelBadge, PixelButton, PixelCard, PixelChip, PixelChipGroup, PixelIconFrame, PxlKitButton, PixelInput, PixelSlider } from '@pxlkit/ui-kit';
+import { FrameworkCode } from '@/components/FrameworkCode';
+import { iconExportName, iconUsage } from '@/lib/icon-usage';
 
 // ─── Registry ───────────────────────────────
 const ALL_PACKS: IconPack[] = [GamificationPack, FeedbackPack, SocialPack, WeatherPack, UiPack, EffectsPack];
 const TOTAL_COUNT = ALL_PACKS.reduce((s, p) => s + p.icons.length, 0);
 
 // ─── Helpers ────────────────────────────────────
-function toPascal(name: string): string {
-  return name
-    .split('-')
-    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-    .join('');
-}
-
 const LIGHT_SWATCH = 'bg-white border-gray-200';
 
 // ─── Page ───────────────────────────────────
@@ -36,7 +31,6 @@ export default function IconsPage() {
   const [selectedIcon, setSelectedIcon] = useState<PxlKitData | AnimatedPxlKitData | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activePack, setActivePack] = useState<string | null>(null);
-  const [copiedField, setCopiedField] = useState<string | null>(null);
   const [animTrigger, setAnimTrigger] = useState<AnimationTrigger>('loop');
   const [animSpeed, setAnimSpeed] = useState(1);
   const [animPlaying, setAnimPlaying] = useState(true);
@@ -98,18 +92,6 @@ export default function IconsPage() {
     },
     [toast]
   );
-
-  // ─── Copy helper ──────────────────────────
-  async function copyToClipboard(text: string, field: string, icon?: PxlKitData) {
-    try {
-      await navigator.clipboard?.writeText(text);
-      setCopiedField(field);
-      setTimeout(() => setCopiedField(null), 2000);
-      showToast('success', 'COPIED', `${field} copied to clipboard`, icon);
-    } catch {
-      showToast('error', 'COPY FAILED', 'Could not copy to clipboard', icon);
-    }
-  }
 
   // ─── SVG download ─────────────────────────
   function downloadSvg(icon: PxlKitData, mode: 'colorful' | 'monochrome') {
@@ -323,9 +305,10 @@ export default function IconsPage() {
 
           <div className="mt-4 p-3 rounded-lg border border-retro-gold/15 bg-retro-surface/20">
             <p className="font-mono text-[10px] text-retro-muted">
-              <span className="text-retro-gold">npm i @pxlkit/core @pxlkit/parallax</span>
+              <span className="text-retro-gold">npm i @pxlkit/parallax</span>
               {' · '}
-              Uses <span className="text-retro-cyan">ParallaxPxlKitIcon</span> from @pxlkit/core
+              Uses <span className="text-retro-cyan">ParallaxPxlKitIcon</span> from @pxlkit/core, @pxlkit/vue or{' '}
+              @pxlkit/angular (<span className="text-retro-cyan">{'<pxl-parallax-icon>'}</span>)
               {' · '}
               <a href="/docs#parallax-icons" className="inline-flex min-h-6 items-center text-retro-gold hover:underline">View docs →</a>
             </p>
@@ -509,62 +492,9 @@ export default function IconsPage() {
                     ))}
                   </div>
 
-                  {/* Code snippets */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-mono text-[10px] text-retro-muted">
-                          Import
-                        </span>
-                        <PixelButton
-                          onClick={() => {
-                            const pascal = toPascal(selectedIcon.name);
-                            copyToClipboard(
-                              `import { ${pascal} } from '@pxlkit/${selectedIcon.category}';`,
-                              'import',
-                              isAnimatedIcon(selectedIcon) ? undefined : selectedIcon
-                            );
-                          }}
-                          size="sm"
-                          tone="green"
-                          variant="ghost"
-                          className="h-auto px-1.5 py-0 text-[10px]"
-                        >
-                          {copiedField === 'import' ? 'Copied!' : 'Copy'}
-                        </PixelButton>
-                      </div>
-                      <code className="block p-2 bg-retro-bg border border-retro-border rounded text-[10px] font-mono text-retro-text/80 truncate">
-                        {`import { ${toPascal(selectedIcon.name)} } from '@pxlkit/${selectedIcon.category}';`}
-                      </code>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-mono text-[10px] text-retro-muted">
-                          Usage
-                        </span>
-                        <PixelButton
-                          onClick={() => {
-                            const pascal = toPascal(selectedIcon.name);
-                            const comp = isAnimatedIcon(selectedIcon) ? 'AnimatedPxlKitIcon' : 'PxlKitIcon';
-                            copyToClipboard(
-                              `<${comp} icon={${pascal}} size={32} colorful />`,
-                              'usage',
-                              isAnimatedIcon(selectedIcon) ? undefined : selectedIcon
-                            );
-                          }}
-                          size="sm"
-                          tone="green"
-                          variant="ghost"
-                          className="h-auto px-1.5 py-0 text-[10px]"
-                        >
-                          {copiedField === 'usage' ? 'Copied!' : 'Copy'}
-                        </PixelButton>
-                      </div>
-                      <code className="block p-2 bg-retro-bg border border-retro-border rounded text-[10px] font-mono text-retro-text/80 truncate">
-                        {`<${isAnimatedIcon(selectedIcon) ? 'AnimatedPxlKitIcon' : 'PxlKitIcon'} icon={${toPascal(selectedIcon.name)}} size={32} colorful />`}
-                      </code>
-                    </div>
+                  {/* The code, in the framework the reader picked */}
+                  <div className="mb-3">
+                    <FrameworkCode title="Code" {...iconUsage(selectedIcon)} />
                   </div>
 
                   {/* Action buttons */}
@@ -605,7 +535,7 @@ export default function IconsPage() {
                       onClick={() =>
                         showToast(
                           'info',
-                          toPascal(selectedIcon.name),
+                          iconExportName(selectedIcon.name),
                           `Toast preview with ${selectedIcon.name} icon`,
                           selectedIcon
                         )

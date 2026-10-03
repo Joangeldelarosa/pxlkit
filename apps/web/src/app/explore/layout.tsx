@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Voxel World Demo — 3D Engine Preview (Coming Soon) | Pxlkit',
+  title: 'Voxel World Demo — 3D Engine Preview (Coming Soon)',
   description:
     'Preview the @pxlkit/voxel 3D engine demo: procedural terrain, biomes & day/night cycles in React. Coming soon — explore the interactive tech preview.',
   keywords: [
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: 'website',
-    title: 'Voxel World Demo — 3D Engine Preview (Coming Soon) | Pxlkit',
+    title: 'Voxel World Demo — 3D Engine Preview (Coming Soon)',
     description:
       'Interactive preview of the @pxlkit/voxel 3D engine: procedural terrain, biomes, day/night cycles. Coming soon — built with Three.js & React Three Fiber.',
     url: 'https://pxlkit.xyz/explore',
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Voxel World Demo — 3D Engine Preview (Coming Soon) | Pxlkit',
+    title: 'Voxel World Demo — 3D Engine Preview (Coming Soon)',
     description:
       'Preview the Pxlkit voxel 3D engine demo: procedural terrain, biomes & day/night cycles in React. Coming soon.',
     images: ['/og/explore.png'],

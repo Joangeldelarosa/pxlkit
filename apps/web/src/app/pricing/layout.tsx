@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses | Pxlkit',
+  title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses',
   description:
-    'Pxlkit: MIT-licensed React UI kit & free icon packs with attribution. Indie $9.50 / Team $24.50 for no-attribution commercial use. One-time payment.',
+    'Pxlkit: MIT-licensed UI kit for React, Vue and Angular & free icon packs with attribution. Indie $9.50 / Team $24.50 for no-attribution commercial use. One-time payment.',
   keywords: [
     'pxlkit pricing',
     'pxlkit plans',
@@ -61,9 +61,9 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     type: 'website',
-    title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses | Pxlkit',
+    title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses',
     description:
-      'MIT-licensed React UI kit (free forever). Icon packs free with attribution. Indie $9.50 / Team $24.50 for no-attribution commercial use. One-time payment, lifetime updates.',
+      'MIT-licensed UI kit for React, Vue and Angular (free forever). Icon packs free with attribution. Indie $9.50 / Team $24.50 for no-attribution commercial use. One-time payment, lifetime updates.',
     url: 'https://pxlkit.xyz/pricing',
     images: [
       {
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses | Pxlkit',
+    title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses',
     description:
       'MIT code is free forever. Icon packs free with attribution. Indie ($9.50) / Team ($24.50) for commercial use. One-time payment.',
     images: ['/og/pricing.png'],

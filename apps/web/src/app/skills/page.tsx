@@ -253,6 +253,11 @@ export default function SkillsPage() {
                       ))}
                     </PixelStack>
                     <PixelAlert
+                      tone="cyan"
+                      title="React projects"
+                      message="The skills write React with @pxlkit/ui-kit. The same kit ships for Vue (@pxlkit/ui-kit-vue) and Angular (@pxlkit/ui-kit-angular), with every component's code in both on /docs — the skills do not write it yet."
+                    />
+                    <PixelAlert
                       tone="gold"
                       title="Tailwind v4 is not optional"
                       message="The kit's stylesheet opens with @import &quot;tailwindcss&quot; and declares an @theme, so it cannot compile on v3. /pxlkit:start checks this first and stops rather than attempting a migration that would change how every existing style in your project compiles."

@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og';
+import { ICON_COUNT_LABEL, UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 
 export const runtime = 'edge';
-export const alt = 'Pxlkit — Retro Pixel Art React UI Kit, 226+ SVG Icons & Ready-to-Use Templates';
+export const alt = `Pxlkit — Retro Pixel Art UI Kit for React, Vue & Angular, ${ICON_COUNT_LABEL} SVG Icons & Ready-to-Use Templates`;
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -88,12 +89,12 @@ export default async function Image() {
               marginBottom: 32,
             }}
           >
-            Retro React UI Kit, Icons &amp; Templates
+            Retro UI Kit for React, Vue &amp; Angular
           </div>
 
           {/* Feature pills */}
           <div style={{ display: 'flex', gap: 16 }}>
-            {['226+ Icons', '54 Components', 'Ready Templates', 'TypeScript-First', 'Tailwind CSS'].map(
+            {[`${ICON_COUNT_LABEL} Icons`, `${UI_COMPONENTS_COUNT} Components`, 'React · Vue · Angular', 'TypeScript-First', 'Tailwind CSS'].map(
               (label) => (
                 <div
                   key={label}

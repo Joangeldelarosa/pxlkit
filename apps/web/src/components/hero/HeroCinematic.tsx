@@ -6,6 +6,7 @@ import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { PixelBadge, PixelButton } from '@pxlkit/ui-kit';
 import { UI_KIT_VERSION_LABEL } from '@/lib/pxlkit-version';
+import { ICON_COUNT_LABEL, UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 import { MouseProvider } from './mouseContext';
 import { HeroBackground } from './HeroBackground';
 import { IconField } from './IconField';
@@ -59,8 +60,8 @@ export function HeroCinematic() {
 
           {/* Compact stats line */}
           <p className="font-mono text-xs sm:text-sm text-retro-muted max-w-xl text-center px-2">
-            Retro pixel-art React UI kit · 226+ icons · 111+ components · MIT code,
-            source-available art.
+            Retro pixel-art UI kit for React, Vue &amp; Angular · {ICON_COUNT_LABEL} icons ·{' '}
+            {UI_COMPONENTS_COUNT} components · MIT code, source-available art.
           </p>
 
           {/* CTAs (ui-kit PixelButton) */}

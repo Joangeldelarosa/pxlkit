@@ -4,12 +4,13 @@ import { UI_COMPONENTS_COUNT, ICON_COUNT_LABEL, ICON_PACK_COUNT, PAGE_TEMPLATE_C
 
 const SITE_URL = 'https://pxlkit.xyz';
 
-const TITLE = `Pxlkit — React Pixel Art UI Kit · ${UI_COMPONENTS_COUNT} Retro Components`;
+const TITLE = `Pxlkit — Pixel Art UI Kit for React, Vue & Angular · ${UI_COMPONENTS_COUNT} Retro Components`;
 const DESCRIPTION =
-  `${UI_COMPONENTS_COUNT} retro React components, ${ICON_COUNT_LABEL} pixel-art SVG icons in ${ICON_PACK_COUNT} packs, ${PAGE_TEMPLATE_COUNT} page templates. Pixel or flat surface in one prop, WCAG 2.1 AA, TypeScript, Tailwind v4. MIT.`;
+  `${UI_COMPONENTS_COUNT} retro components for React, Vue and Angular, ${ICON_COUNT_LABEL} pixel-art SVG icons in ${ICON_PACK_COUNT} packs, ${PAGE_TEMPLATE_COUNT} page templates. Pixel or flat surface in one prop, WCAG 2.1 AA, TypeScript, Tailwind v4. MIT.`;
 
 export const metadata: Metadata = {
-  title: TITLE,
+  // The title names the brand already: the root layout's `%s | Pxlkit` would repeat it.
+  title: { absolute: TITLE },
   description: DESCRIPTION,
   keywords: [
     'react pixel art ui kit',
@@ -28,6 +29,10 @@ export const metadata: Metadata = {
     'react landing page template',
     'game ui components react',
     'mit react ui kit',
+    'vue pixel art ui kit',
+    'retro vue components',
+    'angular pixel art ui kit',
+    'retro angular components',
   ],
   alternates: { canonical: SITE_URL },
   openGraph: {
@@ -35,7 +40,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     title: TITLE,
     description:
-      `Switchable pixel/linear surface, WAI-ARIA on every interactive, and batteries from DataTable to OTPInput. ${UI_COMPONENTS_COUNT} components, ${ICON_COUNT_LABEL} icons. MIT.`,
+      `Switchable pixel/linear surface, WAI-ARIA on every interactive, and batteries from DataTable to OTPInput. ${UI_COMPONENTS_COUNT} components for React, Vue and Angular, ${ICON_COUNT_LABEL} icons. MIT.`,
     images: [
       {
         url: '/og-image.png',
@@ -49,7 +54,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: TITLE,
     description:
-      `Switchable pixel/linear surface, WAI-ARIA on every interactive, batteries from DataTable to OTPInput. ${UI_COMPONENTS_COUNT} components, ${ICON_COUNT_LABEL} icons. MIT.`,
+      `Switchable pixel/linear surface, WAI-ARIA on every interactive, batteries from DataTable to OTPInput. ${UI_COMPONENTS_COUNT} components for React, Vue and Angular, ${ICON_COUNT_LABEL} icons. MIT.`,
     images: ['/og-twitter.png'],
   },
 };
