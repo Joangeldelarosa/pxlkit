@@ -186,4 +186,26 @@ describe('PixelOTPInput', () => {
     await angular.unmount();
     expect(actual).toEqual(expected);
   });
+
+  // Regression: the cells carried the text field's `w-full`, which Tailwind
+  // emits after their own width, so each cell spanned the whole row.
+  it("sizes each cell as a square of its size, without a text field's full width", async () => {
+    @Component({
+      imports: [PixelOTPInput],
+      template: '<pxl-otp-input size="sm" [length]="2" /><pxl-otp-input size="md" [length]="2" /><pxl-otp-input size="lg" [length]="2" />',
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const cells = cellsOf(fixture.nativeElement);
+    expect(cells.map((cell) => ['w-8', 'w-10', 'w-12'].filter((width) => cell.classList.contains(width)))).toEqual([
+      ['w-8'],
+      ['w-8'],
+      ['w-10'],
+      ['w-10'],
+      ['w-12'],
+      ['w-12'],
+    ]);
+    for (const cell of cells) expect(cell.classList).not.toContain('w-full');
+  });
 });

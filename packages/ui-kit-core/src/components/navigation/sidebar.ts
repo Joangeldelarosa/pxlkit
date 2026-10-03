@@ -93,7 +93,7 @@ export interface SidebarItemState {
 export function sidebarItemClasses(surface: Surface, { depth, active, collapsed }: SidebarItemState): string {
   const s = surfaceClasses(surface);
   return cn(
-    'group relative flex w-full items-center gap-2 pr-2 py-2 text-xs outline-none',
+    'group relative flex w-full items-center gap-2 pr-2 py-2 text-xs focus-visible:outline-hidden',
     sidebarDepthClasses[Math.min(depth, 2)],
     s.font,
     s.radius,

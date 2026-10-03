@@ -21,7 +21,7 @@ describe('scroll area recipes', () => {
   });
 
   it('styles a focusable region on each surface, with the surface border on request', () => {
-    const base = 'relative outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40';
+    const base = 'relative focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/40';
     const pixel = surfaceClasses('pixel');
     const linear = surfaceClasses('linear');
     expect(scrollAreaClasses('pixel', { variant: 'auto' })).toBe(

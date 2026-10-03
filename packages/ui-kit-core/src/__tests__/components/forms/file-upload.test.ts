@@ -96,7 +96,7 @@ describe('file upload recipes', () => {
       const c = fileUploadClasses(surface, idle);
       expect(c.dropzone).toBe(
         [
-          'flex flex-col items-center justify-center gap-2 text-center outline-none cursor-pointer',
+          'flex flex-col items-center justify-center gap-2 text-center focus-visible:outline-hidden cursor-pointer',
           'border-dashed bg-retro-surface/20 text-retro-muted',
           s.border,
           s.radiusLg,
@@ -136,5 +136,22 @@ describe('file upload recipes', () => {
     expect(c.button).toMatch(/opacity-50 cursor-not-allowed$/);
     expect(c.remove).toMatch(/opacity-50 cursor-not-allowed$/);
     expect(fileUploadClasses('linear', idle).remove).toMatch(new RegExp(`${focusRing}$`));
+  });
+
+  it("draws the file input's keyboard focus on the browse button that labels it", () => {
+    for (const surface of SURFACES) expect(fileUploadClasses(surface, idle).input).toBe('peer sr-only');
+    expect(fileUploadClasses('linear', idle).button.split(' ')).toEqual(
+      expect.arrayContaining([
+        'peer-focus-visible:outline-hidden',
+        'peer-focus-visible:ring-2',
+        'peer-focus-visible:ring-offset-2',
+        'peer-focus-visible:ring-offset-retro-bg',
+        'peer-focus-visible:ring-retro-cyan/40',
+      ]),
+    );
+    expect(fileUploadClasses('linear', { ...idle, invalid: true }).button).toContain('peer-focus-visible:ring-retro-red/40');
+    const pixel = fileUploadClasses('pixel', idle).button.split(' ');
+    expect(pixel).toEqual(expect.arrayContaining(['pxl-corner-sm', 'peer-focus-visible:pxl-focus-inset']));
+    expect(pixel.filter((c) => c.includes('ring'))).toEqual([]);
   });
 });

@@ -46,7 +46,7 @@ export function PixelChipGroupDocsSection({ className }: PixelChipGroupDocsSecti
         <li><code>radiogroup</code></li>
         <li><code>checkbox-group</code></li>
       </ul>
-      <p className="docs-aria-notes">Each child chip must declare a string <code>value</code> prop. In single (radiogroup) mode an accessible name (aria-label or aria-labelledby) is required so screen readers announce the group; multi mode renders a bare div unless a name is provided. The wrapping button owns role/aria-checked/tabindex; the PixelChip child remains purely visual.</p>
+      <p className="docs-aria-notes">Each child chip must declare a string <code>value</code> prop. In single (radiogroup) mode an accessible name (aria-label or aria-labelledby) is required so screen readers announce the group; multi mode renders a bare div unless a name is provided. The wrapping button owns role/aria-checked/tabindex; the PixelChip child remains purely visual. Selection and keyboard focus read apart: the linear surface rings a selected chip and sets the focus ring off it; the pixel surface frames a selected chip inside its border and lights up the chip&#39;s edge for focus.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

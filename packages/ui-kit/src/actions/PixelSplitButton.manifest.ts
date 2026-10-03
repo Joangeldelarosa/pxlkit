@@ -48,7 +48,7 @@ export default defineManifest({
       { key: 'a-z / 0-9', does: 'Typeahead — highlight the first option whose label starts with the typed prefix.', when: 'menu open' },
     ],
     notes:
-      'Follows the WAI-ARIA menu button pattern, as PixelDropdown does. The chevron is a button of its own, named "More options", with `aria-haspopup="menu"`, `aria-expanded`, and `aria-controls` wired to the menu while it is open. The menu (`role="menu"`, named by the chevron through `aria-labelledby`) takes focus as it opens (`tabindex="-1"`) and points `aria-activedescendant` at the highlighted option, so assistive technology follows the arrows, Home/End and typeahead; its `role="menuitem"` options are not tab stops. Escape, Tab and choosing an option return focus to the chevron; a press outside closes the menu and leaves focus where the pointer put it.',
+      'Follows the WAI-ARIA menu button pattern, as PixelDropdown does. The chevron is a button of its own, named "More options", with `aria-haspopup="menu"`, `aria-expanded`, and `aria-controls` wired to the menu while it is open. The menu (`role="menu"`, named by the chevron through `aria-labelledby`) takes focus as it opens (`tabindex="-1"`) and points `aria-activedescendant` at the highlighted option, so assistive technology follows the arrows, Home/End and typeahead; its `role="menuitem"` options are not tab stops. Escape, Tab and choosing an option return focus to the chevron; a press outside closes the menu and leaves focus where the pointer put it. The frame clips both halves, so each shows keyboard focus inside its own edge.',
   },
   related: ['PixelButton', 'PixelDropdown', 'PixelIconButton'],
   apiStability: 'stable',

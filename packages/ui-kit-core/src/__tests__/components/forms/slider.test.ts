@@ -177,7 +177,7 @@ describe('slider recipes', () => {
       expect(c.fill).toBe(`absolute inset-y-0 transition-[width] ${rounded} ${toneMap.gold.bg}`);
       expect(c.thumb).toBe(
         [
-          'absolute top-1/2 h-4 w-4 -translate-y-1/2 border-2 bg-retro-bg shadow-md transition-shadow outline-none',
+          'absolute top-1/2 h-4 w-4 -translate-y-1/2 border-2 bg-retro-bg shadow-md transition-shadow focus-visible:outline-hidden',
           rounded,
           'group-hover:shadow-[0_0_0_3px_rgba(0,0,0,.15)]',
           focusRing,

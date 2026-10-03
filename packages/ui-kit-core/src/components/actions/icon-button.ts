@@ -16,7 +16,7 @@ export function iconButtonClasses(surface: Surface, { tone, size, disabled }: Ic
   const s = surfaceClasses(surface);
   const t = toneMap[tone];
   return cn(
-    'inline-flex items-center justify-center outline-none disabled:opacity-50 disabled:cursor-not-allowed',
+    'inline-flex items-center justify-center focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
     s.border,
     s.radius,
     s.transition,

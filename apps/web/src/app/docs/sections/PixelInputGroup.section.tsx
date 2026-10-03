@@ -45,7 +45,7 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
       </ul>
-      <p className="docs-aria-notes">Sets <code>role=&quot;group&quot;</code> only when given an accessible name (<code>aria-label</code> / <code>aria-labelledby</code>). Decorative addons inside should use <code>aria-hidden</code>; child controls keep their own labels.</p>
+      <p className="docs-aria-notes">Sets <code>role=&quot;group&quot;</code> only when given an accessible name (<code>aria-label</code> / <code>aria-labelledby</code>). Decorative addons inside should use <code>aria-hidden</code>; child controls keep their own labels. The shell clips its controls, so each shows keyboard focus inside its own edge.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

@@ -99,7 +99,7 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
         : cn(s.border, t.border, t.bg, t.hover, !rest.disabled && s.shadow, !rest.disabled && s.shadowHover);
 
   const mergedClassName = cn(
-    'inline-flex items-center justify-center font-medium outline-none disabled:opacity-50 disabled:cursor-not-allowed',
+    'inline-flex items-center justify-center font-medium focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
     s.font, s.radius, s.transition,
     sizeClass[size],
     focusRing,

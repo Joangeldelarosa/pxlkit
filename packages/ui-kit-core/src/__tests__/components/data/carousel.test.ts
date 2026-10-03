@@ -151,9 +151,9 @@ describe('carousel recipes', () => {
   it('lays the strip out along the orientation, with arrows on its ends', () => {
     for (const surface of ['pixel', 'linear'] as const) {
       const s = surfaceClasses(surface);
-      const arrow = `absolute z-10 inline-flex items-center justify-center w-9 h-9 ${s.border} ${s.radius} ${s.transition} ${s.press} border-retro-border bg-retro-surface/80 text-retro-text hover:bg-retro-surface focus-visible:outline-none ${ring} disabled:opacity-50 disabled:cursor-not-allowed`;
+      const arrow = `absolute z-10 inline-flex items-center justify-center w-9 h-9 ${s.border} ${s.radius} ${s.transition} ${s.press} border-retro-border bg-retro-surface/80 text-retro-text hover:bg-retro-surface focus-visible:outline-hidden ${ring} disabled:opacity-50 disabled:cursor-not-allowed`;
       expect(carouselClasses(surface, 'horizontal')).toEqual({
-        root: `relative outline-none ${ring} ${s.radiusLg}`,
+        root: `relative focus-visible:outline-hidden ${ring} ${s.radiusLg}`,
         viewport: `overflow-hidden ${s.radiusLg}`,
         track: 'flex flex-row',
         previous: `${arrow} left-2 top-1/2 -translate-y-1/2`,
@@ -172,11 +172,11 @@ describe('carousel recipes', () => {
   it('fills the current dot in cyan, square on the pixel surface and round on the linear one', () => {
     const pixel = surfaceClasses('pixel');
     expect(carouselDotClasses('pixel', true)).toBe(
-      `h-2 w-2 ${pixel.border} rounded-none ${pixel.transition} bg-retro-cyan border-retro-cyan focus-visible:outline-none ${ring}`,
+      `h-2 w-2 ${pixel.border} rounded-none ${pixel.transition} bg-retro-cyan border-retro-cyan focus-visible:outline-hidden ${ring}`,
     );
     const linear = surfaceClasses('linear');
     expect(carouselDotClasses('linear', false)).toBe(
-      `h-2 w-2 ${linear.border} rounded-full ${linear.transition} bg-retro-bg/40 border-retro-border hover:bg-retro-surface focus-visible:outline-none ${ring}`,
+      `h-2 w-2 ${linear.border} rounded-full ${linear.transition} bg-retro-bg/40 border-retro-border hover:bg-retro-surface focus-visible:outline-hidden ${ring}`,
     );
     expect(carouselItemClasses).toBe('min-w-0 shrink-0 grow-0 basis-full');
   });

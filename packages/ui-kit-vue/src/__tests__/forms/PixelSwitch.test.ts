@@ -40,4 +40,10 @@ describe('PixelSwitch', () => {
     expect(button.attributes('id')).toBe('n');
     expect(button.attributes('aria-describedby')).toBe('help');
   });
+
+  it('rings keyboard focus, keeping an outline for forced-colors mode, which drops the ring', () => {
+    const classes = mount(PixelSwitch, { props: { label: 'Sound' } }).get('[role="switch"]').classes();
+    expect(classes).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:outline-hidden']));
+    expect(classes.filter((c) => c.endsWith('outline-none'))).toEqual([]);
+  });
 });

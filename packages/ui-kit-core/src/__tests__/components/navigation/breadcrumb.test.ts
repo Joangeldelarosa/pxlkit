@@ -27,7 +27,9 @@ describe('breadcrumb recipes', () => {
   });
 
   it('underlines interactive crumbs on keyboard focus and emphasises the current one', () => {
-    expect(classesOf(breadcrumbLinkClasses)).toEqual(expect.arrayContaining(['focus:outline-none', 'focus-visible:underline']));
+    expect(classesOf(breadcrumbLinkClasses)).toEqual(
+      expect.arrayContaining(['focus:outline-none', 'focus-visible:underline', 'focus-visible:decoration-2']),
+    );
     expect(classesOf(breadcrumbCurrentClasses)).toContain('font-medium');
   });
 

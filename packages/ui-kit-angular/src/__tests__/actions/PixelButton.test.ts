@@ -66,4 +66,14 @@ describe('PixelButton', () => {
     expect(button.classList.contains('pxl-shadow-active')).toBe(false);
     expect(button.disabled).toBe(true);
   });
+
+  it('rings keyboard focus, keeping an outline for forced-colors mode, which drops the ring', async () => {
+    @Component({ imports: [PixelButton], template: '<button pxlButton surface="linear">Go</button>' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const classes = Array.from((fixture.nativeElement as HTMLElement).querySelector('button')!.classList);
+    expect(classes).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:outline-hidden']));
+    expect(classes.filter((c) => c.endsWith('outline-none'))).toEqual([]);
+  });
 });

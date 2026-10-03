@@ -22,7 +22,7 @@ describe('date picker recipes', () => {
     expect(pixel.trigger).toContain('inline-flex items-center justify-between text-left pl-3 pr-7');
     expect(pixel.trigger).not.toContain('px-3');
     const button =
-      'text-retro-muted hover:text-retro-text text-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40 rounded-[2px]';
+      'text-retro-muted hover:text-retro-text text-xs cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/40 rounded-[2px]';
     expect(pixel.clearButton).toBe(
       `absolute top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center right-1.5 ${button} font-mono`,
     );

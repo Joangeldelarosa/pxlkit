@@ -194,7 +194,7 @@ export function sliderClasses(surface: Surface, { tone, disabled }: SliderClassO
     ),
     fill: cn('absolute inset-y-0 transition-[width]', rounded, t.bg),
     thumb: cn(
-      'absolute top-1/2 h-4 w-4 -translate-y-1/2 border-2 bg-retro-bg shadow-md transition-shadow outline-none',
+      'absolute top-1/2 h-4 w-4 -translate-y-1/2 border-2 bg-retro-bg shadow-md transition-shadow focus-visible:outline-hidden',
       rounded,
       !disabled && 'group-hover:shadow-[0_0_0_3px_rgba(0,0,0,.15)]',
       focusRing,

@@ -188,7 +188,7 @@ describe('table recipes', () => {
 
   it('styles the controls, skeletons and empty state', () => {
     const classes = tableClasses('linear', { ...options, density: 'comfortable' });
-    expect(classes.sortButton).toBe(`inline-flex items-center text-retro-muted hover:text-retro-text outline-none ${focusRing}`);
+    expect(classes.sortButton).toBe(`inline-flex items-center text-retro-muted hover:text-retro-text focus-visible:outline-hidden ${focusRing}`);
     expect(tableCheckboxClasses).toBe(`h-4 w-4 ${focusRing}`);
     expect(classes.skeletonRow).toBe('border-b border-retro-border/20');
     expect(classes.skeletonCell).toBe('px-4 py-4');

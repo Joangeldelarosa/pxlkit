@@ -13,6 +13,7 @@
   "include": [
     "audit-coherence/**/*.ts",
     "build-docs/**/*.ts",
+    "focus-audit/**/*.ts",
     "parity/**/*.ts"
   ],
   "exclude": ["node_modules"]

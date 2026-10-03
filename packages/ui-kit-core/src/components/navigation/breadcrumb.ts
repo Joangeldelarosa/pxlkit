@@ -33,9 +33,9 @@ export const breadcrumbListClasses = 'flex flex-wrap items-center gap-1.5';
 /** A crumb's `<li>`, which also holds the separator before it. */
 export const breadcrumbItemClasses = 'flex items-center gap-1.5';
 
-/** A link or button crumb. */
+/** A link or button crumb; keyboard focus underlines it, 2px thick so it shows on a short crumb. */
 export const breadcrumbLinkClasses =
-  'text-retro-muted transition-colors hover:text-retro-green focus:outline-none focus-visible:underline';
+  'text-retro-muted transition-colors hover:text-retro-green focus:outline-none focus-visible:underline focus-visible:decoration-2';
 
 /** The current page. */
 export const breadcrumbCurrentClasses = 'text-retro-text font-medium';

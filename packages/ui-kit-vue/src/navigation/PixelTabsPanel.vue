@@ -26,7 +26,7 @@ const mounted = computed(() => (props.keepMounted ?? context.keepMounted.value) 
 const classes = computed(() => {
   const s = surfaceClasses(context.surface.value);
   return cn(
-    'p-3 text-sm text-retro-muted outline-none',
+    'p-3 text-sm text-retro-muted focus-visible:outline-hidden',
     props.bordered && 'bg-retro-bg/50',
     props.bordered && s.border,
     props.bordered && s.radius,

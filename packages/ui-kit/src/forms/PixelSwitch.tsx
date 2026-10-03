@@ -67,7 +67,7 @@ export const PixelSwitch = forwardRef<HTMLButtonElement, PixelSwitchProps>(funct
         disabled={disabled}
         onClick={() => !disabled && setInternalChecked(!isChecked)}
         className={cn(
-          'group inline-flex items-center gap-3 text-sm text-retro-text outline-none',
+          'group inline-flex items-center gap-3 text-sm text-retro-text focus-visible:outline-hidden',
           s.font, focusRing, toneMap[tone].ring,
           disabled && 'opacity-50 cursor-not-allowed',
         )}

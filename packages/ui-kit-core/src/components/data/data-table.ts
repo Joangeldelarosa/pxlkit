@@ -113,7 +113,7 @@ export function dataTableClasses(surface: Surface, { density, bordered, stickyHe
     ),
     headCell: cn('whitespace-nowrap text-xs font-semibold text-retro-muted', pad),
     sortButton: cn(
-      'inline-flex items-center gap-1 text-left text-retro-muted hover:text-retro-text outline-none',
+      'inline-flex items-center gap-1 text-left text-retro-muted hover:text-retro-text focus-visible:outline-hidden',
       focusRing,
       s.transition,
     ),
@@ -142,14 +142,14 @@ export function dataTablePaginationClasses(surface: Surface): DataTablePaginatio
       surface === 'pixel' ? 'border-t-2 border-retro-border' : 'border-t border-retro-border',
     ),
     pageSizeSelect: cn(
-      'bg-retro-surface/40 px-1 py-0.5 text-retro-text outline-none',
+      'bg-retro-surface/40 px-1 py-0.5 text-retro-text focus-visible:outline-hidden',
       s.border,
       s.radius,
       focusRing,
       'border-retro-border-strong',
     ),
     pageButton: cn(
-      'px-2 py-1 text-retro-text outline-none disabled:opacity-50 disabled:cursor-not-allowed',
+      'px-2 py-1 text-retro-text focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
       s.border,
       s.radius,
       focusRing,

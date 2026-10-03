@@ -50,7 +50,7 @@ export default defineManifest({
       { key: 'Enter', does: 'Removes the chip via the X button', when: 'delete button is focused' },
     ],
     notes:
-      'Renders as a <button> only when onClick is provided so non-interactive chips stay as <span>. The delete X is a <button> with aria-label "Remove <label>" that never fires onClick; a button cannot contain a button, so on a clickable chip the label and the X are sibling buttons inside a <span> frame.',
+      'Renders as a <button> only when onClick is provided so non-interactive chips stay as <span>. The delete X is a <button> with aria-label "Remove <label>" that never fires onClick; a button cannot contain a button, so on a clickable chip the label and the X are sibling buttons inside a <span> frame. On a clickable deletable chip the frame shows the label button\'s keyboard focus; the X shows its own.',
   },
   related: ['PixelBadge', 'PixelChipGroup', 'PixelToggle'],
   apiStability: 'stable',

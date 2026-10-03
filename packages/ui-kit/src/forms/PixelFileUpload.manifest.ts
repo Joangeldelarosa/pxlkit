@@ -28,9 +28,10 @@ export default defineManifest({
     keyboard: [
       { key: 'Enter', does: 'Opens the native file picker', when: 'dropzone has focus' },
       { key: 'Space', does: 'Opens the native file picker', when: 'dropzone has focus' },
+      { key: 'Enter / Space', does: 'Opens the native file picker', when: 'file input has focus (no dropzone)' },
     ],
     notes:
-      'Dropzone exposes role="button" with tabIndex 0 (or -1 when disabled) and, while a hint or error shows, aria-describedby pointing at it. The hidden <input type="file"> is aria-hidden while the dropzone is active; without the dropzone the input itself carries that aria-describedby.',
+      'Dropzone exposes role="button" with tabIndex 0 (or -1 when disabled) and, while a hint or error shows, aria-describedby pointing at it. The hidden <input type="file"> is aria-hidden while the dropzone is active. Without the dropzone the input is the one control and tab stop: the browse button is a second <label> of it, so the input is named by both labels, carries the aria-describedby, and the button shows its keyboard focus.',
   },
   related: ['PixelInput', 'PixelTextarea', 'PixelForm'],
   apiStability: 'stable',

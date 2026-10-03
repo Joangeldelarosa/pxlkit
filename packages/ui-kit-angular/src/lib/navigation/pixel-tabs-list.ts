@@ -60,7 +60,9 @@ export class PixelTabsList {
   protected readonly listClasses = computed(() =>
     cn(
       'flex gap-1',
-      this.vertical() ? 'flex-col' : 'flex-wrap',
+      // A scrollable list keeps its tabs on one line, which overflows:
+      // `flex-wrap` would beat `flex-nowrap`, as Tailwind emits it last.
+      this.vertical() ? 'flex-col' : !this.scrolls() && 'flex-wrap',
       this.scrolls() && 'flex-nowrap overflow-x-auto scrollbar-hidden',
       this.scrolls() && 'overflow-y-hidden',
     ),

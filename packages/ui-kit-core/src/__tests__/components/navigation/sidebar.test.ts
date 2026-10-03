@@ -67,6 +67,12 @@ describe('sidebar recipes', () => {
     );
   });
 
+  it('rings a focused item, keeping an outline for forced-colors mode, which drops the ring', () => {
+    const item = classesOf(sidebarItemClasses('linear', ITEM));
+    expect(item).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:ring-retro-cyan/40', 'focus-visible:outline-hidden']));
+    expect(item).not.toContain('outline-none');
+  });
+
   it('hides item labels visually while collapsed', () => {
     expect(sidebarItemLabelClasses(true)).toBe('truncate sr-only');
     expect(sidebarItemLabelClasses(false)).toBe('truncate');

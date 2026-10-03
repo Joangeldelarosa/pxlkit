@@ -43,7 +43,14 @@ describe('feature card recipes', () => {
     );
     const interactive = classesOf(featureCardClasses('pixel', { ...BASE, interactive: true }).root);
     expect(interactive).toEqual(
-      expect.arrayContaining(['cursor-pointer', 'hover:-translate-y-[2px]', 'pxl-shadow-hover', 'focus-visible:ring-2', 'focus-visible:ring-retro-cyan/60']),
+      expect.arrayContaining([
+        'cursor-pointer',
+        'hover:-translate-y-[2px]',
+        'pxl-shadow-hover',
+        'focus-visible:ring-2',
+        'focus-visible:ring-retro-cyan/60',
+        'focus-visible:outline-hidden',
+      ]),
     );
   });
 

@@ -1,13 +1,14 @@
 /**
  * PixelFileUpload: two-way binding, Angular forms, dropping and choosing
  * files (which the parity scenarios cannot drive: jsdom has no DataTransfer),
- * rejections, image previews and the item template.
+ * rejections, image previews, the item template and the browse button that
+ * stands in for the dropzone.
  */
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { FileUploadRejection } from '@pxlkit/ui-kit-core';
+import { getFocusableElements, type FileUploadRejection } from '@pxlkit/ui-kit-core';
 import { reactExamples } from '../../../../../scripts/parity/catalog';
 import { canonicalPage } from '../../../../../scripts/parity/canonical';
 import { mountReact, type Mounted } from '../../../../../scripts/parity/react';
@@ -106,7 +107,7 @@ describe('PixelFileUpload', () => {
     // Without multiple, the last file chosen replaces the others.
     expect(control.value!.map((f) => f.name)).toEqual(['b.txt']);
     expect(input.value).toBe('');
-    root.querySelector('button')!.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
+    input.dispatchEvent(new FocusEvent('focusout', { bubbles: true }));
     expect(control.touched).toBe(true);
     control.setValue([file('c.txt', 1)]);
     await fixture.whenStable();
@@ -180,6 +181,48 @@ describe('PixelFileUpload', () => {
     fixture.componentInstance.error.set(undefined);
     await fixture.whenStable();
     expect(dropzoneOf(root).hasAttribute('aria-describedby')).toBe(false);
+  });
+
+  // Regression: without a dropzone, the browse button was a tab stop of its
+  // own, after the file input, which took focus unseen (it is visually
+  // hidden). The button is now a second label of the input.
+  it('keeps the file input the one tab stop without a dropzone, named by both its labels and opened from the browse button', async () => {
+    @Component({
+      imports: [PixelFileUpload],
+      template: '<pxl-file-upload id="docs" label="Attachments" hint="PDF, up to 5 MB" [dropzone]="false" />',
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const input = root.querySelector<HTMLInputElement>('input[type="file"]')!;
+    expect(root.querySelector('button')).toBeNull();
+    expect(getFocusableElements(root)).toEqual([input]);
+    expect(Array.from(input.labels!, (label) => label.textContent!.trim())).toEqual(['Attachments', 'Choose file']);
+    expect(input.getAttribute('aria-describedby')).toBe('docs-msg');
+    const opened = vi.fn((event: Event) => event.preventDefault());
+    input.addEventListener('click', opened);
+    root.querySelector<HTMLLabelElement>('input[type="file"] + label')!.click();
+    expect(opened).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows the file input's keyboard focus on the browse button, on both surfaces", async () => {
+    @Component({
+      imports: [PixelFileUpload],
+      template: `
+        <pxl-file-upload label="Pixel" surface="pixel" [dropzone]="false" />
+        <pxl-file-upload label="Linear" surface="linear" [dropzone]="false" />
+      `,
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const [pixel, linear] = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('input[type="file"]'), (input) => {
+      expect(input.classList).toContain('peer');
+      return Array.from(input.nextElementSibling!.classList);
+    });
+    expect(pixel).toEqual(expect.arrayContaining(['pxl-corner-sm', 'peer-focus-visible:pxl-focus-inset']));
+    expect(linear).toEqual(expect.arrayContaining(['peer-focus-visible:ring-2', 'peer-focus-visible:outline-hidden']));
   });
 
   it('previews images with object URLs it revokes as they go', async () => {

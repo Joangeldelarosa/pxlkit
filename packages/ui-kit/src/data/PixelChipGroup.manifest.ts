@@ -39,7 +39,7 @@ export default defineManifest({
       { key: 'End', does: 'Focuses and selects the last chip.', when: 'single mode (radiogroup)' },
     ],
     notes:
-      'Each child chip must declare a string `value` prop. In single (radiogroup) mode an accessible name (aria-label or aria-labelledby) is required so screen readers announce the group; multi mode renders a bare div unless a name is provided. The wrapping button owns role/aria-checked/tabindex; the PixelChip child remains purely visual.',
+      'Each child chip must declare a string `value` prop. In single (radiogroup) mode an accessible name (aria-label or aria-labelledby) is required so screen readers announce the group; multi mode renders a bare div unless a name is provided. The wrapping button owns role/aria-checked/tabindex; the PixelChip child remains purely visual. Selection and keyboard focus read apart: the linear surface rings a selected chip and sets the focus ring off it; the pixel surface frames a selected chip inside its border and lights up the chip\'s edge for focus.',
   },
   related: ['PixelChip', 'PixelBadgeGroup', 'PixelBadge'],
   apiStability: 'stable',

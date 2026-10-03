@@ -59,6 +59,16 @@ describe('alert dialog recipes', () => {
     expect(alertDialogClasses('pixel', idle).action.startsWith('inline-flex items-center justify-center gap-2 px-4 h-9')).toBe(true);
   });
 
+  it('rings a focused button, keeping an outline for forced-colors mode, which drops the ring', () => {
+    for (const surface of SURFACES) {
+      const { cancel, action } = alertDialogClasses(surface, idle);
+      for (const button of [cancel, action]) {
+        expect(classesOf(button)).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:outline-hidden']));
+        expect(classesOf(button)).not.toContain('outline-none');
+      }
+    }
+  });
+
   it('spins the pending indicator unless motion is reduced, on every surface', () => {
     for (const surface of SURFACES) {
       expect(classesOf(alertDialogClasses(surface, idle).spinner)).toContain('animate-spin');

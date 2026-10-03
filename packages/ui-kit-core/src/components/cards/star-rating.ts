@@ -96,7 +96,7 @@ export function starRatingStarClasses(surface: Surface, { interactive, filled, t
   return interactive
     ? cn(
         'cursor-pointer inline-flex items-center justify-center bg-transparent border-0 p-0',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
         color,
         surfaceClasses(surface).transition,
       )

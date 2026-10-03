@@ -6,7 +6,7 @@ export function textLinkClasses(surface: Surface, tone: Tone): string {
   const t = toneMap[tone];
   return cn(
     'underline underline-offset-2 decoration-current/40 transition-colors cursor-pointer',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
+    'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
     t.ring,
     surfaceClasses(surface).font,
     t.text,

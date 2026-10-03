@@ -131,13 +131,19 @@ describe('multi-select focus', () => {
 
 describe('multi-select recipes', () => {
   it('draws the field from the surface and size, red with an error, with the focus of the combobox inside', () => {
+    // The pixel field's cut corners would clip a ring: its edge lights up instead.
+    const focus: Record<Surface, string> = {
+      pixel: 'has-[[role=combobox]:focus-visible]:pxl-focus-inset',
+      linear:
+        'has-[[role=combobox]:focus-visible]:ring-2 has-[[role=combobox]:focus-visible]:ring-offset-2 has-[[role=combobox]:focus-visible]:ring-offset-retro-bg has-[[role=combobox]:focus-visible]:ring-retro-border/60',
+    };
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
       expect(multiSelectClasses(surface, { size: 'sm', invalid: false, open: false }).field).toBe(
         [
           'flex w-full cursor-default select-none items-center justify-between gap-2 px-3',
           'border bg-retro-surface/40 focus-within:bg-retro-surface/70 text-retro-text font-mono transition-all',
-          'has-[[role=combobox]:focus-visible]:ring-2 has-[[role=combobox]:focus-visible]:ring-offset-2 has-[[role=combobox]:focus-visible]:ring-offset-retro-bg has-[[role=combobox]:focus-visible]:ring-retro-border/60',
+          focus[surface],
           'has-[[role=combobox]:disabled]:opacity-50 has-[[role=combobox]:disabled]:cursor-not-allowed',
           `${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} border-retro-border-strong`,
         ].join(' '),
@@ -162,7 +168,7 @@ describe('multi-select recipes', () => {
     expect(linear.empty).toBe('px-3 py-2 text-center text-xs text-retro-muted font-sans');
     expect([linear.values, linear.trigger, linear.placeholder, linear.content, linear.listbox, linear.actions]).toEqual([
       'flex min-w-0 flex-1 flex-wrap items-center gap-1',
-      'flex min-w-0 flex-1 items-center self-stretch text-left outline-none',
+      'flex min-w-0 flex-1 items-center self-stretch text-left focus-visible:outline-hidden',
       'truncate text-retro-muted',
       'p-1 w-[var(--pxl-multiselect-w,16rem)]',
       'max-h-60 overflow-y-auto',
@@ -171,7 +177,7 @@ describe('multi-select recipes', () => {
   });
 
   it('gives the remove and clear buttons a focus ring of their own', () => {
-    const ring = 'rounded-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40';
+    const ring = 'rounded-[2px] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/40';
     const classes = multiSelectClasses('pixel', { size: 'md', invalid: false, open: false });
     expect(classes.chipRemove).toBe(`inline-flex shrink-0 items-center text-retro-muted hover:text-retro-text cursor-pointer ${ring}`);
     expect(classes.clear).toBe(`inline-flex items-center text-retro-muted hover:text-retro-text cursor-pointer ${ring}`);

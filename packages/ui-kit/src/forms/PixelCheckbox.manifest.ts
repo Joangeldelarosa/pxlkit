@@ -45,7 +45,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus to the next focusable element in the tab order.' },
     ],
     notes:
-      'Rendered as a <button type="button"> with role="checkbox" and aria-checked reflecting the boolean state. aria-disabled and aria-required mirror the disabled and required props. When a name prop is supplied a hidden <input> is emitted alongside so the value participates in native <form> submissions only while checked.',
+      'Rendered as a <button type="button"> with role="checkbox" and aria-checked reflecting the boolean state. aria-disabled and aria-required mirror the disabled and required props. When a name prop is supplied a hidden <input> is emitted alongside so the value participates in native <form> submissions only while checked. Keyboard focus shows on the box: a ring in the tone on the linear surface, the box\'s edge on the pixel surface, whose cut corners would clip a ring.',
   },
   related: ['PixelRadioGroup', 'PixelSwitch', 'PixelToggle'],
   apiStability: 'stable',

@@ -245,7 +245,12 @@ defineExpose({
         :aria-describedby="dropzone ? undefined : describedBy"
         @change="onChange"
       />
-      <button v-if="!dropzone" type="button" :disabled="disabled" :class="classes.button" @click="browse">
+      <!--
+        The browse button is a second label of the file input, which stays
+        the one control: one tab stop, named by both labels, described by
+        the hint or error, and opened by a click on either label.
+      -->
+      <label v-if="!dropzone" :for="inputId" :class="classes.button">
         <svg
           viewBox="0 0 16 16"
           :class="classes.buttonIcon"
@@ -258,7 +263,7 @@ defineExpose({
           <path v-for="d in fileUploadIcons.upload" :key="d" :d="d" />
         </svg>
         <span>Choose file{{ multiple ? 's' : '' }}</span>
-      </button>
+      </label>
       <ul v-if="files.length > 0" :class="classes.list">
         <template v-for="(file, index) in files" :key="`${file.name}-${file.size}-${index}`">
           <li v-if="$slots.item" data-pxl-file-item="true">

@@ -138,6 +138,15 @@ describe('PixelTabs scrollable', () => {
     expect(style.toLowerCase()).toContain('scrollbar-width');
   });
 
+  // Regression: the list also took `flex-wrap`, which Tailwind emits after
+  // `flex-nowrap`, so its tabs wrapped onto new rows and nothing scrolled.
+  it('keeps the tabs of a scrollable list on one line, where a plain list wraps them', () => {
+    const { getByRole } = render(<PixelTabs items={ITEMS} scrollable />);
+    expect(getByRole('tablist').className.split(' ')).not.toContain('flex-wrap');
+    const { getAllByRole } = render(<PixelTabs items={ITEMS} />);
+    expect(getAllByRole('tablist')[1]!.className.split(' ')).toContain('flex-wrap');
+  });
+
   it('ignores scrollable when orientation is vertical', () => {
     const { getByRole } = render(
       <PixelTabs items={ITEMS} scrollable orientation="vertical" />,
@@ -201,5 +210,16 @@ describe('PixelTabs compositional API', () => {
     expect(panels).toHaveLength(2);
     // y is mounted (keepMounted) but hidden
     expect(panels[1]).toHaveAttribute('hidden');
+  });
+});
+
+describe('PixelTabs keyboard focus', () => {
+  it('rings the focused tab and panel, keeping an outline for forced-colors mode, which drops the ring', () => {
+    const { getAllByRole, getByRole } = render(<PixelTabs items={ITEMS} defaultTab="a" />);
+    for (const element of [...getAllByRole('tab'), getByRole('tabpanel')]) {
+      const classes = element.className.split(' ');
+      expect(classes).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:outline-hidden']));
+      expect(classes.filter((c) => c.endsWith('outline-none'))).toEqual([]);
+    }
   });
 });

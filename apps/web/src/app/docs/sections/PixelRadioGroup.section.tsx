@@ -45,7 +45,7 @@ export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSec
       <ul className="docs-aria-patterns">
         <li><code>radiogroup</code></li>
       </ul>
-      <p className="docs-aria-notes">Wrapped in a &lt;fieldset role=&quot;radiogroup&quot;&gt; with &lt;legend&gt; derived from label and aria-disabled / aria-required mirroring the props. Each option is a &lt;button role=&quot;radio&quot;&gt; with aria-checked reflecting selection. When name is set a hidden &lt;input&gt; mirrors the current value so the group participates in native &lt;form&gt; submissions.</p>
+      <p className="docs-aria-notes">Wrapped in a &lt;fieldset role=&quot;radiogroup&quot;&gt; with &lt;legend&gt; derived from label and aria-disabled / aria-required mirroring the props. Each option is a &lt;button role=&quot;radio&quot;&gt; with aria-checked reflecting selection. When name is set a hidden &lt;input&gt; mirrors the current value so the group participates in native &lt;form&gt; submissions. Keyboard focus shows on the focused radio&#39;s indicator: a ring in the tone on the linear surface, the indicator&#39;s edge on the pixel surface, whose cut corners would clip a ring.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

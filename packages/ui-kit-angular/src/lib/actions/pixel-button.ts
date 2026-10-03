@@ -111,7 +111,7 @@ export class PixelButton {
           : cn(s.border, t.border, t.bg, t.hover, enabled && s.shadow, enabled && s.shadowHover);
 
     return cn(
-      'inline-flex items-center justify-center font-medium outline-none disabled:opacity-50 disabled:cursor-not-allowed',
+      'inline-flex items-center justify-center font-medium focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
       s.font,
       s.radius,
       s.transition,

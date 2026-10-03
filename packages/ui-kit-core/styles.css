@@ -293,6 +293,31 @@
    */
 }
 
+/* ─── Keyboard focus on the pixel surface ─────────────────────
+ * A cut corner (.pxl-corner-*) is a clip-path, which clips everything
+ * an element paints outside its border box — the focus ring included,
+ * a box-shadow drawn around the box. So pixel controls show keyboard
+ * focus inside: their 2px edge lights up in the text colour and keeps
+ * the cut corners. Every .pxl-corner-* element does so by itself (see
+ * below); `pxl-focus-inset` draws the same where the element that
+ * takes focus is not the one whose corners are cut, with any variant
+ * (`group-focus-visible:`, `has-[…]:`, `peer-focus-visible:`).
+ * Forced-colors mode paints a border and the text in one system
+ * colour, so there the edge lights up in the highlight colour.
+ * ──────────────────────────────────────────────────────────── */
+@utility pxl-focus-inset {
+  outline: 2px solid var(--pxl-focus-color, currentColor);
+  outline-offset: -2px;
+}
+
+@layer base {
+  @media (forced-colors: active) {
+    :root, :host {
+      --pxl-focus-color: Highlight;
+    }
+  }
+}
+
 /* ─── Utility Classes ─────────────────────────────────────────
  * Retro pixel-art utility classes for borders, shadows, and FX.
  * ──────────────────────────────────────────────────────────── */
@@ -378,6 +403,12 @@
       4px 2px,
       6px 2px
     );
+  }
+  /* A cut-corner element shows keyboard focus inside its clip. */
+  .pxl-corner-sm:focus-visible,
+  .pxl-corner-md:focus-visible,
+  .pxl-corner-lg:focus-visible {
+    @apply pxl-focus-inset;
   }
 
   /*

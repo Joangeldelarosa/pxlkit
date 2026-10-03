@@ -292,4 +292,22 @@ describe('PixelMultiSelect', () => {
     expect(document.querySelector('[role="listbox"]')).toBeNull();
     expect(document.activeElement).not.toBe(triggerOf());
   });
+
+  it("shows the combobox's keyboard focus on the field: inside its cut corners on the pixel surface, a ring on the linear one", async () => {
+    @Component({
+      imports: [PixelMultiSelect],
+      template: `
+        <pxl-multi-select label="Pixel" surface="pixel" [options]="options" />
+        <pxl-multi-select label="Linear" surface="linear" [options]="options" />
+      `,
+    })
+    class Host {
+      readonly options = OPTIONS;
+    }
+    await render(Host);
+    const [pixel, linear] = Array.from(document.querySelectorAll('[role="combobox"]'), (combobox) => Array.from(fieldOf(combobox).classList));
+    expect(pixel).toEqual(expect.arrayContaining(['pxl-corner-sm', 'has-[[role=combobox]:focus-visible]:pxl-focus-inset']));
+    expect(pixel!.filter((c) => c.includes('ring'))).toEqual([]);
+    expect(linear).toEqual(expect.arrayContaining(['has-[[role=combobox]:focus-visible]:ring-2']));
+  });
 });

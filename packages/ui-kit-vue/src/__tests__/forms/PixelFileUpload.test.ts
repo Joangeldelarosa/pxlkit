@@ -1,11 +1,13 @@
 /**
  * PixelFileUpload: v-model, dropping and choosing files (which the parity
  * scenarios cannot drive: jsdom has no DataTransfer), rejections, image
- * previews, the item slot and what the dropzone is described by.
+ * previews, the item slot, what the dropzone is described by and the browse
+ * button that stands in for it.
  */
 import { mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defineComponent, h, nextTick, ref } from 'vue';
+import { getFocusableElements } from '@pxlkit/ui-kit-core';
 import { reactExamples } from '../../../../../scripts/parity/catalog';
 import { canonicalPage } from '../../../../../scripts/parity/canonical';
 import { mountReact, type Mounted } from '../../../../../scripts/parity/react';
@@ -147,9 +149,40 @@ describe('PixelFileUpload', () => {
     expect(input.attributes('aria-describedby')).toBeUndefined();
     await wrapper.setProps({ error: 'Required' });
     expect(input.attributes()).toMatchObject({ tabindex: '0', 'aria-describedby': 'docs-msg' });
-    expect(wrapper.get('button').text()).toBe('Choose file');
+    expect(wrapper.get('input[type="file"] + label').text()).toBe('Choose file');
     await wrapper.setProps({ multiple: true });
-    expect(wrapper.get('button').text()).toBe('Choose files');
+    expect(wrapper.get('input[type="file"] + label').text()).toBe('Choose files');
+  });
+
+  // Regression: without a dropzone, the browse button was a tab stop of its
+  // own, after the file input, which took focus unseen (it is visually
+  // hidden). The button is now a second label of the input.
+  it('keeps the file input the one tab stop without a dropzone, named by both its labels', () => {
+    const wrapper = mount(PixelFileUpload, { props: { label: 'Attachments', hint: 'PDF, up to 5 MB', dropzone: false, id: 'docs' } });
+    const input = wrapper.get<HTMLInputElement>('input[type="file"]').element;
+    expect(wrapper.find('button').exists()).toBe(false);
+    expect(getFocusableElements(wrapper.element as HTMLElement)).toEqual([input]);
+    expect(Array.from(input.labels!, (label) => label.textContent!.trim())).toEqual(['Attachments', 'Choose file']);
+    expect(input.getAttribute('aria-describedby')).toBe('docs-msg');
+  });
+
+  it('opens the file picker from a click on the browse button', () => {
+    const wrapper = mount(PixelFileUpload, { props: { label: 'Attachments', dropzone: false } });
+    const input = wrapper.get<HTMLInputElement>('input[type="file"]').element;
+    const opened = vi.fn((event: Event) => event.preventDefault());
+    input.addEventListener('click', opened);
+    wrapper.get<HTMLLabelElement>('input[type="file"] + label').element.click();
+    expect(opened).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows the file input's keyboard focus on the browse button, on both surfaces", () => {
+    const button = (surface: 'pixel' | 'linear') => {
+      const wrapper = mount(PixelFileUpload, { props: { label: 'Attachments', dropzone: false, surface } });
+      expect(wrapper.get('input[type="file"]').classes()).toContain('peer');
+      return wrapper.get('input[type="file"] + label').classes();
+    };
+    expect(button('pixel')).toEqual(expect.arrayContaining(['pxl-corner-sm', 'peer-focus-visible:pxl-focus-inset']));
+    expect(button('linear')).toEqual(expect.arrayContaining(['peer-focus-visible:ring-2', 'peer-focus-visible:outline-hidden']));
   });
 
   it('previews images with object URLs it revokes as they go', async () => {

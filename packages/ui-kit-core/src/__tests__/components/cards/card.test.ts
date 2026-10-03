@@ -22,7 +22,7 @@ const PLAIN: CardOptions = {
   description: false,
 };
 const FOCUS_RING = [
-  'focus-visible:outline-none',
+  'focus-visible:outline-hidden',
   'focus-visible:ring-2',
   'focus-visible:ring-offset-2',
   'focus-visible:ring-offset-retro-bg',

@@ -380,9 +380,9 @@ export const scenarios: ParityScenario[] = [
   {
     component: 'PixelFileUpload',
     example: 'ButtonMode',
-    name: 'opens the file picker from the button that stands in for the dropzone',
+    name: 'opens the file picker from the button that stands in for the dropzone, a label of the file input',
     steps: [
-      { action: 'click', target: 'button' },
+      { action: 'click', target: 'input[type="file"] + label' },
       { action: 'focus', target: 'input[type="file"]' },
     ],
   },

@@ -30,7 +30,9 @@ describe('chip recipes', () => {
     const still = classesOf(chipClasses('pixel', { tone: 'gold', variant: 'soft', size: 'md', interactive: false }).root);
     const clickable = classesOf(chipClasses('pixel', { tone: 'gold', variant: 'soft', size: 'md', interactive: true }).root);
     expect(still).not.toContain('cursor-pointer');
-    expect(clickable).toEqual(expect.arrayContaining(['cursor-pointer', toneMap.gold.hover, toneMap.gold.ring, 'focus-visible:ring-2']));
+    expect(clickable).toEqual(
+      expect.arrayContaining(['cursor-pointer', toneMap.gold.hover, toneMap.gold.ring, 'focus-visible:ring-2', 'focus-visible:outline-hidden']),
+    );
   });
 
   it('frames the chip and its delete button per surface, ringing the button in the tone', () => {
@@ -38,7 +40,7 @@ describe('chip recipes', () => {
     const linear = chipClasses('linear', { tone: 'red', variant: 'soft', size: 'md', interactive: false });
     expect(classesOf(pixel.root)).toEqual(expect.arrayContaining(['border-2', 'pxl-corner-sm', 'font-mono']));
     expect(classesOf(linear.root)).toEqual(expect.arrayContaining(['border', 'rounded-md', 'font-sans']));
-    expect(classesOf(pixel.deleteButton)).toEqual(expect.arrayContaining([toneMap.red.ring, 'pxl-corner-sm']));
+    expect(classesOf(pixel.deleteButton)).toEqual(expect.arrayContaining([toneMap.red.ring, 'focus-visible:outline-hidden', 'pxl-corner-sm']));
     expect(classesOf(linear.deleteButton)).toContain('rounded-md');
     expect(pixel.icon).toBe('inline-flex items-center shrink-0');
     expect(pixel.deleteIcon).toBe('h-2 w-2');
@@ -84,8 +86,16 @@ describe('chip recipes', () => {
           'rounded-md',
         ]),
       );
-      expect(classesOf(action)).toEqual(expect.arrayContaining(['focus-visible:outline-none', 'cursor-pointer']));
+      expect(classesOf(action)).toEqual(expect.arrayContaining(['focus-visible:outline-hidden', 'cursor-pointer']));
       expect(classesOf(action).filter((c) => c.includes('ring'))).toEqual([]);
+    }
+  });
+
+  it('lights up the frame inside its cut corners on the pixel surface while its action has keyboard focus', () => {
+    for (const tone of TONES) {
+      const { frame } = chipClasses('pixel', { tone, variant: 'outline', size: 'md', interactive: true });
+      expect(classesOf(frame)).toEqual(expect.arrayContaining(['pxl-corner-sm', 'has-[[data-chip-action]:focus-visible]:pxl-focus-inset']));
+      expect(classesOf(frame).filter((c) => c.includes('ring'))).toEqual([]);
     }
   });
 

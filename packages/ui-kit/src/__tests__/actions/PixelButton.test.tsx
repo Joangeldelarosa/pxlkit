@@ -140,3 +140,11 @@ describe('PixelButton — asChild', () => {
     expect(getByRole('button')).toBeTruthy();
   });
 });
+
+describe('PixelButton — keyboard focus', () => {
+  it('rings keyboard focus, keeping an outline for forced-colors mode, which drops the ring', () => {
+    const classes = render(<PixelButton surface="linear">Go</PixelButton>).getByRole('button').className.split(' ');
+    expect(classes).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:outline-hidden']));
+    expect(classes.filter((c) => c.endsWith('outline-none'))).toEqual([]);
+  });
+});

@@ -262,6 +262,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Site: section titles read "… | Pxlkit" once — the root layout's title template added a
   second suffix to the titles that carried their own — and the Open Graph image and frame
   showed 54 components instead of the kit's count.
+- `@pxlkit/ui-kit`: keyboard focus shows on every control. On the pixel surface a cut corner
+  (`.pxl-corner-*`) is a `clip-path`, which clipped the focus ring, so most pixel controls showed
+  no focus; they now light up their edge inside their corners. `PixelRadioGroup` and
+  `PixelSplitButton`'s chevron gain a focus style; the split button's halves and
+  `PixelInputGroup`'s controls show focus inside the frame that clips them; `PixelChipGroup`
+  tells focus from selection and shows its selection on the pixel surface; `PixelFileUpload`
+  without a dropzone has one tab stop, whose focus its browse button shows. Focus shows in
+  forced-colors (high-contrast) mode, `PixelCheckbox`'s linear ring takes its tone and
+  `PixelBreadcrumb`'s focus underline is thicker.
+- `@pxlkit/ui-kit`: a `scrollable` `PixelTabs` list scrolls instead of wrapping its tabs onto new
+  rows, and `PixelOTPInput`'s cells keep their size instead of spanning the row.
 
 ## [ui-kit 2.1.1] - 2026-08-08 — Bordered surface-token fix
 

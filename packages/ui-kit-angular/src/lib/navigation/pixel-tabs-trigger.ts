@@ -53,7 +53,7 @@ export class PixelTabsTrigger {
     const radius =
       surface === 'pixel' ? (vertical ? 'rounded-l-[3px]' : 'rounded-t-[3px]') : vertical ? 'rounded-l-md' : 'rounded-t-md';
     return cn(
-      'flex items-center gap-1.5 px-3 py-2 text-xs outline-none transition-colors',
+      'flex items-center gap-1.5 px-3 py-2 text-xs focus-visible:outline-hidden transition-colors',
       vertical ? '-mr-px' : '-mb-px',
       s.font,
       radius,

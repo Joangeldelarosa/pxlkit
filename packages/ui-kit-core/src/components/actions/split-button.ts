@@ -15,15 +15,20 @@ export function splitButtonGroupClasses(surface: Surface, tone: Tone): string {
   return cn('inline-flex overflow-hidden', s.border, s.radius, toneMap[tone].border);
 }
 
-/** Merged into the primary PixelButton: the frame draws its border, so it has no border, radius, shadow or press offset. */
+/**
+ * Merged into the primary PixelButton: the frame draws its border, so it has
+ * no border, radius, shadow or press offset. The frame clips both buttons
+ * (`overflow-hidden`), their focus rings included, so each shows keyboard
+ * focus inside its own edge.
+ */
 export const splitButtonPrimaryClasses =
-  'rounded-none border-0 shadow-none hover:shadow-none active:shadow-none hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0';
+  'rounded-none border-0 shadow-none hover:shadow-none active:shadow-none hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0 focus-visible:pxl-focus-inset';
 
 /** The chevron button that opens the menu. */
 export function splitButtonToggleClasses(surface: Surface, tone: Tone): string {
   const t = toneMap[tone];
   return cn(
-    'flex items-center border-0 border-l px-2 outline-none disabled:opacity-50 disabled:cursor-not-allowed',
+    'flex items-center border-0 border-l px-2 focus-visible:pxl-focus-inset disabled:opacity-50 disabled:cursor-not-allowed',
     surfaceClasses(surface).transition,
     t.border,
     t.bg,

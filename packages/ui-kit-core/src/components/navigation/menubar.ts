@@ -167,7 +167,7 @@ export const menubarTriggerSlotClasses = 'relative max-sm:static';
 export function menubarTriggerClasses(surface: Surface, open: boolean): string {
   const s = surfaceClasses(surface);
   return cn(
-    'px-3 py-1.5 text-xs text-retro-text outline-none',
+    'px-3 py-1.5 text-xs text-retro-text focus-visible:outline-hidden',
     s.font,
     s.radius,
     'hover:bg-retro-surface/60',

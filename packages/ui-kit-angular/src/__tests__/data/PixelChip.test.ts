@@ -26,7 +26,7 @@ describe('PixelChip', () => {
     const root = fixture.nativeElement as HTMLElement;
     expect(root.querySelector('button button')).toBeNull();
     const chip = root.querySelector('pxl-chip')!;
-    expect(chip.className).toContain('has-[[data-chip-action]:focus-visible]:ring-2');
+    expect(chip.className).toContain('has-[[data-chip-action]:focus-visible]:pxl-focus-inset');
     const action = chip.querySelector<HTMLButtonElement>('[data-chip-action]')!;
     expect(action.parentElement).toBe(chip);
     expect(action.getAttribute('type')).toBe('button');
@@ -85,5 +85,24 @@ describe('PixelChip', () => {
     expect(chip.className).toContain('bg-retro-cyan/8');
     expect(chip.className).toContain('px-2.5');
     expect(chip.hasAttribute('type')).toBe(false);
+  });
+
+  it("shows the label button's keyboard focus on the frame: inside its cut corners on the pixel surface, a ring in the tone on the linear one", async () => {
+    @Component({
+      imports: [PixelChip],
+      template: `
+        <pxl-chip label="Pixel" tone="pink" surface="pixel" clickable deletable />
+        <pxl-chip label="Linear" tone="pink" surface="linear" clickable deletable />
+      `,
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const [pixel, linear] = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('pxl-chip'), (frame) => Array.from(frame.classList));
+    expect(pixel).toEqual(expect.arrayContaining(['pxl-corner-sm', 'has-[[data-chip-action]:focus-visible]:pxl-focus-inset']));
+    expect(pixel!.filter((c) => c.includes('ring'))).toEqual([]);
+    expect(linear).toEqual(
+      expect.arrayContaining(['has-[[data-chip-action]:focus-visible]:ring-2', 'has-[[data-chip-action]:focus-visible]:ring-retro-pink/40']),
+    );
   });
 });

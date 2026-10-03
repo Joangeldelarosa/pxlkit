@@ -93,7 +93,7 @@ export class PixelSwitch implements ControlValueAccessor {
     const checked = this.isChecked();
     return {
       button: cn(
-        'group inline-flex items-center gap-3 text-sm text-retro-text outline-none',
+        'group inline-flex items-center gap-3 text-sm text-retro-text focus-visible:outline-hidden',
         s.font,
         focusRing,
         t.ring,

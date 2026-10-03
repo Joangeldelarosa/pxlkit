@@ -41,7 +41,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus through the joined controls in order.' },
     ],
     notes:
-      'Sets `role="group"` only when given an accessible name (`aria-label` / `aria-labelledby`). Decorative addons inside should use `aria-hidden`; child controls keep their own labels.',
+      'Sets `role="group"` only when given an accessible name (`aria-label` / `aria-labelledby`). Decorative addons inside should use `aria-hidden`; child controls keep their own labels. The shell clips its controls, so each shows keyboard focus inside its own edge.',
   },
   related: ['PixelInput', 'PixelBareInput', 'PixelSelect', 'PixelButton'],
   apiStability: 'stable',

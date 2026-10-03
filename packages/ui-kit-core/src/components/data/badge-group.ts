@@ -17,7 +17,7 @@ export function badgeGroupTriggerClasses(surface: Surface): string {
     'inline-flex items-center px-2.5 py-1 text-[11px] leading-none',
     'bg-retro-surface/40 text-retro-text border-retro-border',
     'transition-colors hover:bg-retro-surface/70',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60',
+    'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/60',
     s.border,
     s.radiusFull,
     s.font,

@@ -152,7 +152,7 @@ export function comboboxClasses(surface: Surface, { size, invalid, disabled, ope
   return {
     container: 'relative',
     trigger: cn(
-      'flex w-full items-center justify-between bg-retro-surface/40 px-3 outline-none',
+      'flex w-full items-center justify-between bg-retro-surface/40 px-3 focus-visible:outline-hidden',
       s.font,
       s.border,
       s.radius,

@@ -41,7 +41,7 @@ export default defineManifest({
       { key: 'Tab', does: 'Moves focus between item headers' },
     ],
     notes:
-      'Each header is a native <button> with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels are plain containers that follow their header in reading order — no role="region", which would proliferate landmarks (and collide when several accordions share titles), and so no name, which ARIA does not allow on an element without a role — matching the WAI-ARIA disclosure pattern stacked into an accordion.',
+      'Each header is a native <button> with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels are plain containers that follow their header in reading order — no role="region", which would proliferate landmarks (and collide when several accordions share titles), and so no name, which ARIA does not allow on an element without a role — matching the WAI-ARIA disclosure pattern stacked into an accordion. On the pixel surface a header shows keyboard focus inside its item, whose cut corners would clip a ring.',
   },
   related: ['PixelTabs', 'PixelCollapsible'],
   apiStability: 'stable',

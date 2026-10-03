@@ -21,7 +21,7 @@ describe('select recipes', () => {
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
       expect(selectClasses(surface, { ...closed, tone: 'cyan', size: 'sm' }).trigger).toBe(
-        `flex w-full items-center justify-between bg-retro-surface/40 px-3 outline-none ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} ${focusRing} ${toneMap.cyan.ring} border-retro-border-strong`,
+        `flex w-full items-center justify-between bg-retro-surface/40 px-3 focus-visible:outline-hidden ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} ${focusRing} ${toneMap.cyan.ring} border-retro-border-strong`,
       );
       expect(selectClasses(surface, { ...closed, invalid: true, disabled: true }).trigger).toContain(
         'border-retro-red/60 opacity-50 cursor-not-allowed',

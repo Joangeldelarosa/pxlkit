@@ -67,4 +67,16 @@ describe('PixelInputGroup', () => {
     expect(wrapper.attributes('data-testid')).toBe('group');
     expect(wrapper.classes()).toEqual(expect.arrayContaining(['mine', 'h-12', 'rounded-md']));
   });
+
+  // Regression: the shell clips its controls (`overflow-hidden`), so their
+  // focus rings were cut off.
+  it('shows keyboard focus inside each control, on both surfaces', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const wrapper = mount(PixelInputGroup, {
+        props: { ariaLabel: 'Search', surface },
+        slots: { default: () => [h('input', { 'aria-label': 'Query' }), h('button', 'Go')] },
+      });
+      for (const control of [wrapper.get('input'), wrapper.get('button')]) expect(control.classes()).toContain('focus-visible:pxl-focus-inset');
+    }
+  });
 });

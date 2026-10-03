@@ -29,7 +29,7 @@ describe('segmented recipes', () => {
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
       const t = toneMap.purple;
-      const base = `px-3 py-1.5 text-xs outline-none whitespace-nowrap ${s.font} ${s.radius} ${s.transition} ${focusRing} ${t.ring}`;
+      const base = `px-3 py-1.5 text-xs focus-visible:outline-hidden whitespace-nowrap ${s.font} ${s.radius} ${s.transition} ${focusRing} ${t.ring}`;
       expect(segmentClasses(surface, { tone: 'purple', active: true, disabled: false })).toBe(
         `${base} ${t.bg} ${t.text} border border-transparent shadow-sm`,
       );

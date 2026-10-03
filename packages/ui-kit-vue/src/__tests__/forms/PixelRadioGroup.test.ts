@@ -64,4 +64,15 @@ describe('PixelRadioGroup', () => {
     expect(hidden.name).toBe('plan');
     expect(hidden.value).toBe('b');
   });
+
+  it("draws a radio's keyboard focus on its indicator: inside it on the pixel surface, a ring in the tone on the linear one", () => {
+    const indicators = (surface: 'pixel' | 'linear') =>
+      mount(PixelRadioGroup, { props: { label: 'Plan', options: OPTIONS, modelValue: 'a', tone: 'gold', surface } })
+        .findAll('[role="radio"] > span:first-child')
+        .map((indicator) => indicator.classes());
+    for (const pixel of indicators('pixel')) expect(pixel).toContain('group-focus-visible:pxl-focus-inset');
+    for (const linear of indicators('linear')) {
+      expect(linear).toEqual(expect.arrayContaining(['group-focus-visible:ring-2', 'group-focus-visible:ring-retro-gold/40']));
+    }
+  });
 });

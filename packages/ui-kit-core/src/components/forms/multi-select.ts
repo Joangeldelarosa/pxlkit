@@ -151,7 +151,7 @@ export interface MultiSelectClasses {
 
 // The chips' remove buttons and the clear button sit inside the field, which
 // draws the combobox's focus: each shows its own.
-const buttonFocusRing = 'rounded-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40';
+const buttonFocusRing = 'rounded-[2px] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/40';
 
 /** Classes of every part of a multi-select but its options. */
 export function multiSelectClasses(surface: Surface, { size, invalid, open }: MultiSelectClassOptions): MultiSelectClasses {
@@ -159,11 +159,14 @@ export function multiSelectClasses(surface: Surface, { size, invalid, open }: Mu
   return {
     // A text field's look (`inputBase`, `focusRing`), with its focus states
     // taken from the controls inside: Tailwind only generates the classes it
-    // finds verbatim, so they are spelled out.
+    // finds verbatim, so they are spelled out. On the pixel surface the cut
+    // corners would clip the ring, so the field's edge lights up instead.
     field: cn(
       'flex w-full cursor-default select-none items-center justify-between gap-2 px-3',
       'border bg-retro-surface/40 focus-within:bg-retro-surface/70 text-retro-text font-mono transition-all',
-      'has-[[role=combobox]:focus-visible]:ring-2 has-[[role=combobox]:focus-visible]:ring-offset-2 has-[[role=combobox]:focus-visible]:ring-offset-retro-bg has-[[role=combobox]:focus-visible]:ring-retro-border/60',
+      surface === 'pixel'
+        ? 'has-[[role=combobox]:focus-visible]:pxl-focus-inset'
+        : 'has-[[role=combobox]:focus-visible]:ring-2 has-[[role=combobox]:focus-visible]:ring-offset-2 has-[[role=combobox]:focus-visible]:ring-offset-retro-bg has-[[role=combobox]:focus-visible]:ring-retro-border/60',
       'has-[[role=combobox]:disabled]:opacity-50 has-[[role=combobox]:disabled]:cursor-not-allowed',
       s.font,
       s.border,
@@ -173,7 +176,7 @@ export function multiSelectClasses(surface: Surface, { size, invalid, open }: Mu
       fieldBorderClass(invalid),
     ),
     values: 'flex min-w-0 flex-1 flex-wrap items-center gap-1',
-    trigger: 'flex min-w-0 flex-1 items-center self-stretch text-left outline-none',
+    trigger: 'flex min-w-0 flex-1 items-center self-stretch text-left focus-visible:outline-hidden',
     placeholder: 'truncate text-retro-muted',
     chip: cn(
       'inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px]',

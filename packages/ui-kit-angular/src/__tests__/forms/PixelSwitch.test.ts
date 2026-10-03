@@ -91,4 +91,14 @@ describe('PixelSwitch', () => {
     expect(switchOf(fixture.nativeElement).getAttribute('aria-checked')).toBe('true');
     expect(fixture.componentInstance.on()).toBe(true);
   });
+
+  it('rings keyboard focus, keeping an outline for forced-colors mode, which drops the ring', async () => {
+    @Component({ imports: [PixelSwitch], template: '<pxl-switch label="Sound" />' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const classes = Array.from(switchOf(fixture.nativeElement).classList);
+    expect(classes).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:outline-hidden']));
+    expect(classes.filter((c) => c.endsWith('outline-none'))).toEqual([]);
+  });
 });

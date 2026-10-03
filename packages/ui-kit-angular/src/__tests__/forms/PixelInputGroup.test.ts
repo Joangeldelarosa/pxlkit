@@ -78,4 +78,28 @@ describe('PixelInputGroup', () => {
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.mock.calls[0]![0]).toContain('[PixelInputGroup] missing aria-label');
   });
+
+  // Regression: the shell clips its controls (`overflow-hidden`), so their
+  // focus rings were cut off.
+  it('shows keyboard focus inside each control, on both surfaces', async () => {
+    @Component({
+      imports: [PixelInputGroup, PixelInputGroupItem],
+      template: `
+        <pxl-input-group aria-label="Pixel" surface="pixel">
+          <input pxlInputGroupItem aria-label="Pixel query" />
+          <button pxlInputGroupItem>Go</button>
+        </pxl-input-group>
+        <pxl-input-group aria-label="Linear" surface="linear">
+          <input pxlInputGroupItem aria-label="Linear query" />
+          <button pxlInputGroupItem>Go</button>
+        </pxl-input-group>
+      `,
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const controls = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('input, button'));
+    expect(controls).toHaveLength(4);
+    for (const control of controls) expect(control.classList).toContain('focus-visible:pxl-focus-inset');
+  });
 });

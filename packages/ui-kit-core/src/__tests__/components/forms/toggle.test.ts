@@ -32,7 +32,7 @@ describe('toggle recipes', () => {
       const s = surfaceClasses(surface);
       expect(toggleClasses(surface, { pressed: false, size: 'lg', variant: 'ghost' })).toBe(
         [
-          'inline-flex items-center justify-center font-medium outline-none disabled:opacity-50 disabled:cursor-not-allowed',
+          'inline-flex items-center justify-center font-medium focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
           s.font,
           s.radius,
           s.transition,

@@ -96,7 +96,7 @@ describe('toast recipes', () => {
     expect(classes.body).toBe('flex-1 min-w-0');
     expect(classes.message).toBe('mt-1 text-sm text-retro-muted');
     expect(classes.action).toBe('mt-2.5');
-    expect(classesOf(classes.dismiss)).toEqual(expect.arrayContaining(['h-6', 'w-6', 'focus-visible:ring-2']));
+    expect(classesOf(classes.dismiss)).toEqual(expect.arrayContaining(['h-6', 'w-6', 'focus-visible:ring-2', 'focus:outline-hidden']));
   });
 });
 

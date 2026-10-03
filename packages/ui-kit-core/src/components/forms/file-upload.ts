@@ -140,7 +140,11 @@ export interface FileUploadClasses {
   accepts: string;
   /** The visually hidden file input. */
   input: string;
-  /** The browse button that stands in for the dropzone. */
+  /**
+   * The browse button that stands in for the dropzone: a second `<label>` of
+   * the file input, which stays the one control and tab stop, so the button
+   * shows the input's keyboard focus.
+   */
   button: string;
   buttonIcon: string;
   list: string;
@@ -158,14 +162,21 @@ export interface FileUploadClasses {
   previewGlyph: string;
 }
 
+/** The tone's focus ring of the browse button, drawn while the file input before it has keyboard focus. */
+const PEER_FOCUS_RING = {
+  cyan: 'peer-focus-visible:ring-retro-cyan/40',
+  red: 'peer-focus-visible:ring-retro-red/40',
+} as const;
+
 /** Classes of every part of a PixelFileUpload. */
 export function fileUploadClasses(surface: Surface, { size, invalid, dragActive, disabled }: FileUploadClassOptions): FileUploadClasses {
   const s = surfaceClasses(surface);
-  const t = toneMap[invalid ? 'red' : 'cyan'];
+  const tone = invalid ? 'red' : 'cyan';
+  const t = toneMap[tone];
   return {
     root: 'space-y-3',
     dropzone: cn(
-      'flex flex-col items-center justify-center gap-2 text-center outline-none cursor-pointer',
+      'flex flex-col items-center justify-center gap-2 text-center focus-visible:outline-hidden cursor-pointer',
       'border-dashed bg-retro-surface/20 text-retro-muted',
       s.border,
       s.radiusLg,
@@ -182,7 +193,7 @@ export function fileUploadClasses(surface: Surface, { size, invalid, dragActive,
     dropzoneText: 'flex flex-col',
     prompt: cn('font-medium', dragActive ? t.text : 'text-retro-text'),
     accepts: 'text-[10px] text-retro-muted break-all max-w-full',
-    input: 'sr-only',
+    input: 'peer sr-only',
     button: cn(
       'inline-flex items-center gap-2 px-3 h-10 text-sm font-medium',
       s.border,
@@ -193,8 +204,15 @@ export function fileUploadClasses(surface: Surface, { size, invalid, dragActive,
       t.border,
       t.bg,
       t.hover,
-      focusRing,
-      t.ring,
+      // The file input is not seen, so the button shows its focus: inside the
+      // cut corners on the pixel surface; on the linear one a ring, with the
+      // outline that forced-colors mode shows in place of the ring.
+      surface === 'pixel'
+        ? 'peer-focus-visible:pxl-focus-inset'
+        : cn(
+            'peer-focus-visible:outline-hidden peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-retro-bg',
+            PEER_FOCUS_RING[tone],
+          ),
       disabled && 'opacity-50 cursor-not-allowed',
     ),
     buttonIcon: 'h-4 w-4',

@@ -217,6 +217,19 @@ describe('PixelMultiSelect — field', () => {
     expect(fieldOf(combobox)).not.toHaveAttribute('aria-expanded');
   });
 
+  it('shows the combobox\'s keyboard focus on the field: inside its cut corners on the pixel surface, a ring on the linear one', () => {
+    render(
+      <>
+        <PixelMultiSelect options={OPTIONS} label="Pixel" surface="pixel" />
+        <PixelMultiSelect options={OPTIONS} label="Linear" surface="linear" />
+      </>,
+    );
+    const [pixel, linear] = screen.getAllByRole('combobox').map((combobox) => fieldOf(combobox).className.split(' '));
+    expect(pixel).toEqual(expect.arrayContaining(['pxl-corner-sm', 'has-[[role=combobox]:focus-visible]:pxl-focus-inset']));
+    expect(pixel!.filter((c) => c.includes('ring'))).toEqual([]);
+    expect(linear).toEqual(expect.arrayContaining(['has-[[role=combobox]:focus-visible]:ring-2']));
+  });
+
   it('renders on the server with no control inside another', () => {
     const page = new DOMParser().parseFromString(
       renderToString(<PixelMultiSelect options={OPTIONS} defaultValue={['a', 'b']} clearable label="Fruits" />),

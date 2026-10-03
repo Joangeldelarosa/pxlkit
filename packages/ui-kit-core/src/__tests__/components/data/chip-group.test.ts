@@ -24,6 +24,43 @@ describe('chip group recipes', () => {
     expect(classesOf(chipGroupItemClasses('linear', true))).toEqual(expect.arrayContaining(['rounded-md', 'ring-2', 'ring-retro-cyan/60']));
   });
 
+  it('sets the focus ring off a selected chip on the linear surface, so focus and selection read apart', () => {
+    for (const selected of [false, true]) {
+      expect(classesOf(chipGroupItemClasses('linear', selected))).toEqual(
+        expect.arrayContaining([
+          'focus-visible:outline-hidden',
+          'focus-visible:ring-2',
+          'focus-visible:ring-retro-cyan/60',
+          'focus-visible:ring-offset-2',
+          'focus-visible:ring-offset-retro-bg',
+        ]),
+      );
+    }
+  });
+
+  it('frames a selected chip inside its border on the pixel surface, where the cut corners clip a ring', () => {
+    const frame = ['*:outline-2', '*:outline-solid', '*:-outline-offset-4', '*:outline-retro-cyan/60'];
+    expect(classesOf(chipGroupItemClasses('pixel', true))).toEqual(expect.arrayContaining(frame));
+    expect(classesOf(chipGroupItemClasses('pixel', true)).filter((c) => c.includes('ring'))).toEqual([]);
+    expect(classesOf(chipGroupItemClasses('pixel', false)).filter((c) => c.startsWith('*:'))).toEqual([]);
+    expect(classesOf(chipGroupItemClasses('linear', true)).filter((c) => c.startsWith('*:'))).toEqual([]);
+  });
+
+  it('lights up the chip edge on the pixel surface from a layer over the chip, which paints over the button', () => {
+    for (const selected of [false, true]) {
+      expect(classesOf(chipGroupItemClasses('pixel', selected))).toEqual(
+        expect.arrayContaining([
+          'pxl-corner-sm',
+          'relative',
+          'focus-visible:after:absolute',
+          'focus-visible:after:inset-0',
+          'focus-visible:after:pxl-focus-inset',
+        ]),
+      );
+      expect(classesOf(chipGroupItemClasses('linear', selected)).filter((c) => c.includes(':after:'))).toEqual([]);
+    }
+  });
+
   it('is a radio group for single selection and a group only when named for multiple', () => {
     expect(chipGroupRole(false, false)).toBe('radiogroup');
     expect(chipGroupRole(false, true)).toBe('radiogroup');

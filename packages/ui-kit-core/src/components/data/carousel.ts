@@ -171,11 +171,11 @@ export function carouselClasses(surface: Surface, orientation: CarouselOrientati
     s.press,
     'border-retro-border bg-retro-surface/80 text-retro-text',
     'hover:bg-retro-surface',
-    `focus-visible:outline-none ${focusVisibleRing}`,
+    `focus-visible:outline-hidden ${focusVisibleRing}`,
     'disabled:opacity-50 disabled:cursor-not-allowed',
   );
   return {
-    root: cn(`relative outline-none ${focusVisibleRing}`, s.radiusLg),
+    root: cn(`relative focus-visible:outline-hidden ${focusVisibleRing}`, s.radiusLg),
     viewport: cn('overflow-hidden', s.radiusLg),
     track: cn('flex', vertical ? 'flex-col h-full' : 'flex-row'),
     previous: cn(arrow, vertical ? 'top-2 left-1/2 -translate-x-1/2 rotate-90' : 'left-2 top-1/2 -translate-y-1/2'),
@@ -196,6 +196,6 @@ export function carouselDotClasses(surface: Surface, active: boolean): string {
     surface === 'pixel' ? 'rounded-none' : 'rounded-full',
     s.transition,
     active ? 'bg-retro-cyan border-retro-cyan' : 'bg-retro-bg/40 border-retro-border hover:bg-retro-surface',
-    `focus-visible:outline-none ${focusVisibleRing}`,
+    `focus-visible:outline-hidden ${focusVisibleRing}`,
   );
 }

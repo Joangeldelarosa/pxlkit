@@ -45,7 +45,7 @@ export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): 
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders as a &lt;button&gt; only when onClick is provided so non-interactive chips stay as &lt;span&gt;. The delete X is a &lt;button&gt; with aria-label &quot;Remove &lt;label&gt;&quot; that never fires onClick; a button cannot contain a button, so on a clickable chip the label and the X are sibling buttons inside a &lt;span&gt; frame.</p>
+      <p className="docs-aria-notes">Renders as a &lt;button&gt; only when onClick is provided so non-interactive chips stay as &lt;span&gt;. The delete X is a &lt;button&gt; with aria-label &quot;Remove &lt;label&gt;&quot; that never fires onClick; a button cannot contain a button, so on a clickable chip the label and the X are sibling buttons inside a &lt;span&gt; frame. On a clickable deletable chip the frame shows the label button&#39;s keyboard focus; the X shows its own.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

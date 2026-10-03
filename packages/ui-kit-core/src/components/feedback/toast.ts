@@ -125,7 +125,7 @@ export function toastClasses(surface: Surface, tone: ToastTone): ToastClasses {
     message: 'mt-1 text-sm text-retro-muted',
     action: 'mt-2.5',
     dismiss:
-      '-mr-1 -mt-1 flex h-6 w-6 shrink-0 items-center justify-center text-retro-muted transition-colors hover:text-retro-text focus:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40',
+      '-mr-1 -mt-1 flex h-6 w-6 shrink-0 items-center justify-center text-retro-muted transition-colors hover:text-retro-text focus:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/40',
     track: 'absolute inset-x-0 bottom-0 h-0.5 bg-retro-surface/40',
     bar: cn('h-full transition-[width] ease-linear', t.fill),
   };

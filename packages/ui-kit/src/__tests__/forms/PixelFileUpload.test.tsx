@@ -1,6 +1,7 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
+import { getFocusableElements } from '@pxlkit/ui-kit-core';
 import { PixelFileUpload } from '../../forms/PixelFileUpload';
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -185,5 +186,46 @@ describe('PixelFileUpload — hint / error description (regression)', () => {
   it('describes the file input itself when there is no dropzone', () => {
     const { container } = render(<PixelFileUpload label="Attachments" hint="PDF, up to 5 MB" dropzone={false} />);
     expect(getInput(container)).toHaveAccessibleDescription('PDF, up to 5 MB');
+  });
+});
+
+// Regression: without a dropzone, the browse button was a tab stop of its
+// own, after the file input, which took focus unseen (it is visually
+// hidden). The button is now a second label of the input.
+describe('PixelFileUpload — browse button', () => {
+  it('keeps the file input the one tab stop, named by both its labels', () => {
+    const { container } = render(<PixelFileUpload label="Attachments" hint="PDF, up to 5 MB" dropzone={false} />);
+    const input = getInput(container);
+    expect(container.querySelector('button')).toBeNull();
+    expect(getFocusableElements(container)).toEqual([input]);
+    expect(input).toHaveAccessibleName('Attachments Choose file');
+    expect(input).toHaveAccessibleDescription('PDF, up to 5 MB');
+    const browse = input.nextElementSibling as HTMLLabelElement;
+    expect(browse.tagName).toBe('LABEL');
+    expect(browse.htmlFor).toBe(input.id);
+  });
+
+  it('opens the file picker from a click on the browse button', () => {
+    const { container } = render(<PixelFileUpload label="Attachments" dropzone={false} />);
+    const input = getInput(container);
+    const opened = vi.fn((event: Event) => event.preventDefault());
+    input.addEventListener('click', opened);
+    fireEvent.click(input.nextElementSibling!);
+    expect(opened).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows the file input's keyboard focus on the browse button, on both surfaces", () => {
+    const { container } = render(
+      <>
+        <PixelFileUpload label="Pixel" dropzone={false} surface="pixel" />
+        <PixelFileUpload label="Linear" dropzone={false} surface="linear" />
+      </>,
+    );
+    const [pixel, linear] = Array.from(container.querySelectorAll('input[type="file"]')).map((input) => {
+      expect(input.className.split(' ')).toContain('peer');
+      return input.nextElementSibling!.className.split(' ');
+    });
+    expect(pixel).toEqual(expect.arrayContaining(['pxl-corner-sm', 'peer-focus-visible:pxl-focus-inset']));
+    expect(linear).toEqual(expect.arrayContaining(['peer-focus-visible:ring-2', 'peer-focus-visible:outline-hidden']));
   });
 });

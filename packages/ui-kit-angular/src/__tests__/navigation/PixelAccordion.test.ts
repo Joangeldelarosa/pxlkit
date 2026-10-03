@@ -68,4 +68,26 @@ describe('PixelAccordion', () => {
     await fixture.whenStable();
     expect(root.querySelectorAll('[aria-expanded="true"]')).toHaveLength(2);
   });
+
+  it("lights up a focused header inside its item on the pixel surface, whose cut corners clip a ring, and rings it on the linear one", async () => {
+    @Component({
+      imports: [PixelAccordion],
+      template: '<pxl-accordion surface="pixel" [items]="items" /><pxl-accordion surface="linear" [items]="items" />',
+    })
+    class Host {
+      readonly items: AccordionItem[] = [
+        { id: 'one', title: 'One', content: 'First' },
+        { id: 'two', title: 'Two', content: 'Second' },
+      ];
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const headers = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'), (header) => Array.from(header.classList));
+    expect(headers).toHaveLength(4);
+    for (const pixel of headers.slice(0, 2)) {
+      expect(pixel).toContain('focus-visible:pxl-focus-inset');
+      expect(pixel.filter((c) => c.includes('ring'))).toEqual([]);
+    }
+    for (const linear of headers.slice(2)) expect(linear).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:ring-retro-cyan/30']));
+  });
 });

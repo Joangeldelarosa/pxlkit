@@ -121,4 +121,23 @@ describe('PixelSplitButton', () => {
     clear.mockRestore();
     set.mockRestore();
   });
+
+  // Regression: the frame clips both halves (`overflow-hidden`), so the focus
+  // ring around either was cut off, and the chevron had none.
+  it('shows keyboard focus inside each half, on both surfaces', async () => {
+    @Component({
+      imports: [PixelSplitButton],
+      template: `
+        <pxl-split-button label="Pixel" surface="pixel" [options]="options" />
+        <pxl-split-button label="Linear" surface="linear" [options]="options" />
+      `,
+    })
+    class Surfaces {
+      readonly options = OPTIONS;
+    }
+    await render(Surfaces);
+    const halves = Array.from(document.querySelectorAll('button'));
+    expect(halves).toHaveLength(4);
+    for (const half of halves) expect(half.classList).toContain('focus-visible:pxl-focus-inset');
+  });
 });

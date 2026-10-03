@@ -123,11 +123,16 @@ export interface PixelFileUploadItemContext {
           [attr.aria-describedby]="dropzone() ? null : (describedBy() ?? null)"
           (change)="onChange($event)"
         />
+        <!--
+          The browse button is a second label of the file input, which stays
+          the one control: one tab stop, named by both labels, described by
+          the hint or error, and opened by a click on either label.
+        -->
         @if (!dropzone()) {
-          <button type="button" [disabled]="isDisabled()" [class]="classes().button" (click)="browse()">
+          <label [attr.for]="inputId()" [class]="classes().button">
             <ng-container [ngTemplateOutlet]="icon" [ngTemplateOutletContext]="{ $implicit: icons.upload, class: classes().buttonIcon }" />
             <span>Choose file{{ multiple() ? 's' : '' }}</span>
-          </button>
+          </label>
         }
         @if (files().length > 0) {
           <ul [class]="classes().list">

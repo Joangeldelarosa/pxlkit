@@ -47,7 +47,7 @@ export function alertDialogClasses(surface: Surface, { destructive, reducedMotio
       layout,
       'px-4 h-9',
       pixel ? 'text-xs' : 'text-sm',
-      'font-medium outline-none disabled:opacity-50 disabled:cursor-not-allowed',
+      'font-medium focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
       s.border,
       s.radius,
       s.font,

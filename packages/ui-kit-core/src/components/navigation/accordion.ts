@@ -49,11 +49,12 @@ export function accordionItemClasses(surface: Surface, open: boolean): Accordion
   const s = surfaceClasses(surface);
   return {
     item: cn('bg-retro-surface/40', s.border, s.radius, 'border-retro-border/40'),
+    // The item's cut corners on the pixel surface would clip the header's
+    // focus ring, so there the header's edge lights up inside the item.
     trigger: cn(
-      'flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-retro-text outline-none transition-colors hover:bg-retro-surface/60',
+      'flex w-full items-center justify-between px-3 py-2.5 text-left text-sm text-retro-text focus-visible:outline-hidden transition-colors hover:bg-retro-surface/60',
       s.font,
-      focusRing,
-      'focus-visible:ring-retro-cyan/30',
+      surface === 'pixel' ? 'focus-visible:pxl-focus-inset' : cn(focusRing, 'focus-visible:ring-retro-cyan/30'),
     ),
     chevron: cn('text-retro-muted transition-transform duration-200', open && 'rotate-180'),
     panel: 'border-t border-retro-border/30 px-3 py-2.5 text-sm text-retro-muted',

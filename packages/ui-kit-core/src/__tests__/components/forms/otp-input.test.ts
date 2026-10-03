@@ -100,7 +100,7 @@ describe('OTP input recipes', () => {
       expect(c.root).toBe(`inline-flex max-w-full flex-wrap items-center ${s.font}`);
       expect(c.cell).toBe(
         [
-          inputBase,
+          inputBase.replace('w-full ', ''),
           s.font,
           s.border,
           s.radius,
@@ -117,5 +117,12 @@ describe('OTP input recipes', () => {
     }
     expect(otpInputClasses('pixel', 'sm').cell).toContain('h-8 w-8 text-xs text-xs');
     expect(otpInputClasses('pixel', 'lg').cell).toContain('h-12 w-12 text-base text-sm');
+  });
+
+  it("keeps the cells square: the text field's full width would beat their own", () => {
+    for (const size of ['sm', 'md', 'lg'] as const) {
+      const widths = otpInputClasses('pixel', size).cell.split(' ').filter((name) => /^w-/.test(name));
+      expect(widths).toEqual([{ sm: 'w-8', md: 'w-10', lg: 'w-12' }[size]]);
+    }
   });
 });

@@ -90,4 +90,17 @@ describe('PixelCheckbox', () => {
     expect(box.id).toBe('cb-1');
     expect(ref.current).toBe(box);
   });
+
+  it('draws keyboard focus on its box: inside the cut corners on the pixel surface, a ring in its tone on the linear one', () => {
+    const { getByRole } = render(
+      <>
+        <PixelCheckbox label="Pixel" tone="red" surface="pixel" />
+        <PixelCheckbox label="Linear" tone="red" surface="linear" />
+      </>,
+    );
+    const box = (name: string) => getByRole('checkbox', { name }).firstElementChild!.className.split(' ');
+    expect(box('Pixel')).toContain('group-focus-visible:pxl-focus-inset');
+    expect(box('Pixel').filter((c) => c.includes('ring'))).toEqual([]);
+    expect(box('Linear')).toEqual(expect.arrayContaining(['group-focus-visible:ring-2', 'group-focus-visible:ring-retro-red/40']));
+  });
 });

@@ -92,6 +92,22 @@ describe('PixelSplitButton — disabled & ref', () => {
   });
 });
 
+// Regression: the frame clips both halves (`overflow-hidden`), so the focus
+// ring around either was cut off, and the chevron had none.
+describe('PixelSplitButton — keyboard focus', () => {
+  it('shows keyboard focus inside each half, on both surfaces', () => {
+    const { getAllByRole } = render(
+      <>
+        <PixelSplitButton label="Pixel" options={OPTIONS} surface="pixel" />
+        <PixelSplitButton label="Linear" options={OPTIONS} surface="linear" />
+      </>,
+    );
+    const halves = getAllByRole('button');
+    expect(halves).toHaveLength(4);
+    for (const half of halves) expect(half.className.split(' ')).toContain('focus-visible:pxl-focus-inset');
+  });
+});
+
 /* ─── Regressions: the WAI-ARIA menu button pattern, as in PixelDropdown ── */
 
 describe('PixelSplitButton — menu keyboard and focus', () => {

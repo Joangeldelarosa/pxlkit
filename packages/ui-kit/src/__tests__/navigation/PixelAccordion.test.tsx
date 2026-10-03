@@ -83,4 +83,19 @@ describe('PixelAccordion', () => {
     render(<PixelAccordion ref={ref} items={ITEMS} />);
     expect(ref.current).toBeInstanceOf(HTMLDivElement);
   });
+
+  it("lights up a focused header inside its item on the pixel surface, whose cut corners clip a ring, and rings it on the linear one", () => {
+    const { getAllByRole } = render(
+      <>
+        <PixelAccordion items={ITEMS} surface="pixel" />
+        <PixelAccordion items={ITEMS} surface="linear" />
+      </>,
+    );
+    const headers = getAllByRole('button').map((header) => header.className.split(' '));
+    for (const pixel of headers.slice(0, 3)) {
+      expect(pixel).toContain('focus-visible:pxl-focus-inset');
+      expect(pixel.filter((c) => c.includes('ring'))).toEqual([]);
+    }
+    for (const linear of headers.slice(3)) expect(linear).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:ring-retro-cyan/30']));
+  });
 });

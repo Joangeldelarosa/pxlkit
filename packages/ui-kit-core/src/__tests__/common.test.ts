@@ -80,6 +80,9 @@ describe('class maps', () => {
 
   it('exposes the shared focus ring and input base', () => {
     expect(focusRing).toContain('focus-visible:ring-2');
-    expect(inputBase).toContain('outline-none');
+    // The ring is a box-shadow, which forced-colors mode drops: the input
+    // keeps a hidden outline that mode shows, not none at all.
+    expect(inputBase.split(' ')).toContain('focus-visible:outline-hidden');
+    expect(inputBase.split(' ')).not.toContain('outline-none');
   });
 });

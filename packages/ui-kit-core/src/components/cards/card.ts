@@ -85,7 +85,7 @@ export function cardClasses(
       (media || badge) && 'overflow-hidden',
       interactive && 'cursor-pointer hover:-translate-y-[2px] hover:shadow-lg',
       (interactive || link) &&
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
       link && 'no-underline text-inherit',
       !media && pad,
     ),

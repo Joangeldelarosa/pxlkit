@@ -109,4 +109,24 @@ describe('PixelRadioGroup', () => {
     for (const name of ['name', 'disabled', 'required']) expect(fieldset.hasAttribute(name)).toBe(false);
     expect(radiosOf(fixture.nativeElement).every((radio) => radio.disabled)).toBe(true);
   });
+
+  it("draws a radio's keyboard focus on its indicator: inside it on the pixel surface, a ring in the tone on the linear one", async () => {
+    @Component({
+      imports: [PixelRadioGroup],
+      template: `
+        <fieldset pxlRadioGroup label="Pixel" tone="gold" surface="pixel" [options]="options"></fieldset>
+        <fieldset pxlRadioGroup label="Linear" tone="gold" surface="linear" [options]="options"></fieldset>
+      `,
+    })
+    class Host {
+      readonly options = OPTIONS;
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const indicators = radiosOf(fixture.nativeElement).map((radio) => Array.from(radio.firstElementChild!.classList));
+    for (const pixel of indicators.slice(0, 3)) expect(pixel).toContain('group-focus-visible:pxl-focus-inset');
+    for (const linear of indicators.slice(3)) {
+      expect(linear).toEqual(expect.arrayContaining(['group-focus-visible:ring-2', 'group-focus-visible:ring-retro-gold/40']));
+    }
+  });
 });

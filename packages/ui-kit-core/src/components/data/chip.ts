@@ -30,8 +30,10 @@ const ACTION_SIZE: Record<Size, string> = {
   lg: 'pl-3 py-1.5 gap-2',
 };
 
-// The frame draws the focus ring while its action has keyboard focus. The
-// tone's ring, spelled out: Tailwind only generates classes it finds verbatim.
+// The frame draws the focus while its action has keyboard focus: the tone's
+// ring around it on the linear surface, spelled out (Tailwind only generates
+// classes it finds verbatim); on the pixel surface, whose cut corners clip a
+// ring, its edge lights up.
 const ACTION_FOCUS_RING: Record<Tone, string> = {
   green: 'has-[[data-chip-action]:focus-visible]:ring-retro-green/40',
   cyan: 'has-[[data-chip-action]:focus-visible]:ring-retro-cyan/40',
@@ -80,7 +82,7 @@ export function chipClasses(surface: Surface, { tone, variant, size, interactive
         cn(
           'cursor-pointer transition-colors',
           t.hover,
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
+          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
           t.ring,
         ),
     ),
@@ -93,17 +95,21 @@ export function chipClasses(surface: Surface, { tone, variant, size, interactive
       badgeVariantClasses(variant, tone),
       'cursor-pointer transition-colors',
       t.hover,
-      'has-[[data-chip-action]:focus-visible]:ring-2 has-[[data-chip-action]:focus-visible]:ring-offset-2 has-[[data-chip-action]:focus-visible]:ring-offset-retro-bg',
-      ACTION_FOCUS_RING[tone],
+      surface === 'pixel'
+        ? 'has-[[data-chip-action]:focus-visible]:pxl-focus-inset'
+        : cn(
+            'has-[[data-chip-action]:focus-visible]:ring-2 has-[[data-chip-action]:focus-visible]:ring-offset-2 has-[[data-chip-action]:focus-visible]:ring-offset-retro-bg',
+            ACTION_FOCUS_RING[tone],
+          ),
     ),
     action: cn(
       'inline-flex items-center',
       ACTION_SIZE[size],
-      'bg-transparent border-0 m-0 [font:inherit] text-inherit cursor-pointer focus-visible:outline-none',
+      'bg-transparent border-0 m-0 [font:inherit] text-inherit cursor-pointer focus-visible:outline-hidden',
     ),
     icon: 'inline-flex items-center shrink-0',
     deleteButton: cn(
-      'p-0.5 transition-colors hover:bg-retro-bg/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-retro-bg',
+      'p-0.5 transition-colors hover:bg-retro-bg/50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-retro-bg',
       t.ring,
       s.radius,
     ),

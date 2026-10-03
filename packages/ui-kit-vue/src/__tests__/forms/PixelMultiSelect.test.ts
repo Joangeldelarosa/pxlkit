@@ -224,4 +224,12 @@ describe('PixelMultiSelect', () => {
     expect(document.querySelector('[role="listbox"]')).toBeNull();
     expect(document.activeElement).not.toBe(combobox);
   });
+
+  it("shows the combobox's keyboard focus on the field: inside its cut corners on the pixel surface, a ring on the linear one", () => {
+    const field = (surface: 'pixel' | 'linear') =>
+      fieldOf(mount(PixelMultiSelect, { props: { options: OPTIONS, label: 'Fruits', surface } }).get('[role="combobox"]').element).className.split(' ');
+    expect(field('pixel')).toEqual(expect.arrayContaining(['pxl-corner-sm', 'has-[[role=combobox]:focus-visible]:pxl-focus-inset']));
+    expect(field('pixel').filter((c) => c.includes('ring'))).toEqual([]);
+    expect(field('linear')).toEqual(expect.arrayContaining(['has-[[role=combobox]:focus-visible]:ring-2']));
+  });
 });

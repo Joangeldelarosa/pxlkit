@@ -98,4 +98,20 @@ describe('PixelCheckbox', () => {
     await fixture.whenStable();
     expect(fixture.componentInstance.on()).toBe(false);
   });
+
+  it('draws keyboard focus on its box: inside the cut corners on the pixel surface, a ring in its tone on the linear one', async () => {
+    @Component({
+      imports: [PixelCheckbox],
+      template: '<pxl-checkbox label="Pixel" tone="red" surface="pixel" /><pxl-checkbox label="Linear" tone="red" surface="linear" />',
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const [pixel, linear] = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('[role="checkbox"] > span:first-child'), (box) =>
+      Array.from(box.classList),
+    );
+    expect(pixel).toContain('group-focus-visible:pxl-focus-inset');
+    expect(pixel!.filter((c) => c.includes('ring'))).toEqual([]);
+    expect(linear).toEqual(expect.arrayContaining(['group-focus-visible:ring-2', 'group-focus-visible:ring-retro-red/40']));
+  });
 });

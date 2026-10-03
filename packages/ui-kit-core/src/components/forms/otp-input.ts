@@ -122,6 +122,13 @@ const otpCellSizeClasses: Record<Size, string> = {
   lg: 'h-12 w-12 text-base',
 };
 
+// A text field's look but its full width: `w-full` would beat the cell's
+// width, as nothing merges the two and Tailwind emits `w-full` last.
+const cellBase = inputBase
+  .split(' ')
+  .filter((name) => name !== 'w-full')
+  .join(' ');
+
 /** The type size of the control scale: the classes of `sizeHeight` but its height. */
 function controlTextClasses(size: Size): string {
   return sizeHeight[size]
@@ -144,7 +151,7 @@ export function otpInputClasses(surface: Surface, size: Size): OtpInputClasses {
   return {
     root: cn('inline-flex max-w-full flex-wrap items-center', s.font),
     cell: cn(
-      inputBase,
+      cellBase,
       s.font,
       s.border,
       s.radius,

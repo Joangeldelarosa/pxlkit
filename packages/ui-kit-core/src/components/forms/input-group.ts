@@ -16,11 +16,13 @@ export function inputGroupClasses(surface: Surface, size: Size): string {
 
 /**
  * A control inside the group: it loses its own border and corners, so the
- * controls read as one shell, and gains a divider unless it is the last.
+ * controls read as one shell, and gains a divider unless it is the last. The
+ * shell clips the controls (`overflow-hidden`), focus rings included, so a
+ * control shows keyboard focus inside its own edge.
  */
 export function inputGroupItemClasses(surface: Surface, last: boolean): string {
   return cn(
-    'min-w-0 border-0 rounded-none focus:z-10 focus-visible:z-10 relative',
+    'min-w-0 border-0 rounded-none focus:z-10 focus-visible:z-10 focus-visible:pxl-focus-inset relative',
     !last && cn('border-r', surfaceClasses(surface).border, 'border-retro-border/60'),
   );
 }

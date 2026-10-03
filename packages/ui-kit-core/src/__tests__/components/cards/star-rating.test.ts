@@ -70,7 +70,7 @@ describe('star rating', () => {
     expect(starRatingStarClasses('linear', { interactive: true, filled: true, tone: 'gold' })).toBe(
       [
         'cursor-pointer inline-flex items-center justify-center bg-transparent border-0 p-0',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
         'text-retro-gold',
         surfaceClasses('linear').transition,
       ].join(' '),

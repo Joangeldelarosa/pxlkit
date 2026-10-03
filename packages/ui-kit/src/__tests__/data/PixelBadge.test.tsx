@@ -154,6 +154,13 @@ describe('PixelBadge — onClick makes it a button', () => {
     expect(btn.className).toContain('hover:bg-retro-cyan');
   });
 
+  it('keeps an outline for forced-colors mode on a clickable badge, as that mode drops the focus ring', () => {
+    const { container } = render(<PixelBadge onClick={() => {}}>x</PixelBadge>);
+    const classes = container.querySelector('button')!.className.split(' ');
+    expect(classes).toContain('focus-visible:outline-hidden');
+    expect(classes).not.toContain('focus-visible:outline-none');
+  });
+
   it('falls back to <span> when no onClick', () => {
     const { container } = render(<PixelBadge>x</PixelBadge>);
     expect(container.querySelector('button')).toBeNull();

@@ -43,4 +43,14 @@ describe('PixelAccordion', () => {
     await headers[2]!.trigger('click');
     expect(wrapper.findAll('[aria-expanded="true"]')).toHaveLength(2);
   });
+
+  it("lights up a focused header inside its item on the pixel surface, whose cut corners clip a ring, and rings it on the linear one", () => {
+    const headers = (surface: 'pixel' | 'linear') =>
+      mount(PixelAccordion, { props: { items: ITEMS, surface } }).findAll('button').map((header) => header.classes());
+    for (const pixel of headers('pixel')) {
+      expect(pixel).toContain('focus-visible:pxl-focus-inset');
+      expect(pixel.filter((c) => c.includes('ring'))).toEqual([]);
+    }
+    for (const linear of headers('linear')) expect(linear).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:ring-retro-cyan/30']));
+  });
 });

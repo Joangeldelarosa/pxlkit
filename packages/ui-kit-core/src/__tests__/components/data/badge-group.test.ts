@@ -14,10 +14,10 @@ describe('badge group recipes', () => {
     expect(classesOf(badgeGroupOverflowClasses)).toEqual(expect.arrayContaining(['flex', 'flex-wrap', 'max-w-xs']));
   });
 
-  it('draws the "+N" button like a badge of the surface, with a focus ring', () => {
+  it('draws the "+N" button like a badge of the surface, with a focus ring and an outline for forced-colors mode', () => {
     const pixel = classesOf(badgeGroupTriggerClasses('pixel'));
     const linear = classesOf(badgeGroupTriggerClasses('linear'));
-    expect(pixel).toEqual(expect.arrayContaining(['border-2', 'pxl-corner-sm', 'font-mono', 'focus-visible:ring-2']));
+    expect(pixel).toEqual(expect.arrayContaining(['border-2', 'pxl-corner-sm', 'font-mono', 'focus-visible:ring-2', 'focus-visible:outline-hidden']));
     expect(linear).toEqual(expect.arrayContaining(['border', 'rounded-full', 'font-sans']));
   });
 

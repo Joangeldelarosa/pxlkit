@@ -233,6 +233,21 @@ describe('PixelChip — clickable and deletable', () => {
     expect(ref.current).toBe(action);
   });
 
+  it("shows the label button's keyboard focus on the frame: inside its cut corners on the pixel surface, a ring in the tone on the linear one", () => {
+    const { container } = render(
+      <>
+        <PixelChip label="Pixel" tone="pink" surface="pixel" onClick={() => {}} onDelete={() => {}} />
+        <PixelChip label="Linear" tone="pink" surface="linear" onClick={() => {}} onDelete={() => {}} />
+      </>,
+    );
+    const [pixel, linear] = Array.from(container.children).map((frame) => frame.className.split(' '));
+    expect(pixel).toEqual(expect.arrayContaining(['pxl-corner-sm', 'has-[[data-chip-action]:focus-visible]:pxl-focus-inset']));
+    expect(pixel!.filter((c) => c.includes('ring'))).toEqual([]);
+    expect(linear).toEqual(
+      expect.arrayContaining(['has-[[data-chip-action]:focus-visible]:ring-2', 'has-[[data-chip-action]:focus-visible]:ring-retro-pink/40']),
+    );
+  });
+
   it('hydrates its own server markup without an error', async () => {
     const chip = <PixelChip label="Tag" onClick={() => {}} onDelete={() => {}} />;
     const container = document.createElement('div');

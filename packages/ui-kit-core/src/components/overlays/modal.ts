@@ -59,8 +59,8 @@ export function modalClasses(surface: Surface, size: ModalSize, { closing, reduc
     title: pixel ? 'font-pixel text-[11px] text-retro-green' : cn('text-base font-semibold text-retro-text', s.fontDisplay),
     closeButton: cn(
       pixel
-        ? 'flex h-6 w-6 items-center justify-center border-2 border-retro-border text-retro-muted transition-colors hover:bg-retro-red/10 hover:border-retro-red/40 hover:text-retro-red focus:outline-none focus-visible:ring-2 focus-visible:ring-retro-red/40'
-        : 'flex h-7 w-7 items-center justify-center rounded-md border border-retro-border text-retro-muted transition-colors hover:bg-retro-surface hover:text-retro-text focus:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40',
+        ? 'flex h-6 w-6 items-center justify-center border-2 border-retro-border text-retro-muted transition-colors hover:bg-retro-red/10 hover:border-retro-red/40 hover:text-retro-red focus:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-red/40'
+        : 'flex h-7 w-7 items-center justify-center rounded-md border border-retro-border text-retro-muted transition-colors hover:bg-retro-surface hover:text-retro-text focus:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/40',
       closing && 'opacity-60 cursor-wait',
     ),
     busy: cn(pixel ? 'block h-2 w-2 bg-retro-muted' : 'block h-2 w-2 rounded-full bg-retro-muted', pulse),

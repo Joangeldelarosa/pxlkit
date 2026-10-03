@@ -35,7 +35,7 @@ export const PixelTabsPanel = forwardRef<HTMLDivElement, PixelTabsPanelProps>(
         data-state={selected ? 'active' : 'inactive'}
         tabIndex={0}
         className={cn(
-          'p-3 text-sm text-retro-muted outline-none',
+          'p-3 text-sm text-retro-muted focus-visible:outline-hidden',
           bordered && 'bg-retro-bg/50',
           bordered && s.border,
           bordered && s.radius,

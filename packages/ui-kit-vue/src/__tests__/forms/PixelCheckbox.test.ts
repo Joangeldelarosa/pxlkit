@@ -57,4 +57,12 @@ describe('PixelCheckbox', () => {
     expect(button.attributes('aria-describedby')).toBe('help');
     expect((wrapper.vm as unknown as { element: HTMLButtonElement }).element).toBe(button.element);
   });
+
+  it('draws keyboard focus on its box: inside the cut corners on the pixel surface, a ring in its tone on the linear one', () => {
+    const box = (surface: 'pixel' | 'linear') =>
+      mount(PixelCheckbox, { props: { label: 'Box', tone: 'red', surface } }).get('[role="checkbox"] > span').classes();
+    expect(box('pixel')).toContain('group-focus-visible:pxl-focus-inset');
+    expect(box('pixel').filter((c) => c.includes('ring'))).toEqual([]);
+    expect(box('linear')).toEqual(expect.arrayContaining(['group-focus-visible:ring-2', 'group-focus-visible:ring-retro-red/40']));
+  });
 });

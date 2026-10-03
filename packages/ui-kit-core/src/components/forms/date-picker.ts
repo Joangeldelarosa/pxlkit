@@ -71,7 +71,7 @@ export function datePickerClasses(
       'absolute top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center',
       // Its × where the mark would be: 12px in from the trigger's border.
       surface === 'linear' ? 'right-1' : 'right-1.5',
-      'text-retro-muted hover:text-retro-text text-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40 rounded-[2px]',
+      'text-retro-muted hover:text-retro-text text-xs cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/40 rounded-[2px]',
       s.font,
     ),
     content: cn(months === 2 ? 'w-[34rem] max-w-[calc(100vw-1rem)]' : 'w-[18rem]', s.font),

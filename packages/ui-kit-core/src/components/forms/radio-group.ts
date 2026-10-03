@@ -1,5 +1,6 @@
 /** PixelRadioGroup — the fieldset, its legend and the radios with their dot indicator. */
 import { cn, surfaceClasses, toneMap, type Surface, type Tone } from '../../common';
+import { indicatorFocusClasses } from './checkbox';
 
 export interface RadioGroupClasses {
   /** The `<fieldset role="radiogroup">`. */
@@ -17,7 +18,7 @@ export function radioGroupClasses(surface: Surface, disabled: boolean): RadioGro
     group: 'space-y-2',
     legend: cn('mb-1.5 text-xs text-retro-muted', s.font),
     radio: cn(
-      'group flex items-center gap-2.5 text-sm outline-none',
+      'group flex items-center gap-2.5 text-sm focus-visible:outline-hidden',
       s.font,
       disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
     ),
@@ -32,7 +33,7 @@ export interface RadioIndicatorOptions {
 }
 
 export interface RadioIndicatorClasses {
-  /** The box around the dot: square on the pixel surface, round on the linear one. */
+  /** The box around the dot: square on the pixel surface, round on the linear one; it draws the radio's keyboard focus. */
   indicator: string;
   /** The dot of the checked radio. */
   dot: string;
@@ -52,6 +53,7 @@ export function radioIndicatorClasses(
       pixel ? 'rounded-[2px]' : 'rounded-full',
       checked ? cn(t.border, t.bg) : 'border-retro-border-strong bg-retro-bg',
       !disabled && 'group-hover:border-retro-muted',
+      indicatorFocusClasses(surface, tone),
     ),
     dot: cn('block h-2 w-2', pixel ? 'rounded-[1px]' : 'rounded-full', t.fill),
   };

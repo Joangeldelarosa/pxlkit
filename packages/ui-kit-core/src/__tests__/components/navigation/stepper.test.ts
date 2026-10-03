@@ -126,7 +126,7 @@ describe('stepper recipes', () => {
 
   it('rings the focused step in its tone only when it is clickable', () => {
     expect(classesOf(stepClasses('pixel', { ...BASE, state: 'active', clickable: true }).root)).toEqual(
-      expect.arrayContaining(['cursor-pointer', 'focus-visible:ring-2', 'focus-visible:ring-retro-cyan/40', 'rounded-[2px]']),
+      expect.arrayContaining(['cursor-pointer', 'focus-visible:ring-2', 'focus-visible:ring-retro-cyan/40', 'focus-visible:outline-hidden', 'rounded-[2px]']),
     );
     expect(classesOf(stepClasses('pixel', BASE).root)).toContain('cursor-default');
     expect(classesOf(stepClasses('pixel', { ...BASE, orientation: 'vertical' }).root)).toEqual(

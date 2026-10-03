@@ -106,6 +106,14 @@ describe('modal recipes', () => {
     for (const classes of [pixel, linear]) expect(classes.description).toBe('mb-3 text-xs text-retro-muted/80');
   });
 
+  it('rings the focused close button, keeping an outline for forced-colors mode, which drops the ring', () => {
+    for (const surface of SURFACES) {
+      const close = classesOf(modalClasses(surface, 'md', idle).closeButton);
+      expect(close).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus:outline-hidden']));
+      expect(close).not.toContain('focus:outline-none');
+    }
+  });
+
   it('marks a close in flight and pulses its indicator unless motion is reduced', () => {
     for (const surface of SURFACES) {
       expect(modalClasses(surface, 'md', idle).closeButton).not.toContain('cursor-wait');

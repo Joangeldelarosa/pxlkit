@@ -43,7 +43,7 @@ export default defineManifest({
       { key: 'Enter', does: 'Activates the focused radio option (native <button> behavior).' },
     ],
     notes:
-      'Wrapped in a <fieldset role="radiogroup"> with <legend> derived from label and aria-disabled / aria-required mirroring the props. Each option is a <button role="radio"> with aria-checked reflecting selection. When name is set a hidden <input> mirrors the current value so the group participates in native <form> submissions.',
+      'Wrapped in a <fieldset role="radiogroup"> with <legend> derived from label and aria-disabled / aria-required mirroring the props. Each option is a <button role="radio"> with aria-checked reflecting selection. When name is set a hidden <input> mirrors the current value so the group participates in native <form> submissions. Keyboard focus shows on the focused radio\'s indicator: a ring in the tone on the linear surface, the indicator\'s edge on the pixel surface, whose cut corners would clip a ring.',
   },
   related: ['PixelCheckbox', 'PixelSegmented', 'PixelToggleGroup'],
   apiStability: 'stable',

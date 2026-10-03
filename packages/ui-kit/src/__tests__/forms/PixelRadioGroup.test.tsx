@@ -84,4 +84,18 @@ describe('PixelRadioGroup', () => {
     );
     expect(ref.current).toBeInstanceOf(HTMLFieldSetElement);
   });
+
+  it("draws a radio's keyboard focus on its indicator: inside it on the pixel surface, a ring in the tone on the linear one", () => {
+    const { getAllByRole } = render(
+      <>
+        <PixelRadioGroup label="Pixel" value="a" options={OPTIONS} onChange={() => {}} tone="gold" surface="pixel" />
+        <PixelRadioGroup label="Linear" value="a" options={OPTIONS} onChange={() => {}} tone="gold" surface="linear" />
+      </>,
+    );
+    const indicators = getAllByRole('radio').map((radio) => radio.firstElementChild!.className.split(' '));
+    for (const pixel of indicators.slice(0, 3)) expect(pixel).toContain('group-focus-visible:pxl-focus-inset');
+    for (const linear of indicators.slice(3)) {
+      expect(linear).toEqual(expect.arrayContaining(['group-focus-visible:ring-2', 'group-focus-visible:ring-retro-gold/40']));
+    }
+  });
 });

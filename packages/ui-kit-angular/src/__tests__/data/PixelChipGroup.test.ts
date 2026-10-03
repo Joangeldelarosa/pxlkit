@@ -119,4 +119,31 @@ describe('PixelChipGroup', () => {
     expect(group('named').getAttribute('role')).toBe('group');
     expect(group('multiple').querySelector('[data-value]')!.hasAttribute('tabindex')).toBe(false);
   });
+
+  // Regression: on the linear surface the selection ring and the focus ring
+  // were the same; on the pixel surface the cut corners clipped the selection
+  // ring, the only mark of a selected chip.
+  it('marks the selected chip apart from keyboard focus on both surfaces', async () => {
+    @Component({
+      imports: PARTS,
+      template: `
+        <pxl-chip-group aria-label="Pixel" surface="pixel" [defaultValue]="['a']">${CHIPS}</pxl-chip-group>
+        <pxl-chip-group aria-label="Linear" surface="linear" [defaultValue]="['a']">${CHIPS}</pxl-chip-group>
+      `,
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const [pixelSelected, pixelOther, linearSelected, linearOther] = buttonsOf(fixture.nativeElement).map((item) => Array.from(item.classList));
+    // Pixel: a frame inside the selected chip, which the cut corners leave
+    // whole; focus lights up the chip's edge from a layer over the chip.
+    expect(pixelSelected).toEqual(expect.arrayContaining(['pxl-corner-sm', '*:outline-2', '*:-outline-offset-4', '*:outline-retro-cyan/60']));
+    expect(pixelSelected!.filter((c) => c.includes('ring'))).toEqual([]);
+    expect(pixelOther!.filter((c) => c.startsWith('*:'))).toEqual([]);
+    for (const chip of [pixelSelected!, pixelOther!]) expect(chip).toContain('focus-visible:after:pxl-focus-inset');
+    // Linear: the selection ring hugs the chip; the focus ring stands off it.
+    expect(linearSelected).toEqual(expect.arrayContaining(['ring-2', 'ring-retro-cyan/60', 'focus-visible:ring-offset-2']));
+    expect(linearOther).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:ring-offset-2']));
+    expect(linearOther).not.toContain('ring-2');
+  });
 });

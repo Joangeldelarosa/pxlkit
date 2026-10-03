@@ -210,7 +210,7 @@ export function tableClasses(
     headRow: cn('bg-retro-surface/60', surface === 'pixel' ? 'border-b-2 border-retro-border' : 'border-b border-retro-border'),
     selectHead: cn('whitespace-nowrap text-xs font-semibold text-retro-muted w-10', pad, stickyFirstColumn && stickyFirstHead),
     selectCell: cn('text-retro-text w-10', pad, stickyFirstColumn && stickyFirstBody),
-    sortButton: cn('inline-flex items-center text-retro-muted hover:text-retro-text outline-none', focusRing),
+    sortButton: cn('inline-flex items-center text-retro-muted hover:text-retro-text focus-visible:outline-hidden', focusRing),
     skeletonRow: 'border-b border-retro-border/20',
     skeletonCell: pad,
     skeleton: tableSkeletonClasses(surface),

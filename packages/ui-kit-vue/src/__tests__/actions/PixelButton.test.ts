@@ -59,4 +59,10 @@ describe('PixelButton', () => {
     expect(disabled.classes()).not.toContain('pxl-shadow');
     expect(disabled.classes()).not.toContain('pxl-shadow-active');
   });
+
+  it('rings keyboard focus, keeping an outline for forced-colors mode, which drops the ring', () => {
+    const classes = mount(PixelButton, { props: { surface: 'linear' }, slots: { default: () => 'Go' } }).classes();
+    expect(classes).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:outline-hidden']));
+    expect(classes.filter((c) => c.endsWith('outline-none'))).toEqual([]);
+  });
 });

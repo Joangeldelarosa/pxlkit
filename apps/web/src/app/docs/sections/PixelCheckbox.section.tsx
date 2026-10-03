@@ -45,7 +45,7 @@ export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSection
       <ul className="docs-aria-patterns">
         <li><code>checkbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Rendered as a &lt;button type=&quot;button&quot;&gt; with role=&quot;checkbox&quot; and aria-checked reflecting the boolean state. aria-disabled and aria-required mirror the disabled and required props. When a name prop is supplied a hidden &lt;input&gt; is emitted alongside so the value participates in native &lt;form&gt; submissions only while checked.</p>
+      <p className="docs-aria-notes">Rendered as a &lt;button type=&quot;button&quot;&gt; with role=&quot;checkbox&quot; and aria-checked reflecting the boolean state. aria-disabled and aria-required mirror the disabled and required props. When a name prop is supplied a hidden &lt;input&gt; is emitted alongside so the value participates in native &lt;form&gt; submissions only while checked. Keyboard focus shows on the box: a ring in the tone on the linear surface, the box&#39;s edge on the pixel surface, whose cut corners would clip a ring.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

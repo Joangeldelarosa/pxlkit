@@ -55,9 +55,18 @@ describe('accordion recipes', () => {
     expect(classesOf(accordionItemClasses('linear', false).item)).toEqual(expect.arrayContaining(['border', 'rounded-md']));
   });
 
-  it('rings the focused header and sets it in the surface font', () => {
+  it('rings the focused header, keeping an outline for forced-colors mode, and sets it in the surface font', () => {
     const trigger = classesOf(accordionItemClasses('linear', false).trigger);
-    expect(trigger).toEqual(expect.arrayContaining(['font-sans', 'focus-visible:ring-2', 'focus-visible:ring-retro-cyan/30']));
+    expect(trigger).toEqual(
+      expect.arrayContaining(['font-sans', 'focus-visible:ring-2', 'focus-visible:ring-retro-cyan/30', 'focus-visible:outline-hidden']),
+    );
+    expect(trigger).not.toContain('outline-none');
+  });
+
+  it("lights up the focused header inside the item on the pixel surface, where the item's cut corners would clip a ring", () => {
+    const trigger = classesOf(accordionItemClasses('pixel', false).trigger);
+    expect(trigger).toEqual(expect.arrayContaining(['font-mono', 'focus-visible:pxl-focus-inset']));
+    expect(trigger.filter((c) => c.includes('ring'))).toEqual([]);
   });
 
   it('turns the chevron while open', () => {

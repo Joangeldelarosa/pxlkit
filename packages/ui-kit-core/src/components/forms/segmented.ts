@@ -36,7 +36,7 @@ export function segmentClasses(surface: Surface, { tone, active, disabled }: Seg
   const s = surfaceClasses(surface);
   const t = toneMap[tone];
   return cn(
-    'px-3 py-1.5 text-xs outline-none whitespace-nowrap',
+    'px-3 py-1.5 text-xs focus-visible:outline-hidden whitespace-nowrap',
     s.font,
     s.radius,
     s.transition,

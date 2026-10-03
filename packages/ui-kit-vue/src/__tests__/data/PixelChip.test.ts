@@ -68,4 +68,14 @@ describe('PixelChip', () => {
     expect(wrapper.attributes('value')).toBeUndefined();
     expect(wrapper.attributes('data-testid')).toBe('chip');
   });
+
+  it("shows the label button's keyboard focus on the frame: inside its cut corners on the pixel surface, a ring in the tone on the linear one", () => {
+    const frame = (surface: 'pixel' | 'linear') =>
+      mount(PixelChip, { props: { label: 'React', tone: 'pink', surface, onClick: () => {}, onDelete: () => {} } }).classes();
+    expect(frame('pixel')).toEqual(expect.arrayContaining(['pxl-corner-sm', 'has-[[data-chip-action]:focus-visible]:pxl-focus-inset']));
+    expect(frame('pixel').filter((c) => c.includes('ring'))).toEqual([]);
+    expect(frame('linear')).toEqual(
+      expect.arrayContaining(['has-[[data-chip-action]:focus-visible]:ring-2', 'has-[[data-chip-action]:focus-visible]:ring-retro-pink/40']),
+    );
+  });
 });

@@ -272,6 +272,14 @@ export const pixelType = {
   base: 'text-base',
 } as const;
 
+/**
+ * The keyboard focus ring: a box-shadow around the element, set off by a gap
+ * in the page colour. Pair it with `focus-visible:outline-hidden` rather
+ * than `outline-none`: forced-colors mode drops box-shadows, and the hidden
+ * outline is what shows focus there. On the pixel surface a cut corner
+ * (`.pxl-corner-*`) clips the ring, and the stylesheet draws focus inside
+ * the element instead.
+ */
 export const focusRing = 'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg';
 
 /**
@@ -282,4 +290,4 @@ export const focusRing = 'focus-visible:ring-2 focus-visible:ring-offset-2 focus
  * either theme.
  */
 export const inputBase =
-  'w-full border bg-retro-surface/40 focus:bg-retro-surface/70 text-retro-text font-mono transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed';
+  'w-full border bg-retro-surface/40 focus:bg-retro-surface/70 text-retro-text font-mono transition-all focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed';

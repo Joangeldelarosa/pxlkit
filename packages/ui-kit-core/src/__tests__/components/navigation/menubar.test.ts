@@ -147,6 +147,12 @@ describe('menubar ids and recipes', () => {
     expect(classesOf(menubarTriggerClasses('pixel', false))).not.toContain('bg-retro-surface/80');
   });
 
+  it('rings a focused menu button, keeping an outline for forced-colors mode, which drops the ring', () => {
+    const trigger = classesOf(menubarTriggerClasses('linear', false));
+    expect(trigger).toEqual(expect.arrayContaining(['focus-visible:ring-2', 'focus-visible:outline-hidden']));
+    expect(trigger).not.toContain('outline-none');
+  });
+
   it('tints the highlighted item and dims a disabled one', () => {
     expect(classesOf(menubarItemClasses('pixel', { highlighted: true, disabled: false }))).toContain('bg-retro-surface/80');
     expect(classesOf(menubarItemClasses('pixel', { highlighted: false, disabled: false }))).toContain('hover:bg-retro-surface/40');

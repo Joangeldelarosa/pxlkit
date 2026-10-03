@@ -92,7 +92,7 @@ describe('data table recipes', () => {
       expect(classes.table).toBe(`w-full text-left text-sm ${s.font}`);
       expect(classes.head).toBe(`bg-retro-surface/60 ${rule} sticky top-0 z-10`);
       expect(classes.sortButton).toBe(
-        `inline-flex items-center gap-1 text-left text-retro-muted hover:text-retro-text outline-none ${focusRing} ${s.transition}`,
+        `inline-flex items-center gap-1 text-left text-retro-muted hover:text-retro-text focus-visible:outline-hidden ${focusRing} ${s.transition}`,
       );
       expect(classes.skeleton).toBe(tableSkeletonClasses(surface));
       const pagination = dataTablePaginationClasses(surface);
@@ -102,10 +102,10 @@ describe('data table recipes', () => {
         }`,
       );
       expect(pagination.pageSizeSelect).toBe(
-        `bg-retro-surface/40 px-1 py-0.5 text-retro-text outline-none ${s.border} ${s.radius} ${focusRing} border-retro-border-strong`,
+        `bg-retro-surface/40 px-1 py-0.5 text-retro-text focus-visible:outline-hidden ${s.border} ${s.radius} ${focusRing} border-retro-border-strong`,
       );
       expect(pagination.pageButton).toBe(
-        `px-2 py-1 text-retro-text outline-none disabled:opacity-50 disabled:cursor-not-allowed ${s.border} ${s.radius} ${focusRing} border-retro-border-strong hover:bg-retro-surface/40`,
+        `px-2 py-1 text-retro-text focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed ${s.border} ${s.radius} ${focusRing} border-retro-border-strong hover:bg-retro-surface/40`,
       );
     }
     const plain = dataTableClasses('pixel', { density: 'compact', bordered: false, stickyHeader: false });

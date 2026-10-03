@@ -206,16 +206,16 @@ export const PixelFileUpload = forwardRef<HTMLDivElement, PixelFileUploadProps>(
           aria-describedby={dropzone ? undefined : fieldDescribedBy(inputId, { hint, error })}
         />
 
+        {/*
+          The browse button is a second label of the file input, which stays
+          the one control: one tab stop, named by both labels, described by
+          the hint or error, and opened by a click on either label.
+        */}
         {!dropzone && (
-          <button
-            type="button"
-            onClick={handleBrowse}
-            disabled={disabled}
-            className={c.button}
-          >
+          <label htmlFor={inputId} className={c.button}>
             <OutlineIcon paths={fileUploadIcons.upload} className={c.buttonIcon} />
             <span>Choose file{multiple ? 's' : ''}</span>
-          </button>
+          </label>
         )}
 
         {files && files.length > 0 && (

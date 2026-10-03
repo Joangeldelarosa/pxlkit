@@ -25,9 +25,9 @@ describe('input group recipes', () => {
     }
   });
 
-  it('strips each control and divides it from the next, except the last', () => {
+  it('strips each control, which shows focus inside the shell that clips it, and divides it from the next, except the last', () => {
     for (const surface of SURFACES) {
-      const base = 'min-w-0 border-0 rounded-none focus:z-10 focus-visible:z-10 relative';
+      const base = 'min-w-0 border-0 rounded-none focus:z-10 focus-visible:z-10 focus-visible:pxl-focus-inset relative';
       expect(inputGroupItemClasses(surface, true)).toBe(base);
       expect(inputGroupItemClasses(surface, false)).toBe(
         `${base} border-r ${surfaceClasses(surface).border} border-retro-border/60`,

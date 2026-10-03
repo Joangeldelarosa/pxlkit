@@ -27,7 +27,7 @@ describe('split button recipes', () => {
     }
   });
 
-  it('flattens the primary button into the frame', () => {
+  it('flattens the primary button into the frame, focus drawn inside it', () => {
     expect(classesOf(splitButtonPrimaryClasses)).toEqual([
       'rounded-none',
       'border-0',
@@ -38,15 +38,24 @@ describe('split button recipes', () => {
       'hover:translate-y-0',
       'active:translate-x-0',
       'active:translate-y-0',
+      'focus-visible:pxl-focus-inset',
     ]);
   });
 
   it('fills the chevron button with the tone, behind a divider, dimmed while disabled', () => {
     const t = toneMap.purple;
     expect(splitButtonToggleClasses('linear', 'purple')).toBe(
-      `flex items-center border-0 border-l px-2 outline-none disabled:opacity-50 disabled:cursor-not-allowed ${surfaceClasses('linear').transition} ${t.border} ${t.bg} ${t.hover} ${t.text}`,
+      `flex items-center border-0 border-l px-2 focus-visible:pxl-focus-inset disabled:opacity-50 disabled:cursor-not-allowed ${surfaceClasses('linear').transition} ${t.border} ${t.bg} ${t.hover} ${t.text}`,
     );
     expect(SPLIT_BUTTON_TOGGLE_LABEL).toBe('More options');
+  });
+
+  it('draws keyboard focus inside both buttons on both surfaces, as the frame clips them', () => {
+    expect(splitButtonGroupClasses('linear', 'green')).toContain('overflow-hidden');
+    for (const surface of ['pixel', 'linear'] as const) {
+      expect(classesOf(splitButtonToggleClasses(surface, 'green'))).toContain('focus-visible:pxl-focus-inset');
+    }
+    expect(classesOf(splitButtonPrimaryClasses)).toContain('focus-visible:pxl-focus-inset');
   });
 
   it('places the menu below the root, aligned with either edge', () => {

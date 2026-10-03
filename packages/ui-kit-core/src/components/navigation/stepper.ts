@@ -215,7 +215,7 @@ export function stepClasses(surface: Surface, { orientation, size, state, clicka
     root: cn(
       'group relative flex',
       vertical ? 'flex-row items-start gap-3' : 'flex-1 flex-col items-center text-center gap-1.5',
-      clickable && cn('cursor-pointer outline-none', focusRing, t.ring, 'rounded-[2px]'),
+      clickable && cn('cursor-pointer focus-visible:outline-hidden', focusRing, t.ring, 'rounded-[2px]'),
       !clickable && 'cursor-default',
     ),
     indicator: cn(

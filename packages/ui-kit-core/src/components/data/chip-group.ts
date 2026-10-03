@@ -8,14 +8,26 @@ import { cn, surfaceClasses, type Surface } from '../../common';
 /** The row. */
 export const chipGroupClasses = 'inline-flex flex-row flex-wrap items-center gap-1.5';
 
-/** The toggle button around a chip: a bare button (the chip paints itself), ringed while selected. */
+/**
+ * The toggle button around a chip: a bare button (the chip paints itself).
+ * On the linear surface a selected chip is ringed, and keyboard focus sets
+ * the ring off the chip, so focus and selection read apart. The pixel
+ * surface's cut corners clip any ring: there a selected chip carries a
+ * frame inside its border, and focus lights up the chip's edge from a layer
+ * over the chip — the chip, which clips itself, paints over the button's
+ * own outline.
+ */
 export function chipGroupItemClasses(surface: Surface, selected: boolean): string {
+  const pixel = surface === 'pixel';
   return cn(
     'bg-transparent border-0 p-0 m-0 text-inherit cursor-pointer',
     'inline-flex items-center transition-colors',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/60',
+    'focus-visible:outline-hidden',
     surfaceClasses(surface).radius,
-    selected && 'ring-2 ring-retro-cyan/60',
+    pixel
+      ? 'relative focus-visible:after:absolute focus-visible:after:inset-0 focus-visible:after:pxl-focus-inset'
+      : 'focus-visible:ring-2 focus-visible:ring-retro-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg',
+    selected && (pixel ? '*:outline-2 *:outline-solid *:-outline-offset-4 *:outline-retro-cyan/60' : 'ring-2 ring-retro-cyan/60'),
   );
 }
 

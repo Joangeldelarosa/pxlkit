@@ -144,7 +144,7 @@ describe('navigation menu recipes', () => {
 
   it('tints the item whose panel is open', () => {
     expect(classesOf(navigationMenuTriggerClasses('pixel', true))).toEqual(
-      expect.arrayContaining(['bg-retro-surface/60', 'pxl-corner-sm', 'focus-visible:ring-retro-cyan/40']),
+      expect.arrayContaining(['bg-retro-surface/60', 'pxl-corner-sm', 'focus-visible:ring-retro-cyan/40', 'focus-visible:outline-hidden']),
     );
     expect(classesOf(navigationMenuTriggerClasses('pixel', false))).not.toContain('bg-retro-surface/60');
   });

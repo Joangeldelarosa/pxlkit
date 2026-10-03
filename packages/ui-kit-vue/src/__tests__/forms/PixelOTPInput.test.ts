@@ -137,4 +137,15 @@ describe('PixelOTPInput', () => {
     await vue.unmount();
     expect(actual).toEqual(expected);
   });
+
+  // Regression: the cells carried the text field's `w-full`, which Tailwind
+  // emits after their own width, so each cell spanned the whole row.
+  it("sizes each cell as a square of its size, without a text field's full width", () => {
+    for (const [size, width] of [['sm', 'w-8'], ['md', 'w-10'], ['lg', 'w-12']] as const) {
+      for (const cell of cellsOf(mount(PixelOTPInput, { props: { length: 2, size } }).element)) {
+        expect(cell.className.split(' ')).toContain(width);
+        expect(cell.className.split(' ')).not.toContain('w-full');
+      }
+    }
+  });
 });

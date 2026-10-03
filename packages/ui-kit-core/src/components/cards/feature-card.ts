@@ -81,7 +81,7 @@ export function featureCardClasses(
       interactive && 'cursor-pointer hover:-translate-y-[2px]',
       interactive && s.shadowHover,
       interactive &&
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
     ),
     badgeRow: cn('min-h-[28px] flex items-center', !badge && 'invisible', horizontal && 'col-span-2'),
     badge: cn('inline-flex items-center px-2.5 py-1 text-[11px] leading-none', s.border, s.radiusFull, s.font, b.text, b.border, b.soft),

@@ -37,6 +37,10 @@ const fadeMask = 'linear-gradient(to right, transparent 0, #000 16px, #000 calc(
       )
     "
   >
+    <!--
+      A scrollable list keeps its tabs on one line, which overflows: `flex-wrap`
+      would beat `flex-nowrap`, as Tailwind emits it last.
+    -->
     <div
       v-bind="{ ...$attrs, class: undefined }"
       role="tablist"
@@ -45,7 +49,7 @@ const fadeMask = 'linear-gradient(to right, transparent 0, #000 16px, #000 calc(
       :class="
         cn(
           'flex gap-1',
-          vertical ? 'flex-col' : 'flex-wrap',
+          vertical ? 'flex-col' : !scrolls && 'flex-wrap',
           scrolls && 'flex-nowrap overflow-x-auto scrollbar-hidden',
           scrolls && 'overflow-y-hidden',
         )

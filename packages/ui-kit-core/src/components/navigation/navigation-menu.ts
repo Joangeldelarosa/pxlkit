@@ -146,7 +146,7 @@ export function navigationMenuItemClasses(viewport: boolean): string {
 export function navigationMenuTriggerClasses(surface: Surface, expanded: boolean): string {
   const s = surfaceClasses(surface);
   return cn(
-    'inline-flex max-w-full items-center gap-2 px-3 py-2 text-sm text-retro-text outline-none',
+    'inline-flex max-w-full items-center gap-2 px-3 py-2 text-sm text-retro-text focus-visible:outline-hidden',
     'cursor-pointer select-none',
     s.font,
     s.radius,

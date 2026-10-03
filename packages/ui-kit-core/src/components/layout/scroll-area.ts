@@ -27,7 +27,7 @@ export interface ScrollAreaOptions {
 export function scrollAreaClasses(surface: Surface, { variant, bordered = false }: ScrollAreaOptions): string {
   const s = surfaceClasses(surface);
   return cn(
-    'relative outline-none focus-visible:ring-2 focus-visible:ring-retro-cyan/40',
+    'relative focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-retro-cyan/40',
     scrollAreaVariantClasses[variant],
     bordered && s.border,
     bordered && s.radius,

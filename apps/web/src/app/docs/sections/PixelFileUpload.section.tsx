@@ -46,7 +46,7 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
         <li><code>button-like dropzone</code></li>
         <li><code>aria-describedby for accepted formats</code></li>
       </ul>
-      <p className="docs-aria-notes">Dropzone exposes role=&quot;button&quot; with tabIndex 0 (or -1 when disabled) and, while a hint or error shows, aria-describedby pointing at it. The hidden &lt;input type=&quot;file&quot;&gt; is aria-hidden while the dropzone is active; without the dropzone the input itself carries that aria-describedby.</p>
+      <p className="docs-aria-notes">Dropzone exposes role=&quot;button&quot; with tabIndex 0 (or -1 when disabled) and, while a hint or error shows, aria-describedby pointing at it. The hidden &lt;input type=&quot;file&quot;&gt; is aria-hidden while the dropzone is active. Without the dropzone the input is the one control and tab stop: the browse button is a second &lt;label&gt; of it, so the input is named by both labels, carries the aria-describedby, and the button shows its keyboard focus.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -66,6 +66,11 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
             <td><kbd>Space</kbd></td>
             <td>Opens the native file picker</td>
             <td>dropzone has focus</td>
+          </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Opens the native file picker</td>
+            <td>file input has focus (no dropzone)</td>
           </tr>
         </tbody>
       </table>
