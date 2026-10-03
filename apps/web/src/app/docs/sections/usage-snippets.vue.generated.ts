@@ -88,6 +88,13 @@ import { PixelBadge, PixelBadgeGroup } from '@pxlkit/ui-kit-vue';
     <PixelBadge tone="gold">design</PixelBadge>
   </PixelBadgeGroup>
 </template>`,
+  'pixel-bare-button': `<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton>Bare button</PixelBareButton>
+</template>`,
   'pixel-bare-input': `<script setup lang="ts">
 import { PixelBareInput } from '@pxlkit/ui-kit-vue';
 </script>
@@ -472,6 +479,33 @@ const cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
     </div>
   </PixelGrid>
 </template>`,
+  'pixel-hero-media': `<script setup lang="ts">
+import { PixelHeroMedia } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroMedia ratio="16/10">
+    <div
+      class="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted"
+    >
+      16:10 media
+    </div>
+  </PixelHeroMedia>
+</template>`,
+  'pixel-hero-section': `<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    eyebrow="Introducing"
+    headline="Pixel-perfect retro UI for modern web"
+    subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+  >
+    <template #primary-cta><button type="button">Get started</button></template>
+    <template #secondary-cta><button type="button">View docs</button></template>
+  </PixelHeroSection>
+</template>`,
   'pixel-icon-frame': `<script setup lang="ts">
 import { PixelIconFrame } from '@pxlkit/ui-kit-vue';
 </script>
@@ -566,6 +600,21 @@ const open = ref(false);
     <p>This is a minimal modal with title and body content.</p>
   </PixelModal>
 </template>`,
+  'pixel-mouse-parallax': `<script setup lang="ts">
+import { PixelMouseParallax } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+    <PixelMouseParallax :strength="20">
+      <div
+        class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan"
+      >
+        Follows the cursor
+      </div>
+    </PixelMouseParallax>
+  </div>
+</template>`,
   'pixel-navigation-menu': `<script setup lang="ts">
 import { h } from 'vue';
 import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-vue';
@@ -608,6 +657,24 @@ const page = ref(1);
 
 <template>
   <PixelPagination v-model:page="page" :total="10" />
+</template>`,
+  'pixel-parallax-group': `<script setup lang="ts">
+import { PixelParallaxGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelParallaxGroup style="height: 240px; background: #0b0b0f; color: #e5e7eb">
+    <div style="position: absolute; inset: 0; display: grid; place-items: center">Parallax viewport</div>
+  </PixelParallaxGroup>
+</template>`,
+  'pixel-parallax-layer': `<script setup lang="ts">
+import { PixelParallaxLayer } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelParallaxLayer :speed="0.5" axis="y">
+    <div style="padding: 24px; background: #111; color: #fff">Scroll to see this layer move at half speed.</div>
+  </PixelParallaxLayer>
 </template>`,
   'pixel-password-input': `<script setup lang="ts">
 import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';
@@ -848,6 +915,29 @@ import { PixelSpinner } from '@pxlkit/ui-kit-vue';
 <template>
   <PixelSpinner />
 </template>`,
+  'pixel-split-button': `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSplitButton } from '@pxlkit/ui-kit-vue';
+
+const last = ref('—');
+</script>
+
+<template>
+  <div class="flex flex-col items-start gap-2">
+    <PixelSplitButton
+      label="Save"
+      tone="cyan"
+      :options="[
+        { value: 'draft', label: 'Save as draft' },
+        { value: 'template', label: 'Save as template' },
+        { value: 'copy', label: 'Save a copy' },
+      ]"
+      @primary="last = 'primary'"
+      @select="(value) => (last = value)"
+    />
+    <span class="text-xs text-retro-muted">last action: {{ last }}</span>
+  </div>
+</template>`,
   'pixel-stack': `<script setup lang="ts">
 import { PixelStack } from '@pxlkit/ui-kit-vue';
 </script>
@@ -1017,6 +1107,19 @@ import { PixelZoomIn } from '@pxlkit/ui-kit-vue';
   <PixelZoomIn>
     <div style="padding: 16px; background: #0EA5E9; color: #fff; border-radius: 8px">Zoom in content</div>
   </PixelZoomIn>
+</template>`,
+  'pxl-kit-button': `<script setup lang="ts">
+import { PxlKitButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PxlKitButton label="Favorite">
+    <template #icon>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+      </svg>
+    </template>
+  </PxlKitButton>
 </template>`,
   'pxl-kit-locale-provider': `<script setup lang="ts">
 import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';

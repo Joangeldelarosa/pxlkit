@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { PixelParallaxLayer } from '../../parallax/PixelParallaxLayer';
+import { mockMatchMedia, type MatchMediaController } from '../animations/matchmedia-mock';
 
 describe('PixelParallaxLayer', () => {
   let rafCallbacks: FrameRequestCallback[];
@@ -78,5 +79,48 @@ describe('PixelParallaxLayer', () => {
     const { unmount } = render(<PixelParallaxLayer>x</PixelParallaxLayer>);
     unmount();
     expect(cancelSpy).toHaveBeenCalled();
+  });
+});
+
+/* ─── Regression: the manifest has the layer respect prefers-reduced-motion,
+   but it kept moving with the scroll. ──────────────────────────────────── */
+
+describe('PixelParallaxLayer — reduced motion', () => {
+  let media: MatchMediaController | undefined;
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame'] });
+  });
+
+  afterEach(() => {
+    media?.restore();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('holds still while the user prefers reduced motion', () => {
+    media = mockMatchMedia(true);
+    const { container } = render(<PixelParallaxLayer speed={0.5}>x</PixelParallaxLayer>);
+    act(() => { vi.advanceTimersByTime(100); });
+    expect((container.firstElementChild as HTMLElement).style.transform).toBe('');
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('stops following the scroll when the preference turns on, and follows it again when it turns off', () => {
+    media = mockMatchMedia(false);
+    const { container } = render(<PixelParallaxLayer speed={0.5}>x</PixelParallaxLayer>);
+    const el = container.firstElementChild as HTMLElement;
+    act(() => { vi.advanceTimersToNextFrame(); });
+    expect(el.style.transform).toBe(`translate3d(0, ${(window.innerHeight / 2) * 0.5}px, 0)`);
+
+    act(() => media!.setMatches(true));
+    vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({ top: 100, height: 0 } as DOMRect);
+    act(() => { vi.advanceTimersByTime(100); });
+    expect(el.style.transform).toBe(`translate3d(0, ${(window.innerHeight / 2) * 0.5}px, 0)`);
+    expect(vi.getTimerCount()).toBe(0);
+
+    act(() => media!.setMatches(false));
+    act(() => { vi.advanceTimersToNextFrame(); });
+    expect(el.style.transform).toBe(`translate3d(0, ${(window.innerHeight / 2 - 100) * 0.5}px, 0)`);
   });
 });

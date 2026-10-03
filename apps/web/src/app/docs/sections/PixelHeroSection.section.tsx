@@ -43,9 +43,9 @@ export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsS
       <h3 id="pixel-hero-section-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>semantic &lt;section&gt; with aria-labelledby pointing at headline</code></li>
+        <li><code>region</code></li>
       </ul>
-      <p className="docs-aria-notes">Author should set id on the headline and aria-labelledby on the section when the hero acts as a labelled landmark.</p>
+      <p className="docs-aria-notes">Renders a <code>&lt;section&gt;</code> whose headline is the page&#39;s <code>&lt;h1&gt;</code>. A section is a landmark only once it has an accessible name: give the hero an <code>aria-label</code> (it reaches the <code>&lt;section&gt;</code>) when it should be one, for instance on a page with several landmarks.</p>
     </section>
     <section aria-labelledby="pixel-hero-section-usage">
       <h3 id="pixel-hero-section-usage">Usage</h3>
@@ -65,6 +65,39 @@ export function Default() {
     />
   )
 }`}
+        vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    eyebrow="Introducing"
+    headline="Pixel-perfect retro UI for modern web"
+    subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+  >
+    <template #primary-cta><button type="button">Get started</button></template>
+    <template #secondary-cta><button type="button">View docs</button></template>
+  </PixelHeroSection>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      eyebrow="Introducing"
+      headline="Pixel-perfect retro UI for modern web"
+      subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+      [primaryCta]="getStarted"
+      [secondaryCta]="viewDocs"
+    ></section>
+    <ng-template #getStarted><button type="button">Get started</button></ng-template>
+    <ng-template #viewDocs><button type="button">View docs</button></ng-template>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -87,6 +120,39 @@ export function Default() {
     />
   )
 }`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    eyebrow="Introducing"
+    headline="Pixel-perfect retro UI for modern web"
+    subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+  >
+    <template #primary-cta><button type="button">Get started</button></template>
+    <template #secondary-cta><button type="button">View docs</button></template>
+  </PixelHeroSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      eyebrow="Introducing"
+      headline="Pixel-perfect retro UI for modern web"
+      subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+      [primaryCta]="getStarted"
+      [secondaryCta]="viewDocs"
+    ></section>
+    <ng-template #getStarted><button type="button">Get started</button></ng-template>
+    <ng-template #viewDocs><button type="button">View docs</button></ng-template>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-split">
@@ -109,6 +175,47 @@ export function Split() {
     />
   )
 }`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    variant="split"
+    eyebrow="New in v2"
+    headline="Compose richer hero sections"
+    subline="Pair a tagline with media on the side using the split variant."
+    tone="cyan"
+  >
+    <template #primary-cta><button type="button">Try it</button></template>
+    <template #media>
+      <div style="width: 100%; height: 240px; background: #111; border: 1px solid #333" />
+    </template>
+  </PixelHeroSection>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      variant="split"
+      eyebrow="New in v2"
+      headline="Compose richer hero sections"
+      subline="Pair a tagline with media on the side using the split variant."
+      [primaryCta]="tryIt"
+      [media]="media"
+      tone="cyan"
+    ></section>
+    <ng-template #tryIt><button type="button">Try it</button></ng-template>
+    <ng-template #media>
+      <div style="width: 100%; height: 240px; background: #111; border: 1px solid #333"></div>
+    </ng-template>
+  \`,
+})
+export class Split {}`}
         />
       </article>
       <article className="docs-example" id="example-compact">
@@ -128,6 +235,34 @@ export function Compact() {
     />
   )
 }`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    density="compact"
+    min-height="sm"
+    headline="Compact density"
+    subline="Tighter rhythm for denser layouts."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      density="compact"
+      minHeight="sm"
+      headline="Compact density"
+      subline="Tighter rhythm for denser layouts."
+    ></section>
+  \`,
+})
+export class Compact {}`}
         />
       </article>
     </section>

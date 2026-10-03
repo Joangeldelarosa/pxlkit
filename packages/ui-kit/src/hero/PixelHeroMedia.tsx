@@ -1,22 +1,20 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
-import { tone as toneTokens, ToneKey } from '../tokens';
-
-type Ratio = '1/1' | '4/5' | '16/10' | '16/9';
-type Anchor = 'center' | 'baseline-headline';
-
-const ratioMap: Record<Ratio, string> = {
-  '1/1': '1 / 1',
-  '4/5': '4 / 5',
-  '16/10': '16 / 10',
-  '16/9': '16 / 9',
-};
+import {
+  heroMediaBodyClasses,
+  heroMediaCaptionClasses,
+  heroMediaClasses,
+  heroMediaRatios,
+  type HeroMediaAnchor,
+  type HeroMediaRatio,
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ToneKey } from '../tokens';
 
 export interface PixelHeroMediaProps extends React.HTMLAttributes<HTMLElement> {
-  ratio?: Ratio;
-  anchor?: Anchor;
+  ratio?: HeroMediaRatio;
+  anchor?: HeroMediaAnchor;
   framed?: boolean;
   tone?: ToneKey;
   caption?: string;
@@ -44,29 +42,20 @@ export const PixelHeroMedia = forwardRef<HTMLElement, PixelHeroMediaProps>(
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
-    const t = toneTokens[tone];
 
     return (
       <figure
         ref={ref as React.Ref<HTMLElement>}
-        className={cn(
-          'relative flex w-full flex-col overflow-hidden',
-          anchor === 'baseline-headline' ? 'self-end' : 'self-center',
-          framed && s.border,
-          framed && s.radiusLg,
-          framed && t.border,
-          className,
-        )}
-        style={{ aspectRatio: ratioMap[ratio], ...style }}
+        className={cn(heroMediaClasses(surface, { anchor, framed, tone }), className)}
+        style={{ aspectRatio: heroMediaRatios[ratio], ...style }}
         {...(rest as React.HTMLAttributes<HTMLElement>)}
       >
-        <div className="relative w-full flex-1">
+        <div className={heroMediaBodyClasses}>
           {children}
         </div>
         {caption && (
           <figcaption
-            className={cn('mt-3 text-xs text-retro-muted', s.font, captionClassName)}
+            className={cn(heroMediaCaptionClasses(surface), captionClassName)}
           >
             {caption}
           </figcaption>

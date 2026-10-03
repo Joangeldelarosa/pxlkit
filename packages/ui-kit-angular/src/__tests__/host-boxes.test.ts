@@ -19,10 +19,11 @@ const BLOCK_ELEMENTS = new Set([
 ]);
 
 /**
- * Hosts that set their display inline, as the React element does:
- * `PxlKitLocaleProvider`'s `<div lang>` is `display: contents`.
+ * Hosts that set their display themselves, as the React element does:
+ * `PxlKitLocaleProvider`'s `<div lang>` is `display: contents`, and
+ * `PixelSplitButton`'s root classes make its `<div>` `inline-flex`.
  */
-const OWN_DISPLAY = new Set(['pxl-locale-provider']);
+const OWN_DISPLAY = new Set(['pxl-locale-provider', 'pxl-split-button']);
 
 interface ComponentDefinition {
   selectors: unknown[][];

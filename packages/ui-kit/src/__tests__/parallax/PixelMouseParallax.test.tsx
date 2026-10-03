@@ -2,6 +2,7 @@ import React from 'react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act, fireEvent, render } from '@testing-library/react';
 import { PixelMouseParallax } from '../../parallax/PixelMouseParallax';
+import { mockMatchMedia, type MatchMediaController } from '../animations/matchmedia-mock';
 
 describe('PixelMouseParallax', () => {
   let rafCallbacks: FrameRequestCallback[];
@@ -96,5 +97,58 @@ describe('PixelMouseParallax', () => {
     const removed = removeSpy.mock.calls.map((c) => c[0]);
     expect(removed).toContain('mousemove');
     expect(window.cancelAnimationFrame).toHaveBeenCalled();
+  });
+});
+
+/* ─── Regression: the layer kept following the cursor for users who prefer
+   reduced motion, which the parallax group's manifest says its children
+   respect. ───────────────────────────────────────────────────────────── */
+
+describe('PixelMouseParallax — reduced motion', () => {
+  let media: MatchMediaController | undefined;
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame'] });
+    vi.spyOn(document.body, 'getBoundingClientRect').mockReturnValue({
+      left: 0, top: 0, right: 200, bottom: 100, width: 200, height: 100, x: 0, y: 0,
+      toJSON: () => ({}),
+    } as DOMRect);
+  });
+
+  afterEach(() => {
+    media?.restore();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('holds still while the user prefers reduced motion', () => {
+    media = mockMatchMedia(true);
+    const added = vi.spyOn(window, 'addEventListener');
+    const { container } = render(<PixelMouseParallax strength={20}>x</PixelMouseParallax>);
+    fireEvent.mouseMove(window, { clientX: 200, clientY: 100 });
+    act(() => { vi.advanceTimersByTime(100); });
+    expect((container.firstElementChild as HTMLElement).style.transform).toBe('');
+    expect(added.mock.calls.map((call) => call[0])).not.toContain('mousemove');
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('stops following the cursor when the preference turns on, and picks up where it was when it turns off', () => {
+    media = mockMatchMedia(false);
+    const { container } = render(<PixelMouseParallax strength={20}>x</PixelMouseParallax>);
+    const el = container.firstElementChild as HTMLElement;
+    fireEvent.mouseMove(window, { clientX: 200, clientY: 100 });
+    act(() => { vi.advanceTimersToNextFrame(); });
+    expect(el.style.transform).toBe('translate3d(1.6px, 1.6px, 0)');
+
+    act(() => media!.setMatches(true));
+    fireEvent.mouseMove(window, { clientX: 0, clientY: 0 });
+    act(() => { vi.advanceTimersByTime(100); });
+    expect(el.style.transform).toBe('translate3d(1.6px, 1.6px, 0)');
+    expect(vi.getTimerCount()).toBe(0);
+
+    act(() => media!.setMatches(false));
+    act(() => { vi.advanceTimersToNextFrame(); });
+    const next = 1.6 + (20 - 1.6) * 0.08;
+    expect(el.style.transform).toBe(`translate3d(${next}px, ${next}px, 0)`);
   });
 });

@@ -116,6 +116,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelAvatarGroup` | stable | data |
 | `PixelBadge` | stable | data |
 | `PixelBadgeGroup` | stable | data |
+| `PixelBareButton` | stable | actions |
 | `PixelBareInput` | stable | forms |
 | `PixelBareTextarea` | stable | forms |
 | `PixelBento` | stable | layout |
@@ -146,15 +147,20 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelFloat` | stable | animations |
 | `PixelGlitch` | stable | animations |
 | `PixelGrid` | stable | layout |
+| `PixelHeroMedia` | stable | hero |
+| `PixelHeroSection` | stable | hero |
 | `PixelIconFrame` | stable | cards |
 | `PixelInput` | stable | forms |
 | `PixelInputGroup` | stable | forms |
 | `PixelKbd` | stable | data |
 | `PixelMenubar` | stable | navigation |
 | `PixelModal` | stable | overlays |
+| `PixelMouseParallax` | stable | parallax |
 | `PixelNavigationMenu` | stable | navigation |
 | `PixelNumberInput` | stable | forms |
 | `PixelPagination` | stable | navigation |
+| `PixelParallaxGroup` | stable | parallax |
+| `PixelParallaxLayer` | stable | parallax |
 | `PixelPasswordInput` | stable | forms |
 | `PixelPopover` | stable | overlay-foundation |
 | `PixelPortal` | stable | overlay-foundation |
@@ -175,6 +181,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelSkeleton` | stable | feedback |
 | `PixelSlideIn` | stable | animations |
 | `PixelSpinner` | stable | feedback |
+| `PixelSplitButton` | stable | actions |
 | `PixelStack` | stable | layout |
 | `PixelStarRating` | stable | cards |
 | `PixelStatCard` | stable | cards |
@@ -192,6 +199,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 | `PixelTwoColumn` | stable | layout |
 | `PixelTypewriter` | stable | animations |
 | `PixelZoomIn` | stable | animations |
+| `PxlKitButton` | deprecated | actions |
 | `PxlKitLocaleProvider` | stable | overlay-foundation |
 | `PxlKitSurfaceProvider` | stable | overlay-foundation |
 | `PxlKitToastProvider` | stable | feedback |

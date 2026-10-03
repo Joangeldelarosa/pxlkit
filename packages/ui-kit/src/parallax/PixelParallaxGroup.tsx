@@ -5,16 +5,15 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 import React, { forwardRef } from 'react';
+import { parallaxGroupClasses, type ParallaxGroupElement } from '@pxlkit/ui-kit-core';
 import { cn } from '../common';
-
-type GroupTag = 'div' | 'section' | 'header' | 'main';
 
 export interface PixelParallaxGroupProps {
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
   /** HTML tag to render. Default `"div"`. */
-  as?: GroupTag;
+  as?: ParallaxGroupElement;
 }
 
 /**
@@ -30,7 +29,7 @@ export const PixelParallaxGroup = forwardRef<HTMLElement, PixelParallaxGroupProp
     return (
       <Tag
         ref={ref as React.Ref<HTMLDivElement>}
-        className={cn('relative overflow-hidden', className)}
+        className={cn(parallaxGroupClasses, className)}
         style={style}
       >
         {children}

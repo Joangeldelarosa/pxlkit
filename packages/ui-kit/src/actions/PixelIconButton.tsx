@@ -1,8 +1,6 @@
 import React, { forwardRef } from 'react';
-import {
-  Tone, Size, Surface, cn,
-  toneMap, sizeSquare, focusRing, surfaceClasses, useEffectiveSurface,
-} from '../common';
+import { iconButtonClasses, iconButtonIconClasses } from '@pxlkit/ui-kit-core';
+import { Tone, Size, Surface, cn, useEffectiveSurface } from '../common';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelIconButton — square icon-only button with required `label` for
@@ -36,25 +34,15 @@ export const PixelIconButton = forwardRef<HTMLButtonElement, PixelIconButtonProp
   ref,
 ) {
   const surface = useEffectiveSurface(surfaceProp);
-  const s = surfaceClasses(surface);
-  const t = toneMap[tone];
   return (
     <button
       ref={ref}
       aria-label={label}
       title={label}
-      className={cn(
-        'inline-flex items-center justify-center outline-none disabled:opacity-50 disabled:cursor-not-allowed',
-        s.border, s.radius, s.transition,
-        sizeSquare[size],
-        t.text, t.border, t.bg, t.hover,
-        focusRing, t.ring,
-        !rest.disabled && s.shadow, !rest.disabled && s.shadowHover, !rest.disabled && s.shadowActive,
-        className,
-      )}
+      className={cn(iconButtonClasses(surface, { tone, size, disabled: !!rest.disabled }), className)}
       {...rest}
     >
-      <span className="inline-flex items-center justify-center shrink-0 leading-none">{icon}</span>
+      <span className={iconButtonIconClasses}>{icon}</span>
     </button>
   );
 });

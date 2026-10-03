@@ -79,6 +79,21 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
 export function Default() {
   return <PixelBareButton>Bare button</PixelBareButton>;
 }`}
+        vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton>Bare button</PixelBareButton>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`<button pxlBareButton>Bare button</button>\`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -93,6 +108,21 @@ export function Default() {
 export function Default() {
   return <PixelBareButton>Bare button</PixelBareButton>;
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton>Bare button</PixelBareButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`<button pxlBareButton>Bare button</button>\`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-with-custom-class">
@@ -109,6 +139,30 @@ export function WithCustomClass() {
     </PixelBareButton>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton class="rounded-md border border-retro-border bg-retro-surface px-3 py-1 text-sm text-retro-text">
+    Styled by consumer
+  </PixelBareButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`
+    <button
+      pxlBareButton
+      class="rounded-md border border-retro-border bg-retro-surface px-3 py-1 text-sm text-retro-text"
+    >
+      Styled by consumer
+    </button>
+  \`,
+})
+export class WithCustomClass {}`}
         />
       </article>
       <article className="docs-example" id="example-with-on-click">
@@ -127,6 +181,26 @@ export function WithOnClick() {
     </PixelBareButton>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+
+const count = ref(0);
+</script>
+
+<template>
+  <PixelBareButton @click="count++">Clicked {{ count }} times</PixelBareButton>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`<button pxlBareButton (click)="count.set(count() + 1)">Clicked {{ count() }} times</button>\`,
+})
+export class WithOnClick {
+  readonly count = signal(0);
+}`}
         />
       </article>
       <article className="docs-example" id="example-disabled">
@@ -143,6 +217,21 @@ export function Disabled() {
     </PixelBareButton>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton disabled class="cursor-not-allowed opacity-50">Disabled</PixelBareButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`<button pxlBareButton disabled class="cursor-not-allowed opacity-50">Disabled</button>\`,
+})
+export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-submit-type">
@@ -165,6 +254,29 @@ export function SubmitType() {
     </form>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <form class="flex gap-2" @submit.prevent>
+    <PixelBareButton type="submit">Submit</PixelBareButton>
+    <PixelBareButton type="reset">Reset</PixelBareButton>
+  </form>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`
+    <form class="flex gap-2" (submit)="$event.preventDefault()">
+      <button pxlBareButton type="submit">Submit</button>
+      <button pxlBareButton type="reset">Reset</button>
+    </form>
+  \`,
+})
+export class SubmitType {}`}
         />
       </article>
       <article className="docs-example" id="example-as-icon-trigger">
@@ -186,6 +298,38 @@ export function AsIconTrigger() {
     </PixelBareButton>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelBareButton } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelBareButton
+    aria-label="Close"
+    class="inline-flex h-6 w-6 items-center justify-center text-retro-muted hover:text-retro-text"
+  >
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  </PixelBareButton>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`
+    <button
+      pxlBareButton
+      aria-label="Close"
+      class="inline-flex h-6 w-6 items-center justify-center text-retro-muted hover:text-retro-text"
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+    </button>
+  \`,
+})
+export class AsIconTrigger {}`}
         />
       </article>
     </section>

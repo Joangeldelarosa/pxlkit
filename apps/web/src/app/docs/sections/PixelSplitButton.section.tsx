@@ -43,8 +43,9 @@ export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsS
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>menu</code></li>
+        <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Chevron trigger exposes aria-haspopup=&quot;menu&quot; and aria-expanded. Dropdown container uses role=&quot;menu&quot; with role=&quot;menuitem&quot; children. Outside click dismisses the menu.</p>
+      <p className="docs-aria-notes">Follows the WAI-ARIA menu button pattern, as PixelDropdown does. The chevron is a button of its own, named &quot;More options&quot;, with <code>aria-haspopup=&quot;menu&quot;</code>, <code>aria-expanded</code>, and <code>aria-controls</code> wired to the menu while it is open. The menu (<code>role=&quot;menu&quot;</code>, named by the chevron through <code>aria-labelledby</code>) takes focus as it opens (<code>tabindex=&quot;-1&quot;</code>) and points <code>aria-activedescendant</code> at the highlighted option, so assistive technology follows the arrows, Home/End and typeahead; its <code>role=&quot;menuitem&quot;</code> options are not tab stops. Escape, Tab and choosing an option return focus to the chevron; a press outside closes the menu and leaves focus where the pointer put it.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -56,19 +57,69 @@ export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsS
         </thead>
         <tbody>
           <tr>
-            <td><kbd>Enter</kbd></td>
-            <td>Triggers the primary action when focused on the primary button</td>
-            <td><span className="docs-muted">—</span></td>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Run the primary action (<code>onPrimary</code>).</td>
+            <td>primary button focused</td>
           </tr>
           <tr>
-            <td><kbd>Space</kbd></td>
-            <td>Activates the focused button (primary or chevron trigger)</td>
-            <td><span className="docs-muted">—</span></td>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Open the menu and move focus into it; close it when it is open.</td>
+            <td>chevron focused</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowDown</kbd></td>
+            <td>Open the menu with focus in it, highlighting the first option.</td>
+            <td>chevron focused</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowUp</kbd></td>
+            <td>Open the menu with focus in it, highlighting the last option.</td>
+            <td>chevron focused</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowDown</kbd></td>
+            <td>Highlight the next option; stops at the last.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>ArrowUp</kbd></td>
+            <td>Highlight the previous option; stops at the first.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Home</kbd></td>
+            <td>Highlight the first option.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>End</kbd></td>
+            <td>Highlight the last option.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Enter / Space</kbd></td>
+            <td>Choose the highlighted option (<code>onSelect</code>), close the menu and return focus to the chevron.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Escape</kbd></td>
+            <td>Close the menu and return focus to the chevron.</td>
+            <td>menu open</td>
           </tr>
           <tr>
             <td><kbd>Tab</kbd></td>
-            <td>Moves focus between primary button, chevron trigger, and menu items</td>
-            <td><span className="docs-muted">—</span></td>
+            <td>Close the menu and move focus on from the chevron.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>Shift+Tab</kbd></td>
+            <td>Close the menu and move focus back from the chevron to the primary button.</td>
+            <td>menu open</td>
+          </tr>
+          <tr>
+            <td><kbd>a-z / 0-9</kbd></td>
+            <td>Typeahead — highlight the first option whose label starts with the typed prefix.</td>
+            <td>menu open</td>
           </tr>
         </tbody>
       </table>
@@ -96,6 +147,37 @@ export function Default() {
     />
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelSplitButton } from '@pxlkit/ui-kit-vue';
+
+const exportOptions = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+</script>
+
+<template>
+  <PixelSplitButton label="Export" :options="exportOptions" @primary="() => {}" @select="() => {}" />
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelSplitButton, type Option } from '@pxlkit/ui-kit-angular';
+
+const exportOptions: Option[] = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+
+@Component({
+  imports: [PixelSplitButton],
+  template: \`<pxl-split-button label="Export" [options]="exportOptions" (primary)="exportAll()" (selected)="exportAs()" />\`,
+})
+export class Default {
+  readonly exportOptions = exportOptions;
+  exportAll(): void {}
+  exportAs(): void {}
+}`}
       />
     </section>
     <section aria-label="Examples">
@@ -122,6 +204,37 @@ export function Default() {
       onSelect={() => {}}
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSplitButton } from '@pxlkit/ui-kit-vue';
+
+const exportOptions = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+</script>
+
+<template>
+  <PixelSplitButton label="Export" :options="exportOptions" @primary="() => {}" @select="() => {}" />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSplitButton, type Option } from '@pxlkit/ui-kit-angular';
+
+const exportOptions: Option[] = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+
+@Component({
+  imports: [PixelSplitButton],
+  template: \`<pxl-split-button label="Export" [options]="exportOptions" (primary)="exportAll()" (selected)="exportAs()" />\`,
+})
+export class Default {
+  readonly exportOptions = exportOptions;
+  exportAll(): void {}
+  exportAs(): void {}
 }`}
         />
       </article>
@@ -151,6 +264,53 @@ export function Tones() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelSplitButton } from '@pxlkit/ui-kit-vue';
+
+const exportOptions = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-3">
+    <PixelSplitButton label="Green" tone="green" :options="exportOptions" />
+    <PixelSplitButton label="Cyan" tone="cyan" :options="exportOptions" />
+    <PixelSplitButton label="Gold" tone="gold" :options="exportOptions" />
+    <PixelSplitButton label="Red" tone="red" :options="exportOptions" />
+    <PixelSplitButton label="Purple" tone="purple" :options="exportOptions" />
+    <PixelSplitButton label="Pink" tone="pink" :options="exportOptions" />
+    <PixelSplitButton label="Neutral" tone="neutral" :options="exportOptions" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSplitButton, type Option } from '@pxlkit/ui-kit-angular';
+
+const exportOptions: Option[] = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+
+@Component({
+  imports: [PixelSplitButton],
+  template: \`
+    <div class="flex flex-wrap gap-3">
+      <pxl-split-button label="Green" tone="green" [options]="exportOptions" />
+      <pxl-split-button label="Cyan" tone="cyan" [options]="exportOptions" />
+      <pxl-split-button label="Gold" tone="gold" [options]="exportOptions" />
+      <pxl-split-button label="Red" tone="red" [options]="exportOptions" />
+      <pxl-split-button label="Purple" tone="purple" [options]="exportOptions" />
+      <pxl-split-button label="Pink" tone="pink" [options]="exportOptions" />
+      <pxl-split-button label="Neutral" tone="neutral" [options]="exportOptions" />
+    </div>
+  \`,
+})
+export class Tones {
+  readonly exportOptions = exportOptions;
+}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
@@ -173,6 +333,43 @@ export function Surfaces() {
       <PixelSplitButton label="Linear" surface="linear" options={exportOptions} />
     </div>
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSplitButton } from '@pxlkit/ui-kit-vue';
+
+const exportOptions = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+</script>
+
+<template>
+  <div class="flex flex-wrap gap-3">
+    <PixelSplitButton label="Pixel" surface="pixel" :options="exportOptions" />
+    <PixelSplitButton label="Linear" surface="linear" :options="exportOptions" />
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSplitButton, type Option } from '@pxlkit/ui-kit-angular';
+
+const exportOptions: Option[] = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+
+@Component({
+  imports: [PixelSplitButton],
+  template: \`
+    <div class="flex flex-wrap gap-3">
+      <pxl-split-button label="Pixel" surface="pixel" [options]="exportOptions" />
+      <pxl-split-button label="Linear" surface="linear" [options]="exportOptions" />
+    </div>
+  \`,
+})
+export class Surfaces {
+  readonly exportOptions = exportOptions;
 }`}
         />
       </article>
@@ -197,6 +394,35 @@ export function Disabled() {
       disabled
     />
   );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelSplitButton } from '@pxlkit/ui-kit-vue';
+
+const exportOptions = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+</script>
+
+<template>
+  <PixelSplitButton label="Export" :options="exportOptions" disabled />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelSplitButton, type Option } from '@pxlkit/ui-kit-angular';
+
+const exportOptions: Option[] = [
+  { value: 'png', label: 'Export as PNG' },
+  { value: 'svg', label: 'Export as SVG' },
+  { value: 'json', label: 'Export icon code' },
+];
+
+@Component({
+  imports: [PixelSplitButton],
+  template: \`<pxl-split-button label="Export" [options]="exportOptions" disabled />\`,
+})
+export class Disabled {
+  readonly exportOptions = exportOptions;
 }`}
         />
       </article>
@@ -226,6 +452,54 @@ export function WithCallbacks() {
       <span className="text-xs text-retro-muted">last action: {last}</span>
     </div>
   );
+}`}
+          vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelSplitButton } from '@pxlkit/ui-kit-vue';
+
+const last = ref('—');
+</script>
+
+<template>
+  <div class="flex flex-col items-start gap-2">
+    <PixelSplitButton
+      label="Save"
+      tone="cyan"
+      :options="[
+        { value: 'draft', label: 'Save as draft' },
+        { value: 'template', label: 'Save as template' },
+        { value: 'copy', label: 'Save a copy' },
+      ]"
+      @primary="last = 'primary'"
+      @select="(value) => (last = value)"
+    />
+    <span class="text-xs text-retro-muted">last action: {{ last }}</span>
+  </div>
+</template>`}
+          angular={`import { Component, signal } from '@angular/core';
+import { PixelSplitButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSplitButton],
+  template: \`
+    <div class="flex flex-col items-start gap-2">
+      <pxl-split-button
+        label="Save"
+        tone="cyan"
+        [options]="[
+          { value: 'draft', label: 'Save as draft' },
+          { value: 'template', label: 'Save as template' },
+          { value: 'copy', label: 'Save a copy' },
+        ]"
+        (primary)="last.set('primary')"
+        (selected)="last.set($event)"
+      />
+      <span class="text-xs text-retro-muted">last action: {{ last() }}</span>
+    </div>
+  \`,
+})
+export class WithCallbacks {
+  readonly last = signal('—');
 }`}
         />
       </article>

@@ -139,6 +139,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@pxlkit/ui-kit`: `PixelStepper` steps get valid roles and names (clickable steps are buttons,
   the others read their position and state as hidden text), and `PixelAccordion` /
   `PixelCollapsible` panels drop an `aria-labelledby` that ARIA does not allow without a role.
+- `@pxlkit/ui-kit`: `PixelSplitButton`'s menu follows the WAI-ARIA menu button pattern, as
+  `PixelDropdown`'s does. It never took focus, had no keyboard support, no name and no Escape,
+  and its options were tab stops: it now takes focus as it opens, is named by the chevron
+  (`aria-labelledby`, `aria-controls`) and points `aria-activedescendant` at the highlighted
+  option; the arrows, Home, End and typeahead move the highlight, Enter and Space choose it,
+  ArrowDown / ArrowUp on the chevron open the menu on its first / last option, and Escape, Tab
+  and choosing return focus to the chevron.
+- `@pxlkit/ui-kit`: `PixelParallaxLayer` and `PixelMouseParallax` hold still when the reader
+  prefers reduced motion, as their docs said they did.
 - `@pxlkit/ui-kit`: a link `PixelCard` (`href`) passes `onKeyDown` to its `<a>`, which it
   dropped; a consumer's `onKeyDown` on an interactive `PixelFeatureCard` runs first and can
   keep Enter and Space from activating it, instead of replacing the card's own handler; and

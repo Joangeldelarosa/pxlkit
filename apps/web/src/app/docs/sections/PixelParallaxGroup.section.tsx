@@ -65,6 +65,27 @@ export function Default() {
     </PixelParallaxGroup>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelParallaxGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelParallaxGroup style="height: 240px; background: #0b0b0f; color: #e5e7eb">
+    <div style="position: absolute; inset: 0; display: grid; place-items: center">Parallax viewport</div>
+  </PixelParallaxGroup>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelParallaxGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelParallaxGroup],
+  template: \`
+    <div pxlParallaxGroup style="height: 240px; background: #0b0b0f; color: #e5e7eb">
+      <div style="position: absolute; inset: 0; display: grid; place-items: center">Parallax viewport</div>
+    </div>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -87,6 +108,27 @@ export function Default() {
     </PixelParallaxGroup>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelParallaxGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelParallaxGroup style="height: 240px; background: #0b0b0f; color: #e5e7eb">
+    <div style="position: absolute; inset: 0; display: grid; place-items: center">Parallax viewport</div>
+  </PixelParallaxGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelParallaxGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelParallaxGroup],
+  template: \`
+    <div pxlParallaxGroup style="height: 240px; background: #0b0b0f; color: #e5e7eb">
+      <div style="position: absolute; inset: 0; display: grid; place-items: center">Parallax viewport</div>
+    </div>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-as-section">
@@ -108,6 +150,27 @@ export function AsSection() {
     </PixelParallaxGroup>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelParallaxGroup } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelParallaxGroup as="section" style="height: 200px; background: #111827; color: #e5e7eb">
+    <div style="position: absolute; inset: 0; display: grid; place-items: center">Section variant</div>
+  </PixelParallaxGroup>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelParallaxGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelParallaxGroup],
+  template: \`
+    <section pxlParallaxGroup style="height: 200px; background: #111827; color: #e5e7eb">
+      <div style="position: absolute; inset: 0; display: grid; place-items: center">Section variant</div>
+    </section>
+  \`,
+})
+export class AsSection {}`}
         />
       </article>
     </section>

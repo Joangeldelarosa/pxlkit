@@ -108,6 +108,14 @@ import { PixelBadge, PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit
   \`,
 })
 export class Default {}`,
+  'pixel-bare-button': `import { Component } from '@angular/core';
+import { PixelBareButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelBareButton],
+  template: \`<button pxlBareButton>Bare button</button>\`,
+})
+export class Default {}`,
   'pixel-bare-input': `import { Component } from '@angular/core';
 import { PixelBareInput } from '@pxlkit/ui-kit-angular';
 
@@ -564,6 +572,41 @@ import { PixelGrid } from '@pxlkit/ui-kit-angular';
 export class Default {
   readonly cells = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];
 }`,
+  'pixel-hero-media': `import { Component } from '@angular/core';
+import { PixelHeroMedia } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroMedia],
+  template: \`
+    <figure pxlHeroMedia ratio="16/10">
+      <div
+        class="flex h-full w-full items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-500/20 text-xs font-mono text-retro-muted"
+      >
+        16:10 media
+      </div>
+    </figure>
+  \`,
+})
+export class Default {}`,
+  'pixel-hero-section': `import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      eyebrow="Introducing"
+      headline="Pixel-perfect retro UI for modern web"
+      subline="A component kit that brings cinematic, terminal-grade interfaces to React apps."
+      [primaryCta]="getStarted"
+      [secondaryCta]="viewDocs"
+    ></section>
+    <ng-template #getStarted><button type="button">Get started</button></ng-template>
+    <ng-template #viewDocs><button type="button">View docs</button></ng-template>
+  \`,
+})
+export class Default {}`,
   'pixel-icon-frame': `import { Component } from '@angular/core';
 import { PixelIconFrame } from '@pxlkit/ui-kit-angular';
 
@@ -668,6 +711,24 @@ import { PixelButton, PixelModal } from '@pxlkit/ui-kit-angular';
 export class Default {
   readonly open = signal(false);
 }`,
+  'pixel-mouse-parallax': `import { Component } from '@angular/core';
+import { PixelMouseParallax } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelMouseParallax],
+  template: \`
+    <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+      <pxl-mouse-parallax [strength]="20">
+        <div
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan"
+        >
+          Follows the cursor
+        </div>
+      </pxl-mouse-parallax>
+    </div>
+  \`,
+})
+export class Default {}`,
   'pixel-navigation-menu': `import { Component, TemplateRef, computed, viewChild } from '@angular/core';
 import { PixelNavigationMenu, type PixelNavigationMenuItem } from '@pxlkit/ui-kit-angular';
 
@@ -713,6 +774,30 @@ import { PixelPagination } from '@pxlkit/ui-kit-angular';
 export class Default {
   readonly page = signal(1);
 }`,
+  'pixel-parallax-group': `import { Component } from '@angular/core';
+import { PixelParallaxGroup } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelParallaxGroup],
+  template: \`
+    <div pxlParallaxGroup style="height: 240px; background: #0b0b0f; color: #e5e7eb">
+      <div style="position: absolute; inset: 0; display: grid; place-items: center">Parallax viewport</div>
+    </div>
+  \`,
+})
+export class Default {}`,
+  'pixel-parallax-layer': `import { Component } from '@angular/core';
+import { PixelParallaxLayer } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelParallaxLayer],
+  template: \`
+    <pxl-parallax-layer [speed]="0.5" axis="y">
+      <div style="padding: 24px; background: #111; color: #fff">Scroll to see this layer move at half speed.</div>
+    </pxl-parallax-layer>
+  \`,
+})
+export class Default {}`,
   'pixel-password-input': `import { Component } from '@angular/core';
 import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';
 
@@ -1001,6 +1086,31 @@ import { PixelSpinner } from '@pxlkit/ui-kit-angular';
   template: \`<pxl-spinner />\`,
 })
 export class Default {}`,
+  'pixel-split-button': `import { Component, signal } from '@angular/core';
+import { PixelSplitButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelSplitButton],
+  template: \`
+    <div class="flex flex-col items-start gap-2">
+      <pxl-split-button
+        label="Save"
+        tone="cyan"
+        [options]="[
+          { value: 'draft', label: 'Save as draft' },
+          { value: 'template', label: 'Save as template' },
+          { value: 'copy', label: 'Save a copy' },
+        ]"
+        (primary)="last.set('primary')"
+        (selected)="last.set($event)"
+      />
+      <span class="text-xs text-retro-muted">last action: {{ last() }}</span>
+    </div>
+  \`,
+})
+export class WithCallbacks {
+  readonly last = signal('—');
+}`,
   'pixel-stack': `import { Component } from '@angular/core';
 import { PixelStack } from '@pxlkit/ui-kit-angular';
 
@@ -1205,6 +1315,21 @@ import { PixelZoomIn } from '@pxlkit/ui-kit-angular';
     <pxl-zoom-in>
       <div style="padding: 16px; background: #0EA5E9; color: #fff; border-radius: 8px">Zoom in content</div>
     </pxl-zoom-in>
+  \`,
+})
+export class Default {}`,
+  'pxl-kit-button': `import { Component } from '@angular/core';
+import { PxlKitButton } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PxlKitButton],
+  template: \`
+    <button pxlKitButton label="Favorite" [icon]="star"></button>
+    <ng-template #star>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z" />
+      </svg>
+    </ng-template>
   \`,
 })
 export class Default {}`,

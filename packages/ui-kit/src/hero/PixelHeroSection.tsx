@@ -1,57 +1,30 @@
 'use client';
 
 import React, { forwardRef } from 'react';
-import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
-import { tone, ToneKey, rhythm } from '../tokens';
+import {
+  heroAlign,
+  heroContainerPadding,
+  heroLayout,
+  heroParallaxBodyClasses,
+  heroParallaxMediaClasses,
+  heroSectionClasses,
+  heroSplitMediaClasses,
+  type HeroDensity,
+  type HeroHeadlineEffect,
+  type HeroMinHeight,
+  type HeroVariant,
+} from '@pxlkit/ui-kit-core';
+import { cn, Surface, useEffectiveSurface } from '../common';
+import { ToneKey } from '../tokens';
 import { PixelContainer } from '../layout/PixelContainer';
 import { PixelTwoColumn } from '../layout/PixelTwoColumn';
 import { PixelCluster } from '../layout/PixelCluster';
-
-type HeadlineEffect = 'typewriter' | 'glitch' | 'none';
-type HeroVariant = 'centered' | 'split' | 'parallax';
-type HeroDensity = 'compact' | 'comfortable';
-type HeroMinHeight = 'sm' | 'md' | 'lg' | 'fullscreen';
-
-const minHeightMap: Record<HeroMinHeight, string> = {
-  sm: 'min-h-[400px]',
-  md: 'min-h-[480px]',
-  lg: 'min-h-[640px]',
-  fullscreen: 'min-h-screen',
-};
-
-const headlineSize = {
-  compact: 'text-3xl sm:text-4xl lg:text-5xl',
-  comfortable: 'text-4xl sm:text-5xl lg:text-6xl',
-} as const;
-
-const eyebrowSize = 'text-xs sm:text-sm';
-const sublineSize = {
-  compact: 'text-base sm:text-lg',
-  comfortable: 'text-lg sm:text-xl',
-} as const;
-
-const densityRhythm = {
-  compact: {
-    eyebrowToHeadline: 'mt-3',
-    headlineToSubline: 'mt-2',
-    sublineToCtas: 'mt-5',
-    ctasToInstall: 'mt-6',
-    installToMeta: 'mt-4',
-  },
-  comfortable: {
-    eyebrowToHeadline: rhythm.eyebrowToHeadline,
-    headlineToSubline: rhythm.headlineToSubline,
-    sublineToCtas: rhythm.sublineToCtas,
-    ctasToInstall: rhythm.ctasToMeta,
-    installToMeta: rhythm.metaToInstall,
-  },
-} as const;
 
 export interface PixelHeroSectionProps extends React.HTMLAttributes<HTMLElement> {
   variant?: HeroVariant;
   eyebrow?: string;
   headline: string;
-  headlineEffect?: HeadlineEffect;
+  headlineEffect?: HeroHeadlineEffect;
   subline?: string;
   primaryCta?: React.ReactNode;
   secondaryCta?: React.ReactNode;
@@ -87,51 +60,24 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
     ref,
   ) {
     const surface = useEffectiveSurface(surfaceProp);
-    const s = surfaceClasses(surface);
-    const sp = densityRhythm[density];
-    const t = tone[toneProp];
-
-    const isCentered = variant === 'centered';
-    const isSplit = variant === 'split' && media;
-    const isParallax = variant === 'parallax';
-    const align = isCentered || isParallax ? 'center' : 'start';
+    const align = heroAlign(variant);
+    const layout = heroLayout(variant, !!media);
+    const c = heroSectionClasses(surface, { tone: toneProp, density, minHeight, align, hasEyebrow: !!eyebrow });
 
     const eyebrowNode = eyebrow ? (
-      <span
-        className={cn(
-          eyebrowSize,
-          s.fontDisplay,
-          'uppercase tracking-[0.18em] max-w-full break-words',
-          t.text,
-        )}
-      >
+      <span className={c.eyebrow}>
         {eyebrow}
       </span>
     ) : null;
 
     const headlineNode = (
-      <h1
-        className={cn(
-          headlineSize[density],
-          s.fontDisplay,
-          'font-bold leading-tight text-retro-text max-w-full break-words',
-          eyebrow && sp.eyebrowToHeadline,
-        )}
-      >
+      <h1 className={c.headline}>
         {headline}
       </h1>
     );
 
     const sublineNode = subline ? (
-      <p
-        className={cn(
-          sublineSize[density],
-          s.font,
-          'text-retro-muted leading-relaxed max-w-prose break-words',
-          sp.headlineToSubline,
-          align === 'center' && 'mx-auto',
-        )}
-      >
+      <p className={c.subline}>
         {subline}
       </p>
     ) : null;
@@ -140,9 +86,9 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
       <PixelCluster
         gap={3}
         align="center"
-        justify={align === 'center' ? 'center' : 'start'}
+        justify={align}
         surface={surface}
-        className={sp.sublineToCtas}
+        className={c.ctas}
       >
         {primaryCta}
         {secondaryCta}
@@ -150,24 +96,19 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
     ) : null;
 
     const installNode = install ? (
-      <div className={cn(sp.ctasToInstall, align === 'center' && 'mx-auto')}>
+      <div className={c.install}>
         {install}
       </div>
     ) : null;
 
     const metaNode = meta ? (
-      <div className={cn(sp.installToMeta, align === 'center' && 'mx-auto')}>
+      <div className={c.meta}>
         {meta}
       </div>
     ) : null;
 
     const textColumn = (
-      <div
-        className={cn(
-          'flex flex-col',
-          align === 'center' && 'items-center text-center mx-auto max-w-3xl',
-        )}
-      >
+      <div className={c.text}>
         {eyebrowNode}
         {headlineNode}
         {sublineNode}
@@ -177,22 +118,22 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
       </div>
     );
 
-    const body = isSplit ? (
+    const body = layout === 'split' ? (
       <PixelTwoColumn
         ratio="60/40"
         gap={8}
         stackBelow="md"
         align="center"
         left={textColumn}
-        right={<div className="w-full">{media}</div>}
+        right={<div className={heroSplitMediaClasses}>{media}</div>}
         surface={surface}
       />
-    ) : isParallax ? (
-      <div className="relative w-full">
+    ) : layout === 'parallax' ? (
+      <div className={heroParallaxBodyClasses}>
         {media && (
           <div
             aria-hidden
-            className="absolute inset-0 -z-10 overflow-hidden pointer-events-none"
+            className={heroParallaxMediaClasses}
           >
             {media}
           </div>
@@ -203,7 +144,7 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
       <>
         {textColumn}
         {media && (
-          <div className={cn('mt-10 w-full', align === 'center' && 'mx-auto')}>
+          <div className={c.media}>
             {media}
           </div>
         )}
@@ -213,18 +154,13 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
     return (
       <section
         ref={ref as React.Ref<HTMLElement>}
-        className={cn(
-          'relative w-full flex flex-col justify-center',
-          minHeightMap[minHeight],
-          s.transition,
-          className,
-        )}
+        className={cn(c.root, className)}
         {...rest}
       >
         <PixelContainer
           as="div"
           maxWidth="xl"
-          padding={density === 'compact' ? 'md' : 'lg'}
+          padding={heroContainerPadding(density)}
           surface={surface}
         >
           {body}

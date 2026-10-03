@@ -44,7 +44,7 @@ export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxD
       <ul className="docs-aria-patterns">
         <li><code>decorative-motion</code></li>
       </ul>
-      <p className="docs-aria-notes">Pointer-only effect with no keyboard or assistive impact. Honor prefers-reduced-motion at the page level when wrapping critical content.</p>
+      <p className="docs-aria-notes">Pointer-only effect with no keyboard or assistive impact. The layer holds still when the user prefers reduced motion (<code>prefers-reduced-motion: reduce</code>), and stops where it is if the preference turns on while it moves.</p>
     </section>
     <section aria-labelledby="pixel-mouse-parallax-usage">
       <h3 id="pixel-mouse-parallax-usage">Usage</h3>
@@ -64,6 +64,39 @@ export function Default() {
     </div>
   );
 }`}
+        vue={`<script setup lang="ts">
+import { PixelMouseParallax } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+    <PixelMouseParallax :strength="20">
+      <div
+        class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan"
+      >
+        Follows the cursor
+      </div>
+    </PixelMouseParallax>
+  </div>
+</template>`}
+        angular={`import { Component } from '@angular/core';
+import { PixelMouseParallax } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelMouseParallax],
+  template: \`
+    <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+      <pxl-mouse-parallax [strength]="20">
+        <div
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan"
+        >
+          Follows the cursor
+        </div>
+      </pxl-mouse-parallax>
+    </div>
+  \`,
+})
+export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
@@ -86,6 +119,39 @@ export function Default() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelMouseParallax } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+    <PixelMouseParallax :strength="20">
+      <div
+        class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan"
+      >
+        Follows the cursor
+      </div>
+    </PixelMouseParallax>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelMouseParallax } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelMouseParallax],
+  template: \`
+    <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+      <pxl-mouse-parallax [strength]="20">
+        <div
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-cyan/20 px-4 py-2 text-sm text-retro-cyan"
+        >
+          Follows the cursor
+        </div>
+      </pxl-mouse-parallax>
+    </div>
+  \`,
+})
+export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-inverted">
@@ -106,6 +172,39 @@ export function Inverted() {
     </div>
   );
 }`}
+          vue={`<script setup lang="ts">
+import { PixelMouseParallax } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+    <PixelMouseParallax :strength="30" invert>
+      <div
+        class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-purple/20 px-4 py-2 text-sm text-retro-purple"
+      >
+        Repels from the cursor
+      </div>
+    </PixelMouseParallax>
+  </div>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelMouseParallax } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelMouseParallax],
+  template: \`
+    <div class="relative h-64 w-full overflow-hidden rounded border border-retro-border bg-retro-bg">
+      <pxl-mouse-parallax [strength]="30" invert>
+        <div
+          class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-retro-purple/20 px-4 py-2 text-sm text-retro-purple"
+        >
+          Repels from the cursor
+        </div>
+      </pxl-mouse-parallax>
+    </div>
+  \`,
+})
+export class Inverted {}`}
         />
       </article>
     </section>

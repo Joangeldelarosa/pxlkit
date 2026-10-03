@@ -25,7 +25,7 @@ export default defineManifest({
     patterns: ['decorative-motion'],
     keyboard: [],
     notes:
-      'Pointer-only effect with no keyboard or assistive impact. Honor prefers-reduced-motion at the page level when wrapping critical content.',
+      'Pointer-only effect with no keyboard or assistive impact. The layer holds still when the user prefers reduced motion (`prefers-reduced-motion: reduce`), and stops where it is if the preference turns on while it moves.',
   },
   related: ['PixelParallaxGroup', 'PixelParallaxLayer', 'PixelScrollParallax'],
   apiStability: 'stable',
