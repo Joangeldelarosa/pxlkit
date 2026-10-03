@@ -78,6 +78,16 @@ describe('FrameworkCode', () => {
     expect(panelText(container)).toBe(ANGULAR);
   });
 
+  it('draws the selected code with a render function when given one', () => {
+    window.localStorage.setItem('pxlkit:framework', 'vue');
+    render(
+      <FrameworkCode react={REACT} vue={VUE}>
+        {(code, framework) => <pre data-testid="drawn">{`${framework}: ${code}`}</pre>}
+      </FrameworkCode>,
+    );
+    expect(screen.getByTestId('drawn').textContent).toBe(`vue: ${VUE}`);
+  });
+
   it('draws the plain reference code block in the docs variant', () => {
     const { container } = render(<FrameworkCode variant="docs" react={REACT} vue={VUE} />);
     const code = container.querySelector('pre.docs-code > code');

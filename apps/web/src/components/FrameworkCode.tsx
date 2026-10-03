@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useId, useRef, useSyncExternalStore, type KeyboardEvent } from 'react';
+import { useCallback, useId, useRef, useSyncExternalStore, type KeyboardEvent, type ReactNode } from 'react';
 import { CodeBlock } from './CodeBlock';
 
 /** The frameworks Pxlkit's UI kit ships for. */
@@ -65,6 +65,8 @@ export interface FrameworkCodeProps {
   variant?: 'block' | 'docs';
   /** Label of the tab list, for screen readers. */
   label?: string;
+  /** Draws the selected code in place of the variant's code block. */
+  children?: (code: string, framework: Framework) => ReactNode;
 }
 
 /**
@@ -72,7 +74,14 @@ export interface FrameworkCodeProps {
  * automatic activation). A framework without the code shows its tab
  * disabled; the panel then falls back to React.
  */
-export function FrameworkCode({ react, vue, angular, variant = 'block', label = 'Framework' }: FrameworkCodeProps) {
+export function FrameworkCode({
+  react,
+  vue,
+  angular,
+  variant = 'block',
+  label = 'Framework',
+  children,
+}: FrameworkCodeProps) {
   const sources: Record<Framework, string | undefined> = { react, vue, angular };
   const [preferred, choose] = usePreferredFramework();
   const selected = sources[preferred] ? preferred : 'react';
@@ -132,7 +141,9 @@ export function FrameworkCode({ react, vue, angular, variant = 'block', label = 
         })}
       </div>
       <div role="tabpanel" id={`${baseId}-panel`} aria-labelledby={`${baseId}-${selected}`} tabIndex={0}>
-        {variant === 'block' ? (
+        {children ? (
+          children(code, selected)
+        ) : variant === 'block' ? (
           <CodeBlock code={code} language={framework.language} />
         ) : (
           <pre className="docs-code">

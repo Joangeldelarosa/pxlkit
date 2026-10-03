@@ -36,7 +36,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   each example's code, and the usage lead, in every framework whose kit implements the
   component, as tabs that remember the reader's pick across the site; the generated
   sections of `/ui-kit` do the same. Each snippet is self-contained: the example with the
-  imports and helpers it uses.
+  imports and helpers it uses. The guides on `/docs` — getting started, installing the
+  packs, the icon, animated and parallax components, toasts and the UI kit's setup — give
+  their code in the three frameworks too, and the toast guide uses the kit's published
+  `PxlKitToastProvider` with `useToast()` / `injectToast()` instead of the site's own provider.
 - **`@pxlkit/core/vanilla` and the shared rendering engine.** A React-free entry point
   exports the icon data model, every utility and the engine the three frameworks build on:
   `renderIconSvg` / `renderIconDataUri`, `createAnimatedIconPlayer`,
@@ -176,6 +179,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `docs/runbooks/ship-a-release.md` documented two commands that do not exist
   (`release:bump` and `registry:build`) and used `pnpm` in an npm repository. The
   runbook now describes what the release actually does.
+- Site: the copy button of the code blocks shows when it takes keyboard focus; it only
+  appeared on hover.
 
 ## [ui-kit 2.1.1] - 2026-08-08 — Bordered surface-token fix
 
