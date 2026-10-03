@@ -56,5 +56,6 @@ describe('PixelEqualHeightGrid', () => {
     fixture.componentInstance.rowAlign.set('top');
     await fixture.whenStable();
     expect(list.classList.contains('items-start')).toBe(true);
+    expect(list.classList.contains('items-stretch')).toBe(false);
   });
 });

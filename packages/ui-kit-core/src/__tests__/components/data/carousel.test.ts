@@ -156,17 +156,36 @@ describe('carousel recipes', () => {
         root: `relative focus-visible:outline-hidden ${ring} ${s.radiusLg}`,
         viewport: `overflow-hidden ${s.radiusLg}`,
         track: 'flex flex-row',
-        previous: `${arrow} left-2 top-1/2 -translate-y-1/2`,
-        next: `${arrow} right-2 top-1/2 -translate-y-1/2`,
+        previous: `${arrow} left-2 inset-y-0 my-auto`,
+        next: `${arrow} right-2 inset-y-0 my-auto`,
         dots: 'flex justify-center gap-1.5 mt-3',
       });
       expect(carouselClasses(surface, 'vertical')).toMatchObject({
         track: 'flex flex-col h-full',
-        previous: `${arrow} top-2 left-1/2 -translate-x-1/2 rotate-90`,
-        next: `${arrow} bottom-2 left-1/2 -translate-x-1/2 rotate-90`,
-        dots: 'flex justify-center gap-1.5 mt-3 flex-col items-center mt-0 ml-3 absolute right-2 top-1/2 -translate-y-1/2',
+        previous: `${arrow} top-2 inset-x-0 mx-auto rotate-90`,
+        next: `${arrow} bottom-2 inset-x-0 mx-auto rotate-90`,
+        dots: 'flex justify-center gap-1.5 flex-col items-center ml-3 absolute right-2 top-1/2 -translate-y-1/2',
       });
     }
+  });
+
+  // Regression: the arrows were centred by `-translate-y-1/2` (in a vertical
+  // carousel `-translate-x-1/2`), and the pixel press sets `translate` too, so
+  // a pressed arrow jumped by half its size instead of nudging 2px.
+  it('centres the arrows without a translate, leaving it to the pixel press', () => {
+    for (const orientation of ['horizontal', 'vertical'] as const) {
+      const { previous, next } = carouselClasses('pixel', orientation);
+      for (const arrow of [previous, next].map((classes) => classes.split(' '))) {
+        expect(arrow.filter((name) => /^-?translate-/.test(name))).toEqual([]);
+        expect(arrow).toEqual(expect.arrayContaining(['active:translate-x-[2px]', 'active:translate-y-[2px]']));
+      }
+    }
+  });
+
+  // Regression: vertical dots also took the horizontal `mt-3`, which Tailwind
+  // emits after their `mt-0`, so they sat 12px below the middle.
+  it('centres vertical dots on the right edge, with no top margin', () => {
+    expect(carouselClasses('pixel', 'vertical').dots.split(' ')).not.toContain('mt-3');
   });
 
   it('fills the current dot in cyan, square on the pixel surface and round on the linear one', () => {

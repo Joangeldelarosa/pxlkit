@@ -20,11 +20,13 @@ export const timelineBulletSizeClasses: Record<PixelTimelineBulletSize, string> 
   lg: 'h-5 w-5',
 };
 
-/** Where the rail runs, under the middle of the bullet, per bullet size. */
-export const timelineRailOffsetClasses: Record<PixelTimelineBulletSize, string> = {
-  sm: 'left-[5px]',
-  md: 'left-[7px]',
-  lg: 'left-[10px]',
+/**
+ * Where the rail runs, under the middle of the bullet: from the edge the
+ * bullets are on, per alignment and bullet size.
+ */
+export const timelineRailOffsetClasses: Record<PixelTimelineAlign, Record<PixelTimelineBulletSize, string>> = {
+  left: { sm: 'left-[5px]', md: 'left-[7px]', lg: 'left-[10px]' },
+  right: { sm: 'right-[5px]', md: 'right-[7px]', lg: 'right-[10px]' },
 };
 
 /** Line style of the rail. */
@@ -85,13 +87,12 @@ export function timelineItemClasses(
   const s = surfaceClasses(surface);
   const right = align === 'right';
   return {
-    root: cn('relative pl-7 pb-6 last:pb-0', right && 'pl-0 pr-7 text-right'),
+    root: cn('relative pb-6 last:pb-0', right ? 'pr-7 text-right' : 'pl-7'),
     connector: cn(
       'absolute top-5 bottom-0 border-l-2',
       timelineLineClasses[lineVariant],
       'border-retro-border/60',
-      timelineRailOffsetClasses[bulletSize],
-      right && 'left-auto right-[5px]',
+      timelineRailOffsetClasses[align][bulletSize],
     ),
     bullet: cn(
       'absolute top-0 inline-flex items-center justify-center border-2',

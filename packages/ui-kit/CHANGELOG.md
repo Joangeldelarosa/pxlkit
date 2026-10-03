@@ -83,6 +83,24 @@
 - `PixelCheckbox`'s linear focus ring takes its tone; it was always green. `PixelBreadcrumb`'s focus underline is 2px thick, so it shows under a short crumb.
 - `PixelTabs` with `scrollable` keeps its tabs on one line and scrolls them: `flex-wrap`, which Tailwind emits after `flex-nowrap`, wrapped them.
 - `PixelOTPInput`'s cells keep their size (32, 40 or 48 px square) instead of each spanning the row: the text field's `w-full` beat their width.
+- Classes a component adds to override its own defaults take effect. The kit joins classes without merging them, so of two classes for one property the one Tailwind emits last wins, whatever their order; the components below now emit only the class they mean.
+- `PixelEqualHeightGrid` with `rowAlign="top"` keeps each item at its own height, at the top of its row: the grid's `items-stretch` beat the `items-start` added for it.
+- A `PixelCard` with a `tone` is tinted with it, as documented: the neutral `bg-retro-surface/60` beat the tone's tint.
+- `PixelSplitButton`'s primary half has no border, corners, shadow or press offset of its own; the frame draws them. It was a `PixelButton` whose `border-2` (pixel) and `shadow-sm` (linear) beat the overrides, and whose cut corners and drop shadow they did not undo. On the pixel surface the control is 4px narrower.
+- Glyphs take the size their component gives them: the × of `PixelChip` and of `PixelMultiSelect`'s chips (8px), `PixelMultiSelect`'s check marks (8px), `PixelSelect`'s (10px) and `PixelTestimonialCard`'s verified mark (10px) were drawn at the glyph's own 12px.
+- `PixelCollapsible`'s header is the compact button it was meant to be, with 6px of side padding: a small `PixelButton`'s `px-3` beat its `px-1.5`.
+- A vertical `PixelCarousel` centres its dots on its right edge: `mt-3` beat `mt-0` and left them 12px low.
+- A right-aligned `PixelTimeline` entry is padded on its right only: `pl-7` beat its `pl-0`.
+- `PixelSidebar`'s active item shows its cyan border: `border-transparent` beat it.
+- The linear `PixelSection` title is 14px, and `PixelHeroSection`'s and `PixelSectionHeader`'s eyebrows are spaced 0.18em, as written: the pixel size and the display font's letter-spacing beat them.
+- `PixelDatePicker` and `PixelDateRangePicker` show their placeholder muted: the field's text colour beat it.
+- `PixelCalendarGrid` sets the days of a range, its ends included, in cyan; days of other months stay dimmed.
+- `PixelInputGroup`'s controls lose their own border inside the pixel shell: the surface's `border-2` beat `border-0`, leaving every control but the last a 2px border on three sides.
+- `PixelFileUpload`'s dropzone lights up in its tone while a file is dragged over it.
+- `PixelMultiSelect`'s and `PixelCommand`'s search rules are 1px on the linear surface, and `PixelMultiSelect` mutes its unselected options.
+- Disabled options of `PixelCombobox` and `PixelMultiSelect`, disabled `PixelMenubar` items and a disabled `PixelFileUpload` show the not-allowed cursor: `cursor-pointer` beat it.
+- A right-aligned `PixelTimeline` runs its rail under the middle of its bullets at every `bulletSize`, mirroring the left side: it ran 5px from the right edge whatever the size, off the middle of `md` and `lg` bullets.
+- `PixelCarousel`'s arrows stay where they are while pressed on the pixel surface and nudge 2px, like the kit's other pixel controls: the press offset replaced the translate that centred them, so a pressed arrow jumped about 20px.
 
 ## 2.1.1 — 2026-08-08
 

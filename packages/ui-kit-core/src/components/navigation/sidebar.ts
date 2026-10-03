@@ -93,16 +93,17 @@ export interface SidebarItemState {
 export function sidebarItemClasses(surface: Surface, { depth, active, collapsed }: SidebarItemState): string {
   const s = surfaceClasses(surface);
   return cn(
-    'group relative flex w-full items-center gap-2 pr-2 py-2 text-xs focus-visible:outline-hidden',
-    sidebarDepthClasses[Math.min(depth, 2)],
+    'group relative flex w-full items-center gap-2 py-2 text-xs focus-visible:outline-hidden',
+    collapsed ? 'justify-center pr-0 pl-0' : cn('pr-2', sidebarDepthClasses[Math.min(depth, 2)]),
     s.font,
     s.radius,
     s.transition,
     focusRing,
     'focus-visible:ring-retro-cyan/40',
-    active ? cn('bg-retro-cyan/15 text-retro-cyan', tone.cyan.border) : 'text-retro-text hover:bg-retro-surface/60',
-    'border border-transparent',
-    collapsed && 'justify-center pr-0 pl-0',
+    'border',
+    active
+      ? cn('bg-retro-cyan/15 text-retro-cyan', tone.cyan.border)
+      : 'border-transparent text-retro-text hover:bg-retro-surface/60',
   );
 }
 

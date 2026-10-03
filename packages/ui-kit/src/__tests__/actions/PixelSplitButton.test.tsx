@@ -7,6 +7,18 @@ const OPTIONS = [
   { value: 'csv', label: 'Export CSV' },
   { value: 'json', label: 'Export JSON' },
 ];
+/** The border, corners, shadow, press offset and ring of a framed button. */
+const FRAME = [
+  'border',
+  'border-2',
+  'pxl-corner-sm',
+  'rounded-md',
+  'pxl-shadow',
+  'pxl-shadow-hover',
+  'pxl-shadow-active',
+  'shadow-sm',
+  'focus-visible:ring-2',
+];
 
 describe('PixelSplitButton — primary half', () => {
   it('renders the label and fires onPrimary when the primary button is clicked', () => {
@@ -105,6 +117,24 @@ describe('PixelSplitButton — keyboard focus', () => {
     const halves = getAllByRole('button');
     expect(halves).toHaveLength(4);
     for (const half of halves) expect(half.className.split(' ')).toContain('focus-visible:pxl-focus-inset');
+  });
+});
+
+// Regression: the primary half was a PixelButton with overrides merged in,
+// and Tailwind emits the button's own `border-2` (pixel) and `shadow-sm`
+// (linear) after them, so it kept a border and a shadow inside the frame.
+describe('PixelSplitButton — frame', () => {
+  it('leaves the border, corners and shadow to the frame, on both surfaces', () => {
+    const { getByRole } = render(
+      <>
+        <PixelSplitButton label="Pixel" options={OPTIONS} surface="pixel" />
+        <PixelSplitButton label="Linear" options={OPTIONS} surface="linear" />
+      </>,
+    );
+    for (const name of ['Pixel', 'Linear']) {
+      const classes = getByRole('button', { name }).className.split(' ');
+      for (const frame of FRAME) expect(classes).not.toContain(frame);
+    }
   });
 });
 

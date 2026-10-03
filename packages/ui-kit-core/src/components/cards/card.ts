@@ -77,11 +77,10 @@ export function cardClasses(
   return {
     root: cn(
       'relative flex flex-col transition-all',
-      bordered && 'bg-retro-surface/60',
+      bordered && (t ? t.soft : 'bg-retro-surface/60'),
       bordered && s.border,
       bordered && s.radiusLg,
       bordered && (t ? t.border : 'border-retro-border/40 hover:border-retro-border/60'),
-      bordered && (t ? t.soft : null),
       (media || badge) && 'overflow-hidden',
       interactive && 'cursor-pointer hover:-translate-y-[2px] hover:shadow-lg',
       (interactive || link) &&

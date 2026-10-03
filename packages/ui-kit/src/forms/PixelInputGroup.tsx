@@ -54,7 +54,7 @@ export const PixelInputGroup = forwardRef<HTMLDivElement, PixelInputGroupProps>(
       return React.cloneElement(el, {
         ...(el.props as object),
         // Keep the original child className last so consumer styles win where needed.
-        className: cn(inputGroupItemClasses(surface, i === last), el.props.className),
+        className: cn(inputGroupItemClasses(i === last), el.props.className),
       });
     });
 

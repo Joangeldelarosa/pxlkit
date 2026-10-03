@@ -10,6 +10,7 @@ import {
   splitButtonPrimaryClasses,
   splitButtonRootClasses,
   splitButtonToggleClasses,
+  sizeClass,
   surfaceClasses,
   toneMap,
 } from '../../../index';
@@ -27,19 +28,22 @@ describe('split button recipes', () => {
     }
   });
 
-  it('flattens the primary button into the frame, focus drawn inside it', () => {
-    expect(classesOf(splitButtonPrimaryClasses)).toEqual([
-      'rounded-none',
-      'border-0',
-      'shadow-none',
-      'hover:shadow-none',
-      'active:shadow-none',
-      'hover:translate-x-0',
-      'hover:translate-y-0',
-      'active:translate-x-0',
-      'active:translate-y-0',
-      'focus-visible:pxl-focus-inset',
-    ]);
+  // Regression: the primary was a PixelButton with overrides merged in, and
+  // Tailwind emits the button's `border-2` (pixel) and `shadow-sm` (linear)
+  // after `border-0` and `shadow-none`, so it kept a border and a shadow
+  // inside the frame.
+  it('fills the primary button with the tone, without a frame of its own', () => {
+    const t = toneMap.purple;
+    for (const surface of ['pixel', 'linear'] as const) {
+      const s = surfaceClasses(surface);
+      const primary = splitButtonPrimaryClasses(surface, 'purple');
+      expect(primary).toBe(
+        `inline-flex items-center justify-center font-medium focus-visible:pxl-focus-inset disabled:opacity-50 disabled:cursor-not-allowed ${s.font} ${s.transition} ${sizeClass.md} ${t.text} ${t.bg} ${t.hover}`,
+      );
+      for (const frame of [s.border, s.radius, s.shadow, s.shadowHover, s.shadowActive, s.press].flatMap(classesOf)) {
+        expect(classesOf(primary)).not.toContain(frame);
+      }
+    }
   });
 
   it('fills the chevron button with the tone, behind a divider, dimmed while disabled', () => {
@@ -54,8 +58,8 @@ describe('split button recipes', () => {
     expect(splitButtonGroupClasses('linear', 'green')).toContain('overflow-hidden');
     for (const surface of ['pixel', 'linear'] as const) {
       expect(classesOf(splitButtonToggleClasses(surface, 'green'))).toContain('focus-visible:pxl-focus-inset');
+      expect(classesOf(splitButtonPrimaryClasses(surface, 'green'))).toContain('focus-visible:pxl-focus-inset');
     }
-    expect(classesOf(splitButtonPrimaryClasses)).toContain('focus-visible:pxl-focus-inset');
   });
 
   it('places the menu below the root, aligned with either edge', () => {

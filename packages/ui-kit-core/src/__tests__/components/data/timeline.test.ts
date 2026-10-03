@@ -31,12 +31,23 @@ describe('timeline recipes', () => {
     expect(timelineAsciiConnector('linear')).toBeNull();
   });
 
-  it('sizes the bullet and runs the rail under its middle', () => {
+  // Regression: a right-aligned rail ran 5px from the edge whatever the
+  // bullet's size, off the middle of the md and lg bullets.
+  it('sizes the bullet and runs the rail under its middle, on either side', () => {
+    const middle: Record<PixelTimelineBulletSize, number> = { sm: 5, md: 7, lg: 10 };
     for (const bulletSize of ['sm', 'md', 'lg'] as PixelTimelineBulletSize[]) {
-      const parts = timelineItemClasses('pixel', { ...BASE, bulletSize });
-      expect(classesOf(parts.bullet)).toEqual(expect.arrayContaining(classesOf(timelineBulletSizeClasses[bulletSize])));
-      expect(classesOf(parts.connector)).toContain(timelineRailOffsetClasses[bulletSize]);
+      const left = timelineItemClasses('pixel', { ...BASE, bulletSize });
+      const right = timelineItemClasses('pixel', { ...BASE, align: 'right', bulletSize });
+      expect(classesOf(left.bullet)).toEqual(expect.arrayContaining(classesOf(timelineBulletSizeClasses[bulletSize])));
+      // Mirrored: as far from the right edge as the left rail is from the left.
+      expect(classesOf(left.connector)).toContain(`left-[${middle[bulletSize]}px]`);
+      expect(classesOf(right.connector)).toContain(`right-[${middle[bulletSize]}px]`);
+      expect(classesOf(right.connector).filter((name) => name.startsWith('left-'))).toEqual([]);
     }
+    expect(timelineRailOffsetClasses).toEqual({
+      left: { sm: 'left-[5px]', md: 'left-[7px]', lg: 'left-[10px]' },
+      right: { sm: 'right-[5px]', md: 'right-[7px]', lg: 'right-[10px]' },
+    });
   });
 
   it('draws the rail in the line variant', () => {
@@ -58,14 +69,20 @@ describe('timeline recipes', () => {
     }
   });
 
+  // Regression: a right-aligned entry kept the left one's `pl-7` next to its
+  // `pl-0`, and Tailwind emits `pl-7` later, so it was padded on both sides.
   it('mirrors the entry when aligned right', () => {
     const left = timelineItemClasses('pixel', BASE);
     const right = timelineItemClasses('pixel', { ...BASE, align: 'right' });
+    expect(classesOf(left.root)).toContain('pl-7');
     expect(classesOf(left.root)).not.toContain('text-right');
     expect(classesOf(left.bullet)).toContain('left-0');
-    expect(classesOf(right.root)).toEqual(expect.arrayContaining(['pl-0', 'pr-7', 'text-right']));
+    expect(classesOf(left.connector)).toContain('left-[7px]');
+    expect(classesOf(right.root)).toEqual(expect.arrayContaining(['pr-7', 'text-right']));
+    expect(classesOf(right.root)).not.toContain('pl-7');
     expect(classesOf(right.bullet)).toContain('right-0');
-    expect(classesOf(right.connector)).toEqual(expect.arrayContaining(['left-auto', 'right-[5px]']));
+    expect(classesOf(right.connector)).toContain('right-[7px]');
+    expect(classesOf(right.connector)).not.toContain('left-[7px]');
     expect(classesOf(right.heading)).toContain('justify-end');
   });
 

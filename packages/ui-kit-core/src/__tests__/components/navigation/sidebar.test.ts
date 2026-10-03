@@ -57,14 +57,20 @@ describe('sidebar recipes', () => {
     ]);
   });
 
+  // Regression: every item took `border-transparent`, which Tailwind emits
+  // after the active item's cyan border, and kept `pl-2 pr-2`, which it emits
+  // after the collapsed `pl-0 pr-0`, so neither of those applied.
   it('tints the active item and centres items without padding while collapsed', () => {
-    expect(classesOf(sidebarItemClasses('pixel', { ...ITEM, active: true }))).toEqual(
-      expect.arrayContaining(['bg-retro-cyan/15', 'text-retro-cyan', 'border-retro-cyan/30']),
+    const active = classesOf(sidebarItemClasses('pixel', { ...ITEM, active: true }));
+    expect(active).toEqual(expect.arrayContaining(['bg-retro-cyan/15', 'text-retro-cyan', 'border-retro-cyan/30']));
+    expect(active).not.toContain('border-transparent');
+    expect(classesOf(sidebarItemClasses('pixel', ITEM))).toEqual(
+      expect.arrayContaining(['border', 'border-transparent', 'hover:bg-retro-surface/60']),
     );
-    expect(classesOf(sidebarItemClasses('pixel', ITEM))).toContain('hover:bg-retro-surface/60');
-    expect(classesOf(sidebarItemClasses('linear', { ...ITEM, collapsed: true }))).toEqual(
-      expect.arrayContaining(['justify-center', 'pr-0', 'pl-0']),
-    );
+    const collapsed = classesOf(sidebarItemClasses('linear', { ...ITEM, collapsed: true }));
+    expect(collapsed).toEqual(expect.arrayContaining(['justify-center', 'pr-0', 'pl-0']));
+    expect(collapsed).not.toContain('pr-2');
+    expect(collapsed).not.toContain('pl-2');
   });
 
   it('rings a focused item, keeping an outline for forced-colors mode, which drops the ring', () => {

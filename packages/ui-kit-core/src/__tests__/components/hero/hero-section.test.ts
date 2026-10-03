@@ -79,7 +79,7 @@ describe('hero section recipes', () => {
     expect(classes).toEqual({
       root: `relative w-full flex flex-col justify-center min-h-[480px] ${s.transition}`,
       text: 'flex flex-col items-center text-center mx-auto max-w-3xl',
-      eyebrow: `text-xs sm:text-sm ${s.fontDisplay} uppercase tracking-[0.18em] max-w-full break-words ${tone.cyan.text}`,
+      eyebrow: `text-xs sm:text-sm font-pixel uppercase tracking-[0.18em] max-w-full break-words ${tone.cyan.text}`,
       headline: `text-4xl sm:text-5xl lg:text-6xl ${s.fontDisplay} font-bold leading-tight text-retro-text max-w-full break-words mt-5`,
       subline: `text-lg sm:text-xl ${s.font} text-retro-muted leading-relaxed max-w-prose break-words mt-3 mx-auto`,
       ctas: 'mt-7',
@@ -101,7 +101,7 @@ describe('hero section recipes', () => {
     expect(classes).toEqual({
       root: `relative w-full flex flex-col justify-center min-h-screen ${s.transition}`,
       text: 'flex flex-col',
-      eyebrow: `text-xs sm:text-sm ${s.fontDisplay} uppercase tracking-[0.18em] max-w-full break-words ${tone.neutral.text}`,
+      eyebrow: `text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] max-w-full break-words ${tone.neutral.text}`,
       headline: `text-3xl sm:text-4xl lg:text-5xl ${s.fontDisplay} font-bold leading-tight text-retro-text max-w-full break-words`,
       subline: `text-base sm:text-lg ${s.font} text-retro-muted leading-relaxed max-w-prose break-words mt-2`,
       ctas: 'mt-5',
@@ -109,6 +109,22 @@ describe('hero section recipes', () => {
       meta: 'mt-4',
       media: 'mt-10 w-full',
     });
+  });
+
+  // Regression: the eyebrow's `tracking-[0.18em]` followed the display
+  // font's `tracking-wider` (pixel) and `tracking-tight` (linear), which
+  // Tailwind emits after it, so the eyebrow never took its own letter-spacing.
+  it('spaces the eyebrow by its own letter-spacing on both surfaces', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const { eyebrow } = heroSectionClasses(surface, {
+        tone: 'cyan',
+        density: 'comfortable',
+        minHeight: 'md',
+        align: 'center',
+        hasEyebrow: true,
+      });
+      expect(eyebrow.split(' ').filter((name) => name.startsWith('tracking-'))).toEqual(['tracking-[0.18em]']);
+    }
   });
 
   it('fills the split column and lays the parallax media behind the text', () => {

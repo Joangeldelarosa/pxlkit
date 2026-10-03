@@ -25,14 +25,13 @@ describe('input group recipes', () => {
     }
   });
 
+  // Regression: a control before the last also took the surface's
+  // `border-2`, which Tailwind emits after `border-0`, so on the pixel
+  // surface it kept a border of its own inside the shell.
   it('strips each control, which shows focus inside the shell that clips it, and divides it from the next, except the last', () => {
-    for (const surface of SURFACES) {
-      const base = 'min-w-0 border-0 rounded-none focus:z-10 focus-visible:z-10 focus-visible:pxl-focus-inset relative';
-      expect(inputGroupItemClasses(surface, true)).toBe(base);
-      expect(inputGroupItemClasses(surface, false)).toBe(
-        `${base} border-r ${surfaceClasses(surface).border} border-retro-border/60`,
-      );
-    }
+    const base = 'min-w-0 border-0 rounded-none focus:z-10 focus-visible:z-10 focus-visible:pxl-focus-inset relative';
+    expect(inputGroupItemClasses(true)).toBe(base);
+    expect(inputGroupItemClasses(false)).toBe(`${base} border-r border-retro-border/60`);
   });
 
   it('is a group only when named, unless given its own role', () => {

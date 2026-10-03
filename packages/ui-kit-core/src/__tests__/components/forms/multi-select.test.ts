@@ -155,15 +155,18 @@ describe('multi-select recipes', () => {
     }
   });
 
+  // Regression: the linear rules added `border-b` and `border-t` to the
+  // pixel `border-b-2` and `border-t-2`, which Tailwind emits after them, so
+  // they stayed 2px thick.
   it('turns the chevron while open, and draws the pixel rules thicker', () => {
     const pixel = multiSelectClasses('pixel', { size: 'md', invalid: false, open: true });
     const linear = multiSelectClasses('linear', { size: 'md', invalid: false, open: false });
     expect(pixel.chevron).toBe('text-retro-muted transition-transform rotate-180');
     expect(linear.chevron).toBe('text-retro-muted transition-transform');
     expect(pixel.search).toBe('mb-1 flex items-center px-2 py-1.5 border-b-2 border-retro-border');
-    expect(linear.search).toBe('mb-1 flex items-center px-2 py-1.5 border-b-2 border-retro-border border-b');
+    expect(linear.search).toBe('mb-1 flex items-center px-2 py-1.5 border-b border-retro-border');
     expect(pixel.footer).toBe('mt-1 px-2 py-1 text-[10px] text-retro-muted font-mono border-t-2 border-retro-border');
-    expect(linear.footer).toBe('mt-1 px-2 py-1 text-[10px] text-retro-muted font-sans border-t-2 border-retro-border border-t');
+    expect(linear.footer).toBe('mt-1 px-2 py-1 text-[10px] text-retro-muted font-sans border-t border-retro-border');
     expect(linear.input).toBe('w-full bg-transparent text-xs text-retro-text outline-none placeholder:text-retro-muted font-sans');
     expect(linear.empty).toBe('px-3 py-2 text-center text-xs text-retro-muted font-sans');
     expect([linear.values, linear.trigger, linear.placeholder, linear.content, linear.listbox, linear.actions]).toEqual([
@@ -183,15 +186,19 @@ describe('multi-select recipes', () => {
     expect(classes.clear).toBe(`inline-flex items-center text-retro-muted hover:text-retro-text cursor-pointer ${ring}`);
   });
 
+  // Regression: every option also took `text-retro-text` and
+  // `cursor-pointer`, which Tailwind emits after `text-retro-muted` and
+  // `cursor-not-allowed`, so unselected options were not muted and disabled
+  // ones kept the pointer.
   it('tints selected options, shades the highlighted one and dims disabled ones', () => {
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
-      const start = `flex cursor-pointer items-center gap-2 px-2 py-1.5 text-xs text-retro-text ${s.font} ${s.radius}`;
+      const start = `flex items-center gap-2 px-2 py-1.5 text-xs ${s.font} ${s.radius}`;
       expect(multiSelectOptionClasses(surface, { selected: true, highlighted: true, disabled: false })).toBe(
-        `${start} ${toneMap.neutral.soft} text-retro-text bg-retro-surface/60`,
+        `${start} ${toneMap.neutral.soft} text-retro-text bg-retro-surface/60 cursor-pointer`,
       );
       expect(multiSelectOptionClasses(surface, { selected: false, highlighted: false, disabled: false })).toBe(
-        `${start} text-retro-muted hover:bg-retro-surface hover:text-retro-text`,
+        `${start} text-retro-muted cursor-pointer hover:bg-retro-surface hover:text-retro-text`,
       );
       expect(multiSelectOptionClasses(surface, { selected: false, highlighted: true, disabled: true })).toBe(
         `${start} text-retro-muted opacity-50 cursor-not-allowed`,

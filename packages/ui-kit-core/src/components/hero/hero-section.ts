@@ -116,9 +116,10 @@ export function heroSectionClasses(
   return {
     root: cn('relative w-full flex flex-col justify-center', heroMinHeightClasses[minHeight], s.transition),
     text: cn('flex flex-col', centered && 'items-center text-center mx-auto max-w-3xl'),
+    // The display face without its letter-spacing: the eyebrow sets its own.
     eyebrow: cn(
       heroEyebrowSizeClasses,
-      s.fontDisplay,
+      surface === 'pixel' ? 'font-pixel' : 'font-semibold',
       'uppercase tracking-[0.18em] max-w-full break-words',
       toneTokens[tone].text,
     ),

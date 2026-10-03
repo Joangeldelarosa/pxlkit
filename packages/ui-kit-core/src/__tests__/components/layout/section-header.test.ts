@@ -16,7 +16,7 @@ describe('section header recipes', () => {
     const c = sectionHeaderClasses('pixel', options);
     expect(c.header).toBe('w-full');
     expect(c.stack).toBe('flex flex-col');
-    expect(c.eyebrow).toBe(`text-xs ${s.fontDisplay} uppercase tracking-[0.18em] text-retro-muted`);
+    expect(c.eyebrow).toBe('text-xs font-pixel uppercase tracking-[0.18em] text-retro-muted');
     expect(c.title).toBe(`text-2xl sm:text-3xl ${s.fontDisplay} font-bold leading-tight text-retro-text ${rhythm.eyebrowToHeadline}`);
     expect(c.description).toBe(
       `text-base ${s.font} text-retro-muted leading-relaxed max-w-prose ${rhythm.headlineToSubline}`,
@@ -30,6 +30,17 @@ describe('section header recipes', () => {
     expect(c.description.endsWith('mt-5 mx-auto')).toBe(true);
     expect(c.actions).toBe('flex flex-wrap gap-3 mt-10 justify-center');
     expect(c.title.startsWith('text-3xl sm:text-4xl lg:text-5xl')).toBe(true);
+  });
+
+  // Regression: the eyebrow's `tracking-[0.18em]` followed the display
+  // font's `tracking-wider` (pixel) and `tracking-tight` (linear), which
+  // Tailwind emits after it, so the eyebrow never took its own letter-spacing.
+  it('spaces the eyebrow by its own letter-spacing on both surfaces', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const { eyebrow } = sectionHeaderClasses(surface, options);
+      expect(eyebrow.split(' ').filter((name) => name.startsWith('tracking-'))).toEqual(['tracking-[0.18em]']);
+    }
+    expect(sectionHeaderClasses('linear', options).eyebrow).toBe('text-xs font-semibold uppercase tracking-[0.18em] text-retro-muted');
   });
 
   it('tints the title and eyebrow with the title tone', () => {

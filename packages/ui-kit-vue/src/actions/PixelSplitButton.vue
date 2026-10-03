@@ -25,7 +25,6 @@ import PixelGlyph from '../_internal/PixelGlyph.vue';
 import { useClickOutside, useEscape } from '../composables/overlay.js';
 import { useEffectiveSurface } from '../composables/surface.js';
 import type { Option } from '../forms/_internal/option.js';
-import PixelButton from './PixelButton.vue';
 
 /**
  * A primary action joined to a chevron button that opens a menu of related
@@ -75,6 +74,7 @@ const menu = useTemplateRef<HTMLElement>('menu');
 const values = computed(() => props.options.map((option) => option.value));
 const activeIndex = computed(() => (highlighted.value === null ? -1 : values.value.indexOf(highlighted.value)));
 const groupClasses = computed(() => splitButtonGroupClasses(surface.value, props.tone));
+const primaryClasses = computed(() => splitButtonPrimaryClasses(surface.value, props.tone));
 const toggleClasses = computed(() => splitButtonToggleClasses(surface.value, props.tone));
 const menuClasses = computed(() => splitButtonMenuClasses(surface.value, alignRight.value));
 
@@ -175,15 +175,9 @@ function onMenuKeydown(event: KeyboardEvent) {
 <template>
   <div ref="root" :class="splitButtonRootClasses">
     <div :class="groupClasses">
-      <PixelButton
-        :tone="tone"
-        :surface="surface"
-        :disabled="disabled"
-        :class="splitButtonPrimaryClasses"
-        @click="onPrimaryClick"
-      >
-        {{ label }}
-      </PixelButton>
+      <button :disabled="disabled" :class="primaryClasses" @click="onPrimaryClick">
+        <span>{{ label }}</span>
+      </button>
       <button
         ref="toggle"
         :id="toggleId"

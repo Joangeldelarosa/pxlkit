@@ -32,6 +32,7 @@ describe('PixelEqualHeightGrid', () => {
     expect(wrapper.classes()).not.toContain('items-start');
     await wrapper.setProps({ rowAlign: 'top' });
     expect(wrapper.classes()).toContain('items-start');
+    expect(wrapper.classes()).not.toContain('items-stretch');
   });
 
   it('lays out items added later', async () => {

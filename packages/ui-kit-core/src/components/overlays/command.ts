@@ -141,7 +141,7 @@ export function commandClasses(surface: Surface): CommandClasses {
       'border-retro-border',
       'flex flex-col overflow-hidden',
     ),
-    search: cn('flex items-center gap-2 px-3 py-2 border-b-2 border-retro-border', surface === 'linear' && 'border-b'),
+    search: cn('flex items-center gap-2 px-3 py-2', surface === 'linear' ? 'border-b' : 'border-b-2', 'border-retro-border'),
     prompt: cn('text-retro-muted', s.font, 'text-xs'),
     input: cn('flex-1 bg-transparent text-sm text-retro-text outline-none placeholder:text-retro-muted', s.font),
     empty: cn('px-4 py-6 text-center text-xs text-retro-muted', s.font),

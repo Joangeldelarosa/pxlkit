@@ -1,10 +1,10 @@
-/** PixelCollapsible — the optional frame, the header's chevron and the body, and the ids that wire them. */
-import { cn, surfaceClasses, type Surface } from '../../common';
+/** PixelCollapsible — the optional frame, the header button and its chevron, the body, and the ids that wire them. */
+import { cn, focusRing, surfaceClasses, toneMap, type Surface, type Tone } from '../../common';
 
 export interface CollapsibleClasses {
   /** The wrapper, framed when `bordered`. */
   root: string;
-  /** Added to the ghost header button, to make it compact. */
+  /** The header button: a compact ghost button of the tone. */
   trigger: string;
   /** The chevron in the header, turned while open. */
   chevron: string;
@@ -13,11 +13,26 @@ export interface CollapsibleClasses {
 }
 
 /** Classes of every part of the collapsible. */
-export function collapsibleClasses(surface: Surface, { bordered, open }: { bordered: boolean; open: boolean }): CollapsibleClasses {
+export function collapsibleClasses(
+  surface: Surface,
+  { bordered, open, tone }: { bordered: boolean; open: boolean; tone: Tone },
+): CollapsibleClasses {
   const s = surfaceClasses(surface);
+  const t = toneMap[tone];
   return {
     root: cn(bordered && s.border, bordered && s.radius, bordered && 'border-retro-border'),
-    trigger: 'h-auto px-1.5 py-0.5 text-xs',
+    trigger: cn(
+      'inline-flex items-center justify-center gap-1.5 px-1.5 py-0.5 text-xs font-medium focus-visible:outline-hidden',
+      s.font,
+      s.radius,
+      s.transition,
+      focusRing,
+      t.ring,
+      t.text,
+      'border border-transparent bg-transparent',
+      t.hover,
+      'active:scale-[0.97]',
+    ),
     chevron: cn('transition-transform', open && 'rotate-180'),
     content: 'mt-2',
   };

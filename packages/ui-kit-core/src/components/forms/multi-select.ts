@@ -195,13 +195,13 @@ export function multiSelectClasses(surface: Surface, { size, invalid, open }: Mu
     clearGlyph: 'h-3 w-3',
     chevron: cn('text-retro-muted transition-transform', open && 'rotate-180'),
     content: 'p-1 w-[var(--pxl-multiselect-w,16rem)]',
-    search: cn('mb-1 flex items-center px-2 py-1.5 border-b-2 border-retro-border', surface === 'linear' && 'border-b'),
+    search: cn('mb-1 flex items-center px-2 py-1.5', surface === 'linear' ? 'border-b' : 'border-b-2', 'border-retro-border'),
     input: cn('w-full bg-transparent text-xs text-retro-text outline-none placeholder:text-retro-muted', s.font),
     listbox: 'max-h-60 overflow-y-auto',
     empty: cn('px-3 py-2 text-center text-xs text-retro-muted', s.font),
     label: 'flex-1 truncate',
     checkGlyph: 'h-2 w-2 text-retro-text',
-    footer: cn('mt-1 px-2 py-1 text-[10px] text-retro-muted', s.font, 'border-t-2 border-retro-border', surface === 'linear' && 'border-t'),
+    footer: cn('mt-1 px-2 py-1 text-[10px] text-retro-muted', s.font, surface === 'linear' ? 'border-t' : 'border-t-2', 'border-retro-border'),
   };
 }
 
@@ -220,12 +220,12 @@ export function multiSelectOptionClasses(
 ): string {
   const s = surfaceClasses(surface);
   return cn(
-    'flex cursor-pointer items-center gap-2 px-2 py-1.5 text-xs text-retro-text',
+    'flex items-center gap-2 px-2 py-1.5 text-xs',
     s.font,
     s.radius,
     selected ? cn(toneMap.neutral.soft, 'text-retro-text') : 'text-retro-muted',
     highlighted && !disabled && 'bg-retro-surface/60',
-    disabled && 'opacity-50 cursor-not-allowed',
+    disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
     !disabled && !highlighted && 'hover:bg-retro-surface hover:text-retro-text',
   );
 }

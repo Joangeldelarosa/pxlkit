@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cloneVNode, computed, type VNode } from 'vue';
 import {
+  equalHeightGridAlign,
   equalHeightGridClasses,
   equalHeightGridItemClasses,
   type EqualHeightGridRowAlign,
@@ -41,7 +42,7 @@ const slots = defineSlots<{
 }>();
 
 const surface = useEffectiveSurface(() => props.surface);
-const classes = computed(() => equalHeightGridClasses(surface.value, props.rowAlign));
+const classes = computed(() => equalHeightGridClasses(surface.value));
 
 // Like React's cloneElement: elements and components get the item classes,
 // text passes through as is.
@@ -61,7 +62,7 @@ const Items = () =>
     :auto-fit="autoFit"
     :auto-fill="autoFill"
     :min-col-width="minColWidth"
-    align="stretch"
+    :align="equalHeightGridAlign(rowAlign)"
     :justify="justify"
     :as="as"
     :surface="surface"

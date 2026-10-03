@@ -47,6 +47,19 @@ describe('PixelChip', () => {
     expect(deleteButton(fixture.nativeElement)).toBeNull();
   });
 
+  // Regression: the delete glyph took the chip's `h-2 w-2` after its own
+  // `h-3 w-3`, which Tailwind emits later, so it kept the larger size.
+  it('draws the delete glyph at the chip size, without the glyph default', async () => {
+    @Component({ imports: [PixelChip], template: '<pxl-chip label="React" deletable />' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const glyph = deleteButton(fixture.nativeElement)!.querySelector('svg')!;
+    expect(Array.from(glyph.classList)).toEqual(expect.arrayContaining(['h-2', 'w-2']));
+    expect(glyph.classList).not.toContain('h-3');
+    expect(glyph.classList).not.toContain('w-3');
+  });
+
   it('shows the delete button only when deletable', async () => {
     @Component({
       imports: [PixelChip],

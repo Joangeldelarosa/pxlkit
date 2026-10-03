@@ -178,11 +178,13 @@ export function carouselClasses(surface: Surface, orientation: CarouselOrientati
     root: cn(`relative focus-visible:outline-hidden ${focusVisibleRing}`, s.radiusLg),
     viewport: cn('overflow-hidden', s.radiusLg),
     track: cn('flex', vertical ? 'flex-col h-full' : 'flex-row'),
-    previous: cn(arrow, vertical ? 'top-2 left-1/2 -translate-x-1/2 rotate-90' : 'left-2 top-1/2 -translate-y-1/2'),
-    next: cn(arrow, vertical ? 'bottom-2 left-1/2 -translate-x-1/2 rotate-90' : 'right-2 top-1/2 -translate-y-1/2'),
+    // Centred by auto margins rather than a translate: the pixel press nudges
+    // the arrow with `translate`, which would replace a centring one.
+    previous: cn(arrow, vertical ? 'top-2 inset-x-0 mx-auto rotate-90' : 'left-2 inset-y-0 my-auto'),
+    next: cn(arrow, vertical ? 'bottom-2 inset-x-0 mx-auto rotate-90' : 'right-2 inset-y-0 my-auto'),
     dots: cn(
-      'flex justify-center gap-1.5 mt-3',
-      vertical && 'flex-col items-center mt-0 ml-3 absolute right-2 top-1/2 -translate-y-1/2',
+      'flex justify-center gap-1.5',
+      vertical ? 'flex-col items-center ml-3 absolute right-2 top-1/2 -translate-y-1/2' : 'mt-3',
     ),
   };
 }

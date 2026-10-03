@@ -41,6 +41,13 @@ export interface DatePickerClasses {
   clear: string;
 }
 
+// A text field's look but its text colour, which the placeholder mutes: as
+// nothing merges the two, Tailwind would emit `text-retro-text` last.
+const triggerBase = inputBase
+  .split(' ')
+  .filter((name) => name !== 'text-retro-text')
+  .join(' ');
+
 /** Classes of the parts of a date picker, or of a date range picker. */
 export function datePickerClasses(
   surface: Surface,
@@ -51,7 +58,7 @@ export function datePickerClasses(
   return {
     anchor: 'relative block',
     trigger: cn(
-      inputBase,
+      triggerBase,
       s.font,
       s.border,
       s.radius,
@@ -63,7 +70,7 @@ export function datePickerClasses(
       'inline-flex items-center justify-between text-left',
       // Room for the clear button over its end: the text stops short of it.
       clearButton ? 'pl-3 pr-7' : 'px-3',
-      placeholder && 'text-retro-muted',
+      placeholder ? 'text-retro-muted' : 'text-retro-text',
     ),
     value: 'truncate',
     mark: 'ml-2 text-retro-muted text-xs',

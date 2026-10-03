@@ -139,11 +139,13 @@ describe('combobox recipes', () => {
     expect(c.heading).toBe('px-2 pt-2 pb-1 text-[10px] uppercase tracking-wider text-retro-muted font-sans');
   });
 
+  // Regression: a disabled option kept `cursor-pointer`, which Tailwind
+  // emits after `cursor-not-allowed`.
   it('shades the highlighted option and dims a disabled one', () => {
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
-      const start = `flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm text-retro-text ${s.font} ${s.radius}`;
-      expect(comboboxOptionClasses(surface, { highlighted: true, disabled: false })).toBe(`${start} bg-retro-surface/80`);
+      const start = `flex items-center gap-2 px-2 py-1.5 text-sm text-retro-text ${s.font} ${s.radius}`;
+      expect(comboboxOptionClasses(surface, { highlighted: true, disabled: false })).toBe(`${start} bg-retro-surface/80 cursor-pointer`);
       expect(comboboxOptionClasses(surface, { highlighted: false, disabled: true })).toBe(
         `${start} hover:bg-retro-surface/40 opacity-50 cursor-not-allowed`,
       );

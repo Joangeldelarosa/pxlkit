@@ -2,7 +2,6 @@
 import { computed, ref, useId, type VNode } from 'vue';
 import { collapsibleClasses, collapsibleIds, type Surface, type Tone } from '@pxlkit/ui-kit-core';
 import PixelGlyph from '../_internal/PixelGlyph.vue';
-import PixelButton from '../actions/PixelButton.vue';
 import { useEffectiveSurface } from '../composables/surface.js';
 
 /**
@@ -37,26 +36,24 @@ defineSlots<{
 const effectiveSurface = useEffectiveSurface(() => props.surface);
 const open = ref(props.defaultOpen);
 const ids = collapsibleIds(useId());
-const classes = computed(() => collapsibleClasses(effectiveSurface.value, { bordered: props.bordered, open: open.value }));
+const classes = computed(() =>
+  collapsibleClasses(effectiveSurface.value, { bordered: props.bordered, open: open.value, tone: props.tone }),
+);
 </script>
 
 <template>
   <div :class="classes.root">
-    <PixelButton
+    <button
       :id="ids.trigger"
       type="button"
-      size="sm"
-      :tone="tone"
-      :surface="effectiveSurface"
-      variant="ghost"
       :aria-expanded="open"
       :aria-controls="ids.content"
       :class="classes.trigger"
       @click="open = !open"
     >
-      {{ label }}
-      <template #icon-right><PixelGlyph name="chevronDown" :class="classes.chevron" /></template>
-    </PixelButton>
+      <span>{{ label }}</span>
+      <PixelGlyph name="chevronDown" :class="classes.chevron" />
+    </button>
     <div v-if="open" :id="ids.content" :class="classes.content"><slot /></div>
   </div>
 </template>

@@ -5,7 +5,6 @@ import {
   useEffectiveSurface,
   ChevronDownIcon,
 } from '../common';
-import { PixelButton } from '../actions';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelCollapsible — toggleable details block with a chevron header.
@@ -36,7 +35,7 @@ export function PixelCollapsible({
 }: PixelCollapsibleProps) {
   const surface = useEffectiveSurface(surfaceProp);
   const [open, setOpen] = useState(defaultOpen);
-  const classes = collapsibleClasses(surface, { bordered, open });
+  const classes = collapsibleClasses(surface, { bordered, open, tone });
   /* Stable trigger/content ids for the disclosure aria wiring — same
      pattern as PixelAccordion: aria-expanded + aria-controls on the
      trigger, and a content container without a role, which ARIA does not
@@ -45,21 +44,17 @@ export function PixelCollapsible({
   const { trigger: triggerId, content: contentId } = collapsibleIds(baseId);
   return (
     <div className={classes.root}>
-      <PixelButton
+      <button
         id={triggerId}
         type="button"
-        size="sm"
-        tone={tone}
-        surface={surface}
-        variant="ghost"
         aria-expanded={open}
         aria-controls={contentId}
         onClick={() => setOpen((v) => !v)}
-        iconRight={<ChevronDownIcon className={classes.chevron} />}
         className={classes.trigger}
       >
-        {label}
-      </PixelButton>
+        <span>{label}</span>
+        <ChevronDownIcon className={classes.chevron} />
+      </button>
       {open && (
         <div id={contentId} className={classes.content}>
           {children}

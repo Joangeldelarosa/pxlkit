@@ -96,8 +96,8 @@ describe('file upload recipes', () => {
       const c = fileUploadClasses(surface, idle);
       expect(c.dropzone).toBe(
         [
-          'flex flex-col items-center justify-center gap-2 text-center focus-visible:outline-hidden cursor-pointer',
-          'border-dashed bg-retro-surface/20 text-retro-muted',
+          'flex flex-col items-center justify-center gap-2 text-center focus-visible:outline-hidden',
+          'border-dashed',
           s.border,
           s.radiusLg,
           s.font,
@@ -105,7 +105,8 @@ describe('file upload recipes', () => {
           'p-6 text-sm',
           focusRing,
           toneMap.cyan.ring,
-          'border-retro-border/60',
+          'border-retro-border/60 bg-retro-surface/20 text-retro-muted',
+          'cursor-pointer',
         ].join(' '),
       );
       expect(c.item).toBe(`flex items-center gap-3 p-2 pr-3 ${s.border} ${s.radius} ${s.font} border-retro-border/60 bg-retro-surface/40`);
@@ -116,22 +117,30 @@ describe('file upload recipes', () => {
     expect(fileUploadClasses('pixel', { ...idle, size: 'lg' }).dropzone).toContain('p-8 text-sm');
   });
 
+  // Regression: while a file was dragged over it, the dropzone kept its
+  // resting `bg-retro-surface/20` and `text-retro-muted`, which Tailwind emits
+  // after the tone's tint and the cyan text, so it did not light up.
   it('lights up in the tone while files are dragged over', () => {
     const t = toneMap.cyan;
     const c = fileUploadClasses('pixel', { ...idle, dragActive: true });
     expect(c.dropzone).toContain(`${t.border} ${t.soft} ${t.text}`);
     expect(c.dropzone).not.toContain('border-retro-border/60');
+    expect(c.dropzone.split(' ')).not.toContain('bg-retro-surface/20');
+    expect(c.dropzone.split(' ')).not.toContain('text-retro-muted');
     expect(c.dropzoneIcon).toBe(`h-5 w-5 ${t.text}`);
     expect(c.prompt).toBe(`font-medium ${t.text}`);
     expect(fileUploadClasses('pixel', idle).prompt).toBe('font-medium text-retro-text');
     expect(fileUploadClasses('pixel', idle).dropzoneIcon).toBe('h-5 w-5');
   });
 
+  // Regression: a disabled dropzone kept `cursor-pointer`, which Tailwind
+  // emits after `cursor-not-allowed`.
   it('turns red with an error and fades while disabled', () => {
     const t = toneMap.red;
     const c = fileUploadClasses('linear', { ...idle, invalid: true, disabled: true });
     expect(c.dropzone).toContain(t.ring);
     expect(c.dropzone).toContain('border-retro-red/60 opacity-50 cursor-not-allowed');
+    expect(c.dropzone.split(' ')).not.toContain('cursor-pointer');
     expect(c.button).toContain(`${t.text} ${t.border} ${t.bg} ${t.hover}`);
     expect(c.button).toMatch(/opacity-50 cursor-not-allowed$/);
     expect(c.remove).toMatch(/opacity-50 cursor-not-allowed$/);

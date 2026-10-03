@@ -40,6 +40,15 @@ describe('PixelCollapsible', () => {
     }
   });
 
+  // Regression: the header was a small PixelButton with `px-1.5` added, and
+  // Tailwind emits the button's own `px-3` after it, so it kept its padding.
+  it('keeps its header compact, with no button size left over', () => {
+    const classes = mount(PixelCollapsible, { props: { label: 'Details' } }).find('button').classes();
+    expect(classes).toEqual(expect.arrayContaining(['px-1.5', 'py-0.5', 'text-xs']));
+    expect(classes).not.toContain('px-3');
+    expect(classes).not.toContain('h-8');
+  });
+
   it('frames itself when bordered', () => {
     const wrapper = mount(PixelCollapsible, { props: { label: 'Details', bordered: true, surface: 'linear' } });
     expect(wrapper.classes()).toEqual(expect.arrayContaining(['border', 'rounded-md', 'border-retro-border']));

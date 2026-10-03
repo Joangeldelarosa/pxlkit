@@ -36,9 +36,7 @@ export class PixelInputGroupItem {
   private readonly group = inject(PixelInputGroup);
 
   /** @internal */
-  protected readonly classes = computed(() =>
-    inputGroupItemClasses(this.group.effectiveSurface(), this.group.isLast(this)),
-  );
+  protected readonly classes = computed(() => inputGroupItemClasses(this.group.isLast(this)));
 }
 
 /**
@@ -80,7 +78,7 @@ export class PixelInputGroup {
   readonly ariaLabelledby = input<string | undefined>(undefined, { alias: 'aria-labelledby' });
 
   /** @internal */
-  readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
+  protected readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
   private readonly items = contentChildren(PixelInputGroupItem);
   private readonly named = computed(() => !!(this.ariaLabel() || this.ariaLabelledby()));
   /** @internal */

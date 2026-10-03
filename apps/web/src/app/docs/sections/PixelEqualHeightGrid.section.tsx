@@ -24,10 +24,10 @@ export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightG
       <h2 id='pixel-equal-height-grid-heading'>PixelEqualHeightGrid</h2>
       <p className="docs-lead">Grid wrapper that forces equal-height children via a 3-row subgrid (header / body / footer).</p>
       <ul className="docs-highlights">
-        <li>Inherits PixelGrid props (cols, gap, surface, etc.) minus align (forced to stretch)</li>
+        <li>Inherits PixelGrid props (cols, gap, surface, etc.) minus align, which rowAlign sets</li>
         <li>Clones children with grid-rows-[auto_1fr_auto] so footers align across the row</li>
         <li>Surface-aware via useEffectiveSurface for consistent borders and transitions</li>
-        <li>rowAlign=&quot;top&quot; opts out of stretching while keeping equal-height children</li>
+        <li>rowAlign=&quot;top&quot; keeps each item at its own height, at the top of its row</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

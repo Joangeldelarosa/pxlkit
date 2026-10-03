@@ -4,15 +4,23 @@ import { datePickerClasses, focusRing, inputBase, sizeHeight, surfaceClasses, to
 const SURFACES: Surface[] = ['pixel', 'linear'];
 
 describe('date picker recipes', () => {
+  // Regression: the placeholder's `text-retro-muted` followed the field's
+  // `text-retro-text`, which Tailwind emits later, so it was never muted.
   it('composes the trigger from the surface and size, red with an error and muted while it shows the placeholder', () => {
+    const base = inputBase
+      .split(' ')
+      .filter((name) => name !== 'text-retro-text')
+      .join(' ');
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
       expect(datePickerClasses(surface, { size: 'sm', invalid: false, placeholder: false }).trigger).toBe(
-        `${inputBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} ${focusRing} ${toneMap.neutral.ring} border-retro-border-strong inline-flex items-center justify-between text-left px-3`,
+        `${base} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} ${focusRing} ${toneMap.neutral.ring} border-retro-border-strong inline-flex items-center justify-between text-left px-3 text-retro-text`,
       );
-      expect(datePickerClasses(surface, { size: 'lg', invalid: true, placeholder: true }).trigger).toContain(
+      const placeholder = datePickerClasses(surface, { size: 'lg', invalid: true, placeholder: true }).trigger;
+      expect(placeholder).toContain(
         `${sizeHeight.lg} ${focusRing} ${toneMap.neutral.ring} border-retro-red/60 inline-flex items-center justify-between text-left px-3 text-retro-muted`,
       );
+      expect(placeholder.split(' ')).not.toContain('text-retro-text');
     }
   });
 

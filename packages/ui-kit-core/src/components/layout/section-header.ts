@@ -83,9 +83,10 @@ export function sectionHeaderClasses(
   return {
     header: 'w-full',
     stack: cn('flex flex-col', centered && 'mx-auto text-center items-center max-w-3xl'),
+    // The display face without its letter-spacing: the eyebrow sets its own.
     eyebrow: cn(
       sectionHeaderEyebrowSizeClasses[size],
-      s.fontDisplay,
+      surface === 'pixel' ? 'font-pixel' : 'font-semibold',
       'uppercase tracking-[0.18em]',
       titleTone ? toneTokens[titleTone].text : 'text-retro-muted',
     ),

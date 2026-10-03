@@ -53,7 +53,7 @@ function controls() {
   const elements = nodes.filter((node) => typeof node.type !== 'symbol');
   return elements.map((node, index) => ({
     node,
-    class: inputGroupItemClasses(surface.value, index === elements.length - 1),
+    class: inputGroupItemClasses(index === elements.length - 1),
   }));
 }
 </script>

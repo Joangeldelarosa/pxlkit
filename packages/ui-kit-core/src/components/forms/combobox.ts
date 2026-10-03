@@ -185,11 +185,11 @@ export interface ComboboxOptionClassOptions {
 export function comboboxOptionClasses(surface: Surface, { highlighted, disabled }: ComboboxOptionClassOptions): string {
   const s = surfaceClasses(surface);
   return cn(
-    'flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm text-retro-text',
+    'flex items-center gap-2 px-2 py-1.5 text-sm text-retro-text',
     s.font,
     s.radius,
     highlighted && 'bg-retro-surface/80',
     !highlighted && 'hover:bg-retro-surface/40',
-    disabled && 'opacity-50 cursor-not-allowed',
+    disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
   );
 }

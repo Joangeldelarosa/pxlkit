@@ -4,7 +4,7 @@
  * dropdown's keyboard logic (`dropdownTriggerKeyAction` on the chevron,
  * `dropdownMenuKeyAction` in the open menu); this module holds its recipes.
  */
-import { cn, surfaceClasses, toneMap, type Surface, type Tone } from '../../common';
+import { cn, sizeClass, surfaceClasses, toneMap, type Surface, type Tone } from '../../common';
 
 /** The root, which the menu is positioned against. */
 export const splitButtonRootClasses = 'relative inline-flex';
@@ -16,13 +16,24 @@ export function splitButtonGroupClasses(surface: Surface, tone: Tone): string {
 }
 
 /**
- * Merged into the primary PixelButton: the frame draws its border, so it has
- * no border, radius, shadow or press offset. The frame clips both buttons
- * (`overflow-hidden`), their focus rings included, so each shows keyboard
- * focus inside its own edge.
+ * The primary button, a solid button of the tone without a frame of its own:
+ * the group draws the border, so it has no border, radius, shadow or press
+ * offset. The group clips both buttons (`overflow-hidden`), so each shows
+ * keyboard focus inside its own edge.
  */
-export const splitButtonPrimaryClasses =
-  'rounded-none border-0 shadow-none hover:shadow-none active:shadow-none hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0 focus-visible:pxl-focus-inset';
+export function splitButtonPrimaryClasses(surface: Surface, tone: Tone): string {
+  const s = surfaceClasses(surface);
+  const t = toneMap[tone];
+  return cn(
+    'inline-flex items-center justify-center font-medium focus-visible:pxl-focus-inset disabled:opacity-50 disabled:cursor-not-allowed',
+    s.font,
+    s.transition,
+    sizeClass.md,
+    t.text,
+    t.bg,
+    t.hover,
+  );
+}
 
 /** The chevron button that opens the menu. */
 export function splitButtonToggleClasses(surface: Surface, tone: Tone): string {

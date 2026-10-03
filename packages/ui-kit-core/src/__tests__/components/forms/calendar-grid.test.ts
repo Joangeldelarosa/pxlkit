@@ -365,7 +365,7 @@ describe('calendar recipes', () => {
       expect(calendarDayClasses(surface, base)).toBe(`${start} text-retro-text hover:bg-retro-surface/60`);
       expect(calendarDayClasses(surface, { ...base, inMonth: false })).toBe(`${start} text-retro-muted/50 hover:bg-retro-surface/60`);
       expect(calendarDayClasses(surface, { ...base, selected: true, today: true })).toBe(
-        `${start} ${cyan.bg} ${cyan.text} font-semibold`,
+        `${start} ${cyan.text} ${cyan.bg} font-semibold`,
       );
       expect(calendarDayClasses(surface, { ...base, today: true })).toBe(
         `${start} text-retro-text ${cyan.border} border hover:bg-retro-surface/60`,
@@ -376,22 +376,28 @@ describe('calendar recipes', () => {
     }
   });
 
+  // Regression: days in a range kept the plain `text-retro-text` next to the
+  // range's cyan, which Tailwind emits after it, so their text never turned
+  // cyan.
   it('tints a range preview, which still lights up under the pointer, and fills its ends', () => {
     expect(calendarDayClasses('pixel', { ...base, inRange: true })).toBe(
-      `h-8 text-xs inline-flex items-center justify-center pxl-corner-sm motion-safe:transition-colors text-retro-text ${cyan.soft} ${cyan.text} hover:bg-retro-surface/60`,
+      `h-8 text-xs inline-flex items-center justify-center pxl-corner-sm motion-safe:transition-colors ${cyan.text} ${cyan.soft} hover:bg-retro-surface/60`,
     );
     expect(calendarDayClasses('pixel', { ...base, inRange: true, rangeEnd: true, today: true })).toBe(
-      `h-8 text-xs inline-flex items-center justify-center pxl-corner-sm motion-safe:transition-colors text-retro-text ${cyan.bg} ${cyan.text} font-semibold`,
+      `h-8 text-xs inline-flex items-center justify-center pxl-corner-sm motion-safe:transition-colors ${cyan.text} ${cyan.bg} font-semibold`,
     );
+    const otherMonth = calendarDayClasses('pixel', { ...base, inMonth: false, inRange: true }).split(' ');
+    expect(otherMonth).toEqual(expect.arrayContaining(['text-retro-muted/50', cyan.soft]));
+    expect(otherMonth).not.toContain(cyan.text);
   });
 
   it('keeps a selected range tinted under the pointer, and fills its selected ends', () => {
     const range = { ...base, inRange: true, rangeSelected: true };
     expect(calendarDayClasses('linear', range)).toBe(
-      `h-8 text-xs inline-flex items-center justify-center rounded-md motion-safe:transition-colors text-retro-text ${cyan.soft} ${cyan.text}`,
+      `h-8 text-xs inline-flex items-center justify-center rounded-md motion-safe:transition-colors ${cyan.text} ${cyan.soft}`,
     );
     expect(calendarDayClasses('linear', { ...range, selected: true })).toBe(
-      `h-8 text-xs inline-flex items-center justify-center rounded-md motion-safe:transition-colors ${cyan.bg} ${cyan.text} font-semibold`,
+      `h-8 text-xs inline-flex items-center justify-center rounded-md motion-safe:transition-colors ${cyan.text} ${cyan.bg} font-semibold`,
     );
     expect(calendarDayClasses('linear', { ...base, rangeSelected: true })).toContain('hover:bg-retro-surface/60');
   });

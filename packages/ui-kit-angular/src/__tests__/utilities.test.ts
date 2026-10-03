@@ -37,6 +37,7 @@ import {
 } from '../public-api';
 import { PxlIdGenerator, injectId } from '../lib/_internal/ids';
 import { PxlOutlet } from '../lib/_internal/outlet';
+import { PixelGlyph } from '../lib/_internal/pixel-glyph';
 import { PixelFieldShell } from '../lib/_internal/field-shell';
 import { createElement } from 'react';
 import { ReactFieldShell } from '../../../../scripts/parity/react-internals';
@@ -298,6 +299,30 @@ describe('PxlOutlet', () => {
     fixture.componentInstance.content.set(null);
     await fixture.whenStable();
     expect(out()).toBe('');
+  });
+});
+
+describe('PixelGlyph', () => {
+  // Regression: a caller's smaller size followed the glyph's own, and
+  // Tailwind emits `h-3` after `h-2`, so the glyph kept its own size.
+  it("replaces its size with the element's, from a class attribute or a binding", async () => {
+    @Component({
+      imports: [PixelGlyph],
+      template: `
+        <svg id="fixed" pxlGlyph="close" class="h-2 w-2"></svg>
+        <svg id="bound" pxlGlyph="check" [class]="classes()"></svg>
+      `,
+    })
+    class Host {
+      readonly classes = signal('h-2 w-2');
+    }
+    const fixture = await render(Host);
+    const classesOf = (id: string) => Array.from(document.getElementById(id)!.classList).sort();
+    expect(classesOf('fixed')).toEqual(['h-2', 'shrink-0', 'w-2']);
+    expect(classesOf('bound')).toEqual(['h-2', 'shrink-0', 'w-2']);
+    fixture.componentInstance.classes.set('text-retro-green');
+    await fixture.whenStable();
+    expect(classesOf('bound')).toEqual(['h-3', 'shrink-0', 'text-retro-green', 'w-3']);
   });
 });
 

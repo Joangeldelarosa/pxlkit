@@ -10,10 +10,10 @@ export default defineManifest({
   description:
     'Grid wrapper that forces equal-height children via a 3-row subgrid (header / body / footer).',
   highlights: [
-    'Inherits PixelGrid props (cols, gap, surface, etc.) minus align (forced to stretch)',
+    'Inherits PixelGrid props (cols, gap, surface, etc.) minus align, which rowAlign sets',
     'Clones children with grid-rows-[auto_1fr_auto] so footers align across the row',
     'Surface-aware via useEffectiveSurface for consistent borders and transitions',
-    'rowAlign="top" opts out of stretching while keeping equal-height children',
+    'rowAlign="top" keeps each item at its own height, at the top of its row',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

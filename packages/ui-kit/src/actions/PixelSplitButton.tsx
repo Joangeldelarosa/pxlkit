@@ -24,7 +24,6 @@ import {
   ChevronDownIcon,
 } from '../common';
 import { useEscape } from '../hooks/useEscape';
-import { PixelButton } from './PixelButton';
 
 /* ─────────────────────────────────────────────────────────────────────────
    PixelSplitButton — primary action + chevron dropdown for secondary options.
@@ -170,15 +169,9 @@ export const PixelSplitButton = forwardRef<HTMLDivElement, PixelSplitButtonProps
       className={splitButtonRootClasses}
     >
       <div className={splitButtonGroupClasses(surface, tone)}>
-        <PixelButton
-          tone={tone}
-          surface={surface}
-          disabled={disabled}
-          className={splitButtonPrimaryClasses}
-          onClick={onPrimary}
-        >
-          {label}
-        </PixelButton>
+        <button disabled={disabled} className={splitButtonPrimaryClasses(surface, tone)} onClick={onPrimary}>
+          <span>{label}</span>
+        </button>
         <button
           ref={toggleRef}
           id={toggleId}

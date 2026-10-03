@@ -40,7 +40,6 @@ import { PixelGlyph } from '../_internal/pixel-glyph';
 import type { Option } from '../forms/option';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 import { injectClickOutside, injectEscape } from '../utilities/dom';
-import { PixelButton } from './pixel-button';
 
 /**
  * A primary action joined to a chevron button that opens a menu of related
@@ -57,7 +56,7 @@ import { PixelButton } from './pixel-button';
  */
 @Component({
   selector: 'pxl-split-button',
-  imports: [PixelButton, PixelGlyph],
+  imports: [PixelGlyph],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class]': 'rootClasses',
@@ -67,15 +66,8 @@ import { PixelButton } from './pixel-button';
   },
   template: `
     <div [class]="groupClasses()">
-      <button
-        pxlButton
-        [tone]="tone()"
-        [surface]="effectiveSurface()"
-        [disabled]="disabled()"
-        [class]="primaryClasses"
-        (click)="onPrimaryClick()"
-      >
-        {{ label() }}
+      <button [disabled]="disabled()" [class]="primaryClasses()" (click)="onPrimaryClick()">
+        <span>{{ label() }}</span>
       </button>
       <button
         #toggle
@@ -169,7 +161,7 @@ export class PixelSplitButton {
   /** @internal */
   protected readonly rootClasses = splitButtonRootClasses;
   /** @internal */
-  protected readonly primaryClasses = splitButtonPrimaryClasses;
+  protected readonly primaryClasses = computed(() => splitButtonPrimaryClasses(this.effectiveSurface(), this.tone()));
   /** @internal */
   protected readonly groupClasses = computed(() => splitButtonGroupClasses(this.effectiveSurface(), this.tone()));
   /** @internal */

@@ -38,7 +38,7 @@ export function sectionClasses(
       sectionRhythm[verticalPadding],
       !container && pageGutter[horizontalGutter],
     ),
-    title: cn('text-xs text-retro-green', surface === 'pixel' ? 'font-pixel' : 'font-semibold text-sm'),
+    title: cn('text-retro-green', surface === 'pixel' ? 'font-pixel text-xs' : 'font-semibold text-sm'),
     subtitle: cn('mt-2 text-sm text-retro-muted', s.font),
   };
 }

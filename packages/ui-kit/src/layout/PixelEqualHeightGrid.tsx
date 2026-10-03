@@ -2,6 +2,7 @@
 
 import React, { forwardRef } from 'react';
 import {
+  equalHeightGridAlign,
   equalHeightGridClasses,
   equalHeightGridItemClasses,
   type EqualHeightGridRowAlign,
@@ -34,9 +35,9 @@ export const PixelEqualHeightGrid = forwardRef<HTMLDivElement, PixelEqualHeightG
     return (
       <PixelGrid
         ref={ref}
-        align="stretch"
+        align={equalHeightGridAlign(rowAlign)}
         surface={surface}
-        className={cn(equalHeightGridClasses(surface, rowAlign), className)}
+        className={cn(equalHeightGridClasses(surface), className)}
         style={style}
         {...rest}
       >

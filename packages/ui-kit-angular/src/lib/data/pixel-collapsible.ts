@@ -3,7 +3,6 @@ import { collapsibleClasses, collapsibleIds, type Surface, type Tone } from '@px
 import { booleanOr, withDefault } from '../_internal/coercion';
 import { injectId } from '../_internal/ids';
 import { PixelGlyph } from '../_internal/pixel-glyph';
-import { PixelButton } from '../actions/pixel-button';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 
 /**
@@ -20,7 +19,7 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
  */
 @Component({
   selector: 'pxl-collapsible',
-  imports: [PixelButton, PixelGlyph],
+  imports: [PixelGlyph],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The host stands for React's <div>: a block box, in the base layer, so
   // display utilities set on it still win.
@@ -29,20 +28,16 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
   host: { '[class]': 'classes().root' },
   template: `
     <button
-      pxlButton
       [id]="ids.trigger"
       type="button"
-      size="sm"
-      [tone]="tone()"
-      [surface]="effectiveSurface()"
-      variant="ghost"
       [attr.aria-expanded]="isOpen()"
       [attr.aria-controls]="ids.content"
       [class]="classes().trigger"
-      [iconRight]="chevron"
       (click)="toggle()"
-    >{{ label() }}</button>
-    <ng-template #chevron><svg pxlGlyph="chevronDown" [class]="classes().chevron"></svg></ng-template>
+    >
+      <span>{{ label() }}</span>
+      <svg pxlGlyph="chevronDown" [class]="classes().chevron"></svg>
+    </button>
     @if (isOpen()) {
       <div [id]="ids.content" [class]="classes().content"><ng-content /></div>
     }
@@ -70,7 +65,7 @@ export class PixelCollapsible {
   protected readonly isOpen = computed(() => this.open() ?? this.defaultOpen());
   /** @internal */
   protected readonly classes = computed(() =>
-    collapsibleClasses(this.effectiveSurface(), { bordered: this.bordered(), open: this.isOpen() }),
+    collapsibleClasses(this.effectiveSurface(), { bordered: this.bordered(), open: this.isOpen(), tone: this.tone() }),
   );
 
   /** @internal */

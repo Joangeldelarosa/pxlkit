@@ -273,6 +273,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `PixelBreadcrumb`'s focus underline is thicker.
 - `@pxlkit/ui-kit`: a `scrollable` `PixelTabs` list scrolls instead of wrapping its tabs onto new
   rows, and `PixelOTPInput`'s cells keep their size instead of spanning the row.
+- `@pxlkit/ui-kit`: classes a component adds to override its own defaults take effect. Classes are
+  joined without merging, so of two classes for one property Tailwind's stylesheet order decides,
+  and here the default won: `PixelEqualHeightGrid` stretched its items with `rowAlign="top"`; a
+  toned `PixelCard` kept the neutral background; `PixelSplitButton`'s primary half kept a border,
+  cut corners and a shadow inside its frame; the × of `PixelChip` and `PixelMultiSelect`'s chips,
+  the check marks of `PixelSelect` and `PixelMultiSelect` and `PixelTestimonialCard`'s verified
+  mark kept the glyph's size; `PixelCollapsible`'s header kept a button's padding; a vertical
+  `PixelCarousel`'s dots sat 12px low; a right-aligned `PixelTimeline` entry was padded on both
+  sides; `PixelSidebar`'s active item had no border; and `PixelInputGroup`'s controls kept a
+  border of their own on the pixel surface.
+- `@pxlkit/ui-kit`: likewise, the linear `PixelSection` title is 14px; `PixelHeroSection`'s and
+  `PixelSectionHeader`'s eyebrows are spaced 0.18em, as written, not by the display font;
+  `PixelDatePicker` and `PixelDateRangePicker` mute their placeholder; `PixelCalendarGrid` sets a
+  range in cyan; `PixelFileUpload` lights up while a file is dragged over it; the linear search
+  rules of `PixelMultiSelect` and `PixelCommand` are 1px; `PixelMultiSelect` mutes its unselected
+  options; and disabled options and items of `PixelCombobox`, `PixelMultiSelect`, `PixelMenubar`
+  and a disabled `PixelFileUpload` show the not-allowed cursor.
+- `@pxlkit/ui-kit`: a right-aligned `PixelTimeline` runs its rail under the middle of its `md` and
+  `lg` bullets, mirroring the left side, and `PixelCarousel`'s arrows stay put while pressed on the
+  pixel surface: the press offset replaced the translate that centred them, so they jumped about
+  20px; they now nudge 2px like the other pixel controls.
 
 ## [ui-kit 2.1.1] - 2026-08-08 — Bordered surface-token fix
 

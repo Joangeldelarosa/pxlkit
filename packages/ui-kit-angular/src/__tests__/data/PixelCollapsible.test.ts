@@ -47,6 +47,19 @@ describe('PixelCollapsible', () => {
     }
   });
 
+  // Regression: the header was a small pxlButton with `px-1.5` added, and
+  // Tailwind emits the button's own `px-3` after it, so it kept its padding.
+  it('keeps its header compact, with no button size left over', async () => {
+    @Component({ imports: [PixelCollapsible], template: '<pxl-collapsible label="Details" />' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const classes = (fixture.nativeElement as HTMLElement).querySelector('button')!.classList;
+    expect(Array.from(classes)).toEqual(expect.arrayContaining(['px-1.5', 'py-0.5', 'text-xs']));
+    expect(classes).not.toContain('px-3');
+    expect(classes).not.toContain('h-8');
+  });
+
   it('frames itself when bordered', async () => {
     @Component({
       imports: [PixelCollapsible],

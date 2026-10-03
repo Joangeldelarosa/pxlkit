@@ -5,9 +5,9 @@ import {
   PIXEL_GLYPHS,
   PIXEL_GLYPH_STYLE,
   PIXEL_GLYPH_VIEWBOX,
-  cn,
   fieldShellClasses,
   fieldShellTextClasses,
+  pixelGlyphClasses,
   type PixelGlyphName,
   type Surface,
 } from '@pxlkit/ui-kit-core';
@@ -79,10 +79,9 @@ export function useClickOutside(ref: React.RefObject<HTMLElement | null>, handle
 }
 
 function PixelGlyph({ name, className }: { name: PixelGlyphName; className?: string }) {
-  const glyph = PIXEL_GLYPHS[name];
   return (
-    <svg viewBox={PIXEL_GLYPH_VIEWBOX} className={cn(glyph.className, className)} shapeRendering="crispEdges" fill="currentColor" preserveAspectRatio="xMidYMid meet" style={PIXEL_GLYPH_STYLE}>
-      {glyph.rects.map(([x, y, width, height]) => (
+    <svg viewBox={PIXEL_GLYPH_VIEWBOX} className={pixelGlyphClasses(name, className)} shapeRendering="crispEdges" fill="currentColor" preserveAspectRatio="xMidYMid meet" style={PIXEL_GLYPH_STYLE}>
+      {PIXEL_GLYPHS[name].rects.map(([x, y, width, height]) => (
         <rect key={`${x}-${y}`} x={x} y={y} width={width} height={height} />
       ))}
     </svg>

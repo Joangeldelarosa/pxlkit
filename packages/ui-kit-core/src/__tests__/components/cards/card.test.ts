@@ -40,10 +40,13 @@ describe('card recipes', () => {
     }
   });
 
+  // Regression: a toned card also took the neutral `bg-retro-surface/60`,
+  // which Tailwind emits after the tone's tint, so the tint never showed.
   it('tints border and background with the tone, and drops the chrome when not bordered', () => {
     const tinted = classesOf(cardClasses('pixel', { ...PLAIN, tone: 'cyan' }).root);
     expect(tinted).toEqual(expect.arrayContaining([tone.cyan.border, tone.cyan.soft]));
     expect(tinted).not.toContain('border-retro-border/40');
+    expect(tinted).not.toContain('bg-retro-surface/60');
     expect(cardClasses('linear', { ...PLAIN, tone: 'cyan', bordered: false }).root).toBe(
       'relative flex flex-col transition-all p-4',
     );

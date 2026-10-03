@@ -215,12 +215,12 @@ export interface MenubarItemState {
 export function menubarItemClasses(surface: Surface, { highlighted, disabled, submenu = false }: MenubarItemState): string {
   const s = surfaceClasses(surface);
   return cn(
-    'flex w-full cursor-pointer items-center gap-2 px-2 py-1.5 text-xs text-retro-text',
+    'flex w-full items-center gap-2 px-2 py-1.5 text-xs text-retro-text',
     s.font,
     s.radius,
     highlighted && !disabled && 'bg-retro-surface/80',
     !highlighted && !disabled && (submenu ? 'hover:bg-retro-surface/60' : 'hover:bg-retro-surface/40'),
-    disabled && 'cursor-not-allowed opacity-50',
+    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
   );
 }
 

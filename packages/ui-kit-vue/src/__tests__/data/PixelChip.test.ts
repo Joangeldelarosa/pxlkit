@@ -28,6 +28,15 @@ describe('PixelChip', () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
+  // Regression: the delete glyph took the chip's `h-2 w-2` after its own
+  // `h-3 w-3`, which Tailwind emits later, so it kept the larger size.
+  it('draws the delete glyph at the chip size, without the glyph default', () => {
+    const glyph = mount(PixelChip, { props: { label: 'React', onDelete: vi.fn() } }).find(`${deleteButton} svg`);
+    expect(glyph.classes()).toEqual(expect.arrayContaining(['h-2', 'w-2']));
+    expect(glyph.classes()).not.toContain('h-3');
+    expect(glyph.classes()).not.toContain('w-3');
+  });
+
   it('takes the legacy remove listener, prefers delete, and hides the button when not deletable', async () => {
     const onRemove = vi.fn();
     const onDelete = vi.fn();

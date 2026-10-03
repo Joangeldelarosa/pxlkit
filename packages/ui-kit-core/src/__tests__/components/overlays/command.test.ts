@@ -102,6 +102,10 @@ describe('command recipes', () => {
     }
     expect(commandClasses('pixel').search.split(' ')).not.toContain('border-b');
     expect(commandClasses('linear').search.split(' ')).toContain('border-b');
+    // Regression: the linear field added `border-b` to the pixel `border-b-2`,
+    // which Tailwind emits after it, so its rule stayed 2px thick.
+    expect(commandClasses('pixel').search.split(' ')).toContain('border-b-2');
+    expect(commandClasses('linear').search.split(' ')).not.toContain('border-b-2');
   });
 
   it('fills the highlighted option and lights the others on hover', () => {

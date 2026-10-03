@@ -1,6 +1,7 @@
 import { Directive, ElementRef, Renderer2, computed, inject, input, type AfterContentChecked } from '@angular/core';
 import {
   cn,
+  equalHeightGridAlign,
   equalHeightGridClasses,
   equalHeightGridItemClasses,
   gridClasses,
@@ -42,7 +43,7 @@ export class PixelEqualHeightGrid extends PixelGridBase implements AfterContentC
   /** @internal */
   protected readonly classes = computed(() => {
     const surface = this.effectiveSurface();
-    return cn(gridClasses(surface, this.gridOptions('stretch')), equalHeightGridClasses(surface, this.rowAlign()));
+    return cn(gridClasses(surface, this.gridOptions(equalHeightGridAlign(this.rowAlign()))), equalHeightGridClasses(surface));
   });
 
   // The items are the element's children, whoever renders them, so they are

@@ -24,9 +24,11 @@ describe('section recipes', () => {
     }
   });
 
+  // Regression: the linear title took `text-sm` after the pixel `text-xs`,
+  // which Tailwind emits later, so it stayed at the pixel size.
   it('sets the title row in the surface typography', () => {
-    expect(sectionClasses('pixel', plain).title).toBe('text-xs text-retro-green font-pixel');
-    expect(sectionClasses('linear', plain).title).toBe('text-xs text-retro-green font-semibold text-sm');
+    expect(sectionClasses('pixel', plain).title).toBe('text-retro-green font-pixel text-xs');
+    expect(sectionClasses('linear', plain).title).toBe('text-retro-green font-semibold text-sm');
     expect(sectionClasses('linear', plain).subtitle).toBe(`mt-2 text-sm text-retro-muted ${surfaceClasses('linear').font}`);
   });
 });

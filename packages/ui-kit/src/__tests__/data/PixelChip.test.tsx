@@ -175,6 +175,17 @@ describe('PixelChip — deletable + onDelete', () => {
     expect(screen.queryByRole('button', { name: 'Remove React' })).toBeNull();
   });
 
+  // Regression: the X took the chip's `h-2 w-2` after the glyph's own
+  // `h-3 w-3`, which Tailwind emits later, so it kept the larger size.
+  it('draws the X at the chip size, without the glyph default', () => {
+    render(<PixelChip label="React" onDelete={() => {}} />);
+    const glyph = screen.getByRole('button', { name: 'Remove React' }).querySelector('svg')!;
+    const classes = glyph.getAttribute('class')!.split(' ');
+    expect(classes).toEqual(expect.arrayContaining(['h-2', 'w-2']));
+    expect(classes).not.toContain('h-3');
+    expect(classes).not.toContain('w-3');
+  });
+
   it('the X button has accessible aria-label "Remove <label>"', () => {
     render(<PixelChip label="TypeScript" onDelete={() => {}} />);
     expect(

@@ -24,6 +24,14 @@ describe('PixelGlyph', () => {
     expect(wrapper.findAll('rect')).toHaveLength(PIXEL_GLYPHS.check.rects.length);
     expect(svg.attributes('style')).toContain('vertical-align: middle');
   });
+
+  // Regression: a caller's smaller size followed the glyph's own, and
+  // Tailwind emits `h-3` after `h-2`, so the glyph kept its own size.
+  it("replaces its size with the caller's, and passes other attributes on", () => {
+    const svg = mount(PixelGlyph, { props: { name: 'close' }, attrs: { class: 'h-2 w-2', 'aria-hidden': 'true' } }).find('svg');
+    expect(svg.classes()).toEqual(['shrink-0', 'h-2', 'w-2']);
+    expect(svg.attributes('aria-hidden')).toBe('true');
+  });
 });
 
 describe('FieldShell', () => {

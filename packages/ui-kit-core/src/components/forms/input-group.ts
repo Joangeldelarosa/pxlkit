@@ -20,10 +20,10 @@ export function inputGroupClasses(surface: Surface, size: Size): string {
  * shell clips the controls (`overflow-hidden`), focus rings included, so a
  * control shows keyboard focus inside its own edge.
  */
-export function inputGroupItemClasses(surface: Surface, last: boolean): string {
+export function inputGroupItemClasses(last: boolean): string {
   return cn(
     'min-w-0 border-0 rounded-none focus:z-10 focus-visible:z-10 focus-visible:pxl-focus-inset relative',
-    !last && cn('border-r', surfaceClasses(surface).border, 'border-retro-border/60'),
+    !last && 'border-r border-retro-border/60',
   );
 }
 

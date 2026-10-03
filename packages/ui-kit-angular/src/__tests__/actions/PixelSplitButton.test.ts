@@ -13,6 +13,18 @@ const OPTIONS: Option[] = [
   { value: 'csv', label: 'Export CSV' },
   { value: 'json', label: 'Export JSON' },
 ];
+/** The border, corners, shadow, press offset and ring of a framed button. */
+const FRAME = [
+  'border',
+  'border-2',
+  'pxl-corner-sm',
+  'rounded-md',
+  'pxl-shadow',
+  'pxl-shadow-hover',
+  'pxl-shadow-active',
+  'shadow-sm',
+  'focus-visible:ring-2',
+];
 
 const chevron = () => document.querySelector<HTMLButtonElement>('[aria-haspopup="menu"]')!;
 const menu = () => document.querySelector<HTMLElement>('[role="menu"]');
@@ -139,5 +151,25 @@ describe('PixelSplitButton', () => {
     const halves = Array.from(document.querySelectorAll('button'));
     expect(halves).toHaveLength(4);
     for (const half of halves) expect(half.classList).toContain('focus-visible:pxl-focus-inset');
+  });
+
+  // Regression: the primary half was a pxlButton with overrides merged in, and
+  // Tailwind emits the button's own `border-2` (pixel) and `shadow-sm`
+  // (linear) after them, so it kept a border and a shadow inside the frame.
+  it('leaves the border, corners and shadow to the frame, on both surfaces', async () => {
+    @Component({
+      imports: [PixelSplitButton],
+      template: `
+        <pxl-split-button label="Pixel" surface="pixel" [options]="options" />
+        <pxl-split-button label="Linear" surface="linear" [options]="options" />
+      `,
+    })
+    class Surfaces {
+      readonly options = OPTIONS;
+    }
+    await render(Surfaces);
+    const primaries = Array.from(document.querySelectorAll('button:not([aria-haspopup])'));
+    expect(primaries).toHaveLength(2);
+    for (const primary of primaries) for (const frame of FRAME) expect(primary.classList).not.toContain(frame);
   });
 });

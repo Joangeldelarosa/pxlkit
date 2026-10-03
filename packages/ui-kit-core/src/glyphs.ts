@@ -3,19 +3,20 @@
  * plain data, so every framework draws the identical SVG:
  *
  * ```html
- * <svg viewBox="0 0 8 8" class="{size classes} {caller classes}"
+ * <svg viewBox="0 0 8 8" class="{pixelGlyphClasses(name, caller classes)}"
  *      shape-rendering="crispEdges" fill="currentColor"
  *      preserveAspectRatio="xMidYMid meet" style="{PIXEL_GLYPH_STYLE}">
  *   <rect x y width height /> …
  * </svg>
  * ```
  */
+import { cn } from './common';
 
 /** A pixel rectangle on the glyph grid: `[x, y, width, height]`. */
 export type PixelGlyphRect = readonly [x: number, y: number, width: number, height: number];
 
 export interface PixelGlyph {
-  /** Size classes, placed before the caller's classes. */
+  /** Size classes, placed before the caller's classes, whose own size replaces them. */
   readonly className: string;
   /** Filled pixels, drawn in order. */
   readonly rects: readonly PixelGlyphRect[];
@@ -76,3 +77,24 @@ export const PIXEL_GLYPHS: Readonly<Record<PixelGlyphName, PixelGlyph>> = {
     ],
   },
 };
+
+/**
+ * A height or width class of a glyph, and the caller's classes that replace
+ * it: an `h-*` or `w-*` of the same axis, or a `size-*`.
+ */
+const GLYPH_SIZE_OVERRIDES: ReadonlyArray<readonly [own: RegExp, caller: RegExp]> = [
+  [/^h-/, /(?:^|\s)(?:h|size)-/],
+  [/^w-/, /(?:^|\s)(?:w|size)-/],
+];
+
+/**
+ * Classes of a glyph's `<svg>`: the glyph's size classes, then the caller's.
+ * A height or width among the caller's classes replaces the glyph's own:
+ * Tailwind orders two classes of one property by its stylesheet, not by the
+ * class list, so the glyph's `h-3` would win over a caller's `h-2`.
+ */
+export function pixelGlyphClasses(name: PixelGlyphName, className = ''): string {
+  const replaced = (token: string) =>
+    GLYPH_SIZE_OVERRIDES.some(([size, override]) => size.test(token) && override.test(className));
+  return cn(...PIXEL_GLYPHS[name].className.split(' ').filter((token) => !replaced(token)), className);
+}

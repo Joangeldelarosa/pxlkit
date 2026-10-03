@@ -153,8 +153,12 @@ describe('menubar ids and recipes', () => {
     expect(trigger).not.toContain('outline-none');
   });
 
+  // Regression: a disabled item kept `cursor-pointer`, which Tailwind emits
+  // after `cursor-not-allowed`.
   it('tints the highlighted item and dims a disabled one', () => {
-    expect(classesOf(menubarItemClasses('pixel', { highlighted: true, disabled: false }))).toContain('bg-retro-surface/80');
+    expect(classesOf(menubarItemClasses('pixel', { highlighted: true, disabled: false }))).toEqual(
+      expect.arrayContaining(['bg-retro-surface/80', 'cursor-pointer']),
+    );
     expect(classesOf(menubarItemClasses('pixel', { highlighted: false, disabled: false }))).toContain('hover:bg-retro-surface/40');
     expect(classesOf(menubarItemClasses('pixel', { highlighted: false, disabled: false, submenu: true }))).toContain(
       'hover:bg-retro-surface/60',
@@ -162,5 +166,6 @@ describe('menubar ids and recipes', () => {
     const disabled = classesOf(menubarItemClasses('linear', { highlighted: true, disabled: true }));
     expect(disabled).toEqual(expect.arrayContaining(['cursor-not-allowed', 'opacity-50']));
     expect(disabled).not.toContain('bg-retro-surface/80');
+    expect(disabled).not.toContain('cursor-pointer');
   });
 });
