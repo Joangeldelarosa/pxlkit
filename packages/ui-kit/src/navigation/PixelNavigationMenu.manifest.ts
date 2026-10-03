@@ -26,7 +26,7 @@ export default defineManifest({
   props: 'auto',
   a11y: {
     wcag: '2.1 AA',
-    patterns: ['navigation', 'disclosure'],
+    patterns: ['disclosure', 'link'],
     keyboard: [
       { key: 'Tab', does: 'Move to the next link or button; from the button of an open panel, into the panel' },
       { key: 'Shift+Tab', does: 'Move to the previous link or button' },

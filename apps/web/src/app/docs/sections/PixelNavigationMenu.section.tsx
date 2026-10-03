@@ -43,8 +43,8 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
       <h3 id="pixel-navigation-menu-a11y">Accessibility</h3>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
-        <li><code>navigation</code></li>
         <li><code>disclosure</code></li>
+        <li><code>link</code></li>
       </ul>
       <p className="docs-aria-notes">Follows the WAI-ARIA disclosure navigation pattern, without menu roles (those are for application menus): a <code>&lt;nav&gt;</code> landmark — give it a unique <code>ariaLabel</code> when the page has more than one (WCAG 2.4.6) — holding a list of links, and of buttons with <code>aria-expanded</code> and <code>aria-controls</code> for the items with <code>content</code>. Each panel is a plain container rendered right after its button, inside the same list item, so Tab moves from the button into the open panel; the shared viewport is only drawn below the whole list. A click, or Enter / Space on the button, toggles the panel; focus alone never opens it. A mouse pointing at an item opens its panel — touch and pen pointers do not, so a tap opens it once — and the pointer leaving the menu closes that panel, unless a click on its button kept it open: a panel opened by a click stays open until a click on its button or another one, or Escape. A panel that closes while focus is inside it hands focus back to its button. An item with both an <code>href</code> and <code>content</code> is a button whose activation toggles the panel instead of navigating.</p>
       <h4>Keyboard</h4>
