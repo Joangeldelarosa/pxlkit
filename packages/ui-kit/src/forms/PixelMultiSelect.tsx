@@ -74,7 +74,9 @@ export interface PixelMultiSelectProps {
  * prevent that. The combobox carries the popup's ARIA, so the field leaves
  * out what PixelPopover.Trigger gives it.
  */
-const MultiSelectField = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+type MultiSelectFieldProps = React.HTMLAttributes<HTMLDivElement>;
+
+const MultiSelectField = forwardRef<HTMLDivElement, MultiSelectFieldProps>(
   function MultiSelectField(
     { 'aria-expanded': _expanded, 'aria-haspopup': _haspopup, 'aria-controls': _controls, ...rest },
     ref,
