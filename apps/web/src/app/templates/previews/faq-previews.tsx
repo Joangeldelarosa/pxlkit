@@ -19,6 +19,7 @@ import {
   PixelSectionHeader,
   PixelTwoColumn,
 } from '@pxlkit/ui-kit';
+import { ICON_COUNT_LABEL, ICON_PACK_COUNT, UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 
 /* ── Data ───────────────────────────────────────────────────────────────── */
 
@@ -28,7 +29,7 @@ const ACCORDION_ITEMS = [
     tone: 'green' as const,
     category: 'Overview',
     q: 'What is Pxlkit?',
-    a: 'A complete pixel-art component library for React. It includes 54 UI components, 226+ handcrafted SVG icons across 7 themed packs, rich animations, a 3D voxel engine, and full TypeScript support.',
+    a: `A complete pixel-art component library for React, Vue and Angular. It includes ${UI_COMPONENTS_COUNT} UI components, ${ICON_COUNT_LABEL} handcrafted SVG icons across ${ICON_PACK_COUNT} themed packs, rich animations, a 3D voxel engine, and full TypeScript support.`,
   },
   {
     icon: Shield,

@@ -38,6 +38,7 @@ import {
   PixelTwoColumn,
   PixelHeroMedia,
 } from '@pxlkit/ui-kit';
+import { UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 
 /* ── Hero Centered ──────────────────────────────────────────────────────── */
 export function HeroCenteredPreview() {
@@ -106,7 +107,7 @@ export function HeroCenteredPreview() {
                 <PixelTooltip content="Buttons, cards, modals, animations, and more" position="top">
                   <span className="inline-flex items-center gap-1.5">
                     <PxlKitIcon icon={Grid} size={14} colorful />
-                    54 components
+                    {UI_COMPONENTS_COUNT} components
                   </span>
                 </PixelTooltip>
                 <span className="text-retro-border">|</span>

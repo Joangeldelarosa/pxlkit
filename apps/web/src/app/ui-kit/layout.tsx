@@ -116,15 +116,15 @@ export const metadata: Metadata = {
 const UI_KIT_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: '@pxlkit/ui-kit',
+  name: 'Pxlkit UI Kit',
   applicationCategory: 'DeveloperApplication',
-  applicationSubCategory: 'React Component Library',
+  applicationSubCategory: 'UI Component Library',
   operatingSystem: 'Web',
   url: 'https://pxlkit.xyz/ui-kit',
   description:
-    `${UI_COMPONENTS_COUNT} accessible retro React primitives — buttons, forms, modals, tables, charts, calendars, parallax, and more. TypeScript-first, Tailwind v4, MIT.`,
+    `${UI_COMPONENTS_COUNT} accessible retro components for React (@pxlkit/ui-kit), Vue (@pxlkit/ui-kit-vue) and Angular (@pxlkit/ui-kit-angular) — buttons, forms, modals, tables, charts, calendars, parallax, and more. TypeScript-first, Tailwind v4, MIT.`,
   softwareVersion: UI_KIT_VERSION,
-  programmingLanguage: ['TypeScript', 'React', 'JavaScript'],
+  programmingLanguage: ['TypeScript', 'JavaScript', 'React', 'Vue', 'Angular'],
   downloadUrl: 'https://www.npmjs.com/package/@pxlkit/ui-kit',
   license: 'https://github.com/Joangeldelarosa/pxlkit/blob/main/LICENSE',
   offers: [
