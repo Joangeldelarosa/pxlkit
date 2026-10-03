@@ -27,7 +27,9 @@
     "lint": "ngc -p tsconfig.lint.json && tsc --noEmit -p tsconfig.spec.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "storybook": "cd .storybook && ng run ui-kit-angular:storybook",
+    "build-storybook": "cd .storybook && ng run ui-kit-angular:build-storybook"
   },
   "peerDependencies": {
     "@angular/common": ">=20.0.0 <23.0.0",

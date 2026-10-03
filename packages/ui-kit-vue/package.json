@@ -27,7 +27,9 @@
     "lint": "vue-tsc --noEmit -p tsconfig.json && vue-tsc --noEmit -p tsconfig.test.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "storybook": "storybook dev -p 6007",
+    "build-storybook": "storybook build"
   },
   "peerDependencies": {
     "vue": "^3.5.0"

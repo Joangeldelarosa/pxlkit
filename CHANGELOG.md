@@ -76,6 +76,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   that does not exist.
 - `npm run release:bump-plugin -- --version X.Y.Z`, which keeps the plugin manifest
   and marketplace entry in step with the kit during a release.
+- **Storybooks for Vue and Angular, on Storybook 10.** `npm run storybook:vue` and
+  `npm run storybook:angular` open Storybooks of the Vue and Angular kits beside the React
+  one, under the same titles and story names, so a story id opens the same example in all
+  three. `npm run docs:build` generates their stories from the kits' examples
+  (`generate-port-stories`): every component, with each example's code on its docs page and,
+  in Vue, a props table read from the components' types. The React Storybook moves from 8.6
+  to 10 — which Angular 20 needs — with controls, actions, backgrounds, viewport and
+  interactions now in Storybook's core.
 
 ### Changed
 

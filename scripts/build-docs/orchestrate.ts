@@ -24,8 +24,10 @@
  *   - hand-authored files are only written through explicit contracts: the
  *     marker blocks (<!-- COMPONENTS:START/END -->, <!-- WORKSPACES:START/END -->)
  *     replace just the delimited region, and CHANGELOG.md is only created as
- *     a one-time seed when the package has none. Everything else emits to a
- *     `.generated.*` (or sibling `_generated/`) location.
+ *     a one-time seed when the package has none. The Vue and Angular kits'
+ *     `stories/` folders hold only generated files, which are rewritten whole.
+ *     Everything else emits to a `.generated.*` (or sibling `_generated/`)
+ *     location.
  */
 
 import path from "node:path";
@@ -50,6 +52,7 @@ import {
 } from "./extract-bundle-size.js";
 import { GenerateRegistryGenerator } from "./generate-registry.js";
 import { GenerateStoriesGenerator } from "./generate-stories.js";
+import { GeneratePortStoriesGenerator } from "./generate-port-stories.js";
 import { GenerateShowcaseGenerator } from "./generate-showcase.js";
 import { GenerateDocsPageGenerator } from "./generate-docs-page.js";
 import { GenerateReadmePackageGenerator } from "./generate-readme-package.js";
@@ -157,6 +160,8 @@ export function defaultPipelineSteps(repoRoot: string): StepDescriptor[] {
       required: false,
     },
     { name: "generate-stories", factory: () => new GenerateStoriesGenerator() },
+    // The Vue and Angular Storybooks' stories, from the ports' examples.
+    { name: "generate-port-stories", factory: () => new GeneratePortStoriesGenerator() },
     { name: "generate-showcase", factory: () => new GenerateShowcaseGenerator() },
     { name: "generate-docs-page", factory: () => new GenerateDocsPageGenerator(out.docsPage) },
     { name: "generate-readme-package", factory: () => new GenerateReadmePackageGenerator() },
@@ -191,6 +196,7 @@ const STEP_ALIASES: Record<string, string> = {
   "skill-refs": "generate-skill-refs",
   skills: "generate-skill-refs",
   stories: "generate-stories",
+  "port-stories": "generate-port-stories",
   showcase: "generate-showcase",
   "docs-page": "generate-docs-page",
   docs: "generate-docs-page",

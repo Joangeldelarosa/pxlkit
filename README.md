@@ -547,33 +547,21 @@ Checks grid dimensions (16×16), palette usage, and detects unused/missing palet
 
 ## Storybook
 
-Every component in `@pxlkit/core` and `@pxlkit/ui-kit` has a live Storybook entry — 100+ stories total, organised by category, with Controls panels to manipulate every prop live (tone, size, surface, appearance, tint colour, disabled state, animation timing, etc.).
+Three Storybooks (Storybook 10), one per framework, show the UI kit's components under the same titles and story names: each story is one of a component's examples, so the same story id opens the same example in React, Vue and Angular.
 
-**Live**: [storybook.pxlkit.xyz](https://storybook.pxlkit.xyz)
+| Storybook | Command | Port |
+| --- | --- | --- |
+| React: `@pxlkit/ui-kit` and the icon components of `@pxlkit/core` | `npm run storybook` | 6006 |
+| Vue: `@pxlkit/ui-kit-vue` | `npm run storybook:vue` | 6007 |
+| Angular: `@pxlkit/ui-kit-angular` | `npm run storybook:angular` | 6008 |
 
-**Local**:
+Run `npm run build` first: the stories import the icon packs as an application does. `npm run build-storybook`, `npm run build-storybook:vue` and `npm run build-storybook:angular` write static builds to `storybook-static/` — the repository's, `packages/ui-kit-vue/`'s and `packages/ui-kit-angular/`'s. Storybook 10 needs Node.js 20.19+ or 22.12+.
 
-```bash
-npm run storybook       # dev mode on http://localhost:6006
-npm run build-storybook # static build → ./storybook-static/
-```
+The Vue and Angular stories are generated from the kits' examples by `npm run docs:build` (`scripts/build-docs/generate-port-stories.ts`); their docs pages show each example's code, and the Vue ones a props table read from the components' types. The Angular Storybook runs in an Angular workspace of its own, `packages/ui-kit-angular/.storybook/`, whose PostCSS configuration (Tailwind CSS) stays out of the library build.
 
-Sidebar categories:
+**Live** (React): [storybook.pxlkit.xyz](https://storybook.pxlkit.xyz)
 
-- **Foundations / Surface** — `pixel` vs `linear` aesthetic split-screen
-- **Core / PxlKitIcon** — colour modes (`palette`, `tinted`, `solid`) + size grid
-- **Core / AnimatedPxlKitIcon** — every trigger (`loop`, `hover`, `once`, `appear`, `ping-pong`)
-- **Core / PixelToast** — every position + tone
-- **UI Kit / Actions** — `PixelButton`, `PxlKitButton`, `PixelSplitButton`
-- **UI Kit / Inputs** — the 9 form controls
-- **UI Kit / Feedback** — Alert (with HP-bar progress), Empty State, Skeleton
-- **UI Kit / Overlay** — Modal (window-style title bar in pixel surface), Tooltip, Dropdown
-- **UI Kit / Layout** — Section, Divider with ornaments
-- **UI Kit / Navigation** — Tabs, Accordion, Breadcrumb, Pagination
-- **UI Kit / Animations** — 11 motion primitives applied to real `@pxlkit/gamification` icons
-- **UI Kit / Parallax** — Mouse + scroll parallax wrappers
-- **UI Kit / Data Display** — 14 components from Cards to ColorSwatches
-- **UI Kit / Locale** — `PxlKitLocaleProvider` Turkish vs English side-by-side
+The sidebar follows the kit's categories — **UI Kit / Actions, Animations, Cards, Data, Feedback, Forms, Hero, Layout, Navigation, Overlay Foundation, Overlays, Parallax** — and the React Storybook adds **Foundations / Surface** (the `pixel` and `linear` surfaces side by side), the icon components (**Core / PxlKitIcon, AnimatedPxlKitIcon, PixelToast**) and a few category showcases.
 
 ## Tech Stack
 
@@ -585,6 +573,7 @@ Sidebar categories:
 | **Components** | React ≥ 18 · Vue ≥ 3.3 (UI kit: ≥ 3.5) · Angular 20–22      |
 | **Web App**    | Next.js 15 · React 19 · Tailwind CSS 4 · Framer Motion 11   |
 | **3D Engine**  | Three.js · React Three Fiber · @react-three/drei             |
+| **Storybook**  | Storybook 10 — one per framework: React, Vue and Angular     |
 | **Engine**     | Node.js ≥ 20                                                 |
 
 ## Packages

@@ -16,6 +16,6 @@
       "defaultCategory": "error"
     }
   },
-  "include": ["src/**/*.ts", "examples/**/*.ts"],
+  "include": ["src/**/*.ts", "examples/**/*.ts", "stories/**/*.ts"],
   "exclude": ["src/__tests__/**"]
 }

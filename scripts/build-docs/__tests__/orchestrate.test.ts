@@ -414,6 +414,7 @@ describe("PIPELINE_STEPS", () => {
       // stay pinned immediately after generate-registry.
       "generate-skill-refs",
       "generate-stories",
+      "generate-port-stories",
       "generate-showcase",
       "generate-docs-page",
       "generate-readme-package",

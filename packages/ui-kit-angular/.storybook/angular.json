@@ -1,0 +1,38 @@
+{
+  "$schema": "../../../node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": { "analytics": false, "packageManager": "npm" },
+  "projects": {
+    "ui-kit-angular": {
+      "projectType": "library",
+      "root": "..",
+      "sourceRoot": "../src",
+      "prefix": "pxl",
+      "architect": {
+        "storybook": {
+          "builder": "@storybook/angular:start-storybook",
+          "options": {
+            "configDir": ".",
+            "tsConfig": "tsconfig.json",
+            "styles": ["styles.css"],
+            "experimentalZoneless": true,
+            "compodoc": false,
+            "port": 6008
+          }
+        },
+        "build-storybook": {
+          "builder": "@storybook/angular:build-storybook",
+          "options": {
+            "configDir": ".",
+            "tsConfig": "tsconfig.json",
+            "styles": ["styles.css"],
+            "experimentalZoneless": true,
+            "compodoc": false,
+            "quiet": true,
+            "outputDir": "../storybook-static"
+          }
+        }
+      }
+    }
+  }
+}
