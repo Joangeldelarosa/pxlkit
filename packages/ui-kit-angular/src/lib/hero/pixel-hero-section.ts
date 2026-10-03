@@ -17,6 +17,8 @@ import {
 } from '@pxlkit/ui-kit-core';
 import { withDefault } from '../_internal/coercion';
 import { PxlOutlet, type PxlContent } from '../_internal/outlet';
+import { PixelGlitch, PixelGlitchContent } from '../animations/pixel-glitch';
+import { PixelTypewriter } from '../animations/pixel-typewriter';
 import { PixelCluster } from '../layout/pixel-cluster';
 import { PixelContainer } from '../layout/pixel-container';
 import { PixelTwoColumn } from '../layout/pixel-two-column';
@@ -37,7 +39,7 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
  */
 @Component({
   selector: 'section[pxlHeroSection]',
-  imports: [NgTemplateOutlet, PxlOutlet, PixelCluster, PixelContainer, PixelTwoColumn],
+  imports: [NgTemplateOutlet, PxlOutlet, PixelCluster, PixelContainer, PixelGlitch, PixelGlitchContent, PixelTwoColumn, PixelTypewriter],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class]': 'classes().root' },
   template: `
@@ -78,7 +80,13 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
         @if (eyebrow()) {
           <span [class]="classes().eyebrow">{{ eyebrow() }}</span>
         }
-        <h1 [class]="classes().headline">{{ headline() }}</h1>
+        @if (headlineEffect() === 'glitch') {
+          <pxl-glitch>
+            <ng-container *pxlGlitchContent [ngTemplateOutlet]="headlineBlock" />
+          </pxl-glitch>
+        } @else {
+          <ng-container [ngTemplateOutlet]="headlineBlock" />
+        }
         @if (subline()) {
           <p [class]="classes().subline">{{ subline() }}</p>
         }
@@ -96,6 +104,13 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
         }
       </div>
     </ng-template>
+    <ng-template #headlineBlock>
+      @if (headlineEffect() === 'typewriter') {
+        <h1 [class]="classes().headline"><pxl-typewriter [label]="headline()" tone="inherit" /></h1>
+      } @else {
+        <h1 [class]="classes().headline">{{ headline() }}</h1>
+      }
+    </ng-template>
     <ng-template #mediaColumn>
       <div [class]="splitMediaClasses"><ng-container *pxlOutlet="media(); let text">{{ text }}</ng-container></div>
     </ng-template>
@@ -110,7 +125,11 @@ export class PixelHeroSection {
   });
   /** Small upper-cased line above the headline, in the tone. */
   readonly eyebrow = input<string>();
-  /** Animation of the headline. Reserved: it has no effect yet, as in the React kit. */
+  /**
+   * Animates the headline: `'typewriter'` types it out once — screen readers
+   * get the whole headline from the start — and `'glitch'` plays the glitch
+   * over it. Both hold still when the user prefers reduced motion.
+   */
   readonly headlineEffect = input<HeroHeadlineEffect, HeroHeadlineEffect | undefined>('none', {
     transform: withDefault<HeroHeadlineEffect>('none'),
   });

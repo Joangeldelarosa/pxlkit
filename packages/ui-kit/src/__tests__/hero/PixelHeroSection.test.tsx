@@ -1,7 +1,8 @@
 import React from 'react';
-import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { act, render, screen } from '@testing-library/react';
 import { PixelHeroSection } from '../../hero/PixelHeroSection';
+import { mockMatchMedia } from '../animations/matchmedia-mock';
 
 describe('PixelHeroSection', () => {
   it('renders headline as h1', () => {
@@ -72,4 +73,53 @@ describe('PixelHeroSection', () => {
     const paragraphs = container.querySelectorAll('p');
     expect(paragraphs.length).toBe(0);
   });
+
+  describe('headlineEffect', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('types the headline out, which screen readers get whole from the start', () => {
+      vi.useFakeTimers();
+      const { container } = render(<PixelHeroSection headline="Loading" headlineEffect="typewriter" />);
+      const heading = screen.getByRole('heading', { level: 1, name: 'Loading' });
+      const typed = heading.querySelector('[aria-hidden="true"]')!;
+      // Nothing typed yet: the caret alone.
+      expect(typed.textContent).toBe('▌');
+      act(() => { vi.advanceTimersByTime(60 * 3); });
+      expect(typed.textContent).toBe('Loa▌');
+      act(() => { vi.advanceTimersByTime(60 * 10); });
+      expect(typed.textContent).toBe('Loading');
+      // The headline keeps its own font and colour.
+      expect(heading.firstElementChild!.className).not.toMatch(/font-mono|text-retro-green/);
+      expect(container.querySelectorAll('h1')).toHaveLength(1);
+    });
+
+    it('glitches the headline, whose copies are hidden from assistive technology', () => {
+      const { container } = render(<PixelHeroSection headline="Signal lost" headlineEffect="glitch" />);
+      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+      const copies = [...container.querySelectorAll('h1')].filter((h1) => h1.closest('[aria-hidden="true"]'));
+      expect(copies).toHaveLength(2);
+    });
+
+    it('holds still when the user prefers reduced motion', () => {
+      const ctl = mockMatchMedia(true);
+      try {
+        const { container, unmount } = render(<PixelHeroSection headline="Signal lost" headlineEffect="glitch" />);
+        expect(container.querySelectorAll('h1')).toHaveLength(1);
+        unmount();
+        render(<PixelHeroSection headline="Loading" headlineEffect="typewriter" />);
+        const heading = screen.getByRole('heading', { level: 1, name: 'Loading' });
+        expect(heading.querySelector('[aria-hidden="true"]')!.textContent).toBe('Loading');
+      } finally {
+        ctl.restore();
+      }
+    });
+
+    it('renders the plain headline by default', () => {
+      const { container } = render(<PixelHeroSection headline="Plain" />);
+      expect(container.querySelector('h1')!.innerHTML).toBe('Plain');
+    });
+  });
 });
+

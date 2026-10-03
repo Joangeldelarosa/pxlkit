@@ -37,3 +37,27 @@ export function Compact() {
     />
   )
 }
+
+export function TypewriterHeadline() {
+  return (
+    <PixelHeroSection
+      eyebrow="Boot sequence"
+      headline="Loading retro interfaces"
+      headlineEffect="typewriter"
+      subline="The headline types itself out; screen readers get it whole from the start."
+    />
+  )
+}
+
+export function GlitchHeadline() {
+  return (
+    <PixelHeroSection
+      density="compact"
+      minHeight="sm"
+      headline="Signal lost"
+      headlineEffect="glitch"
+      subline="The headline glitches, and holds still for readers who prefer reduced motion."
+      tone="red"
+    />
+  )
+}

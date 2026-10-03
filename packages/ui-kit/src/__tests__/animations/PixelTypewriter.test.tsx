@@ -103,6 +103,12 @@ describe('PixelTypewriter', () => {
     expect(el.className).toContain('custom');
   });
 
+  it('keeps the font and colour of the text around it with tone="inherit"', () => {
+    const { container } = render(<PixelTypewriter label="x" tone="inherit" className="custom" />);
+    const el = container.firstElementChild as HTMLElement;
+    expect(el.className).toBe('custom');
+  });
+
   it('shows the full text immediately (no caret) when the user prefers reduced motion', () => {
     const ctl = mockMatchMedia(true);
     try {

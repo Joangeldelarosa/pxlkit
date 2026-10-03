@@ -6,6 +6,10 @@ describe('typewriter recipes', () => {
     expect(typewriterClasses('cyan')).toEqual({ root: `font-mono ${toneMap.cyan.text}`, caret: 'animate-pulse' });
     expect(TYPEWRITER_CARET).toBe('▌');
   });
+
+  it('keeps the font and colour of the text around it for the inherit tone', () => {
+    expect(typewriterClasses('inherit')).toEqual({ root: '', caret: 'animate-pulse' });
+  });
 });
 
 describe('typeText', () => {

@@ -1,5 +1,5 @@
 import { defineManifest } from '../../../../scripts/build-docs/manifest-schema'
-import { Default, Split, Compact } from './PixelHeroSection.examples'
+import { Default, Split, Compact, TypewriterHeadline, GlitchHeadline } from './PixelHeroSection.examples'
 
 export default defineManifest({
   name: 'PixelHeroSection',
@@ -19,6 +19,8 @@ export default defineManifest({
     { id: 'default', label: 'Default', Component: Default },
     { id: 'split', label: 'Split with media', Component: Split },
     { id: 'compact', label: 'Compact density', Component: Compact },
+    { id: 'typewriter-headline', label: 'Typewriter headline', Component: TypewriterHeadline },
+    { id: 'glitch-headline', label: 'Glitch headline', Component: GlitchHeadline },
   ],
   props: 'auto',
   a11y: {

@@ -52,3 +52,34 @@ export class Split {}
   `,
 })
 export class Compact {}
+
+@Component({
+  imports: [PixelHeroSection],
+  template: `
+    <section
+      pxlHeroSection
+      eyebrow="Boot sequence"
+      headline="Loading retro interfaces"
+      headlineEffect="typewriter"
+      subline="The headline types itself out; screen readers get it whole from the start."
+    ></section>
+  `,
+})
+export class TypewriterHeadline {}
+
+@Component({
+  imports: [PixelHeroSection],
+  template: `
+    <section
+      pxlHeroSection
+      density="compact"
+      minHeight="sm"
+      headline="Signal lost"
+      headlineEffect="glitch"
+      subline="The headline glitches, and holds still for readers who prefer reduced motion."
+      tone="red"
+    ></section>
+  `,
+})
+export class GlitchHeadline {}
+

@@ -12,7 +12,7 @@ import {
   untracked,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { TYPEWRITER_CARET, typeText, typewriterClasses, type AnimationTrigger, type Tone } from '@pxlkit/ui-kit-core';
+import { TYPEWRITER_CARET, typeText, typewriterClasses, type AnimationTrigger, type TypewriterTone } from '@pxlkit/ui-kit-core';
 import { booleanOr, numberOr, withDefault } from '../_internal/coercion';
 import { injectAnimationTrigger } from './_internal/animation-trigger';
 
@@ -46,8 +46,13 @@ export class PixelTypewriter {
   readonly delay = input(0, { transform: numberOr(0) });
   /** Show a blinking caret while writing. */
   readonly cursor = input(true, { transform: booleanOr(true) });
-  /** Tone token applied to the text color. */
-  readonly tone = input<Tone, Tone | undefined>('green', { transform: withDefault<Tone>('green') });
+  /**
+   * Tone token applied to the text color, in monospace; `'inherit'` keeps the
+   * font and colour of the text around it.
+   */
+  readonly tone = input<TypewriterTone, TypewriterTone | undefined>('green', {
+    transform: withDefault<TypewriterTone>('green'),
+  });
   /**
    * When the typing plays: `'mount'`, `'hover'`, `'click'`, `'focus'`,
    * `'inView'`, or `true` / `false` to control it.

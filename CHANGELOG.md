@@ -145,6 +145,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `@pxlkit/ui-kit`: `PixelStepper` steps get valid roles and names (clickable steps are buttons,
   the others read their position and state as hidden text), and `PixelAccordion` /
   `PixelCollapsible` panels drop an `aria-labelledby` that ARIA does not allow without a role.
+- `@pxlkit/ui-kit`: `PixelHeroSection`'s `headlineEffect` had no effect. `'typewriter'` types
+  the headline out — screen readers get it whole from the start — and `'glitch'` plays
+  `PixelGlitch` over it, in every kit; both hold still when the reader prefers reduced motion.
+  `PixelTypewriter` takes `tone="inherit"` for this: it keeps the font and colour of the text
+  around it.
 - `@pxlkit/ui-kit`: `PixelSplitButton`'s menu follows the WAI-ARIA menu button pattern, as
   `PixelDropdown`'s does. It never took focus, had no keyboard support, no name and no Escape,
   and its options were tab stops: it now takes focus as it opens, is named by the chevron

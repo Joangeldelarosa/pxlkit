@@ -7,15 +7,22 @@ import { cn, toneMap, type Tone } from '../../common';
 /** The caret shown while the text is being typed. */
 export const TYPEWRITER_CARET = '▌';
 
+/**
+ * A typewriter's tone: a kit tone, which sets the text in monospace in that
+ * colour, or `'inherit'`, which keeps the font and colour of the text around
+ * it (a headline that types itself out).
+ */
+export type TypewriterTone = Tone | 'inherit';
+
 export interface TypewriterClasses {
-  /** The wrapper: monospace, in the tone colour. */
+  /** The wrapper: monospace, in the tone colour — none for `'inherit'`. */
   root: string;
   /** The blinking caret. */
   caret: string;
 }
 
-export function typewriterClasses(tone: Tone): TypewriterClasses {
-  return { root: cn('font-mono', toneMap[tone].text), caret: 'animate-pulse' };
+export function typewriterClasses(tone: TypewriterTone): TypewriterClasses {
+  return { root: tone === 'inherit' ? '' : cn('font-mono', toneMap[tone].text), caret: 'animate-pulse' };
 }
 
 /**

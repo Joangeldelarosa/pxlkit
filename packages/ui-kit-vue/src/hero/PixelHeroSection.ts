@@ -15,6 +15,8 @@ import {
   type ToneKey,
 } from '@pxlkit/ui-kit-core';
 import { useEffectiveSurface } from '../composables/surface.js';
+import PixelGlitch from '../animations/PixelGlitch.vue';
+import PixelTypewriter from '../animations/PixelTypewriter.vue';
 import PixelCluster from '../layout/PixelCluster.vue';
 import PixelContainer from '../layout/PixelContainer.vue';
 import PixelTwoColumn from '../layout/PixelTwoColumn.vue';
@@ -26,7 +28,11 @@ const heroSectionProps = {
   variant: { type: String as PropType<HeroVariant>, default: 'centered' },
   /** Small upper-cased line above the headline, in the tone. */
   eyebrow: { type: String, default: undefined },
-  /** Animation of the headline. Reserved: it has no effect yet, as in the React kit. */
+  /**
+   * Animates the headline: `'typewriter'` types it out once — screen readers
+   * get the whole headline from the start — and `'glitch'` plays PixelGlitch
+   * over it. Both hold still when the user prefers reduced motion.
+   */
   headlineEffect: { type: String as PropType<HeroHeadlineEffect>, default: 'none' },
   /** Paragraph under the headline. */
   subline: { type: String, default: undefined },
@@ -91,9 +97,14 @@ export default defineComponent({
           slots['primary-cta']?.(),
           slots['secondary-cta']?.(),
         ]);
+      const headline = h(
+        'h1',
+        { class: c.headline },
+        props.headlineEffect === 'typewriter' ? h(PixelTypewriter, { label: props.headline, tone: 'inherit' }) : props.headline,
+      );
       const text = h('div', { class: c.text }, [
         props.eyebrow ? h('span', { class: c.eyebrow }, props.eyebrow) : null,
-        h('h1', { class: c.headline }, props.headline),
+        props.headlineEffect === 'glitch' ? h(PixelGlitch, null, () => headline) : headline,
         props.subline ? h('p', { class: c.subline }, props.subline) : null,
         ctas,
         slots.install && h('div', { class: c.install }, slots.install()),

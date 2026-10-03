@@ -1,8 +1,8 @@
 'use client';
 
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
-import { TYPEWRITER_CARET, typeText, typewriterClasses } from '@pxlkit/ui-kit-core';
-import { cn, Tone } from '../common';
+import { TYPEWRITER_CARET, typeText, typewriterClasses, type TypewriterTone } from '@pxlkit/ui-kit-core';
+import { cn } from '../common';
 import type { AnimationTrigger } from './types';
 import { mergeRefs, useAnimationTrigger } from './_internal/animation-hooks';
 
@@ -24,8 +24,11 @@ export interface PixelTypewriterProps {
   delay?: number;
   /** Show a blinking caret while writing. Default `true`. */
   cursor?: boolean;
-  /** Tone token applied to the text color. Default `'green'`. */
-  tone?: Tone;
+  /**
+   * Tone token applied to the text color, in monospace; `'inherit'` keeps the
+   * font and colour of the text around it. Default `'green'`.
+   */
+  tone?: TypewriterTone;
   /** When the animation should play. Default `'mount'`. */
   trigger?: AnimationTrigger;
   /** Fires once the full string is rendered. */

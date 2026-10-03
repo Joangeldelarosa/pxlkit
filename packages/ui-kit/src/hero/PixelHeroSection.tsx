@@ -19,11 +19,19 @@ import { ToneKey } from '../tokens';
 import { PixelContainer } from '../layout/PixelContainer';
 import { PixelTwoColumn } from '../layout/PixelTwoColumn';
 import { PixelCluster } from '../layout/PixelCluster';
+import { PixelGlitch } from '../animations/PixelGlitch';
+import { PixelTypewriter } from '../animations/PixelTypewriter';
 
 export interface PixelHeroSectionProps extends React.HTMLAttributes<HTMLElement> {
   variant?: HeroVariant;
   eyebrow?: string;
   headline: string;
+  /**
+   * Animates the headline: `'typewriter'` types it out once — screen readers
+   * get the whole headline from the start — and `'glitch'` plays PixelGlitch
+   * over it. Both hold still when the user prefers reduced motion. Default
+   * `'none'`.
+   */
   headlineEffect?: HeroHeadlineEffect;
   subline?: string;
   primaryCta?: React.ReactNode;
@@ -43,7 +51,7 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
       variant = 'centered',
       eyebrow,
       headline,
-      headlineEffect: _headlineEffect = 'none',
+      headlineEffect = 'none',
       subline,
       primaryCta,
       secondaryCta,
@@ -72,7 +80,7 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
 
     const headlineNode = (
       <h1 className={c.headline}>
-        {headline}
+        {headlineEffect === 'typewriter' ? <PixelTypewriter label={headline} tone="inherit" /> : headline}
       </h1>
     );
 
@@ -110,7 +118,7 @@ export const PixelHeroSection = forwardRef<HTMLElement, PixelHeroSectionProps>(
     const textColumn = (
       <div className={c.text}>
         {eyebrowNode}
-        {headlineNode}
+        {headlineEffect === 'glitch' ? <PixelGlitch>{headlineNode}</PixelGlitch> : headlineNode}
         {sublineNode}
         {ctaNode}
         {installNode}

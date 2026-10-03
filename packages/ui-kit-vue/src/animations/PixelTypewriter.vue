@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
-import { TYPEWRITER_CARET, typeText, typewriterClasses, type AnimationTrigger, type Tone } from '@pxlkit/ui-kit-core';
+import { TYPEWRITER_CARET, typeText, typewriterClasses, type AnimationTrigger, type TypewriterTone } from '@pxlkit/ui-kit-core';
 import { useAnimationTrigger } from './_internal/animation-trigger.js';
 
 /**
@@ -24,8 +24,11 @@ export interface PixelTypewriterProps {
   delay?: number;
   /** Show a blinking caret while writing. */
   cursor?: boolean;
-  /** Tone token applied to the text color. */
-  tone?: Tone;
+  /**
+   * Tone token applied to the text color, in monospace; `'inherit'` keeps
+   * the font and colour of the text around it.
+   */
+  tone?: TypewriterTone;
   /**
    * When the typing plays: `'mount'`, `'hover'`, `'click'`, `'focus'`,
    * `'inView'`, or `true` / `false` to control it.

@@ -20,4 +20,28 @@ export const scenarios: ParityScenario[] = [
       { action: 'blur', target: 'h1 ~ div button' },
     ],
   },
+  {
+    component: 'PixelHeroSection',
+    example: 'TypewriterHeadline',
+    name: 'types its headline out behind the caret, which screen readers get whole',
+    // "Loadi" after 300 ms; the 24 characters after 1440 ms.
+    steps: [
+      { action: 'wait', ms: 330 },
+      { action: 'wait', ms: 1140 },
+    ],
+  },
+  {
+    component: 'PixelHeroSection',
+    example: 'TypewriterHeadline',
+    name: 'shows its whole headline at once for a reader who prefers reduced motion',
+    reducedMotion: true,
+    steps: [{ action: 'wait', ms: 330 }],
+  },
+  {
+    component: 'PixelHeroSection',
+    example: 'GlitchHeadline',
+    name: 'shows its headline alone and still for a reader who prefers reduced motion',
+    reducedMotion: true,
+    steps: [{ action: 'wait', ms: 3000 }],
+  },
 ];

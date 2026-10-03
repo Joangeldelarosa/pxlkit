@@ -1,11 +1,11 @@
 /**
  * PixelHeroSection: each slot in each layout, the parallax media hidden from
- * assistive technology, a split hero without media, the reserved
- * headlineEffect and attributes of the consumer's on the section.
+ * assistive technology, a split hero without media, the headline effects
+ * and attributes of the consumer's on the section.
  */
 import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
-import { h } from 'vue';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { h, nextTick } from 'vue';
 import { PixelHeroSection } from '../../index';
 
 const slots = {
@@ -72,4 +72,45 @@ describe('PixelHeroSection', () => {
     expect(wrapper.attributes()).not.toHaveProperty('headlineeffect');
     expect(wrapper.attributes()).not.toHaveProperty('headline-effect');
   });
+
+  describe('headlineEffect', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('types the headline out, which screen readers get whole from the start', async () => {
+      vi.useFakeTimers();
+      const wrapper = mount(PixelHeroSection, { props: { headline: 'Loading', headlineEffect: 'typewriter' } });
+      const heading = wrapper.get('h1');
+      expect(heading.get('.sr-only').text()).toBe('Loading');
+      const typed = heading.get('[aria-hidden="true"]');
+      // Nothing typed yet: the caret alone.
+      expect(typed.text()).toBe('▌');
+      vi.advanceTimersByTime(60 * 3);
+      await nextTick();
+      expect(typed.text()).toBe('Loa▌');
+      vi.advanceTimersByTime(60 * 10);
+      await nextTick();
+      expect(typed.text()).toBe('Loading');
+      // The headline keeps its own font and colour.
+      expect(heading.element.firstElementChild!.className).not.toMatch(/font-mono|text-retro-green/);
+      expect(wrapper.findAll('h1')).toHaveLength(1);
+      wrapper.unmount();
+    });
+
+    it('glitches the headline, whose copies are hidden from assistive technology', () => {
+      const wrapper = mount(PixelHeroSection, { props: { headline: 'Signal lost', headlineEffect: 'glitch' } });
+      const headings = wrapper.findAll('h1');
+      expect(headings).toHaveLength(3);
+      expect(headings.filter((heading) => heading.element.closest('[aria-hidden="true"]'))).toHaveLength(2);
+      wrapper.unmount();
+    });
+
+    it('renders the plain headline by default', () => {
+      const wrapper = mount(PixelHeroSection, { props: { headline: 'Plain' } });
+      expect(wrapper.get('h1').element.innerHTML).toBe('Plain');
+      wrapper.unmount();
+    });
+  });
 });
+

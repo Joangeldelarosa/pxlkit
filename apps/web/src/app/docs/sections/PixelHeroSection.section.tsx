@@ -265,6 +265,106 @@ import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
 export class Compact {}`}
         />
       </article>
+      <article className="docs-example" id="example-typewriter-headline">
+        <h4>Typewriter headline</h4>
+        <FrameworkCode
+          variant="docs"
+          label={'Typewriter headline code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function TypewriterHeadline() {
+  return (
+    <PixelHeroSection
+      eyebrow="Boot sequence"
+      headline="Loading retro interfaces"
+      headlineEffect="typewriter"
+      subline="The headline types itself out; screen readers get it whole from the start."
+    />
+  )
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    eyebrow="Boot sequence"
+    headline="Loading retro interfaces"
+    headline-effect="typewriter"
+    subline="The headline types itself out; screen readers get it whole from the start."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      eyebrow="Boot sequence"
+      headline="Loading retro interfaces"
+      headlineEffect="typewriter"
+      subline="The headline types itself out; screen readers get it whole from the start."
+    ></section>
+  \`,
+})
+export class TypewriterHeadline {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-glitch-headline">
+        <h4>Glitch headline</h4>
+        <FrameworkCode
+          variant="docs"
+          label={'Glitch headline code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function GlitchHeadline() {
+  return (
+    <PixelHeroSection
+      density="compact"
+      minHeight="sm"
+      headline="Signal lost"
+      headlineEffect="glitch"
+      subline="The headline glitches, and holds still for readers who prefer reduced motion."
+      tone="red"
+    />
+  )
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    density="compact"
+    min-height="sm"
+    headline="Signal lost"
+    headline-effect="glitch"
+    subline="The headline glitches, and holds still for readers who prefer reduced motion."
+    tone="red"
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      density="compact"
+      minHeight="sm"
+      headline="Signal lost"
+      headlineEffect="glitch"
+      subline="The headline glitches, and holds still for readers who prefer reduced motion."
+      tone="red"
+    ></section>
+  \`,
+})
+export class GlitchHeadline {}`}
+        />
+      </article>
     </section>
     <section aria-label="Related components">
       <h3>Related</h3>

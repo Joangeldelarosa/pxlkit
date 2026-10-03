@@ -1,12 +1,12 @@
 /**
  * PixelHeroSection: text and template content in each layout, the parallax
- * media hidden from assistive technology, a split hero without media, and
- * attributes of the consumer's on the section.
+ * media hidden from assistive technology, a split hero without media, the
+ * headline effects, and attributes of the consumer's on the section.
  */
 import { Component, signal } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { describe, expect, it } from 'vitest';
-import { PixelHeroSection, type HeroVariant } from '../../public-api';
+import { TestBed, type ComponentFixture } from '@angular/core/testing';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { PixelHeroSection, type HeroHeadlineEffect, type HeroVariant } from '../../public-api';
 
 @Component({
   imports: [PixelHeroSection],
@@ -88,4 +88,67 @@ describe('PixelHeroSection', () => {
     expect(section.getAttribute('aria-label')).toBe('Welcome');
     expect(Array.from(section.classList)).toEqual(expect.arrayContaining(['own', 'min-h-[480px]']));
   });
+
+  describe('headlineEffect', () => {
+    @Component({
+      imports: [PixelHeroSection],
+      template: `<section pxlHeroSection [headline]="headline" [headlineEffect]="effect()"></section>`,
+    })
+    class EffectHost {
+      headline = 'Loading';
+      readonly effect = signal<HeroHeadlineEffect>('none');
+    }
+
+    async function renderEffect(effect: HeroHeadlineEffect, headline = 'Loading') {
+      const fixture = TestBed.createComponent(EffectHost);
+      fixture.componentInstance.headline = headline;
+      fixture.componentInstance.effect.set(effect);
+      await settle(fixture);
+      return { fixture, section: fixture.nativeElement.querySelector('section') as HTMLElement };
+    }
+
+    async function settle(fixture: ComponentFixture<unknown>) {
+      await fixture.whenStable();
+      await new Promise((done) => setTimeout(done, 0));
+      await fixture.whenStable();
+    }
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('types the headline out, which screen readers get whole from the start', async () => {
+      // The typing's intervals are fake; timeouts stay real for the zoneless scheduler.
+      vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+      const { fixture, section } = await renderEffect('typewriter');
+      const heading = section.querySelector('h1')!;
+      expect(heading.querySelector('.sr-only')!.textContent).toBe('Loading');
+      const typed = () => heading.querySelector('[aria-hidden="true"]')!.textContent;
+      // Nothing typed yet: the caret alone.
+      expect(typed()).toBe('▌');
+      vi.advanceTimersByTime(60 * 3);
+      await settle(fixture);
+      expect(typed()).toBe('Loa▌');
+      vi.advanceTimersByTime(60 * 10);
+      await settle(fixture);
+      expect(typed()).toBe('Loading');
+      // The headline keeps its own font and colour.
+      expect(heading.querySelector('pxl-typewriter')!.className).not.toMatch(/font-mono|text-retro-green/);
+      expect(section.querySelectorAll('h1')).toHaveLength(1);
+    });
+
+    it('glitches the headline, whose copies are hidden from assistive technology', async () => {
+      const { section } = await renderEffect('glitch', 'Signal lost');
+      const headings = Array.from(section.querySelectorAll('h1'));
+      expect(headings).toHaveLength(3);
+      expect(headings.filter((heading) => heading.closest('[aria-hidden="true"]'))).toHaveLength(2);
+      expect(headings.every((heading) => heading.textContent === 'Signal lost')).toBe(true);
+    });
+
+    it('renders the plain headline by default', async () => {
+      const { section } = await renderEffect('none', 'Plain');
+      expect(section.querySelector('h1')!.innerHTML).toBe('Plain');
+    });
+  });
 });
+
