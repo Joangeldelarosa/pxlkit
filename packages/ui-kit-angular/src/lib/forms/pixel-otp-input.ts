@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  NgZone,
   ViewEncapsulation,
   afterRenderEffect,
   computed,
+  inject,
   input,
   model,
   output,
@@ -129,6 +131,7 @@ export class PixelOTPInput implements ControlValueAccessor {
   protected readonly groupLabel = otpGroupLabel;
   private readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
   private readonly cellElements = viewChildren<ElementRef<HTMLInputElement>>('cell');
+  private readonly zone = inject(NgZone);
 
   /** @internal */
   protected readonly classes = computed(() => otpInputClasses(this.effectiveSurface(), this.size()));
@@ -188,8 +191,10 @@ export class PixelOTPInput implements ControlValueAccessor {
     const edit = pasteOtp(this.cells(), index, event.clipboardData?.getData?.('text') ?? '', this.resolvedVariant());
     if (!edit) return;
     this.setCode(edit.value);
-    // Focus once the cells show the pasted code.
-    requestAnimationFrame(() => this.focusCell(edit.focus));
+    // Focus once the cells show the pasted code, a frame later as in React.
+    // The frame runs outside the zone: a zone.js application checks nothing
+    // for it, only for the focused cell's own listener.
+    this.zone.runOutsideAngular(() => requestAnimationFrame(() => this.focusCell(edit.focus)));
   }
 
   /** @internal */

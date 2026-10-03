@@ -2,17 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  PLATFORM_ID,
+  afterRenderEffect,
   computed,
   effect,
-  inject,
   input,
   model,
   signal,
   untracked,
   viewChild,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import type { ControlValueAccessor } from '@angular/forms';
 import {
   clampHighlight,
@@ -275,13 +273,9 @@ export class PixelCombobox implements ControlValueAccessor {
       const clamped = clampHighlight(highlighted, this.list().items.length);
       if (clamped !== highlighted) this.highlighted.set(clamped);
     });
-    // The search field takes focus once the popover is on the page.
-    const browser = isPlatformBrowser(inject(PLATFORM_ID));
-    effect((onCleanup) => {
-      if (!this.open() || !this.searchable() || !browser) return;
-      const timer = setTimeout(() => this.search()?.nativeElement.focus(), 0);
-      onCleanup(() => clearTimeout(timer));
-    });
+    // The search field takes focus as the popover opens. After-render work
+    // runs outside the zone, so a zone.js application checks nothing for it.
+    afterRenderEffect(() => this.search()?.nativeElement.focus());
   }
 
   /** @internal */

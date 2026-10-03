@@ -2,16 +2,15 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  PLATFORM_ID,
+  afterRenderEffect,
   computed,
   effect,
-  inject,
   input,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import {
   commandClasses,
   commandLayerClasses,
@@ -185,15 +184,11 @@ export class PixelCommand {
         this.highlighted.set(count - 1);
       }
     });
-    const browser = isPlatformBrowser(inject(PLATFORM_ID));
-    effect((onCleanup) => {
+    effect(() => {
       if (!this.open()) return;
       // Every opening starts from an empty search.
       this.query.set('');
       this.highlighted.set(0);
-      if (!browser) return;
-      const timer = setTimeout(() => this.field()?.nativeElement.focus(), 0);
-      onCleanup(() => clearTimeout(timer));
     });
     injectEventListener('keydown', (event) => {
       const shortcut = this.parsedShortcut();
@@ -210,6 +205,13 @@ export class PixelCommand {
       () => this.open(),
       () => this.panel()?.nativeElement,
     );
+    // The search field takes focus as the palette opens. Registered after
+    // the focus trap, so the trap first remembers the element to hand focus
+    // back to; after-render work runs outside the zone, so a zone.js
+    // application checks nothing for it.
+    afterRenderEffect(() => {
+      if (this.open()) untracked(this.field)?.nativeElement.focus();
+    });
   }
 
   /** @internal */

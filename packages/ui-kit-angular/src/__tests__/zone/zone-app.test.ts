@@ -4,21 +4,27 @@
  * the page-wide listeners of the popover and of the components built on it
  * (the combobox, the date picker), of the tooltip and of the dropdown run
  * outside the Angular zone, so they add no app-wide change detection until
- * they actually close or move what they anchor.
+ * they actually close or move what they anchor. Moving focus as they open —
+ * into the combobox's and the command palette's search field, to the alert
+ * dialog's Cancel — adds none either, nor does the frame after which a pasted
+ * passcode moves focus on.
  */
 import { ApplicationRef, Component, NgZone, provideZoneChangeDetection, type DoCheck } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  PixelAlertDialog,
   PixelButton,
   PixelCombobox,
+  PixelCommand,
   PixelDatePicker,
   PixelDropdownContent,
   PixelDropdownItem,
   PixelDropdownRoot,
   PixelDropdownTrigger,
   PixelModal,
+  PixelOTPInput,
   PixelPopover,
   PixelPopoverContent,
   PixelPopoverTrigger,
@@ -44,6 +50,9 @@ import {
     PixelPopoverTrigger,
     PixelPopoverContent,
     PixelModal,
+    PixelAlertDialog,
+    PixelCommand,
+    PixelOTPInput,
     PixelCombobox,
     PixelDatePicker,
     PixelTooltip,
@@ -74,9 +83,15 @@ import {
     <button type="button" id="open-modal" (click)="modal = true">Open modal</button>
     <pxl-modal [(open)]="modal" title="Zone" (closed)="closedCount = closedCount + 1"><p>Modal body</p></pxl-modal>
     <output id="modal">{{ modal }} {{ closedCount }}</output>
+    <button type="button" id="open-confirm" (click)="confirm = true">Delete</button>
+    <pxl-alert-dialog [(open)]="confirm" title="Delete it?" [onAction]="remove" />
+    <button type="button" id="open-command" (click)="command = true">Commands</button>
+    <pxl-command [(open)]="command" [groups]="commands" />
+    <pxl-otp-input />
     <div id="scroller" style="overflow: auto">
       <pxl-combobox id="fruit-picker" label="Fruit" [options]="fruits" [(value)]="fruit" />
       <output id="fruit">{{ fruit }}</output>
+      <pxl-combobox id="fruit-list" label="Fruit, listed" [options]="fruits" [searchable]="false" />
       <pxl-date-picker id="due-picker" label="Due" [(ngModel)]="due" />
       <output id="due">{{ due?.toDateString() }}</output>
       <pxl-tooltip label="Tip" trigger="click" [(open)]="tip"><button type="button" id="tip-trigger">Hint</button></pxl-tooltip>
@@ -105,6 +120,10 @@ class ZoneApp implements DoCheck {
   due: Date | null = new Date(2026, 5, 15);
   tip = false;
   menu = false;
+  confirm = false;
+  readonly remove = () => {};
+  command = false;
+  readonly commands = [{ heading: 'Go to', items: [{ id: 'home', label: 'Home', onSelect: () => {} }] }];
   /** Times the root view was checked — once per app-wide change detection. */
   checks = 0;
 
@@ -124,6 +143,32 @@ describe('@pxlkit/ui-kit-angular in a zone.js application', () => {
   /** Whether the application becomes stable within `ms`. */
   async function stableWithin(ms: number): Promise<boolean> {
     return Promise.race([appRef!.whenStable().then(() => true), sleep(ms).then(() => false)]);
+  }
+
+  /**
+   * App-wide checks from `act` until the application is stable again, past
+   * the next frame and anything it sets off.
+   */
+  async function checksOf(app: ZoneApp, act: () => void): Promise<number> {
+    await appRef!.whenStable();
+    const before = app.checks;
+    act();
+    expect(await stableWithin(5000)).toBe(true);
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    await sleep(10);
+    await appRef!.whenStable();
+    return app.checks - before;
+  }
+
+  /** App-wide checks of opening with a click, focus leaving a button without listeners (which costs nothing). */
+  function checksToOpen(app: ZoneApp, opener: string): Promise<number> {
+    $('#outside')!.focus();
+    return checksOf(app, () => $(opener)!.click());
+  }
+
+  async function escape(): Promise<void> {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await appRef!.whenStable();
   }
 
   /** Click and wait for the popover the click opens to be anchored. */
@@ -242,6 +287,53 @@ describe('@pxlkit/ui-kit-angular in a zone.js application', () => {
     expect(document.body.style.overflow).toBe('');
   });
 
+  it("moves focus to the alert dialog's Cancel at no app-wide check, opening as the modal does", async () => {
+    const app = await bootstrap();
+    const modal = await checksToOpen(app, '#open-modal');
+    await escape();
+    expect(await checksToOpen(app, '#open-confirm')).toBe(modal);
+    expect(document.activeElement).toBe($('[role="alertdialog"] button'));
+    expect(document.activeElement!.textContent!.trim()).toBe('Cancel');
+    await escape();
+    expect($('[role="alertdialog"]')).toBeNull();
+    expect(document.activeElement).toBe($('#outside'));
+  });
+
+  it("moves focus into the command palette's search field at no app-wide check, opening as the modal does", async () => {
+    const app = await bootstrap();
+    const modal = await checksToOpen(app, '#open-modal');
+    await escape();
+    expect(await checksToOpen(app, '#open-command')).toBe(modal);
+    expect(document.activeElement).toBe($('[aria-label="Command palette"] input'));
+    await escape();
+    expect($('[aria-label="Command palette"]')).toBeNull();
+    expect(document.activeElement).toBe($('#outside'));
+  });
+
+  it('moves focus on a frame after a passcode is pasted, at no app-wide check of its own', async () => {
+    const app = await bootstrap();
+    const cells = Array.from(document.querySelectorAll<HTMLInputElement>('[data-pxl-otp-cell]'));
+    // jsdom has no ClipboardEvent: a paste built by hand.
+    const paste = (cell: HTMLInputElement, text: string) => {
+      const event = new Event('paste', { bubbles: true, cancelable: true });
+      Object.defineProperty(event, 'clipboardData', { value: { getData: () => text } });
+      cell.dispatchEvent(event);
+    };
+    cells[0]!.focus();
+    // What moving focus between two cells costs: their own focus and blur listeners.
+    const focusing = await checksOf(app, () => cells[5]!.focus());
+    // A paste of nothing the cells take renders nothing; one into the last
+    // cell leaves focus there: past its frame, it costs no more.
+    const rejected = await checksOf(app, () => paste(cells[5]!, 'abc'));
+    expect(await checksOf(app, () => paste(cells[5]!, '9'))).toBe(rejected);
+    expect(document.activeElement).toBe(cells[5]);
+
+    cells[0]!.focus();
+    expect(await checksOf(app, () => paste(cells[0]!, '123456'))).toBe(rejected + focusing);
+    expect(cells.map((cell) => cell.value).join('')).toBe('123456');
+    expect(document.activeElement).toBe(cells[5]);
+  });
+
   it('opens the combobox, filters it and picks an option, rendering a plain field', async () => {
     const app = await bootstrap();
     const combobox = $('#fruit-picker')!;
@@ -265,6 +357,23 @@ describe('@pxlkit/ui-kit-angular in a zone.js application', () => {
     expect($('#fruit')!.textContent).toBe('banana');
     expect($('[role="listbox"]')).toBeNull();
     expect(combobox.textContent).toContain('Banana');
+  });
+
+  it('moves focus into the combobox search field at no app-wide check, opening as a combobox without one does', async () => {
+    const app = await bootstrap();
+    // Anchored once, a popover opens again where it was: the openings
+    // compared below render the same but for the search field.
+    for (const trigger of ['#fruit-list', '#fruit-picker']) {
+      await open($(trigger)!);
+      const panel = $('[role="listbox"]')!.parentElement!;
+      // jsdom lays nothing out, but the offset and the viewport padding move the panel off 0, 0.
+      await vi.waitFor(() => expect(panel.style.transform).not.toBe('translate(0px, 0px)'));
+      await escape();
+    }
+    const withoutSearch = await checksToOpen(app, '#fruit-list');
+    await escape();
+    expect(await checksToOpen(app, '#fruit-picker')).toBe(withoutSearch);
+    expect(document.activeElement).toBe($('[role="searchbox"]'));
   });
 
   it('opens the date picker, moves through its grid and picks a day, rendering a plain field', async () => {

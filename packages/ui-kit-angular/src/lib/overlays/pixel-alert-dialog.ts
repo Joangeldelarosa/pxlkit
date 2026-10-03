@@ -2,16 +2,16 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  PLATFORM_ID,
+  afterRenderEffect,
   computed,
   effect,
-  inject,
   input,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
-import { NgTemplateOutlet, isPlatformBrowser } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import {
   alertDialogClasses,
   alertDialogLayerClasses,
@@ -175,17 +175,16 @@ export class PixelAlertDialog {
       () => this.cancel(),
       () => this.open(),
     );
-    const browser = isPlatformBrowser(inject(PLATFORM_ID));
-    effect((onCleanup) => {
-      // Closed from outside while an action was pending: start over next time.
-      if (!this.open()) {
-        this.pending.set(false);
-        return;
-      }
-      if (!browser) return;
-      // Cancel holds the initial focus — the safe default for destructive flows.
-      const timer = setTimeout(() => this.cancelButton()?.nativeElement.focus(), 0);
-      onCleanup(() => clearTimeout(timer));
+    // Closed from outside while an action was pending: start over next time.
+    effect(() => {
+      if (!this.open()) this.pending.set(false);
+    });
+    // Cancel holds the initial focus — the safe default for destructive
+    // flows. Registered after the focus trap, so the trap first remembers the
+    // element to hand focus back to; after-render work runs outside the zone,
+    // so a zone.js application checks nothing for it.
+    afterRenderEffect(() => {
+      if (this.open()) untracked(this.cancelButton)?.nativeElement.focus();
     });
   }
 
