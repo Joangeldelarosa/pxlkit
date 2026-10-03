@@ -12,7 +12,7 @@ import { resetPage, usePreferences } from '../../../../scripts/parity/page';
 import { mountReact, type Mounted } from '../../../../scripts/parity/react';
 import { scenarios } from '../../../../scripts/parity/scenarios';
 import { mountAngular } from './angular';
-import { angularExamples, loadKit } from './examples';
+import { angularExamples, LOAD_KIT_TIMEOUT, loadKit } from './examples';
 import { angularDomRules } from './dom-rules';
 
 const unwrap = (element: Element) => element.hasAttribute('data-parity-root');
@@ -44,7 +44,7 @@ async function record(
 
 const examples = reactExamples();
 
-beforeAll(loadKit, 60_000);
+beforeAll(loadKit, LOAD_KIT_TIMEOUT);
 
 describe('React ↔ Angular parity — mounted examples', () => {
   for (const example of examples) {

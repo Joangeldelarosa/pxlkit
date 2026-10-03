@@ -4,14 +4,14 @@
  */
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createSSRApp, nextTick } from 'vue';
-import { loadKit, vueExamples } from './examples';
+import { LOAD_KIT_TIMEOUT, loadKit, vueExamples } from './examples';
 import { vueServerHtml } from './vue';
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
-beforeAll(loadKit, 60_000);
+beforeAll(loadKit, LOAD_KIT_TIMEOUT);
 
 describe('Vue examples hydrate cleanly', () => {
   for (const [key, example] of vueExamples) {

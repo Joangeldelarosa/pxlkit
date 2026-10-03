@@ -11,7 +11,7 @@ import { perform, type ParityScenario } from '../../../../scripts/parity/interac
 import { resetPage, usePreferences } from '../../../../scripts/parity/page';
 import { mountReact, type Mounted } from '../../../../scripts/parity/react';
 import { scenarios } from '../../../../scripts/parity/scenarios';
-import { loadKit, vueExamples } from './examples';
+import { LOAD_KIT_TIMEOUT, loadKit, vueExamples } from './examples';
 import { mountVue } from './vue';
 
 const unwrap = (element: Element) => element.hasAttribute('data-parity-root');
@@ -43,7 +43,7 @@ async function record(
 
 const examples = reactExamples();
 
-beforeAll(loadKit, 60_000);
+beforeAll(loadKit, LOAD_KIT_TIMEOUT);
 
 describe('React ↔ Vue parity — mounted examples', () => {
   for (const example of examples) {

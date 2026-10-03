@@ -47,6 +47,13 @@ export async function loadKit(): Promise<void> {
   await import('@pxlkit/ui-kit-angular');
 }
 
+/**
+ * The time `loadKit` may take: compiling every component with coverage on, on
+ * a CI runner whose cores the other packages' suites share, can take more
+ * than a minute. The limit only has to catch a hang.
+ */
+export const LOAD_KIT_TIMEOUT = 300_000;
+
 export const angularExamples: ReadonlyMap<string, AngularExample> = new Map(
   Object.entries(loaders).flatMap(([path, loader]) => {
     const [, category, file] = /examples\/([^/]+)\/([^/]+)\.examples\.ts$/.exec(path)!;
