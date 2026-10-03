@@ -16,7 +16,7 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Styled keyboard shortcut indicator that renders a native <kbd> element with surface-aware framing for inline docs, hints, and command menus.',
+    'Styled keyboard shortcut indicator that renders a native `<kbd>` element with surface-aware framing for inline docs, hints, and command menus.',
   highlights: [
     'Semantic <kbd> root so assistive tech announces the key role correctly.',
     'Surface-aware: pixel chamfered border + pixel font, or linear pill.',

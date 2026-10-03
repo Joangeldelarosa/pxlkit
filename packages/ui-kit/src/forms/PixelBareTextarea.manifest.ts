@@ -19,7 +19,7 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Unstyled escape-hatch <textarea> passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.',
+    'Unstyled escape-hatch `<textarea>` passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.',
   highlights: [
     'Zero styling — pure passthrough to the native <textarea> element',
     'Forwards every standard TextareaHTMLAttributes prop (value, rows, maxLength, etc.)',

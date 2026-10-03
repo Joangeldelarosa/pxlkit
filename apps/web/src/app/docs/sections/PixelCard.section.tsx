@@ -22,7 +22,7 @@ export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): 
   return (
     <section aria-labelledby={'pixel-card-heading'} className={className} data-status='stable'>
       <h2 id='pixel-card-heading'>PixelCard</h2>
-      <p className="docs-lead">Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as &lt;article&gt;, &lt;a href&gt;, or role=&quot;button&quot; depending on props.</p>
+      <p className="docs-lead">Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as <code>&lt;article&gt;</code>, <code>&lt;a href&gt;</code>, or <code>role=&quot;button&quot;</code> depending on props.</p>
       <ul className="docs-highlights">
         <li>Pixel + linear surfaces with optional tone tint on border and soft background</li>
         <li>Polymorphic root: renders as &lt;article&gt;, &lt;a href&gt;, or interactive role=&quot;button&quot; with Enter/Space activation</li>

@@ -14,7 +14,7 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Unstyled passthrough <button> primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.',
+    'Unstyled passthrough `<button>` primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.',
   highlights: [
     'Zero styling — renders a raw <button> with all native attributes forwarded',
     'Defaults type="button" to prevent accidental form submissions',

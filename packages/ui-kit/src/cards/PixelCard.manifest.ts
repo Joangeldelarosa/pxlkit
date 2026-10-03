@@ -22,7 +22,7 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as <article>, <a href>, or role="button" depending on props.',
+    'Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as `<article>`, `<a href>`, or `role="button"` depending on props.',
   highlights: [
     'Pixel + linear surfaces with optional tone tint on border and soft background',
     'Polymorphic root: renders as <article>, <a href>, or interactive role="button" with Enter/Space activation',

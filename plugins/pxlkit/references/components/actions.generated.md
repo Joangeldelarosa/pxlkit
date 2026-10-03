@@ -6,7 +6,7 @@
 
 ### PixelBareButton
 - stable · since 1.0.0
-- Unstyled passthrough <button> primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.
+- Unstyled passthrough `<button>` primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.
 - Zero styling — renders a raw <button> with all native attributes forwarded · Defaults type="button" to prevent accidental form submissions · Forwards refs to the underlying HTMLButtonElement · Ideal for icon triggers, custom-styled CTAs, or wrapping inside compound components · Tree-shakable and SSR-safe
 - related: PixelButton, PixelBareInput, PixelBareTextarea
 

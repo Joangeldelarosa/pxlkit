@@ -22,7 +22,7 @@ export function PixelFeatureCardDocsSection({ className }: PixelFeatureCardDocsS
   return (
     <section aria-labelledby={'pixel-feature-card-heading'} className={className} data-status='stable'>
       <h2 id='pixel-feature-card-heading'>PixelFeatureCard</h2>
-      <p className="docs-lead">Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as &lt;article&gt;, role=&quot;button&quot;, or &lt;a href&gt; with full-card click target.</p>
+      <p className="docs-lead">Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as <code>&lt;article&gt;</code>, <code>role=&quot;button&quot;</code>, or <code>&lt;a href&gt;</code> with full-card click target.</p>
       <ul className="docs-highlights">
         <li>Toned icon frame (48/56/64/80px) with surface-aware border and soft background</li>
         <li>Optional badge slot above the icon with independent tone</li>

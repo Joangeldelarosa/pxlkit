@@ -22,7 +22,7 @@ export default defineManifest({
   since: '1.7.0',
   status: 'stable',
   description:
-    'Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as <article>, role="button", or <a href> with full-card click target.',
+    'Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as `<article>`, `role="button"`, or `<a href>` with full-card click target.',
   highlights: [
     'Toned icon frame (48/56/64/80px) with surface-aware border and soft background',
     'Optional badge slot above the icon with independent tone',

@@ -22,7 +22,7 @@ export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSec
   return (
     <section aria-labelledby={'pixel-code-inline-heading'} className={className} data-status='stable'>
       <h2 id='pixel-code-inline-heading'>PixelCodeInline</h2>
-      <p className="docs-lead">Inline &lt;code&gt; element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.</p>
+      <p className="docs-lead">Inline <code>&lt;code&gt;</code> element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.</p>
       <ul className="docs-highlights">
         <li>Semantic &lt;code&gt; root so assistive tech announces the inline-code role.</li>
         <li>Tone-tinted border, background, and text for at-a-glance categorisation (neutral, cyan, green, gold, red, purple, pink).</li>

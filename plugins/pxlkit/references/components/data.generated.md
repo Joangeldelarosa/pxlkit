@@ -60,7 +60,7 @@
 
 ### PixelCodeInline
 - stable · since 1.0.0
-- Inline <code> element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.
+- Inline `<code>` element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.
 - Semantic <code> root so assistive tech announces the inline-code role. · Tone-tinted border, background, and text for at-a-glance categorisation (neutral, cyan, green, gold, red, purple, pink). · Surface-aware: pixel chamfered border + pixel font, or linear pill. · Composable inline — accepts any ReactNode children for icons or multi-token snippets.
 - related: PixelKbd
 
@@ -84,7 +84,7 @@
 
 ### PixelKbd
 - stable · since 1.0.0
-- Styled keyboard shortcut indicator that renders a native <kbd> element with surface-aware framing for inline docs, hints, and command menus.
+- Styled keyboard shortcut indicator that renders a native `<kbd>` element with surface-aware framing for inline docs, hints, and command menus.
 - Semantic <kbd> root so assistive tech announces the key role correctly. · Surface-aware: pixel chamfered border + pixel font, or linear pill. · Drop-shadow depth tuned per surface for a tactile keycap feel. · Composable inline — accepts any ReactNode children to support icons or multi-character keys.
 - related: PixelCodeInline
 

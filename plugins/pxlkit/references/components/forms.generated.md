@@ -12,7 +12,7 @@
 
 ### PixelBareTextarea
 - stable · since 1.0.0
-- Unstyled escape-hatch <textarea> passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.
+- Unstyled escape-hatch `<textarea>` passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.
 - Zero styling — pure passthrough to the native <textarea> element · Forwards every standard TextareaHTMLAttributes prop (value, rows, maxLength, etc.) · forwardRef-friendly: refs land on the underlying HTMLTextAreaElement · SSR-safe and tree-shakable; no runtime state or context · Ideal for composing bespoke field chrome while keeping native form semantics
 - related: PixelTextarea, PixelBareInput, PixelBareButton
 

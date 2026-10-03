@@ -22,7 +22,7 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
   return (
     <section aria-labelledby={'pixel-bare-button-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bare-button-heading'>PixelBareButton</h2>
-      <p className="docs-lead">Unstyled passthrough &lt;button&gt; primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.</p>
+      <p className="docs-lead">Unstyled passthrough <code>&lt;button&gt;</code> primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.</p>
       <ul className="docs-highlights">
         <li>Zero styling — renders a raw &lt;button&gt; with all native attributes forwarded</li>
         <li>Defaults type=&quot;button&quot; to prevent accidental form submissions</li>

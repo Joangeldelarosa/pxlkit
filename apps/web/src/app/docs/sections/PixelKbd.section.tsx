@@ -22,7 +22,7 @@ export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): Re
   return (
     <section aria-labelledby={'pixel-kbd-heading'} className={className} data-status='stable'>
       <h2 id='pixel-kbd-heading'>PixelKbd</h2>
-      <p className="docs-lead">Styled keyboard shortcut indicator that renders a native &lt;kbd&gt; element with surface-aware framing for inline docs, hints, and command menus.</p>
+      <p className="docs-lead">Styled keyboard shortcut indicator that renders a native <code>&lt;kbd&gt;</code> element with surface-aware framing for inline docs, hints, and command menus.</p>
       <ul className="docs-highlights">
         <li>Semantic &lt;kbd&gt; root so assistive tech announces the key role correctly.</li>
         <li>Surface-aware: pixel chamfered border + pixel font, or linear pill.</li>

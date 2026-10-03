@@ -6,13 +6,13 @@
 
 ### PixelCard
 - stable · since 1.0.0
-- Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as <article>, <a href>, or role="button" depending on props.
+- Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as `<article>`, `<a href>`, or `role="button"` depending on props.
 - Pixel + linear surfaces with optional tone tint on border and soft background · Polymorphic root: renders as <article>, <a href>, or interactive role="button" with Enter/Space activation · Media slot, corner ribbon badge, clamped description, padding scale, and composable Header/Body/Footer subcomponents · Focus-visible ring + keyboard parity when interactive or anchored
 - related: PixelStatCard, PixelFeatureCard, PixelPricingCard, PixelTestimonialCard
 
 ### PixelFeatureCard
 - stable · since 1.7.0
-- Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as <article>, role="button", or <a href> with full-card click target.
+- Feature highlight card with toned icon frame, optional badge, title, clamped description, and footer — renders as `<article>`, `role="button"`, or `<a href>` with full-card click target.
 - Toned icon frame (48/56/64/80px) with surface-aware border and soft background · Optional badge slot above the icon with independent tone · Vertical or horizontal orientation with consistent alignment · Polymorphic root: <article>, interactive role="button" with Enter/Space, or <a href> with full-card target · Clamped description (2/3/4 lines) keeps cards aligned in grids
 - related: PixelCard, PixelStatCard, PixelPricingCard, PixelTestimonialCard
 
