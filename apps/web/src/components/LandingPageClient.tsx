@@ -463,7 +463,7 @@ function LiveKitDemo() {
           <DemoCell
             title="Notifications"
             components="PixelToast via useToast()"
-            slug="pixel-toast"
+            slug="pxl-kit-toast-provider"
             tone="pink"
           >
             <div className="flex flex-col gap-3 w-full">

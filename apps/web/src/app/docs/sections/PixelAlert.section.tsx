@@ -285,8 +285,7 @@ export class WithIcon {}`}
         <FrameworkCode
           variant="docs"
           label={'With Action code'}
-          react={`import { PixelAlert } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelAlert, PixelButton } from '@pxlkit/ui-kit';
 
 const InfoIcon = () => (
   <span

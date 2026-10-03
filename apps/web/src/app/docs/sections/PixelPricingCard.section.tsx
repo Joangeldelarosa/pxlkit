@@ -182,8 +182,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'With price badge code'}
-          react={`import { PixelPricingCard } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
+          react={`import { PixelPricingCard, PixelBadge } from '@pxlkit/ui-kit';
 
 export function WithPriceBadge() {
   return (

@@ -52,8 +52,7 @@ export function PixelBentoCellDocsSection({ className }: PixelBentoCellDocsSecti
       <FrameworkCode
         variant="docs"
         label={'PixelBentoCell usage'}
-        react={`import { PixelBento } from '@pxlkit/ui-kit';
-import { PixelBentoCell } from '@pxlkit/ui-kit';
+        react={`import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -122,8 +121,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Default code'}
-          react={`import { PixelBento } from '@pxlkit/ui-kit';
-import { PixelBentoCell } from '@pxlkit/ui-kit';
+          react={`import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -190,8 +188,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
-          react={`import { PixelBento } from '@pxlkit/ui-kit';
-import { PixelBentoCell } from '@pxlkit/ui-kit';
+          react={`import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
 
 export function Tones() {
   return (
@@ -261,8 +258,7 @@ export class Tones {}`}
         <FrameworkCode
           variant="docs"
           label={'Media Cell code'}
-          react={`import { PixelBento } from '@pxlkit/ui-kit';
-import { PixelBentoCell } from '@pxlkit/ui-kit';
+          react={`import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
 
 export function MediaCell() {
   return (

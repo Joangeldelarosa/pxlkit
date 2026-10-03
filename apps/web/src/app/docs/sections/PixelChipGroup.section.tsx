@@ -111,8 +111,7 @@ export function PixelChipGroupDocsSection({ className }: PixelChipGroupDocsSecti
         variant="docs"
         label={'PixelChipGroup usage'}
         react={`import React, { useState } from 'react';
-import { PixelChipGroup } from '@pxlkit/ui-kit';
-import { PixelChip } from '@pxlkit/ui-kit';
+import { PixelChipGroup, PixelChip } from '@pxlkit/ui-kit';
 
 const Chip = PixelChip as unknown as React.ComponentType<
   React.ComponentProps<typeof PixelChip> & { value: string }
@@ -168,8 +167,7 @@ export class Default {
           variant="docs"
           label={'Default code'}
           react={`import React, { useState } from 'react';
-import { PixelChipGroup } from '@pxlkit/ui-kit';
-import { PixelChip } from '@pxlkit/ui-kit';
+import { PixelChipGroup, PixelChip } from '@pxlkit/ui-kit';
 
 const Chip = PixelChip as unknown as React.ComponentType<
   React.ComponentProps<typeof PixelChip> & { value: string }
@@ -223,8 +221,7 @@ export class Default {
           variant="docs"
           label={'Multi Select code'}
           react={`import React, { useState } from 'react';
-import { PixelChipGroup } from '@pxlkit/ui-kit';
-import { PixelChip } from '@pxlkit/ui-kit';
+import { PixelChipGroup, PixelChip } from '@pxlkit/ui-kit';
 
 const Chip = PixelChip as unknown as React.ComponentType<
   React.ComponentProps<typeof PixelChip> & { value: string }
@@ -286,8 +283,7 @@ export class MultiSelect {
           variant="docs"
           label={'Surfaces code'}
           react={`import React, { useState } from 'react';
-import { PixelChipGroup } from '@pxlkit/ui-kit';
-import { PixelChip } from '@pxlkit/ui-kit';
+import { PixelChipGroup, PixelChip } from '@pxlkit/ui-kit';
 
 const Chip = PixelChip as unknown as React.ComponentType<
   React.ComponentProps<typeof PixelChip> & { value: string }

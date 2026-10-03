@@ -15,6 +15,10 @@
  *   - Usage lead + examples: each example's code, self-contained, in React
  *     and in every port (Vue, Angular) that implements the component in full
  *
+ * and the usage-snippet modules the /ui-kit showcase reads: per component,
+ * the example the site picks for it in
+ * apps/web/src/app/ui-kit/showcase-examples.ts, else its usage lead.
+ *
  * Safety: NEVER overwrites hand-authored files. Always writes
  *   <Name>.section.tsx into a NEW `sections/` subtree; the orchestrator owns
  *   wiring sections into the docs route (out of scope for this generator).
@@ -767,7 +771,7 @@ export class GenerateDocsPageGenerator extends Generator {
       path: entry.outFile,
       content: renderSectionModule(entry),
     }));
-    writes.push(...usageSnippetWrites(this.outRoot, entries));
+    writes.push(...usageSnippetWrites(this.outRoot, entries, await readShowcaseExamples(ctx.repoRoot)));
     return { writes };
   }
 }
@@ -817,24 +821,70 @@ export async function exampleSourcesOf(
   return out;
 }
 
+/** The site's module that picks each component's /ui-kit example, from the repo root. */
+export const SHOWCASE_EXAMPLES_SUBPATH = "apps/web/src/app/ui-kit/showcase-examples.ts";
+
+/** Component slug → the id of the manifest example a page outside the reference shows. */
+export type ShowcaseExamples = Readonly<Record<string, string>>;
+
+/** The site's picks (`SHOWCASE_EXAMPLES`), none where the repo has no such module. */
+export async function readShowcaseExamples(repoRoot: string): Promise<ShowcaseExamples> {
+  const file = path.join(repoRoot, SHOWCASE_EXAMPLES_SUBPATH);
+  if (!(await fs.pathExists(file))) return {};
+  const mod = (await import(pathToFileURL(file).href)) as { SHOWCASE_EXAMPLES?: ShowcaseExamples };
+  return mod.SHOWCASE_EXAMPLES ?? {};
+}
+
+/**
+ * Each component's usage snippet for pages outside the reference: the example
+ * `showcase` picks for it, else its usage lead. A pick naming a component or
+ * an example the manifests do not have throws, rather than fall back unseen.
+ */
+export function showcaseSnippets(
+  entries: readonly DocsPagePlanEntry[],
+  showcase: ShowcaseExamples = {},
+): Map<string, FrameworkSources> {
+  const bySlug = new Map(entries.map((entry) => [entry.slug, entry]));
+  for (const [slug, id] of Object.entries(showcase)) {
+    const entry = bySlug.get(slug);
+    if (!entry) throw new Error(`${SHOWCASE_EXAMPLES_SUBPATH}: no component has the slug "${slug}"`);
+    if (!entry.examples.some((example) => example.id === id)) {
+      throw new Error(
+        `${SHOWCASE_EXAMPLES_SUBPATH}: ${entry.name} has no example "${id}" (it has ${entry.examples.map((example) => example.id).join(", ")})`,
+      );
+    }
+  }
+  const out = new Map<string, FrameworkSources>();
+  for (const entry of entries) {
+    const picked = showcase[entry.slug];
+    const code = picked ? entry.examples.find((example) => example.id === picked)!.code : entry.usageSnippet;
+    if (code) out.set(entry.slug, code);
+  }
+  return out;
+}
+
 /**
  * Slug → consumer-ready usage snippet map for pages that surface a quick
- * "how do I use this" block outside the full /docs reference (e.g. the
- * /ui-kit showcase): `USAGE_SNIPPETS` holds React's; with `framework`, the
- * module holds that framework's (`USAGE_SNIPPETS_VUE`, …), in a module of
- * its own so a page loads it only when a reader picks the framework.
+ * "how do I use this" block outside the full /docs reference (the /ui-kit
+ * showcase): per component, the example `showcase` picks, else its usage
+ * lead (see `showcaseSnippets`). `USAGE_SNIPPETS` holds React's; with
+ * `framework`, the module holds that framework's (`USAGE_SNIPPETS_VUE`, …),
+ * in a module of its own so a page loads it only when a reader picks the
+ * framework.
  */
 export function renderUsageSnippetsModule(
   entries: DocsPagePlanEntry[],
   framework: keyof FrameworkSources = "react",
+  showcase: ShowcaseExamples = {},
 ): string {
+  const snippets = showcaseSnippets(entries, showcase);
   const lines: string[] = [];
   lines.push(FILE_BANNER.trimEnd());
   lines.push(``);
   const name = framework === "react" ? "USAGE_SNIPPETS" : `USAGE_SNIPPETS_${framework.toUpperCase()}`;
   lines.push(`export const ${name}: Record<string, string> = {`);
   for (const e of [...entries].sort((a, b) => a.slug.localeCompare(b.slug))) {
-    const snippet = e.usageSnippet?.[framework];
+    const snippet = snippets.get(e.slug)?.[framework];
     if (!snippet) continue;
     lines.push(`  '${e.slug}': \`${escapeForTemplateLiteral(snippet)}\`,`);
   }
@@ -844,12 +894,16 @@ export function renderUsageSnippetsModule(
 }
 
 /** The usage snippet modules: React's, then one per port. */
-function usageSnippetWrites(outRoot: string, entries: DocsPagePlanEntry[]): Array<{ path: string; content: string }> {
+function usageSnippetWrites(
+  outRoot: string,
+  entries: DocsPagePlanEntry[],
+  showcase: ShowcaseExamples,
+): Array<{ path: string; content: string }> {
   return (["react", "vue", "angular"] as const).map((framework) => ({
     path: ensurePosix(
       path.join(outRoot, framework === "react" ? "usage-snippets.generated.ts" : `usage-snippets.${framework}.generated.ts`),
     ),
-    content: renderUsageSnippetsModule(entries, framework),
+    content: renderUsageSnippetsModule(entries, framework, showcase),
   }));
 }
 
@@ -900,7 +954,7 @@ export async function generateDocsPage(
   }
 
   if (!opts.dryRun && entries.length > 0) {
-    for (const write of usageSnippetWrites(outRoot, entries)) {
+    for (const write of usageSnippetWrites(outRoot, entries, await readShowcaseExamples(repoRoot))) {
       await writeOutput(write.path, write.content);
       written++;
     }

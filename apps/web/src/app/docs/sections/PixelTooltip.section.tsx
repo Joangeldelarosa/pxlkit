@@ -84,8 +84,7 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
       <FrameworkCode
         variant="docs"
         label={'PixelTooltip usage'}
-        react={`import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+        react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -124,8 +123,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Default code'}
-          react={`import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -162,8 +160,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Positions code'}
-          react={`import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function Positions() {
   return (
@@ -233,8 +230,7 @@ export class Positions {}`}
         <FrameworkCode
           variant="docs"
           label={'Triggers code'}
-          react={`import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function Triggers() {
   return (
@@ -295,8 +291,7 @@ export class Triggers {}`}
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
-          react={`import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function Surfaces() {
   return (
@@ -348,8 +343,7 @@ export class Surfaces {}`}
         <FrameworkCode
           variant="docs"
           label={'Rich content code'}
-          react={`import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function RichContent() {
   return (
@@ -405,8 +399,7 @@ export class RichContent {}`}
         <FrameworkCode
           variant="docs"
           label={'Custom delay code'}
-          react={`import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function CustomDelay() {
   return (
@@ -459,8 +452,7 @@ export class CustomDelay {}`}
           variant="docs"
           label={'Controlled code'}
           react={`import { useState } from 'react';
-import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function Controlled() {
   const [open, setOpen] = useState(false);
@@ -514,8 +506,7 @@ export class Controlled {
         <FrameworkCode
           variant="docs"
           label={'Uncontrolled code'}
-          react={`import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function Uncontrolled() {
   return (
@@ -552,8 +543,7 @@ export class Uncontrolled {}`}
         <FrameworkCode
           variant="docs"
           label={'Side offset code'}
-          react={`import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function SideOffset() {
   return (

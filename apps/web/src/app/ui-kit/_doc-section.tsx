@@ -7,7 +7,10 @@ import {
   PixelTextLink,
   type PixelTableColumn,
 } from '@pxlkit/ui-kit';
-import { CodeBlock } from '../../components/CodeBlock';
+import { FrameworkCode } from '../../components/FrameworkCode';
+import { USAGE_SNIPPETS } from '../docs/sections/usage-snippets.generated';
+import { USAGE_SNIPPETS_VUE } from '../docs/sections/usage-snippets.vue.generated';
+import { USAGE_SNIPPETS_ANGULAR } from '../docs/sections/usage-snippets.angular.generated';
 
 export type PropDef = { name: string; type: string; default: string; description: string };
 
@@ -42,19 +45,37 @@ export function PropsTable({ data }: { data: PropDef[] }) {
   );
 }
 
+/* The example the docs build picks for the component (showcase-examples.ts,
+   else its first), self-contained, in React and in the Vue and Angular kits
+   that implement it — the same code /docs shows, from the same examples the
+   parity suites render in all three. */
+export function UsageCode({ component, title }: { component: string; title: string }) {
+  const react = USAGE_SNIPPETS[component];
+  if (!react) return null;
+  return (
+    <FrameworkCode
+      react={react}
+      vue={USAGE_SNIPPETS_VUE[component]}
+      angular={USAGE_SNIPPETS_ANGULAR[component]}
+      label={`${title} code`}
+    />
+  );
+}
+
 export function DocSection({
   id,
+  component = id,
   title,
   description,
   props,
-  code,
   children,
 }: {
   id: string;
+  /** The component's slug, where the section's anchor is another one. */
+  component?: string;
   title: string;
   description: React.ReactNode;
   props?: PropDef[];
-  code?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -79,7 +100,7 @@ export function DocSection({
         </PixelCollapsible>
       )}
 
-      {code && <CodeBlock code={code} language="tsx" />}
+      <UsageCode component={component} title={title} />
     </section>
   );
 }

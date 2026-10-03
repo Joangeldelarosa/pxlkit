@@ -48,8 +48,7 @@ export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightG
       <FrameworkCode
         variant="docs"
         label={'PixelEqualHeightGrid usage'}
-        react={`import { cn } from '@pxlkit/ui-kit';
-import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+        react={`import { cn, PixelEqualHeightGrid } from '@pxlkit/ui-kit';
 
 function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
@@ -122,8 +121,7 @@ export class Default {
         <FrameworkCode
           variant="docs"
           label={'Default code'}
-          react={`import { cn } from '@pxlkit/ui-kit';
-import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+          react={`import { cn, PixelEqualHeightGrid } from '@pxlkit/ui-kit';
 
 function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
@@ -194,8 +192,7 @@ export class Default {
         <FrameworkCode
           variant="docs"
           label={'Row Align Top code'}
-          react={`import { cn } from '@pxlkit/ui-kit';
-import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+          react={`import { cn, PixelEqualHeightGrid } from '@pxlkit/ui-kit';
 
 function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
@@ -266,8 +263,7 @@ export class RowAlignTop {
         <FrameworkCode
           variant="docs"
           label={'Pixel Surface code'}
-          react={`import { cn } from '@pxlkit/ui-kit';
-import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+          react={`import { cn, PixelEqualHeightGrid } from '@pxlkit/ui-kit';
 
 function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (

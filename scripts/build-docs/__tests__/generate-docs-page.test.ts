@@ -16,6 +16,7 @@ import path from "node:path";
 import os from "node:os";
 import { pathToFileURL } from "node:url";
 import fs from "fs-extra";
+import fg from "fast-glob";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
@@ -32,9 +33,12 @@ import {
   normalizeProps,
   normalizeDeprecation,
   planEntryFor,
+  readShowcaseExamples,
   renderSectionModule,
   renderUsageSnippetsModule,
+  showcaseSnippets,
   slugFor,
+  SHOWCASE_EXAMPLES_SUBPATH,
 } from "../generate-docs-page";
 import { readManifest, type ManifestRecord } from "../_lib/generator-base";
 
@@ -652,6 +656,80 @@ describe("renderUsageSnippetsModule", () => {
     expect(renderUsageSnippetsModule(entries(), "angular")).toContain(
       "export const USAGE_SNIPPETS_ANGULAR: Record<string, string> = {\n};",
     );
+  });
+});
+
+describe("showcaseSnippets", () => {
+  const entries = () => {
+    const alpha = planEntryFor(fakeRecord({ name: "PixelAlpha", examples: [] }), "/o");
+    alpha.examples = [
+      {
+        id: "default",
+        label: "Default",
+        description: "",
+        code: { react: "<PixelAlpha />", vue: "<template><PixelAlpha /></template>" },
+      },
+      { id: "with-icon", label: "With icon", description: "", code: { react: "<PixelAlpha icon />" } },
+    ];
+    alpha.usageSnippet = alpha.examples[0]!.code;
+    const beta = planEntryFor(fakeRecord({ name: "PixelBeta", examples: [] }), "/o");
+    return [alpha, beta];
+  };
+
+  it("holds each component's usage lead where the site picks no example", () => {
+    const snippets = showcaseSnippets(entries());
+    expect(snippets.get("pixel-alpha")).toEqual({
+      react: "<PixelAlpha />",
+      vue: "<template><PixelAlpha /></template>",
+    });
+    // A component without examples has no snippet.
+    expect(snippets.has("pixel-beta")).toBe(false);
+  });
+
+  it("holds the picked example, in the frameworks that have its code", () => {
+    const snippets = showcaseSnippets(entries(), { "pixel-alpha": "with-icon" });
+    expect(snippets.get("pixel-alpha")).toEqual({ react: "<PixelAlpha icon />" });
+    const vue = renderUsageSnippetsModule(entries(), "vue", { "pixel-alpha": "with-icon" });
+    expect(vue).not.toContain("pixel-alpha");
+    expect(renderUsageSnippetsModule(entries(), "react", { "pixel-alpha": "with-icon" })).toContain(
+      "'pixel-alpha': `<PixelAlpha icon />`,",
+    );
+  });
+
+  it("throws on a pick naming a component or an example the manifests do not have", () => {
+    expect(() => showcaseSnippets(entries(), { "pixel-gamma": "default" })).toThrow(
+      `${SHOWCASE_EXAMPLES_SUBPATH}: no component has the slug "pixel-gamma"`,
+    );
+    expect(() => showcaseSnippets(entries(), { "pixel-alpha": "with-badge" })).toThrow(
+      `${SHOWCASE_EXAMPLES_SUBPATH}: PixelAlpha has no example "with-badge" (it has default, with-icon)`,
+    );
+  });
+});
+
+describe("readShowcaseExamples", () => {
+  const repoRoot = path.resolve(__dirname, "../../..");
+
+  it("reads the site's picks, each an example its component's manifest has", async () => {
+    const picks = await readShowcaseExamples(repoRoot);
+    expect(Object.keys(picks).length).toBeGreaterThan(0);
+    for (const [slug, id] of Object.entries(picks)) {
+      // Only the picked components' manifests: loading one imports its examples.
+      const name = slug.replace(/(^|-)([a-z])/g, (_, __, letter: string) => letter.toUpperCase());
+      const [file] = await fg(`packages/ui-kit/src/**/${name}.manifest.ts`, { cwd: repoRoot, absolute: true });
+      expect(file, `${name}.manifest.ts`).toBeDefined();
+      const manifest = (await readManifest(file!))!.manifest as { name: string; examples?: Array<{ id: string }> };
+      expect(slugFor(manifest.name)).toBe(slug);
+      expect((manifest.examples ?? []).map((example) => example.id), slug).toContain(id);
+    }
+  }, 60_000);
+
+  it("has no picks in a repo without the site's module", async () => {
+    const empty = await fs.mkdtemp(path.join(os.tmpdir(), "gen-docs-showcase-"));
+    try {
+      expect(await readShowcaseExamples(empty)).toEqual({});
+    } finally {
+      await fs.remove(empty);
+    }
   });
 });
 

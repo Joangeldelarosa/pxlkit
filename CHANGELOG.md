@@ -40,6 +40,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   packs, the icon, animated and parallax components, toasts and the UI kit's setup — give
   their code in the three frameworks too, and the toast guide uses the kit's published
   `PxlKitToastProvider` with `useToast()` / `injectToast()` instead of the site's own provider.
+  `/ui-kit` shows one example per component in the three frameworks — the one the site picks
+  in `showcase-examples.ts`, else the first — in place of hand-written React snippets, some of
+  which used props the kit does not have (`PixelChip`'s `onRemove`). Its getting started,
+  surface, locale and animation guides give their code in the three frameworks, with a table
+  of how React props read in Vue and Angular; its toast sections show the kit's toast card and
+  a playground on the kit's provider, and `/docs` documents the icon components' `PixelToast`.
+  Snippets merge the imports that end up from the same package.
 - **`@pxlkit/core/vanilla` and the shared rendering engine.** A React-free entry point
   exports the icon data model, every utility and the engine the three frameworks build on:
   `renderIconSvg` / `renderIconDataUri`, `createAnimatedIconPlayer`,

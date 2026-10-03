@@ -196,8 +196,7 @@ export class WithIcon {}`}
         <FrameworkCode
           variant="docs"
           label={'With Action code'}
-          react={`import { PixelEmptyState } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelEmptyState, PixelButton } from '@pxlkit/ui-kit';
 
 export function WithAction() {
   return (
@@ -245,8 +244,7 @@ export class WithAction {}`}
         <FrameworkCode
           variant="docs"
           label={'With Icon + Action code'}
-          react={`import { PixelEmptyState } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+          react={`import { PixelEmptyState, PixelButton } from '@pxlkit/ui-kit';
 
 const FolderIcon = () => (
   <span

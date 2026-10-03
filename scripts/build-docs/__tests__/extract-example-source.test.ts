@@ -135,6 +135,35 @@ describe('selfContainedExamples — React examples', () => {
     expect(examples.Default).not.toContain("from 'react'");
   });
 
+  it('merges the imports that end up from the same module, keeping type-only ones apart, and drops a relative one for its side effects', () => {
+    const source = `import { PixelAlert } from './PixelAlert';
+import { PixelButton, PixelBadge } from '../actions';
+import type { Tone } from '../common';
+import * as Icons from '../icons';
+import './demo.css';
+
+const TONE: Tone = 'red';
+
+export function WithAction() {
+  return <PixelAlert tone={TONE} action={<PixelButton>{Icons.retry}</PixelButton>} />;
+}
+`;
+    expect(selfContainedExamples(source, { kind: 'tsx', packageName: '@pxlkit/ui-kit' }).WithAction).toBe(
+      [
+        "import { PixelAlert, PixelButton } from '@pxlkit/ui-kit';",
+        "import type { Tone } from '@pxlkit/ui-kit';",
+        "import * as Icons from '@pxlkit/ui-kit';",
+        '',
+        "const TONE: Tone = 'red';",
+        '',
+        'export function WithAction() {',
+        '  return <PixelAlert tone={TONE} action={<PixelButton>{Icons.retry}</PixelButton>} />;',
+        '}',
+        '',
+      ].join('\n'),
+    );
+  });
+
   it('leaves the specifiers alone without a package name', () => {
     const raw = selfContainedExamples(REACT, { kind: 'tsx' });
     expect(raw.Default).toContain("import { PixelAreaChart } from './PixelAreaChart';");

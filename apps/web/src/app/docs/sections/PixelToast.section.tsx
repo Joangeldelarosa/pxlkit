@@ -426,9 +426,8 @@ export class Loading {
         <FrameworkCode
           variant="docs"
           label={'With Action code'}
-          react={`import { PixelToast } from '@pxlkit/ui-kit';
+          react={`import { PixelToast, PixelButton } from '@pxlkit/ui-kit';
 import type { ToastItem } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
 
 const noop = () => {};
 

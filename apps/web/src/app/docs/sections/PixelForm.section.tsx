@@ -76,8 +76,7 @@ export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): 
         variant="docs"
         label={'PixelForm usage'}
         react={`import { useForm } from 'react-hook-form';
-import { PixelForm } from '@pxlkit/ui-kit';
-import { PixelInput } from '@pxlkit/ui-kit';
+import { PixelForm, PixelInput } from '@pxlkit/ui-kit';
 
 type DefaultValues = {
   username: string;
@@ -141,8 +140,7 @@ export function Default() {
           variant="docs"
           label={'Default code'}
           react={`import { useForm } from 'react-hook-form';
-import { PixelForm } from '@pxlkit/ui-kit';
-import { PixelInput } from '@pxlkit/ui-kit';
+import { PixelForm, PixelInput } from '@pxlkit/ui-kit';
 
 type DefaultValues = {
   username: string;

@@ -1038,23 +1038,23 @@ import {
 
           {/* Toast Notifications */}
           <Section id="toast-notifications" title="Toast Notifications">
-            <P>
-              Toast notifications come in two layers — both documented in the UI Kit:
-            </P>
+            <P>Toast notifications come in two layers:</P>
             <ul className="space-y-2 text-sm text-retro-muted ml-4 list-disc list-outside mb-3">
               <li>
-                <PixelTextLink href="/ui-kit#pixel-toast">/ui-kit#pixel-toast</PixelTextLink>{' '}
-                — the low-level <Code>{'<PixelToast>'}</Code> component shipped with the icon components
-                (<Code>@pxlkit/core</Code>, <Code>@pxlkit/vue</Code>, <Code>@pxlkit/angular</Code>): props for
-                visibility, title/message, icon, position, duration, colours, close button.
+                <strong className="text-retro-text">The UI kit&apos;s toasts</strong> — its{' '}
+                <Code>{'<PxlKitToastProvider>'}</Code> with <Code>useToast()</Code> (React, Vue) or{' '}
+                <Code>injectToast()</Code> (Angular), which stacks toasts, handles their timers, announces them
+                to screen readers and exposes <Code>success</Code> / <Code>error</Code> / <Code>info</Code> /{' '}
+                <Code>warning</Code> / <Code>loading</Code> / <Code>promise</Code> shortcuts. Use this in app
+                code: try it in the{' '}
+                <PixelTextLink href="/ui-kit#use-toast">/ui-kit playground</PixelTextLink>, or read{' '}
+                <PixelTextLink href="/docs#pxl-kit-toast-provider">its reference</PixelTextLink>.
               </li>
               <li>
-                <PixelTextLink href="/docs#pxl-kit-toast-provider">/docs#pxl-kit-toast-provider</PixelTextLink>{' '}
-                — the UI kit&apos;s <Code>{'<PxlKitToastProvider>'}</Code> with <Code>useToast()</Code> (React,
-                Vue) or <Code>injectToast()</Code> (Angular), which stacks toasts, handles their timers,
-                announces them to screen readers and exposes <Code>success</Code> / <Code>error</Code> /{' '}
-                <Code>info</Code> / <Code>warning</Code> / <Code>loading</Code> / <Code>promise</Code>{' '}
-                shortcuts. Use this in app code.
+                <strong className="text-retro-text">The icon components&apos; PixelToast</strong> —{' '}
+                <Code>@pxlkit/core</Code>, <Code>@pxlkit/vue</Code> and <Code>@pxlkit/angular</Code> ship a
+                single toast pinned to a corner of the screen, whose visibility you control: for a page that
+                needs one notification without the UI kit. Its props and code are below.
               </li>
             </ul>
             <FrameworkCodeBlock
@@ -1113,17 +1113,109 @@ export class SaveButton {
               options to show one.
             </P>
             <div className="p-4 bg-retro-surface rounded-lg border border-retro-cyan/20 mt-4">
-              <p className="font-pixel text-[10px] text-retro-cyan mb-2">DETAILED UI KIT DOCS</p>
+              <p className="font-pixel text-[10px] text-retro-cyan mb-2">TRY THE UI KIT&apos;S TOASTS</p>
               <p className="text-xs text-retro-muted">
-                Open the dedicated UI Kit section for interactive controls and full prop details:
+                Push toasts live — every shortcut, position, duration, an animated icon and a promise:
               </p>
               <PixelTextLink
-                href="/ui-kit#pixel-toast"
+                href="/ui-kit#use-toast"
                 className="inline-block mt-3 px-4 py-2 font-mono text-xs border border-retro-cyan/40 rounded hover:bg-retro-cyan/10 transition-colors no-underline"
               >
-                Open PixelToast Docs →
+                Open the toast playground →
               </PixelTextLink>
             </div>
+
+            <p className="font-pixel text-[10px] text-retro-gold mt-8 mb-3">THE ICON COMPONENTS&apos; PIXELTOAST</p>
+            <P>
+              One toast at a time, pinned to a corner: you show it with <Code>visible</Code>, and it asks to be
+              closed when its <Code>duration</Code> runs out or the reader presses its close button —{' '}
+              <Code>onClose</Code> in React, the <Code>close</Code> event in Vue (<Code>@close</Code>), the{' '}
+              <Code>closed</Code> output in Angular (<Code>(closed)</Code>).
+            </P>
+            <CodeBlock title="PixelToast props">{`interface PixelToastProps {
+  /** Whether the toast is shown. */
+  visible: boolean;
+  title: string;
+  message?: string;
+  /** A Pxlkit icon, shown on the left. */
+  icon?: PxlKitData;
+  /** The icon in its palette colours (default), or flat in accentColor. */
+  colorfulIcon?: boolean;      // default true
+  iconSize?: number;           // default 24
+  bgColor?: string;            // default '#12121a'
+  borderColor?: string;        // default '#2a2a3e'
+  textColor?: string;          // default '#e8e6e3'
+  /** Colour of the title, status dot and close button. */
+  accentColor?: string;        // default '#00ff88'
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'; // default 'top-right'
+  /** Auto-close delay in ms; 0 disables it. */
+  duration?: number;           // default 2200
+  showClose?: boolean;         // default true
+  onClose?: () => void;        // Vue: @close · Angular: (closed)
+  className?: string;          // Vue and Angular: class
+}`}</CodeBlock>
+            <FrameworkCodeBlock
+              title="A single toast"
+              react={`import { useState } from 'react';
+import { PixelToast } from '@pxlkit/core';
+import { CheckCircle } from '@pxlkit/feedback';
+
+export function SaveButton() {
+  const [saved, setSaved] = useState(false);
+  return (
+    <>
+      <button onClick={() => setSaved(true)}>Save</button>
+      <PixelToast
+        visible={saved}
+        title="Saved"
+        message="Your changes were saved."
+        icon={CheckCircle}
+        onClose={() => setSaved(false)}
+      />
+    </>
+  );
+}`}
+              vue={`<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelToast } from '@pxlkit/vue';
+import { CheckCircle } from '@pxlkit/feedback';
+
+const saved = ref(false);
+</script>
+
+<template>
+  <button @click="saved = true">Save</button>
+  <PixelToast
+    :visible="saved"
+    title="Saved"
+    message="Your changes were saved."
+    :icon="CheckCircle"
+    @close="saved = false"
+  />
+</template>`}
+              angular={`import { Component, signal } from '@angular/core';
+import { PixelToast } from '@pxlkit/angular';
+import { CheckCircle } from '@pxlkit/feedback';
+
+@Component({
+  selector: 'app-save-button',
+  imports: [PixelToast],
+  template: \`
+    <button (click)="saved.set(true)">Save</button>
+    <pxl-toast
+      [visible]="saved()"
+      title="Saved"
+      message="Your changes were saved."
+      [icon]="checkCircle"
+      (closed)="saved.set(false)"
+    />
+  \`,
+})
+export class SaveButton {
+  protected readonly saved = signal(false);
+  protected readonly checkCircle = CheckCircle;
+}`}
+            />
           </Section>
 
           {/* SVG Generation */}

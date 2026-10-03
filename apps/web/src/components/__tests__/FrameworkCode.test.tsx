@@ -88,6 +88,12 @@ describe('FrameworkCode', () => {
     expect(screen.getByTestId('drawn').textContent).toBe(`vue: ${VUE}`);
   });
 
+  it('titles the code block, and labels the tabs with the title', () => {
+    render(<FrameworkCode react={REACT} vue={VUE} title="Quick start" />);
+    expect(screen.getByRole('tablist', { name: 'Quick start' })).toBeTruthy();
+    expect(screen.getByRole('tabpanel').textContent).toContain('Quick start');
+  });
+
   it('draws the plain reference code block in the docs variant', () => {
     const { container } = render(<FrameworkCode variant="docs" react={REACT} vue={VUE} />);
     const code = container.querySelector('pre.docs-code > code');

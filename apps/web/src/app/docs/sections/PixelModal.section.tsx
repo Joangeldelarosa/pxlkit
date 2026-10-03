@@ -80,8 +80,7 @@ export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps)
         variant="docs"
         label={'PixelModal usage'}
         react={`import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [open, setOpen] = useState(false);
@@ -132,8 +131,7 @@ export class Default {
           variant="docs"
           label={'Default code'}
           react={`import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [open, setOpen] = useState(false);
@@ -182,8 +180,7 @@ export class Default {
           variant="docs"
           label={'Sizes code'}
           react={`import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function Sizes() {
   const [size, setSize] = useState<'sm' | 'md' | 'lg' | 'xl' | 'full' | null>(null);
@@ -253,8 +250,7 @@ export class Sizes {
           variant="docs"
           label={'Surfaces code'}
           react={`import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function Surfaces() {
   const [which, setWhich] = useState<'pixel' | 'linear' | null>(null);
@@ -316,8 +312,7 @@ export class Surfaces {
           variant="docs"
           label={'With description code'}
           react={`import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function WithDescription() {
   const [open, setOpen] = useState(false);
@@ -376,8 +371,7 @@ export class WithDescription {
           variant="docs"
           label={'With footer code'}
           react={`import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function WithFooter() {
   const [open, setOpen] = useState(false);
@@ -444,8 +438,7 @@ export class WithFooter {
           variant="docs"
           label={'Async close code'}
           react={`import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function AsyncClose() {
   const [open, setOpen] = useState(false);
@@ -502,8 +495,7 @@ export class AsyncClose {
           variant="docs"
           label={'Custom close label code'}
           react={`import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function CustomCloseLabel() {
   const [open, setOpen] = useState(false);

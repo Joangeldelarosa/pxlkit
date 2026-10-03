@@ -87,8 +87,7 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
         variant="docs"
         label={'PxlKitToastProvider usage'}
         react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -151,8 +150,7 @@ export class Default {}`}
           variant="docs"
           label={'Default code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -213,8 +211,7 @@ export class Default {}`}
           variant="docs"
           label={'Tones code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -286,8 +283,7 @@ export class Tones {}`}
           variant="docs"
           label={'Bottom Right code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -344,8 +340,7 @@ export class BottomRight {}`}
           variant="docs"
           label={'Top Center code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -402,8 +397,7 @@ export class TopCenter {}`}
           variant="docs"
           label={'Stacked code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -481,8 +475,7 @@ export class Stacked {
           variant="docs"
           label={'Flat code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -560,8 +553,7 @@ export class Flat {
           variant="docs"
           label={'Pixel Surface code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -634,8 +626,7 @@ export class PixelSurface {}`}
           variant="docs"
           label={'Linear Surface code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -708,8 +699,7 @@ export class LinearSurface {}`}
           variant="docs"
           label={'Loading → Success code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -808,8 +798,7 @@ export class Loading {
           variant="docs"
           label={'Promise Flow code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -896,8 +885,7 @@ export class PromiseFlow {
           variant="docs"
           label={'Promise Rejected code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -994,8 +982,7 @@ export class PromiseRejected {
           variant="docs"
           label={'Max Limit code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;
@@ -1073,8 +1060,7 @@ export class MaxLimit {
           variant="docs"
           label={'With Action code'}
           react={`import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;

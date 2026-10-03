@@ -80,8 +80,7 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
       <FrameworkCode
         variant="docs"
         label={'PixelBadgeGroup usage'}
-        react={`import { PixelBadgeGroup } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
+        react={`import { PixelBadgeGroup, PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -126,8 +125,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Default code'}
-          react={`import { PixelBadgeGroup } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
+          react={`import { PixelBadgeGroup, PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -170,8 +168,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Overflow +N code'}
-          react={`import { PixelBadgeGroup } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
+          react={`import { PixelBadgeGroup, PixelBadge } from '@pxlkit/ui-kit';
 
 export function Overflow() {
   return (
@@ -223,8 +220,7 @@ export class Overflow {}`}
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
-          react={`import { PixelBadgeGroup } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
+          react={`import { PixelBadgeGroup, PixelBadge } from '@pxlkit/ui-kit';
 
 export function Surfaces() {
   return (

@@ -63,7 +63,9 @@ export interface FrameworkCodeProps {
    * highlighting); `docs` with the component reference's plain one.
    */
   variant?: 'block' | 'docs';
-  /** Label of the tab list, for screen readers. */
+  /** Title of the code block, in the `block` variant. */
+  title?: string;
+  /** Label of the tab list, for screen readers; the title by default. */
   label?: string;
   /** Draws the selected code in place of the variant's code block. */
   children?: (code: string, framework: Framework) => ReactNode;
@@ -79,7 +81,8 @@ export function FrameworkCode({
   vue,
   angular,
   variant = 'block',
-  label = 'Framework',
+  title,
+  label = title ?? 'Framework',
   children,
 }: FrameworkCodeProps) {
   const sources: Record<Framework, string | undefined> = { react, vue, angular };
@@ -144,7 +147,7 @@ export function FrameworkCode({
         {children ? (
           children(code, selected)
         ) : variant === 'block' ? (
-          <CodeBlock code={code} language={framework.language} />
+          <CodeBlock code={code} language={framework.language} title={title} />
         ) : (
           <pre className="docs-code">
             <code>{code}</code>

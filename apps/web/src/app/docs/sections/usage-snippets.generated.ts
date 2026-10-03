@@ -26,13 +26,33 @@ const SAMPLE_ITEMS = [
 export function Default() {
   return <PixelAccordion items={SAMPLE_ITEMS} />;
 }`,
-  'pixel-alert': `import { PixelAlert } from '@pxlkit/ui-kit';
+  'pixel-alert': `import { PixelAlert, PixelButton } from '@pxlkit/ui-kit';
 
-export function Default() {
+const InfoIcon = () => (
+  <span
+    aria-hidden
+    style={{
+      width: 14,
+      height: 14,
+      borderRadius: 9999,
+      background: 'currentColor',
+      display: 'inline-block',
+    }}
+  />
+);
+
+export function WithAction() {
   return (
     <PixelAlert
-      title="Something went wrong"
-      message="Your session expired. Please sign in again to continue."
+      tone="red"
+      title="Connection lost"
+      message="We couldn't reach the server. Check your network and retry."
+      icon={<InfoIcon />}
+      action={
+        <PixelButton size="sm" tone="red" variant="outline">
+          Retry
+        </PixelButton>
+      }
     />
   );
 }`,
@@ -77,8 +97,7 @@ export function Default() {
 export function Default() {
   return <PixelAvatar name="Joangel De La Rosa" />;
 }`,
-  'pixel-avatar-group': `import { PixelAvatarGroup } from '@pxlkit/ui-kit';
-import { PixelAvatar } from '@pxlkit/ui-kit';
+  'pixel-avatar-group': `import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -94,8 +113,7 @@ export function Default() {
 export function Default() {
   return <PixelBadge>NEW</PixelBadge>;
 }`,
-  'pixel-badge-group': `import { PixelBadgeGroup } from '@pxlkit/ui-kit';
-import { PixelBadge } from '@pxlkit/ui-kit';
+  'pixel-badge-group': `import { PixelBadgeGroup, PixelBadge } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -162,8 +180,7 @@ export function Default() {
     </PixelBento>
   );
 }`,
-  'pixel-bento-cell': `import { PixelBento } from '@pxlkit/ui-kit';
-import { PixelBentoCell } from '@pxlkit/ui-kit';
+  'pixel-bento-cell': `import { PixelBento, PixelBentoCell } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -214,8 +231,18 @@ export function Default() {
 }`,
   'pixel-button': `import { PixelButton } from '@pxlkit/ui-kit';
 
-export function Default() {
-  return <PixelButton>Click me</PixelButton>;
+const Arrow = () => (
+  <span aria-hidden className="inline-block h-3.5 w-3.5">→</span>
+);
+
+export function WithIcons() {
+  return (
+    <div className="flex flex-wrap gap-2">
+      <PixelButton iconLeft={<Arrow />}>Leading</PixelButton>
+      <PixelButton iconRight={<Arrow />}>Trailing</PixelButton>
+      <PixelButton iconLeft={<Arrow />} iconRight={<Arrow />}>Both</PixelButton>
+    </div>
+  );
 }`,
   'pixel-calendar-grid': `import { useState } from 'react';
 import { PixelCalendarGrid } from '@pxlkit/ui-kit';
@@ -226,10 +253,13 @@ export function Default() {
 }`,
   'pixel-card': `import { PixelCard } from '@pxlkit/ui-kit';
 
-export function Default() {
+export function WithFooter() {
   return (
-    <PixelCard title="Project Atlas">
-      <p>Compact dossier on the Atlas migration. Status nominal.</p>
+    <PixelCard
+      title="Invoice #1042"
+      footer={<span className="text-xs text-retro-muted">Due in 7 days</span>}
+    >
+      <p>Total: $1,250.00</p>
     </PixelCard>
   );
 }`,
@@ -285,14 +315,22 @@ export function Default() {
     />
   );
 }`,
-  'pixel-chip': `import { PixelChip } from '@pxlkit/ui-kit';
+  'pixel-chip': `import { useState } from 'react';
+import { PixelChip } from '@pxlkit/ui-kit';
 
-export function Default() {
-  return <PixelChip label="React" />;
+export function Deletable() {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return null;
+  return (
+    <PixelChip
+      label="Remove me"
+      tone="red"
+      onDelete={() => setVisible(false)}
+    />
+  );
 }`,
   'pixel-chip-group': `import React, { useState } from 'react';
-import { PixelChipGroup } from '@pxlkit/ui-kit';
-import { PixelChip } from '@pxlkit/ui-kit';
+import { PixelChipGroup, PixelChip } from '@pxlkit/ui-kit';
 
 const Chip = PixelChip as unknown as React.ComponentType<
   React.ComponentProps<typeof PixelChip> & { value: string }
@@ -559,18 +597,36 @@ export function Default() {
     />
   );
 }`,
-  'pixel-empty-state': `import { PixelEmptyState } from '@pxlkit/ui-kit';
+  'pixel-empty-state': `import { PixelEmptyState, PixelButton } from '@pxlkit/ui-kit';
 
-export function Default() {
+const FolderIcon = () => (
+  <span
+    aria-hidden
+    style={{
+      width: 32,
+      height: 32,
+      borderRadius: 4,
+      border: '2px solid currentColor',
+      display: 'inline-block',
+    }}
+  />
+);
+
+export function WithIconAndAction() {
   return (
     <PixelEmptyState
-      title="No results found"
-      description="Try adjusting your filters or search terms to find what you are looking for."
+      icon={<FolderIcon />}
+      title="No documents"
+      description="Upload a file or create a new document to begin."
+      action={
+        <PixelButton size="sm" tone="green" variant="solid">
+          Create document
+        </PixelButton>
+      }
     />
   );
 }`,
-  'pixel-equal-height-grid': `import { cn } from '@pxlkit/ui-kit';
-import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';
+  'pixel-equal-height-grid': `import { cn, PixelEqualHeightGrid } from '@pxlkit/ui-kit';
 
 function Card({ title, body, className }: { title: string; body: string; className?: string }) {
   return (
@@ -649,8 +705,7 @@ export function Default() {
   );
 }`,
   'pixel-form': `import { useForm } from 'react-hook-form';
-import { PixelForm } from '@pxlkit/ui-kit';
-import { PixelInput } from '@pxlkit/ui-kit';
+import { PixelForm, PixelInput } from '@pxlkit/ui-kit';
 
 type DefaultValues = {
   username: string;
@@ -846,8 +901,7 @@ export function Default() {
   return <PixelMenubar menus={menus} />;
 }`,
   'pixel-modal': `import { useState } from 'react';
-import { PixelModal } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PixelModal, PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [open, setOpen] = useState(false);
@@ -1270,22 +1324,26 @@ export function Default() {
 export function Default() {
   return <PixelSpinner />
 }`,
-  'pixel-split-button': `import { PixelSplitButton } from '@pxlkit/ui-kit';
+  'pixel-split-button': `import React from 'react';
+import { PixelSplitButton } from '@pxlkit/ui-kit';
 
-const exportOptions = [
-  { value: 'png', label: 'Export as PNG' },
-  { value: 'svg', label: 'Export as SVG' },
-  { value: 'json', label: 'Export icon code' },
-];
-
-export function Default() {
+export function WithCallbacks() {
+  const [last, setLast] = React.useState<string>('—');
   return (
-    <PixelSplitButton
-      label="Export"
-      options={exportOptions}
-      onPrimary={() => {}}
-      onSelect={() => {}}
-    />
+    <div className="flex flex-col items-start gap-2">
+      <PixelSplitButton
+        label="Save"
+        tone="cyan"
+        options={[
+          { value: 'draft', label: 'Save as draft' },
+          { value: 'template', label: 'Save as template' },
+          { value: 'copy', label: 'Save a copy' },
+        ]}
+        onPrimary={() => setLast('primary')}
+        onSelect={(v) => setLast(v)}
+      />
+      <span className="text-xs text-retro-muted">last action: {last}</span>
+    </div>
   );
 }`,
   'pixel-stack': `import { PixelStack } from '@pxlkit/ui-kit';
@@ -1309,8 +1367,7 @@ export function Default() {
 export function Default() {
   return <PixelStatCard label="Revenue" value="$12,480" trend="+8.2% vs last week" />
 }`,
-  'pixel-stat-group': `import { PixelStatGroup } from '@pxlkit/ui-kit';
-import { PixelStatCard } from '@pxlkit/ui-kit';
+  'pixel-stat-group': `import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -1468,8 +1525,7 @@ export function Default() {
     </PixelToggleGroup>
   );
 }`,
-  'pixel-tooltip': `import { PixelTooltip } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+  'pixel-tooltip': `import { PixelTooltip, PixelButton } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -1524,8 +1580,7 @@ export function Default() {
     </PxlKitLocaleProvider>
   );
 }`,
-  'pxl-kit-surface-provider': `import { PixelButton } from '@pxlkit/ui-kit';
-import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+  'pxl-kit-surface-provider': `import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -1538,8 +1593,7 @@ export function Default() {
   );
 }`,
   'pxl-kit-toast-provider': `import React from 'react';
-import { PxlKitToastProvider, useToast } from '@pxlkit/ui-kit';
-import { PixelButton } from '@pxlkit/ui-kit';
+import { PxlKitToastProvider, useToast, PixelButton } from '@pxlkit/ui-kit';
 
 function TriggerRow({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap gap-2">{children}</div>;

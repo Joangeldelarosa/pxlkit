@@ -52,8 +52,7 @@ export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSecti
       <FrameworkCode
         variant="docs"
         label={'PixelStatGroup usage'}
-        react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
-import { PixelStatCard } from '@pxlkit/ui-kit';
+        react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -98,8 +97,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Default code'}
-          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
-import { PixelStatCard } from '@pxlkit/ui-kit';
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -142,8 +140,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Row layout code'}
-          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
-import { PixelStatCard } from '@pxlkit/ui-kit';
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
 
 export function RowLayout() {
   return (
@@ -186,8 +183,7 @@ export class RowLayout {}`}
         <FrameworkCode
           variant="docs"
           label={'Grid layout code'}
-          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
-import { PixelStatCard } from '@pxlkit/ui-kit';
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
 
 export function GridLayout() {
   return (
@@ -233,8 +229,7 @@ export class GridLayout {}`}
         <FrameworkCode
           variant="docs"
           label={'Grid with gap code'}
-          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
-import { PixelStatCard } from '@pxlkit/ui-kit';
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
 
 export function GridWithGap() {
   return (
@@ -277,8 +272,7 @@ export class GridWithGap {}`}
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
-          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
-import { PixelStatCard } from '@pxlkit/ui-kit';
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Tones() {
   return (
@@ -336,8 +330,7 @@ export class Tones {}`}
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
-          react={`import { PixelStatGroup } from '@pxlkit/ui-kit';
-import { PixelStatCard } from '@pxlkit/ui-kit';
+          react={`import { PixelStatGroup, PixelStatCard } from '@pxlkit/ui-kit';
 
 export function Surfaces() {
   return (

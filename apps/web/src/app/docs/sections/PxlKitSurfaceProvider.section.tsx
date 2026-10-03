@@ -51,8 +51,7 @@ export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfacePro
       <FrameworkCode
         variant="docs"
         label={'PxlKitSurfaceProvider usage'}
-        react={`import { PixelButton } from '@pxlkit/ui-kit';
-import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+        react={`import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -100,8 +99,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Default (Pixel) code'}
-          react={`import { PixelButton } from '@pxlkit/ui-kit';
-import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+          react={`import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -147,8 +145,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Linear code'}
-          react={`import { PixelButton } from '@pxlkit/ui-kit';
-import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+          react={`import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
 
 export function Linear() {
   return (
@@ -194,8 +191,7 @@ export class Linear {}`}
         <FrameworkCode
           variant="docs"
           label={'Per-component override code'}
-          react={`import { PixelButton } from '@pxlkit/ui-kit';
-import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+          react={`import { PixelButton, PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
 
 export function Override() {
   return (

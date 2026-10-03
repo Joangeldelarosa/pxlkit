@@ -52,8 +52,7 @@ export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsS
       <FrameworkCode
         variant="docs"
         label={'PixelAvatarGroup usage'}
-        react={`import { PixelAvatarGroup } from '@pxlkit/ui-kit';
-import { PixelAvatar } from '@pxlkit/ui-kit';
+        react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -98,8 +97,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'Default code'}
-          react={`import { PixelAvatarGroup } from '@pxlkit/ui-kit';
-import { PixelAvatar } from '@pxlkit/ui-kit';
+          react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Default() {
   return (
@@ -142,8 +140,7 @@ export class Default {}`}
         <FrameworkCode
           variant="docs"
           label={'With Overflow code'}
-          react={`import { PixelAvatarGroup } from '@pxlkit/ui-kit';
-import { PixelAvatar } from '@pxlkit/ui-kit';
+          react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
 
 export function WithOverflow() {
   return (
@@ -195,8 +192,7 @@ export class WithOverflow {}`}
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
-          react={`import { PixelAvatarGroup } from '@pxlkit/ui-kit';
-import { PixelAvatar } from '@pxlkit/ui-kit';
+          react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Sizes() {
   return (
@@ -275,8 +271,7 @@ export class Sizes {}`}
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
-          react={`import { PixelAvatarGroup } from '@pxlkit/ui-kit';
-import { PixelAvatar } from '@pxlkit/ui-kit';
+          react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Tones() {
   return (
@@ -364,8 +359,7 @@ export class Tones {}`}
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
-          react={`import { PixelAvatarGroup } from '@pxlkit/ui-kit';
-import { PixelAvatar } from '@pxlkit/ui-kit';
+          react={`import { PixelAvatarGroup, PixelAvatar } from '@pxlkit/ui-kit';
 
 export function Surfaces() {
   return (

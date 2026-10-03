@@ -20,13 +20,28 @@ export class Default {
   readonly items = SAMPLE_ITEMS;
 }`,
   'pixel-alert': `import { Component } from '@angular/core';
-import { PixelAlert } from '@pxlkit/ui-kit-angular';
+import { PixelAlert, PixelButton } from '@pxlkit/ui-kit-angular';
 
 @Component({
-  imports: [PixelAlert],
-  template: \`<pxl-alert title="Something went wrong" message="Your session expired. Please sign in again to continue." />\`,
+  imports: [PixelAlert, PixelButton],
+  template: \`
+    <pxl-alert
+      tone="red"
+      title="Connection lost"
+      message="We couldn't reach the server. Check your network and retry."
+      [icon]="info"
+      [action]="retry"
+    />
+    <ng-template #info>
+      <span
+        aria-hidden="true"
+        style="width: 14px; height: 14px; border-radius: 9999px; background: currentColor; display: inline-block"
+      ></span>
+    </ng-template>
+    <ng-template #retry><button pxlButton size="sm" tone="red" variant="outline">Retry</button></ng-template>
+  \`,
 })
-export class Default {}`,
+export class WithAction {}`,
   'pixel-alert-dialog': `import { Component, signal } from '@angular/core';
 import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';
 
@@ -206,21 +221,29 @@ import { PixelButton } from '@pxlkit/ui-kit-angular';
 
 @Component({
   imports: [PixelButton],
-  template: \`<button pxlButton>Click me</button>\`,
+  template: \`
+    <div class="flex flex-wrap gap-2">
+      <button pxlButton [iconLeft]="arrow">Leading</button>
+      <button pxlButton [iconRight]="arrow">Trailing</button>
+      <button pxlButton [iconLeft]="arrow" [iconRight]="arrow">Both</button>
+    </div>
+    <ng-template #arrow><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></ng-template>
+  \`,
 })
-export class Default {}`,
+export class WithIcons {}`,
   'pixel-card': `import { Component } from '@angular/core';
 import { PixelCard } from '@pxlkit/ui-kit-angular';
 
 @Component({
   imports: [PixelCard],
   template: \`
-    <pxl-card title="Project Atlas">
-      <p>Compact dossier on the Atlas migration. Status nominal.</p>
+    <pxl-card title="Invoice #1042" [footer]="due">
+      <p>Total: $1,250.00</p>
     </pxl-card>
+    <ng-template #due><span class="text-xs text-retro-muted">Due in 7 days</span></ng-template>
   \`,
 })
-export class Default {}`,
+export class WithFooter {}`,
   'pixel-center': `import { Component } from '@angular/core';
 import { PixelCenter } from '@pxlkit/ui-kit-angular';
 
@@ -245,14 +268,20 @@ import { PixelCheckbox } from '@pxlkit/ui-kit-angular';
 export class Default {
   readonly checked = signal(false);
 }`,
-  'pixel-chip': `import { Component } from '@angular/core';
+  'pixel-chip': `import { Component, signal } from '@angular/core';
 import { PixelChip } from '@pxlkit/ui-kit-angular';
 
 @Component({
   imports: [PixelChip],
-  template: \`<pxl-chip label="React" />\`,
+  template: \`
+    @if (visible()) {
+      <pxl-chip label="Remove me" tone="red" deletable (delete)="visible.set(false)" />
+    }
+  \`,
 })
-export class Default {}`,
+export class Deletable {
+  readonly visible = signal(true);
+}`,
   'pixel-chip-group': `import { Component, signal } from '@angular/core';
 import { PixelChip, PixelChipGroup, PixelChipGroupItem } from '@pxlkit/ui-kit-angular';
 
@@ -413,18 +442,27 @@ export class Default {
   select(): void {}
 }`,
   'pixel-empty-state': `import { Component } from '@angular/core';
-import { PixelEmptyState } from '@pxlkit/ui-kit-angular';
+import { PixelButton, PixelEmptyState } from '@pxlkit/ui-kit-angular';
 
 @Component({
-  imports: [PixelEmptyState],
+  imports: [PixelButton, PixelEmptyState],
   template: \`
     <pxl-empty-state
-      title="No results found"
-      description="Try adjusting your filters or search terms to find what you are looking for."
+      title="No documents"
+      description="Upload a file or create a new document to begin."
+      [icon]="folder"
+      [action]="create"
     />
+    <ng-template #folder>
+      <span
+        aria-hidden="true"
+        style="width: 32px; height: 32px; border-radius: 4px; border: 2px solid currentColor; display: inline-block"
+      ></span>
+    </ng-template>
+    <ng-template #create><button pxlButton size="sm" tone="green" variant="solid">Create document</button></ng-template>
   \`,
 })
-export class Default {}`,
+export class WithIconAndAction {}`,
   'pixel-equal-height-grid': `import { Component } from '@angular/core';
 import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';
 

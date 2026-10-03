@@ -49,18 +49,6 @@ export default function ParallaxDemos() {
           { name: 'style', type: 'CSSProperties', default: '—', description: 'Inline styles on wrapper div.' },
           ...COMMON_PARALLAX,
         ]}
-        code={`<PixelParallaxGroup className="h-[400px]">
-  {/* Slow background layer */}
-  <PixelParallaxLayer speed={0.3} className="absolute inset-0">
-    {/* eslint-disable-next-line @next/next/no-img-element */}
-    <img src="/bg-stars.png" alt="" className="w-full h-full object-cover" />
-  </PixelParallaxLayer>
-
-  {/* Foreground content */}
-  <PixelParallaxLayer speed={-0.1}>
-    <PixelCard title="Floating Card">I move slightly opposite to scroll</PixelCard>
-  </PixelParallaxLayer>
-</PixelParallaxGroup>`}
       >
         <div className="space-y-3">
           <p className="text-sm text-retro-muted">Scroll the page to see the parallax effect on these layers:</p>
@@ -90,14 +78,6 @@ export default function ParallaxDemos() {
           { name: 'style', type: 'CSSProperties', default: '—', description: 'Inline styles.' },
           ...COMMON_PARALLAX,
         ]}
-        code={`<PixelParallaxGroup as="section" className="h-[600px] bg-retro-bg">
-  <PixelParallaxLayer speed={0.2}>
-    {/* Background */}
-  </PixelParallaxLayer>
-  <PixelMouseParallax strength={15}>
-    {/* Foreground that follows cursor */}
-  </PixelMouseParallax>
-</PixelParallaxGroup>`}
       >
         <PixelParallaxGroup className="h-40 rounded-lg border border-retro-border/30 bg-retro-bg/50">
           <PixelParallaxLayer speed={0.12} className="absolute inset-0 flex items-center justify-center opacity-15">
@@ -121,15 +101,6 @@ export default function ParallaxDemos() {
           { name: 'style', type: 'CSSProperties', default: '—', description: 'Inline styles.' },
           ...COMMON_PARALLAX,
         ]}
-        code={`{/* Follows cursor */}
-<PixelMouseParallax strength={15}>
-  <PxlKitIcon icon={Star} size={32} />
-</PixelMouseParallax>
-
-{/* Moves away from cursor (depth feel) */}
-<PixelMouseParallax strength={25} invert>
-  <PixelBadge tone="cyan">Background layer</PixelBadge>
-</PixelMouseParallax>`}
       >
         <div className="space-y-3">
           <p className="text-sm text-retro-muted">Move your mouse over this area:</p>

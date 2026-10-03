@@ -9,6 +9,9 @@
  *      specifiers (the React kit's examples import from its source tree,
  *      `./PixelAreaChart`, `../actions`) become the package name consumers
  *      write, `@pxlkit/ui-kit`; every binding they import is a public export.
+ *      Imports that end up from the same module merge into one. A relative
+ *      import for its side effects only (`import './demo.css'`) is the
+ *      examples module's own setup, which no consumer has: it is dropped.
  *   2. The module-level helpers the example reaches, transitively — sample
  *      data, small components, types — in source order.
  *   3. The example itself.
@@ -93,24 +96,72 @@ function declaredNames(statement: ts.Statement): string[] {
   return [];
 }
 
+/** What an import statement keeps of its bindings. */
+interface PrunedImport {
+  /** The module specifier as written, quotes included. */
+  from: string;
+  typeOnly: boolean;
+  /** No bindings: an import for its side effects. */
+  bare: boolean;
+  defaultName?: string;
+  namespace?: string;
+  named: string[];
+}
+
 /** An import statement keeping only the bindings in `used`, or null when none is. */
-function prunedImport(statement: ts.ImportDeclaration, used: ReadonlySet<string>, packageName?: string): string | null {
+function prunedImport(statement: ts.ImportDeclaration, used: ReadonlySet<string>, packageName?: string): PrunedImport | null {
   const written = statement.moduleSpecifier.getText();
   const specifier = (statement.moduleSpecifier as ts.StringLiteral).text;
   const quote = written[0];
-  const from = packageName && /^\.{1,2}\//.test(specifier) ? `${quote}${packageName}${quote}` : written;
+  const relative = /^\.{1,2}\//.test(specifier);
+  const from = packageName && relative ? `${quote}${packageName}${quote}` : written;
   const clause = statement.importClause;
-  if (!clause) return `import ${from};`;
-  const parts: string[] = [];
-  if (clause.name && used.has(clause.name.text)) parts.push(clause.name.text);
+  if (!clause) return packageName && relative ? null : { from: written, typeOnly: false, bare: true, named: [] };
+  const out: PrunedImport = { from, typeOnly: clause.isTypeOnly, bare: false, named: [] };
+  if (clause.name && used.has(clause.name.text)) out.defaultName = clause.name.text;
   const bindings = clause.namedBindings;
-  if (bindings && ts.isNamespaceImport(bindings) && used.has(bindings.name.text)) parts.push(`* as ${bindings.name.text}`);
+  if (bindings && ts.isNamespaceImport(bindings) && used.has(bindings.name.text)) out.namespace = bindings.name.text;
   if (bindings && ts.isNamedImports(bindings)) {
-    const named = bindings.elements.filter((element) => used.has(element.name.text)).map((element) => element.getText());
-    if (named.length > 0) parts.push(`{ ${named.join(', ')} }`);
+    out.named = bindings.elements.filter((element) => used.has(element.name.text)).map((element) => element.getText());
   }
-  if (parts.length === 0) return null;
-  return `import ${clause.isTypeOnly ? 'type ' : ''}${parts.join(', ')} from ${from};`;
+  return out.defaultName || out.namespace || out.named.length > 0 ? out : null;
+}
+
+/**
+ * The imports as statements, those from the same module (and of the same
+ * kind, type-only or not) merged into the first: `import { A } from 'x'`
+ * and `import { B } from 'x'` read `import { A, B } from 'x'`. A namespace
+ * import stays on its own, as does a second default one.
+ */
+function importStatements(imports: readonly PrunedImport[]): string[] {
+  const merged: PrunedImport[] = [];
+  for (const next of imports) {
+    const into = merged.find(
+      (kept) =>
+        !kept.bare &&
+        !next.bare &&
+        kept.from === next.from &&
+        kept.typeOnly === next.typeOnly &&
+        !kept.namespace &&
+        !next.namespace &&
+        !(kept.defaultName && next.defaultName),
+    );
+    if (into) {
+      into.defaultName ??= next.defaultName;
+      into.named.push(...next.named.filter((binding) => !into.named.includes(binding)));
+    } else {
+      merged.push({ ...next, named: [...next.named] });
+    }
+  }
+  return merged.map(({ from, typeOnly, bare, defaultName, namespace, named }) => {
+    if (bare) return `import ${from};`;
+    const parts = [
+      ...(defaultName ? [defaultName] : []),
+      ...(namespace ? [`* as ${namespace}`] : []),
+      ...(named.length > 0 ? [`{ ${named.join(', ')} }`] : []),
+    ];
+    return `import ${typeOnly ? 'type ' : ''}${parts.join(', ')} from ${from};`;
+  });
 }
 
 /**
@@ -150,9 +201,11 @@ export function selfContainedExamples(source: string, { kind, packageName }: Sel
         }
       }
     }
-    const importLines = imports
-      .map((statement) => prunedImport(statement, used, packageName))
-      .filter((line): line is string => line !== null);
+    const importLines = importStatements(
+      imports
+        .map((statement) => prunedImport(statement, used, packageName))
+        .filter((pruned): pruned is PrunedImport => pruned !== null),
+    );
     const bodies = declarations.filter((declaration) => reached.has(declaration)).map(({ statement }) => statement.getText(file));
     const snippet = [importLines.join('\n'), ...bodies].filter(Boolean).join('\n\n') + '\n';
     for (const name of root.names) out[name] = snippet;

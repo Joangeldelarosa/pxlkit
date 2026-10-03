@@ -17,11 +17,21 @@ const items: AccordionItem[] = [
   <PixelAccordion :items="items" />
 </template>`,
   'pixel-alert': `<script setup lang="ts">
-import { PixelAlert } from '@pxlkit/ui-kit-vue';
+import { PixelAlert, PixelButton } from '@pxlkit/ui-kit-vue';
 </script>
 
 <template>
-  <PixelAlert title="Something went wrong" message="Your session expired. Please sign in again to continue." />
+  <PixelAlert tone="red" title="Connection lost" message="We couldn't reach the server. Check your network and retry.">
+    <template #icon>
+      <span
+        aria-hidden="true"
+        style="width: 14px; height: 14px; border-radius: 9999px; background: currentColor; display: inline-block"
+      />
+    </template>
+    <template #action>
+      <PixelButton size="sm" tone="red" variant="outline">Retry</PixelButton>
+    </template>
+  </PixelAlert>
 </template>`,
   'pixel-alert-dialog': `<script setup lang="ts">
 import { ref } from 'vue';
@@ -174,15 +184,32 @@ import { PixelButton } from '@pxlkit/ui-kit-vue';
 </script>
 
 <template>
-  <PixelButton>Click me</PixelButton>
+  <div class="flex flex-wrap gap-2">
+    <PixelButton>
+      <template #icon-left><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+      Leading
+    </PixelButton>
+    <PixelButton>
+      Trailing
+      <template #icon-right><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+    </PixelButton>
+    <PixelButton>
+      <template #icon-left><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+      Both
+      <template #icon-right><span aria-hidden="true" class="inline-block h-3.5 w-3.5">→</span></template>
+    </PixelButton>
+  </div>
 </template>`,
   'pixel-card': `<script setup lang="ts">
 import { PixelCard } from '@pxlkit/ui-kit-vue';
 </script>
 
 <template>
-  <PixelCard title="Project Atlas">
-    <p>Compact dossier on the Atlas migration. Status nominal.</p>
+  <PixelCard title="Invoice #1042">
+    <p>Total: $1,250.00</p>
+    <template #footer>
+      <span class="text-xs text-retro-muted">Due in 7 days</span>
+    </template>
   </PixelCard>
 </template>`,
   'pixel-center': `<script setup lang="ts">
@@ -207,11 +234,14 @@ const checked = ref(false);
   <PixelCheckbox v-model:checked="checked" label="Accept terms" />
 </template>`,
   'pixel-chip': `<script setup lang="ts">
+import { ref } from 'vue';
 import { PixelChip } from '@pxlkit/ui-kit-vue';
+
+const visible = ref(true);
 </script>
 
 <template>
-  <PixelChip label="React" />
+  <PixelChip v-if="visible" label="Remove me" tone="red" @delete="visible = false" />
 </template>`,
   'pixel-chip-group': `<script setup lang="ts">
 import { ref } from 'vue';
@@ -348,14 +378,21 @@ import { PixelDropdown } from '@pxlkit/ui-kit-vue';
   />
 </template>`,
   'pixel-empty-state': `<script setup lang="ts">
-import { PixelEmptyState } from '@pxlkit/ui-kit-vue';
+import { PixelButton, PixelEmptyState } from '@pxlkit/ui-kit-vue';
 </script>
 
 <template>
-  <PixelEmptyState
-    title="No results found"
-    description="Try adjusting your filters or search terms to find what you are looking for."
-  />
+  <PixelEmptyState title="No documents" description="Upload a file or create a new document to begin.">
+    <template #icon>
+      <span
+        aria-hidden="true"
+        style="width: 32px; height: 32px; border-radius: 4px; border: 2px solid currentColor; display: inline-block"
+      />
+    </template>
+    <template #action>
+      <PixelButton size="sm" tone="green" variant="solid">Create document</PixelButton>
+    </template>
+  </PixelEmptyState>
 </template>`,
   'pixel-equal-height-grid': `<script setup lang="ts">
 import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';
