@@ -372,7 +372,12 @@ describe('@pxlkit/ui-kit-angular in a zone.js application', () => {
     expect(document.activeElement).toBe(cells[5]);
 
     cells[0]!.focus();
-    expect(await checksOf(app, () => paste(cells[0]!, '123456'))).toBe(rejected + focusing);
+    // Angular runs the paste's own check on a race between a timeout and the
+    // next frame. On a loaded machine the frame that moves focus can come
+    // first, and the paste's check and the focus listeners' then land in one:
+    // either way the frame adds no check of its own.
+    const pasted = await checksOf(app, () => paste(cells[0]!, '123456'));
+    expect([rejected + focusing, focusing]).toContain(pasted);
     expect(cells.map((cell) => cell.value).join('')).toBe('123456');
     expect(document.activeElement).toBe(cells[5]);
   });
