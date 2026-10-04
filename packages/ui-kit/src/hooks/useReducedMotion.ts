@@ -7,8 +7,9 @@ import { useMediaQuery } from './useMediaQuery';
  * Subscribe to the user's `prefers-reduced-motion: reduce` setting.
  *
  * Returns `true` when the OS-level reduced-motion preference is active.
- * Thin wrapper over `useMediaQuery` — SSR-safe (defaults to `false` on the
- * server) and automatically reacts to OS-level toggles at runtime.
+ * Thin wrapper over `useMediaQuery` — SSR-safe (`false` on the server and in
+ * the render that hydrates its markup) and automatically reacts to OS-level
+ * toggles at runtime.
  *
  * @example
  * const reduced = useReducedMotion();

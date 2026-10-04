@@ -294,6 +294,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `lg` bullets, mirroring the left side, and `PixelCarousel`'s arrows stay put while pressed on the
   pixel surface: the press offset replaced the translate that centred them, so they jumped about
   20px; they now nudge 2px like the other pixel controls.
+- `@pxlkit/ui-kit`: pages hydrate for readers who prefer reduced motion. `useMediaQuery` read
+  `matchMedia` in the render that hydrates server markup, so `useReducedMotion` returned `true`
+  there and the components that stop animating for those readers rendered other markup than the
+  server had sent (React error #418). Both hooks now run on `useSyncExternalStore`: the render
+  that hydrates uses `defaultValue` and the reader's value follows right after. The Vue and
+  Angular kits hydrate the same way.
+- Site: pages hydrate without React error #418 for readers who prefer reduced motion (`/ui-kit`,
+  `/skills`, `/templates`, `/toast`) and, on every page, for readers who picked the light theme,
+  whose stored theme the render that hydrates read. The footer's copyright year comes from the
+  server render instead of the reader's clock, which differs once the year turns, and the landing
+  hero holds still from its first render after a client-side navigation for readers who prefer
+  reduced motion.
 
 ## [ui-kit 2.1.1] - 2026-08-08 — Bordered surface-token fix
 

@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, type ReactNode } from 'react';
+import { useReducedMotion } from '@pxlkit/ui-kit';
 import { useMouse } from './mouseContext';
-import { useReducedMotion } from './useReducedMotion';
 
 export const MAX_TILT = 6;
 

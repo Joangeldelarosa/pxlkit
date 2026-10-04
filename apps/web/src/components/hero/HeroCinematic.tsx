@@ -4,14 +4,13 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
-import { PixelBadge, PixelButton } from '@pxlkit/ui-kit';
+import { PixelBadge, PixelButton, useReducedMotion } from '@pxlkit/ui-kit';
 import { UI_KIT_VERSION_LABEL } from '@/lib/pxlkit-version';
 import { ICON_COUNT_LABEL, UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 import { MouseProvider } from './mouseContext';
 import { HeroBackground } from './HeroBackground';
 import { IconField } from './IconField';
 import { VoxelText } from './VoxelText';
-import { useReducedMotion } from './useReducedMotion';
 
 const DustParticles = dynamic(() => import('./DustParticles'), { ssr: false });
 

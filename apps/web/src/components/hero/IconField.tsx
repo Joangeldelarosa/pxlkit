@@ -8,9 +8,9 @@ import {
   type PxlKitData,
   type AnimatedPxlKitData,
 } from '@pxlkit/core';
+import { useReducedMotion } from '@pxlkit/ui-kit';
 import { useMouse } from './mouseContext';
 import { ALL_ICONS, shuffle } from './iconPool';
-import { useReducedMotion } from './useReducedMotion';
 
 export type Layer = {
   z: number;

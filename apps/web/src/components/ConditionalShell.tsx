@@ -17,7 +17,7 @@ const NO_CHROME_ROUTES = new Set(['/templates/preview']);
 const NO_CHROME_PREFIXES = ['/dev', '/og'];
 const NO_FOOTER_ROUTES = new Set(['/explore']);
 
-export function ConditionalShell({ children }: { children: React.ReactNode }) {
+export function ConditionalShell({ children, year }: { children: React.ReactNode; year: number }) {
   const pathname = usePathname();
 
   if (NO_CHROME_ROUTES.has(pathname) || NO_CHROME_PREFIXES.some((p) => pathname.startsWith(p))) {
@@ -30,7 +30,7 @@ export function ConditionalShell({ children }: { children: React.ReactNode }) {
     <>
       <Navbar />
       <main className="flex-1">{children}</main>
-      {!hideFooter && <Footer />}
+      {!hideFooter && <Footer year={year} />}
     </>
   );
 }

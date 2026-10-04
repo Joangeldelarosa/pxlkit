@@ -6,7 +6,12 @@ import { Heart } from '@pxlkit/social';
 import { BrandMark } from './Logo';
 import { UI_KIT_VERSION_LABEL } from '@/lib/pxlkit-version';
 
-export function Footer() {
+/**
+ * The site footer. `year` is the copyright year the server rendered: a year
+ * read from the browser's clock would differ from a page built in an earlier
+ * year, and fail to hydrate.
+ */
+export function Footer({ year }: { year: number }) {
   return (
     <footer className="border-t border-retro-border/50 bg-retro-surface/30 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -122,7 +127,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-retro-border/30 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-retro-muted text-xs font-mono">
-            Split licensing • MIT code + asset terms © {new Date().getFullYear()} Pxlkit Contributors
+            Split licensing • MIT code + asset terms © {year} Pxlkit Contributors
           </p>
           <div className="flex flex-col items-center sm:items-end gap-1">
             <p className="text-retro-muted/50 text-xs font-mono">

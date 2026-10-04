@@ -14,7 +14,9 @@ import {
   viewChild,
   type Type,
 } from '@angular/core';
+import { NgComponentOutlet } from '@angular/common';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
+import { bootstrapApplication, provideClientHydration } from '@angular/platform-browser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   PixelPortal,
@@ -45,6 +47,7 @@ import { canonicalDom } from '../../../../scripts/parity/canonical';
 import { mountReact } from '../../../../scripts/parity/react';
 import { angularDomRules } from './dom-rules';
 import { installMatchMedia } from './match-media';
+import { ROOT_TAG, angularServerPage } from './server';
 
 async function render<T>(type: Type<T>): Promise<ComponentFixture<T>> {
   const fixture = TestBed.createComponent(type);
@@ -142,6 +145,88 @@ describe('injectMediaQuery / injectReducedMotion', () => {
     await fixture.whenStable();
     expect(host.wide()).toBe(false);
     expect(host.fixed()).toBe(false);
+  });
+
+  describe('server-rendered markup', () => {
+    /** Shows what `injectReducedMotion` answers, recording each new answer it renders. */
+    @Component({ selector: 'motion-probe', template: '<span>{{ label(reduced()) }}</span>' })
+    class Probe {
+      static seen: boolean[] = [];
+      readonly reduced = injectReducedMotion();
+      label(reduced: boolean): string {
+        if (Probe.seen.at(-1) !== reduced) Probe.seen.push(reduced);
+        return reduced ? 'still' : 'moving';
+      }
+    }
+
+    @Component({
+      imports: [Probe],
+      template: '<button type="button" (click)="shown.set(true)">Show</button> @if (shown()) { <motion-probe /> }',
+    })
+    class Later {
+      readonly shown = signal(false);
+    }
+
+    /**
+     * Hydrates the server's page of `Example` for a reader who prefers
+     * reduced motion, which no server knows; `firstRender` runs once the
+     * render that hydrates is done.
+     */
+    async function hydrate(Example: Type<unknown>, firstRender: () => void = () => {}) {
+      TestBed.resetTestingModule();
+      Reflect.deleteProperty(window, 'matchMedia');
+      const html = await angularServerPage(Example, { hydration: true });
+      document.open();
+      document.write(html);
+      document.close();
+      Probe.seen = [];
+      installMatchMedia((query) => query === '(prefers-reduced-motion: reduce)');
+
+      @Component({ selector: ROOT_TAG, imports: [NgComponentOutlet], template: '<ng-container [ngComponentOutlet]="example" />' })
+      class Root {
+        readonly example = Example;
+        constructor() {
+          afterNextRender(firstRender);
+        }
+      }
+      vi.spyOn(console, 'log').mockImplementation(() => {});
+      const errors = vi.spyOn(console, 'error');
+      const appRef = await bootstrapApplication(Root, {
+        providers: [provideClientHydration(), provideZonelessChangeDetection()],
+      });
+      await appRef.whenStable();
+      expect(errors).not.toHaveBeenCalled();
+      return appRef;
+    }
+
+    beforeEach(() => {
+      Probe.seen = [];
+    });
+
+    it('hydrate with the server value, then take the reader’s', async () => {
+      const shown: string[] = [];
+      const text = () => document.querySelector('motion-probe')!.textContent!;
+      const appRef = await hydrate(Probe, () => shown.push(text()));
+      shown.push(text());
+      appRef.destroy();
+      // The render that hydrates shows what the server sent; the reader's value follows.
+      expect(shown).toEqual(['moving', 'still']);
+      expect(Probe.seen).toEqual([false, true]);
+    });
+
+    it('start from the reader’s value in a component created after hydration', async () => {
+      const appRef = await hydrate(Later);
+      document.querySelector('button')!.click();
+      await appRef.whenStable();
+      appRef.destroy();
+      expect(Probe.seen).toEqual([true]);
+    });
+
+    it('start from the reader’s value in a render without server markup', async () => {
+      installMatchMedia((query) => query === '(prefers-reduced-motion: reduce)');
+      await render(Probe);
+      expect(Probe.seen).toEqual([true]);
+    });
   });
 });
 

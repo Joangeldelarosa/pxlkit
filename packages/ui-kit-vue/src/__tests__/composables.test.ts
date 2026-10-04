@@ -4,7 +4,8 @@
  */
 import { mount } from '@vue/test-utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { defineComponent, h, nextTick, ref, type Ref } from 'vue';
+import { createApp, createSSRApp, defineComponent, h, nextTick, ref, type Ref } from 'vue';
+import { renderToString } from 'vue/server-renderer';
 import {
   PxlKitLocaleProvider,
   PxlKitSurfaceProvider,
@@ -141,6 +142,68 @@ describe('useMediaQuery / useReducedMotion', () => {
     const { result } = withSetup(() => useReducedMotion());
     await nextTick();
     expect(result().value).toBe(true);
+  });
+
+  describe('server-rendered markup', () => {
+    /** Shows what `useReducedMotion` answers, recording each answer it renders. */
+    const probe = (seen: boolean[]) =>
+      defineComponent({
+        setup() {
+          const reduced = useReducedMotion();
+          return () => {
+            seen.push(reduced.value);
+            return h('span', reduced.value ? 'still' : 'moving');
+          };
+        },
+      });
+
+    /** The server's markup of `component`, then the reader's preferences, which no server knows. */
+    async function serverMarkup(component: ReturnType<typeof defineComponent>): Promise<HTMLElement> {
+      Reflect.deleteProperty(window, 'matchMedia');
+      const container = document.createElement('div');
+      container.innerHTML = await renderToString(createSSRApp(component));
+      document.body.appendChild(container);
+      installMatchMedia((query) => query === '(prefers-reduced-motion: reduce)');
+      return container;
+    }
+
+    it('hydrates with the server value, then takes the reader’s', async () => {
+      const seen: boolean[] = [];
+      const Probe = probe(seen);
+      const container = await serverMarkup(Probe);
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const app = createSSRApp(Probe);
+      app.mount(container);
+      await nextTick();
+      expect(warn).not.toHaveBeenCalled();
+      expect(container.textContent).toBe('still');
+      // The server's render, the one that hydrates, then the reader's value.
+      expect(seen).toEqual([false, false, true]);
+      app.unmount();
+    });
+
+    it('starts from the reader’s value in a component mounted after hydration', async () => {
+      const seen: boolean[] = [];
+      const Probe = probe(seen);
+      const shown = ref(false);
+      const Later = defineComponent({ render: () => h('div', shown.value ? [h(Probe)] : []) });
+      const app = createSSRApp(Later);
+      app.mount(await serverMarkup(Later));
+      shown.value = true;
+      await nextTick();
+      expect(seen).toEqual([true]);
+      app.unmount();
+    });
+
+    it('starts from the reader’s value in a render without server markup', () => {
+      installMatchMedia((query) => query === '(prefers-reduced-motion: reduce)');
+      const seen: boolean[] = [];
+      const container = document.createElement('div');
+      const app = createApp(probe(seen));
+      app.mount(container);
+      expect(seen).toEqual([true]);
+      app.unmount();
+    });
   });
 });
 

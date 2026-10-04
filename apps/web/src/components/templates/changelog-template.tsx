@@ -69,6 +69,12 @@ const RELEASES: Release[] = [
       },
       {
         category: 'Fixed',
+        title: 'Server-rendered pages hydrate for every reader',
+        detail:
+          'For readers who prefer reduced motion, the first browser render read their preference and differed from the markup the server had sent, so the page failed to hydrate: useMediaQuery and useReducedMotion now start from their default while hydrating, in the three kits.',
+      },
+      {
+        category: 'Fixed',
         title: 'Accessibility and behaviour fixes the ports surfaced',
         detail:
           'Focus moved into dialogs and pickers, menus and menu buttons on the WAI-ARIA patterns, the calendars on the date grid pattern, clickable table rows from the keyboard, announced toasts and loading states, and more — see CHANGELOG.md.',

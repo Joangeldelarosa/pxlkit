@@ -454,7 +454,8 @@ export default function RootLayout({
             <div className="fixed inset-0 pointer-events-none opacity-60 bg-grid-pattern" data-pxlkit="grid-bg" />
 
             <div className="relative z-10 flex flex-col min-h-screen">
-              <ConditionalShell>
+              {/* The footer's copyright year, from this render rather than the reader's clock. */}
+              <ConditionalShell year={new Date().getFullYear()}>
                 {children}
               </ConditionalShell>
             </div>
