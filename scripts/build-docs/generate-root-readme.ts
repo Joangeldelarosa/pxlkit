@@ -78,6 +78,12 @@ export interface WorkspaceEntry {
   bucket: string;
   /** True when `private: true` in package.json. */
   isPrivate: boolean;
+  /**
+   * False when the release workflow (`.github/workflows/publish.yml`) does
+   * not publish this public package, so it has no npm page to link to;
+   * undefined when that is not known.
+   */
+  published?: boolean;
 }
 
 export interface CoverageSummaryLike {
@@ -215,6 +221,46 @@ export async function discoverWorkspaces(
   return entries;
 }
 
+/** The release workflow, whose `PACKAGES` list says what goes to npm. */
+export const PUBLISH_WORKFLOW = ".github/workflows/publish.yml";
+
+/**
+ * The workspace directories the release workflow publishes: the quoted
+ * entries of its `PACKAGES=( … )` shell array. `null` when the workflow has
+ * no such list.
+ */
+export function readPublishedWorkspaces(workflow: string): Set<string> | null {
+  const list = /PACKAGES=\(([\s\S]*?)\)/.exec(workflow);
+  if (!list) return null;
+  const dirs = [...list[1].matchAll(/["']([^"'\s]+)["']/g)].map((m) => m[1].replace(/\/+$/, ""));
+  return dirs.length > 0 ? new Set(dirs) : null;
+}
+
+/** Marks the public workspaces the release workflow does not publish. */
+async function markPublished(
+  repoRoot: string,
+  workspaces: WorkspaceEntry[],
+  logger: Logger,
+): Promise<void> {
+  const workflowPath = path.join(repoRoot, PUBLISH_WORKFLOW);
+  if (!(await fs.pathExists(workflowPath))) return;
+  const published = readPublishedWorkspaces(await fs.readFile(workflowPath, "utf8"));
+  if (!published) {
+    logger.warn(`markPublished: no PACKAGES list in ${PUBLISH_WORKFLOW}; every public package links to npm`);
+    return;
+  }
+  for (const w of workspaces) {
+    if (!w.isPrivate) w.published = published.has(w.relDir);
+  }
+}
+
+/** The package cell: an npm link, or why there is none. */
+function packageCell(w: WorkspaceEntry): string {
+  if (w.isPrivate) return `\`${w.name}\` _(private)_`;
+  if (w.published === false) return `\`${w.name}\` _(not yet on npm)_`;
+  return `[\`${w.name}\`](https://www.npmjs.com/package/${w.name})`;
+}
+
 // ---------------------------------------------------------------------------
 // Coverage
 // ---------------------------------------------------------------------------
@@ -265,7 +311,8 @@ export const WORKSPACES_END_MARKER = "<!-- WORKSPACES:END -->";
 /**
  * Render the auto-managed workspace map block body (without the markers).
  * One row per workspace: repo-relative dir (linked), package name (npm link
- * for public packages, `_(private)_` tag otherwise), version, description.
+ * for published packages, `_(private)_` or `_(not yet on npm)_` otherwise),
+ * version, description.
  */
 export function renderWorkspacesBlock(workspaces: WorkspaceEntry[]): string {
   const sorted = [...workspaces].sort((a, b) => a.relDir.localeCompare(b.relDir));
@@ -276,12 +323,9 @@ export function renderWorkspacesBlock(workspaces: WorkspaceEntry[]): string {
     "| --- | --- | --- | --- |",
   ];
   for (const w of sorted) {
-    const pkgCell = w.isPrivate
-      ? `\`${w.name}\` _(private)_`
-      : `[\`${w.name}\`](https://www.npmjs.com/package/${w.name})`;
     const ver = w.version ? `\`${w.version}\`` : "—";
     lines.push(
-      `| [\`${w.relDir}\`](./${w.relDir}) | ${pkgCell} | ${ver} | ${escapeCell(w.description)} |`,
+      `| [\`${w.relDir}\`](./${w.relDir}) | ${packageCell(w)} | ${ver} | ${escapeCell(w.description)} |`,
     );
   }
   return lines.join("\n");
@@ -343,7 +387,7 @@ function workspaceTable(
   const sep = "| --- | --- | --- |";
   const rows = filtered.map((e) => {
     const ver = e.version ? `\`${e.version}\`` : "—";
-    const priv = e.isPrivate ? " _(private)_" : "";
+    const priv = e.isPrivate ? " _(private)_" : e.published === false ? " _(not yet on npm)_" : "";
     return `| [\`${e.name}\`](./${e.relDir})${priv} | ${ver} | ${escapeCell(
       e.description,
     )} |`;
@@ -456,6 +500,7 @@ export async function generateRootReadme(
   }
 
   const workspaces = await discoverWorkspaces(repoRoot, rootPkg, logger);
+  await markPublished(repoRoot, workspaces, logger);
   const coverage = await loadCoverage(repoRoot, opts.coverageSummaryPath, logger);
 
   // Marker contract: when the hand-authored README.md declares the
