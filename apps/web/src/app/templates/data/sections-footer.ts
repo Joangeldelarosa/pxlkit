@@ -26,10 +26,10 @@ export function MinimalFooter() {
 
           <div className="flex items-center gap-3">
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-retro-muted hover:text-retro-cyan transition-colors" aria-label="Twitter">
-              <PxlKitIcon icon={AtSign} size={16} />
+              <PxlKitIcon icon={AtSign} size={16} decorative />
             </a>
             <a href="https://myapp.com" target="_blank" rel="noopener noreferrer" className="text-retro-muted hover:text-retro-green transition-colors" aria-label="Website">
-              <PxlKitIcon icon={Globe} size={16} />
+              <PxlKitIcon icon={Globe} size={16} decorative />
             </a>
           </div>
         </div>
@@ -95,7 +95,7 @@ export function MultiColumnFooter() {
                 />
               </div>
               <PixelButton tone="green" size="sm" aria-label="Subscribe">
-                <PxlKitIcon icon={Mail} size={14} />
+                <PxlKitIcon icon={Mail} size={14} decorative />
               </PixelButton>
             </div>
           </PixelStack>
@@ -133,10 +133,10 @@ export function MultiColumnFooter() {
               Built with <PxlKitIcon icon={Heart} size={12} colorful className="mx-1" /> and pixels
             </span>
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-retro-muted hover:text-retro-cyan transition-colors" aria-label="Twitter">
-              <PxlKitIcon icon={AtSign} size={14} />
+              <PxlKitIcon icon={AtSign} size={14} decorative />
             </a>
             <a href="https://myapp.com" target="_blank" rel="noopener noreferrer" className="text-retro-muted hover:text-retro-green transition-colors" aria-label="Website">
-              <PxlKitIcon icon={Globe} size={14} />
+              <PxlKitIcon icon={Globe} size={14} decorative />
             </a>
           </PixelCluster>
         </PixelCluster>
@@ -183,7 +183,7 @@ export function CtaFooter() {
                 <PixelButton
                   tone="green"
                   size="lg"
-                  iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                  iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
                 >
                   Get Started Free
                 </PixelButton>
@@ -209,7 +209,7 @@ export function CtaFooter() {
               <span>Made with</span>
               <PxlKitIcon icon={Heart} size={12} colorful />
               <a href="https://myapp.com" className="hover:text-retro-green transition-colors" aria-label="Website">
-                <PxlKitIcon icon={Globe} size={14} />
+                <PxlKitIcon icon={Globe} size={14} decorative />
               </a>
             </div>
           </div>

@@ -56,7 +56,7 @@ function PreviewContent() {
             className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
             aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
-            <PxlKitIcon icon={dark ? Sun : Moon} size={16} colorful />
+            <PxlKitIcon icon={dark ? Sun : Moon} size={16} colorful decorative />
           </button>
         </PixelTooltip>
         <span className="font-mono text-xs text-retro-muted/60 select-none">

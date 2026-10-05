@@ -51,7 +51,7 @@ export default function SaasLandingPage() {
       <PixelContainer as="section" maxWidth="xl" padding="xl" className="text-center">
         <PixelFadeIn>
           <PixelStack gap={4} align="center">
-            <PixelBadge tone="green" iconLeft={<PxlKitIcon icon={Sparkles} size={12} />}>
+            <PixelBadge tone="green" iconLeft={<PxlKitIcon icon={Sparkles} size={12} decorative />}>
               v1.0 — Now open source
             </PixelBadge>
             <h1 className="font-pixel text-2xl sm:text-4xl leading-loose">
@@ -61,7 +61,7 @@ export default function SaasLandingPage() {
               The complete pixel-art React ecosystem. Components, icons, animations, and 3D effects — MIT code, source-available art.
             </p>
             <PixelCluster gap={3} justify="center">
-              <PixelButton tone="green" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>
+              <PixelButton tone="green" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}>
                 Get Started Free
               </PixelButton>
               <PixelButton tone="neutral" size="lg" variant="outline">Browse Docs</PixelButton>
@@ -70,9 +70,9 @@ export default function SaasLandingPage() {
         </PixelFadeIn>
         <PixelFadeIn delay={300} className="mt-12">
           <PixelCluster gap={4} justify="center">
-            <PixelStatCard label="Stars" value="4.2k" size="sm" icon={<PxlKitIcon icon={Trophy} size={16} colorful />} />
-            <PixelStatCard label="Downloads" value="18k/mo" size="sm" icon={<PxlKitIcon icon={Coin} size={16} colorful />} />
-            <PixelStatCard label="Icons" value="226+" size="sm" icon={<AnimatedPxlKitIcon icon={SparkleStar} size={16} colorful />} />
+            <PixelStatCard label="Stars" value="4.2k" size="sm" icon={<PxlKitIcon icon={Trophy} size={16} colorful decorative />} />
+            <PixelStatCard label="Downloads" value="18k/mo" size="sm" icon={<PxlKitIcon icon={Coin} size={16} colorful decorative />} />
+            <PixelStatCard label="Icons" value="226+" size="sm" icon={<AnimatedPxlKitIcon icon={SparkleStar} size={16} colorful decorative />} />
           </PixelCluster>
         </PixelFadeIn>
       </PixelContainer>
@@ -93,7 +93,7 @@ export default function SaasLandingPage() {
               <PixelFadeIn key={f.title} delay={i * 100} className="h-full">
                 <PixelFeatureCard
                   className="h-full"
-                  icon={<PxlKitIcon icon={f.icon} size={24} colorful />}
+                  icon={<PxlKitIcon icon={f.icon} size={24} colorful decorative />}
                   title={f.title}
                   description={f.desc}
                   descriptionLines={2}
@@ -164,7 +164,7 @@ export default function SaasLandingPage() {
         <PixelStack gap={4} align="center" className="text-center">
           <h2 className="font-pixel text-xl leading-loose">Ready to ship?</h2>
           <p className="text-retro-muted font-mono text-sm">Free forever. Open source. No credit card required.</p>
-          <PixelButton tone="green" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>
+          <PixelButton tone="green" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}>
             Start Building
           </PixelButton>
         </PixelStack>
@@ -221,13 +221,13 @@ export default function DeveloperPortfolio() {
       <section className="relative min-h-screen flex items-center overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <PixelMouseParallax strength={14} className="absolute top-20 left-10">
-            <ParallaxPxlKitIcon icon={PixelRocket} size={64} />
+            <ParallaxPxlKitIcon icon={PixelRocket} size={64} decorative />
           </PixelMouseParallax>
           <PixelMouseParallax strength={24} className="absolute top-28 right-16">
-            <ParallaxPxlKitIcon icon={MagicOrb} size={56} />
+            <ParallaxPxlKitIcon icon={MagicOrb} size={56} decorative />
           </PixelMouseParallax>
           <PixelMouseParallax strength={10} className="absolute bottom-24 right-20">
-            <ParallaxPxlKitIcon icon={CoolEmoji} size={48} />
+            <ParallaxPxlKitIcon icon={CoolEmoji} size={48} decorative />
           </PixelMouseParallax>
         </div>
         <PixelContainer as="div" maxWidth="3xl" padding="lg" className="relative z-10">
@@ -242,7 +242,7 @@ export default function DeveloperPortfolio() {
                 pixel art, game dev, and open source.
               </p>
               <PixelCluster gap={3}>
-                <PixelButton tone="green" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>
+                <PixelButton tone="green" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}>
                   View Projects
                 </PixelButton>
                 <PixelButton tone="neutral" size="lg" variant="outline">
@@ -325,7 +325,7 @@ export default function DeveloperPortfolio() {
               tone="green"
               size="md"
               className="w-full justify-center"
-              iconRight={<PxlKitIcon icon={AtSign} size={14} />}
+              iconRight={<PxlKitIcon icon={AtSign} size={14} decorative />}
             >
               Send Message
             </PixelButton>
@@ -386,10 +386,10 @@ export default function IndieGameLanding() {
           <PixelStack gap={4} align="center">
             <PixelCluster gap={4} justify="center">
               <PixelFloat>
-                <AnimatedPxlKitIcon icon={FireSword} size={64} colorful />
+                <AnimatedPxlKitIcon icon={FireSword} size={64} colorful decorative />
               </PixelFloat>
               <PixelBounce>
-                <AnimatedPxlKitIcon icon={FloatingSkull} size={48} colorful />
+                <AnimatedPxlKitIcon icon={FloatingSkull} size={48} colorful decorative />
               </PixelBounce>
             </PixelCluster>
             <PixelBadge tone="red">Now in Early Access</PixelBadge>
@@ -404,10 +404,10 @@ export default function IndieGameLanding() {
               and hundreds of items to collect.
             </p>
             <PixelCluster gap={3} justify="center">
-              <PixelButton tone="red" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>
+              <PixelButton tone="red" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}>
                 Play Now — Free
               </PixelButton>
-              <PixelButton tone="neutral" size="lg" variant="outline" iconRight={<PxlKitIcon icon={Download} size={14} />}>
+              <PixelButton tone="neutral" size="lg" variant="outline" iconRight={<PxlKitIcon icon={Download} size={14} decorative />}>
                 Download Demo
               </PixelButton>
             </PixelCluster>
@@ -416,9 +416,9 @@ export default function IndieGameLanding() {
 
         <PixelFadeIn delay={200} className="mt-12">
           <PixelCluster gap={4} justify="center">
-            <PixelStatCard label="Players" value="24k+" size="sm" icon={<PxlKitIcon icon={Trophy} size={16} colorful />} />
-            <PixelStatCard label="Items" value="500+" size="sm" icon={<PxlKitIcon icon={Coin} size={16} colorful />} />
-            <PixelStatCard label="Dungeons" value="∞" size="sm" icon={<AnimatedPxlKitIcon icon={SparkleStar} size={16} colorful />} />
+            <PixelStatCard label="Players" value="24k+" size="sm" icon={<PxlKitIcon icon={Trophy} size={16} colorful decorative />} />
+            <PixelStatCard label="Items" value="500+" size="sm" icon={<PxlKitIcon icon={Coin} size={16} colorful decorative />} />
+            <PixelStatCard label="Dungeons" value="∞" size="sm" icon={<AnimatedPxlKitIcon icon={SparkleStar} size={16} colorful decorative />} />
           </PixelCluster>
         </PixelFadeIn>
       </PixelContainer>
@@ -432,7 +432,7 @@ export default function IndieGameLanding() {
               <PixelFadeIn key={f.title} delay={i * 100}>
                 <PixelCard padding="lg" className="h-full text-center">
                   <div className="flex justify-center mb-4">
-                    <PxlKitIcon icon={f.icon} size={32} colorful />
+                    <PxlKitIcon icon={f.icon} size={32} colorful decorative />
                   </div>
                   <h3 className="font-pixel text-xs mb-2 leading-relaxed">{f.title}</h3>
                   <p className="text-retro-muted font-mono text-xs">{f.desc}</p>
@@ -446,7 +446,7 @@ export default function IndieGameLanding() {
       {/* Leaderboard */}
       <PixelContainer as="section" maxWidth="sm" padding="lg" className="bg-retro-surface/20">
         <h2 className="font-pixel text-xl text-center leading-loose mb-10">
-          <AnimatedPxlKitIcon icon={CoinSpin} size={24} colorful className="inline mr-3" />
+          <AnimatedPxlKitIcon icon={CoinSpin} size={24} colorful className="inline mr-3" decorative />
           Leaderboard
         </h2>
         <PixelTable
@@ -469,12 +469,12 @@ export default function IndieGameLanding() {
       >
         <PixelStack gap={4} align="center">
           <PixelCluster gap={3} justify="center">
-            <AnimatedPxlKitIcon icon={ExplosionBurst} size={40} colorful />
-            <AnimatedPxlKitIcon icon={GlowPulse} size={40} colorful />
+            <AnimatedPxlKitIcon icon={ExplosionBurst} size={40} colorful decorative />
+            <AnimatedPxlKitIcon icon={GlowPulse} size={40} colorful decorative />
           </PixelCluster>
           <h2 className="font-pixel text-xl leading-loose">Ready to explore?</h2>
           <p className="text-retro-muted font-mono text-sm">Free to play. Cross-platform. No ads.</p>
-          <PixelButton tone="red" size="lg" iconRight={<PxlKitIcon icon={Download} size={14} />}>
+          <PixelButton tone="red" size="lg" iconRight={<PxlKitIcon icon={Download} size={14} decorative />}>
             Download Free
           </PixelButton>
         </PixelStack>
@@ -546,14 +546,14 @@ export default function AdminDashboard() {
                   : 'text-retro-muted hover:text-retro-text hover:bg-retro-surface'
               }\`}
             >
-              <PxlKitIcon icon={item.icon} size={16} />
+              <PxlKitIcon icon={item.icon} size={16} decorative />
               {item.label}
             </button>
           ))}
         </nav>
         <div className="pt-4 border-t border-retro-border/30">
           <button className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-mono text-retro-muted hover:text-retro-text rounded transition-all">
-            <PxlKitIcon icon={Settings} size={16} />
+            <PxlKitIcon icon={Settings} size={16} decorative />
             Settings
           </button>
         </div>
@@ -569,12 +569,12 @@ export default function AdminDashboard() {
               placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              prefix={<PxlKitIcon icon={Search} size={14} className="text-retro-muted" />}
+              prefix={<PxlKitIcon icon={Search} size={14} className="text-retro-muted" decorative />}
             />
           </div>
           <div className="flex items-center gap-2">
-            <button className="relative p-2 text-retro-muted hover:text-retro-text border border-retro-border/50 rounded transition-all" aria-label="Notifications">
-              <PxlKitIcon icon={Bell} size={16} />
+            <button className="relative p-2 text-retro-muted hover:text-retro-text border border-retro-border/50 rounded transition-all" aria-label="Notifications, 3 unread">
+              <PxlKitIcon icon={Bell} size={16} decorative />
               <PixelBadge tone="red" size="sm" className="absolute -top-1 -right-1 px-1">3</PixelBadge>
             </button>
             <PixelButton tone="green" size="sm">+ New Project</PixelButton>
@@ -585,7 +585,7 @@ export default function AdminDashboard() {
           {/* Alerts */}
           <PixelAlert
             tone="cyan"
-            icon={<PxlKitIcon icon={InfoCircle} size={16} />}
+            icon={<PxlKitIcon icon={InfoCircle} size={16} decorative />}
             message="System maintenance scheduled for Sunday 02:00–04:00 UTC."
           />
 
@@ -598,7 +598,7 @@ export default function AdminDashboard() {
                 value={s.value}
                 trend={s.trend}
                 tone={s.tone}
-                icon={<PxlKitIcon icon={s.icon} size={18} colorful />}
+                icon={<PxlKitIcon icon={s.icon} size={18} colorful decorative />}
               />
             ))}
           </PixelGrid>
@@ -733,7 +733,7 @@ export default function BlogSite() {
             </div>
             <div className="flex items-center gap-2">
               <button className="p-2 text-retro-muted hover:text-retro-text border border-retro-border/50 rounded transition-all" aria-label="Search">
-                <PxlKitIcon icon={Search} size={16} />
+                <PxlKitIcon icon={Search} size={16} decorative />
               </button>
               <PixelButton tone="green" size="sm">Subscribe</PixelButton>
             </div>
@@ -764,12 +764,12 @@ export default function BlogSite() {
                       <div>
                         <div className="font-mono text-xs text-retro-text">{FEATURED.author}</div>
                         <div className="flex items-center gap-1 font-mono text-[10px] text-retro-muted">
-                          <PxlKitIcon icon={Calendar} size={10} />
+                          <PxlKitIcon icon={Calendar} size={10} decorative />
                           {FEATURED.date}
                         </div>
                       </div>
                     </div>
-                    <PixelButton tone="green" size="sm" iconRight={<PxlKitIcon icon={ArrowRight} size={12} />}>
+                    <PixelButton tone="green" size="sm" iconRight={<PxlKitIcon icon={ArrowRight} size={12} decorative />}>
                       Read More
                     </PixelButton>
                   </div>
@@ -778,13 +778,13 @@ export default function BlogSite() {
               right={
                 <div className="hidden lg:flex items-center justify-center gap-4 text-retro-muted font-mono text-xs">
                   <span className="flex items-center gap-1.5">
-                    <PxlKitIcon icon={Heart} size={14} colorful /> {FEATURED.likes}
+                    <PxlKitIcon icon={Heart} size={14} colorful aria-label="Likes" /> {FEATURED.likes}
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <PxlKitIcon icon={Eye} size={14} /> {FEATURED.views}
+                    <PxlKitIcon icon={Eye} size={14} aria-label="Views" /> {FEATURED.views}
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <PxlKitIcon icon={Comment} size={14} /> 24
+                    <PxlKitIcon icon={Comment} size={14} aria-label="Comments" /> 24
                   </span>
                 </div>
               }
@@ -839,7 +839,7 @@ export default function BlogSite() {
               <PixelInput placeholder="your@email.com" aria-label="Email for newsletter" />
             </div>
             <PixelButton tone="green" size="md" aria-label="Subscribe">
-              <PxlKitIcon icon={Mail} size={16} />
+              <PxlKitIcon icon={Mail} size={16} decorative />
             </PixelButton>
           </div>
         </PixelStack>
@@ -853,10 +853,10 @@ export default function BlogSite() {
             <span>© {new Date().getFullYear()} PixelBlog. All rights reserved.</span>
             <div className="flex items-center gap-3">
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-retro-cyan transition-colors" aria-label="Twitter">
-                <PxlKitIcon icon={AtSign} size={16} />
+                <PxlKitIcon icon={AtSign} size={16} decorative />
               </a>
               <a href="https://myblog.com" target="_blank" rel="noopener noreferrer" className="hover:text-retro-green transition-colors" aria-label="Website">
-                <PxlKitIcon icon={Globe} size={16} />
+                <PxlKitIcon icon={Globe} size={16} decorative />
               </a>
             </div>
           </div>

@@ -56,7 +56,7 @@ export default function ParallaxDemos() {
             <PixelParallaxLayer speed={0.15} className="absolute inset-0 flex items-center justify-center opacity-20">
               <div className="grid grid-cols-8 gap-4">
                 {Array.from({ length: 16 }).map((_, i) => (
-                  <PxlKitIcon key={i} icon={Star} size={20} />
+                  <PxlKitIcon key={i} icon={Star} size={20} decorative />
                 ))}
               </div>
             </PixelParallaxLayer>

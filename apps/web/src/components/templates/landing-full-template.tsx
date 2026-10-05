@@ -437,7 +437,7 @@ function HeroSection() {
             </PixelBadge>
           </PixelFloat>
           <PixelFloat duration={3200} distance={8}>
-            <PxlKitIcon icon={Lightning} size={28} colorful />
+            <PxlKitIcon icon={Lightning} size={28} colorful decorative />
           </PixelFloat>
         </div>
       </div>
@@ -949,17 +949,17 @@ function FooterSection() {
             <PixelCluster gap={3} align="center">
               <PixelTooltip content="Source code" position="top">
                 <a href="#" aria-label="Source code" className="opacity-60 hover:opacity-100 transition-opacity">
-                  <PxlKitIcon icon={ExternalLink} size={16} colorful />
+                  <PxlKitIcon icon={ExternalLink} size={16} colorful decorative />
                 </a>
               </PixelTooltip>
               <PixelTooltip content="Community" position="top">
                 <a href="#" aria-label="Community" className="opacity-60 hover:opacity-100 transition-opacity">
-                  <PxlKitIcon icon={ChatBubble} size={16} colorful />
+                  <PxlKitIcon icon={ChatBubble} size={16} colorful decorative />
                 </a>
               </PixelTooltip>
               <PixelTooltip content="Contact" position="top">
                 <a href="#" aria-label="Email us" className="opacity-60 hover:opacity-100 transition-opacity">
-                  <PxlKitIcon icon={Mail} size={16} colorful />
+                  <PxlKitIcon icon={Mail} size={16} colorful decorative />
                 </a>
               </PixelTooltip>
             </PixelCluster>

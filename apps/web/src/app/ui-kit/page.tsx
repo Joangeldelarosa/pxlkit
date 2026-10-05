@@ -1049,12 +1049,12 @@ import { Search } from '@pxlkit/ui';
 export function QuickStart() {
   return (
     <>
-      <PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} />}>
+      <PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} decorative />}>
         Create Quest
       </PixelButton>
       <PixelInput
         label="Search"
-        prefix={<PxlKitIcon icon={Search} size={16} />}
+        prefix={<PxlKitIcon icon={Search} size={16} decorative />}
         placeholder="Find icons..."
       />
     </>
@@ -1073,11 +1073,11 @@ import { Search } from '@pxlkit/ui';
 
 <template>
   <PixelButton tone="green">
-    <template #icon-left><PxlKitIcon :icon="Trophy" :size="16" /></template>
+    <template #icon-left><PxlKitIcon :icon="Trophy" :size="16" decorative /></template>
     Create Quest
   </PixelButton>
   <PixelInput label="Search" placeholder="Find icons...">
-    <template #prefix><PxlKitIcon :icon="Search" :size="16" /></template>
+    <template #prefix><PxlKitIcon :icon="Search" :size="16" decorative /></template>
   </PixelInput>
 </template>`}
                 angular={`// 1. In your Tailwind CSS file (e.g., src/styles.css), in place of @import "tailwindcss":
@@ -1097,8 +1097,8 @@ import { PixelButton, PixelInput } from '@pxlkit/ui-kit-angular';
     <button pxlButton tone="green" [iconLeft]="trophyIcon">Create Quest</button>
     <pxl-input label="Search" [prefix]="searchIcon" placeholder="Find icons..." />
 
-    <ng-template #trophyIcon><pxl-icon [icon]="trophy" [size]="16" /></ng-template>
-    <ng-template #searchIcon><pxl-icon [icon]="search" [size]="16" /></ng-template>
+    <ng-template #trophyIcon><pxl-icon [icon]="trophy" [size]="16" decorative /></ng-template>
+    <ng-template #searchIcon><pxl-icon [icon]="search" [size]="16" decorative /></ng-template>
   \`,
 })
 export class QuickStart {

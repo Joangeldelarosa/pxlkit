@@ -28,7 +28,7 @@ export function HeroCentered() {
           <PixelFadeIn delay={0}>
             <PixelBadge
               tone="green"
-              iconLeft={<PxlKitIcon icon={SparkleSmall} size={12} className="text-retro-green" />}
+              iconLeft={<PxlKitIcon icon={SparkleSmall} size={12} className="text-retro-green" decorative />}
             >
               Now open source
             </PixelBadge>
@@ -50,7 +50,7 @@ export function HeroCentered() {
               <PixelButton
                 tone="green"
                 size="lg"
-                iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
               >
                 Get Started
               </PixelButton>
@@ -63,7 +63,7 @@ export function HeroCentered() {
           <PixelFadeIn delay={300}>
             <PixelCluster gap={6} justify="center" className="mt-6 text-retro-muted font-mono text-xs">
               <PixelBounce>
-                <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful />
+                <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful decorative />
               </PixelBounce>
               <span>226+ icons</span>
               <span className="text-retro-border">|</span>
@@ -100,7 +100,7 @@ export function HeroSplit() {
   const left = (
     <PixelSlideIn from="left">
       <PixelStack gap={4} align="start">
-        <PixelBadge tone="cyan" iconLeft={<PxlKitIcon icon={Package} size={12} />}>
+        <PixelBadge tone="cyan" iconLeft={<PxlKitIcon icon={Package} size={12} decorative />}>
           v1.0 Released
         </PixelBadge>
         <h1 className="font-pixel text-2xl sm:text-3xl text-retro-text leading-loose">
@@ -115,7 +115,7 @@ export function HeroSplit() {
           <PixelButton
             tone="green"
             size="lg"
-            iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+            iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
           >
             Start Building
           </PixelButton>
@@ -132,10 +132,10 @@ export function HeroSplit() {
       <PixelHeroMedia ratio="16/10" framed tone="green">
         <div className="relative flex h-full w-full items-center justify-center bg-retro-green/5">
           <PixelFloat>
-            <AnimatedPxlKitIcon icon={FloatingHearts} size={80} colorful />
+            <AnimatedPxlKitIcon icon={FloatingHearts} size={80} colorful decorative />
           </PixelFloat>
           <div className="absolute top-4 right-4">
-            <AnimatedPxlKitIcon icon={PulseHeart} size={24} colorful />
+            <AnimatedPxlKitIcon icon={PulseHeart} size={24} colorful decorative />
           </div>
         </div>
       </PixelHeroMedia>
@@ -178,16 +178,16 @@ export function HeroParallax() {
       {/* Parallax background layers */}
       <div className="absolute inset-0 pointer-events-none">
         <PixelMouseParallax strength={14} className="absolute top-16 left-12">
-          <ParallaxPxlKitIcon icon={PixelCrown} size={56} />
+          <ParallaxPxlKitIcon icon={PixelCrown} size={56} decorative />
         </PixelMouseParallax>
         <PixelMouseParallax strength={26} className="absolute top-24 right-16">
-          <ParallaxPxlKitIcon icon={MagicOrb} size={72} />
+          <ParallaxPxlKitIcon icon={MagicOrb} size={72} decorative />
         </PixelMouseParallax>
         <PixelMouseParallax strength={10} className="absolute bottom-24 left-20">
-          <ParallaxPxlKitIcon icon={CoolEmoji} size={48} />
+          <ParallaxPxlKitIcon icon={CoolEmoji} size={48} decorative />
         </PixelMouseParallax>
         <PixelMouseParallax strength={20} className="absolute bottom-16 right-12">
-          <ParallaxPxlKitIcon icon={PixelRocket} size={64} />
+          <ParallaxPxlKitIcon icon={PixelRocket} size={64} decorative />
         </PixelMouseParallax>
       </div>
 
@@ -205,7 +205,7 @@ export function HeroParallax() {
             <PixelButton
               tone="gold"
               size="lg"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+              iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
             >
               Explore Now
             </PixelButton>

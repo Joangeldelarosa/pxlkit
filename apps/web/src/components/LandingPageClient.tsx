@@ -1361,12 +1361,12 @@ function LandingCta() {
     <section className="relative border-t border-retro-border/30 overflow-hidden">
       <PixelMouseParallax strength={40} invert>
         <div className="absolute top-10 left-[10%] opacity-10 pointer-events-none">
-          <PxlKitIcon icon={Trophy} size={64} colorful />
+          <PxlKitIcon icon={Trophy} size={64} colorful decorative />
         </div>
       </PixelMouseParallax>
       <PixelMouseParallax strength={25}>
         <div className="absolute bottom-10 right-[12%] opacity-10 pointer-events-none">
-          <PxlKitIcon icon={Lightning} size={56} colorful />
+          <PxlKitIcon icon={Lightning} size={56} colorful decorative />
         </div>
       </PixelMouseParallax>
       <PixelParallaxLayer

@@ -28,7 +28,7 @@ export function BannerCta() {
     >
       <PixelStack gap={6} align="center" className="text-center">
         <PixelBounce>
-          <AnimatedPxlKitIcon icon={SparkleStar} size={48} colorful />
+          <AnimatedPxlKitIcon icon={SparkleStar} size={48} colorful decorative />
         </PixelBounce>
         <PixelSectionHeader
           id="banner-cta-title"
@@ -42,7 +42,7 @@ export function BannerCta() {
           <PixelButton
             tone="green"
             size="lg"
-            iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+            iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
           >
             Get Started Free
           </PixelButton>
@@ -96,7 +96,7 @@ export function SplitCta() {
                   <PixelButton
                     tone="green"
                     size="lg"
-                    iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                    iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
                   >
                     Start Free
                   </PixelButton>
@@ -117,7 +117,7 @@ export function SplitCta() {
                   label={s.label}
                   value={s.value}
                   tone={s.tone}
-                  icon={<PxlKitIcon icon={s.icon} size={20} colorful />}
+                  icon={<PxlKitIcon icon={s.icon} size={20} colorful decorative />}
                 />
               ))}
             </PixelStack>
@@ -150,7 +150,7 @@ export function CardCta() {
       <PixelFadeIn>
         <PixelCard tone="gold" padding="lg" className="text-center sm:p-12">
           <PixelStack gap={5} align="center">
-            <AnimatedPxlKitIcon icon={FireSword} size={56} colorful />
+            <AnimatedPxlKitIcon icon={FireSword} size={56} colorful decorative />
             <h2 className="font-pixel text-lg sm:text-xl text-retro-text leading-loose">
               <PixelTypewriter label="Level up your UI" speed={50} />
             </h2>
@@ -162,7 +162,7 @@ export function CardCta() {
               <PixelButton
                 tone="gold"
                 size="lg"
-                iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
               >
                 Start for Free
               </PixelButton>

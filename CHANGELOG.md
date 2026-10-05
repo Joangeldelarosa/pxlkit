@@ -112,8 +112,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (the parallax icon's container `aria-hidden`), so screen readers skip it and its name stays out
   of the page's text. `PixelToast`'s icon is decorative, the title naming the toast. The site marks
   the icons beside its buttons, links, navigation, headings, badges, cards, template previews and
-  toasts decorative (183 icons), so a button reads "Browse all 6 templates" instead of "Browse all 6
-  templates arrow-right", and its icon-only buttons have names of their own.
+  toasts decorative, as well as its ornaments and the icons of buttons and links named by their own
+  label (205 icons), so a button reads "Browse all 6 templates" instead of "Browse all 6 templates
+  arrow-right", and its icon-only buttons have names of their own. The templates' code to copy
+  follows the same rule (81 icons decorative) and names the icons that carry meaning: "Included"
+  and "Not included" in the pricing comparison, the likes, views and comments counts, a star
+  rating's "Rated 5 out of 5", and a notifications button's unread count.
 - **Doc comments for the kits' props and slots.** About 500 props across 65 React components and
   the slots and props of 37 Vue components gained descriptions (comments only), which editors
   show on hover and the API reference prints; TSDoc coverage (gate 27) rose from 50% to 99%.

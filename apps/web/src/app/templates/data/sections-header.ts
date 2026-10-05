@@ -47,7 +47,7 @@ export function SimpleNavbar() {
             <PixelButton
               tone="green"
               size="sm"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={12} />}
+              iconRight={<PxlKitIcon icon={ArrowRight} size={12} decorative />}
             >
               Get Started
             </PixelButton>
@@ -59,7 +59,7 @@ export function SimpleNavbar() {
             onClick={() => setOpen(!open)}
             aria-label="Toggle menu"
           >
-            <PxlKitIcon icon={open ? Close : Menu} size={18} />
+            <PxlKitIcon icon={open ? Close : Menu} size={18} decorative />
           </button>
         </div>
       </PixelCenter>
@@ -144,14 +144,14 @@ export function NavbarWithDropdown() {
 
           {/* Right actions */}
           <div className="hidden md:flex items-center gap-2">
-            <button className="relative p-2 text-retro-muted hover:text-retro-text border border-retro-border/50 rounded transition-all" aria-label="Notifications">
-              <PxlKitIcon icon={Bell} size={16} />
+            <button className="relative p-2 text-retro-muted hover:text-retro-text border border-retro-border/50 rounded transition-all" aria-label="Notifications, 3 unread">
+              <PxlKitIcon icon={Bell} size={16} decorative />
               <PixelBadge tone="red" size="sm" className="absolute -top-1 -right-1 px-1">3</PixelBadge>
             </button>
             <PixelButton
               tone="green"
               size="sm"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={12} />}
+              iconRight={<PxlKitIcon icon={ArrowRight} size={12} decorative />}
             >
               Sign Up
             </PixelButton>
@@ -163,7 +163,7 @@ export function NavbarWithDropdown() {
             onClick={() => setOpen(!open)}
             aria-label="Toggle menu"
           >
-            <PxlKitIcon icon={open ? Close : Menu} size={18} />
+            <PxlKitIcon icon={open ? Close : Menu} size={18} decorative />
           </button>
         </div>
       </PixelCenter>
@@ -178,7 +178,7 @@ export function NavbarWithDropdown() {
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 px-4 py-2.5 text-sm font-mono text-retro-muted hover:text-retro-text hover:bg-retro-surface rounded transition-all"
             >
-              <PxlKitIcon icon={ChainLink} size={14} />
+              <PxlKitIcon icon={ChainLink} size={14} decorative />
               {i.label}
             </Link>
           ))}
@@ -240,13 +240,13 @@ export function CenteredLogoHeader() {
               </Link>
             ))}
             <button className="ml-1 p-2 text-retro-muted hover:text-retro-text border border-retro-border/50 rounded transition-all" aria-label="Search">
-              <PxlKitIcon icon={Search} size={16} />
+              <PxlKitIcon icon={Search} size={16} decorative />
             </button>
             <PixelButton
               tone="green"
               size="sm"
               className="ml-1"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={12} />}
+              iconRight={<PxlKitIcon icon={ArrowRight} size={12} decorative />}
             >
               Sign Up
             </PixelButton>

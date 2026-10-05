@@ -24,7 +24,7 @@ function ThemeToggleButton({ isDark, onToggleTheme }: ThemeToggleProps) {
         className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
         aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       >
-        <PxlKitIcon icon={isDark ? Sun : Moon} size={16} colorful />
+        <PxlKitIcon icon={isDark ? Sun : Moon} size={16} colorful decorative />
       </button>
     </PixelTooltip>
   );
@@ -80,7 +80,7 @@ export function HeaderSimplePreview({ isDark, onToggleTheme }: ThemeToggleProps)
               className="p-2 rounded text-retro-muted hover:text-retro-green hover:bg-retro-surface/40 transition-colors"
               aria-label="Search"
             >
-              <PxlKitIcon icon={Search} size={16} colorful />
+              <PxlKitIcon icon={Search} size={16} colorful decorative />
             </button>
           </PixelTooltip>
           <PixelButton tone="green" size="sm">Sign Up</PixelButton>
@@ -228,9 +228,9 @@ export function HeaderDropdownPreview({ isDark, onToggleTheme }: ThemeToggleProp
           <ThemeToggleButton isDark={isDark} onToggleTheme={onToggleTheme} />
           <button
             className="relative p-2 rounded text-retro-muted hover:text-retro-cyan hover:bg-retro-surface/40 transition-colors"
-            aria-label="Notifications"
+            aria-label="Notifications, 3 unread"
           >
-            <PxlKitIcon icon={Bell} size={16} colorful />
+            <PxlKitIcon icon={Bell} size={16} colorful decorative />
             <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 rounded-full bg-retro-red text-white font-mono text-[9px] flex items-center justify-center px-1">
               3
             </span>
@@ -321,7 +321,7 @@ export function HeaderCenteredLogoPreview({ isDark, onToggleTheme }: ThemeToggle
                 className="p-2 rounded text-retro-muted hover:text-retro-gold hover:bg-retro-surface/40 transition-colors"
                 aria-label="Settings"
               >
-                <PxlKitIcon icon={Settings} size={16} colorful />
+                <PxlKitIcon icon={Settings} size={16} colorful decorative />
               </button>
             </PixelTooltip>
           </nav>

@@ -101,7 +101,7 @@ export function HeroCenteredPreview() {
             <PixelMouseParallax strength={15}>
               <PixelCluster gap={6} justify="center" className="text-retro-muted font-mono text-sm">
                 <PixelBounce>
-                  <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful />
+                  <AnimatedPxlKitIcon icon={SparkleStar} size={28} colorful decorative />
                 </PixelBounce>
                 <PixelTooltip content="Across 7 themed icon packs" position="top">
                   <span className="inline-flex items-center gap-1.5">
@@ -277,7 +277,7 @@ export function HeroParallaxPreview() {
         {parallaxIcons.map(({ icon, top, left, size, duration, distance, useParallax }, i) => {
           const inner = (
             <span className={`absolute ${top} ${left} opacity-20`}>
-              <PxlKitIcon icon={icon} size={size} colorful />
+              <PxlKitIcon icon={icon} size={size} colorful decorative />
             </span>
           );
 
@@ -299,12 +299,12 @@ export function HeroParallaxPreview() {
         {/* Animated accent icons */}
         <PixelFloat duration={3600} distance={6}>
           <span className="absolute top-8 left-[45%] opacity-15">
-            <AnimatedPxlKitIcon icon={Twinkle} size={20} colorful />
+            <AnimatedPxlKitIcon icon={Twinkle} size={20} colorful decorative />
           </span>
         </PixelFloat>
         <PixelFloat duration={3100} distance={8}>
           <span className="absolute bottom-8 left-[50%] opacity-15">
-            <AnimatedPxlKitIcon icon={GlowPulse} size={22} colorful />
+            <AnimatedPxlKitIcon icon={GlowPulse} size={22} colorful decorative />
           </span>
         </PixelFloat>
       </div>
