@@ -59,8 +59,14 @@ export function avatarGroupOverflowClasses(
   afterAvatars: boolean,
 ): string {
   const t = toneTokens[tone];
-  // The pixel face on pixel, as an avatar's initials; the surface's font on linear.
-  return cn(slotClasses(surface, size, afterAvatars), t.border, t.text, surface === 'pixel' ? 'font-pixel' : surfaceClasses(surface).font);
+  // The pixel face on pixel, as an avatar's initials; on linear the surface's
+  // font, semibold as the initials are.
+  return cn(
+    slotClasses(surface, size, afterAvatars),
+    t.border,
+    t.text,
+    surface === 'pixel' ? 'font-pixel' : cn(surfaceClasses(surface).font, 'font-semibold'),
+  );
 }
 
 /** What the "+N" tile says to assistive technology, which does not read its visible "+N". */

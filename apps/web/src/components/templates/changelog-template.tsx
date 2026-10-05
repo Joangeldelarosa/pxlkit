@@ -105,6 +105,12 @@ const RELEASES: Release[] = [
       },
       {
         category: 'Fixed',
+        title: 'Linear progress bars that stand out',
+        detail:
+          "PixelProgress on the linear surface filled its track with an 18% tint that stood out from it by only 1.2:1 to 1.5:1; it now fills with the tone's solid colour, as the pixel blocks do.",
+      },
+      {
+        category: 'Fixed',
         title: 'Keyboard focus shows on the pixel surface',
         detail:
           'The cut corners clipped the focus ring, so most pixel controls showed no keyboard focus: they now light up their edge inside their corners, and focus also shows in high-contrast (forced-colors) mode.',

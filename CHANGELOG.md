@@ -389,7 +389,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   server-rendered markup on, as `PixelSpinner` does. On the pixel surface `PixelKbd` shows its
   depth as a thicker bottom edge; its drop shadow fell outside the cut corners. Class lists that
   set one property twice (a linear ribbon's or divider label's letter-spacing, the text fields'
-  border width and font family) set it once; they render as before.
+  border width and font family) set it once; they render as before. On the linear surface
+  `PixelProgress` fills its track with the tone's solid colour, as the pixel blocks do — its 18%
+  tint stood out from the track by only 1.2:1 to 1.5:1 — and `PixelAvatarGroup`'s "+N" is
+  semibold, like the avatars' initials.
 - Site and README claims: "zero runtime deps" (the kits need Tailwind CSS v4), the Indie license's
   "lifetime updates" (a lifetime license with the updates available at purchase, as
   `COMMERCIAL_TERMS` says), 6 icon packs and 6 tones (there are 7 of each), a hard-coded gate count,

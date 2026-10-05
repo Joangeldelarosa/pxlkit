@@ -36,7 +36,7 @@ describe('avatar group recipes', () => {
   it('paints the "+N" tile in the group tone and overlaps it after avatars', () => {
     for (const key of Object.keys(tone) as ToneKey[]) {
       const tile = classesOf(avatarGroupOverflowClasses('linear', 'md', key, true));
-      expect(tile).toEqual(expect.arrayContaining([tone[key].border, tone[key].text, 'font-sans', '-ml-3']));
+      expect(tile).toEqual(expect.arrayContaining([tone[key].border, tone[key].text, 'font-sans', 'font-semibold', '-ml-3']));
       expect(tile).not.toContain('font-pixel');
     }
     expect(classesOf(avatarGroupOverflowClasses('pixel', 'md', 'neutral', true))).toEqual(expect.arrayContaining(['font-pixel']));

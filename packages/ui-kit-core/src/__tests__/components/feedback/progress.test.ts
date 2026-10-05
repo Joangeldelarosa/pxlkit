@@ -40,12 +40,14 @@ describe('progress recipes', () => {
     );
   });
 
-  it('tints the percentage and the linear fill with the tone, pulsing while indeterminate', () => {
+  it('colours the percentage and the linear fill with the tone, pulsing while indeterminate', () => {
     const classes = progressClasses('linear', 'cyan', determinate);
     expect(classes.root).toBe('space-y-1.5');
     expect(classes.header).toBe('flex items-center justify-between text-xs text-retro-muted font-sans');
     expect(classes.value).toBe(toneMap.cyan.text);
-    expect(classes.fill).toBe(`h-full rounded-full transition-all duration-500 ${toneMap.cyan.bg}`);
+    // The solid colour, as the pixel blocks: the tint barely stood out from the track.
+    expect(classes.fill).toBe(`h-full rounded-full transition-all duration-500 ${toneMap.cyan.fill}`);
+    expect(classes.fill.split(' ')).not.toContain(toneMap.cyan.bg);
     // Pulsing, unless the reader prefers reduced motion: then it holds still,
     // at 70 % as the pixel blocks do, so it does not read as a full bar.
     const fill = progressClasses('linear', 'cyan', indeterminate).fill.split(' ');

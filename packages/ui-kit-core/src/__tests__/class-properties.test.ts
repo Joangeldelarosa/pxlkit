@@ -7,6 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import {
+  avatarClasses,
   avatarGroupOverflowClasses,
   colorInputClasses,
   commandClasses,
@@ -124,10 +125,15 @@ describe('class lists set each property once', () => {
     expect(wider(dividerClasses('linear', 'md', 'neutral').label)).toEqual(['tracking-wider']);
   });
 
-  it("sets the avatar group's \"+N\" in the pixel face on pixel and in the surface's font on linear", () => {
+  it("sets the avatar group's \"+N\" in the pixel face on pixel and in the surface's font on linear, as heavy as the initials", () => {
     const family = (classes: string) => classes.split(' ').filter((name) => PROPERTIES['font family']!.test(name));
+    const weight = (classes: string) => classes.split(' ').filter((name) => PROPERTIES['font weight']!.test(name));
     expect(family(avatarGroupOverflowClasses('pixel', 'md', 'cyan', true))).toEqual(['font-pixel']);
     expect(family(avatarGroupOverflowClasses('linear', 'md', 'cyan', true))).toEqual(['font-sans']);
+    for (const surface of ['pixel', 'linear'] as const) {
+      const initials = avatarClasses(surface, { size: 'md', shape: 'circle', tone: 'cyan', status: undefined }).frame;
+      expect(weight(avatarGroupOverflowClasses(surface, 'md', 'cyan', true))).toEqual(weight(initials));
+    }
   });
 
   it("gives every field its surface's font family and border width", () => {
