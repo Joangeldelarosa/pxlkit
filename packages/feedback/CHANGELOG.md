@@ -3,7 +3,7 @@
 <!-- Seeded from git history by scripts/build-docs/generate-changelog.ts (initial generation). -->
 <!-- This file is hand-maintained from this point on — add an entry at the top for each release. -->
 
-## 1.2.6 — 2026-10-03
+## 1.2.6 — 2026-10-05
 
 ### Changed
 

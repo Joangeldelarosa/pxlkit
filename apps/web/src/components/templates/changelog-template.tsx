@@ -34,7 +34,7 @@ interface Release {
 const RELEASES: Release[] = [
   {
     version: '2.2.0',
-    date: '2026-10-03',
+    date: '2026-10-05',
     title: 'The UI kit in Vue and Angular',
     changes: [
       {
