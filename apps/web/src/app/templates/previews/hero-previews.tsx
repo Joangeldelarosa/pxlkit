@@ -55,7 +55,7 @@ export function HeroCenteredPreview() {
           <PixelFadeIn>
             <PixelBadge tone="green">
               <span className="inline-flex items-center gap-1">
-                <PxlKitIcon icon={Verified} size={12} colorful />
+                <PxlKitIcon icon={Verified} size={12} colorful decorative />
                 Now open source
               </span>
             </PixelBadge>
@@ -81,7 +81,7 @@ export function HeroCenteredPreview() {
               <PixelButton
                 tone="green"
                 size="lg"
-                iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
               >
                 Get Started
               </PixelButton>
@@ -105,21 +105,21 @@ export function HeroCenteredPreview() {
                 </PixelBounce>
                 <PixelTooltip content="Across 7 themed icon packs" position="top">
                   <span className="inline-flex items-center gap-1.5">
-                    <PxlKitIcon icon={Package} size={14} colorful />
+                    <PxlKitIcon icon={Package} size={14} colorful decorative />
                     226+ icons
                   </span>
                 </PixelTooltip>
                 <span className="text-retro-border">|</span>
                 <PixelTooltip content="Buttons, cards, modals, animations, and more" position="top">
                   <span className="inline-flex items-center gap-1.5">
-                    <PxlKitIcon icon={Grid} size={14} colorful />
+                    <PxlKitIcon icon={Grid} size={14} colorful decorative />
                     {UI_COMPONENTS_COUNT} components
                   </span>
                 </PixelTooltip>
                 <span className="text-retro-border">|</span>
                 <PixelTooltip content="Free for personal and commercial use" position="top">
                   <span className="inline-flex items-center gap-1.5">
-                    <PxlKitIcon icon={ShieldCheck} size={14} colorful />
+                    <PxlKitIcon icon={ShieldCheck} size={14} colorful decorative />
                     MIT licensed
                   </span>
                 </PixelTooltip>
@@ -130,15 +130,15 @@ export function HeroCenteredPreview() {
           <PixelFadeIn delay={480}>
             <PixelCluster gap={4} justify="center" className="text-retro-muted font-mono text-xs">
               <span className="inline-flex items-center gap-1">
-                <PxlKitIcon icon={CheckCircle} size={12} colorful />
+                <PxlKitIcon icon={CheckCircle} size={12} colorful decorative />
                 TypeScript-first
               </span>
               <span className="inline-flex items-center gap-1">
-                <PxlKitIcon icon={CheckCircle} size={12} colorful />
+                <PxlKitIcon icon={CheckCircle} size={12} colorful decorative />
                 Tree-shakeable
               </span>
               <span className="inline-flex items-center gap-1">
-                <PxlKitIcon icon={CheckCircle} size={12} colorful />
+                <PxlKitIcon icon={CheckCircle} size={12} colorful decorative />
                 SSR ready
               </span>
             </PixelCluster>
@@ -162,7 +162,7 @@ export function HeroSplitPreview() {
       <PixelStack gap={4} align="start">
         <PixelBadge tone="cyan">
           <span className="inline-flex items-center gap-1">
-            <PxlKitIcon icon={Lightning} size={12} colorful />
+            <PxlKitIcon icon={Lightning} size={12} colorful decorative />
             v2.0 release
           </span>
         </PixelBadge>
@@ -186,15 +186,15 @@ export function HeroSplitPreview() {
 
         <PixelCluster gap={4} justify="start" className="text-retro-muted font-mono text-xs">
           <span className="inline-flex items-center gap-1.5">
-            <PxlKitIcon icon={Trophy} size={14} colorful />
+            <PxlKitIcon icon={Trophy} size={14} colorful decorative />
             6 icon packs
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <PxlKitIcon icon={Globe} size={14} colorful />
+            <PxlKitIcon icon={Globe} size={14} colorful decorative />
             i18n ready
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <PxlKitIcon icon={Shield} size={14} colorful />
+            <PxlKitIcon icon={Shield} size={14} colorful decorative />
             Fully typed
           </span>
         </PixelCluster>
@@ -202,7 +202,7 @@ export function HeroSplitPreview() {
         <PixelPulse>
           <PixelBadge tone="gold">
             <span className="inline-flex items-center gap-1">
-              <PxlKitIcon icon={Star} size={12} colorful />
+              <PxlKitIcon icon={Star} size={12} colorful decorative />
               2.4k stars
             </span>
           </PixelBadge>
@@ -212,7 +212,7 @@ export function HeroSplitPreview() {
           <PixelButton
             tone="cyan"
             size="lg"
-            iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+            iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
           >
             Get Started
           </PixelButton>
@@ -313,7 +313,7 @@ export function HeroParallaxPreview() {
         <PixelFadeIn>
           <PixelBadge tone="gold">
             <span className="inline-flex items-center gap-1">
-              <PxlKitIcon icon={Sparkles} size={12} colorful />
+              <PxlKitIcon icon={Sparkles} size={12} colorful decorative />
               Interactive
             </span>
           </PixelBadge>
@@ -336,7 +336,7 @@ export function HeroParallaxPreview() {
             <PixelButton
               tone="gold"
               size="lg"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+              iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
             >
               Explore Now
             </PixelButton>
@@ -379,17 +379,17 @@ export function HeroParallaxPreview() {
         <PixelFadeIn delay={500}>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-5 text-retro-muted font-mono text-xs">
             <span className="inline-flex items-center gap-1.5">
-              <PxlKitIcon icon={Community} size={14} colorful />
+              <PxlKitIcon icon={Community} size={14} colorful decorative />
               2k+ stars
             </span>
             <span className="text-retro-border">|</span>
             <span className="inline-flex items-center gap-1.5">
-              <PxlKitIcon icon={Check} size={14} colorful />
+              <PxlKitIcon icon={Check} size={14} colorful decorative />
               Zero dependencies
             </span>
             <span className="text-retro-border">|</span>
             <span className="inline-flex items-center gap-1.5">
-              <PxlKitIcon icon={Globe} size={14} colorful />
+              <PxlKitIcon icon={Globe} size={14} colorful decorative />
               Used worldwide
             </span>
           </div>

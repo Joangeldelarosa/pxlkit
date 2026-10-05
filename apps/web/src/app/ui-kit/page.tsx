@@ -764,7 +764,7 @@ function SidebarContent({
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder="Search components..."
-        prefix={<PxlKitIcon icon={Search} size={14} />}
+        prefix={<PxlKitIcon icon={Search} size={14} decorative />}
         size="sm"
       />
 
@@ -990,10 +990,10 @@ export default function UIKitPage() {
                 <PixelBadge tone="red">Tailwind CSS v4</PixelBadge>
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <PixelStatCard label="Components" value={String(UI_COMPONENTS_COUNT)} icon={<PxlKitIcon icon={Grid} size={16} />} tone="green" />
-                <PixelStatCard label="Icon Packs" value={String(ICON_PACK_COUNT)} icon={<PxlKitIcon icon={Package} size={16} />} tone="cyan" />
-                <PixelStatCard label="Design Tokens" value="7 tones" icon={<PxlKitIcon icon={SparkleSmall} size={16} />} tone="gold" />
-                <PixelStatCard label="New in 2.2" value="Vue + Angular" icon={<PxlKitIcon icon={Check} size={16} />} tone="purple" />
+                <PixelStatCard label="Components" value={String(UI_COMPONENTS_COUNT)} icon={<PxlKitIcon icon={Grid} size={16} decorative />} tone="green" />
+                <PixelStatCard label="Icon Packs" value={String(ICON_PACK_COUNT)} icon={<PxlKitIcon icon={Package} size={16} decorative />} tone="cyan" />
+                <PixelStatCard label="Design Tokens" value="7 tones" icon={<PxlKitIcon icon={SparkleSmall} size={16} decorative />} tone="gold" />
+                <PixelStatCard label="New in 2.2" value="Vue + Angular" icon={<PxlKitIcon icon={Check} size={16} decorative />} tone="purple" />
               </div>
             </header>
 
@@ -1665,12 +1665,12 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
                 <div>
                   <p className="mb-2 text-[10px] font-pixel text-retro-muted">TONES</p>
                   <div className="flex flex-wrap gap-2">
-                    <PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} />}>Green</PixelButton>
-                    <PixelButton tone="cyan" iconLeft={<PxlKitIcon icon={Edit} size={16} />}>Cyan</PixelButton>
-                    <PixelButton tone="gold" iconLeft={<PxlKitIcon icon={Star} size={16} />}>Gold</PixelButton>
-                    <PixelButton tone="red" iconLeft={<PxlKitIcon icon={Shield} size={16} />}>Red</PixelButton>
-                    <PixelButton tone="purple" iconLeft={<PxlKitIcon icon={Crown} size={16} />}>Purple</PixelButton>
-                    <PixelButton tone="neutral" iconLeft={<PxlKitIcon icon={Gear} size={16} />}>Neutral</PixelButton>
+                    <PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} decorative />}>Green</PixelButton>
+                    <PixelButton tone="cyan" iconLeft={<PxlKitIcon icon={Edit} size={16} decorative />}>Cyan</PixelButton>
+                    <PixelButton tone="gold" iconLeft={<PxlKitIcon icon={Star} size={16} decorative />}>Gold</PixelButton>
+                    <PixelButton tone="red" iconLeft={<PxlKitIcon icon={Shield} size={16} decorative />}>Red</PixelButton>
+                    <PixelButton tone="purple" iconLeft={<PxlKitIcon icon={Crown} size={16} decorative />}>Purple</PixelButton>
+                    <PixelButton tone="neutral" iconLeft={<PxlKitIcon icon={Gear} size={16} decorative />}>Neutral</PixelButton>
                   </div>
                 </div>
                 <div>
@@ -1687,7 +1687,7 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
                     <PixelButton tone="cyan" variant="ghost">Ghost</PixelButton>
                     <PixelButton tone="gold" loading>Loading</PixelButton>
                     <PixelButton tone="neutral" disabled>Disabled</PixelButton>
-                    <PixelButton tone="green" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>With Icon</PixelButton>
+                    <PixelButton tone="green" iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}>With Icon</PixelButton>
                   </div>
                 </div>
               </div>
@@ -1771,7 +1771,7 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
                   value={inputVal}
                   onChange={(e) => setInputVal(e.target.value)}
                   placeholder="Find components..."
-                  icon={<PxlKitIcon icon={Search} size={16} />}
+                  icon={<PxlKitIcon icon={Search} size={16} decorative />}
                   tone="cyan"
                 />
                 <PixelInput label="Email" placeholder="info@pxlkit.xyz" hint="We will never share your email" />
@@ -1841,12 +1841,12 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
                   value={selectVal}
                   onChange={setSelectVal}
                   options={[
-                    { value: 'ui', label: 'UI', icon: <PxlKitIcon icon={Grid} size={14} /> },
-                    { value: 'gamification', label: 'Gamification', icon: <PxlKitIcon icon={Trophy} size={14} /> },
-                    { value: 'social', label: 'Social', icon: <PxlKitIcon icon={Heart} size={14} /> },
-                    { value: 'feedback', label: 'Feedback', icon: <PxlKitIcon icon={Bell} size={14} /> },
-                    { value: 'effects', label: 'Effects', icon: <PxlKitIcon icon={SparkleSmall} size={14} /> },
-                    { value: 'weather', label: 'Weather', icon: <PxlKitIcon icon={Star} size={14} /> },
+                    { value: 'ui', label: 'UI', icon: <PxlKitIcon icon={Grid} size={14} decorative /> },
+                    { value: 'gamification', label: 'Gamification', icon: <PxlKitIcon icon={Trophy} size={14} decorative /> },
+                    { value: 'social', label: 'Social', icon: <PxlKitIcon icon={Heart} size={14} decorative /> },
+                    { value: 'feedback', label: 'Feedback', icon: <PxlKitIcon icon={Bell} size={14} decorative /> },
+                    { value: 'effects', label: 'Effects', icon: <PxlKitIcon icon={SparkleSmall} size={14} decorative /> },
+                    { value: 'weather', label: 'Weather', icon: <PxlKitIcon icon={Star} size={14} decorative /> },
                   ]}
                 />
                 <PixelSelect
@@ -1996,15 +1996,15 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
               <div className="grid gap-3 sm:grid-cols-2">
                 <PixelCard
                   title="Gamification Pack"
-                  icon={<PxlKitIcon icon={Trophy} size={16} />}
-                  footer={<PixelButton tone="gold" size="sm" iconLeft={<PxlKitIcon icon={Lightning} size={14} />}>Use Pack</PixelButton>}
+                  icon={<PxlKitIcon icon={Trophy} size={16} decorative />}
+                  footer={<PixelButton tone="gold" size="sm" iconLeft={<PxlKitIcon icon={Lightning} size={14} decorative />}>Use Pack</PixelButton>}
                 >
                   RPG icons, progress bars, rewards, and game UI elements ready to use.
                 </PixelCard>
                 <PixelCard
                   title="Social Pack"
-                  icon={<PxlKitIcon icon={Heart} size={16} />}
-                  footer={<PixelButton tone="cyan" size="sm" iconLeft={<PxlKitIcon icon={Message} size={14} />}>Preview</PixelButton>}
+                  icon={<PxlKitIcon icon={Heart} size={16} decorative />}
+                  footer={<PixelButton tone="cyan" size="sm" iconLeft={<PxlKitIcon icon={Message} size={14} decorative />}>Preview</PixelButton>}
                 >
                   Emotions, interactions, and communication elements for modern apps.
                 </PixelCard>
@@ -2026,10 +2026,10 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
               ]}
             >
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <PixelStatCard label="Total Icons" value="204" icon={<PxlKitIcon icon={Package} size={16} />} tone="green" trend="+12 new" />
-                <PixelStatCard label="Components" value={String(UI_KIT_COMPONENTS.length)} icon={<PxlKitIcon icon={Grid} size={16} />} tone="cyan" trend="100% typed" />
-                <PixelStatCard label="Downloads" value="8.2k" icon={<PxlKitIcon icon={Coin} size={16} />} tone="gold" trend="+24%" />
-                <PixelStatCard label="Stars" value="1.4k" icon={<PxlKitIcon icon={Star} size={16} />} tone="purple" trend="trending" />
+                <PixelStatCard label="Total Icons" value="204" icon={<PxlKitIcon icon={Package} size={16} decorative />} tone="green" trend="+12 new" />
+                <PixelStatCard label="Components" value={String(UI_KIT_COMPONENTS.length)} icon={<PxlKitIcon icon={Grid} size={16} decorative />} tone="cyan" trend="100% typed" />
+                <PixelStatCard label="Downloads" value="8.2k" icon={<PxlKitIcon icon={Coin} size={16} decorative />} tone="gold" trend="+24%" />
+                <PixelStatCard label="Stars" value="1.4k" icon={<PxlKitIcon icon={Star} size={16} decorative />} tone="purple" trend="trending" />
               </div>
             </DocSection>
 
@@ -2236,26 +2236,26 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
               <div className="space-y-3">
                 <PixelAlert
                   tone="green"
-                  icon={<PxlKitIcon icon={CheckCircle} size={16} />}
+                  icon={<PxlKitIcon icon={CheckCircle} size={16} decorative />}
                   title="Build Success"
                   message="Package compiled and DTS types generated."
-                  action={<PixelButton tone="green" size="sm" iconLeft={<PxlKitIcon icon={Check} size={14} />}>View Logs</PixelButton>}
+                  action={<PixelButton tone="green" size="sm" iconLeft={<PxlKitIcon icon={Check} size={14} decorative />}>View Logs</PixelButton>}
                 />
                 <PixelAlert
                   tone="gold"
-                  icon={<PxlKitIcon icon={WarningTriangle} size={16} />}
+                  icon={<PxlKitIcon icon={WarningTriangle} size={16} decorative />}
                   title="Warning"
                   message="Some components still need visual fine-tuning review."
                 />
                 <PixelAlert
                   tone="red"
-                  icon={<PxlKitIcon icon={Bell} size={16} />}
+                  icon={<PxlKitIcon icon={Bell} size={16} decorative />}
                   title="Breaking Change"
                   message="PixelSelect API changed from native to custom dropdown in v2.0."
                 />
                 <PixelAlert
                   tone="cyan"
-                  icon={<PxlKitIcon icon={InfoCircle} size={16} />}
+                  icon={<PxlKitIcon icon={InfoCircle} size={16} decorative />}
                   title="Tip"
                   message="Use the tone prop to match your alert to the appropriate severity level."
                 />
@@ -2321,8 +2321,8 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
               <PixelEmptyState
                 title="No results found"
                 description="Adjust your filters or create a new custom component for this kit."
-                icon={<PxlKitIcon icon={SparkleSmall} size={20} />}
-                action={<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Check} size={14} />}>Create Component</PixelButton>}
+                icon={<PxlKitIcon icon={SparkleSmall} size={20} decorative />}
+                action={<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Check} size={14} decorative />}>Create Component</PixelButton>}
               />
             </DocSection>
 
@@ -2382,9 +2382,9 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
             >
               <PixelTabs
                 items={[
-                  { id: 'overview', label: 'Overview', icon: <PxlKitIcon icon={Home} size={14} />, content: 'Quick start guide and component summary for the Pxlkit UI Kit.' },
-                  { id: 'api', label: 'API', icon: <PxlKitIcon icon={Edit} size={14} />, content: 'All components expose typed props with Tone, Size, and icon slots as common patterns.' },
-                  { id: 'tokens', label: 'Tokens', icon: <PxlKitIcon icon={SparkleSmall} size={14} />, content: 'CSS custom properties like --retro-green, --retro-bg control theming globally.' },
+                  { id: 'overview', label: 'Overview', icon: <PxlKitIcon icon={Home} size={14} decorative />, content: 'Quick start guide and component summary for the Pxlkit UI Kit.' },
+                  { id: 'api', label: 'API', icon: <PxlKitIcon icon={Edit} size={14} decorative />, content: 'All components expose typed props with Tone, Size, and icon slots as common patterns.' },
+                  { id: 'tokens', label: 'Tokens', icon: <PxlKitIcon icon={SparkleSmall} size={14} decorative />, content: 'CSS custom properties like --retro-green, --retro-bg control theming globally.' },
                 ]}
               />
             </DocSection>
@@ -2488,7 +2488,7 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
                 ...COMMON_CONTAINER,
               ]}
             >
-              <PixelButton tone="purple" iconLeft={<PxlKitIcon icon={Bell} size={16} />} onClick={() => setModalOpen(true)}>
+              <PixelButton tone="purple" iconLeft={<PxlKitIcon icon={Bell} size={16} decorative />} onClick={() => setModalOpen(true)}>
                 Open Modal Demo
               </PixelButton>
             </DocSection>
@@ -2813,7 +2813,7 @@ const [active, setActive] = useState(false);
             >
               {(key) => (
                 <PixelFadeIn key={key} duration={500}>
-                  <PixelCard title="Faded In" icon={<PxlKitIcon icon={SparkleSmall} size={16} />}>
+                  <PixelCard title="Faded In" icon={<PxlKitIcon icon={SparkleSmall} size={16} decorative />}>
                     This card fades in from opacity 0. Click replay to restart.
                   </PixelCard>
                 </PixelFadeIn>
@@ -2996,7 +2996,7 @@ const [active, setActive] = useState(false);
               {(key) => (
                 <div className="grid gap-3 sm:grid-cols-3">
                   <PixelZoomIn key={key}>
-                    <PixelCard title="Pack Ready" icon={<PxlKitIcon icon={Package} size={16} />}>UI pack bundled</PixelCard>
+                    <PixelCard title="Pack Ready" icon={<PxlKitIcon icon={Package} size={16} decorative />}>UI pack bundled</PixelCard>
                   </PixelZoomIn>
                   <PixelZoomIn key={`${key}-b`} delay={80} startScale={0.88}>
                     <PixelBadge tone="gold">New Anim</PixelBadge>
@@ -3246,7 +3246,7 @@ const [active, setActive] = useState(false);
           Supports <PixelCodeInline>sm</PixelCodeInline>, <PixelCodeInline>md</PixelCodeInline>, and <PixelCodeInline>lg</PixelCodeInline> sizes.
         </p>
         <div className="flex gap-2">
-          <PixelButton tone="green" size="sm" iconLeft={<AnimatedPxlKitIcon icon={FireSword} size={14} />} onClick={() => setModalOpen(false)}>
+          <PixelButton tone="green" size="sm" iconLeft={<AnimatedPxlKitIcon icon={FireSword} size={14} decorative />} onClick={() => setModalOpen(false)}>
             Confirm
           </PixelButton>
           <PixelButton tone="neutral" size="sm" onClick={() => setModalOpen(false)}>

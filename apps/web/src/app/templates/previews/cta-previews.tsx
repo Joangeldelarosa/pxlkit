@@ -38,7 +38,7 @@ export function CtaBannerPreview() {
     >
       <PixelStack gap={6} align="center" className="text-center">
         <PixelBounce>
-          <AnimatedPxlKitIcon icon={SparkleStar} size={48} colorful />
+          <AnimatedPxlKitIcon icon={SparkleStar} size={48} colorful decorative />
         </PixelBounce>
 
         <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose break-words">
@@ -59,7 +59,7 @@ export function CtaBannerPreview() {
           <PixelTooltip content="Growing every day" position="top">
             <PixelBadge tone="green">
               <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={Community} size={12} colorful />
+                <PxlKitIcon icon={Community} size={12} colorful decorative />
                 5,000+ devs
               </span>
             </PixelBadge>
@@ -67,7 +67,7 @@ export function CtaBannerPreview() {
           <PixelTooltip content="Free for personal and commercial use" position="top">
             <PixelBadge tone="cyan">
               <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={ShieldCheck} size={12} colorful />
+                <PxlKitIcon icon={ShieldCheck} size={12} colorful decorative />
                 MIT licensed
               </span>
             </PixelBadge>
@@ -75,7 +75,7 @@ export function CtaBannerPreview() {
           <PixelTooltip content="Enterprise-grade reliability" position="top">
             <PixelBadge tone="gold">
               <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={Lightning} size={12} colorful />
+                <PxlKitIcon icon={Lightning} size={12} colorful decorative />
                 99.9% uptime
               </span>
             </PixelBadge>
@@ -87,7 +87,7 @@ export function CtaBannerPreview() {
           <PixelButton
             tone="green"
             size="lg"
-            iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+            iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
           >
             Get Started Free
           </PixelButton>
@@ -118,7 +118,7 @@ export function CtaSplitPreview() {
           <div className="mb-4">
             <PixelBadge tone="purple">
               <span className="inline-flex items-center gap-1.5">
-                <PxlKitIcon icon={Sparkles} size={12} colorful />
+                <PxlKitIcon icon={Sparkles} size={12} colorful decorative />
                 Why Pxlkit
               </span>
             </PixelBadge>
@@ -137,7 +137,7 @@ export function CtaSplitPreview() {
               <PixelTooltip key={i} content={f.tip} position="top">
                 <li className="flex items-start gap-2.5">
                   <span className="flex-shrink-0 mt-0.5">
-                    <PxlKitIcon icon={f.icon} size={14} colorful />
+                    <PxlKitIcon icon={f.icon} size={14} colorful decorative />
                   </span>
                   <span className="font-mono text-sm text-retro-muted leading-relaxed">
                     {f.label}
@@ -150,7 +150,7 @@ export function CtaSplitPreview() {
           <PixelButton
             tone="cyan"
             size="lg"
-            iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+            iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
           >
             Try it Now
           </PixelButton>
@@ -173,11 +173,11 @@ export function CtaSplitPreview() {
           </div>
           <PixelCluster gap={4} justify="center" className="mt-4 px-2">
             <div className="flex items-center gap-1.5">
-              <PxlKitIcon icon={Trophy} size={14} colorful />
+              <PxlKitIcon icon={Trophy} size={14} colorful decorative />
               <span className="font-mono text-xs text-retro-muted">#1 Pixel UI lib</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <PxlKitIcon icon={CheckCircle} size={14} colorful />
+              <PxlKitIcon icon={CheckCircle} size={14} colorful decorative />
               <span className="font-mono text-xs text-retro-muted">100% TypeScript</span>
             </div>
           </PixelCluster>
@@ -200,7 +200,7 @@ export function CtaCardPreview() {
           className="rounded-xl border border-retro-red/30 bg-retro-red/5 p-10 text-center"
         >
           <PixelShake trigger={true}>
-            <AnimatedPxlKitIcon icon={FireSword} size={56} colorful />
+            <AnimatedPxlKitIcon icon={FireSword} size={56} colorful decorative />
           </PixelShake>
 
           <h3 className="font-pixel text-xl sm:text-2xl text-retro-text leading-loose">
@@ -227,13 +227,13 @@ export function CtaCardPreview() {
                   type="email"
                   tone="neutral"
                   size="lg"
-                  icon={<PxlKitIcon icon={Mail} size={16} colorful />}
+                  icon={<PxlKitIcon icon={Mail} size={16} colorful decorative />}
                 />
               </div>
               <PixelButton
                 tone="red"
                 size="lg"
-                iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+                iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
                 onClick={() => setSigned(true)}
               >
                 Sign Up
@@ -245,15 +245,15 @@ export function CtaCardPreview() {
           <PixelDivider className="my-1 w-full" />
           <PixelCluster gap={4} justify="center">
             <div className="flex items-center gap-1.5">
-              <PxlKitIcon icon={ShieldCheck} size={12} colorful />
+              <PxlKitIcon icon={ShieldCheck} size={12} colorful decorative />
               <span className="font-mono text-[11px] text-retro-muted">No spam, ever</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <PxlKitIcon icon={CheckCircle} size={12} colorful />
+              <PxlKitIcon icon={CheckCircle} size={12} colorful decorative />
               <span className="font-mono text-[11px] text-retro-muted">Unsubscribe anytime</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <PxlKitIcon icon={Community} size={12} colorful />
+              <PxlKitIcon icon={Community} size={12} colorful decorative />
               <span className="font-mono text-[11px] text-retro-muted">5k+ subscribers</span>
             </div>
           </PixelCluster>

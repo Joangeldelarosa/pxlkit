@@ -144,7 +144,7 @@ export function FeaturesIconGridPreview() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
           <PixelBadge tone="green">
-            <PxlKitIcon icon={Gem} size={12} colorful />
+            <PxlKitIcon icon={Gem} size={12} colorful decorative />
             <span className="ml-1.5">Core Features</span>
           </PixelBadge>
           <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose mb-3 mt-4 break-words">
@@ -181,7 +181,7 @@ export function FeaturesIconGridPreview() {
                   className={`h-full text-center ${selectedIdx === i ? 'ring-2 ring-retro-green shadow-lg' : ''}`}
                   icon={
                     <PixelTooltip content={f.iconPack} position="top">
-                      <PxlKitIcon icon={f.icon} size={40} colorful />
+                      <PxlKitIcon icon={f.icon} size={40} colorful decorative />
                     </PixelTooltip>
                   }
                 />
@@ -194,7 +194,7 @@ export function FeaturesIconGridPreview() {
           <PixelFadeIn>
             <div className="mt-8 rounded-xl border border-retro-green/30 bg-retro-green/5 p-6">
               <div className="flex items-center gap-3 mb-3">
-                <PxlKitIcon icon={GRID_FEATURES[selectedIdx].icon} size={28} colorful />
+                <PxlKitIcon icon={GRID_FEATURES[selectedIdx].icon} size={28} colorful decorative />
                 <h3 className="font-pixel text-base text-retro-text">
                   {GRID_FEATURES[selectedIdx].title}
                 </h3>
@@ -210,7 +210,7 @@ export function FeaturesIconGridPreview() {
           <PixelButton
             tone="green"
             size="md"
-            iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+            iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
           >
             Browse all features
           </PixelButton>
@@ -246,7 +246,7 @@ export function FeaturesAlternatingPreview() {
                 left={
                   <div className="flex justify-center sm:justify-start">
                     <PixelIconFrame
-                      icon={<PxlKitIcon icon={f.icon} size={48} colorful />}
+                      icon={<PxlKitIcon icon={f.icon} size={48} colorful decorative />}
                       size={112}
                       tone={f.tone}
                       shape="rounded"
@@ -255,7 +255,7 @@ export function FeaturesAlternatingPreview() {
                           ? {
                               icon: (
                                 <PixelFloat duration={2800} distance={4}>
-                                  <AnimatedPxlKitIcon icon={f.accentIcon} size={18} colorful />
+                                  <AnimatedPxlKitIcon icon={f.accentIcon} size={18} colorful decorative />
                                 </PixelFloat>
                               ),
                             }
@@ -311,9 +311,9 @@ export function FeaturesBentoPreview() {
           <PixelBentoCell span="1x2" kind="feature" tone="green" className="justify-between">
             <div>
               <div className="flex items-center gap-3 mb-5">
-                <PxlKitIcon icon={Crown} size={44} colorful />
+                <PxlKitIcon icon={Crown} size={44} colorful decorative />
                 <PixelBadge tone="gold">
-                  <PxlKitIcon icon={Trophy} size={10} colorful />
+                  <PxlKitIcon icon={Trophy} size={10} colorful decorative />
                   <span className="ml-1">Flagship</span>
                 </PixelBadge>
               </div>
@@ -328,7 +328,7 @@ export function FeaturesBentoPreview() {
             <PixelButton
               tone="green"
               size="md"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+              iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
               className="mt-6 self-start"
             >
               Browse Icons
@@ -338,7 +338,7 @@ export function FeaturesBentoPreview() {
           {/* Medium card with stat — Accessibility */}
           <PixelBentoCell span="1x1" kind="feature" tone="cyan">
             <div className="flex items-start justify-between w-full">
-              <PxlKitIcon icon={ShieldCheck} size={36} colorful />
+              <PxlKitIcon icon={ShieldCheck} size={36} colorful decorative />
               <PixelBadge tone="cyan">WCAG AA</PixelBadge>
             </div>
             <div>
@@ -353,7 +353,7 @@ export function FeaturesBentoPreview() {
           <PixelBentoCell span="1x1" kind="feature" tone="purple" className="relative">
             <PixelRibbon position="top-right" tone="green" offset="sm">New</PixelRibbon>
             <div className="flex items-start justify-between w-full">
-              <PxlKitIcon icon={Lightning} size={36} colorful />
+              <PxlKitIcon icon={Lightning} size={36} colorful decorative />
               <PixelBadge tone="purple">&lt;1kb each</PixelBadge>
             </div>
             <div>
@@ -382,7 +382,7 @@ export function FeaturesBentoPreview() {
           {/* Small compact card — Modular */}
           <PixelTooltip content="Import individual packs to keep bundles small" position="top">
             <PixelBentoCell span="1x1" kind="compact" tone="gold">
-              <PxlKitIcon icon={Package} size={28} colorful />
+              <PxlKitIcon icon={Package} size={28} colorful decorative />
               <div>
                 <h3 className="font-pixel text-xs text-retro-text mb-1">Modular</h3>
                 <p className="font-mono text-xs text-retro-muted">Install only the packs you need.</p>
@@ -393,7 +393,7 @@ export function FeaturesBentoPreview() {
           {/* Small compact card — Searchable */}
           <PixelTooltip content="Built-in fuzzy search across all icon packs" position="top">
             <PixelBentoCell span="1x1" kind="compact" tone="neutral">
-              <PxlKitIcon icon={Search} size={28} colorful />
+              <PxlKitIcon icon={Search} size={28} colorful decorative />
               <div>
                 <h3 className="font-pixel text-xs text-retro-text mb-1">Searchable</h3>
                 <p className="font-mono text-xs text-retro-muted">Find any icon in milliseconds.</p>
@@ -404,7 +404,7 @@ export function FeaturesBentoPreview() {
           {/* Small compact card — Configurable */}
           <PixelTooltip content="Customize size, color, tone, and animation per icon" position="top">
             <PixelBentoCell span="1x1" kind="compact" tone="red">
-              <PxlKitIcon icon={Settings} size={28} colorful />
+              <PxlKitIcon icon={Settings} size={28} colorful decorative />
               <div>
                 <h3 className="font-pixel text-xs text-retro-text mb-1">Configurable</h3>
                 <p className="font-mono text-xs text-retro-muted">Size, color, tone — fully yours.</p>

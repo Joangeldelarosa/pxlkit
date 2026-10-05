@@ -67,7 +67,7 @@ export function TestimonialsCardsPreview() {
         description="Don't take our word for it — here's what our community has to say."
         actions={
           <PixelBadge tone="gold">
-            <PxlKitIcon icon={Crown} size={12} colorful />
+            <PxlKitIcon icon={Crown} size={12} colorful decorative />
             <span className="ml-1.5">Testimonials</span>
           </PixelBadge>
         }

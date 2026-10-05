@@ -17,7 +17,7 @@
 - `react` and `react-dom` are now optional peer dependencies: only the root entry's components need them, so Vue, Angular and vanilla installs no longer pull React in.
 - The package `exports` map declares separate ESM (`.d.ts`) and CommonJS (`.d.cts`) type declarations per condition, and `typesVersions` resolves the `vanilla` subpath under `moduleResolution: "node"`.
 - The React component props (`PxlKitProps`, `AnimatedPxlKitProps`, `ParallaxPxlKitProps`, `PixelToastProps`) moved from `src/types.ts` to the React layer (`src/components/types.ts`); `types.ts` is now the framework-agnostic icon data model. Both are still exported from `@pxlkit/core` under the same names.
-- `PxlKitIcon`, `AnimatedPxlKitIcon`, `ParallaxPxlKitIcon` and `PixelToast` render through the shared engine. Their markup is unchanged; `ParallaxPxlKitIcon` no longer re-renders on every frame of its intro animation, and touches its particle canvas only while particles are on screen (it used to call `getContext('2d')` and clear the canvas on every animation frame).
+- `PxlKitIcon`, `AnimatedPxlKitIcon`, `ParallaxPxlKitIcon` and `PixelToast` render through the shared engine. Their markup is unchanged apart from `PixelToast`'s icon (above); `ParallaxPxlKitIcon` no longer re-renders on every frame of its intro animation, and touches its particle canvas only while particles are on screen (it used to call `getContext('2d')` and clear the canvas on every animation frame).
 
 ### Fixed
 

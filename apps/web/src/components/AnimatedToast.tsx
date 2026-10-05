@@ -257,9 +257,9 @@ export function AnimatedToast({
                 {icon && (
                   <motion.div className="mt-0.5 shrink-0" variants={iconVariants}>
                     {isAnimatedIcon(icon) ? (
-                      <AnimatedPxlKitIcon icon={icon} size={22} colorful />
+                      <AnimatedPxlKitIcon icon={icon} size={22} colorful decorative />
                     ) : (
-                      <PxlKitIcon icon={icon} size={22} colorful color={theme.accent} />
+                      <PxlKitIcon icon={icon} size={22} colorful color={theme.accent} decorative />
                     )}
                   </motion.div>
                 )}

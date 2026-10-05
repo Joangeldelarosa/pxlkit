@@ -247,9 +247,9 @@ function ToastCard({ item, onDismiss }: { item: ToastItem; onDismiss: () => void
                 animate={{ opacity: 1, scale: 1, rotate: 0, transition: { type: 'spring', stiffness: 600, damping: 20 } }}
               >
                 {item.animatedIcon ? (
-                  <AnimatedPxlKitIcon icon={item.animatedIcon} size={22} colorful />
+                  <AnimatedPxlKitIcon icon={item.animatedIcon} size={22} colorful decorative />
                 ) : item.icon ? (
-                  <PxlKitIcon icon={item.icon} size={22} colorful color={theme.accent} />
+                  <PxlKitIcon icon={item.icon} size={22} colorful color={theme.accent} decorative />
                 ) : null}
               </motion.div>
             )}

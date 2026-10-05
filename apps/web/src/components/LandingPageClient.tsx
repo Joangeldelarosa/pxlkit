@@ -141,7 +141,7 @@ function PillarsBento() {
         <PixelBento columns={3} gap={4}>
           <PixelBentoCell tone="cyan" variant="feature">
             <div className="flex items-center gap-3 mb-1">
-              <PxlKitIcon icon={Palette} size={24} colorful />
+              <PxlKitIcon icon={Palette} size={24} colorful decorative />
               <h3 className="font-pixel text-sm text-retro-cyan">Surface system</h3>
             </div>
             <p className="text-sm text-retro-muted leading-relaxed">
@@ -153,7 +153,7 @@ function PillarsBento() {
 
           <PixelBentoCell tone="green" variant="feature">
             <div className="flex items-center gap-3 mb-1">
-              <PxlKitIcon icon={CheckCircle} size={24} colorful />
+              <PxlKitIcon icon={CheckCircle} size={24} colorful decorative />
               <h3 className="font-pixel text-sm text-retro-green">Accessibility-first</h3>
             </div>
             <p className="text-sm text-retro-muted leading-relaxed">
@@ -165,7 +165,7 @@ function PillarsBento() {
 
           <PixelBentoCell tone="gold" variant="feature">
             <div className="flex items-center gap-3 mb-1">
-              <PxlKitIcon icon={Package} size={24} colorful />
+              <PxlKitIcon icon={Package} size={24} colorful decorative />
               <h3 className="font-pixel text-sm text-retro-gold">Batteries-included</h3>
             </div>
             <p className="text-sm text-retro-muted leading-relaxed">
@@ -704,8 +704,8 @@ function FeaturesShowcase() {
                 descriptionLines={4}
                 icon={
                   f.animated && isAnimatedIcon(f.icon)
-                    ? <AnimatedPxlKitIcon icon={f.icon} size={28} colorful />
-                    : <PxlKitIcon icon={f.icon as PxlKitData} size={28} colorful />
+                    ? <AnimatedPxlKitIcon icon={f.icon} size={28} colorful decorative />
+                    : <PxlKitIcon icon={f.icon as PxlKitData} size={28} colorful decorative />
                 }
               />
             </motion.div>
@@ -739,7 +739,7 @@ function TemplatesTeaser() {
             tone="gold"
             size="md"
             variant="solid"
-            iconRight={<PxlKitIcon icon={ArrowRight} size={14} className="inline-block" />}
+            iconRight={<PxlKitIcon icon={ArrowRight} size={14} className="inline-block" decorative />}
             onClick={() => router.push('/templates')}
           >
             Browse all {PAGE_TEMPLATE_COUNT} templates
@@ -951,7 +951,7 @@ function IconShowcase() {
       <div className="text-center mt-8 sm:mt-12">
         <PixelButton
           tone="green"
-          iconRight={<PxlKitIcon icon={ArrowRight} size={14} className="inline-block" />}
+          iconRight={<PxlKitIcon icon={ArrowRight} size={14} className="inline-block" decorative />}
           onClick={() => router.push('/icons')}
         >
           Browse all {TOTAL_ICON_COUNT} icons

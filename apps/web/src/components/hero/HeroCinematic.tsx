@@ -68,7 +68,7 @@ export function HeroCinematic() {
           <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 mt-1">
             <PixelButton
               tone="green"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+              iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
               onClick={() => router.push('/templates')}
             >
               Browse Templates
@@ -76,7 +76,7 @@ export function HeroCinematic() {
             <PixelButton
               tone="cyan"
               variant="ghost"
-              iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+              iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
               onClick={() => router.push('/icons')}
             >
               Explore Icons

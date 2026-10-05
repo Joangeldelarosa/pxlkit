@@ -21,28 +21,28 @@ const SHORTCUTS: { value: Shortcut; label: string; icon: ReactNode; title: strin
   {
     value: 'success',
     label: 'Success',
-    icon: <PxlKitIcon icon={CheckCircle} size={14} />,
+    icon: <PxlKitIcon icon={CheckCircle} size={14} decorative />,
     title: 'Saved',
     message: 'Your changes were saved.',
   },
   {
     value: 'error',
     label: 'Error',
-    icon: <PxlKitIcon icon={WarningTriangle} size={14} />,
+    icon: <PxlKitIcon icon={WarningTriangle} size={14} decorative />,
     title: 'Not saved',
     message: 'The server did not answer. Try again.',
   },
   {
     value: 'info',
     label: 'Info',
-    icon: <PxlKitIcon icon={InfoCircle} size={14} />,
+    icon: <PxlKitIcon icon={InfoCircle} size={14} decorative />,
     title: 'Syncing',
     message: 'Fetching the latest updates.',
   },
   {
     value: 'warning',
     label: 'Warning',
-    icon: <PxlKitIcon icon={Bell} size={14} />,
+    icon: <PxlKitIcon icon={Bell} size={14} decorative />,
     title: 'Heads up',
     message: 'This action needs a confirmation.',
   },
@@ -65,7 +65,7 @@ const GALLERY: ToastItem[] = [
     message: 'Your changes were saved.',
     tone: 'green',
     duration: 0,
-    icon: <PxlKitIcon icon={CheckCircle} size={16} />,
+    icon: <PxlKitIcon icon={CheckCircle} size={16} decorative />,
   },
   {
     id: 'not-saved',
@@ -73,7 +73,7 @@ const GALLERY: ToastItem[] = [
     message: 'The server did not answer. Try again.',
     tone: 'red',
     duration: 0,
-    icon: <PxlKitIcon icon={WarningTriangle} size={16} />,
+    icon: <PxlKitIcon icon={WarningTriangle} size={16} decorative />,
   },
   { id: 'syncing', title: 'Syncing…', message: 'Fetching the latest updates.', tone: 'cyan', loading: true },
   {
@@ -182,13 +182,13 @@ function ToastControls({
         </PixelButton>
         <PixelButton
           tone="purple"
-          iconLeft={<AnimatedPxlKitIcon icon={FireSword} size={14} />}
+          iconLeft={<AnimatedPxlKitIcon icon={FireSword} size={14} decorative />}
           onClick={() =>
             toast[shortcut]({
               title: 'Pixel event',
               message: `${picked.label} · ${position} · ${duration} ms`,
               duration,
-              animatedIcon: <AnimatedPxlKitIcon icon={FireSword} size={16} />,
+              animatedIcon: <AnimatedPxlKitIcon icon={FireSword} size={16} decorative />,
             })
           }
         >

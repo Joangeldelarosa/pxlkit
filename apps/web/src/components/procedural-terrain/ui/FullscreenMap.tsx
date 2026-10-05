@@ -363,7 +363,7 @@ export function FullscreenMap({
       <div className="relative flex h-full flex-col p-3 sm:p-4">
         <div className="mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-retro-border/40 bg-retro-surface/30 px-2 py-2 sm:px-3 sm:py-2.5">
           <div className="mr-auto flex items-center gap-2">
-            <PxlKitIcon icon={QuestMap} size={16} colorful />
+            <PxlKitIcon icon={QuestMap} size={16} colorful decorative />
             <span className="font-pixel text-[9px] sm:text-[10px] text-retro-green tracking-wider">WORLD MAP</span>
             <PixelBadge tone="cyan">
               <span className="text-[8px]">{worldMode === 'infinite' ? 'INFINITE' : 'FINITE'}</span>
@@ -376,7 +376,7 @@ export function FullscreenMap({
           <PixelButton tone="cyan" variant="ghost" size="sm" onClick={handleZoomOut} title="Zoom out (-)">-</PixelButton>
           <PixelButton tone="cyan" variant="ghost" size="sm" onClick={handleZoomIn} title="Zoom in (+)">+</PixelButton>
           <PixelButton tone="green" variant="ghost" size="sm" onClick={handleCenter} title="Center on player (C)">CENTER</PixelButton>
-          <PixelButton tone="red" size="sm" onClick={onClose} iconLeft={<PxlKitIcon icon={Close} size={12} />}>
+          <PixelButton tone="red" size="sm" onClick={onClose} iconLeft={<PxlKitIcon icon={Close} size={12} decorative />}>
             CLOSE
           </PixelButton>
         </div>

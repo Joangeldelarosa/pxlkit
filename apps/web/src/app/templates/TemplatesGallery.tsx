@@ -91,7 +91,7 @@ function CopyButton({ text }: { text: string }) {
       }`}
       aria-label="Copy code"
     >
-      <PxlKitIcon icon={copied ? Check : Copy} size={11} />
+      <PxlKitIcon icon={copied ? Check : Copy} size={11} decorative />
       {copied ? 'COPIED' : 'COPY'}
     </button>
   );
@@ -316,7 +316,7 @@ function PageTemplateCard({ tpl }: { tpl: FullPageTemplate }) {
               href={tpl.fullPageHref}
               className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono text-retro-cyan border border-retro-cyan/40 bg-retro-cyan/8 rounded-sm hover:bg-retro-cyan/15 transition-all"
             >
-              <PxlKitIcon icon={ExternalLink} size={10} />
+              <PxlKitIcon icon={ExternalLink} size={10} decorative />
               Open full page
             </a>
           )}
@@ -392,7 +392,7 @@ export default function TemplatesGallery() {
           <PixelFadeIn>
             <div className="mb-4 inline-flex items-center gap-2">
               <PixelBadge tone="gold">
-                <PxlKitIcon icon={Grid} size={11} className="mr-1" />
+                <PxlKitIcon icon={Grid} size={11} className="mr-1" decorative />
                 Templates
               </PixelBadge>
             </div>

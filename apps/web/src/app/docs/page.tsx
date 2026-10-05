@@ -1463,7 +1463,7 @@ if (icon) {
 import { PxlKitIcon } from '@pxlkit/core';
 import { Trophy } from '@pxlkit/gamification';
 
-<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} />}>
+<PixelButton tone="green" iconLeft={<PxlKitIcon icon={Trophy} size={16} decorative />}>
   Create Quest
 </PixelButton>`}
               vue={`<script setup lang="ts">
@@ -1474,7 +1474,7 @@ import { Trophy } from '@pxlkit/gamification';
 
 <template>
   <PixelButton tone="green">
-    <template #icon-left><PxlKitIcon :icon="Trophy" :size="16" /></template>
+    <template #icon-left><PxlKitIcon :icon="Trophy" :size="16" decorative /></template>
     Create Quest
   </PixelButton>
 </template>`}
@@ -1488,7 +1488,7 @@ import { PixelButton } from '@pxlkit/ui-kit-angular';
   imports: [PixelButton, PxlKitIcon],
   template: \`
     <button pxlButton tone="green" [iconLeft]="trophyIcon">Create Quest</button>
-    <ng-template #trophyIcon><pxl-icon [icon]="trophy" [size]="16" /></ng-template>
+    <ng-template #trophyIcon><pxl-icon [icon]="trophy" [size]="16" decorative /></ng-template>
   \`,
 })
 export class CreateQuest {

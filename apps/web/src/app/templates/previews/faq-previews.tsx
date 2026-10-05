@@ -198,7 +198,7 @@ export function FaqAccordionPreview() {
         <div className="mb-14">
           <PixelFadeIn>
             <div className="inline-flex w-full justify-center items-center gap-2 mb-4">
-              <PxlKitIcon icon={ChatBubble} size={20} colorful />
+              <PxlKitIcon icon={ChatBubble} size={20} colorful decorative />
               <PixelBadge tone="purple">FAQ</PixelBadge>
             </div>
             <PixelSectionHeader
@@ -216,7 +216,7 @@ export function FaqAccordionPreview() {
             placeholder="Search questions..."
             tone="neutral"
             size="md"
-            icon={<PxlKitIcon icon={Search} size={16} colorful />}
+            icon={<PxlKitIcon icon={Search} size={16} colorful decorative />}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -237,7 +237,7 @@ export function FaqAccordionPreview() {
               >
                 <div className="flex items-start gap-2.5">
                   <span className="flex-shrink-0 mt-1">
-                    <PxlKitIcon icon={item.icon} size={16} colorful />
+                    <PxlKitIcon icon={item.icon} size={16} colorful decorative />
                   </span>
                   <PixelBadge tone={item.tone}>{item.category}</PixelBadge>
                   <div className="flex-1">
@@ -286,7 +286,7 @@ export function FaqAccordionPreview() {
         <PixelDivider className="my-10" />
         <div className="text-center">
           <div className="inline-flex items-center gap-2 mb-3">
-            <PxlKitIcon icon={Mail} size={18} colorful />
+            <PxlKitIcon icon={Mail} size={18} colorful decorative />
             <p className="font-pixel text-sm text-retro-text">Still have questions?</p>
           </div>
           <p className="font-mono text-xs text-retro-muted mb-5">
@@ -295,7 +295,7 @@ export function FaqAccordionPreview() {
           <PixelButton
             tone="cyan"
             size="md"
-            iconRight={<PxlKitIcon icon={Send} size={14} />}
+            iconRight={<PxlKitIcon icon={Send} size={14} decorative />}
           >
             Contact Support
           </PixelButton>
@@ -316,7 +316,7 @@ export function FaqTwoColumnPreview() {
   const leftCol = (
     <PixelFadeIn>
       <div className="flex items-center gap-2 mb-4">
-        <PxlKitIcon icon={Search} size={20} colorful />
+        <PxlKitIcon icon={Search} size={20} colorful decorative />
         <PixelBadge tone="green">Help Center</PixelBadge>
       </div>
       <PixelSectionHeader
@@ -329,7 +329,7 @@ export function FaqTwoColumnPreview() {
         <PixelButton
           tone="cyan"
           size="md"
-          iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}
+          iconRight={<PxlKitIcon icon={ArrowRight} size={14} decorative />}
         >
           Contact Support
         </PixelButton>
@@ -341,13 +341,13 @@ export function FaqTwoColumnPreview() {
       {/* Quick stats */}
       <div className="mt-8 space-y-3">
         <div className="flex items-center gap-2">
-          <PxlKitIcon icon={CheckCircle} size={14} colorful />
+          <PxlKitIcon icon={CheckCircle} size={14} colorful decorative />
           <span className="font-mono text-xs text-retro-muted">
             Avg. response time: 4 hrs
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <PxlKitIcon icon={ShieldCheck} size={14} colorful />
+          <PxlKitIcon icon={ShieldCheck} size={14} colorful decorative />
           <span className="font-mono text-xs text-retro-muted">
             99% satisfaction rate
           </span>
@@ -425,7 +425,7 @@ export function FaqTabbedPreview() {
         <div className="mb-10">
           <PixelFadeIn>
             <div className="inline-flex w-full justify-center items-center gap-2 mb-4">
-              <PxlKitIcon icon={InfoCircle} size={20} colorful />
+              <PxlKitIcon icon={InfoCircle} size={20} colorful decorative />
               <PixelBadge tone="gold">Knowledge Base</PixelBadge>
             </div>
             <PixelSectionHeader
@@ -443,7 +443,7 @@ export function FaqTabbedPreview() {
             placeholder="Filter answers..."
             tone="neutral"
             size="md"
-            icon={<PxlKitIcon icon={Search} size={16} colorful />}
+            icon={<PxlKitIcon icon={Search} size={16} colorful decorative />}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -461,7 +461,7 @@ export function FaqTabbedPreview() {
                   : 'text-retro-muted hover:text-retro-text'
               }`}
             >
-              <PxlKitIcon icon={tab.icon} size={14} colorful />
+              <PxlKitIcon icon={tab.icon} size={14} colorful decorative />
               {tab.label}
             </button>
           ))}
