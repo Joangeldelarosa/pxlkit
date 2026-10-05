@@ -1,166 +1,50 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
-import { UI_KIT_VERSION } from '@/lib/pxlkit-version';
+import { JsonLd } from '@/components/JsonLd';
 import { UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
+import { pageMetadata } from '@/lib/seo';
+import { breadcrumbList, UI_KIT_STRUCTURED_DATA } from '@/lib/structured-data';
 
-const UI_KIT_TITLE = `${UI_COMPONENTS_COUNT} Retro Pixel-Art Components for React, Vue & Angular — UI Kit with Live Demos`;
-
-export const metadata: Metadata = {
-  title: UI_KIT_TITLE,
-  description:
-    `Production-ready retro UI kit for React, Vue and Angular: ${UI_COMPONENTS_COUNT} pixel-art components — buttons, forms, modals, tables, animations, parallax & more. TypeScript, Tailwind CSS. MIT-licensed.`,
+export const metadata: Metadata = pageMetadata({
+  path: '/ui-kit',
+  title: `${UI_COMPONENTS_COUNT} Retro React Components — Pixel Art UI Kit`,
+  description: `Retro pixel-art UI kit for React: ${UI_COMPONENTS_COUNT} components (forms, overlays, data tables, charts, animations) with live demos. New in 2.2: Vue and Angular editions.`,
+  socialDescription: `${UI_COMPONENTS_COUNT} retro pixel-art components for React with live demos and props tables — buttons, forms, modals, data tables, charts, toasts, animations, parallax. New in 2.2: the same kit for Vue 3 and Angular. TypeScript, Tailwind CSS v4, MIT.`,
+  imageAlt: `Pxlkit UI Kit — ${UI_COMPONENTS_COUNT} retro pixel-art React components with live demos, now also for Vue and Angular`,
   keywords: [
     'react ui kit',
     'react component library',
-    'pixel art ui',
-    'retro ui components',
-    'retro react',
-    'retro design system',
+    'retro react components',
     'pixel art react components',
-    'tailwind components',
+    'pixel art ui kit',
+    'retro design system',
+    '8-bit ui kit',
     'tailwind css ui kit',
     'typescript react components',
-    'button component',
     'pixel buttons',
-    'retro button react',
-    'form component',
-    'pixel forms',
-    'pixel input field',
-    'pixel checkbox',
-    'pixel radio button',
-    'pixel select component',
-    'pixel dropdown',
-    'modal component',
     'pixel modal',
-    'dialog component react',
-    'table component',
-    'pixel table',
     'data table react',
-    'pixel tabs component',
-    'tab component react',
-    'component playground',
-    'live demo components',
-    'interactive component preview',
-    'pixel card component',
-    'pixel toast react',
+    'date picker react',
     'toast notification component',
-    'retro progress bar',
-    'progress bar component',
-    'pixel avatar component',
-    'pixel badge component',
-    'tooltip component react',
-    'accordion component react',
-    'pixel sidebar component',
-    'pixel navbar component',
-    'pagination component react',
-    'slider component react',
-    'switch toggle component',
-    'animation components',
-    'react design tokens',
-    'dark mode react ui',
     'accessible ui components',
-    'responsive pixel ui',
+    'dark mode react ui',
     'game ui components',
-    'indie game ui react',
-    '8-bit ui kit',
-    'nostalgic design system',
-    'mit react ui kit',
-    'free react components',
-    'open source ui kit',
     'next.js ui components',
     'vite react components',
-    'zero native browser ui',
-    'tree-shakeable components',
-    'react ui library 2024',
-    'pixel art design system',
-    'customizable react components',
-    'themed react components',
-    'react component demos',
-    'pxlkit ui',
+    'mit react ui kit',
+    'vue ui kit',
+    'vue 3 component library',
+    'nuxt ui kit',
+    'angular ui kit',
+    'angular standalone components',
     'pxlkit ui kit',
-    'pxlkit components',
   ],
-  openGraph: {
-    type: 'website',
-    title: UI_KIT_TITLE,
-    description:
-      `${UI_COMPONENTS_COUNT} hand-crafted retro components for React, Vue and Angular: buttons, forms, modals, tables, toast notifications, animations, parallax, locale support, and more — the same markup and behaviour in every framework. TypeScript-first, Tailwind-powered, zero native UI. MIT-licensed and free to use.`,
-    url: 'https://pxlkit.xyz/ui-kit',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1280,
-        height: 640,
-        alt: `Pxlkit UI Kit — ${UI_COMPONENTS_COUNT} retro pixel-art components for React, Vue and Angular, with live demos`,
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: UI_KIT_TITLE,
-    description:
-      `Production-ready retro pixel-art UI kit for React, Vue and Angular: ${UI_COMPONENTS_COUNT} components with live demos. TypeScript, Tailwind CSS, tree-shakeable. MIT-licensed.`,
-    images: ['/og-twitter.png'],
-  },
-  alternates: {
-    canonical: 'https://pxlkit.xyz/ui-kit',
-  },
-  other: {
-    'article:author': 'Pxlkit',
-    'og:updated_time': new Date().toISOString(),
-    'og:type': 'website',
-    'og:site_name': 'Pxlkit',
-  },
-};
-
-const UI_KIT_JSON_LD = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'Pxlkit UI Kit',
-  applicationCategory: 'DeveloperApplication',
-  applicationSubCategory: 'UI Component Library',
-  operatingSystem: 'Web',
-  url: 'https://pxlkit.xyz/ui-kit',
-  description:
-    `${UI_COMPONENTS_COUNT} accessible retro components for React (@pxlkit/ui-kit), Vue (@pxlkit/ui-kit-vue) and Angular (@pxlkit/ui-kit-angular) — buttons, forms, modals, tables, charts, calendars, parallax, and more. TypeScript-first, Tailwind v4, MIT.`,
-  softwareVersion: UI_KIT_VERSION,
-  programmingLanguage: ['TypeScript', 'JavaScript', 'React', 'Vue', 'Angular'],
-  downloadUrl: 'https://www.npmjs.com/package/@pxlkit/ui-kit',
-  license: 'https://github.com/Joangeldelarosa/pxlkit/blob/main/LICENSE',
-  offers: [
-    {
-      '@type': 'Offer',
-      name: 'Community',
-      price: '0',
-      priceCurrency: 'USD',
-      description: 'MIT-licensed code, free forever',
-    },
-    {
-      '@type': 'Offer',
-      name: 'Indie',
-      price: '9.50',
-      priceCurrency: 'USD',
-      description: 'One commercial project, no asset attribution, lifetime updates',
-    },
-    {
-      '@type': 'Offer',
-      name: 'Team',
-      price: '24.50',
-      priceCurrency: 'USD',
-      description: 'Unlimited projects, all future packs, priority support',
-    },
-  ],
-};
+});
 
 export default function UIKitLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Script
-        id="ldjson-ui-kit"
-        type="application/ld+json"
-        strategy="beforeInteractive"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(UI_KIT_JSON_LD) }}
-      />
+      <JsonLd data={UI_KIT_STRUCTURED_DATA} />
+      <JsonLd data={breadcrumbList([{ name: 'UI Kit', path: '/ui-kit' }])} />
       {children}
     </>
   );

@@ -47,12 +47,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   of how React props read in Vue and Angular; its toast sections show the kit's toast card and
   a playground on the kit's provider, and `/docs` documents the icon components' `PixelToast`.
   Snippets merge the imports that end up from the same package.
-- **The site and the README for three frameworks.** The README documents the UI kit in React,
-  Vue and Angular and maps the new packages; the site's titles, descriptions, keywords,
-  structured data (every npm package, `@pxlkit/vue`, `@pxlkit/angular` and the three UI kit
-  packages included), web manifest, Open Graph image and landing copy say React, Vue and
-  Angular; the landing FAQ answers whether Pxlkit works with Vue or Angular; `/icons` gives each
-  icon's code in the three frameworks; and `/skills` says the plugin writes React.
+- **The site and the READMEs: React first, Vue and Angular new.** Titles, descriptions,
+  headings, structured data, the web manifest, the Open Graph image and the READMEs present Pxlkit
+  as a React UI kit, with the Vue and Angular editions as what 2.2 adds. The root README opens with
+  the UI kit's quick start — install, Tailwind CSS v4 in the build, the stylesheet, a first
+  component, React first — and maps the new packages. `/ui-kit` gains Vue and Angular setup
+  sections (`/ui-kit#vue`, `/ui-kit#angular`); the landing FAQ, whose answers are now in the HTML,
+  answers whether Pxlkit is a React library, whether it works with Vue or Angular and whether the
+  templates exist for them; `/icons` gives each icon's code in the three frameworks; and `/skills`
+  says the plugin writes React.
+- **`/llms.txt`.** The site in plain text: what Pxlkit is, the install line per framework, the
+  Tailwind CSS v4 step, and links to the docs, the packages and the licensing.
 - **`@pxlkit/core/vanilla` and the shared rendering engine.** A React-free entry point
   exports the icon data model, every utility and the engine the three frameworks build on:
   `renderIconSvg` / `renderIconDataUri`, `createAnimatedIconPlayer`,
@@ -117,6 +122,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Coherence gate 06 (`consistency-version`) checks that each icon pack reads its `version` from
   `package.json` — a literal that differs is a blocker, a matching one major — and the packs now do,
   so their exported version cannot drift from the published one.
+- Site: structured data in the server HTML of every page — the organization and the site
+  everywhere, the home page's packages and FAQ, `/ui-kit`'s application with its React, Vue and
+  Angular sources, a breadcrumb trail elsewhere — and every page sets its canonical URL and link
+  previews. The stat cards' figures are in the HTML, the sitemap dates pages by release instead of
+  by build, the social images and app icons match their declared sizes, `/changelog` has one h1 and
+  an anchor per release, `/templates/preview` is not indexed, `/toast` redirects permanently to
+  `/ui-kit#use-toast`, and pages can be zoomed. An unused copy of the voxel world engine
+  (`components/ProceduralTerrain.tsx`, 2,341 lines) is gone.
+- Docs (`/docs`, `/ui-kit` and the kits' READMEs): the Tailwind CSS v4 build step for Next.js,
+  Vite, Nuxt and Angular; Next.js App Router setup; Nuxt; Angular's `app.config`, server rendering
+  and hydration, overlays and form controls; dark mode with the anti-flash script
+  (`pxlkit:dark-mode`); body styles; fonts; the toast `@source` line; calendars under server
+  rendering; and upgrading from 2.1.
+- Tooling: gates 31 and 34 read the root CHANGELOG's release section for what a release added when
+  the kit's own section lists only changes and fixes. Plugin 1.0.1: the setup reference's
+  anti-flash script uses the kit's key and default and gains the Tailwind CSS build step, App
+  Router guidance, fonts from `@pxlkit/ui-kit-core`, `duration` / `hotkey` and a verify command;
+  `/pxlkit:start` sends Vue and Angular projects to their kits. The three Storybooks carry the
+  framework in their title and description.
+- npm metadata: every package has a homepage, an issue tracker, its repository directory, a
+  description of 155 characters or fewer that names its framework, and keywords.
 - `@pxlkit/core`: `react` and `react-dom` are optional peer dependencies — only the
   React components need them.
 - `@pxlkit/ui-kit`: tokens, class maps, the theme stylesheet, locale data and the focus
@@ -344,6 +370,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   glitch hero headline renders one `<h1>` instead of three, a `.dark` palette override reaches the
   utilities, server-rendered animations hold still from the first paint for readers who prefer
   reduced motion, and the examples compile under strict TypeScript and link to pxlkit.xyz.
+- Site and README claims: "zero runtime deps" (the kits need Tailwind CSS v4), the Indie license's
+  "lifetime updates" (a lifetime license with the updates available at purchase, as
+  `COMMERCIAL_TERMS` says), 6 icon packs and 6 tones (there are 7 of each), a hard-coded gate count,
+  an unmeasured coverage figure, "WCAG 2.1 AA" stated as conformance (the kits are built for it),
+  `@pxlkit/voxel` shown as published (an early preview, not yet on npm), an
+  `@pxlkit/ui-kit/templates` import that does not exist, and template copy that called Tailwind CSS
+  optional or attribution never required. Four Open Graph images that returned 404 point at the
+  site's image, and a social profile that returned 404 is no longer linked.
+- Site: the live `PixelCalendarGrid` demo on `/ui-kit` and the dashboard template render in the
+  browser only, behind a placeholder of the same height, so a page built on one day and read in
+  another month hydrates; a template preview's glitch heading is one `<h2>`, not three.
 
 ## [ui-kit 2.1.1] - 2026-08-08 — Bordered surface-token fix
 

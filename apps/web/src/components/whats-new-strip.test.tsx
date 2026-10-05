@@ -13,10 +13,23 @@ describe('WhatsNewStrip', () => {
     render(<WhatsNewStrip version="2.0.0" date="2026-05-31" items={items} />);
 
     expect(screen.getByText('v2.0.0')).toBeInTheDocument();
-    expect(screen.getByText('2026-05-31')).toBeInTheDocument();
+    expect(screen.getByText('May 31, 2026')).toBeInTheDocument();
     expect(screen.getByText('PixelDataTable')).toBeInTheDocument();
     expect(screen.getByText('PixelStepper')).toBeInTheDocument();
     expect(screen.getByText('PixelColorInput')).toBeInTheDocument();
+  });
+
+  it('renders the summary line when one is given', () => {
+    render(
+      <WhatsNewStrip version="2.2.0" date="2026-10-03" items={items} summary="The React kit, now in Vue and Angular." />,
+    );
+    expect(screen.getByText('The React kit, now in Vue and Angular.')).toBeInTheDocument();
+  });
+
+  it('marks the date up as a <time> element, written out for readers', () => {
+    render(<WhatsNewStrip version="2.0.0" date="2026-05-31" items={items} />);
+    expect(screen.getByText('May 31, 2026').tagName).toBe('TIME');
+    expect(screen.getByText('May 31, 2026').getAttribute('datetime')).toBe('2026-05-31');
   });
 
   it('renders an explicit landmark with aria-label', () => {

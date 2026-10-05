@@ -1,105 +1,48 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@/components/JsonLd';
+import { UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
+import { pageMetadata } from '@/lib/seo';
+import { breadcrumbList } from '@/lib/structured-data';
 
-export const metadata: Metadata = {
-  title: 'Docs — Installation Guide, Component API & TypeScript Reference',
-  description:
-    'Get started with Pxlkit in React, Vue or Angular: installation guides, component API reference, icon usage docs, TypeScript types & design tokens for the retro UI kit.',
+export const metadata: Metadata = pageMetadata({
+  path: '/docs',
+  title: 'Docs — Install the React Pixel Art UI Kit & Icons',
+  description: `Install Pxlkit in React (or in Vue and Angular, new in 2.2): setup, icon components, the ${UI_COMPONENTS_COUNT}-component API reference, design tokens and TypeScript types.`,
+  socialDescription: `Pxlkit docs: install the React pixel-art UI kit — or its new Vue and Angular editions — set up Tailwind CSS v4, render the icon components and browse the API of all ${UI_COMPONENTS_COUNT} components.`,
+  imageAlt: 'Pxlkit docs — install the React pixel-art UI kit and icons',
   keywords: [
     'pxlkit documentation',
     'pxlkit docs',
-    'pxlkit getting started',
     'pxlkit installation',
-    'pxlkit tutorial',
     'pxlkit api reference',
-    'installation guide',
-    'getting started guide',
     'npm install pxlkit',
-    'yarn add pxlkit',
-    'pnpm add pxlkit',
     'quick start react ui kit',
-    'component API',
+    'react ui kit docs',
     'component api reference',
     'react component docs',
     'typescript component api',
-    'typescript types reference',
-    'react props reference',
-    'component props documentation',
-    'icon usage guide',
-    'icon usage react',
-    'svg icon usage guide',
-    'react icon import',
     'icon component api',
     'pixel art icons docs',
-    'icon packs guide',
     'animated icon docs',
     'parallax icon docs',
-    'design tokens documentation',
+    'toast notification docs',
     'design tokens reference',
-    'theme customization guide',
-    'tailwind ui docs',
-    'tailwind configuration pxlkit',
-    'retro ui documentation',
-    'pixel art react guide',
-    'react ui kit docs',
-    'react ui kit tutorial',
+    'tailwind css v4 setup',
     'next.js setup pxlkit',
     'vite setup pxlkit',
-    'toast notification docs',
-    'icon builder tutorial',
-    'builder documentation',
-    'code examples react',
-    'copy paste code examples',
-    'component examples',
-    'storybook pixel art',
-    'accessibility docs',
-    'a11y documentation',
+    'vue setup pxlkit',
+    'nuxt setup pxlkit',
+    'angular setup pxlkit',
     'dark mode setup guide',
-    'responsive design docs',
-    'tree shaking guide',
-    'bundle size optimization',
-    'migration guide pxlkit',
-    'changelog pxlkit',
-    'troubleshooting pxlkit',
-    'faq pxlkit',
-    'react icon library docs',
-    'pixel icons guide',
-    'install pixel icons',
-    'pxlkit packages',
-    'pxlkit monorepo',
+    'accessibility docs',
   ],
-  openGraph: {
-    type: 'website',
-    title: 'Docs — Installation Guide, Component API & TypeScript Reference',
-    description:
-      'Complete documentation for Pxlkit: installation guides, component API reference with code in React, Vue and Angular, icon usage, TypeScript types, and design tokens for the retro UI kit & 226+ icons.',
-    url: 'https://pxlkit.xyz/docs',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1280,
-        height: 640,
-        alt: 'Pxlkit docs — Installation, component API & TypeScript reference',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Docs — Installation Guide, Component API & TypeScript Reference',
-    description:
-      'Full Pxlkit docs: installation, component API, icon usage, TypeScript types & design tokens. Get started with the retro UI kit in React, Vue or Angular in minutes.',
-    images: ['/og-twitter.png'],
-  },
-  alternates: {
-    canonical: 'https://pxlkit.xyz/docs',
-  },
-  other: {
-    'article:author': 'Pxlkit',
-    'og:updated_time': new Date().toISOString(),
-    'og:type': 'website',
-    'og:site_name': 'Pxlkit',
-  },
-};
+});
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <JsonLd data={breadcrumbList([{ name: 'Docs', path: '/docs' }])} />
+      {children}
+    </>
+  );
 }

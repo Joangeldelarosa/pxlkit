@@ -7,7 +7,15 @@
     "url": "https://github.com/joangeldelarosa"
   },
   "license": "SEE LICENSE IN LICENSE",
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
+  "homepage": "https://pxlkit.xyz/icons",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/gamification"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -57,6 +65,9 @@
     "react-icons",
     "pxlkit",
     "source-available-icons",
-    "free-game-icons"
+    "free-game-icons",
+    "pixel-icons",
+    "vue-icons",
+    "angular-icons"
   ]
 }

@@ -8,6 +8,11 @@ const ProceduralTerrain = dynamic(() => import('../../components/procedural-terr
   loading: () => (
     <div className="w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] flex items-center justify-center bg-retro-bg">
       <div className="text-center space-y-3">
+        {/* The page's heading until the world takes over the screen with its own. */}
+        <h1 className="font-pixel text-base sm:text-xl text-retro-green">PROCEDURAL WORLDS</h1>
+        <p className="font-mono text-[10px] sm:text-xs text-retro-muted">
+          @pxlkit/voxel — early preview, not yet on npm
+        </p>
         <div className="font-pixel text-sm sm:text-base text-retro-green animate-pulse">
           Generating World…
         </div>

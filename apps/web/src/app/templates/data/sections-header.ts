@@ -4,7 +4,6 @@ const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui';
 
 const simpleNavbar = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { useState } from 'react';
 import Link from 'next/link';
 import { PxlKitIcon } from '@pxlkit/core';
@@ -92,7 +91,6 @@ export function SimpleNavbar() {
 
 const navbarWithDropdown = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { useState } from 'react';
 import Link from 'next/link';
 import { PxlKitIcon } from '@pxlkit/core';
@@ -193,7 +191,6 @@ export function NavbarWithDropdown() {
 
 const centeredLogoHeader = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import Link from 'next/link';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight, Search } from '@pxlkit/ui';

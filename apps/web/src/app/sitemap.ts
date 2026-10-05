@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { UI_KIT_LATEST_DATE } from '@/lib/pxlkit-version';
 
 /**
  * Dynamic sitemap generated at build time by Next.js.
@@ -16,6 +17,8 @@ type Entry = {
   path: string;
   changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'];
   priority: number;
+  /** When the page last changed (`YYYY-MM-DD`), if not with the latest release. */
+  lastModified?: string;
 };
 
 const ROUTES: Entry[] = [
@@ -39,11 +42,17 @@ const ROUTES: Entry[] = [
   { path: '/templates/ecommerce', changeFrequency: 'monthly', priority: 0.7 },
 ];
 
+/**
+ * `lastModified` is the date a page's content last changed, never the build
+ * time: search engines only trust a `lastmod` that moves when the page does.
+ * The pages follow the kit — its components, counts, version and docs — so
+ * they take the date of the latest release (`packages/ui-kit/version-meta.json`);
+ * a page that changes between releases gets its own `lastModified` above.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
   return ROUTES.map((r) => ({
     url: `${SITE_URL}${r.path}`,
-    lastModified: now,
+    lastModified: new Date(`${r.lastModified ?? UI_KIT_LATEST_DATE}T00:00:00Z`),
     changeFrequency: r.changeFrequency,
     priority: r.priority,
   }));

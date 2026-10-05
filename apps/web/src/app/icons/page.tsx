@@ -17,6 +17,8 @@ import type { ToastTone } from '@/components/ToastProvider';
 import { PixelBadge, PixelButton, PixelCard, PixelChip, PixelChipGroup, PixelIconFrame, PxlKitButton, PixelInput, PixelSlider } from '@pxlkit/ui-kit';
 import { FrameworkCode } from '@/components/FrameworkCode';
 import { iconExportName, iconUsage } from '@/lib/icon-usage';
+// The parallax pack is a plain array of icons, with no pack object to carry its version.
+import parallaxPackage from '../../../../../packages/parallax/package.json';
 
 // ─── Registry ───────────────────────────────
 const ALL_PACKS: IconPack[] = [GamificationPack, FeedbackPack, SocialPack, WeatherPack, UiPack, EffectsPack];
@@ -122,9 +124,16 @@ export default function IconsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* ─── Header ─── */}
       <div className="text-center mb-8">
-        <h1 className="font-pixel text-xl text-retro-gold mb-3">ICON GALLERY</h1>
+        <h1 className="font-pixel text-xl text-retro-gold mb-3">PIXEL ART ICONS</h1>
         <p className="text-retro-muted font-mono text-sm">
-          {TOTAL_COUNT + ParallaxPack.length} pixel art icons in {ALL_PACKS.length + 1} packs — click any icon for details
+          {TOTAL_COUNT + ParallaxPack.length} pixel-art icons in {ALL_PACKS.length + 1} packs for React (and, new in 2.2,
+          Vue and Angular). Click any icon for its code and SVG.
+        </p>
+        <p className="mx-auto mt-2 max-w-2xl text-retro-muted/80 font-mono text-xs leading-relaxed">
+          Each icon is a 16×16 grid, static or animated, in a themed pack you install from npm and render with{' '}
+          <span className="text-retro-cyan">PxlKitIcon</span> from @pxlkit/core — or @pxlkit/vue and @pxlkit/angular.
+          Copy the code, download the SVG or open it in the builder. Free with attribution; an Indie or Team license
+          removes it.
         </p>
       </div>
 
@@ -180,7 +189,7 @@ export default function IconsPage() {
         >
           <PixelChip
             value="all"
-            label={`All (${TOTAL_COUNT})`}
+            label={`All (${TOTAL_COUNT + ParallaxPack.length})`}
             size="sm"
             tone={!activePack ? 'green' : 'neutral'}
             variant={!activePack ? 'soft' : 'outline'}
@@ -265,7 +274,7 @@ export default function IconsPage() {
             <span className="text-retro-muted/50 font-mono text-xs">
               {ParallaxPack.length} icon{ParallaxPack.length !== 1 ? 's' : ''}
             </span>
-            <span className="text-retro-muted/30 font-mono text-xs">v1.2.0</span>
+            <span className="text-retro-muted/30 font-mono text-xs">v{parallaxPackage.version}</span>
           </div>
 
           <p className="text-sm text-retro-muted mb-6 max-w-2xl">

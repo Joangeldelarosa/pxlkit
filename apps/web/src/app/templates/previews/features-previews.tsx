@@ -6,6 +6,7 @@ import { ArrowRight, Package, Settings, Search } from '@pxlkit/ui';
 import { Trophy, Shield, Lightning, Crown, Gem, MagicWand, SparkleStar } from '@pxlkit/gamification';
 import { Globe } from '@pxlkit/social';
 import { ShieldCheck, Sparkles } from '@pxlkit/feedback';
+import { ICON_PACK_COUNT, UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 import {
   PixelButton,
   PixelBadge,
@@ -42,14 +43,14 @@ const GRID_FEATURES = [
     iconPack: 'Gamification Pack',
     title: 'Accessible',
     desc: 'ARIA-ready by default. Every component ships with proper roles and keyboard navigation.',
-    detail: 'Built to WCAG 2.1 AA standards with full screen-reader support. Focus management, keyboard navigation, and semantic HTML are baked into every component.',
+    detail: 'Built for WCAG 2.1 AA: focus management, keyboard navigation, and semantic HTML with WAI-ARIA roles are baked into every component.',
     tone: 'cyan' as const,
   },
   {
     icon: Lightning,
     iconPack: 'Gamification Pack',
     title: 'Fast & Tiny',
-    desc: 'Tree-shakeable imports ensure zero unused code reaches your production bundle.',
+    desc: 'Tree-shakeable icon imports: the icons you do not use never reach your production bundle.',
     detail: 'Each icon weighs under 1kb gzipped. ESM exports allow bundlers to eliminate unused icons automatically. Zero runtime dependencies.',
     tone: 'green' as const,
   },
@@ -64,9 +65,9 @@ const GRID_FEATURES = [
   {
     icon: Globe,
     iconPack: 'Social Pack',
-    title: 'Framework Agnostic',
-    desc: 'Works with React, Next.js, Remix, and any component-driven framework out of the box.',
-    detail: 'Pure React components with zero framework-specific code. Compatible with SSR, RSC, and any bundler. Drop-in support for Vite, Webpack, and Turbopack.',
+    title: 'React First, Vue & Angular Too',
+    desc: 'Works with Next.js, Vite, and Remix; Vue and Angular editions of the same kit since 2.2.',
+    detail: 'React components that render on the server and hydrate — in the Next.js App Router as Client Components — with Vite, webpack, or Turbopack. The Vue and Angular kits render the same markup and behaviour.',
     tone: 'red' as const,
   },
   {
@@ -97,7 +98,7 @@ const ALT_FEATURES = [
     icon: ShieldCheck,
     accentIcon: null,
     title: 'Accessibility First',
-    desc: 'Full ARIA support, keyboard navigation, and screen-reader-friendly markup. Built to WCAG 2.1 AA standards.',
+    desc: 'WAI-ARIA roles, keyboard navigation, and screen-reader-friendly markup. Built for WCAG 2.1 AA.',
     stat: { label: 'WCAG', value: 'AA' },
     tone: 'cyan' as const,
     chips: [
@@ -110,7 +111,7 @@ const ALT_FEATURES = [
     icon: Lightning,
     accentIcon: null,
     title: 'Blazing Performance',
-    desc: 'Tree-shakeable ESM exports, automatic dead-code elimination, and sub-kilobyte per-icon footprint.',
+    desc: 'Tree-shakeable icon packs: bundlers drop the icons you do not import, and each icon weighs under a kilobyte.',
     stat: { label: 'Per icon', value: '<1kb' },
     tone: 'green' as const,
     chips: [
@@ -358,7 +359,7 @@ export function FeaturesBentoPreview() {
             <div>
               <h3 className="font-pixel text-sm text-retro-text mb-2">Blazing Fast</h3>
               <p className="font-mono text-sm text-retro-muted leading-relaxed">
-                Tree-shakeable ESM. Zero unused code in your production bundle.
+                Tree-shakeable icons: unused ones never reach your production bundle.
               </p>
             </div>
           </PixelBentoCell>
@@ -370,10 +371,10 @@ export function FeaturesBentoPreview() {
                 <PixelStatCard label="Icons" value="226+" tone="gold" />
               </PixelFadeIn>
               <PixelFadeIn delay={100}>
-                <PixelStatCard label="Packs" value="10" tone="green" />
+                <PixelStatCard label="Packs" value={String(ICON_PACK_COUNT)} tone="green" />
               </PixelFadeIn>
               <PixelFadeIn delay={200}>
-                <PixelStatCard label="Components" value="50+" tone="cyan" />
+                <PixelStatCard label="Components" value={String(UI_COMPONENTS_COUNT)} tone="cyan" />
               </PixelFadeIn>
             </div>
           </PixelBentoCell>

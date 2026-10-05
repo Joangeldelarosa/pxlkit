@@ -65,14 +65,19 @@ import { Trophy, Lightning, FireSword, Crown, Shield, Coin, Star } from '@pxlkit
 import { Bell, CheckCircle, WarningTriangle, InfoCircle } from '@pxlkit/feedback';
 import { Heart, Message } from '@pxlkit/social';
 import { FrameworkCode } from '../../components/FrameworkCode';
+import { CodeBlock } from '../../components/CodeBlock';
 import { DocSection, PropsTable, UsageCode, type PropDef } from './_doc-section';
 import { ToastGallery, ToastPlayground } from './_toasts';
-import { WhatsNewStrip, type WhatsNewItem } from '../../components/whats-new-strip';
+import { WhatsNewStrip } from '../../components/whats-new-strip';
+import { ClientOnly } from '../../components/ClientOnly';
+import { WHATS_NEW_ITEMS, WHATS_NEW_SUMMARY } from '@/lib/whats-new';
 import {
   UI_KIT_VERSION,
   UI_KIT_VERSION_LABEL,
   UI_KIT_LATEST_DATE,
 } from '@/lib/pxlkit-version';
+import { ICON_PACK_COUNT } from '@/lib/pxlkit-counts';
+import { TAILWIND_SETUP } from '@/lib/setup-snippets';
 
 /* ── Live demos imported from package SSOT .examples.tsx files.
    Each export is the `Default` example function authored alongside the component.
@@ -109,7 +114,8 @@ import { Default as PixelBarChartDefault } from '@pxlkit/ui-kit/data/PixelBarCha
 import { Default as PixelAreaChartDefault } from '@pxlkit/ui-kit/data/PixelAreaChart.examples';
 
 // Hero & Cards
-import { Default as PixelHeroSectionDefault } from '@pxlkit/ui-kit/hero/PixelHeroSection.examples';
+// The hero demo with an h2 headline: the page's own h1 stays its only one.
+import { HeadingLevel as PixelHeroSectionDemo } from '@pxlkit/ui-kit/hero/PixelHeroSection.examples';
 import { Default as PixelHeroMediaDefault } from '@pxlkit/ui-kit/hero/PixelHeroMedia.examples';
 import { Default as PixelFeatureCardDefault } from '@pxlkit/ui-kit/cards/PixelFeatureCard.examples';
 import { Default as PixelPricingCardDefault } from '@pxlkit/ui-kit/cards/PixelPricingCard.examples';
@@ -205,6 +211,74 @@ const COMMON_DISPLAY: PropDef[] = [PROP_SURFACE, PROP_CLASSNAME];
 const COMMON_CONTAINER: PropDef[] = [PROP_SURFACE, PROP_CLASSNAME, PROP_CHILDREN_REQUIRED];
 const COMMON_ANIMATION: PropDef[] = [PROP_CLASSNAME, PROP_CHILDREN_REQUIRED];
 
+/* The Vue and Angular setups shown in their sections (#vue, #angular). */
+const VUE_SETUP = {
+  install: `npm install @pxlkit/ui-kit-vue @pxlkit/vue
+npm install -D tailwindcss @tailwindcss/vite`,
+  vite: `import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+  plugins: [vue(), tailwindcss()],
+});`,
+  css: `@import "@pxlkit/ui-kit-vue/styles.css";`,
+  app: `<script setup lang="ts">
+import { ref } from 'vue';
+import { PixelButton, PixelInput, PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
+
+const email = ref('');
+
+function save() {
+  // send email.value
+}
+</script>
+
+<template>
+  <PxlKitSurfaceProvider surface="pixel">
+    <PixelInput v-model="email" label="Email" placeholder="you@studio.dev" />
+    <PixelButton tone="green" @click="save">Save</PixelButton>
+  </PxlKitSurfaceProvider>
+</template>`,
+};
+
+const ANGULAR_SETUP = {
+  install: `npm install @pxlkit/ui-kit-angular @pxlkit/angular
+# Tailwind CSS v4: ng new my-app --style=tailwind (Angular CLI 21 and later),
+# or on Angular 20: npm install -D tailwindcss @tailwindcss/postcss postcss
+# and a .postcssrc.json with { "plugins": { "@tailwindcss/postcss": {} } }`,
+  css: `@import "@pxlkit/ui-kit-angular/styles.css";`,
+  config: `import type { ApplicationConfig } from '@angular/core';
+import { providePxlKitSurface } from '@pxlkit/ui-kit-angular';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // …keep the providers ng new generated (change detection, router,
+    // provideClientHydration() in SSR apps), and add:
+    providePxlKitSurface('pixel'),
+  ],
+};`,
+  component: `import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { PixelButton, PixelInput } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  selector: 'app-signup',
+  imports: [FormsModule, PixelButton, PixelInput],
+  template: \`
+    <pxl-input label="Email" placeholder="you@studio.dev" [(ngModel)]="email" />
+    <button pxlButton tone="green" (click)="save()">Save</button>
+  \`,
+})
+export class Signup {
+  protected email = '';
+
+  protected save() {
+    // send this.email
+  }
+}`,
+};
+
 /* How a React prop reads in the Vue and Angular kits (docs/ui-kit-porting.md,
    "Mapping the API"; the kits' READMEs carry the same table). */
 type FrameworkIdiom = { react: string; vue: string; angular: string };
@@ -217,7 +291,7 @@ const FRAMEWORK_IDIOMS: FrameworkIdiom[] = [
   { react: 'value + onChange', vue: 'v-model', angular: '[(value)]; form controls also take ngModel and formControlName' },
   { react: 'open + onOpenChange, checked + onChange', vue: 'v-model:open, v-model:checked', angular: '[(open)], [(checked)]' },
   { react: 'other callbacks: onClose', vue: 'events: @close', angular: 'outputs: (closed) — past tense where the present would shadow a DOM event' },
-  { react: '<PixelForm.Root form={useForm()}> on React Hook Form', vue: '<PixelForm :form="useForm()"> on VeeValidate', angular: '<form [pxlForm]="group"> on reactive forms' },
+  { react: 'const form = useForm(); <PixelForm form={form}> on React Hook Form', vue: 'const form = useForm() in <script setup>; <PixelForm :form="form"> on VeeValidate', angular: '<form [pxlForm]="group"> on reactive forms' },
   { react: 'className', vue: 'class', angular: 'class' },
   { react: '<PxlKitSurfaceProvider surface>', vue: '<PxlKitSurfaceProvider surface>', angular: 'providePxlKitSurface() for the app, pxlKitSurface="…" on an element' },
 ];
@@ -389,6 +463,8 @@ const CATEGORY_META: Array<{ id: string; label: string }> = [
 
 const OVERVIEW_ITEMS: { id: string; name: string }[] = [
   { id: 'getting-started', name: 'Getting Started' },
+  { id: 'vue', name: 'Vue — new in 2.2' },
+  { id: 'angular', name: 'Angular — new in 2.2' },
   { id: 'design-tokens', name: 'Design Tokens' },
   { id: 'surface-system', name: 'Surface System' },
   { id: 'locale-support', name: 'Locale / Turkish' },
@@ -475,7 +551,7 @@ const LIVE_DEMOS: Record<string, React.ComponentType> = {
   PixelAreaChart: PixelAreaChartDefault,
 
   // Hero & Cards
-  PixelHeroSection: PixelHeroSectionDefault,
+  PixelHeroSection: PixelHeroSectionDemo,
   PixelHeroMedia: PixelHeroMediaDefault,
   PixelFeatureCard: PixelFeatureCardDefault,
   PixelPricingCard: PixelPricingCardDefault,
@@ -516,15 +592,11 @@ const LIVE_DEMOS: Record<string, React.ComponentType> = {
   PixelSectionHeader: PixelSectionHeaderDefault,
 };
 
-/* v2.1.0 highlights — API upgrades from the responsive-hardening + dogfooding release.
-   Links land on each component's DocSection anchor on this page. */
-const WHATS_NEW_V210_ITEMS: WhatsNewItem[] = [
-  { name: 'PixelCard', category: 'cards', href: '#pixel-card', isNew: true },
-  { name: 'PixelPricingCard', category: 'cards', href: '#pixel-pricing-card', isNew: true },
-  { name: 'PixelStatCard', category: 'cards', href: '#pixel-stat-card', isNew: true },
-  { name: 'PixelStatGroup', category: 'data', href: '#pixel-stat-group', isNew: true },
-  { name: 'PixelChip', category: 'data', href: '#pixel-chip', isNew: true },
-];
+/* Demos whose markup depends on the reader's clock — a calendar shows the
+   current month and marks today — render in the browser only: a page built on
+   one day and read on another would otherwise fail to hydrate. The fallback
+   keeps the calendar's height so nothing moves when it appears. */
+const CLOCK_DEPENDENT_DEMOS = new Set(['PixelCalendarGrid']);
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    INTERNAL: Cross-link helper
@@ -564,17 +636,26 @@ function MoreComponentSection({ id, name }: { id: string; name: string }) {
       title={name}
       description={
         <>
-          Shipped in <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>. See the{' '}
+          In <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>,{' '}
+          <PixelCodeInline>@pxlkit/ui-kit-vue</PixelCodeInline> and{' '}
+          <PixelCodeInline>@pxlkit/ui-kit-angular</PixelCodeInline>. See the{' '}
           <PixelTextLink href={`/changelog#v${UI_KIT_VERSION.replace(/\./g, '')}`}>
             {`${UI_KIT_VERSION_LABEL} changelog`}
           </PixelTextLink>{' '}
           for release notes, or the{' '}
           <PixelTextLink href={`/docs#${id}`}>full reference</PixelTextLink>{' '}
-          for props, accessibility, and keyboard docs generated from the component manifest.
+          for props, accessibility, keyboard and the examples in React, Vue and Angular.
         </>
       }
     >
-      {Demo ? (
+      {Demo && CLOCK_DEPENDENT_DEMOS.has(name) ? (
+        // The calendar always draws six weeks: 263px tall, whatever the month.
+        <div className="min-h-[263px]">
+          <ClientOnly fallback={<PixelSkeleton width="100%" height="263px" className="max-w-xs" />}>
+            <Demo />
+          </ClientOnly>
+        </div>
+      ) : Demo ? (
         <Demo />
       ) : (
         <p className="text-retro-muted text-sm">
@@ -683,7 +764,7 @@ function SidebarContent({
         value={searchQuery}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder="Search components..."
-        icon={<PxlKitIcon icon={Search} size={14} />}
+        prefix={<PxlKitIcon icon={Search} size={14} />}
         size="sm"
       />
 
@@ -691,7 +772,7 @@ function SidebarContent({
       {filtered.map((cat) => (
         <div key={cat.id}>
           <div className="mb-1.5 flex items-center justify-between px-2">
-            <h4 className="font-pixel text-[9px] uppercase tracking-wider text-retro-muted">{cat.label}</h4>
+            <p className="font-pixel text-[9px] uppercase tracking-wider text-retro-muted">{cat.label}</p>
             <span className="font-mono text-[9px] text-retro-muted/50">{cat.items.length}</span>
           </div>
           <ul className="space-y-0.5">
@@ -876,14 +957,15 @@ export default function UIKitPage() {
               <WhatsNewStrip
                 version={UI_KIT_VERSION}
                 date={UI_KIT_LATEST_DATE}
-                items={WHATS_NEW_V210_ITEMS}
+                items={WHATS_NEW_ITEMS}
+                summary={WHATS_NEW_SUMMARY}
               />
             </div>
 
             {/* ══════════════════ HERO ══════════════════ */}
             <header>
               <PixelBreadcrumb items={[{ label: 'Home', href: '/' }, { label: 'UI Kit', active: true }]} />
-              <h1 className="mt-4 font-pixel text-base text-retro-green sm:text-lg leading-relaxed">PXLKIT UI KIT</h1>
+              <h1 className="mt-4 font-pixel text-base text-retro-green sm:text-lg leading-relaxed">PXLKIT UI KIT FOR REACT</h1>
               <p className="mt-3 max-w-2xl text-sm text-retro-muted leading-relaxed">
                 A React component kit built on three promises.{' '}
                 <strong className="text-retro-cyan">Surface system</strong> — flip every component between an 8-bit
@@ -894,18 +976,24 @@ export default function UIKitPage() {
                 Calendar, Charts, OTPInput and {UI_COMPONENTS_COUNT - 8}+ more are already in the box. Use the sidebar
                 to browse all {UI_COMPONENTS_COUNT} components and the PixelToast guide.
               </p>
+              <p className="mt-3 max-w-2xl text-sm text-retro-muted leading-relaxed">
+                <strong className="text-retro-purple">New in 2.2:</strong> the same {UI_COMPONENTS_COUNT} components for
+                Vue 3 and Angular — same markup, theme and keyboard behaviour, checked against React by parity tests. See{' '}
+                <PixelTextLink href="#vue">Vue</PixelTextLink> and <PixelTextLink href="#angular">Angular</PixelTextLink>{' '}
+                below.
+              </p>
               <div className="mt-5 flex flex-wrap gap-2">
                 <PixelBadge tone="green">{UI_COMPONENTS_COUNT} components</PixelBadge>
                 <PixelBadge tone="cyan">pixel ↔ linear surface</PixelBadge>
                 <PixelBadge tone="gold">typescript-first</PixelBadge>
                 <PixelBadge tone="purple">WAI-ARIA baseline</PixelBadge>
-                <PixelBadge tone="red">zero runtime deps</PixelBadge>
+                <PixelBadge tone="red">Tailwind CSS v4</PixelBadge>
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <PixelStatCard label="Components" value={String(UI_COMPONENTS_COUNT)} icon={<PxlKitIcon icon={Grid} size={16} />} tone="green" />
-                <PixelStatCard label="Icon Packs" value="6" icon={<PxlKitIcon icon={Package} size={16} />} tone="cyan" />
-                <PixelStatCard label="Design Tokens" value="6 tones" icon={<PxlKitIcon icon={SparkleSmall} size={16} />} tone="gold" />
-                <PixelStatCard label="Fully Custom" value="100%" icon={<PxlKitIcon icon={Check} size={16} />} tone="purple" />
+                <PixelStatCard label="Icon Packs" value={String(ICON_PACK_COUNT)} icon={<PxlKitIcon icon={Package} size={16} />} tone="cyan" />
+                <PixelStatCard label="Design Tokens" value="7 tones" icon={<PxlKitIcon icon={SparkleSmall} size={16} />} tone="gold" />
+                <PixelStatCard label="New in 2.2" value="Vue + Angular" icon={<PxlKitIcon icon={Check} size={16} />} tone="purple" />
               </div>
             </header>
 
@@ -915,11 +1003,13 @@ export default function UIKitPage() {
             <section data-section="getting-started" id="getting-started" className="scroll-mt-20 space-y-4">
               <h2 className="font-pixel text-xs text-retro-green">GETTING STARTED</h2>
               <p className="text-sm text-retro-muted">
-                Three steps and you&apos;re rendering, in React, Vue or Angular. Install the kit for your framework —{' '}
-                <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline>, <PixelCodeInline>@pxlkit/ui-kit-vue</PixelCodeInline> or{' '}
+                Three steps and you&apos;re rendering. Install the React kit,{' '}
+                <PixelCodeInline>@pxlkit/ui-kit</PixelCodeInline> — or, new in 2.2,{' '}
+                <PixelCodeInline>@pxlkit/ui-kit-vue</PixelCodeInline> or{' '}
                 <PixelCodeInline>@pxlkit/ui-kit-angular</PixelCodeInline> — with your framework&apos;s icon components and the
-                icon packs you use; import its stylesheet, which brings Tailwind CSS v4 with it; and use the components. The
-                three kits render the same markup and classes and behave the same way. Every primitive accepts the shared{' '}
+                icon packs you use; import its stylesheet — a Tailwind CSS v4 entry point, so Tailwind&apos;s Vite or PostCSS
+                plugin must run on it; and use the components. The three kits render the same markup and classes and behave
+                the same way. Every primitive accepts the shared{' '}
                 <CompLink id="design-tokens"><PixelCodeInline>tone</PixelCodeInline></CompLink>,{' '}
                 <PixelCodeInline>size</PixelCodeInline>, and <PixelCodeInline>surface</PixelCodeInline> contract — so
                 what you learn on <CompLink id="pixel-button">PixelButton</CompLink> applies to{' '}
@@ -929,10 +1019,22 @@ export default function UIKitPage() {
               </p>
               <FrameworkCode
                 title="Install"
-                react="npm install @pxlkit/ui-kit @pxlkit/core @pxlkit/gamification @pxlkit/ui tailwindcss"
-                vue="npm install @pxlkit/ui-kit-vue @pxlkit/vue @pxlkit/gamification @pxlkit/ui tailwindcss"
-                angular="npm install @pxlkit/ui-kit-angular @pxlkit/angular @pxlkit/gamification @pxlkit/ui tailwindcss"
+                react="npm install @pxlkit/ui-kit @pxlkit/core @pxlkit/gamification @pxlkit/ui"
+                vue="npm install @pxlkit/ui-kit-vue @pxlkit/vue @pxlkit/gamification @pxlkit/ui"
+                angular="npm install @pxlkit/ui-kit-angular @pxlkit/angular @pxlkit/gamification @pxlkit/ui"
               />
+              <FrameworkCode
+                title="Tailwind CSS v4 in your build"
+                react={TAILWIND_SETUP.react}
+                vue={TAILWIND_SETUP.vue}
+                angular={TAILWIND_SETUP.angular}
+              />
+              <p className="text-xs text-retro-muted">
+                The kit&apos;s stylesheet is a Tailwind CSS v4 entry point, so Tailwind has to process it. Without that step
+                the build still succeeds, but the CSS keeps <PixelCodeInline>@theme</PixelCodeInline>,{' '}
+                <PixelCodeInline>@source</PixelCodeInline> and <PixelCodeInline>@apply</PixelCodeInline> as written and the
+                components render unstyled.
+              </p>
               <FrameworkCode
                 title="Quick Start"
                 react={`// 1. In your Tailwind CSS file (e.g., index.css), in place of @import "tailwindcss":
@@ -952,7 +1054,7 @@ export function QuickStart() {
       </PixelButton>
       <PixelInput
         label="Search"
-        icon={<PxlKitIcon icon={Search} size={16} />}
+        prefix={<PxlKitIcon icon={Search} size={16} />}
         placeholder="Find icons..."
       />
     </>
@@ -975,7 +1077,7 @@ import { Search } from '@pxlkit/ui';
     Create Quest
   </PixelButton>
   <PixelInput label="Search" placeholder="Find icons...">
-    <template #icon><PxlKitIcon :icon="Search" :size="16" /></template>
+    <template #prefix><PxlKitIcon :icon="Search" :size="16" /></template>
   </PixelInput>
 </template>`}
                 angular={`// 1. In your Tailwind CSS file (e.g., src/styles.css), in place of @import "tailwindcss":
@@ -993,7 +1095,7 @@ import { PixelButton, PixelInput } from '@pxlkit/ui-kit-angular';
   imports: [PixelButton, PixelInput, PxlKitIcon],
   template: \`
     <button pxlButton tone="green" [iconLeft]="trophyIcon">Create Quest</button>
-    <pxl-input label="Search" [icon]="searchIcon" placeholder="Find icons..." />
+    <pxl-input label="Search" [prefix]="searchIcon" placeholder="Find icons..." />
 
     <ng-template #trophyIcon><pxl-icon [icon]="trophy" [size]="16" /></ng-template>
     <ng-template #searchIcon><pxl-icon [icon]="search" [size]="16" /></ng-template>
@@ -1004,6 +1106,26 @@ export class QuickStart {
   protected readonly search = Search;
 }`}
               />
+
+              <p className="text-xs text-retro-muted">
+                <strong className="text-retro-text">Next.js (App Router).</strong> Keep{' '}
+                <PixelCodeInline>app/layout.tsx</PixelCodeInline> a Server Component and put the providers in a{' '}
+                <PixelCodeInline>&apos;use client&apos;</PixelCodeInline> file of your own; start files that use the
+                components&apos; hooks or event handlers with <PixelCodeInline>&apos;use client&apos;</PixelCodeInline>, and
+                import server-side helpers such as <PixelCodeInline>buildGoogleFontsUrl</PixelCodeInline> from{' '}
+                <PixelCodeInline>@pxlkit/ui-kit-core</PixelCodeInline>. The{' '}
+                <PixelTextLink href="/docs#ui-kit">setup guide</PixelTextLink> has the files.
+              </p>
+              <p className="text-xs text-retro-muted">
+                <strong className="text-retro-text">Server rendering.</strong> The three kits render on the server and
+                hydrate — Next.js, Nuxt, <PixelCodeInline>@angular/ssr</PixelCodeInline>. A calendar shows the current
+                month and marks today, which depends on the reader&apos;s clock: give{' '}
+                <PixelCodeInline>PixelCalendarGrid</PixelCodeInline> a <PixelCodeInline>month</PixelCodeInline> (or a{' '}
+                <PixelCodeInline>value</PixelCodeInline>) for a stable server render, or render a current-month calendar in
+                the browser only — <PixelCodeInline>next/dynamic</PixelCodeInline> with{' '}
+                <PixelCodeInline>ssr: false</PixelCodeInline> in Next.js, <PixelCodeInline>&lt;ClientOnly&gt;</PixelCodeInline>{' '}
+                in Nuxt, <PixelCodeInline>@defer</PixelCodeInline> in Angular.
+              </p>
 
               <div className="rounded-lg border border-retro-border/30 bg-retro-surface/30 p-4">
                 <h3 className="mb-3 font-mono text-xs font-semibold text-retro-text">From React props to Vue and Angular</h3>
@@ -1031,12 +1153,68 @@ export class QuickStart {
                   { name: 'size', type: '"sm" | "md" | "lg"', default: '"md"', description: 'Controls height, padding, and font size' },
                   { name: 'surface', type: '"pixel" | "linear"', default: 'inherits from PxlKitSurfaceProvider, falls back to "pixel"', description: 'Visual aesthetic. Per-component override of the global surface — see Surface System.' },
                   { name: 'disabled', type: 'boolean', default: 'false', description: 'Standard HTML disabled state — applies to every interactive component (buttons, inputs, switches, sliders, segmented, etc.).' },
-                  { name: 'iconLeft / iconRight', type: 'ReactNode', default: '—', description: 'Icon slots flanking the label. Accepted by PixelButton; PxlKitButton/PixelSplitButton use the single `icon` slot. Standalone inputs use the `icon` prop instead.' },
+                  { name: 'iconLeft / iconRight', type: 'ReactNode', default: '—', description: 'Icon slots flanking the label. Accepted by PixelButton; PxlKitButton/PixelSplitButton use the single `icon` slot. Inputs take `prefix` and `suffix` instead (`icon` is the older name of `prefix`).' },
                   { name: 'label', type: 'string', default: '—', description: 'Accessible label for inputs/controls (PixelInput, PixelSelect, PixelCheckbox, PixelSwitch, PixelSlider, PixelRadioGroup, …). Buttons use `children` for their visible text, not `label`.' },
                   { name: 'children', type: 'ReactNode', default: '—', description: 'Required for container components (PixelCard, PixelModal, PixelTooltip, animations, etc.). Listed here once; not repeated in each table.' },
                   { name: 'className', type: 'string', default: '—', description: 'Extra CSS class names merged onto the outer element.' },
                 ]} />
               </div>
+            </section>
+
+            {/* ══════════════════ VUE AND ANGULAR (new in 2.2) ══════════════════ */}
+            <section data-section="vue" id="vue" className="scroll-mt-20 space-y-4 pt-10">
+              <h2 className="font-pixel text-xs text-retro-green">PXLKIT FOR VUE 3 · NEW IN 2.2</h2>
+              <p className="text-sm text-retro-muted">
+                <PixelCodeInline>@pxlkit/ui-kit-vue</PixelCodeInline> is the Vue 3 edition of this kit: the same{' '}
+                {UI_COMPONENTS_COUNT} components, markup, Tailwind CSS v4 theme and keyboard behaviour as the React kit,
+                checked against it example by example. They are single-file components — React&apos;s element props
+                become slots, <PixelCodeInline>value</PixelCodeInline> and <PixelCodeInline>open</PixelCodeInline>{' '}
+                become <PixelCodeInline>v-model</PixelCodeInline>, callbacks become events. It needs Vue 3.5 or later,
+                renders on the server with Nuxt or <PixelCodeInline>vue/server-renderer</PixelCodeInline> and hydrates
+                without mismatches. The icon components come from <PixelCodeInline>@pxlkit/vue</PixelCodeInline>; React is
+                never installed.
+              </p>
+              <CodeBlock title="Install (Vite)" language="bash" code={VUE_SETUP.install} />
+              <CodeBlock title="vite.config.ts" language="typescript" code={VUE_SETUP.vite} />
+              <CodeBlock title="src/style.css — in place of @import &quot;tailwindcss&quot;" language="css" code={VUE_SETUP.css} />
+              <CodeBlock title="App.vue" language="vue" code={VUE_SETUP.app} />
+              <p className="text-xs text-retro-muted">
+                <strong className="text-retro-text">Nuxt.</strong> No Nuxt module or{' '}
+                <PixelCodeInline>build.transpile</PixelCodeInline> entry is needed: add{' '}
+                <PixelCodeInline>@tailwindcss/vite</PixelCodeInline> to <PixelCodeInline>vite.plugins</PixelCodeInline> and
+                the stylesheet to <PixelCodeInline>css</PixelCodeInline> in <PixelCodeInline>nuxt.config.ts</PixelCodeInline>{' '}
+                (see the Tailwind step above). Nuxt auto-imports your own components, not a package&apos;s, so import the
+                kit&apos;s components where you use them. Every example on this page has a Vue tab; the{' '}
+                <PixelTextLink href="https://www.npmjs.com/package/@pxlkit/ui-kit-vue">package README</PixelTextLink> maps
+                the whole API.
+              </p>
+            </section>
+
+            <section data-section="angular" id="angular" className="scroll-mt-20 space-y-4 pt-10">
+              <h2 className="font-pixel text-xs text-retro-green">PXLKIT FOR ANGULAR · NEW IN 2.2</h2>
+              <p className="text-sm text-retro-muted">
+                <PixelCodeInline>@pxlkit/ui-kit-angular</PixelCodeInline> brings the same {UI_COMPONENTS_COUNT} components
+                to Angular 20, 21 and 22 as standalone, signal-based components —{' '}
+                <PixelCodeInline>&lt;button pxlButton&gt;</PixelCodeInline>,{' '}
+                <PixelCodeInline>&lt;pxl-modal&gt;</PixelCodeInline> — with the React kit&apos;s markup, theme and keyboard
+                behaviour. Form controls implement <PixelCodeInline>ControlValueAccessor</PixelCodeInline>, so{' '}
+                <PixelCodeInline>ngModel</PixelCodeInline>, <PixelCodeInline>formControlName</PixelCodeInline> and{' '}
+                <PixelCodeInline>[formControl]</PixelCodeInline> work; overlays take{' '}
+                <PixelCodeInline>[(open)]</PixelCodeInline>. They run in zoneless and zone.js applications and hydrate with{' '}
+                <PixelCodeInline>@angular/ssr</PixelCodeInline>. The icon components come from{' '}
+                <PixelCodeInline>@pxlkit/angular</PixelCodeInline>.
+              </p>
+              <CodeBlock title="Install" language="bash" code={ANGULAR_SETUP.install} />
+              <CodeBlock title="src/styles.css — in place of @import &quot;tailwindcss&quot;" language="css" code={ANGULAR_SETUP.css} />
+              <CodeBlock title="src/app/app.config.ts" language="typescript" code={ANGULAR_SETUP.config} />
+              <CodeBlock title="A component" language="typescript" code={ANGULAR_SETUP.component} />
+              <p className="text-xs text-retro-muted">
+                Keep the providers <PixelCodeInline>ng new</PixelCodeInline> generated —{' '}
+                <PixelCodeInline>provideClientHydration()</PixelCodeInline> in particular: without it the browser throws the
+                server markup away and renders again. Every example on this page has an Angular tab; the{' '}
+                <PixelTextLink href="https://www.npmjs.com/package/@pxlkit/ui-kit-angular">package README</PixelTextLink>{' '}
+                maps the whole API, overlays and form controls included.
+              </p>
             </section>
 
             {/* ══════════════════ DESIGN TOKENS ══════════════════ */}
@@ -1071,8 +1249,8 @@ export class QuickStart {
                       <p className="text-xs font-mono text-retro-muted">Code &amp; UI labels — font-mono</p>
                     </div>
                     <div>
-                      <p className="font-body text-sm text-retro-text">Inter</p>
-                      <p className="text-xs font-mono text-retro-muted">Body text — font-body</p>
+                      <p className="font-sans text-sm text-retro-text">Inter</p>
+                      <p className="text-xs font-mono text-retro-muted">Body text — font-sans</p>
                     </div>
                   </div>
                   <PixelDivider />
@@ -1151,20 +1329,18 @@ export class QuickStart {
 
               <FrameworkCode
                 title="Surface — Setup & override"
-                react={`import { PxlKitSurfaceProvider, PixelButton, PixelCard } from '@pxlkit/ui-kit';
+                react={`// === GLOBAL toggle: wrap your whole app once ===
+// app/providers.tsx — in Next.js (App Router) the providers live in a Client Component
+'use client';
 
-// === GLOBAL toggle: wrap your whole app once ===
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        <PxlKitSurfaceProvider surface="linear">
-          {children}
-        </PxlKitSurfaceProvider>
-      </body>
-    </html>
-  );
+import { PxlKitSurfaceProvider, PixelButton, PixelCard } from '@pxlkit/ui-kit';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return <PxlKitSurfaceProvider surface="linear">{children}</PxlKitSurfaceProvider>;
 }
+
+// app/layout.tsx stays a Server Component and renders <Providers>{children}</Providers> in <body>.
+// In a Vite app, wrap <App /> in main.tsx instead.
 
 // === LOCAL override: one component in a different mode ===
 <PxlKitSurfaceProvider surface="pixel">
@@ -1180,6 +1356,7 @@ import { PxlKitSurfaceProvider, PixelButton, PixelCard } from '@pxlkit/ui-kit-vu
 <template>
   <!-- === GLOBAL toggle: wrap your whole app once (App.vue) === -->
   <PxlKitSurfaceProvider surface="linear">
+    <!-- your app (RouterView with Vue Router) -->
     <RouterView />
   </PxlKitSurfaceProvider>
 
@@ -1196,7 +1373,10 @@ import type { ApplicationConfig } from '@angular/core';
 import { providePxlKitSurface } from '@pxlkit/ui-kit-angular';
 
 export const appConfig: ApplicationConfig = {
-  providers: [providePxlKitSurface('linear')],
+  providers: [
+    // …keep the providers ng new generated (provideClientHydration() in SSR apps), and add:
+    providePxlKitSurface('linear'),
+  ],
 };
 
 // === LOCAL override: one component in a different mode ===
@@ -1308,9 +1488,9 @@ export class RetroCard {}`}
                   </div>
                   <PixelDivider />
                   <div>
-                    <p className="text-[10px] font-mono text-retro-muted mb-1">Inter (font-body)</p>
-                    <p className="text-sm text-retro-green">{TURKISH_CHARACTERS.uppercase}</p>
-                    <p className="text-sm text-retro-cyan">{TURKISH_CHARACTERS.lowercase}</p>
+                    <p className="text-[10px] font-mono text-retro-muted mb-1">Inter (font-sans)</p>
+                    <p className="font-sans text-sm text-retro-green">{TURKISH_CHARACTERS.uppercase}</p>
+                    <p className="font-sans text-sm text-retro-cyan">{TURKISH_CHARACTERS.lowercase}</p>
                   </div>
                   <PixelDivider />
                   <div>
@@ -1347,44 +1527,24 @@ export class RetroCard {}`}
               {/* ── Setup guide ── */}
               <FrameworkCode
                 title="Turkish Locale — Complete Setup Guide"
-                react={`// === STEP 1: Install & import ===
+                react={`// === STEP 1: Wrap your app — in src/main.tsx (Vite), or in a 'use client' providers file (Next.js App Router) ===
 import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';
 
-// === STEP 2: Wrap your app (React / Next.js) ===
-
-// For a standard React app (Vite, CRA, etc.):
-function App() {
-  return (
-    <PxlKitLocaleProvider locale="tr">
-      <MyApp />
-    </PxlKitLocaleProvider>
-  );
+export function Providers({ children }: { children: React.ReactNode }) {
+  return <PxlKitLocaleProvider locale="tr">{children}</PxlKitLocaleProvider>;
 }
+// Server-rendered apps: also set lang="tr" on <html> (app/layout.tsx in Next.js).
 
-// For Next.js App Router — also set lang on <html>:
-// app/layout.tsx
-export default function RootLayout({ children }) {
-  return (
-    <html lang="tr">
-      <body>
-        <PxlKitLocaleProvider locale="tr">
-          {children}
-        </PxlKitLocaleProvider>
-      </body>
-    </html>
-  );
-}
-
-// === STEP 3: Google Fonts — ensure latin-ext subset ===
+// === STEP 2: Google Fonts — ensure the latin-ext subset ===
 // In your CSS file or HTML <head>:
 // @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&subset=latin,latin-ext&display=swap');
 
-// Or generate the URL dynamically:
-import { buildGoogleFontsUrl } from '@pxlkit/ui-kit';
+// Or build the URL — from @pxlkit/ui-kit-core, which a Server Component (app/layout.tsx) can import:
+import { buildGoogleFontsUrl } from '@pxlkit/ui-kit-core';
 const fontsUrl = buildGoogleFontsUrl('tr');
 // → includes &subset=latin,latin-ext
 
-// === STEP 4: Use locale-aware text in custom components ===
+// === STEP 3: Use locale-aware text in your components (a Client Component in Next.js) ===
 import { usePxlKitLocale, toLocaleUpper } from '@pxlkit/ui-kit';
 
 function MyTitle({ text }: { text: string }) {
@@ -1403,6 +1563,7 @@ import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';
 
 <template>
   <PxlKitLocaleProvider locale="tr">
+    <!-- your app (RouterView with Vue Router) -->
     <RouterView />
   </PxlKitLocaleProvider>
 </template>
@@ -1489,7 +1650,9 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
               props={[
                 { name: 'tone', type: 'Tone', default: '"green"', description: 'Color variant' },
                 { name: 'size', type: 'Size', default: '"md"', description: 'Button size' },
-                { name: 'variant', type: '"solid" | "ghost"', default: '"solid"', description: 'Visual style' },
+                { name: 'variant', type: '"solid" | "soft" | "outline" | "ghost"', default: '"solid"', description: 'Visual style' },
+                { name: 'fullWidth', type: 'boolean', default: 'false', description: "Stretch to the parent's width" },
+                { name: 'asChild', type: 'boolean', default: 'false', description: 'Render the single child element (a link) as the button' },
                 { name: 'iconLeft', type: 'ReactNode', default: '—', description: 'Icon before label' },
                 { name: 'iconRight', type: 'ReactNode', default: '—', description: 'Icon after label' },
                 { name: 'loading', type: 'boolean', default: 'false', description: 'Shows spinner, disables button' },
@@ -1949,7 +2112,13 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
               props={[
                 { name: 'label', type: 'string', default: '—', description: 'Chip text content' },
                 { name: 'tone', type: 'Tone', default: '"cyan"', description: 'Color variant' },
-                { name: 'onRemove', type: '() => void', default: '—', description: 'Shows remove button when provided' },
+                { name: 'variant', type: '"soft" | "solid" | "outline" | "ghost"', default: '"soft"', description: 'Visual style' },
+                { name: 'size', type: 'Size', default: '"md"', description: 'Chip size' },
+                { name: 'iconLeft', type: 'ReactNode', default: '—', description: 'Icon before the label' },
+                { name: 'value', type: 'string', default: '—', description: 'Identifies the chip inside a PixelChipGroup' },
+                { name: 'onDelete', type: '() => void', default: '—', description: 'Shows the × button (Vue: @delete; Angular: deletable + (delete)). onRemove is its older name.' },
+                { name: 'deletable', type: 'boolean', default: '—', description: 'false hides the × even with onDelete' },
+                { name: 'onClick', type: 'MouseEventHandler', default: '—', description: 'Makes the label a button (Angular: clickable + (clicked), or <button pxlChip>)' },
                 ...COMMON_DISPLAY,
               ]}
             >
@@ -1957,8 +2126,8 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
                 <PixelChip tone="cyan" label="react" />
                 <PixelChip tone="purple" label="typescript" />
                 <PixelChip tone="green" label="tailwind" />
-                <PixelChip tone="gold" label="removable" onRemove={() => {}} />
-                <PixelChip tone="red" label="deprecated" onRemove={() => {}} />
+                <PixelChip tone="gold" label="removable" onDelete={() => {}} />
+                <PixelChip tone="red" label="deprecated" onDelete={() => {}} />
               </div>
             </DocSection>
 
@@ -2310,7 +2479,12 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
                 { name: 'open', type: 'boolean', default: '—', description: 'Visibility state' },
                 { name: 'title', type: 'string', default: '—', description: 'Modal heading' },
                 { name: 'onClose', type: '() => void', default: '—', description: 'Close handler' },
-                { name: 'size', type: '"sm" | "md" | "lg"', default: '"md"', description: 'Max width' },
+                { name: 'size', type: '"sm" | "md" | "lg" | "xl" | "full"', default: '"md"', description: 'Max width' },
+                { name: 'description', type: 'ReactNode', default: '—', description: 'Text under the title, wired to aria-describedby' },
+                { name: 'footer', type: 'ReactNode', default: '—', description: 'Actions row under the body' },
+                { name: 'closeLabel', type: 'string', default: '"Close"', description: 'Accessible name of the close button' },
+                { name: 'asyncClose', type: '() => Promise<void>', default: '—', description: 'The close button awaits it, showing a busy state, before onClose' },
+                { name: 'container', type: 'HTMLElement | null', default: 'document.body', description: 'Where the dialog is portaled' },
                 ...COMMON_CONTAINER,
               ]}
             >
@@ -2325,8 +2499,12 @@ toLocaleUpper('istanbul', 'tr'); // → "İSTANBUL"`}
               title="PixelTooltip"
               description={<>Informational tooltip that appears on hover and focus. Supports four positions. Wrap any element — works perfectly with <CompLink id="pxlkit-button">PxlKitButton</CompLink>.</>}
               props={[
-                { name: 'content', type: 'string', default: '—', description: 'Tooltip text' },
+                { name: 'content', type: 'ReactNode', default: '—', description: 'Tooltip content (label is its plain-text alias)' },
                 { name: 'position', type: '"top" | "bottom" | "left" | "right"', default: '"top"', description: 'Tooltip placement' },
+                { name: 'trigger', type: '"hover" | "focus" | "click"', default: '"hover"', description: 'What opens it; Escape closes it in every mode' },
+                { name: 'delay', type: 'number | { open?: number; close?: number }', default: '{ open: 200, close: 100 }', description: 'Open and close delays in ms' },
+                { name: 'open / defaultOpen / onOpenChange', type: 'boolean / boolean / (open: boolean) => void', default: '—', description: 'Controlled or uncontrolled open state' },
+                { name: 'sideOffset', type: 'number', default: '8', description: 'Gap between the trigger and the tooltip, in px' },
                 ...COMMON_CONTAINER,
               ]}
             >

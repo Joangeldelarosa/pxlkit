@@ -37,7 +37,7 @@ This makes one network request at most once a day, caches the result, times out 
 
 **No Tailwind at all.** Same root cause, simpler conversation: the kit needs a Tailwind v4 build. Offer to add it as its own step.
 
-**No React, or React below 18.2.** The peer range is `^18.2.0 || ^19.0.0`. Vue, Svelte and Astro-without-React are out of scope — say so rather than improvising.
+**No React, or React below 18.2.** The peer range is `^18.2.0 || ^19.0.0`. Vue, Angular, Svelte and Astro-without-React are out of scope for these skills — say so, point Vue and Angular projects to `@pxlkit/ui-kit-vue` / `@pxlkit/ui-kit-angular` and pxlkit.xyz/docs, and do not improvise.
 
 ## Step 2 — Apply the setup for *this* project
 

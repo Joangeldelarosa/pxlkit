@@ -377,7 +377,7 @@ export default function SkillsPage() {
             <PixelTimelineItem title="/pxlkit:start" time="1 min">
               <span className="font-mono text-xs text-retro-muted">
                 Checks compatibility and wires up the stylesheet, providers, fonts and dark mode
-                for your framework.
+                for your React setup.
               </span>
             </PixelTimelineItem>
             <PixelTimelineItem title="/pxlkit:imagine …" time="first result">

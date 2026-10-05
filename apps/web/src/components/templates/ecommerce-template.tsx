@@ -456,7 +456,12 @@ function CartIcon() {
   );
 }
 
-export function PixelEcommerceTemplate() {
+export interface PixelEcommerceTemplateProps {
+  /** Heading level of the catalog title: `'h2'` where the template is a preview inside another page. */
+  headingAs?: 'h1' | 'h2';
+}
+
+export function PixelEcommerceTemplate({ headingAs: Heading = 'h1' }: PixelEcommerceTemplateProps = {}) {
   const [query, setQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([10, 500]);
@@ -555,9 +560,9 @@ export function PixelEcommerceTemplate() {
 
       <PixelContainer maxWidth="2xl" padding={{ x: 'lg', y: 'md' }}>
         <div>
-          <h1 className="font-pixel text-base sm:text-lg text-retro-text leading-loose">
+          <Heading className="font-pixel text-base sm:text-lg text-retro-text leading-loose">
             Featured Catalog
-          </h1>
+          </Heading>
           <p className="font-mono text-xs sm:text-sm text-retro-muted mt-1">
             {filtered.length} product{filtered.length === 1 ? '' : 's'} matching your filters.
           </p>

@@ -1,10 +1,10 @@
 import type { TemplateSection } from '../types';
+import { UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 
 const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui @pxlkit/feedback';
 
 const iconGrid = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Package, Palette, CloudSync } from '@pxlkit/ui';
 import { ShieldCheck, Sparkles, Bell } from '@pxlkit/feedback';
@@ -20,7 +20,7 @@ const FEATURES = [
   {
     icon: Package,
     title: 'Modular Packages',
-    description: 'Install only what you need. Each package is tree-shakeable and independently versioned.',
+    description: 'Install only what you need. Each package is versioned independently, and the icon packs are tree-shakeable.',
     tone: 'green',
   },
   {
@@ -88,7 +88,6 @@ export function IconFeatureGrid() {
 
 const alternatingFeatures = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { AnimatedPxlKitIcon } from '@pxlkit/core';
 import { SparkleStar, CoinSpin, GlowingSword } from '@pxlkit/gamification';
 import {
@@ -111,7 +110,7 @@ const FEATURES = [
   {
     badge: 'Components',
     tone: 'cyan' as const,
-    title: '60+ React Components',
+    title: '${UI_COMPONENTS_COUNT} React Components',
     description: 'Buttons, cards, inputs, tables, modals, accordions, tabs, pagination, animations — all built with Tailwind CSS and the retro design token system. No third-party UI library required.',
     icon: CoinSpin,
   },
@@ -119,7 +118,7 @@ const FEATURES = [
     badge: '3D Effects',
     tone: 'gold' as const,
     title: 'Parallax & 3D Icons',
-    description: 'Mouse-tracking 3D parallax icons with layered depth using React Three Fiber. 10 iconic characters including rockets, skulls, orbs, and more.',
+    description: 'Mouse-tracking 3D parallax icons with layered depth, drawn with CSS 3D transforms. 10 iconic characters including rockets, skulls, orbs, and more.',
     icon: GlowingSword,
   },
 ] as const;
@@ -168,7 +167,6 @@ export function AlternatingFeatures() {
 
 const bentoGrid = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { Palette } from '@pxlkit/ui';
 import { ShieldCheck } from '@pxlkit/feedback';

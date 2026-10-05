@@ -51,7 +51,7 @@ const CASE_STUDIES: CaseStudy[] = [
     title: 'Pxlkit',
     role: 'Creator · Maintainer',
     year: '2026',
-    summary: `A pixel-perfect UI kit for React, Vue and Angular with ${UI_COMPONENTS_COUNT} components and a deterministic icon system.`,
+    summary: `A pixel-perfect React UI kit — now also for Vue and Angular — with ${UI_COMPONENTS_COUNT} components and a deterministic icon system.`,
     body:
       'Started as a Saturday spike, grew into thousands of downloads and the first paid licenses inside a month. Built around a Surface system (pixel ↔ linear) so every primitive can switch aesthetics from one prop. The icon inspector + refinement skill turned visual QA into a repeatable loop.',
     image:

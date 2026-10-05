@@ -1,7 +1,12 @@
 import type { StorybookConfig } from '@storybook/react-vite';
 import tailwindcss from '@tailwindcss/vite';
 
-const config: StorybookConfig = {
+// `title` names the manager page — "Pxlkit UI Kit for React - Storybook" —
+// in place of the repository's package name; `managerHead` describes it.
+const config: StorybookConfig & { title: string } = {
+  title: 'Pxlkit UI Kit for React',
+  managerHead: (head) => `${head}
+    <meta name="description" content="Storybook of @pxlkit/ui-kit, the retro pixel-art UI kit for React, and the icon components of @pxlkit/core: every component's examples, with controls, docs and accessibility checks." />`,
   framework: '@storybook/react-vite',
   stories: [
     '../packages/ui-kit/src/**/*.stories.@(ts|tsx)',

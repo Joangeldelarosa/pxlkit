@@ -6,8 +6,16 @@
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://pxlkit.xyz/icons",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/effects"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -58,6 +66,9 @@
     "source-available-icons",
     "free-animated-icons",
     "game-effects",
-    "retro-effects"
+    "retro-effects",
+    "pixel-icons",
+    "vue-icons",
+    "angular-icons"
   ]
 }

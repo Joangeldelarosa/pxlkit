@@ -76,7 +76,10 @@ packages/
   core/           → Rendering engine, types, utilities + React components
   vue/            → Vue 3 components on the engine
   angular/        → Angular standalone components on the engine
+  ui-kit-core/    → UI kit core: tokens, Tailwind v4 theme, class recipes, DOM behaviour
   ui-kit/         → Retro React UI kit (111 components)
+  ui-kit-vue/     → The same kit for Vue 3
+  ui-kit-angular/ → The same kit for Angular
   gamification/   → RPG, achievements, rewards icons
   feedback/       → Alerts, status, notification icons
   social/         → Community, emojis, messaging icons
@@ -84,7 +87,7 @@ packages/
   ui/             → Interface controls, navigation icons
   effects/        → Animated VFX, particle icons
   parallax/       → Multi-layer 3D parallax icons
-  voxel/          → 3D voxel toolkit (Three.js + React Three Fiber)
+  voxel/          → 3D voxel toolkit, early preview (Three.js + React Three Fiber)
 apps/
   web/            → Next.js showcase & documentation site
 ```

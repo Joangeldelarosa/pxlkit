@@ -6,7 +6,6 @@ const INSTALL_SOCIAL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/social';
 
 const centeredCtaHero = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight, SparkleSmall } from '@pxlkit/ui';
 import { SparkleStar } from '@pxlkit/gamification';
@@ -82,7 +81,6 @@ export function HeroCentered() {
 
 const splitHero = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight, Package } from '@pxlkit/ui';
 import { FloatingHearts, PulseHeart } from '@pxlkit/social';
@@ -163,7 +161,6 @@ export function HeroSplit() {
 
 const parallaxHero = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { ParallaxPxlKitIcon, PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { PixelRocket, CoolEmoji, MagicOrb, PixelCrown } from '@pxlkit/parallax';

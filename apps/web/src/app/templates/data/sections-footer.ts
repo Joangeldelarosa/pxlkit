@@ -4,7 +4,6 @@ const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/social';
 
 const minimalFooter = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import Link from 'next/link';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Globe, AtSign } from '@pxlkit/social';
@@ -42,7 +41,6 @@ export function MinimalFooter() {
 
 const multiColumnFooter = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import Link from 'next/link';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Globe, AtSign, Heart } from '@pxlkit/social';
@@ -150,7 +148,6 @@ export function MultiColumnFooter() {
 
 const ctaFooter = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import Link from 'next/link';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';

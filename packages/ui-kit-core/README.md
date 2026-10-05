@@ -1,12 +1,12 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit" width="480" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit — the framework-neutral core of the retro pixel-art UI kit" width="480" />
 </p>
 
 <h1 align="center">@pxlkit/ui-kit-core</h1>
 
 <p align="center">
-  <strong>The framework-neutral core of the Pxlkit retro UI kit.</strong><br/>
-  Design tokens, the Tailwind CSS theme, class recipes, pixel glyphs, locale data and DOM behaviour — shared by the React, Vue and Angular kits so all three render the same markup and behave the same way.
+  <strong>The framework-neutral core of the Pxlkit retro UI kit — new in Pxlkit 2.2.0.</strong><br/>
+  Design tokens, the Tailwind CSS theme, class recipes, pixel glyphs, locale data and DOM behaviour — shared by the React kit and its Vue and Angular editions, so all three render the same markup and behave the same way.
 </p>
 
 <p align="center">
@@ -28,7 +28,7 @@ Usually not directly — it comes with your framework's kit:
 | Vue 3 | [`@pxlkit/ui-kit-vue`](https://www.npmjs.com/package/@pxlkit/ui-kit-vue) | `@import "@pxlkit/ui-kit-vue/styles.css";` |
 | Angular | [`@pxlkit/ui-kit-angular`](https://www.npmjs.com/package/@pxlkit/ui-kit-angular) | `@import "@pxlkit/ui-kit-angular/styles.css";` |
 
-Each kit's stylesheet brings Tailwind CSS v4 and this package's theme, and points Tailwind at the class names both packages use, so one `@import` of it — in place of `@import "tailwindcss";` — is all the setup there is.
+Each kit's stylesheet imports Tailwind CSS v4 and this package's theme, and points Tailwind at the class names both packages use, so one `@import` of it — in place of `@import "tailwindcss";` — is all the CSS setup there is, once Tailwind CSS v4 runs in your build (its Vite or PostCSS plugin — your kit's README has the step). Without Tailwind in the build, the components render unstyled.
 
 Install it yourself when you build your own components on the same design system, in any framework or none:
 
@@ -79,7 +79,7 @@ releaseScroll(); // scroll locks stack across every kit on the page
 
 ## Theming
 
-The stylesheet defines the `--retro-*` palette for the light theme (`:root`) and the dark theme (`.dark` on `<html>` or any ancestor), maps it onto Tailwind utilities (`bg-retro-bg`, `text-retro-cyan`, …) and adds the pixel utilities (`pxl-corner-*`, `pxl-shadow*`). Override any variable after importing your kit's stylesheet:
+The stylesheet defines the `--retro-*` palette for the light theme (`:root`) and the dark theme (`.dark` on `<html>` or any ancestor), maps it onto Tailwind utilities (`bg-retro-bg`, `text-retro-cyan`, …) and adds the pixel utilities (`pxl-corner-*`, `pxl-shadow*`, `pxl-nudge-*`). Override any variable after importing your kit's stylesheet:
 
 ```css
 @import "@pxlkit/ui-kit/styles.css";
@@ -87,6 +87,18 @@ The stylesheet defines the `--retro-*` palette for the light theme (`:root`) and
 :root { --retro-green: #22c55e; }
 .dark { --retro-green: #4ade80; }
 ```
+
+### Using the theme in your own styles
+
+- Styles Tailwind compiles separately (a Vue `<style>` block, Angular component styles, CSS modules) must reference the theme before `@apply` can use it — otherwise the build stops with `Cannot apply unknown utility class 'bg-retro-…'`:
+  ```css
+  @reference "@pxlkit/ui-kit-vue/styles.css"; /* or @pxlkit/ui-kit/styles.css, @pxlkit/ui-kit-angular/styles.css */
+
+  .panel { @apply bg-retro-surface text-retro-text font-pixel; }
+  ```
+- `pxl-corner-*`, `pxl-shadow*` and `pxl-nudge-*` are plain classes: use them in markup; they take no variants and `@apply` rejects them.
+- A cut corner (`pxl-corner-*`) is a `clip-path`, which also clips a drop shadow on the same element: put `pxl-shadow` on an element whose corners are whole, or on a wrapper. `pxl-nudge-hover` and `pxl-nudge-active` give the pixel press feel without the shadow — 1px on hover, 2px while pressed — as the kits' pixel buttons do.
+- On the pixel surface a cut corner clips a focus ring drawn outside the element, so keyboard focus lights the 2px edge inside: automatically on a `pxl-corner-*` element that takes focus; elsewhere add `pxl-focus-inset` with a variant (`focus-visible:pxl-focus-inset`, `group-focus-visible:pxl-focus-inset`, `has-[input:focus-visible]:pxl-focus-inset`). `--pxl-focus-color` sets its colour (`currentColor`; `Highlight` in forced-colors mode).
 
 ## Related Packages
 
@@ -98,7 +110,7 @@ The stylesheet defines the `--retro-*` palette for the light theme (`:root`) and
 
 ## Documentation
 
-Browse every component and the full docs at **[pxlkit.xyz](https://pxlkit.xyz)**.
+Browse every component at **[pxlkit.xyz/ui-kit](https://pxlkit.xyz/ui-kit)** and the setup guide at [pxlkit.xyz/docs](https://pxlkit.xyz/docs#ui-kit).
 
 ## License
 

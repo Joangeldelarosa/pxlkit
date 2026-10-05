@@ -15,6 +15,7 @@ import { ParallaxPack, GhostFriend, CoolEmoji } from '@pxlkit/parallax';
 import { PixelTextLink, PxlKitButton, UI_KIT_COMPONENTS } from '@pxlkit/ui-kit';
 import { ComponentDocs } from './_component-docs';
 import { FrameworkCode, type FrameworkCodeProps } from '@/components/FrameworkCode';
+import { STYLESHEET_SETUP, TAILWIND_SETUP } from '@/lib/setup-snippets';
 
 /* ─── Dynamic pack registry ─── */
 const ALL_PACKS: { pack: IconPack; previewIcon: AnyIcon; accent: string }[] = [
@@ -46,7 +47,7 @@ const sections = [
   { id: 'available-packs', label: 'Available Packs' },
   { id: 'icon-format', label: 'Icon Format' },
   { id: 'opacity', label: 'Opacity / Alpha' },
-  { id: 'react-component', label: 'Icon Component' },
+  { id: 'icon-component', label: 'Icon Component' },
   { id: 'animated-icons', label: 'Animated Icons' },
   { id: 'parallax-icons', label: 'Parallax 3D Icons' },
   { id: 'toast-notifications', label: 'Toast Notifications' },
@@ -218,7 +219,7 @@ export default function DocsPage() {
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10 py-8 pb-24 space-y-16">
 
           <div className="text-center pt-8 mb-4">
-            <h1 className="font-pixel text-xl text-retro-cyan mb-3">DOCUMENTATION</h1>
+            <h1 className="font-pixel text-xl text-retro-cyan mb-3">PXLKIT DOCUMENTATION</h1>
             <p className="text-retro-muted font-mono text-sm">
               Three steps to your first rendered component. Then dig into icons, animation, and the rest of the kit.
             </p>
@@ -231,34 +232,46 @@ export default function DocsPage() {
           <Section id="getting-started" title="Getting Started">
             <P>
               <strong className="text-retro-green">Step 1 — Install.</strong> One command pulls the
-              components for your framework — <Code>@pxlkit/core</Code> for React, <Code>@pxlkit/vue</Code>{' '}
-              for Vue 3, <Code>@pxlkit/angular</Code> for Angular — and whichever icon packs you actually need.
+              components for your framework — <Code>@pxlkit/core</Code> for React or, new in 2.2,{' '}
+              <Code>@pxlkit/vue</Code> for Vue 3 and <Code>@pxlkit/angular</Code> for Angular — and whichever icon
+              packs you actually need.
               The packs are plain data, the same in every framework: pure SVG, no font loading, tree-shakeable —
               every pack is its own npm module under the <Code>@pxlkit</Code> scope. The code below follows the
               framework you pick, here and across the site.
             </P>
             <FrameworkCodeBlock title="Install the components and the icon packs" {...INSTALL} />
             <P>
-              <strong className="text-retro-green">Step 2 — Set the surface</strong>{' '}
-              (only needed for the UI Kit). Set the default surface once at the root of your app —
-              &quot;pixel&quot; for the retro 8-bit aesthetic, &quot;linear&quot; for a flat modern one — with{' '}
-              <Code>{'<PxlKitSurfaceProvider>'}</Code> in React and Vue, or <Code>providePxlKitSurface()</Code>{' '}
-              in Angular. Every UI Kit component reads it, and any component can override it locally with its
-              own <Code>surface</Code> prop.
+              <strong className="text-retro-green">Step 2 — Add the UI kit (optional).</strong> Install{' '}
+              <Code>@pxlkit/ui-kit</Code> for React — or, new in 2.2, <Code>@pxlkit/ui-kit-vue</Code> or{' '}
+              <Code>@pxlkit/ui-kit-angular</Code> — set up Tailwind CSS v4 and import the kit&apos;s stylesheet (see{' '}
+              <a href="#ui-kit" className="text-retro-cyan underline decoration-retro-cyan/40">UI Kit Components</a> below).
+              Then, if you want, set the default surface once at the root — it is &quot;pixel&quot;, the retro 8-bit
+              aesthetic, unless you pick &quot;linear&quot;, a flat modern one — with{' '}
+              <Code>{'<PxlKitSurfaceProvider>'}</Code> in React and Vue, or <Code>providePxlKitSurface()</Code> in
+              Angular. Every UI Kit component reads it, and any component can override it locally with its own{' '}
+              <Code>surface</Code> prop.
             </P>
             <FrameworkCodeBlock
               title="Set the surface once at the root"
-              react={`// app/layout.tsx
-import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
-import '@pxlkit/ui-kit/styles.css';
+              react={`// app/providers.tsx — Next.js App Router: the kit renders in Client Components
+'use client';
 
-export default function RootLayout({ children }) {
+import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return <PxlKitSurfaceProvider surface="pixel">{children}</PxlKitSurfaceProvider>;
+}
+
+// app/layout.tsx — stays a Server Component;
+// app/globals.css: @import "@pxlkit/ui-kit/styles.css"; (in place of @import "tailwindcss")
+import './globals.css';
+import { Providers } from './providers';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html lang="en">
       <body>
-        <PxlKitSurfaceProvider surface="pixel">
-          {children}
-        </PxlKitSurfaceProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
@@ -270,15 +283,20 @@ import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';
 
 <template>
   <PxlKitSurfaceProvider surface="pixel">
+    <!-- your app (RouterView with Vue Router) -->
     <RouterView />
   </PxlKitSurfaceProvider>
 </template>`}
-              angular={`// app.config.ts — and in src/styles.css: @import "@pxlkit/ui-kit-angular/styles.css";
+              angular={`// src/app/app.config.ts — and in src/styles.css: @import "@pxlkit/ui-kit-angular/styles.css";
 import type { ApplicationConfig } from '@angular/core';
 import { providePxlKitSurface } from '@pxlkit/ui-kit-angular';
 
 export const appConfig: ApplicationConfig = {
-  providers: [providePxlKitSurface('pixel')],
+  providers: [
+    // …keep the providers \`ng new\` generated (error listeners, change detection,
+    // router, provideClientHydration() in SSR apps), and add:
+    providePxlKitSurface('pixel'),
+  ],
 };`}
             />
             <P>
@@ -523,7 +541,9 @@ const solid = encodeHexColor('#FF0000');
           </Section>
 
           {/* React Component */}
-          <Section id="react-component" title="Icon Component">
+          <Section id="icon-component" title="Icon Component">
+            {/* The section's earlier id, kept so links to it still land here. */}
+            <span id="react-component" className="block scroll-mt-24" aria-hidden="true" />
             <P>
               The <Code>{'<PxlKitIcon />'}</Code> component — <Code>{'<pxl-icon>'}</Code> in Angular — renders pixel art as an{' '}
               <Code>{'<img>'}</Code> element whose <Code>src</Code> is an inline SVG
@@ -544,7 +564,8 @@ const solid = encodeHexColor('#FF0000');
   appearance?: IconAppearance; // Colour mode (default: 'palette')
   color?: string;              // Tint hue / flat colour for 'tinted' & 'solid'
   className?: string;          // CSS class names (applied to the <img>)
-  'aria-label'?: string;       // Accessibility label (becomes <img alt>)
+  'aria-label'?: string;       // Accessible name (the <img alt>); unset or empty → the icon's name
+  decorative?: boolean;        // Beside text that says the same: alt="", skipped by screen readers
   style?: React.CSSProperties; // Inline styles (merged onto the <img>)
 
   /** @deprecated since v1.3 — use \`appearance="palette" | "solid"\` instead. */
@@ -557,10 +578,10 @@ const solid = encodeHexColor('#FF0000');
             <P>
               Vue&apos;s <Code>PxlKitIcon</Code> (<Code>@pxlkit/vue</Code>) and Angular&apos;s{' '}
               <Code>{'<pxl-icon>'}</Code> (<Code>@pxlkit/angular</Code>) take the same props as inputs —{' '}
-              <Code>icon</Code>, <Code>size</Code>, <Code>appearance</Code>, <Code>color</Code> and the
-              accessible name (<Code>aria-label</Code>, <Code>ariaLabel</Code> in Angular) — and render the same
-              image; <Code>class</Code> and <Code>style</Code> apply to their root. The deprecated props are
-              React only.
+              <Code>icon</Code>, <Code>size</Code>, <Code>appearance</Code>, <Code>color</Code>, the
+              accessible name (<Code>aria-label</Code>, <Code>ariaLabel</Code> in Angular) and{' '}
+              <Code>decorative</Code> — and render the same image; <Code>class</Code> and <Code>style</Code>{' '}
+              apply to their root. The deprecated props are React only.
             </P>
             <FrameworkCodeBlock
               title="Colour modes in action"
@@ -588,6 +609,68 @@ const solid = encodeHexColor('#FF0000');
 
 <!-- Solid — every pixel becomes one colour -->
 <pxl-icon [icon]="trophy" [size]="32" appearance="solid" color="#FF0000" />`}
+            />
+            <P>
+              Screen readers announce an icon by its <Code>aria-label</Code>, else by the icon&apos;s name; an
+              empty label counts as none. When visible text beside the icon already says what it means — a
+              button or link label, a heading, a list item — mark it <Code>decorative</Code>: it renders{' '}
+              <Code>alt=&quot;&quot;</Code>, so it is skipped instead of read before the label, and its name stays
+              out of the page&apos;s text. An icon that is a button&apos;s only content is its label: give it an{' '}
+              <Code>aria-label</Code> instead.
+            </P>
+            <FrameworkCodeBlock
+              title="Decorative icons"
+              react={`import { PxlKitIcon } from '@pxlkit/core';
+import { Download, Trash } from '@pxlkit/ui';
+
+// The visible label names the button: the icon beside it is decorative.
+<button>
+  <PxlKitIcon icon={Download} size={16} decorative /> Download
+</button>
+
+// The icon is the button's only content: it needs a label.
+<button>
+  <PxlKitIcon icon={Trash} size={16} aria-label="Delete" />
+</button>`}
+              vue={`<script setup lang="ts">
+import { PxlKitIcon } from '@pxlkit/vue';
+import { Download, Trash } from '@pxlkit/ui';
+</script>
+
+<template>
+  <!-- The visible label names the button: the icon beside it is decorative. -->
+  <button>
+    <PxlKitIcon :icon="Download" :size="16" decorative /> Download
+  </button>
+
+  <!-- The icon is the button's only content: it needs a label. -->
+  <button>
+    <PxlKitIcon :icon="Trash" :size="16" aria-label="Delete" />
+  </button>
+</template>`}
+              angular={`import { Component } from '@angular/core';
+import { PxlKitIcon } from '@pxlkit/angular';
+import { Download, Trash } from '@pxlkit/ui';
+
+@Component({
+  selector: 'app-file-actions',
+  imports: [PxlKitIcon],
+  template: \`
+    <!-- The visible label names the button: the icon beside it is decorative. -->
+    <button>
+      <pxl-icon [icon]="download" [size]="16" decorative /> Download
+    </button>
+
+    <!-- The icon is the button's only content: it needs a label. -->
+    <button>
+      <pxl-icon [icon]="trash" [size]="16" ariaLabel="Delete" />
+    </button>
+  \`,
+})
+export class FileActions {
+  protected readonly download = Download;
+  protected readonly trash = Trash;
+}`}
             />
             <div className="rounded-lg border border-retro-border/30 bg-retro-surface p-4 mt-2">
               <p className="font-pixel text-[10px] text-retro-gold mb-3">MIGRATION FROM v1.2.x</p>
@@ -655,7 +738,8 @@ type AnimationTrigger = 'loop' | 'once' | 'hover' | 'appear' | 'ping-pong';`}</C
   playing?: boolean;           // manual play/pause override
   className?: string;
   style?: React.CSSProperties;
-  'aria-label'?: string;
+  'aria-label'?: string;       // accessible name of the frames (default: the icon's name)
+  decorative?: boolean;        // beside text that says the same: every frame alt=""
 
   /** @deprecated since v1.3 — use \`appearance\` instead. */
   colorful?: boolean;
@@ -828,7 +912,7 @@ const monoSvg = generateAnimatedSvg(FireSword, {
               </div>
               <div className="ml-auto text-right">
                 <p className="font-pixel text-[10px] text-retro-gold mb-1">LIVE PREVIEW</p>
-                <p className="font-mono text-[10px] text-retro-muted">FireSword &mdash; 4 frames &middot; 150ms</p>
+                <p className="font-mono text-[10px] text-retro-muted">FireSword &mdash; {FireSword.frames.length} frames &middot; {FireSword.frameDuration}ms</p>
                 <p className="font-mono text-[10px] text-retro-muted/50 mt-0.5">hover center icon to trigger it</p>
               </div>
             </div>
@@ -930,8 +1014,9 @@ export class ParallaxIcons {
 }
 
 interface ParallaxLayer {
-  icon: AnimatedPxlKitData;  // each layer is an animated icon
-  depth: number;             // Z-depth: positive = far, negative = near
+  icon: PxlKitData | AnimatedPxlKitData;  // static or animated
+  depth: number;  // authoring metadata: 0 = anchor, positive = behind, negative = in front;
+                  // the renderers stack layers in array order, deepest first
   // depth: 3.0  → far background (shadow, trail)
   // depth: 0    → center baseline (body)
   // depth: -2.0 → near foreground (face details, blush)
@@ -951,7 +1036,8 @@ interface ParallaxLayer {
   onActivate?: (active: boolean) => void;  // Click toggle callback
   className?: string;
   style?: React.CSSProperties;
-  'aria-label'?: string;
+  'aria-label'?: string;       // Name of the role="img" container (default: the icon's name)
+  decorative?: boolean;        // Container aria-hidden, every layer alt="" (default: false)
 
   /** @deprecated since v1.3 — use \`appearance\` instead. */
   colorful?: boolean;
@@ -974,7 +1060,7 @@ interface ParallaxLayer {
               <li><strong className="text-retro-text">True 3D Depth</strong> — CSS perspective + preserve-3d + per-layer translateZ for real depth</li>
               <li><strong className="text-retro-text">Page-Wide Tracking</strong> — Mouse rotation works across the entire viewport, not just the icon</li>
               <li><strong className="text-retro-text">Click Interactions</strong> — Particle bursts, layer explosions, random rotation jolt, color hue-shift on click</li>
-              <li><strong className="text-retro-text">Animated Layers</strong> — Each layer is a full <Code>AnimatedPxlKitData</Code> with frame-based animation (e.g., blinking eyes, flickering shadows)</li>
+              <li><strong className="text-retro-text">Animated Layers</strong> — Each layer is a static or animated icon; animated layers play their frames (e.g., blinking eyes, flickering shadows)</li>
               <li><strong className="text-retro-text">Peel-Apart Intro</strong> — Layers spread out in a dramatic animation on mount</li>
               <li><strong className="text-retro-text">Depth Shadows</strong> — Soft CSS shadows between layers for visual depth</li>
             </ul>
@@ -1216,6 +1302,12 @@ export class SaveButton {
   protected readonly checkCircle = CheckCircle;
 }`}
             />
+            <P>
+              This <Code>PixelToast</Code> is styled with Tailwind utilities that ship inside <Code>@pxlkit/core</Code>{' '}
+              — the UI kit&apos;s stylesheet does not cover them. With Tailwind CSS v4, add{' '}
+              <Code>@source &quot;../node_modules/@pxlkit/core/dist&quot;;</Code> to your stylesheet (adjust the
+              relative path to where your stylesheet sits).
+            </P>
           </Section>
 
           {/* SVG Generation */}
@@ -1336,33 +1428,35 @@ if (icon) {
           {/* UI Kit Components */}
           <Section id="ui-kit" title="UI Kit Components">
             <P>
-              Pxlkit&apos;s UI kit comes for React, Vue and Angular:{' '}
+              Pxlkit&apos;s UI kit is a React library, <Code>@pxlkit/ui-kit</Code>:{' '}
               <Code>{UI_COMPONENTS_COUNT} production-ready components</Code> — buttons, inputs, cards, selects,
-              modals, toasts, tables, badges, avatars, skeletons, layout primitives and animation wrappers — with
-              the same markup, theme and behaviour in every framework, on one framework-neutral core (
-              <Code>@pxlkit/ui-kit-core</Code>). <Code>@pxlkit/ui-kit</Code> is the React kit,{' '}
-              <Code>@pxlkit/ui-kit-vue</Code> the Vue 3 one, <Code>@pxlkit/ui-kit-angular</Code> the Angular one
-              (standalone, signal-based components that work with <Code>ngModel</Code> and reactive forms).
+              modals, toasts, tables, badges, avatars, skeletons, layout primitives and animation wrappers. New in
+              2.2, the same components ship for Vue 3 (<Code>@pxlkit/ui-kit-vue</Code>) and Angular (
+              <Code>@pxlkit/ui-kit-angular</Code>, standalone, signal-based components that work with{' '}
+              <Code>ngModel</Code> and reactive forms), with the same markup, theme and behaviour on one
+              framework-neutral core (<Code>@pxlkit/ui-kit-core</Code>). Live demos and the walkthrough are on{' '}
+              <PixelTextLink href="/ui-kit#getting-started">/ui-kit</PixelTextLink>.
             </P>
-            <CodeBlock title="UI Kit Route">{`/ui-kit#getting-started`}</CodeBlock>
             <FrameworkCodeBlock
               title="Install the UI kit"
-              react="npm install @pxlkit/ui-kit @pxlkit/core @pxlkit/gamification tailwindcss"
-              vue="npm install @pxlkit/ui-kit-vue @pxlkit/vue @pxlkit/gamification tailwindcss"
-              angular="npm install @pxlkit/ui-kit-angular @pxlkit/angular @pxlkit/gamification tailwindcss"
+              react="npm install @pxlkit/ui-kit @pxlkit/core @pxlkit/gamification"
+              vue="npm install @pxlkit/ui-kit-vue @pxlkit/vue @pxlkit/gamification"
+              angular="npm install @pxlkit/ui-kit-angular @pxlkit/angular @pxlkit/gamification"
             />
-            <FrameworkCodeBlock
-              title="CSS setup (Tailwind CSS v4)"
-              react={`/* Your global stylesheet (e.g., globals.css or index.css), in place of
-   @import "tailwindcss" — the kit's stylesheet brings Tailwind with it */
-@import "@pxlkit/ui-kit/styles.css";`}
-              vue={`/* The stylesheet Tailwind processes (e.g., src/style.css), in place of
-   @import "tailwindcss" — the kit's stylesheet brings Tailwind with it */
-@import "@pxlkit/ui-kit-vue/styles.css";`}
-              angular={`/* The stylesheet Tailwind processes (e.g., src/styles.css), in place of
-   @import "tailwindcss" — the kit's stylesheet brings Tailwind with it */
-@import "@pxlkit/ui-kit-angular/styles.css";`}
-            />
+            <FrameworkCodeBlock title="Tailwind CSS v4 in your build" {...TAILWIND_SETUP} />
+            <P>
+              The kit&apos;s stylesheet is a Tailwind CSS v4 entry point, so Tailwind has to process it. Without that
+              step the build still succeeds, but the CSS keeps <Code>@theme</Code>, <Code>@source</Code> and{' '}
+              <Code>@apply</Code> as written and the components render unstyled.
+            </P>
+            <FrameworkCodeBlock title="CSS setup — in place of @import &quot;tailwindcss&quot;" {...STYLESHEET_SETUP} />
+            <P>
+              The kit&apos;s stylesheet imports Tailwind CSS itself, so do not import <Code>tailwindcss</Code> as well.
+              It styles the components, not the page: give <Code>{'<body>'}</Code> the theme yourself, and remove a
+              starter template&apos;s own theme rules — create-next-app&apos;s <Code>globals.css</Code> sets a white
+              body background, <Code>font-family: Arial</Code> and an <Code>@theme inline</Code> that remaps{' '}
+              <Code>--font-sans</Code> and <Code>--font-mono</Code>, all of which override the kit&apos;s.
+            </P>
             <FrameworkCodeBlock
               title="Use the components"
               react={`import { PixelButton } from '@pxlkit/ui-kit';
@@ -1402,8 +1496,35 @@ export class CreateQuest {
 }`}
             />
             <P>
+              <strong className="text-retro-text">Next.js (App Router).</strong> The components use state, effects
+              and context, so they render in Client Components. Keep <Code>app/layout.tsx</Code> a Server Component
+              and put the providers in a <Code>&apos;use client&apos;</Code> file of your own (Step 2 above has both
+              files); start the files that use the components&apos; hooks or event handlers with{' '}
+              <Code>&apos;use client&apos;</Code>. In Server Components, import helpers such as{' '}
+              <Code>buildGoogleFontsUrl</Code>, <Code>toLocaleUpper</Code> or <Code>cn</Code> from{' '}
+              <Code>@pxlkit/ui-kit-core</Code>. Of the icon components, <Code>PxlKitIcon</Code> renders in a
+              Server Component; <Code>AnimatedPxlKitIcon</Code>, <Code>ParallaxPxlKitIcon</Code> and{' '}
+              <Code>PixelToast</Code> need a Client Component.
+            </P>
+            <P>
+              <strong className="text-retro-text">Server rendering.</strong> The three kits render on the server
+              and hydrate — Next.js, Nuxt, <Code>@angular/ssr</Code>. A calendar shows the current month and marks
+              today, which depends on the reader&apos;s clock: give <Code>PixelCalendarGrid</Code> a{' '}
+              <Code>month</Code> (or a <Code>value</Code>) for a stable server render, or render a current-month
+              calendar in the browser only — <Code>next/dynamic</Code> with <Code>ssr: false</Code> in Next.js,{' '}
+              <Code>{'<ClientOnly>'}</Code> in Nuxt, <Code>@defer</Code> in Angular.
+            </P>
+            <P>
+              <strong className="text-retro-text">Dark mode.</strong> The theme follows a class:{' '}
+              <Code>.dark</Code> on <Code>{'<html>'}</Code> (or any ancestor) selects the dark palette,{' '}
+              <Code>.light</Code> the light one. <Code>useDarkMode()</Code> (React, Vue) and{' '}
+              <Code>injectDarkMode()</Code> (Angular) switch it and remember the reader&apos;s choice. To re-skin,
+              redefine any <Code>--retro-*</Code> variable on <Code>:root</Code> (light) and <Code>.dark</Code>, after
+              the kit&apos;s import.
+            </P>
+            <P>
               The UI Kit page includes live previews, props tables, and copy-ready code examples
-              for each element. Use the sidebar to browse everything by category, including
+              for each element. Use the sidebar to browse everything by category, including{' '}
               <Code>PixelToast</Code> and animation utilities.
             </P>
             <PixelTextLink
@@ -1423,9 +1544,9 @@ export class CreateQuest {
               components are added or removed from @pxlkit/ui-kit. */}
           <Section id="component-reference" title="Component Reference">
             <P>
-              Per-component API reference for every <Code>@pxlkit/ui-kit</Code> component, generated
-              straight from each component&apos;s SSOT manifest — description, props, accessibility
-              contract, keyboard map, and examples, all inlined per component. Click an entry to
+              Per-component API reference for every component of the kit — description, props,
+              accessibility contract, keyboard map, and the examples in React, Vue and Angular, all
+              generated from each component&apos;s manifest. Click an entry to
               expand it, or deep-link with <Code>/docs#pixel-button</Code>. For live demos, head to
               the <PixelTextLink href="/ui-kit">UI Kit showcase</PixelTextLink>.
             </P>

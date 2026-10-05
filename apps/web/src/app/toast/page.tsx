@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 
-/* The toast docs live inside the UI Kit page — jump straight to its toast playground. */
+/* The toast docs live inside the UI Kit page — jump straight to its toast playground, for good. */
 export default function ToastRedirect() {
-  redirect('/ui-kit#use-toast');
+  permanentRedirect('/ui-kit#use-toast');
 }

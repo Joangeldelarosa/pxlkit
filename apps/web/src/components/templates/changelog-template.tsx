@@ -62,6 +62,42 @@ const RELEASES: Release[] = [
           'Every example on /docs and /ui-kit in React, Vue and Angular, and Storybooks for the Vue and Angular kits beside the React one, on Storybook 10.',
       },
       {
+        category: 'Added',
+        title: 'Decorative icons',
+        detail:
+          'decorative on PxlKitIcon, AnimatedPxlKitIcon and ParallaxPxlKitIcon renders alt="" for an icon beside text that already says what it means, so screen readers skip it — in React, Vue and Angular.',
+      },
+      {
+        category: 'Added',
+        title: 'A heading level for the hero',
+        detail:
+          'PixelHeroSection takes as (h1–h6), and PixelGlitch takes label, so a glitch headline is one heading with its text once.',
+      },
+      {
+        category: 'Added',
+        title: 'Setup guides for every framework',
+        detail:
+          'The Tailwind CSS v4 build step for Next.js, Vite, Nuxt and Angular, the Next.js App Router, dark mode without a flash, fonts, server rendering and upgrading from 2.1, on /docs, /ui-kit and in the READMEs.',
+      },
+      {
+        category: 'Changed',
+        title: 'A tree-shakeable, client-ready React kit',
+        detail:
+          "An app that imports one component bundles 6 KB of the kit instead of 362 KB, and every built file starts with 'use client', so Next.js Server Components render the kit directly.",
+      },
+      {
+        category: 'Fixed',
+        title: 'Pixel buttons without a doubled label',
+        detail:
+          'The drop shadow on cut corners was clipped outside the button and, inside, drew a second copy of its label and border in the light theme. Pixel buttons keep their hover and press moves.',
+      },
+      {
+        category: 'Fixed',
+        title: 'Bold headlines on the linear surface',
+        detail:
+          "The hero headline, the section header title and the pricing amount render at 700, as intended: the display face's semibold won over them.",
+      },
+      {
         category: 'Fixed',
         title: 'Keyboard focus shows on the pixel surface',
         detail:
@@ -334,14 +370,22 @@ function formatDate(iso: string): string {
   });
 }
 
+/** A release's anchor on the page: `v2.2.0` → `#v220`. */
+export function releaseAnchor(version: string): string {
+  return `v${version.replace(/\./g, '')}`;
+}
+
 function ReleaseEntry({
   release,
   isLatest,
   categoryFilter,
+  headingAs: Heading,
 }: {
   release: Release;
   isLatest: boolean;
   categoryFilter: ChangeCategory | 'all';
+  /** One level below the page title. */
+  headingAs: 'h2' | 'h3';
 }) {
   const filteredChanges = useMemo(() => {
     if (categoryFilter === 'all') return release.changes;
@@ -349,7 +393,7 @@ function ReleaseEntry({
   }, [release.changes, categoryFilter]);
 
   return (
-    <div className="relative">
+    <div id={releaseAnchor(release.version)} className="relative scroll-mt-24">
       {isLatest && (
         <PixelRibbon position="top-center" tone="gold">
           LATEST
@@ -368,9 +412,9 @@ function ReleaseEntry({
             <PixelBadge tone="neutral" variant="outline" size="sm">
               {formatDate(release.date)}
             </PixelBadge>
-            <span className="ml-auto text-sm font-semibold text-retro-text">
+            <Heading className="ml-auto text-sm font-semibold text-retro-text">
               {release.title}
-            </span>
+            </Heading>
           </div>
         </PixelCard.Header>
 
@@ -414,17 +458,19 @@ function ReleaseEntry({
 }
 
 export interface PixelChangelogTemplateProps {
-  /** Override the seeded list of releases. Defaults to the bundled v1.6–v1.9 set. */
+  /** Override the seeded list of releases. Defaults to the bundled v1.6.0–v2.2.0 set. */
   releases?: Release[];
+  /** Heading level of the page title: `'h1'` where the changelog is the page. */
+  headingAs?: 'h1' | 'h2';
 }
 
 export function PixelChangelogTemplate({
   releases = RELEASES,
+  headingAs = 'h2',
 }: PixelChangelogTemplateProps) {
   const latestVersion = releases[0]?.version;
-  const [selectedVersions, setSelectedVersions] = useState<string[]>(
-    latestVersion ? [latestVersion] : [],
-  );
+  // Every release shows until the reader picks versions to narrow the list.
+  const [selectedVersions, setSelectedVersions] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string[]>(['all']);
 
   const categoryFilter = (selectedCategory[0] ?? 'all') as ChangeCategory | 'all';
@@ -437,9 +483,10 @@ export function PixelChangelogTemplate({
   return (
     <PixelContainer maxWidth="3xl" padding="xl">
       <PixelSectionHeader
+        as={headingAs}
         eyebrow="Releases"
-        title="What's new in pxlkit"
-        description="Every shipped wave, ordered most-recent first. Filter by version or change category to focus on what matters."
+        title="Pxlkit changelog"
+        description="Every release of the Pxlkit UI kit, most recent first — 2.2.0 brings the React kit to Vue and Angular. Filter by version or change type."
         size="lg"
       />
 
@@ -466,6 +513,7 @@ export function PixelChangelogTemplate({
                     release={release}
                     isLatest={release.version === latestVersion}
                     categoryFilter={categoryFilter}
+                    headingAs={headingAs === 'h1' ? 'h2' : 'h3'}
                   />
                 ))
               )}

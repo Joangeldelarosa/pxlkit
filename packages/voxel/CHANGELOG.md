@@ -5,6 +5,10 @@
 
 ## 0.1.5 — 2026-10-03
 
+### Changed
+
+- README: an early preview, not yet on npm — how to build it from the repository.
+
 ### Fixed
 
 - `PxlKitData` (the input of `pxlToVoxels`) now resolves from the React-free `@pxlkit/core/vanilla` entry instead of the root entry, so projects without React type-check this package without React's type declarations — even with `skipLibCheck: false`. Runtime output is unchanged.

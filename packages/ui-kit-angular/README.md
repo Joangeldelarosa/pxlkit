@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit" width="480" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit — retro pixel-art UI kit for Angular" width="480" />
 </p>
 
 <h1 align="center">@pxlkit/ui-kit-angular</h1>
 
 <p align="center">
-  <strong>The Pxlkit retro UI kit for Angular.</strong><br/>
+  <strong>The Pxlkit retro UI kit for Angular — new in Pxlkit 2.2.0.</strong><br/>
   The same components, markup, theme and behaviour as the React kit — buttons, inputs, modals, popovers, tabs, toasts, animations — as standalone, signal-based Angular components.
 </p>
 
@@ -27,20 +27,53 @@ The components are standalone and `OnPush`, use signal inputs, `model()` and `ou
 ## Installation
 
 ```bash
-npm install @pxlkit/ui-kit-angular
+npm install @pxlkit/ui-kit-angular @pxlkit/angular
 ```
+
+`@pxlkit/angular` renders the icons the examples use. React is never installed.
 
 > **Peer dependencies:** `@angular/core`, `@angular/common` and `@angular/forms`, versions 20 to 22. The styles need [Tailwind CSS v4](https://tailwindcss.com) in your build.
 
+### Tailwind CSS v4 in your build
+
+The kit's stylesheet is a Tailwind CSS v4 entry point, so Tailwind has to process it. If your app does not use Tailwind v4 yet:
+
+- **Angular CLI 21 and later** — `ng new my-app --style=tailwind`.
+- **Angular 20, or an existing app** — `npm install -D tailwindcss @tailwindcss/postcss postcss`, and `.postcssrc.json` at the workspace root:
+  ```json
+  { "plugins": { "@tailwindcss/postcss": {} } }
+  ```
+
+Without it the build still succeeds, but the CSS keeps `@theme`, `@source` and `@apply` as written and the components render unstyled.
+
 ### Styles
 
-The kit's stylesheet brings Tailwind CSS v4, the Pxlkit theme and the kit's class names, so it takes the place of `@import "tailwindcss"` in the stylesheet Tailwind processes (for example `src/styles.css`):
+The kit's stylesheet imports Tailwind CSS v4 and adds the Pxlkit theme and the kit's class names, so it takes the place of `@import "tailwindcss"` in the stylesheet Tailwind processes (for example `src/styles.css`):
 
 ```css
 @import "@pxlkit/ui-kit-angular/styles.css";
+
+/* The kit styles the components, not the page: theme <body> yourself */
+@layer base {
+  body {
+    background-color: var(--color-retro-bg);
+    color: var(--color-retro-text);
+    font-family: var(--font-sans);
+  }
+}
 ```
 
-There is nothing else to configure. Do not import `tailwindcss` separately as well — it would load Tailwind's base styles twice.
+Once Tailwind CSS v4 processes that stylesheet, there is nothing else to configure. Do not import `tailwindcss` separately as well — it would load Tailwind's base styles twice.
+
+### Fonts
+
+The theme names Press Start 2P (`font-pixel`), Inter (`font-sans`) and JetBrains Mono (`font-mono`) but loads none of them. Add the stylesheet `buildGoogleFontsUrl('en')` builds — from `@pxlkit/ui-kit-core`; `'tr'` adds the Latin Extended subset — to `src/index.html`:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&subset=latin&display=swap" />
+```
 
 ## Quick start
 
@@ -78,6 +111,11 @@ The inputs, their names and their defaults are the React kit's props; the rest f
 
 Components that render no element of their own in React (providers, popovers, form fields wrapping a control) have a layout-neutral host (`display: contents`).
 
+- **Overlays decide nothing on their own.** `<pxl-modal>`, `<pxl-drawer>`, `<pxl-sheet>`, `<pxl-alert-dialog>`, `<pxl-command>` and `<pxl-popover>` take `open` as a required input and show exactly that: the close button, Escape, the backdrop, a press outside or the palette's shortcut only ask through `(openChange)`. Bind `[(open)]`, or `[open]` with `(openChange)` / `(closed)` — a one-way `[open]="true"` with no listener stays open. `<pxl-dropdown-root>` and `<pxl-tooltip>` may stay uncontrolled: leave `open` unbound and set `defaultOpen`.
+- **Callbacks whose presence changes React's markup** become a boolean input plus an output, since an output cannot tell whether anyone listens: `PixelChip` — `deletable` + `(delete)`, `clickable` + `(clicked)` (a clickable chip without ×: `<button pxlChip>`); `PixelTable` / `PixelDataTable` — `[clickableRows]` + `(rowClick)`; `PixelStepper` — `[clickable]` + `(stepClick)`.
+- **Native attributes on form fields.** `<pxl-input>` passes `id`, `name`, `type`, `placeholder`, `autocomplete`, `pattern`, `minlength`, `maxlength`, `required`, `readonly`, `disabled`, `aria-label` and `aria-describedby` to its `<input>`; any other attribute (`inputmode`, `min`, `step`, `data-*`) stays on the host. Use `<input pxlBareInput>` for full control.
+- **Form controls** (`ngModel`, `formControlName`, `[formControl]`): `pxl-input`, `pxl-password-input`, `pxl-textarea`, `pxl-number-input`, `pxl-otp-input`, `pxl-select`, `pxl-combobox`, `pxl-multi-select`, `pxl-date-picker`, `pxl-date-range-picker`, `pxl-calendar-grid`, `pxl-color-input`, `pxl-checkbox`, `pxl-switch`, `fieldset[pxlRadioGroup]`, `pxl-segmented`, `pxl-slider`, `button[pxlToggle]`, `pxl-toggle-group`, `pxl-file-upload`, `pxl-star-rating`, `pxl-chip-group`, `input[pxlBareInput]`, `textarea[pxlBareTextarea]`.
+
 ## Surfaces and tones
 
 Every visible component takes `surface: 'pixel' | 'linear'` — chunky pixel borders and staircase corners, or soft borders and rounded corners — and, where it applies, `tone: 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'`. Switch a whole subtree, or the whole application:
@@ -88,15 +126,56 @@ Every visible component takes `surface: 'pixel' | 'linear'` — chunky pixel bor
 </ng-container>
 ```
 
+For the whole application, add `providePxlKitSurface('linear')` to the `providers` in `src/app/app.config.ts`, next to the ones the CLI generated:
+
 ```ts
-bootstrapApplication(App, { providers: [providePxlKitSurface('linear')] });
+import type { ApplicationConfig } from '@angular/core';
+import { providePxlKitSurface } from '@pxlkit/ui-kit-angular';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    // …keep the providers `ng new` generated (error listeners, change detection,
+    // router, provideClientHydration() in SSR apps), and add:
+    providePxlKitSurface('linear'),
+  ],
+};
 ```
 
 Tones and surfaces resolve to the `--retro-*` CSS variables of the theme: override any of them on `:root` or `.dark` to reskin every component.
 
-## Server rendering
+## Dark mode
 
-Components render on the server (`@angular/ssr`) and hydrate without mismatches. Overlays render their content in place on the server and during hydration, then move it into `document.body`; browser-only behaviour (positioning, focus, page-wide listeners) starts after the first render and runs outside the Angular zone.
+The theme follows a class: `.dark` on `<html>` (or any ancestor) selects the dark palette, `.light` the light one. `injectDarkMode()` returns `{ mode, resolved, setMode }` as signals and a setter; `setMode('light' | 'dark' | 'system')` stores the choice in `localStorage` (`pxlkit:dark-mode`) and sets the class, and `'system'` follows `prefers-color-scheme`.
+
+```ts
+import { Component } from '@angular/core';
+import { PixelButton, injectDarkMode } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  selector: 'app-theme-toggle',
+  imports: [PixelButton],
+  template: `
+    <button pxlButton (click)="toggle()">
+      {{ theme.resolved() === 'dark' ? 'Light theme' : 'Dark theme' }}
+    </button>
+  `,
+})
+export class ThemeToggle {
+  protected readonly theme = injectDarkMode();
+
+  toggle() {
+    this.theme.setMode(this.theme.resolved() === 'dark' ? 'light' : 'dark');
+  }
+}
+```
+
+It starts from `'system'` / `'light'` on the server and reads the stored choice in the browser, so a server-rendered app sets the class before first paint with a small inline script in `src/index.html`'s `<head>` that reads the same key — the [`@pxlkit/ui-kit` README](https://github.com/Joangeldelarosa/pxlkit/blob/main/packages/ui-kit/README.md#dark-mode) has it. To re-skin, redefine any `--retro-*` variable after the kit's import, on `:root` for the light theme and on `.dark` for the dark one.
+
+## Server rendering and hydration
+
+Nothing beyond Angular's own setup: `ng new --ssr` (or `ng add @angular/ssr`), and keep `provideClientHydration()` in `app.config.ts` — removing it makes the browser throw the server markup away and render again. Components render on the server and hydrate without mismatches. Overlays render in place on the server and move into `document.body` after hydration; listeners, positioning and focus start in the browser only, outside the Angular zone. Zoneless applications (the default from Angular 21) and zone.js ones (`zone.js` in `polyfills`, `provideZoneChangeDetection()` in the providers) work alike.
+
+A calendar shows the current month and marks today, which depends on the reader's clock: give `pxl-calendar-grid` a `month` (or a bound value) for a stable server render, or render a current-month calendar in the browser only, inside `@defer`.
 
 ## Utilities
 
@@ -224,7 +303,7 @@ The React kit's hooks, as injection functions: `injectDarkMode`, `injectLocalSto
 
 ## Documentation
 
-Guides, every component and live examples at **[pxlkit.xyz](https://pxlkit.xyz)**.
+The Angular setup at **[pxlkit.xyz/ui-kit#angular](https://pxlkit.xyz/ui-kit#angular)**; every component, with its Angular code, at [pxlkit.xyz/ui-kit](https://pxlkit.xyz/ui-kit) and [pxlkit.xyz/docs](https://pxlkit.xyz/docs).
 
 ## Related packages
 

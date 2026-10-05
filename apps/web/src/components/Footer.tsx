@@ -22,16 +22,16 @@ export function Footer({ year }: { year: number }) {
               <BrandMark size={26} />
             </Link>
             <p className="text-retro-muted text-sm font-mono max-w-sm">
-              The retro React toolkit with MIT code packages and licensed icon assets.
-              Ship pixel-perfect interfaces with components, icons, and 3D effects — all from code.
+              The retro pixel-art toolkit for React — now also for Vue and Angular. MIT code packages,
+              licensed icon assets: components, icons and 3D effects, all from code.
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h3 className="font-pixel text-[10px] text-retro-text mb-4">
+            <h2 className="font-pixel text-[10px] text-retro-text mb-4">
               RESOURCES
-            </h3>
+            </h2>
             <ul className="space-y-2 font-mono text-sm">
               <li>
                 <Link href="/ui-kit" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
@@ -64,6 +64,11 @@ export function Footer({ year }: { year: number }) {
                 </Link>
               </li>
               <li>
+                <Link href="/changelog" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
+                  Changelog
+                </Link>
+              </li>
+              <li>
                 <Link href="/skills" className="inline-block py-1 -my-1 text-retro-muted hover:text-retro-green transition-colors">
                   Claude Code Skills
                 </Link>
@@ -87,9 +92,9 @@ export function Footer({ year }: { year: number }) {
           </div>
 
           <div>
-            <h3 className="font-pixel text-[10px] text-retro-text mb-4">
+            <h2 className="font-pixel text-[10px] text-retro-text mb-4">
               COMMUNITY
-            </h3>
+            </h2>
             <ul className="space-y-2 font-mono text-sm">
               <li>
                 <a

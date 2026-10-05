@@ -1,115 +1,47 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@/components/JsonLd';
+import { pageMetadata } from '@/lib/seo';
+import { breadcrumbList } from '@/lib/structured-data';
 
-export const metadata: Metadata = {
-  title: 'Browse 226+ Pixel Art SVG Icons — Free Icon Library for React, Vue & Angular',
+export const metadata: Metadata = pageMetadata({
+  path: '/icons',
+  title: '226+ Pixel Art Icons for React — Free SVG Packs',
   description:
-    'Search & browse 226+ pixel art SVG icons in 7 packs. Copy the code for React, Vue or Angular, or download the SVG. Filter by category, preview animations. Free with attribution.',
+    'Browse 226+ pixel-art SVG icons in 7 packs. Copy the React code (or, new in 2.2, Vue and Angular) or download the SVG. Free with attribution.',
+  socialDescription:
+    '226+ hand-crafted pixel-art SVG icons in 7 themed packs. Filter, preview animations, copy the React code (or Vue and Angular, new in 2.2) and download the SVG.',
+  imageAlt: 'Pxlkit — 226+ pixel-art SVG icons for React, now also for Vue and Angular',
   keywords: [
     'pixel art icons',
+    'pixel icons for react',
+    'react icon library',
     'retro icons',
     'svg icons',
-    'react icons',
-    'react icon component',
-    'react icon library',
-    'icon pack',
-    'icon gallery',
-    'icon search',
-    'icon browser',
-    'free icons',
     'free svg icons',
-    'pixel art icons download',
-    'download svg icons',
-    'copy paste icons',
-    'copy paste icons react',
-    'svg icon pack free',
-    'source available icons',
-    'open source icons',
     'pixel art svg',
-    'pixel icons library',
     'animated pixel icons',
-    'pixel art sprites',
     '16x16 pixel icons',
     '8-bit icons',
     'retro game icons',
     'rpg icons',
-    'game ui icons',
-    'indie game icons',
     'gamification icons',
-    'achievement icons',
-    'trophy icons',
-    'social icons',
-    'weather icons',
     'weather pixel icons',
     'notification icons',
-    'feedback icons',
-    'ui icons pack',
     'emoji pixel art',
-    'effects icons animated',
     'parallax 3d icons',
-    'hand-crafted icons',
-    'typescript icons',
     'tree-shakeable icons',
-    'icon search engine',
-    'search pixel icons',
-    'browse icon library',
-    'react svg component',
-    'tailwind icons',
-    'next.js icons',
-    'vite icons',
-    'icon set for developers',
-    'web app icons',
-    'dashboard icons pixel',
-    'saas icons retro',
-    'custom icon library react',
-    'lightweight svg icons',
-    'scalable pixel icons',
-    'themed icon packs',
-    'icon categories filter',
-    'pixel icon preview',
-    'animated svg icons',
-    'accessible svg icons',
-    'aria-label icons',
-    'dark mode icons',
-    'retro pixel sprite sheet',
-    'pixel perfect icons',
-    'crisp svg icons',
-    'icon component react typescript',
+    'download svg icons',
+    'vue icons',
+    'angular icons',
     'pxlkit icons',
-    'pxlkit icon library',
   ],
-  openGraph: {
-    type: 'website',
-    title: 'Browse 226+ Pixel Art SVG Icons — Free Icon Library for React, Vue & Angular',
-    description:
-      '226+ hand-crafted pixel art SVG icons across 7 themed packs. Filter by category, preview animations, copy the code for React, Vue or Angular, and use them free in your projects.',
-    url: 'https://pxlkit.xyz/icons',
-    images: [
-      {
-        url: '/og/icons.png',
-        width: 1280,
-        height: 640,
-        alt: 'Pxlkit icons — Browse 226+ free pixel-art SVG icons for React, Vue and Angular',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Browse 226+ Pixel Art SVG Icons — Free Icon Library for React, Vue & Angular',
-    description:
-      '226+ pixel art SVG icons in 7 packs — UI, Gamification, Social, Feedback, Effects, Weather & 3D. Copy React, Vue or Angular code instantly. Free with attribution.',
-    images: ['/og/icons.png'],
-  },
-  alternates: {
-    canonical: 'https://pxlkit.xyz/icons',
-  },
-  other: {
-    'article:author': 'Pxlkit',
-    'og:updated_time': new Date().toISOString(),
-    'og:type': 'website',
-    'og:site_name': 'Pxlkit',
-  },
-};
+});
 
 export default function IconsLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <JsonLd data={breadcrumbList([{ name: 'Icons', path: '/icons' }])} />
+      {children}
+    </>
+  );
 }

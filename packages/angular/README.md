@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit" width="480" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit pixel-art icons for Angular" width="480" />
 </p>
 
 <h1 align="center">@pxlkit/angular</h1>
 
 <p align="center">
-  <strong>Angular standalone components for Pxlkit pixel art icons.</strong><br/>
+  <strong>Angular standalone components for Pxlkit pixel art icons — new in Pxlkit 2.2 (version 0.1.0).</strong><br/>
   Static, animated and 3D parallax icons plus pixel toasts — the same rendering engine, markup and behaviour as the React and Vue components.
 </p>
 
@@ -66,7 +66,7 @@ The components are standalone: add them to the `imports` of the components (or N
 
 Every component is its own root element: `class`, `style` and other attributes set on `<pxl-icon>`, `<pxl-animated-icon>`, `<pxl-parallax-icon>` or `<pxl-toast>` apply to that element, and your `style` wins over the component's own layout styles.
 
-Inputs accept attribute values as well as bindings — `size="48"`, `fps="12"`, a bare `interactive` or `playing` attribute, `shadow="false"` — and an optional input bound to `undefined` falls back to its default, exactly as an omitted React or Vue prop does.
+Inputs accept attribute values as well as bindings — `size="48"`, `fps="12"`, a bare `interactive`, `playing` or `decorative` attribute, `shadow="false"` — and an optional input bound to `undefined` falls back to its default, exactly as an omitted React or Vue prop does.
 
 ### `<pxl-icon>` — `PxlKitIcon`
 
@@ -76,9 +76,20 @@ Inputs accept attribute values as well as bindings — `size="48"`, `fps="12"`, 
 | `size` | `number` | `32` | Width and height in px |
 | `appearance` | `'palette' \| 'tinted' \| 'solid'` | `'palette'` | Colour mode |
 | `color` | `string` | — | Tint hue (`tinted`) or flat colour (`solid`); falls back to `#FFFFFF` |
-| `ariaLabel` | `string` | icon name | Accessible name, rendered as the image `alt` |
+| `ariaLabel` | `string` | icon name | Accessible name, rendered as the image `alt`; an empty label counts as none |
+| `decorative` | `boolean` | `false` | The icon only illustrates visible text beside it: `alt=""`, skipped by screen readers. Wins over `ariaLabel` |
 
 The host is an exact `size`×`size` inline-block box (middle-aligned, never shrunk in flex rows) and the image fills it.
+
+Mark an icon `decorative` when visible text beside it already says what it means — a button or link label, a heading, a list item — so screen readers do not read its name before the label. An icon that is a button's only content is its label: give it an `ariaLabel` instead.
+
+```html
+<!-- The visible label names the button: the icon beside it is decorative. -->
+<button><pxl-icon [icon]="download" [size]="16" decorative /> Download</button>
+
+<!-- The icon is the button's only content: it needs a label. -->
+<button><pxl-icon [icon]="trash" [size]="16" ariaLabel="Delete" /></button>
+```
 
 ### `<pxl-animated-icon>` — `AnimatedPxlKitIcon`
 
@@ -92,7 +103,8 @@ The host is an exact `size`×`size` inline-block box (middle-aligned, never shru
 | `speed` | `number` | `1` | Speed multiplier, clamped to 0.1–10 |
 | `fps` | `number` | — | Fixed frame rate, clamped to 1–60; wins over `speed` |
 | `playing` | `boolean` | — | Explicit play / pause override (unset = trigger-driven) |
-| `ariaLabel` | `string` | icon name | Accessible name of the frames |
+| `ariaLabel` | `string` | icon name | Accessible name of the frames; an empty label counts as none |
+| `decorative` | `boolean` | `false` | Every frame renders `alt=""`, skipped by screen readers. Wins over `ariaLabel` |
 
 Looping icons pause while they are off-screen. `appear` plays once when 30 % of the icon first enters the viewport.
 
@@ -109,7 +121,8 @@ Looping icons pause while they are off-screen. `appear` plays once when 30 % of 
 | `layerGap` | `number` | `max(12, size × 0.2)` | Z distance between layers in px |
 | `shadow` | `boolean` | `true` | Soft depth shadows between layers |
 | `interactive` | `boolean` | `true` | Click: explode the layers, jolt the scene, burst particles |
-| `ariaLabel` | `string` | icon name | Accessible name (the host is `role="img"`) |
+| `ariaLabel` | `string` | icon name | Accessible name (the host is `role="img"`); an empty label counts as none |
+| `decorative` | `boolean` | `false` | The host drops its role and name for `aria-hidden="true"` and every layer renders `alt=""`. Wins over `ariaLabel` |
 
 | Output | Payload | Description |
 | --- | --- | --- |
@@ -126,7 +139,7 @@ Looping icons pause while they are off-screen. `appear` plays once when 30 % of 
 | `visible` | `boolean` | — *(required)* | Whether the toast is shown |
 | `title` | `string` | — *(required)* | Heading line |
 | `message` | `string` | — | Body text |
-| `icon` | `PxlKitData` | — | Optional icon (an accent dot is shown without one) |
+| `icon` | `PxlKitData` | — | Optional icon, decorative (`alt=""`: the title names the toast); an accent dot is shown without one |
 | `colorfulIcon` | `boolean` | `true` | Palette colours instead of flat `accentColor` |
 | `iconSize` | `number` | `24` | Icon size in px |
 | `position` | `'top-left' \| 'top-right' \| 'bottom-left' \| 'bottom-right'` | `'top-right'` | Screen corner |

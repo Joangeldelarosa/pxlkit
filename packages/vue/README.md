@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit" width="480" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit pixel-art icons for Vue 3" width="480" />
 </p>
 
 <h1 align="center">@pxlkit/vue</h1>
 
 <p align="center">
-  <strong>Vue 3 components for Pxlkit pixel art icons.</strong><br/>
+  <strong>Vue 3 components for Pxlkit pixel art icons — new in Pxlkit 2.2 (version 0.1.0).</strong><br/>
   Static, animated and 3D parallax icons plus pixel toasts — the same rendering engine, markup and behaviour as the React and Angular components.
 </p>
 
@@ -65,7 +65,18 @@ Props are listed with their declared camelCase names; templates may use either `
 | `size` | `number` | `32` | Width and height in px |
 | `appearance` | `'palette' \| 'tinted' \| 'solid'` | `'palette'` | Colour mode |
 | `color` | `string` | — | Tint hue (`tinted`) or flat colour (`solid`); falls back to `#FFFFFF` |
-| `aria-label` | `string` | icon name | Accessible name, rendered as the image `alt` |
+| `aria-label` | `string` | icon name | Accessible name, rendered as the image `alt`; an empty label counts as none |
+| `decorative` | `boolean` | `false` | The icon only illustrates visible text beside it: `alt=""`, skipped by screen readers. Wins over `aria-label` |
+
+Mark an icon `decorative` when visible text beside it already says what it means — a button or link label, a heading, a list item — so screen readers do not read its name before the label. An icon that is a button's only content is its label: give it an `aria-label` instead.
+
+```vue
+<!-- The visible label names the button: the icon beside it is decorative. -->
+<button><PxlKitIcon :icon="Download" :size="16" decorative /> Download</button>
+
+<!-- The icon is the button's only content: it needs a label. -->
+<button><PxlKitIcon :icon="Trash" :size="16" aria-label="Delete" /></button>
+```
 
 ### `<AnimatedPxlKitIcon>`
 
@@ -79,7 +90,8 @@ Props are listed with their declared camelCase names; templates may use either `
 | `speed` | `number` | `1` | Speed multiplier, clamped to 0.1–10 |
 | `fps` | `number` | — | Fixed frame rate, clamped to 1–60; wins over `speed` |
 | `playing` | `boolean` | — | Explicit play / pause override (unset = trigger-driven) |
-| `aria-label` | `string` | icon name | Accessible name of the frames |
+| `aria-label` | `string` | icon name | Accessible name of the frames; an empty label counts as none |
+| `decorative` | `boolean` | `false` | Every frame renders `alt=""`, skipped by screen readers. Wins over `aria-label` |
 
 Looping icons pause while they are off-screen. `appear` plays once when 30 % of the icon first enters the viewport.
 
@@ -96,7 +108,8 @@ Looping icons pause while they are off-screen. `appear` plays once when 30 % of 
 | `layerGap` | `number` | `max(12, size × 0.2)` | Z distance between layers in px |
 | `shadow` | `boolean` | `true` | Soft depth shadows between layers |
 | `interactive` | `boolean` | `true` | Click: explode the layers, jolt the scene, burst particles |
-| `aria-label` | `string` | icon name | Accessible name |
+| `aria-label` | `string` | icon name | Accessible name of the `role="img"` container; an empty label counts as none |
+| `decorative` | `boolean` | `false` | The container drops its role and name for `aria-hidden="true"` and every layer renders `alt=""`. Wins over `aria-label` |
 
 | Event | Payload | Description |
 | --- | --- | --- |
@@ -113,7 +126,7 @@ Looping icons pause while they are off-screen. `appear` plays once when 30 % of 
 | `visible` | `boolean` | — *(required)* | Whether the toast is shown |
 | `title` | `string` | — *(required)* | Heading line |
 | `message` | `string` | — | Body text |
-| `icon` | `PxlKitData` | — | Optional icon (an accent dot is shown without one) |
+| `icon` | `PxlKitData` | — | Optional icon, decorative (`alt=""`: the title names the toast); an accent dot is shown without one |
 | `colorfulIcon` | `boolean` | `true` | Palette colours instead of flat `accentColor` |
 | `iconSize` | `number` | `24` | Icon size in px |
 | `position` | `'top-left' \| 'top-right' \| 'bottom-left' \| 'bottom-right'` | `'top-right'` | Screen corner |

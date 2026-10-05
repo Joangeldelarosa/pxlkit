@@ -5,19 +5,30 @@ import { useEffect, useState } from 'react';
 /**
  * Counts up from 0 to `to` over `duration` ms (RAF, ease-out cubic) when
  * `start` flips to true. Returns the rounded integer at the current frame.
+ *
+ * The server render, and the render that hydrates it, show `to`: the figure is
+ * in the HTML for readers and crawlers without scripts. Mounted in the
+ * browser, the value drops to 0 until `start` — the strip is below the fold by
+ * then — and with `animate` false it stays at `to`.
  */
 export function useCountUp({
   to,
   duration,
   start,
+  animate = true,
 }: {
   to: number;
   duration: number;
   start: boolean;
+  animate?: boolean;
 }): number {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(to);
 
   useEffect(() => {
+    if (!animate) {
+      setValue(to);
+      return;
+    }
     if (!start) {
       setValue(0);
       return;
@@ -39,7 +50,7 @@ export function useCountUp({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [to, duration, start]);
+  }, [to, duration, start, animate]);
 
   return value;
 }

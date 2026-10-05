@@ -26,7 +26,7 @@ import { CodeBlock } from './CodeBlock';
 import { HeroCinematic, StatCardStrip } from './hero';
 import { useToast } from './ToastProvider';
 import type { ToastTone } from './ToastProvider';
-import { WhatsNewStrip, type WhatsNewItem } from './whats-new-strip';
+import { WhatsNewStrip } from './whats-new-strip';
 import {
   UI_KIT_VERSION,
   UI_KIT_VERSION_LABEL,
@@ -40,8 +40,8 @@ import {
   A11Y_BASELINE,
 } from '@/lib/pxlkit-counts';
 import { LANDING_FAQS } from '@/lib/landing-faq';
+import { WHATS_NEW_ITEMS, WHATS_NEW_SUMMARY } from '@/lib/whats-new';
 import {
-  PixelAccordion,
   PixelAreaChart,
   PixelBadge,
   PixelBarChart,
@@ -95,15 +95,6 @@ const staggerContainer = {
 /** Derived from the icon data already bundled for the hero + showcase. */
 const TOTAL_ICON_COUNT = ALL_ICONS.length + ParallaxPack.length;
 
-/* v2.2.0 highlights — the UI kit and the icon components in Vue and Angular. */
-const WHATS_NEW_ITEMS: WhatsNewItem[] = [
-  { name: '@pxlkit/ui-kit-vue', category: 'vue', href: '/ui-kit#getting-started', isNew: true },
-  { name: '@pxlkit/ui-kit-angular', category: 'angular', href: '/ui-kit#getting-started', isNew: true },
-  { name: '@pxlkit/ui-kit-core', category: 'core', href: '/ui-kit#getting-started', isNew: true },
-  { name: '@pxlkit/vue', category: 'icons', href: '/docs#react-component', isNew: true },
-  { name: '@pxlkit/angular', category: 'icons', href: '/docs#react-component', isNew: true },
-];
-
 export function LandingPageClient() {
   return (
     <div className="relative overflow-x-hidden w-full max-w-[100vw]">
@@ -112,8 +103,9 @@ export function LandingPageClient() {
       <WhatsNewStrip
         version={UI_KIT_VERSION}
         date={UI_KIT_LATEST_DATE}
+        summary={WHATS_NEW_SUMMARY}
         items={WHATS_NEW_ITEMS}
-        changelogHref="/changelog"
+        changelogHref="/changelog#v220"
       />
       <PillarsBento />
       <LiveKitDemo />
@@ -167,7 +159,7 @@ function PillarsBento() {
             <p className="text-sm text-retro-muted leading-relaxed">
               WAI-ARIA roles, keyboard nav, focus rings, and reduced-motion
               fallbacks ship with every interactive — not retrofitted later.
-              WCAG 2.1 AA contrast tokens by default.
+              Colour tokens built for WCAG 2.1 AA contrast.
             </p>
           </PixelBentoCell>
 
@@ -496,20 +488,25 @@ function LiveKitDemo() {
 
 /* ──────────────────── HOW IT WORKS — install → wrap → use ──────────────────── */
 
-const STEP_INSTALL = `npm install @pxlkit/core @pxlkit/ui-kit tailwindcss`;
+const STEP_INSTALL = `npm install @pxlkit/ui-kit
 
-const STEP_PROVIDER = `import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
-import '@pxlkit/ui-kit/styles.css';
+# Tailwind CSS v4 in your build (Next.js;
+# with Vite: tailwindcss @tailwindcss/vite)
+npm install -D tailwindcss @tailwindcss/postcss postcss`;
 
-export default function RootLayout({ children }) {
+const STEP_PROVIDER = `// app/globals.css, in place of @import "tailwindcss":
+//   @import "@pxlkit/ui-kit/styles.css";
+
+// app/providers.tsx — wrap {children} in app/layout.tsx
+'use client';
+
+import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';
+
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <html>
-      <body>
-        <PxlKitSurfaceProvider surface="pixel">
-          {children}
-        </PxlKitSurfaceProvider>
-      </body>
-    </html>
+    <PxlKitSurfaceProvider surface="pixel">
+      {children}
+    </PxlKitSurfaceProvider>
   );
 }`;
 
@@ -599,6 +596,18 @@ function HowItWorks() {
         </PixelCard>
       </motion.div>
 
+      <p className="mt-6 text-center font-mono text-xs text-retro-muted">
+        Vue or Angular? New in 2.2: the same three steps with{' '}
+        <Link href="/ui-kit#vue" className="text-retro-cyan hover:text-retro-green transition-colors">
+          @pxlkit/ui-kit-vue
+        </Link>{' '}
+        or{' '}
+        <Link href="/ui-kit#angular" className="text-retro-cyan hover:text-retro-green transition-colors">
+          @pxlkit/ui-kit-angular
+        </Link>
+        .
+      </p>
+
       <div className="mt-8 flex justify-center">
         <PixelCluster gap={3} justify="center">
           <PixelButton tone="cyan" onClick={() => router.push('/docs#ui-kit')}>
@@ -626,7 +635,7 @@ const FEATURES: FeatureRow[] = [
   {
     icon: Package,
     title: 'Skip the design-system sprint',
-    description: `${UI_COMPONENTS_COUNT} accessible primitives for React, Vue and Angular — buttons, inputs, DataTable, Stepper, Calendar, Sidebar, Timeline, Charts — wired to the same surface/tone/density contract. Drop them in and theme once.`,
+    description: `${UI_COMPONENTS_COUNT} accessible React primitives — buttons, inputs, DataTable, Stepper, Calendar, Sidebar, Timeline, Charts — wired to one surface/tone/density contract, and since 2.2 in Vue and Angular too. Drop them in and theme once.`,
     tone: 'green',
   },
   {
@@ -638,7 +647,7 @@ const FEATURES: FeatureRow[] = [
   {
     icon: FireSword,
     title: 'Bundle stays tiny — only what you import',
-    description: `${TOTAL_ICON_COUNT}+ hand-crafted 16×16 SVG icons across ${ICON_PACK_COUNT} packs, fully tree-shakeable. Pure SVG, zero runtime deps, no font loading. Your bundle only carries what you actually render.`,
+    description: `${TOTAL_ICON_COUNT}+ hand-crafted 16×16 SVG icons across ${ICON_PACK_COUNT} packs, fully tree-shakeable. Plain SVG, no third-party dependencies, no font loading. Your bundle only carries the icons you import.`,
     tone: 'red',
     animated: true,
   },
@@ -720,8 +729,8 @@ function TemplatesTeaser() {
     >
       <PixelSectionHeader
         eyebrow="Templates"
-        title="Six full layouts. Open, copy, swap, ship."
-        description="Dashboards, changelog, docs, full SaaS landing, portfolio, e-commerce — every page wired end-to-end with the kit, dark + light included. Preview live, copy the route, change the words."
+        title="Six full React layouts. Open, copy, swap, ship."
+        description="Dashboards, changelog, docs, full SaaS landing, portfolio, e-commerce — React pages wired end-to-end with the kit, dark + light included. Preview live, copy the route, change the words."
         align="center"
         titleTone="gold"
         size="md"
@@ -744,10 +753,10 @@ function TemplatesTeaser() {
 /* ──────────────────── STATS STRIP (PixelStatGroup) ──────────────────── */
 function StatsStrip() {
   const stats: { label: string; value: string; tone: 'green' | 'gold' | 'cyan' | 'purple' }[] = [
-    { label: 'Components', value: `${UI_COMPONENTS_COUNT}`, tone: 'green' },
+    { label: 'React components', value: `${UI_COMPONENTS_COUNT}`, tone: 'green' },
     { label: `Icons · ${ICON_PACK_COUNT} packs`, value: ICON_COUNT_LABEL, tone: 'gold' },
     { label: 'Page templates', value: `${PAGE_TEMPLATE_COUNT}`, tone: 'cyan' },
-    { label: 'Accessibility', value: A11Y_BASELINE, tone: 'purple' },
+    { label: 'Built for', value: A11Y_BASELINE, tone: 'purple' },
   ];
 
   return (
@@ -1134,7 +1143,7 @@ function PricingPreview() {
       price: 'Free',
       suffix: 'perfect for: side projects, OSS, prototypes',
       color: 'green' as const,
-      features: [`${ICON_COUNT_LABEL} pixel art icons`, `${ICON_PACK_COUNT} thematic packs`, `${UI_COMPONENTS_COUNT} components for React, Vue & Angular`, 'All section templates', 'Asset attribution required'],
+      features: [`${ICON_COUNT_LABEL} pixel art icons`, `${ICON_PACK_COUNT} thematic packs`, `${UI_COMPONENTS_COUNT} React components (Vue & Angular too)`, 'All section templates', 'Asset attribution required'],
     },
     {
       name: 'Indie',
@@ -1143,7 +1152,7 @@ function PricingPreview() {
       suffix: 'perfect for: solo dev shipping one paid product',
       color: 'gold' as const,
       popular: true,
-      features: ['No attribution needed', '1 commercial project', 'Lifetime updates included', 'All current icon packs'],
+      features: ['No attribution needed', '1 commercial project', 'Lifetime license, updates at purchase', 'All current icon packs'],
     },
     {
       name: 'Team',
@@ -1151,7 +1160,7 @@ function PricingPreview() {
       originalPrice: '$49',
       suffix: 'perfect for: agencies and teams shipping many products',
       color: 'cyan' as const,
-      features: ['Unlimited commercial projects', 'All future packs free', 'Priority support', 'Sponsor logo on GitHub'],
+      features: ['Unlimited commercial projects', 'All future packs free', 'Priority support', 'Logo in README sponsors'],
     },
   ];
 
@@ -1217,7 +1226,17 @@ function PricingPreview() {
   );
 }
 
-/* ──────────────────── FAQ — data shared with the FAQPage JSON-LD in app/layout.tsx ──────────────────── */
+/* ──────────────────── FAQ — data shared with the home page's FAQPage JSON-LD (lib/structured-data.ts) ──────────────────── */
+
+/** The chevron the kit's accordion draws, on its 8×8 pixel grid: [x, y, width, height]. */
+const FAQ_CHEVRON: ReadonlyArray<readonly [number, number, number, number]> = [
+  [1, 2, 1, 1],
+  [2, 3, 1, 1],
+  [3, 4, 2, 1],
+  [5, 3, 1, 1],
+  [6, 2, 1, 1],
+];
+
 function FAQSection() {
   return (
     <PixelContainer as="section" maxWidth="xl" padding="md" className="border-t border-retro-border/30 bg-retro-surface/20">
@@ -1235,18 +1254,34 @@ function FAQSection() {
         />
       </motion.div>
 
-      <div className="mt-10 max-w-3xl mx-auto">
-        <PixelAccordion
-          items={LANDING_FAQS.map((faq, i) => ({
-            id: `faq-${i}`,
-            title: faq.q,
-            content: (
-              <p className="text-retro-muted text-xs sm:text-sm leading-relaxed">
-                {faq.a}
-              </p>
-            ),
-          }))}
-        />
+      {/* Native disclosures styled like the kit's accordion (pixel surface):
+          a closed answer stays in the page's HTML, for every reader. */}
+      <div className="mt-10 max-w-3xl mx-auto space-y-1.5">
+        {LANDING_FAQS.map((faq, i) => (
+          <details
+            key={faq.q}
+            open={i === 0}
+            className="group border-2 pxl-corner-sm border-retro-border/40 bg-retro-surface/40"
+          >
+            <summary className="flex w-full cursor-pointer list-none items-center justify-between gap-4 px-3 py-2.5 text-left font-mono text-xs sm:text-sm text-retro-text transition-colors hover:bg-retro-surface/60 focus-visible:outline-hidden focus-visible:pxl-focus-inset [&::-webkit-details-marker]:hidden">
+              <span>{faq.q}</span>
+              <svg
+                viewBox="0 0 8 8"
+                aria-hidden="true"
+                shapeRendering="crispEdges"
+                fill="currentColor"
+                className="h-2.5 w-2.5 shrink-0 text-retro-muted transition-transform duration-200 group-open:rotate-180"
+              >
+                {FAQ_CHEVRON.map(([x, y, width, height]) => (
+                  <rect key={`${x}-${y}`} x={x} y={y} width={width} height={height} />
+                ))}
+              </svg>
+            </summary>
+            <p className="border-t border-retro-border/30 px-3 py-2.5 text-retro-muted text-xs sm:text-sm leading-relaxed">
+              {faq.a}
+            </p>
+          </details>
+        ))}
       </div>
     </PixelContainer>
   );
@@ -1269,7 +1304,7 @@ function VoxelComingSoon() {
         >
           <PixelSectionHeader
             title="WHAT'S NEXT: @pxlkit/voxel"
-            description="A 3D voxel engine for React is on the way. Procedural worlds, biome generation, interactive scenes — the retro aesthetic in full 3D."
+            description="A 3D voxel toolkit for React, in early preview and not yet on npm. Procedural worlds, biome generation, interactive scenes — the retro aesthetic in full 3D."
             align="center"
             titleTone="purple"
             size="md"
@@ -1355,7 +1390,7 @@ function LandingCta() {
         <div className="mt-6 sm:mt-8 flex flex-col items-center gap-5">
           <div className="max-w-full rounded-lg border border-retro-border bg-retro-bg/80 px-4 py-2 font-mono text-[11px] sm:text-xs text-retro-muted break-words">
             <span className="text-retro-green mr-2">$</span>
-            npm i @pxlkit/core @pxlkit/ui-kit
+            npm i @pxlkit/ui-kit
           </div>
 
           <PixelCluster gap={3} justify="center">

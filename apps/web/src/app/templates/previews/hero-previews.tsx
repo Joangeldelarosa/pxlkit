@@ -1,5 +1,11 @@
 'use client';
 
+/*
+ * The heroes here are previews on the templates gallery, under the page's own
+ * h1, so their headlines are h2. The code tab's snippets (data/sections-hero.ts)
+ * keep the h1 a page's hero needs.
+ */
+
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight, Package, Grid, Check } from '@pxlkit/ui';
 import {
@@ -57,11 +63,11 @@ export function HeroCenteredPreview() {
 
           <PixelFadeIn delay={120}>
             <PixelStack gap={3} align="center" className="text-center">
-              <h1 className="font-pixel text-xl sm:text-2xl md:text-3xl lg:text-4xl text-retro-text leading-loose break-words">
-                <PixelGlitch trigger="hover" intensity={3} duration={800}>
+              <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl lg:text-4xl text-retro-text leading-loose break-words">
+                <PixelGlitch as="span" trigger="hover" intensity={3} duration={800}>
                   <PixelTypewriter text="Build retro UIs" speed={55} />
                 </PixelGlitch>
-              </h1>
+              </h2>
               <p className="text-retro-muted font-mono text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
                 Production-ready pixel-art React components with 226+ colorful
                 icons, rich animations, and a full design system. Ship fast. Look
@@ -162,9 +168,9 @@ export function HeroSplitPreview() {
         </PixelBadge>
 
         <PixelStack gap={3} align="start">
-          <h1 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose break-words">
+          <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose break-words">
             Gamify your <span className="text-retro-cyan">Interface</span>
-          </h1>
+          </h2>
           <p className="text-retro-muted font-mono text-sm sm:text-base max-w-md leading-relaxed">
             Animated gamification icons, community-ready social components,
             and pixel-perfect feedback indicators — all built for the retro
@@ -314,10 +320,10 @@ export function HeroParallaxPreview() {
         </PixelFadeIn>
 
         <PixelFadeIn delay={100}>
-          <h1 className="font-pixel text-xl sm:text-2xl md:text-3xl lg:text-4xl text-retro-text leading-loose mt-6 mb-4 break-words">
+          <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl lg:text-4xl text-retro-text leading-loose mt-6 mb-4 break-words">
             Experience the{' '}
             <span className="text-retro-gold">Pixel</span> Universe
-          </h1>
+          </h2>
           <p className="text-retro-muted font-mono text-sm sm:text-base mb-8 max-w-lg mx-auto leading-relaxed">
             Parallax-ready icons, animated effects, and a complete retro
             design system for modern web experiences. Every icon renders in

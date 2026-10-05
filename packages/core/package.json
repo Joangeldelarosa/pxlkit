@@ -3,6 +3,15 @@
   "version": "1.4.0",
   "description": "Pixel art rendering engine for Pxlkit: framework-agnostic core (SVG renderer, animation player, 3D parallax) plus React components, utilities and types",
   "license": "MIT",
+  "homepage": "https://pxlkit.xyz/docs",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/core"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -100,14 +109,11 @@
     "design-system",
     "icon-toolkit",
     "mit-license",
-    "vue",
-    "angular",
     "framework-agnostic",
     "vanilla-js",
-    "headless"
+    "headless",
+    "pixel-icons"
   ],
-  "homepage": "https://pxlkit.xyz",
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"

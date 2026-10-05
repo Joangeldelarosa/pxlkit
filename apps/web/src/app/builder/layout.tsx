@@ -1,106 +1,49 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@/components/JsonLd';
+import { pageMetadata } from '@/lib/seo';
+import { breadcrumbList } from '@/lib/structured-data';
 
-export const metadata: Metadata = {
-  title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG',
+export const metadata: Metadata = pageMetadata({
+  path: '/builder',
+  title: 'Free Pixel Art Icon Builder — Draw & Export SVG',
   description:
-    'Design pixel art icons on a 16×16 grid. Export as React component, SVG or data URI. Free browser-based editor, no signup needed. Real-time preview.',
+    'Draw pixel-art icons on 8×8 to 64×64 grids with retro palettes and animation frames. Export SVG, PNG or PxlKitData code for React, Vue or Angular. Free.',
+  socialDescription:
+    'A free, browser-based pixel-art icon editor: retro palettes, mirroring, animation frames. Export SVG, PNG or PxlKitData code for React (or Vue and Angular). No signup.',
+  imageAlt: 'Pxlkit icon builder — draw pixel-art icons and export SVG, PNG or code',
   keywords: [
-    'pixel art builder',
-    'pixel art tool',
-    'pixel art tool free',
+    'pixel art icon builder',
     'pixel art editor online',
-    'online pixel editor',
     'free online pixel editor',
     'pixel art creator',
-    'pixel art generator',
     'pixel art design tool',
-    'pixel drawing app',
-    'pixel drawing online',
-    'icon builder',
-    'icon designer',
-    'icon design tool',
-    'icon creator online',
     'icon maker free',
-    'visual icon maker',
-    'custom icon creator',
     'svg icon creator',
-    'svg icon designer',
-    'svg generator online',
     'svg export tool',
-    'react icon generator',
-    'react component generator',
-    'react svg export',
-    'create pixel icons',
-    'design pixel icons',
-    'draw pixel art',
+    'pixel art export svg',
+    'pixel art export png',
+    'typescript code export',
     '16x16 icon editor',
-    '16x16 pixel grid',
-    '32x32 pixel editor',
     'pixel grid editor',
     'retro icon maker',
-    'retro art maker',
-    '8-bit art generator',
     '8-bit icon creator',
-    'custom pixel art',
     'pixel art color palette',
-    'retro palette generator',
-    'color picker pixel art',
-    'pixel art export svg',
-    'pixel art export react',
-    'pixel art export png',
-    'data uri export',
-    'typescript code export',
     'sprite editor online',
-    'sprite maker free',
     'game icon maker',
-    'indie game sprite editor',
-    'game asset creator',
-    'free icon editor',
     'browser pixel editor',
-    'browser based design tool',
     'no signup icon editor',
-    'real-time pixel preview',
-    'pixel art canvas',
-    'draw and export icons',
     'favicon maker pixel',
-    'emoji creator pixel',
-    'pxlkit builder',
     'pxlkit icon builder',
-    'pxlkit visual builder',
   ],
-  openGraph: {
-    type: 'website',
-    title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG',
-    description:
-      'Design pixel art icons on a 16×16 grid and export as React component, SVG, or data URI. Free, fast, and browser-based. No signup required.',
-    url: 'https://pxlkit.xyz/builder',
-    images: [
-      {
-        url: '/og/builder.png',
-        width: 1280,
-        height: 640,
-        alt: 'Pxlkit builder — Free browser-based pixel art icon editor with SVG/React export',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Free Online Pixel Art Icon Builder — Draw, Design & Export SVG',
-    description:
-      'Create custom pixel art icons on a 16×16 grid. Export as React component, SVG, or data URI. Free, browser-based, no signup required.',
-    images: ['/og/builder.png'],
-  },
-  alternates: {
-    canonical: 'https://pxlkit.xyz/builder',
-  },
-  other: {
-    'article:author': 'Pxlkit',
-    'og:updated_time': new Date().toISOString(),
-    'og:type': 'website',
-    'og:site_name': 'Pxlkit',
-  },
-};
+});
 
 export default function BuilderLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <JsonLd data={breadcrumbList([{ name: 'Icon builder', path: '/builder' }])} />
+      {/* The editor fills the viewport; the heading names it for assistive technology and the outline. */}
+      <h1 className="sr-only">Pixel art icon builder</h1>
+      {children}
+    </>
+  );
 }

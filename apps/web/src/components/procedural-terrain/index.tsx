@@ -709,9 +709,12 @@ export default function ProceduralTerrain() {
               </h1>
             </PixelFadeIn>
             <PixelFadeIn duration={400} delay={200}>
-              <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
+              <div className="flex flex-wrap items-center justify-center gap-2 mb-3 sm:mb-4">
                 <PixelBadge tone="purple">
                   <span className="text-[8px] sm:text-[9px]">@pxlkit/voxel</span>
+                </PixelBadge>
+                <PixelBadge tone="gold">
+                  <span className="text-[8px] sm:text-[9px]">Early preview · not yet on npm</span>
                 </PixelBadge>
                 <PixelBadge tone="green">
                   <span className="text-[8px] sm:text-[9px]">MIT Licensed</span>

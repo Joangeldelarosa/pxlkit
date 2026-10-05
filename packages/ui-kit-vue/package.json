@@ -1,8 +1,17 @@
 {
   "name": "@pxlkit/ui-kit-vue",
   "version": "2.2.0",
-  "description": "Vue 3 retro UI kit: the Pxlkit components with the same markup, theme and behaviour as the React kit, built on @pxlkit/ui-kit-core",
+  "description": "Retro pixel-art UI kit for Vue 3: the 111 components of the Pxlkit React kit, with the same markup, theme and behaviour. TypeScript, Tailwind CSS v4.",
   "license": "MIT",
+  "homepage": "https://pxlkit.xyz/ui-kit#vue",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/ui-kit-vue"
+  },
   "type": "module",
   "module": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
@@ -72,10 +81,12 @@
     "dark-mode",
     "accessible-ui",
     "typescript",
-    "mit-license"
+    "vue-ui-kit",
+    "vue-component-library",
+    "ui-components",
+    "retro-ui",
+    "tailwindcss"
   ],
-  "homepage": "https://pxlkit.xyz",
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"

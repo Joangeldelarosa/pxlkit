@@ -49,10 +49,22 @@ hands to Tailwind:
 @import "@pxlkit/ui-kit/styles.css";
 ```
 
-That one line is the whole integration — with npm, pnpm or Yarn's
-`node_modules` linker, in a standalone app or a monorepo: the `@source` paths
-resolve from the stylesheet itself, wherever the package manager put it. Two
-mistakes to avoid:
+Tailwind itself has to run in the build — the kit's stylesheet is its input.
+`create-next-app --tailwind` sets that up; otherwise:
+
+- **Next.js** — `npm install -D tailwindcss @tailwindcss/postcss postcss`, and
+  `export default { plugins: { '@tailwindcss/postcss': {} } };` in
+  `postcss.config.mjs`.
+- **Vite** — `npm install -D tailwindcss @tailwindcss/vite`, and
+  `plugins: [react(), tailwindcss()]` in `vite.config.ts`.
+
+Without it the build still succeeds, but the CSS keeps `@theme`, `@source` and
+`@apply` as written and the components render unstyled.
+
+With Tailwind in the build, that one import is the whole integration — with npm,
+pnpm or Yarn's `node_modules` linker, in a standalone app or a monorepo: the
+`@source` paths resolve from the stylesheet itself, wherever the package manager
+put it. Two mistakes to avoid:
 
 - **Importing `tailwindcss` as well.** The kit's stylesheet already does; a
   second import ships Tailwind's base styles twice.
@@ -71,8 +83,11 @@ check that the computed background is a retro green, not transparent — or grep
 the built CSS for a utility Tailwind generates only from the kit's files:
 
 ```bash
-grep -c '\.bg-retro-green' .next/static/css/*.css   # 0: the kit's classes were never generated
+grep -l '\.bg-retro-green' .next/static/chunks/*.css .next/static/css/*.css 2>/dev/null   # no file listed: the kit's classes were never generated
 ```
+
+(Next.js 16 writes the CSS to `.next/static/chunks`, earlier versions to
+`.next/static/css`; with Vite, grep `dist/assets/*.css`.)
 
 ## The CSS entry file
 
@@ -113,6 +128,12 @@ overrides follow it.
 }
 ```
 
+The kit styles the components, not the page: the `body` rule above is yours to
+keep. Remove a starter template's own theme rules — create-next-app's
+`globals.css` sets a white `body` background, `font-family: Arial` and an
+`@theme inline` that remaps `--font-sans` / `--font-mono` to Geist, all of which
+override the kit's.
+
 `image-rendering: pixelated` on `*` is deliberate and load-bearing: without it
 every icon and border blurs the moment the browser scales it, and the whole
 aesthetic collapses into "slightly wrong flat design".
@@ -130,7 +151,7 @@ Re-skinning is a variable override, never a component fork — redefine any
 | Provider | Props (real signature) | Notes |
 | --- | --- | --- |
 | `PxlKitLocaleProvider` | `locale?: 'en' \| 'tr'` (default `'en'`), `children` | Renders a layout-neutral wrapper `<div lang={locale}>` (`display: contents`) and exposes `upper` / `lower` and `fontsUrl` through `usePxlKitLocale()`. Turkish needs it for correct `i → İ` casing. Loads no fonts — see Fonts. |
-| `PxlKitToastProvider` | `position?: ToastPosition` (default `'top-right'`), `max?: number` (default `5`), `surface?: 'pixel' \| 'linear'`, `stacked?: boolean` (default `true`), `stackVisible?: number` (default `2`), `children` | `ToastPosition` = `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left' \| 'top-center' \| 'bottom-center'`. Required before any `useToast()` call. |
+| `PxlKitToastProvider` | `position?: ToastPosition` (default `'top-right'`), `max?: number` (default `5`), `duration?: number` (default `4500`; `0` keeps toasts until dismissed), `hotkey?: string \| false` (default `'F8'`), `surface?: 'pixel' \| 'linear'`, `stacked?: boolean` (default `true`), `stackVisible?: number` (default `2`), `children` | `ToastPosition` = `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left' \| 'top-center' \| 'bottom-center'`. Required before any `useToast()` call. |
 | `PxlKitSurfaceProvider` | `surface?: 'pixel' \| 'linear'` (default `'pixel'`), `children` | Sets the default surface for every descendant. Per-component `surface` props still win. |
 
 The props are **not** `defaultPosition` / `maxToasts` — those belong to the
@@ -144,11 +165,10 @@ then toasts (its portal should inherit both).
 
 ### Next.js — App Router
 
-Every pxlkit provider is a client component (`'use client'` at the top of each
-provider source). A Server Component may not render one directly with children
-coming from the server tree, so wrap them once in your own client boundary and
-keep `layout.tsx` a Server Component — that way pages and children stay server
-components and only the provider shell ships to the browser.
+The kit's components hold state, effects and context, so they run as Client
+Components. Wrap the providers once in a `'use client'` file of your own and keep
+`layout.tsx` a Server Component — pages and children stay Server Components and
+only the provider shell ships to the browser.
 
 ```tsx
 // app/providers.tsx
@@ -178,13 +198,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
 import './globals.css';
 import { Providers } from './providers';
 
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('pxlkit-theme');
-if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}
-else{document.documentElement.classList.add('dark');document.documentElement.classList.remove('light');}}catch(e){}})();`;
+// Same key and default as useDarkMode() — see "Dark mode without the flash"
+const THEME_INIT_SCRIPT = `(function () { try { var raw = localStorage.getItem('pxlkit:dark-mode'); var mode = raw; try { mode = JSON.parse(raw); } catch (e) {} var dark = mode === 'dark' || (mode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches); document.documentElement.classList.toggle('dark', dark); document.documentElement.classList.toggle('light', !dark); } catch (e) {} })();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
@@ -196,11 +215,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-Any page or component of your own that calls a pxlkit hook (`useToast`,
-`usePxlKitLocale`, `usePxlKitSurface`) or passes an event handler to a pxlkit component needs its
-own `'use client'`. Rendering a pxlkit component with only static props from a
-Server Component is fine — the `'use client'` inside the package marks the
-boundary for you.
+Put `'use client'` at the top of every file of your own that imports from
+`@pxlkit/ui-kit` — to render a component or to call a hook (`useToast`,
+`usePxlKitLocale`, `usePxlKitSurface`, `useDarkMode`): that works with every
+version of the kit. A Server Component imports the server-safe helpers
+(`buildGoogleFontsUrl`, `toLocaleUpper`, `cn`, the tokens) from
+`@pxlkit/ui-kit-core` — with pnpm's strict layout, add it to the dependencies to
+import it. From `@pxlkit/core`, `PxlKitIcon` renders in a Server Component;
+`AnimatedPxlKitIcon`, `ParallaxPxlKitIcon` and `PixelToast` need a Client
+Component.
 
 ### Next.js — Pages Router
 
@@ -236,13 +259,12 @@ export default function App({ Component, pageProps }: AppProps) {
 // pages/_document.tsx
 import { Html, Head, Main, NextScript } from 'next/document';
 
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('pxlkit-theme');
-if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}
-else{document.documentElement.classList.add('dark');document.documentElement.classList.remove('light');}}catch(e){}})();`;
+// Same key and default as useDarkMode() — see "Dark mode without the flash"
+const THEME_INIT_SCRIPT = `(function () { try { var raw = localStorage.getItem('pxlkit:dark-mode'); var mode = raw; try { mode = JSON.parse(raw); } catch (e) {} var dark = mode === 'dark' || (mode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches); document.documentElement.classList.toggle('dark', dark); document.documentElement.classList.toggle('light', !dark); } catch (e) {} })();`;
 
 export default function Document() {
   return (
-    <Html lang="en" className="dark">
+    <Html lang="en">
       <Head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </Head>
@@ -263,12 +285,11 @@ module script tag, which is deferred by definition.
 
 ```html
 <!-- index.html -->
-<html lang="en" class="dark">
+<html lang="en">
   <head>
+    <!-- Same key and default as useDarkMode() — see "Dark mode without the flash" -->
     <script>
-      (function(){try{var t=localStorage.getItem('pxlkit-theme');
-      if(t==='light'){document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');}
-      else{document.documentElement.classList.add('dark');document.documentElement.classList.remove('light');}}catch(e){}})();
+      (function () { try { var raw = localStorage.getItem('pxlkit:dark-mode'); var mode = raw; try { mode = JSON.parse(raw); } catch (e) {} var dark = mode === 'dark' || (mode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches); document.documentElement.classList.toggle('dark', dark); document.documentElement.classList.toggle('light', !dark); } catch (e) {} })();
     </script>
   </head>
   <body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body>
@@ -308,29 +329,46 @@ against your entry CSS and import the compiled output instead.
 
 Dark mode is a `.dark` class on `<html>`, not a media query, so the class must
 be on the element **before first paint** or the page flashes the wrong theme.
-This is the exact script `apps/web` ships:
+`useDarkMode()` stores the reader's choice in `localStorage` under
+`pxlkit:dark-mode`, JSON-encoded (`"light"`, `"dark"` or `"system"`), and
+`'system'` — the default — follows `prefers-color-scheme`. The hook reads the
+stored choice only after mounting, so this script sets the class first. It
+reads the same key and default as the kit's `useDarkMode()`:
 
 ```js
-(function(){
+(function () {
   try {
-    var t = localStorage.getItem('pxlkit-theme');
-    if (t === 'light') {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.classList.add('light');
-    } else {
-      document.documentElement.classList.add('dark');
-      document.documentElement.classList.remove('light');
-    }
-  } catch(e){}
+    var raw = localStorage.getItem('pxlkit:dark-mode');
+    var mode = raw;
+    try { mode = JSON.parse(raw); } catch (e) {}
+    var dark = mode === 'dark' || (mode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', dark);
+    document.documentElement.classList.toggle('light', !dark);
+  } catch (e) {}
 })();
 ```
 
 It must run **synchronously in `<head>`, before any stylesheet-dependent
 paint** — a `<script defer>`, a `useEffect`, or a Next `<Script>` with the
 default `afterInteractive` strategy all run too late and reintroduce the flash.
-Pair it with `className="dark"` + `suppressHydrationWarning` on `<html>` so the
-server markup matches the default branch and React does not warn when the
-script has already flipped the class.
+In the App Router, put `suppressHydrationWarning` on `<html>` and leave its
+`className` unset: the script changes the class before React hydrates.
+
+A theme toggle calls the hook — `setMode()` stores the choice and sets the class:
+
+```tsx
+'use client';
+import { PixelButton, useDarkMode } from '@pxlkit/ui-kit';
+
+export function ThemeToggle() {
+  const { resolved, setMode } = useDarkMode();
+  return (
+    <PixelButton onClick={() => setMode(resolved === 'dark' ? 'light' : 'dark')}>
+      {resolved === 'dark' ? 'Light theme' : 'Dark theme'}
+    </PixelButton>
+  );
+}
+```
 
 ## Fonts
 
@@ -340,14 +378,14 @@ the kit loads no font files: add the Google Fonts stylesheet to the document
 `<head>` — in the initial HTML of a server-rendered app — or self-host the three
 families.
 
-`buildGoogleFontsUrl(locale)` is exported from `@pxlkit/ui-kit` and is the SSoT
+`buildGoogleFontsUrl(locale)` is exported from `@pxlkit/ui-kit` and `@pxlkit/ui-kit-core` — import it from the core in a Server Component — and is the SSoT
 for that URL — it picks the subsets per locale (`en` → `latin`, `tr` →
 `latin,latin-ext`, because Turkish `ğ ı İ ş` live outside basic latin). Under a
 `PxlKitLocaleProvider`, `usePxlKitLocale().fontsUrl` is the same URL for the
 current locale:
 
 ```ts
-import { buildGoogleFontsUrl } from '@pxlkit/ui-kit';
+import { buildGoogleFontsUrl } from '@pxlkit/ui-kit-core';
 
 buildGoogleFontsUrl('en');
 // https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700
@@ -355,8 +393,8 @@ buildGoogleFontsUrl('en');
 ```
 
 ```tsx
-// Next App Router — app/layout.tsx <head>
-import { buildGoogleFontsUrl } from '@pxlkit/ui-kit';
+// Next App Router — app/layout.tsx <head> (a Server Component: the helper comes from the core)
+import { buildGoogleFontsUrl } from '@pxlkit/ui-kit-core';
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -375,8 +413,9 @@ font weight. Call the builder.
 | Colors are wrong / `--retro-*` undefined | `@pxlkit/ui-kit/styles.css` not imported | Import it at the top of your entry CSS |
 | Tailwind's base styles appear twice in the built CSS | `tailwindcss` imported next to the kit's stylesheet | Drop `@import "tailwindcss"` — the kit's stylesheet includes it |
 | Text renders in system fonts, not the pixel, Inter and JetBrains Mono families | The fonts are not loaded — the kit names them but loads none | Add the `buildGoogleFontsUrl()` stylesheet to `<head>`, or self-host the families |
-| Theme flashes light then dark on load | Anti-FOUC script deferred or in `useEffect` | Inline synchronous `<script>` in `<head>` |
+| Theme flashes light then dark on load | Anti-FOUC script deferred, in `useEffect`, or reading another key than `useDarkMode()` | Inline synchronous `<script>` in `<head>` reading `pxlkit:dark-mode` |
 | `useToast` throws / toasts never appear | No `PxlKitToastProvider` above the caller | Mount it in the provider shell |
 | Turkish text uppercases `i` as `I` | Locale provider missing or `lang` unset | Wrap in `PxlKitLocaleProvider locale="tr"` and set `lang` on `<html>` |
 | `useState`/context error from a pxlkit import | Client component rendered inside a Server Component boundary | Move the providers into a `'use client'` shell |
+| Build error `Export Controller doesn't exist in target module` / `'FormProvider' is not exported from 'react-hook-form'`, or `useRef is not a function` at prerender | `@pxlkit/ui-kit` imported in a Server Component from a kit version whose bundle has no `'use client'`, or an animated or parallax icon from `@pxlkit/core` rendered in one | Add `'use client'` to that file; keep the providers in a `'use client'` shell; import server helpers from `@pxlkit/ui-kit-core` |
 | Icons look blurry when scaled | `image-rendering: pixelated` missing | Add the `*` base rule shown above |

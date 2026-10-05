@@ -1,7 +1,7 @@
 {
-  "name": "Pxlkit — Retro UI Kit for React, Vue & Angular, 226+ Pixel Art Icons & Ready-to-Use Templates",
+  "name": "Pxlkit — Retro Pixel Art UI Kit for React",
   "short_name": "Pxlkit",
-  "description": "Retro pixel-art toolkit for React, Vue and Angular: a UI kit of 111 components, 226+ SVG icons, ready-to-use templates & sections, a visual icon builder, and Tailwind CSS integration. TypeScript-first, MIT-licensed code.",
+  "description": "Retro pixel-art UI kit for React — 111 components, 226+ SVG icons, templates and a visual icon builder — now also for Vue and Angular. TypeScript, Tailwind CSS v4, MIT code.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0A0A0F",

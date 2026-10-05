@@ -4,7 +4,6 @@ const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/social @pxlkit/
 
 const testimonialCards = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import {
   PixelTestimonialCard,
   PixelFadeIn,
@@ -78,7 +77,6 @@ export function TestimonialCards() {
 
 const largeQuote = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { SocialStar } from '@pxlkit/social';
 import { SparkleStar } from '@pxlkit/gamification';
@@ -132,7 +130,6 @@ export function LargeQuote() {
 
 const testimonialSlider = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { useState } from 'react';
 import {
   PixelTestimonialCard,

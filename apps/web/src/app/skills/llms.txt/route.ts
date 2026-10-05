@@ -43,7 +43,7 @@ ${args}
   const body = `# pxlkit — Claude Code skills
 
 Plugin v${PLUGIN_VERSION}, built against @pxlkit/ui-kit v${UI_KIT_VERSION}.
-The two version independently; the skills read whichever kit version your project has.
+The two are versioned independently; the skills read whichever kit version your project has.
 
 Five skills for building pixel-art interfaces with @pxlkit/ui-kit:
 ${UI_COMPONENTS_COUNT} React components, ${ICON_COUNT_LABEL} pixel-art icons, a switchable

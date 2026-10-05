@@ -5,7 +5,6 @@ import type { FullPageTemplate } from '../types';
    ───────────────────────────────────────────────────────────────────────── */
 const saasLanding = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight, Package, CloudSync } from '@pxlkit/ui';
 import { ShieldCheck, Sparkles } from '@pxlkit/feedback';
@@ -59,7 +58,7 @@ export default function SaasLandingPage() {
               <PixelTypewriter label="Ship retro UIs faster" speed={55} />
             </h1>
             <p className="text-retro-muted font-mono text-sm max-w-lg mx-auto">
-              The complete pixel-art React ecosystem. Components, icons, animations, and 3D effects — all open source.
+              The complete pixel-art React ecosystem. Components, icons, animations, and 3D effects — MIT code, source-available art.
             </p>
             <PixelCluster gap={3} justify="center">
               <PixelButton tone="green" size="lg" iconRight={<PxlKitIcon icon={ArrowRight} size={14} />}>
@@ -180,7 +179,6 @@ export default function SaasLandingPage() {
    ───────────────────────────────────────────────────────────────────────── */
 const devPortfolio = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { ParallaxPxlKitIcon, PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight, ExternalLink } from '@pxlkit/ui';
 import { AtSign } from '@pxlkit/social';
@@ -344,7 +342,6 @@ export default function DeveloperPortfolio() {
    ───────────────────────────────────────────────────────────────────────── */
 const indieGame = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight, Download } from '@pxlkit/ui';
 import { Trophy, Sword, Coin, Crown, FireSword, SparkleStar, CoinSpin, FloatingSkull } from '@pxlkit/gamification';
@@ -492,7 +489,6 @@ export default function IndieGameLanding() {
    ───────────────────────────────────────────────────────────────────────── */
 const adminDashboard = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { useState } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Home, Settings, Grid, List, Search, Upload } from '@pxlkit/ui';
@@ -660,7 +656,6 @@ export default function AdminDashboard() {
    ───────────────────────────────────────────────────────────────────────── */
 const blogSite = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import Link from 'next/link';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight, Search, Calendar } from '@pxlkit/ui';
@@ -876,12 +871,12 @@ export default function BlogSite() {
    6. Docs Site (placeholder — full template lives at /templates/docs)
    ───────────────────────────────────────────────────────────────────────── */
 const docsSite = `\
-// Full source for the docs template lives at:
-// apps/web/src/components/templates/docs-template.tsx
-// The route /templates/docs renders <PixelDocsTemplate /> end-to-end.
-// Lift the component into your repo, theme it, swap the copy, ship.
+// The template's full source is apps/web/src/components/templates/docs-template.tsx
+// in the Pxlkit repository (github.com/Joangeldelarosa/pxlkit); /templates/docs
+// renders it end-to-end. Copy that file into your app — here as
+// components/docs-template.tsx — then theme it, swap the copy, ship.
 
-import { PixelDocsTemplate } from '@pxlkit/ui-kit/templates';
+import { PixelDocsTemplate } from '@/components/docs-template';
 
 export default function DocsPage() {
   return <PixelDocsTemplate />;
@@ -892,12 +887,12 @@ export default function DocsPage() {
    7. Shop / Storefront (placeholder — full template lives at /templates/ecommerce)
    ───────────────────────────────────────────────────────────────────────── */
 const shopStorefront = `\
-// Full source for the storefront template lives at:
-// apps/web/src/components/templates/ecommerce-template.tsx
-// The route /templates/ecommerce renders <PixelEcommerceTemplate /> end-to-end.
-// Lift the component into your repo, wire it to your products + cart, ship.
+// The template's full source is apps/web/src/components/templates/ecommerce-template.tsx
+// in the Pxlkit repository (github.com/Joangeldelarosa/pxlkit); /templates/ecommerce
+// renders it end-to-end. Copy that file into your app — here as
+// components/ecommerce-template.tsx — then wire it to your products and cart, ship.
 
-import { PixelEcommerceTemplate } from '@pxlkit/ui-kit/templates';
+import { PixelEcommerceTemplate } from '@/components/ecommerce-template';
 
 export default function ShopPage() {
   return <PixelEcommerceTemplate />;

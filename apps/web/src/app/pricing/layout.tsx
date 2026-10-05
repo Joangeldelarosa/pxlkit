@@ -1,97 +1,43 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@/components/JsonLd';
+import { pageMetadata } from '@/lib/seo';
+import { breadcrumbList } from '@/lib/structured-data';
 
-export const metadata: Metadata = {
-  title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses',
+export const metadata: Metadata = pageMetadata({
+  path: '/pricing',
+  title: 'Pricing — Free MIT UI Kit, One-Time Icon Licenses',
   description:
-    'Pxlkit: MIT-licensed UI kit for React, Vue and Angular & free icon packs with attribution. Indie $9.50 / Team $24.50 for no-attribution commercial use. One-time payment.',
+    'The UI kit (React, plus Vue and Angular) is MIT and free. Icon packs are free with attribution; Indie $9.50 or Team $24.50 removes it. One-time payment.',
+  socialDescription:
+    'MIT-licensed UI kit for React — and now Vue and Angular — free forever. Icon packs are free with attribution; Indie $9.50 or Team $24.50 for no-attribution commercial use. One-time payment, lifetime license.',
+  imageAlt: 'Pxlkit pricing — free MIT code and one-time icon licenses',
   keywords: [
     'pxlkit pricing',
-    'pxlkit plans',
-    'pxlkit free plan',
+    'pxlkit license',
     'pxlkit indie license',
     'pxlkit team license',
-    'react ui kit pricing',
     'react ui kit free',
-    'free react components',
-    'pixel art icons price',
-    'pixel icons license',
-    'icon license',
-    'icon pack license',
-    'svg icon license',
-    'open source license',
-    'mit license',
-    'mit code license',
     'mit react ui kit',
-    'commercial license',
+    'mit license',
+    'pixel icons license',
+    'icon pack license',
     'commercial icon license',
     'commercial use icons',
-    'source available icon license',
-    'retro ui license',
-    'one-time purchase',
-    'one-time payment ui kit',
-    'no subscription',
-    'lifetime license',
-    'lifetime updates license',
-    'developer license',
-    'indie developer license',
-    'team license',
-    'enterprise license',
     'free with attribution',
-    'attribution license',
     'no attribution license',
     'remove attribution icons',
-    'react component license',
-    'tailwind ui pricing',
-    'ui kit comparison pricing',
-    'affordable ui kit',
-    'cheap icon pack',
-    'budget react components',
-    'free tier ui kit',
-    'split licensing model',
-    'code vs asset licensing',
-    'icon licensing terms',
-    'commercial project icons',
-    'startup license react',
-    'agency license icons',
-    'multi-project license',
-    'per-seat licensing',
-    'pxlkit cost',
-    'pxlkit buy',
-    'pxlkit upgrade',
+    'one-time payment',
+    'no subscription',
+    'lifetime license',
+    'split licensing',
   ],
-  openGraph: {
-    type: 'website',
-    title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses',
-    description:
-      'MIT-licensed UI kit for React, Vue and Angular (free forever). Icon packs free with attribution. Indie $9.50 / Team $24.50 for no-attribution commercial use. One-time payment, lifetime updates.',
-    url: 'https://pxlkit.xyz/pricing',
-    images: [
-      {
-        url: '/og/pricing.png',
-        width: 1280,
-        height: 640,
-        alt: 'Pxlkit pricing — Free MIT code, indie & team licenses for commercial use',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Pricing & Licensing — Free MIT Code + Affordable Icon Licenses',
-    description:
-      'MIT code is free forever. Icon packs free with attribution. Indie ($9.50) / Team ($24.50) for commercial use. One-time payment.',
-    images: ['/og/pricing.png'],
-  },
-  alternates: {
-    canonical: 'https://pxlkit.xyz/pricing',
-  },
-  other: {
-    'article:author': 'Pxlkit',
-    'og:updated_time': new Date().toISOString(),
-    'og:type': 'website',
-    'og:site_name': 'Pxlkit',
-  },
-};
+});
 
 export default function PricingLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return (
+    <>
+      <JsonLd data={breadcrumbList([{ name: 'Pricing', path: '/pricing' }])} />
+      {children}
+    </>
+  );
 }

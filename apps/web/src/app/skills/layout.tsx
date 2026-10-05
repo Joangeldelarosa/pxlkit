@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
+import { JsonLd } from '@/components/JsonLd';
+import { absoluteUrl, pageMetadata } from '@/lib/seo';
 import { INSTALL_COMMAND, PLUGIN_VERSION, SKILLS } from '@/lib/skills-data';
+import { breadcrumbList } from '@/lib/structured-data';
 
 /**
  * No " | Pxlkit" suffix here: the root layout applies a `%s | Pxlkit` title
@@ -8,11 +11,13 @@ import { INSTALL_COMMAND, PLUGIN_VERSION, SKILLS } from '@/lib/skills-data';
  */
 const TITLE = 'Claude Code Skills — Build Pixel-Perfect UI with AI';
 const DESCRIPTION =
-  'Five Claude Code skills for pxlkit: imagine new pixel-art frontends, convert existing sites, author icons, and audit for canonical usage. Install with one command.';
+  'Five Claude Code skills for the pxlkit React kit: imagine pixel-art frontends, convert existing ones, author icons, audit the result. One-command install.';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: '/skills',
   title: TITLE,
   description: DESCRIPTION,
+  imageAlt: 'Pxlkit Claude Code skills — build pixel-perfect interfaces with AI',
   keywords: [
     'claude code plugin',
     'claude code skills',
@@ -32,82 +37,44 @@ export const metadata: Metadata = {
     'pixel art icon generator',
     'react ui kit ai',
   ],
-  openGraph: {
-    type: 'website',
-    title: TITLE,
-    description: DESCRIPTION,
-    url: 'https://pxlkit.xyz/skills',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1280,
-        height: 640,
-        alt: 'Pxlkit Claude Code skills — build pixel-perfect interfaces with AI',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: TITLE,
-    description: DESCRIPTION,
-    images: ['/og-twitter.png'],
-  },
-  alternates: {
-    canonical: 'https://pxlkit.xyz/skills',
-  },
+});
+
+/** The plugin as an application, and a HowTo whose single step is the install command. */
+const SKILLS_STRUCTURED_DATA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      name: 'pxlkit Claude Code plugin',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'macOS, Linux, Windows',
+      softwareVersion: PLUGIN_VERSION,
+      description: DESCRIPTION,
+      url: absoluteUrl('/skills'),
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      featureList: SKILLS.map((s) => `${s.command} — ${s.tagline}`),
+    },
+    {
+      '@type': 'HowTo',
+      name: 'Install the pxlkit Claude Code plugin',
+      description: 'Register the marketplace and install the plugin.',
+      step: [
+        {
+          '@type': 'HowToStep',
+          name: 'Install',
+          text: INSTALL_COMMAND,
+          url: absoluteUrl('/skills#install'),
+        },
+      ],
+    },
+  ],
 };
-
-/**
- * Structured data.
- *
- * The audience for this page includes agents as much as people: someone pastes the
- * URL into an assistant, or a model searches for "pxlkit claude skill". SoftwareApplication
- * plus a HowTo whose single step is the install command is what makes that legible.
- */
-function JsonLd() {
-  const graph = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'SoftwareApplication',
-        name: 'pxlkit Claude Code plugin',
-        applicationCategory: 'DeveloperApplication',
-        operatingSystem: 'macOS, Linux, Windows',
-        softwareVersion: PLUGIN_VERSION,
-        description: DESCRIPTION,
-        url: 'https://pxlkit.xyz/skills',
-        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-        featureList: SKILLS.map((s) => `${s.command} — ${s.tagline}`),
-      },
-      {
-        '@type': 'HowTo',
-        name: 'Install the pxlkit Claude Code plugin',
-        description: 'Register the marketplace and install the plugin.',
-        step: [
-          {
-            '@type': 'HowToStep',
-            name: 'Install',
-            text: INSTALL_COMMAND,
-            url: 'https://pxlkit.xyz/skills#install',
-          },
-        ],
-      },
-    ],
-  };
-
-  return (
-    <script
-      type="application/ld+json"
-      // Static, locally constructed JSON-LD.
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }}
-    />
-  );
-}
 
 export default function SkillsLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <JsonLd />
+      <JsonLd data={SKILLS_STRUCTURED_DATA} />
+      <JsonLd data={breadcrumbList([{ name: 'Skills', path: '/skills' }])} />
       {children}
     </>
   );

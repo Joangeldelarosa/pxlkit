@@ -57,7 +57,7 @@ releases invisible to the update check — the one thing that check exists to pr
 `references/VERSION.json` records both:
 
 ```json
-{ "plugin": "1.0.0", "uiKit": "2.1.1", "date": "…", "digestHash": "…" }
+{ "plugin": "1.0.1", "uiKit": "2.2.0", "date": "…", "digestHash": "…" }
 ```
 
 `plugin` is what users install and update to. `uiKit` records which version of the
@@ -86,8 +86,10 @@ Set `PXLKIT_SKIP_UPDATE_CHECK=1` to disable it entirely.
 
 ## Out of scope
 
-The voxel engine and 3D, the web icon builder, Storybook generation, and frameworks
-without React. The skills say so rather than improvising.
+The voxel engine and 3D, the web icon builder, Storybook generation, and projects
+without React. Pxlkit's Vue and Angular kits (`@pxlkit/ui-kit-vue`,
+`@pxlkit/ui-kit-angular`, new in 2.2) exist, but these skills write React; they say
+so rather than improvising.
 
 ## Licence
 

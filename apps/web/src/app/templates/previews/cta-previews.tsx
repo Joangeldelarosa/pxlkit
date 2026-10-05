@@ -41,11 +41,9 @@ export function CtaBannerPreview() {
           <AnimatedPxlKitIcon icon={SparkleStar} size={48} colorful />
         </PixelBounce>
 
-        <PixelGlitch>
-          <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose break-words">
-            Start your quest
-          </h2>
-        </PixelGlitch>
+        <h2 className="font-pixel text-xl sm:text-2xl md:text-3xl text-retro-text leading-loose break-words">
+          <PixelGlitch as="span" label="Start your quest" />
+        </h2>
 
         <p className="text-retro-text font-mono text-base sm:text-lg">
           Join <PixelTypewriter text="5,000+" speed={50} /> developers
@@ -105,11 +103,11 @@ export function CtaBannerPreview() {
 /* ── CTA Split ──────────────────────────────────────────────────────────── */
 
 const FEATURES = [
-  { label: 'Tree-shakeable — zero unused code ships to production', icon: Check, tip: 'Only the components you use are bundled' },
+  { label: 'Tree-shakeable icons — unused ones never ship', icon: Check, tip: 'Only the icons you import are bundled' },
   { label: '226+ handcrafted pixel-art SVG icons', icon: Package, tip: 'New icons added with every release' },
   { label: 'First-class TypeScript support & full SSR compatibility', icon: Shield, tip: 'Works seamlessly with Next.js and Remix' },
-  { label: 'Accessible components that meet WCAG guidelines', icon: Verified, tip: 'Tested with screen readers and keyboard navigation' },
-  { label: 'Active community & weekly releases', icon: Globe, tip: 'Join our Discord for support and updates' },
+  { label: 'Accessible components built for WCAG 2.1 AA', icon: Verified, tip: 'WAI-ARIA roles, keyboard navigation and visible focus' },
+  { label: 'Open source, with regular releases', icon: Globe, tip: 'Issues and contributions welcome on GitHub' },
 ];
 
 export function CtaSplitPreview() {
@@ -130,7 +128,7 @@ export function CtaSplitPreview() {
             size="md"
             spacing="tight"
             title="Level up your UI"
-            description="Blazingly fast, tree-shakeable components with pixel-art character. No bloat — just the essentials, done right."
+            description="Accessible components and tree-shakeable icons with pixel-art character. No bloat — just the essentials, done right."
           />
 
           {/* Feature list */}

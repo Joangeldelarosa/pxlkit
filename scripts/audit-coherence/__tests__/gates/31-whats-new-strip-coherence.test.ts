@@ -17,6 +17,7 @@ async function createFixture(opts: {
   registryComponents: string[];
   uiKitVersion: string | null;
   uiKitChangelog?: string;
+  rootChangelog?: string;
 }): Promise<Fixture> {
   const root = await mkdtemp(join(tmpdir(), 'pxlkit-gate-31-'));
 
@@ -32,6 +33,10 @@ async function createFixture(opts: {
 
   if (opts.uiKitChangelog) {
     await writeFile(join(root, 'packages/ui-kit/CHANGELOG.md'), opts.uiKitChangelog);
+  }
+
+  if (opts.rootChangelog) {
+    await writeFile(join(root, 'CHANGELOG.md'), opts.rootChangelog);
   }
 
   const entries = opts.registryComponents.map((c) => `  '${c}',`).join('\n');
@@ -195,6 +200,35 @@ describe('gate 31: whats-new-strip coherence', () => {
 
       const result = await whatsNewStripCoherenceGate({ repoRoot: f.root });
       expect(result.drift).toEqual([]);
+    });
+
+    it('stops accepting the previous release once the root CHANGELOG writes up the current one', async () => {
+      // 2.0.1's own section has no Added entries, but the release is written
+      // up in the root CHANGELOG with what it added: 2.0.1 is advertised.
+      const f = await createFixture({
+        stripContent: `
+          import { PixelCard } from '@pxlkit/ui-kit';
+          export default function Strip() {
+            return <PixelCard title="v2.0.0">launch highlights</PixelCard>;
+          }
+        `,
+        registryComponents: ['PixelCard'],
+        uiKitVersion: '2.0.1',
+        uiKitChangelog: FALLBACK_CHANGELOG,
+        rootChangelog: `# Changelog
+
+## [ui-kit 2.0.1 / core 1.3.0] - 2026-06-02 — Toasts everywhere
+
+### Added
+- **\`@pxlkit/toasts\`** — a new package.
+`,
+      });
+      fixtures.push(f);
+
+      const result = await whatsNewStripCoherenceGate({ repoRoot: f.root });
+      const versionDrift = result.drift.find((d) => d.expected.includes('2.0.1'));
+      expect(versionDrift).toBeDefined();
+      expect(versionDrift?.severity).toBe('major');
     });
 
     it('still flags a strip pinned to a version that is neither current nor advertised', async () => {

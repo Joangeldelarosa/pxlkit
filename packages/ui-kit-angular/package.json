@@ -1,8 +1,17 @@
 {
   "name": "@pxlkit/ui-kit-angular",
   "version": "2.2.0",
-  "description": "Angular retro UI kit: the Pxlkit components as standalone, signal-based components with the same markup, theme and behaviour as the React kit",
+  "description": "Retro pixel-art UI kit for Angular 20–22: the Pxlkit React kit's 111 components as standalone, signal-based components. TypeScript, Tailwind CSS v4.",
   "license": "MIT",
+  "homepage": "https://pxlkit.xyz/ui-kit#angular",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/ui-kit-angular"
+  },
   "type": "module",
   "module": "./dist/fesm2022/pxlkit-ui-kit-angular.mjs",
   "typings": "./dist/index.d.ts",
@@ -79,10 +88,13 @@
     "dark-mode",
     "accessible-ui",
     "typescript",
-    "mit-license"
+    "angular-ui-kit",
+    "angular-component-library",
+    "zoneless",
+    "ui-components",
+    "retro-ui",
+    "tailwindcss"
   ],
-  "homepage": "https://pxlkit.xyz",
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"

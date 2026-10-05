@@ -4,7 +4,7 @@ import { MouseProvider } from '../../components/hero/mouseContext';
 import { HeroBackground } from '../../components/hero/HeroBackground';
 import { IconField } from '../../components/hero/IconField';
 import { BrandIcon } from '../../components/Logo';
-import { ICON_COUNT_LABEL, ICON_PACK_COUNT, UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
+import { ICON_COUNT_LABEL, UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 
 /**
  * Curated full-bleed frame used by the OG / Twitter / README screenshot
@@ -56,8 +56,8 @@ export function OgFrame() {
 
           {/* Mono summary */}
           <p className="font-mono text-sm sm:text-base text-retro-muted text-center max-w-2xl">
-            Retro pixel-art UI kit for React, Vue &amp; Angular · {ICON_COUNT_LABEL} icons ·{' '}
-            {UI_COMPONENTS_COUNT} components · {ICON_PACK_COUNT} themed packs · MIT code, source-available art.
+            Retro pixel-art UI kit for React — now also for Vue &amp; Angular · {UI_COMPONENTS_COUNT} components ·{' '}
+            {ICON_COUNT_LABEL} icons · MIT code, source-available art.
           </p>
         </div>
 

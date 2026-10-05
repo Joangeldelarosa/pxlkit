@@ -4,7 +4,6 @@ const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/ui';
 
 const simplePricingCards = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import {
@@ -96,7 +95,6 @@ export function SimplePricingCards() {
 
 const comparisonTable = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon } from '@pxlkit/core';
 import { Check, Close } from '@pxlkit/ui';
 import {
@@ -180,7 +178,6 @@ export function ComparisonTable() {
 
 const togglePricing = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { useState } from 'react';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';

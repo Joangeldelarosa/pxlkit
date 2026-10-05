@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit" width="480" />
+  <img src="https://raw.githubusercontent.com/joangeldelarosa/pxlkit/main/apps/web/public/og-image.png" alt="Pxlkit pixel-art icon engine and React icon components" width="480" />
 </p>
 
 <h1 align="center">@pxlkit/core</h1>
@@ -29,7 +29,7 @@
 | `@pxlkit/core` | Everything below **plus** the React components (`PxlKitIcon`, `AnimatedPxlKitIcon`, `ParallaxPxlKitIcon`, `PixelToast`) | React ≥ 18 |
 | `@pxlkit/core/vanilla` | The framework-agnostic API: icon data types, utilities and the rendering engine (SVG renderer, animation player, parallax controller, toast view model) | Nothing — no UI framework anywhere in its module graph |
 
-The React, [Vue](https://www.npmjs.com/package/@pxlkit/vue) and [Angular](https://www.npmjs.com/package/@pxlkit/angular) components are all thin adapters over the same engine, so an icon's image is byte-identical — and animates identically — in every framework. All icon packs (`@pxlkit/gamification`, `@pxlkit/feedback`, `@pxlkit/social`, …) are plain data typed against this package.
+The React, [Vue](https://www.npmjs.com/package/@pxlkit/vue) and [Angular](https://www.npmjs.com/package/@pxlkit/angular) components are all thin adapters over the same engine, so an icon's image is byte-identical — and animates identically — in every framework. The `vanilla` entry and the Vue and Angular components are new in version 1.4.0 (Pxlkit 2.2). All icon packs (`@pxlkit/gamification`, `@pxlkit/feedback`, `@pxlkit/social`, …) are plain data typed against this package.
 
 ## Pick your framework
 
@@ -72,6 +72,29 @@ Icons render as `<img>` elements backed by inline SVG data URIs with `image-rend
 | `"solid"` *(no color)* | (legacy) inheriting text colour | `#FFFFFF` fallback — pass an explicit `color` for solid mode inside `<img>` since `currentColor` isn't honoured in isolated img contexts |
 
 > **Migration from v1.2.x**: the boolean `colorful`, `solid`, and `tint` props are accepted as `@deprecated` aliases that map to the new `appearance`. Existing code keeps working; new code should use `appearance` + `color`. (The Vue and Angular adapters only accept `appearance` + `color`.)
+
+### Labels and decorative icons
+
+Screen readers announce an icon by its `aria-label`, else by the icon's `name` (`"trophy"`). An empty `aria-label` counts as no label, as it does in ARIA, so the name is read: hiding an icon takes the `decorative` prop.
+
+Mark an icon `decorative` when visible text beside it already says what it means — a button or link label, a heading, a list item. It renders `alt=""`, so screen readers skip it instead of reading its name before the label, and the name stays out of the page's text. `decorative` wins over `aria-label`; `AnimatedPxlKitIcon` and `ParallaxPxlKitIcon` take it too (a parallax icon swaps its `role="img"` and name for `aria-hidden="true"` and empties its layers' `alt`).
+
+```tsx
+import { PxlKitIcon } from '@pxlkit/core';
+import { Download, Trash } from '@pxlkit/ui';
+
+// The visible label names the button: the icon beside it is decorative.
+<button>
+  <PxlKitIcon icon={Download} size={16} decorative /> Download
+</button>
+
+// An icon that is the button's only content is its label: name it instead.
+<button>
+  <PxlKitIcon icon={Trash} size={16} aria-label="Delete" />
+</button>
+```
+
+`PixelToast` renders its icon decorative: the toast's title says what it is about.
 
 ### Animated Icons
 
@@ -170,7 +193,8 @@ unsubscribe();
 | --- | --- |
 | `renderIconSvg(icon, { appearance, color })` | The standalone SVG document an icon component renders (merged rects, tint filter) |
 | `renderIconDataUri(icon, { appearance, color })` | The same SVG as a `data:image/svg+xml` URI for `<img src>` |
-| `resolveIconLabel(icon, label?)` | Accessible name: the label, else the icon's name |
+| `resolveIconLabel(icon, { label?, decorative? })` | The `alt` of an icon `<img>`: the label, else the icon's name (an empty label counts as none); `''` when decorative |
+| `resolveIconContainerAria(icon, { label?, decorative? })` | `role`, `aria-label` and `aria-hidden` of an icon drawn as a container of images (the parallax icon): a named `role="img"`, or `aria-hidden` when decorative |
 | `ICON_IMAGE_STYLE` | Inline style of the icon `<img>` (pixelated, inline-block, middle-aligned) |
 | `createAnimatedIconPlayer(options)` | Playback state machine: frame clock, `loop` / `once` / `hover` / `appear` / `ping-pong`, off-screen pausing |
 | `getAnimationFrame(icon, index)` | One frame of an animated icon as a static `PxlKitData` (palette overrides merged) |

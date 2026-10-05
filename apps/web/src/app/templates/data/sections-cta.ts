@@ -1,10 +1,10 @@
 import type { TemplateSection } from '../types';
+import { UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 
 const INSTALL = 'npm install @pxlkit/core @pxlkit/ui-kit @pxlkit/gamification';
 
 const bannerCta = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { SparkleStar } from '@pxlkit/gamification';
@@ -58,7 +58,6 @@ export function BannerCta() {
 
 const splitCta = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { Trophy, Coin, LevelUp } from '@pxlkit/gamification';
@@ -76,7 +75,7 @@ export function SplitCta() {
   const stats = [
     { icon: Trophy, label: 'Stars', value: '4.2k', tone: 'gold' as const },
     { icon: Coin, label: 'Downloads/mo', value: '18k', tone: 'cyan' as const },
-    { icon: LevelUp, label: 'Components', value: '60+', tone: 'green' as const },
+    { icon: LevelUp, label: 'Components', value: '${UI_COMPONENTS_COUNT}', tone: 'green' as const },
   ];
 
   return (
@@ -132,7 +131,6 @@ export function SplitCta() {
 
 const cardCta = `\
 'use client';
-import '@pxlkit/ui-kit/styles.css';
 import { PxlKitIcon, AnimatedPxlKitIcon } from '@pxlkit/core';
 import { ArrowRight } from '@pxlkit/ui';
 import { FireSword } from '@pxlkit/gamification';

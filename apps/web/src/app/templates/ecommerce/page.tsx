@@ -1,10 +1,14 @@
 import type { Metadata } from 'next';
 import { PixelEcommerceTemplate } from '@/components/templates/ecommerce-template';
+import { TemplatePageHeader } from '@/components/TemplatePageHeader';
+import { pageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
-  title: 'Ecommerce Template — Grid + Cart Sheet | Pxlkit',
+export const metadata: Metadata = pageMetadata({
+  path: '/templates/ecommerce',
+  title: 'Retro React Ecommerce Template — Grid & Cart',
   description:
-    'Drop-in retro ecommerce: sticky search, filter sidebar, product grid with NEW/SALE ribbons + star ratings, pagination, and a bottom-sheet cart.',
+    'Drop-in retro React storefront: sticky search, filter sidebar, product grid with NEW/SALE ribbons and star ratings, pagination and a bottom-sheet cart.',
+  imageAlt: 'Pxlkit ecommerce template — product grid with a bottom-sheet cart',
   keywords: [
     'ecommerce template react',
     'product listing template',
@@ -14,38 +18,16 @@ export const metadata: Metadata = {
     'cart bottom sheet',
     'filter sidebar template',
     'pixel art ecommerce',
-    'react shop template',
     'tailwind ecommerce template',
     'pxlkit templates',
-    'pxlkit ecommerce',
   ],
-  openGraph: {
-    type: 'website',
-    title: 'Ecommerce Template — Grid + Cart Sheet | Pxlkit',
-    description:
-      'Sticky search, filter sidebar, product grid with ribbons and ratings, pagination, and a bottom-sheet cart — all retro-styled.',
-    url: 'https://pxlkit.xyz/templates/ecommerce',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1280,
-        height: 640,
-        alt: 'Pxlkit ecommerce template — Product grid with cart bottom-sheet',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Ecommerce Template — Grid + Cart Sheet | Pxlkit',
-    description:
-      'Sticky search, filter sidebar, product grid with ribbons and ratings, pagination, and bottom-sheet cart.',
-    images: ['/og-twitter.png'],
-  },
-  alternates: {
-    canonical: 'https://pxlkit.xyz/templates/ecommerce',
-  },
-};
+});
 
 export default function EcommerceTemplatePage() {
-  return <PixelEcommerceTemplate />;
+  return (
+    <>
+      <TemplatePageHeader name="Ecommerce" path="/templates/ecommerce" title="Retro React ecommerce template" as="p" />
+      <PixelEcommerceTemplate />
+    </>
+  );
 }
