@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelGridDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelGridDocsMeta = {
@@ -99,10 +103,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): React.ReactElement {
+export function PixelGridDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelGridDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-grid-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-grid-heading'>PixelGrid</h2>
+      <Title id='pixel-grid-heading'>PixelGrid</Title>
       <p className="docs-lead">Surface-aware CSS grid container with responsive column maps, asymmetric gaps, and auto-fit/auto-fill modes.</p>
       <ul className="docs-highlights">
         <li>Numeric or responsive column spec (base/sm/md/lg/xl)</li>
@@ -117,16 +125,16 @@ export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): 
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-grid-api">
-      <h3 id="pixel-grid-api">API</h3>
-      <FrameworkApi label={'PixelGrid API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-grid-api">API</Heading>
+      <FrameworkApi label={'PixelGrid API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-grid-a11y">
-      <h3 id="pixel-grid-a11y">Accessibility</h3>
+      <Heading id="pixel-grid-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the element provided via <code>as</code> (e.g. ul, section). Authors are responsible for the semantic role of grid children.</p>
     </section>
     <section aria-labelledby="pixel-grid-usage">
-      <h3 id="pixel-grid-usage">Usage</h3>
+      <Heading id="pixel-grid-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelGrid usage'}
@@ -185,9 +193,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -246,7 +254,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-responsive">
-        <h4>Responsive Columns</h4>
+        <Subheading>Responsive Columns</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Responsive Columns code'}
@@ -303,7 +311,7 @@ export class Responsive {
         />
       </article>
       <article className="docs-example" id="example-auto-fit">
-        <h4>Auto Fit</h4>
+        <Subheading>Auto Fit</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Auto Fit code'}
@@ -360,7 +368,7 @@ export class AutoFit {
         />
       </article>
       <article className="docs-example" id="example-asymmetric-gaps">
-        <h4>Asymmetric Gaps</h4>
+        <Subheading>Asymmetric Gaps</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Asymmetric Gaps code'}
@@ -418,12 +426,12 @@ export class AsymmetricGaps {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-stack">PixelStack</a></li>
-        <li><a href="#pixel-cluster">PixelCluster</a></li>
-        <li><a href="#pixel-bento">PixelBento</a></li>
-        <li><a href="#pixel-equal-height-grid">PixelEqualHeightGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stack' : '#pixel-stack'}>PixelStack</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-cluster' : '#pixel-cluster'}>PixelCluster</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bento' : '#pixel-bento'}>PixelBento</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-equal-height-grid' : '#pixel-equal-height-grid'}>PixelEqualHeightGrid</a></li>
       </ul>
     </section>
     </section>

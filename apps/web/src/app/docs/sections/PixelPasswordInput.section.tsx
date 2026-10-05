@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPasswordInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelPasswordInputDocsMeta = {
@@ -109,10 +113,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputDocsSectionProps): React.ReactElement {
+export function PixelPasswordInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelPasswordInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-password-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-password-input-heading'>PixelPasswordInput</h2>
+      <Title id='pixel-password-input-heading'>PixelPasswordInput</Title>
       <p className="docs-lead">Password text field with an inline show/hide toggle that swaps the input type between password and text.</p>
       <ul className="docs-highlights">
         <li>Inline visibility toggle with localizable labels via toggleLabels</li>
@@ -127,18 +135,18 @@ export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputD
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-password-input-api">
-      <h3 id="pixel-password-input-api">API</h3>
-      <FrameworkApi label={'PixelPasswordInput API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-password-input-api">API</Heading>
+      <FrameworkApi label={'PixelPasswordInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-password-input-a11y">
-      <h3 id="pixel-password-input-a11y">Accessibility</h3>
+      <Heading id="pixel-password-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">The visibility toggle is a real &lt;button type=&quot;button&quot;&gt; with an aria-label that mirrors the current state, and exposes aria-pressed so screen readers announce whether the password is currently visible. The input sets aria-invalid when an error is present, and its aria-describedby points at the hint/error message while one shows, after any ids you pass.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -162,7 +170,7 @@ export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputD
       </table>
     </section>
     <section aria-labelledby="pixel-password-input-usage">
-      <h3 id="pixel-password-input-usage">Usage</h3>
+      <Heading id="pixel-password-input-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelPasswordInput usage'}
@@ -189,9 +197,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -218,7 +226,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-with-hint">
-        <h4>With hint</h4>
+        <Subheading>With hint</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With hint code'}
@@ -261,7 +269,7 @@ export class WithHint {}`}
         />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With error</h4>
+        <Subheading>With error</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With error code'}
@@ -294,7 +302,7 @@ export class WithError {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -349,7 +357,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -392,7 +400,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -432,7 +440,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -465,7 +473,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-custom-toggle-labels">
-        <h4>Custom toggle labels</h4>
+        <Subheading>Custom toggle labels</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom toggle labels code'}
@@ -498,7 +506,7 @@ export class CustomToggleLabels {}`}
         />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
+        <Subheading>Controlled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled code'}
@@ -539,7 +547,7 @@ export class Controlled {
         />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
+        <Subheading>Uncontrolled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Uncontrolled code'}
@@ -572,10 +580,10 @@ export class Uncontrolled {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-otp-input">PixelOTPInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-otp-input' : '#pixel-otp-input'}>PixelOTPInput</a></li>
       </ul>
     </section>
     </section>

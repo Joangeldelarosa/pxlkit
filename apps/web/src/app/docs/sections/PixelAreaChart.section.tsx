@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAreaChartDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAreaChartDocsMeta = {
@@ -84,10 +88,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelAreaChartDocsSection({ className }: PixelAreaChartDocsSectionProps): React.ReactElement {
+export function PixelAreaChartDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAreaChartDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-area-chart-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-area-chart-heading'>PixelAreaChart</h2>
+      <Title id='pixel-area-chart-heading'>PixelAreaChart</Title>
       <p className="docs-lead">Pure-SVG filled area chart that closes the trend polyline down to the baseline, with crisp pixel edges or smoothed linear joins.</p>
       <ul className="docs-highlights">
         <li>Tone-aware stroke + fill via retro-* token classes — matches the rest of the kit.</li>
@@ -102,11 +110,11 @@ export function PixelAreaChartDocsSection({ className }: PixelAreaChartDocsSecti
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-area-chart-api">
-      <h3 id="pixel-area-chart-api">API</h3>
-      <FrameworkApi label={'PixelAreaChart API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-area-chart-api">API</Heading>
+      <FrameworkApi label={'PixelAreaChart API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-area-chart-a11y">
-      <h3 id="pixel-area-chart-a11y">Accessibility</h3>
+      <Heading id="pixel-area-chart-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
@@ -114,7 +122,7 @@ export function PixelAreaChartDocsSection({ className }: PixelAreaChartDocsSecti
       <p className="docs-aria-notes">The SVG renders as role=&quot;img&quot; with an auto-derived aria-label summarizing the series (kind, point count and min..max range of its finite values — a point whose y is NaN or ±Infinity is left out of the chart and of the summary, which reads &quot;area chart, no data&quot; when no value is finite). Pass a custom aria-label for richer context. For full data accessibility, render a visually-hidden &lt;table&gt; sibling with sr-only that mirrors the data points — assistive tech then has a tabular fallback to read.</p>
     </section>
     <section aria-labelledby="pixel-area-chart-usage">
-      <h3 id="pixel-area-chart-usage">Usage</h3>
+      <Heading id="pixel-area-chart-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelAreaChart usage'}
@@ -173,9 +181,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -234,7 +242,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -318,7 +326,7 @@ export class Tones {
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -393,7 +401,7 @@ export class Sizes {
         />
       </article>
       <article className="docs-example" id="example-smooth">
-        <h4>Smooth</h4>
+        <Subheading>Smooth</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Smooth code'}
@@ -452,7 +460,7 @@ export class Smooth {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -525,12 +533,12 @@ export class Surfaces {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-sparkline">PixelSparkline</a></li>
-        <li><a href="#pixel-bar-chart">PixelBarChart</a></li>
-        <li><a href="#pixel-stat-group">PixelStatGroup</a></li>
-        <li><a href="#pixel-data-table">PixelDataTable</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-sparkline' : '#pixel-sparkline'}>PixelSparkline</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bar-chart' : '#pixel-bar-chart'}>PixelBarChart</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stat-group' : '#pixel-stat-group'}>PixelStatGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-data-table' : '#pixel-data-table'}>PixelDataTable</a></li>
       </ul>
     </section>
     </section>

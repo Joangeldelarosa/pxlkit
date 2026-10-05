@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitLocaleProviderDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PxlKitLocaleProviderDocsMeta = {
@@ -67,10 +71,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProviderDocsSectionProps): React.ReactElement {
+export function PxlKitLocaleProviderDocsSection({ className, headingLevel = 2 }: PxlKitLocaleProviderDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pxl-kit-locale-provider-heading'} className={className} data-status='stable'>
-      <h2 id='pxl-kit-locale-provider-heading'>PxlKitLocaleProvider</h2>
+      <Title id='pxl-kit-locale-provider-heading'>PxlKitLocaleProvider</Title>
       <p className="docs-lead">Sets the locale for every nested PxlKit component: lang on a layout-neutral wrapper, locale-aware upper/lower helpers and the matching Google Fonts URL.</p>
       <ul className="docs-highlights">
         <li>Sets lang on a wrapper so CSS text-transform handles Turkish i → İ correctly</li>
@@ -84,11 +92,11 @@ export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProvi
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pxl-kit-locale-provider-api">
-      <h3 id="pxl-kit-locale-provider-api">API</h3>
-      <FrameworkApi label={'PxlKitLocaleProvider API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pxl-kit-locale-provider-api">API</Heading>
+      <FrameworkApi label={'PxlKitLocaleProvider API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-locale-provider-a11y">
-      <h3 id="pxl-kit-locale-provider-a11y">Accessibility</h3>
+      <Heading id="pxl-kit-locale-provider-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>sets lang/dir context for descendants; no direct ARIA</code></li>
@@ -96,7 +104,7 @@ export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProvi
       <p className="docs-aria-notes">Wraps its content in a layout-neutral element carrying <code>lang</code> (in Angular, the host element) so assistive tech and CSS text-transform pick up the correct language. In server-rendered apps (Next.js, Nuxt, Angular SSR), also set lang on the &lt;html&gt; tag.</p>
     </section>
     <section aria-labelledby="pxl-kit-locale-provider-usage">
-      <h3 id="pxl-kit-locale-provider-usage">Usage</h3>
+      <Heading id="pxl-kit-locale-provider-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PxlKitLocaleProvider usage'}
@@ -133,9 +141,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -172,7 +180,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-turkish">
-        <h4>Turkish</h4>
+        <Subheading>Turkish</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Turkish code'}

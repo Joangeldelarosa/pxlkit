@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFloatDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelFloatDocsMeta = {
@@ -90,10 +94,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelFloatDocsSection({ className }: PixelFloatDocsSectionProps): React.ReactElement {
+export function PixelFloatDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelFloatDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-float-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-float-heading'>PixelFloat</h2>
+      <Title id='pixel-float-heading'>PixelFloat</Title>
       <p className="docs-lead">Gentle vertical sine loop, perfect for hero badges and floating accents.</p>
       <ul className="docs-highlights">
         <li>Configurable travel distance, duration, easing, and repeat count</li>
@@ -107,11 +115,11 @@ export function PixelFloatDocsSection({ className }: PixelFloatDocsSectionProps)
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-float-api">
-      <h3 id="pixel-float-api">API</h3>
-      <FrameworkApi label={'PixelFloat API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-float-api">API</Heading>
+      <FrameworkApi label={'PixelFloat API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-float-a11y">
-      <h3 id="pixel-float-a11y">Accessibility</h3>
+      <Heading id="pixel-float-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -119,7 +127,7 @@ export function PixelFloatDocsSection({ className }: PixelFloatDocsSectionProps)
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-float-usage">
-      <h3 id="pixel-float-usage">Usage</h3>
+      <Heading id="pixel-float-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelFloat usage'}
@@ -156,9 +164,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -195,7 +203,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-farther-travel">
-        <h4>Farther Travel</h4>
+        <Subheading>Farther Travel</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Farther Travel code'}
@@ -232,7 +240,7 @@ export class FartherTravel {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
-        <h4>Hover Trigger</h4>
+        <Subheading>Hover Trigger</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Hover Trigger code'}
@@ -270,11 +278,11 @@ export class HoverTrigger {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-bounce">PixelBounce</a></li>
-        <li><a href="#pixel-pulse">PixelPulse</a></li>
-        <li><a href="#pixel-fade-in">PixelFadeIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bounce' : '#pixel-bounce'}>PixelBounce</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pulse' : '#pixel-pulse'}>PixelPulse</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-fade-in' : '#pixel-fade-in'}>PixelFadeIn</a></li>
       </ul>
     </section>
     </section>

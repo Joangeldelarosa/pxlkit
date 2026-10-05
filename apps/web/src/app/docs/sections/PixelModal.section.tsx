@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelModalDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelModalDocsMeta = {
@@ -100,10 +104,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps): React.ReactElement {
+export function PixelModalDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelModalDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-modal-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-modal-heading'>PixelModal</h2>
+      <Title id='pixel-modal-heading'>PixelModal</Title>
       <p className="docs-lead">Centered modal dialog with title bar, optional description and footer, surface-aware chrome, focus trap, scroll lock, and async close support.</p>
       <ul className="docs-highlights">
         <li>Five sizes (sm/md/lg/xl/full) with surface-aware chrome — pixel renders an old-school window, linear a flat card</li>
@@ -118,17 +126,17 @@ export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps)
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-modal-api">
-      <h3 id="pixel-modal-api">API</h3>
-      <FrameworkApi label={'PixelModal API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-modal-api">API</Heading>
+      <FrameworkApi label={'PixelModal API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-modal-a11y">
-      <h3 id="pixel-modal-a11y">Accessibility</h3>
+      <Heading id="pixel-modal-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>dialog</code></li>
       </ul>
       <p className="docs-aria-notes">Renders with role=&quot;dialog&quot; and aria-modal=&quot;true&quot;. Title is exposed via aria-labelledby; description (when provided) via aria-describedby. The close button advertises aria-busy while asyncClose is in flight. Backdrop click is equivalent to Escape and is disabled while closing to avoid double-firing.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -157,7 +165,7 @@ export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps)
       </table>
     </section>
     <section aria-labelledby="pixel-modal-usage">
-      <h3 id="pixel-modal-usage">Usage</h3>
+      <Heading id="pixel-modal-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelModal usage'}
@@ -206,9 +214,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -257,7 +265,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -327,7 +335,7 @@ export class Sizes {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -389,7 +397,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-with-description">
-        <h4>With description</h4>
+        <Subheading>With description</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With description code'}
@@ -448,7 +456,7 @@ export class WithDescription {
         />
       </article>
       <article className="docs-example" id="example-with-footer">
-        <h4>With footer</h4>
+        <Subheading>With footer</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With footer code'}
@@ -515,7 +523,7 @@ export class WithFooter {
         />
       </article>
       <article className="docs-example" id="example-async-close">
-        <h4>Async close</h4>
+        <Subheading>Async close</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Async close code'}
@@ -572,7 +580,7 @@ export class AsyncClose {
         />
       </article>
       <article className="docs-example" id="example-custom-close-label">
-        <h4>Custom close label</h4>
+        <Subheading>Custom close label</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom close label code'}
@@ -627,12 +635,12 @@ export class CustomCloseLabel {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-drawer">PixelDrawer</a></li>
-        <li><a href="#pixel-alert-dialog">PixelAlertDialog</a></li>
-        <li><a href="#pixel-sheet">PixelSheet</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-drawer' : '#pixel-drawer'}>PixelDrawer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert-dialog' : '#pixel-alert-dialog'}>PixelAlertDialog</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-sheet' : '#pixel-sheet'}>PixelSheet</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
       </ul>
     </section>
     </section>

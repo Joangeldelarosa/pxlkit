@@ -94,6 +94,16 @@ describe('FrameworkApi', () => {
     expect(within(panel()).getByText('points to', { exact: false })).toBeInTheDocument();
   });
 
+  it("titles the parts one level below the heading it sits under: h4 by default, h3 on a component's page", () => {
+    const { unmount } = render(<FrameworkApi label="PixelToggle API" headingLevel={3} {...API} />);
+    expect(within(panel()).getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
+      'PixelToggle',
+      'PixelToggle.Icon',
+    ]);
+    expect(within(panel()).queryAllByRole('heading', { level: 4 })).toHaveLength(0);
+    unmount();
+  });
+
   it("follows the reader's framework: Vue's bindings, events and slots", () => {
     render(<FrameworkApi label="PixelToggle API" {...API} />);
     fireEvent.click(screen.getByRole('tab', { name: 'Vue' }));

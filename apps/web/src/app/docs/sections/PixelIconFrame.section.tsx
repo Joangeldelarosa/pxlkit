@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelIconFrameDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelIconFrameDocsMeta = {
@@ -84,10 +88,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelIconFrameDocsSection({ className }: PixelIconFrameDocsSectionProps): React.ReactElement {
+export function PixelIconFrameDocsSection({ className, headingLevel = 2 }: PixelIconFrameDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-icon-frame-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-icon-frame-heading'>PixelIconFrame</h2>
+      <Title id='pixel-icon-frame-heading'>PixelIconFrame</Title>
       <p className="docs-lead">Decorative icon container with surface-aware borders, tone tinting, sizes, shapes, and an optional accent badge.</p>
       <ul className="docs-highlights">
         <li>Five fixed sizes (48 / 56 / 64 / 80 / 112) for consistent layout rhythm</li>
@@ -102,11 +110,11 @@ export function PixelIconFrameDocsSection({ className }: PixelIconFrameDocsSecti
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
     <section aria-labelledby="pixel-icon-frame-api">
-      <h3 id="pixel-icon-frame-api">API</h3>
-      <FrameworkApi label={'PixelIconFrame API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-icon-frame-api">API</Heading>
+      <FrameworkApi label={'PixelIconFrame API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-icon-frame-a11y">
-      <h3 id="pixel-icon-frame-a11y">Accessibility</h3>
+      <Heading id="pixel-icon-frame-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>decorative wrapper</code></li>
@@ -114,7 +122,7 @@ export function PixelIconFrameDocsSection({ className }: PixelIconFrameDocsSecti
       <p className="docs-aria-notes">Inner icon and accent are aria-hidden. Provide an accessible label on a parent element when the frame conveys meaning.</p>
     </section>
     <section aria-labelledby="pixel-icon-frame-usage">
-      <h3 id="pixel-icon-frame-usage">Usage</h3>
+      <Heading id="pixel-icon-frame-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelIconFrame usage'}
@@ -150,9 +158,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -188,7 +196,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -246,7 +254,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -300,7 +308,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-shapes">
-        <h4>Shapes</h4>
+        <Subheading>Shapes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Shapes code'}
@@ -350,7 +358,7 @@ export class Shapes {}`}
         />
       </article>
       <article className="docs-example" id="example-with-accent">
-        <h4>With Accent</h4>
+        <Subheading>With Accent</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Accent code'}

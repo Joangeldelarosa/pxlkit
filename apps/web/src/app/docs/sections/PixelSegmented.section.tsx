@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSegmentedDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSegmentedDocsMeta = {
@@ -97,10 +101,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSectionProps): React.ReactElement {
+export function PixelSegmentedDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSegmentedDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-segmented-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-segmented-heading'>PixelSegmented</h2>
+      <Title id='pixel-segmented-heading'>PixelSegmented</Title>
       <p className="docs-lead">Single-select segmented control for toggling between a small set of mutually exclusive options inline.</p>
       <ul className="docs-highlights">
         <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — over a list of options.</li>
@@ -115,17 +123,17 @@ export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSecti
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-segmented-api">
-      <h3 id="pixel-segmented-api">API</h3>
-      <FrameworkApi label={'PixelSegmented API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-segmented-api">API</Heading>
+      <FrameworkApi label={'PixelSegmented API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-segmented-a11y">
-      <h3 id="pixel-segmented-a11y">Accessibility</h3>
+      <Heading id="pixel-segmented-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>radiogroup</code></li>
       </ul>
       <p className="docs-aria-notes">Each option renders as a &lt;button&gt; with aria-pressed reflecting the active selection, and aria-disabled mirroring the disabled prop. When name is set a hidden &lt;input&gt; mirrors the current value so the control participates in native &lt;form&gt; submissions. The implementation uses aria-pressed (toggle-button semantics) rather than role=&quot;radio&quot; on each button.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -154,7 +162,7 @@ export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSecti
       </table>
     </section>
     <section aria-labelledby="pixel-segmented-usage">
-      <h3 id="pixel-segmented-usage">Usage</h3>
+      <Heading id="pixel-segmented-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSegmented usage'}
@@ -213,9 +221,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -274,7 +282,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
+        <Subheading>Controlled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled code'}
@@ -345,7 +353,7 @@ export class Controlled {
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -425,7 +433,7 @@ export class Tones {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -505,7 +513,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -560,7 +568,7 @@ export class Disabled {
         />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
+        <Subheading>Required</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Required code'}
@@ -620,7 +628,7 @@ export class Required {
         />
       </article>
       <article className="docs-example" id="example-with-form-name">
-        <h4>With form name</h4>
+        <Subheading>With form name</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With form name code'}
@@ -690,11 +698,11 @@ export class WithFormName {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-radio-group">PixelRadioGroup</a></li>
-        <li><a href="#pixel-toggle-group">PixelToggleGroup</a></li>
-        <li><a href="#pixel-tabs">PixelTabs</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-radio-group' : '#pixel-radio-group'}>PixelRadioGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toggle-group' : '#pixel-toggle-group'}>PixelToggleGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tabs' : '#pixel-tabs'}>PixelTabs</a></li>
       </ul>
     </section>
     </section>

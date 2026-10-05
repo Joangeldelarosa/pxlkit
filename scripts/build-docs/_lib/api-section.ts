@@ -36,22 +36,22 @@ function isPlain(value: unknown): boolean {
  * A value as a JS literal: objects of plain values on one line, the rest
  * one entry per line; empty strings, empty lists and `false` left out.
  */
-function literal(value: unknown, indent: string): string {
+export function jsLiteral(value: unknown, indent: string): string {
   if (typeof value === "string") return quote(value);
   if (typeof value === "number" || typeof value === "boolean" || value === null) return String(value);
   const inner = `${indent}  `;
   if (Array.isArray(value)) {
     if (value.length === 0) return "[]";
-    return `[\n${value.map((item) => `${inner}${literal(item, inner)},`).join("\n")}\n${indent}]`;
+    return `[\n${value.map((item) => `${inner}${jsLiteral(item, inner)},`).join("\n")}\n${indent}]`;
   }
   const entries = Object.entries(value as Record<string, unknown>).filter(
     ([, v]) => v !== undefined && v !== "" && v !== false && !(Array.isArray(v) && v.length === 0),
   );
   const key = (k: string) => (/^[A-Za-z_$][\w$]*$/.test(k) ? k : quote(k));
   if (entries.every(([, v]) => isPlain(v))) {
-    return `{ ${entries.map(([k, v]) => `${key(k)}: ${literal(v, inner)}`).join(", ")} }`;
+    return `{ ${entries.map(([k, v]) => `${key(k)}: ${jsLiteral(v, inner)}`).join(", ")} }`;
   }
-  return `{\n${entries.map(([k, v]) => `${inner}${key(k)}: ${literal(v, inner)},`).join("\n")}\n${indent}}`;
+  return `{\n${entries.map(([k, v]) => `${inner}${key(k)}: ${jsLiteral(v, inner)},`).join("\n")}\n${indent}}`;
 }
 
 /** A component as the site's `ApiComponent`: its fields in a fixed order. */
@@ -89,17 +89,21 @@ export function renderApiConstant(name: string, api: ComponentApi): string {
   }
   return [
     `/** ${name}'s API in each kit, read from its sources by \`npm run docs:build\`. */`,
-    `const api: FrameworkApiReferences = ${literal(data, "")};`,
+    `const api: FrameworkApiReferences = ${jsLiteral(data, "")};`,
   ].join("\n");
 }
 
-/** The section's API block: a heading, then the tabs. */
+/**
+ * The section's API block: a heading, then the tabs. `Heading` is the
+ * section's subsection heading (h3 on /docs, h2 on the component's page);
+ * the reference titles its parts one level below it.
+ */
 export function renderApiBlock(name: string, slug: string, api: ComponentApi): string {
   const frameworks = API_FRAMEWORKS.filter((framework) => api[framework]).map((framework) => `${framework}={api.${framework}}`);
   return [
     `    <section aria-labelledby="${slug}-api">`,
-    `      <h3 id="${slug}-api">API</h3>`,
-    `      <FrameworkApi label={${quote(`${name} API`)}} ${frameworks.join(" ")} />`,
+    `      <Heading id="${slug}-api">API</Heading>`,
+    `      <FrameworkApi label={${quote(`${name} API`)}} headingLevel={headingLevel === 1 ? 3 : 4} ${frameworks.join(" ")} />`,
     `    </section>`,
   ].join("\n");
 }

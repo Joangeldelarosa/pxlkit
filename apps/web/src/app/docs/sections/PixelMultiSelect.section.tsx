@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelMultiSelectDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelMultiSelectDocsMeta = {
@@ -114,10 +118,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsSectionProps): React.ReactElement {
+export function PixelMultiSelectDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelMultiSelectDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-multi-select-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-multi-select-heading'>PixelMultiSelect</h2>
+      <Title id='pixel-multi-select-heading'>PixelMultiSelect</Title>
       <p className="docs-lead">Multi-select combobox with chip-based selected values, optional search, and max-selection cap.</p>
       <ul className="docs-highlights">
         <li>Combobox + listbox with aria-multiselectable</li>
@@ -132,18 +140,18 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-multi-select-api">
-      <h3 id="pixel-multi-select-api">API</h3>
-      <FrameworkApi label={'PixelMultiSelect API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-multi-select-api">API</Heading>
+      <FrameworkApi label={'PixelMultiSelect API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-multi-select-a11y">
-      <h3 id="pixel-multi-select-a11y">Accessibility</h3>
+      <Heading id="pixel-multi-select-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>combobox</code></li>
         <li><code>listbox</code></li>
       </ul>
       <p className="docs-aria-notes">The field holds, side by side, the chips — each a label and a native button named after it (&quot;Remove Apple&quot;) — the combobox and, when clearable, a native &quot;Clear selection&quot; button: a button cannot contain a button, so none sits inside another, and each is a tab stop in reading order. The combobox (role=combobox, named by the label) has aria-controls/expanded/activedescendant, and so does the search field while focus is in it; it reads the selected labels as its value. A remove or clear button that holds focus hands it on as it goes; under the pointer they leave focus where it is. A press elsewhere on the field opens or closes the listbox and focuses the combobox; the popover anchors to the field. The field shows the combobox&#39;s keyboard focus. Listbox advertises aria-multiselectable and marks the chosen options aria-selected.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -212,7 +220,7 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
       </table>
     </section>
     <section aria-labelledby="pixel-multi-select-usage">
-      <h3 id="pixel-multi-select-usage">Usage</h3>
+      <Heading id="pixel-multi-select-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelMultiSelect usage'}
@@ -278,9 +286,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -346,7 +354,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-searchable">
-        <h4>Searchable + Clearable</h4>
+        <Subheading>Searchable + Clearable</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Searchable + Clearable code'}
@@ -416,7 +424,7 @@ export class Searchable {
         />
       </article>
       <article className="docs-example" id="example-with-max">
-        <h4>With Max</h4>
+        <Subheading>With Max</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Max code'}
@@ -484,11 +492,11 @@ export class WithMax {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-select">PixelSelect</a></li>
-        <li><a href="#pixel-combobox">PixelCombobox</a></li>
-        <li><a href="#pixel-tag-input">PixelTagInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-combobox' : '#pixel-combobox'}>PixelCombobox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tag-input' : '#pixel-tag-input'}>PixelTagInput</a></li>
       </ul>
     </section>
     </section>

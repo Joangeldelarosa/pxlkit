@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelChipDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelChipDocsMeta = {
@@ -97,10 +101,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): React.ReactElement {
+export function PixelChipDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelChipDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-chip-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-chip-heading'>PixelChip</h2>
+      <Title id='pixel-chip-heading'>PixelChip</Title>
       <p className="docs-lead">Compact label tag for representing tags, filters, or selections, optionally clickable or removable via an inline delete control.</p>
       <ul className="docs-highlights">
         <li>Four visual variants (soft, solid, outline, ghost) across the full tone palette</li>
@@ -115,17 +123,17 @@ export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): 
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-chip-api">
-      <h3 id="pixel-chip-api">API</h3>
-      <FrameworkApi label={'PixelChip API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-chip-api">API</Heading>
+      <FrameworkApi label={'PixelChip API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-chip-a11y">
-      <h3 id="pixel-chip-a11y">Accessibility</h3>
+      <Heading id="pixel-chip-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">Renders as a &lt;button&gt; only when it handles clicks (<code>onClick</code>, <code>@click</code> in Vue, <code>button[pxlChip]</code> or <code>clickable</code> in Angular), so non-interactive chips stay static. The delete X is a &lt;button&gt; with aria-label &quot;Remove &lt;label&gt;&quot; that never fires the chip click; a button cannot contain a button, so on a clickable chip the label and the X are sibling buttons inside a &lt;span&gt; frame. On a clickable deletable chip the frame shows the label button&#39;s keyboard focus; the X shows its own.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -154,7 +162,7 @@ export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): 
       </table>
     </section>
     <section aria-labelledby="pixel-chip-usage">
-      <h3 id="pixel-chip-usage">Usage</h3>
+      <Heading id="pixel-chip-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelChip usage'}
@@ -181,9 +189,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -210,7 +218,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -265,7 +273,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -308,7 +316,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-variants">
-        <h4>Variants</h4>
+        <Subheading>Variants</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Variants code'}
@@ -354,7 +362,7 @@ export class Variants {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -394,7 +402,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-with-icon">
-        <h4>With Icon</h4>
+        <Subheading>With Icon</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Icon code'}
@@ -432,7 +440,7 @@ export class WithIcon {}`}
         />
       </article>
       <article className="docs-example" id="example-clickable">
-        <h4>Clickable</h4>
+        <Subheading>Clickable</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Clickable code'}
@@ -471,7 +479,7 @@ export class Clickable {
         />
       </article>
       <article className="docs-example" id="example-deletable">
-        <h4>Deletable</h4>
+        <Subheading>Deletable</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Deletable code'}
@@ -516,7 +524,7 @@ export class Deletable {
         />
       </article>
       <article className="docs-example" id="example-clickable-and-deletable">
-        <h4>Clickable + Deletable</h4>
+        <Subheading>Clickable + Deletable</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Clickable + Deletable code'}
@@ -569,11 +577,11 @@ export class ClickableAndDeletable {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-badge">PixelBadge</a></li>
-        <li><a href="#pixel-chip-group">PixelChipGroup</a></li>
-        <li><a href="#pixel-toggle">PixelToggle</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge' : '#pixel-badge'}>PixelBadge</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-chip-group' : '#pixel-chip-group'}>PixelChipGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toggle' : '#pixel-toggle'}>PixelToggle</a></li>
       </ul>
     </section>
     </section>

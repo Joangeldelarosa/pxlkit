@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAccordionDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAccordionDocsMeta = {
@@ -72,10 +76,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSectionProps): React.ReactElement {
+export function PixelAccordionDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAccordionDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-accordion-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-accordion-heading'>PixelAccordion</h2>
+      <Title id='pixel-accordion-heading'>PixelAccordion</Title>
       <p className="docs-lead">Vertical list of expandable disclosure items, each header wired to its panel with aria-expanded / aria-controls.</p>
       <ul className="docs-highlights">
         <li>Single-open by default; opt into multi-open via <code>allowMultiple</code></li>
@@ -90,17 +98,17 @@ export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSecti
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-accordion-api">
-      <h3 id="pixel-accordion-api">API</h3>
-      <FrameworkApi label={'PixelAccordion API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-accordion-api">API</Heading>
+      <FrameworkApi label={'PixelAccordion API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-accordion-a11y">
-      <h3 id="pixel-accordion-a11y">Accessibility</h3>
+      <Heading id="pixel-accordion-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>disclosure</code></li>
       </ul>
       <p className="docs-aria-notes">Each header is a native &lt;button&gt; with aria-expanded reflecting open state and aria-controls pointing at the panel id. Expanded panels are plain containers that follow their header in reading order — no role=&quot;region&quot;, which would proliferate landmarks (and collide when several accordions share titles), and so no name, which ARIA does not allow on an element without a role — matching the WAI-ARIA disclosure pattern stacked into an accordion. On the pixel surface a header shows keyboard focus inside its item, whose cut corners would clip a ring.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -129,7 +137,7 @@ export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSecti
       </table>
     </section>
     <section aria-labelledby="pixel-accordion-usage">
-      <h3 id="pixel-accordion-usage">Usage</h3>
+      <Heading id="pixel-accordion-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelAccordion usage'}
@@ -188,9 +196,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -249,7 +257,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-collapsed-by-default">
-        <h4>Collapsed by default</h4>
+        <Subheading>Collapsed by default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Collapsed by default code'}
@@ -308,7 +316,7 @@ export class CollapsedByDefault {
         />
       </article>
       <article className="docs-example" id="example-allow-multiple">
-        <h4>Allow multiple</h4>
+        <Subheading>Allow multiple</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Allow multiple code'}
@@ -367,7 +375,7 @@ export class AllowMultiple {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -439,7 +447,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-rich-content">
-        <h4>Rich content</h4>
+        <Subheading>Rich content</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Rich content code'}
@@ -531,10 +539,10 @@ export class RichContent {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-tabs">PixelTabs</a></li>
-        <li><a href="#pixel-collapsible">PixelCollapsible</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tabs' : '#pixel-tabs'}>PixelTabs</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-collapsible' : '#pixel-collapsible'}>PixelCollapsible</a></li>
       </ul>
     </section>
     </section>

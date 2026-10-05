@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAvatarGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAvatarGroupDocsMeta = {
@@ -83,10 +87,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsSectionProps): React.ReactElement {
+export function PixelAvatarGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAvatarGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-avatar-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-avatar-group-heading'>PixelAvatarGroup</h2>
+      <Title id='pixel-avatar-group-heading'>PixelAvatarGroup</Title>
       <p className="docs-lead">Clusters PixelAvatar children into an overlapping row with a tone-aware &quot;+N&quot; overflow tile when the count exceeds max.</p>
       <ul className="docs-highlights">
         <li>Overlapping layout with surface-aware ring isolation against the page background</li>
@@ -101,11 +109,11 @@ export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsS
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-avatar-group-api">
-      <h3 id="pixel-avatar-group-api">API</h3>
-      <FrameworkApi label={'PixelAvatarGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-avatar-group-api">API</Heading>
+      <FrameworkApi label={'PixelAvatarGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-avatar-group-a11y">
-      <h3 id="pixel-avatar-group-a11y">Accessibility</h3>
+      <Heading id="pixel-avatar-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
@@ -113,7 +121,7 @@ export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsS
       <p className="docs-aria-notes">Provide aria-label or aria-labelledby summarizing the count (e.g. &quot;5 team members&quot;); without one, role=group is dropped so the cluster is treated as presentational. The &quot;+N&quot; overflow tile hides its visible &quot;+N&quot; from assistive tech and announces &quot;N more users&quot; through screen-reader-only text.</p>
     </section>
     <section aria-labelledby="pixel-avatar-group-usage">
-      <h3 id="pixel-avatar-group-usage">Usage</h3>
+      <Heading id="pixel-avatar-group-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelAvatarGroup usage'}
@@ -156,9 +164,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -201,7 +209,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-with-overflow">
-        <h4>With Overflow</h4>
+        <Subheading>With Overflow</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Overflow code'}
@@ -253,7 +261,7 @@ export class WithOverflow {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -332,7 +340,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -420,7 +428,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -485,11 +493,11 @@ export class Surfaces {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-avatar">PixelAvatar</a></li>
-        <li><a href="#pixel-badge">PixelBadge</a></li>
-        <li><a href="#pixel-chip">PixelChip</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-avatar' : '#pixel-avatar'}>PixelAvatar</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge' : '#pixel-badge'}>PixelBadge</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-chip' : '#pixel-chip'}>PixelChip</a></li>
       </ul>
     </section>
     </section>

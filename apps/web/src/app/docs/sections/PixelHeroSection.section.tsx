@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelHeroSectionDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelHeroSectionDocsMeta = {
@@ -108,10 +112,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsSectionProps): React.ReactElement {
+export function PixelHeroSectionDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelHeroSectionDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-hero-section-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-hero-section-heading'>PixelHeroSection</h2>
+      <Title id='pixel-hero-section-heading'>PixelHeroSection</Title>
       <p className="docs-lead">Surface-aware hero section with eyebrow, headline, subline, CTA cluster, install snippet, meta and optional media in centered, split or parallax variants.</p>
       <ul className="docs-highlights">
         <li>Three variants: centered, split (with media column) and parallax (media behind text)</li>
@@ -126,11 +134,11 @@ export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsS
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
     <section aria-labelledby="pixel-hero-section-api">
-      <h3 id="pixel-hero-section-api">API</h3>
-      <FrameworkApi label={'PixelHeroSection API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-hero-section-api">API</Heading>
+      <FrameworkApi label={'PixelHeroSection API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-hero-section-a11y">
-      <h3 id="pixel-hero-section-a11y">Accessibility</h3>
+      <Heading id="pixel-hero-section-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>region</code></li>
@@ -138,7 +146,7 @@ export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsS
       <p className="docs-aria-notes">Renders a <code>&lt;section&gt;</code> whose headline is the page&#39;s <code>&lt;h1&gt;</code>, or the level <code>as</code> sets for a hero embedded under the page&#39;s own <code>&lt;h1&gt;</code>. The headline is one heading with every effect: the glitch&#39;s colour copies are <code>aria-hidden</code> spans inside it. A section is a landmark only once it has an accessible name: give the hero an <code>aria-label</code> (it reaches the <code>&lt;section&gt;</code>) when it should be one, for instance on a page with several landmarks.</p>
     </section>
     <section aria-labelledby="pixel-hero-section-usage">
-      <h3 id="pixel-hero-section-usage">Usage</h3>
+      <Heading id="pixel-hero-section-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelHeroSection usage'}
@@ -191,9 +199,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -246,7 +254,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-split">
-        <h4>Split with media</h4>
+        <Subheading>Split with media</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Split with media code'}
@@ -309,7 +317,7 @@ export class Split {}`}
         />
       </article>
       <article className="docs-example" id="example-compact">
-        <h4>Compact density</h4>
+        <Subheading>Compact density</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Compact density code'}
@@ -356,7 +364,7 @@ export class Compact {}`}
         />
       </article>
       <article className="docs-example" id="example-typewriter-headline">
-        <h4>Typewriter headline</h4>
+        <Subheading>Typewriter headline</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Typewriter headline code'}
@@ -403,7 +411,7 @@ export class TypewriterHeadline {}`}
         />
       </article>
       <article className="docs-example" id="example-glitch-headline">
-        <h4>Glitch headline</h4>
+        <Subheading>Glitch headline</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Glitch headline code'}
@@ -456,7 +464,7 @@ export class GlitchHeadline {}`}
         />
       </article>
       <article className="docs-example" id="example-heading-level">
-        <h4>Heading level</h4>
+        <Subheading>Heading level</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Heading level code'}
@@ -510,12 +518,12 @@ export class HeadingLevel {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-hero-media">PixelHeroMedia</a></li>
-        <li><a href="#pixel-container">PixelContainer</a></li>
-        <li><a href="#pixel-two-column">PixelTwoColumn</a></li>
-        <li><a href="#pixel-cluster">PixelCluster</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-hero-media' : '#pixel-hero-media'}>PixelHeroMedia</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-container' : '#pixel-container'}>PixelContainer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-two-column' : '#pixel-two-column'}>PixelTwoColumn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-cluster' : '#pixel-cluster'}>PixelCluster</a></li>
       </ul>
     </section>
     </section>

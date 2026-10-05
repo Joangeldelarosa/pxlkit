@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTypewriterDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTypewriterDocsMeta = {
@@ -89,10 +93,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSectionProps): React.ReactElement {
+export function PixelTypewriterDocsSection({ className, headingLevel = 2 }: PixelTypewriterDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-typewriter-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-typewriter-heading'>PixelTypewriter</h2>
+      <Title id='pixel-typewriter-heading'>PixelTypewriter</Title>
       <p className="docs-lead">Types out a string one character at a time with an optional blinking caret.</p>
       <ul className="docs-highlights">
         <li>Configurable speed, delay, and blinking caret</li>
@@ -106,11 +114,11 @@ export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSec
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-typewriter-api">
-      <h3 id="pixel-typewriter-api">API</h3>
-      <FrameworkApi label={'PixelTypewriter API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-typewriter-api">API</Heading>
+      <FrameworkApi label={'PixelTypewriter API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-typewriter-a11y">
-      <h3 id="pixel-typewriter-a11y">Accessibility</h3>
+      <Heading id="pixel-typewriter-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -118,7 +126,7 @@ export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSec
       <p className="docs-aria-notes">Caret and the character-by-character animation are aria-hidden; the complete string is exposed to assistive tech from the first render via a visually hidden span. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and the completion event fires once.</p>
     </section>
     <section aria-labelledby="pixel-typewriter-usage">
-      <h3 id="pixel-typewriter-usage">Usage</h3>
+      <Heading id="pixel-typewriter-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelTypewriter usage'}
@@ -145,9 +153,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -174,7 +182,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-fast-cyan">
-        <h4>Fast (cyan)</h4>
+        <Subheading>Fast (cyan)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Fast (cyan) code'}
@@ -201,7 +209,7 @@ export class FastCyan {}`}
         />
       </article>
       <article className="docs-example" id="example-no-cursor">
-        <h4>No cursor</h4>
+        <Subheading>No cursor</Subheading>
         <FrameworkCode
           variant="docs"
           label={'No cursor code'}
@@ -228,7 +236,7 @@ export class NoCursor {}`}
         />
       </article>
       <article className="docs-example" id="example-on-view">
-        <h4>On view</h4>
+        <Subheading>On view</Subheading>
         <FrameworkCode
           variant="docs"
           label={'On view code'}

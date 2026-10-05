@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToggleGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelToggleGroupDocsMeta = {
@@ -105,10 +109,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsSectionProps): React.ReactElement {
+export function PixelToggleGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelToggleGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-toggle-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-toggle-group-heading'>PixelToggleGroup</h2>
+      <Title id='pixel-toggle-group-heading'>PixelToggleGroup</Title>
       <p className="docs-lead">Grouped pressable toggles with single- or multi-select semantics, roving focus, and surface-aware styling.</p>
       <ul className="docs-highlights">
         <li>Discriminated union API: type=&quot;single&quot; → string value, type=&quot;multiple&quot; → string[] value</li>
@@ -122,18 +130,18 @@ export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsS
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-toggle-group-api">
-      <h3 id="pixel-toggle-group-api">API</h3>
-      <FrameworkApi label={'PixelToggleGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-toggle-group-api">API</Heading>
+      <FrameworkApi label={'PixelToggleGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-toggle-group-a11y">
-      <h3 id="pixel-toggle-group-a11y">Accessibility</h3>
+      <Heading id="pixel-toggle-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>radiogroup</code></li>
         <li><code>toolbar</code></li>
       </ul>
       <p className="docs-aria-notes">Provide an aria-label (or aria-labelledby) for screen reader context. Single-select renders role=&quot;radiogroup&quot; with role=&quot;radio&quot; children; multi-select renders role=&quot;group&quot; only when named.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -172,7 +180,7 @@ export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsS
       </table>
     </section>
     <section aria-labelledby="pixel-toggle-group-usage">
-      <h3 id="pixel-toggle-group-usage">Usage</h3>
+      <Heading id="pixel-toggle-group-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelToggleGroup usage'}
@@ -227,9 +235,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -284,7 +292,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-multiple">
-        <h4>Multiple</h4>
+        <Subheading>Multiple</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Multiple code'}
@@ -339,7 +347,7 @@ export class Multiple {
         />
       </article>
       <article className="docs-example" id="example-variants">
-        <h4>Variants</h4>
+        <Subheading>Variants</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Variants code'}
@@ -449,7 +457,7 @@ export class Variants {
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -541,7 +549,7 @@ export class Sizes {
         />
       </article>
       <article className="docs-example" id="example-roving-focus">
-        <h4>Roving focus</h4>
+        <Subheading>Roving focus</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Roving focus code'}
@@ -598,7 +606,7 @@ export class RovingFocus {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -679,11 +687,11 @@ export class Surfaces {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-toggle">PixelToggle</a></li>
-        <li><a href="#pixel-segmented-control">PixelSegmentedControl</a></li>
-        <li><a href="#pixel-checkbox">PixelCheckbox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toggle' : '#pixel-toggle'}>PixelToggle</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-segmented-control' : '#pixel-segmented-control'}>PixelSegmentedControl</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-checkbox' : '#pixel-checkbox'}>PixelCheckbox</a></li>
       </ul>
     </section>
     </section>

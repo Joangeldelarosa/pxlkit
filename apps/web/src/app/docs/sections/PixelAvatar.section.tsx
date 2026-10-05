@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAvatarDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAvatarDocsMeta = {
@@ -84,10 +88,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProps): React.ReactElement {
+export function PixelAvatarDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAvatarDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-avatar-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-avatar-heading'>PixelAvatar</h2>
+      <Title id='pixel-avatar-heading'>PixelAvatar</Title>
       <p className="docs-lead">Displays a user identity as an initials-or-image badge with optional status dot, tone, shape, and deterministic colored fallback.</p>
       <ul className="docs-highlights">
         <li>Initials fallback locale-aware via PxlKitLocale (uppercases per locale rules)</li>
@@ -102,11 +110,11 @@ export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProp
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-avatar-api">
-      <h3 id="pixel-avatar-api">API</h3>
-      <FrameworkApi label={'PixelAvatar API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-avatar-api">API</Heading>
+      <FrameworkApi label={'PixelAvatar API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-avatar-a11y">
-      <h3 id="pixel-avatar-a11y">Accessibility</h3>
+      <Heading id="pixel-avatar-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
@@ -114,7 +122,7 @@ export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProp
       <p className="docs-aria-notes">Avatar is a presentational identity badge. The user name is exposed via <code>title</code>; when <code>status</code> is set the frame becomes role=&quot;img&quot; named by the user name plus the status word (no live region — status dots are not transient announcements). When <code>src</code> is provided the inner &lt;img&gt; uses the same accessible name as its alt text.</p>
     </section>
     <section aria-labelledby="pixel-avatar-usage">
-      <h3 id="pixel-avatar-usage">Usage</h3>
+      <Heading id="pixel-avatar-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelAvatar usage'}
@@ -141,9 +149,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -170,7 +178,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -219,7 +227,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -274,7 +282,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -314,7 +322,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-shapes">
-        <h4>Shapes</h4>
+        <Subheading>Shapes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Shapes code'}
@@ -357,7 +365,7 @@ export class Shapes {}`}
         />
       </article>
       <article className="docs-example" id="example-statuses">
-        <h4>Statuses</h4>
+        <Subheading>Statuses</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Statuses code'}
@@ -403,7 +411,7 @@ export class Statuses {}`}
         />
       </article>
       <article className="docs-example" id="example-with-image">
-        <h4>With Image</h4>
+        <Subheading>With Image</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Image code'}
@@ -437,7 +445,7 @@ export class WithImage {}`}
         />
       </article>
       <article className="docs-example" id="example-color-seed">
-        <h4>Color Seed</h4>
+        <Subheading>Color Seed</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Color Seed code'}
@@ -484,11 +492,11 @@ export class ColorSeed {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-avatar-group">PixelAvatarGroup</a></li>
-        <li><a href="#pixel-badge">PixelBadge</a></li>
-        <li><a href="#pixel-chip">PixelChip</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-avatar-group' : '#pixel-avatar-group'}>PixelAvatarGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge' : '#pixel-badge'}>PixelBadge</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-chip' : '#pixel-chip'}>PixelChip</a></li>
       </ul>
     </section>
     </section>

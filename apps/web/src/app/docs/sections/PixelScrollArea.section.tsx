@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelScrollAreaDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelScrollAreaDocsMeta = {
@@ -91,10 +95,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSectionProps): React.ReactElement {
+export function PixelScrollAreaDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelScrollAreaDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-scroll-area-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-scroll-area-heading'>PixelScrollArea</h2>
+      <Title id='pixel-scroll-area-heading'>PixelScrollArea</Title>
       <p className="docs-lead">Surface-aware scroll container with styled scrollbar, configurable visibility and dimensions.</p>
       <ul className="docs-highlights">
         <li>Surface-aware scrollbar palette (pixel / linear)</li>
@@ -109,17 +117,17 @@ export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSec
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-scroll-area-api">
-      <h3 id="pixel-scroll-area-api">API</h3>
-      <FrameworkApi label={'PixelScrollArea API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-scroll-area-api">API</Heading>
+      <FrameworkApi label={'PixelScrollArea API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-scroll-area-a11y">
-      <h3 id="pixel-scroll-area-a11y">Accessibility</h3>
+      <Heading id="pixel-scroll-area-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>scrollable-region</code></li>
       </ul>
       <p className="docs-aria-notes">Region is focusable (tabIndex 0, role=&quot;region&quot;) so keyboard users can scroll. Provide aria-label or aria-labelledby so screen-reader users know what they have landed on; a dev-time warning fires if none is set.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -153,7 +161,7 @@ export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-scroll-area-usage">
-      <h3 id="pixel-scroll-area-usage">Usage</h3>
+      <Heading id="pixel-scroll-area-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelScrollArea usage'}
@@ -206,9 +214,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -261,7 +269,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-always-visible">
-        <h4>Always Visible</h4>
+        <Subheading>Always Visible</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Always Visible code'}
@@ -319,7 +327,7 @@ export class AlwaysVisible {
         />
       </article>
       <article className="docs-example" id="example-custom-scrollbar-size">
-        <h4>Custom Scrollbar Size</h4>
+        <Subheading>Custom Scrollbar Size</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom Scrollbar Size code'}
@@ -378,11 +386,11 @@ export class CustomScrollbarSize {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-box">PixelBox</a></li>
-        <li><a href="#pixel-stack">PixelStack</a></li>
-        <li><a href="#pixel-section">PixelSection</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-box' : '#pixel-box'}>PixelBox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stack' : '#pixel-stack'}>PixelStack</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-section' : '#pixel-section'}>PixelSection</a></li>
       </ul>
     </section>
     </section>

@@ -63,6 +63,12 @@ const RELEASES: Release[] = [
       },
       {
         category: 'Added',
+        title: 'An API reference and a page for every component',
+        detail:
+          'Every component has its own page under /docs/components with its props, events, slots and bindings in React, Vue and Angular, read from the kits\' sources, next to its examples and accessibility notes.',
+      },
+      {
+        category: 'Added',
         title: 'Decorative icons',
         detail:
           'decorative on PxlKitIcon, AnimatedPxlKitIcon and ParallaxPxlKitIcon renders alt="" for an icon beside text that already says what it means, so screen readers skip it — in React, Vue and Angular.',

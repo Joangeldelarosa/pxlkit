@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelColorSwatchDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelColorSwatchDocsMeta = {
@@ -66,10 +70,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsSectionProps): React.ReactElement {
+export function PixelColorSwatchDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelColorSwatchDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-color-swatch-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-color-swatch-heading'>PixelColorSwatch</h2>
+      <Title id='pixel-color-swatch-heading'>PixelColorSwatch</Title>
       <p className="docs-lead">Design-token preview tile that renders a CSS custom property as a color sample alongside its human name and variable identifier.</p>
       <ul className="docs-highlights">
         <li>Pairs a 32px color chip with token name + CSS variable label for at-a-glance audits</li>
@@ -83,11 +91,11 @@ export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsS
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-color-swatch-api">
-      <h3 id="pixel-color-swatch-api">API</h3>
-      <FrameworkApi label={'PixelColorSwatch API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-color-swatch-api">API</Heading>
+      <FrameworkApi label={'PixelColorSwatch API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-color-swatch-a11y">
-      <h3 id="pixel-color-swatch-a11y">Accessibility</h3>
+      <Heading id="pixel-color-swatch-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>img</code></li>
@@ -95,7 +103,7 @@ export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsS
       <p className="docs-aria-notes">Non-interactive presentational block. The visible token name + cssVar string provide the textual description of the color sample for screen readers; no separate alt text is required because the chip itself carries no semantic meaning beyond the adjacent label.</p>
     </section>
     <section aria-labelledby="pixel-color-swatch-usage">
-      <h3 id="pixel-color-swatch-usage">Usage</h3>
+      <Heading id="pixel-color-swatch-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelColorSwatch usage'}
@@ -122,9 +130,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -151,7 +159,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-palette">
-        <h4>Palette</h4>
+        <Subheading>Palette</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Palette code'}
@@ -203,7 +211,7 @@ export class Palette {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -243,7 +251,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-surface-tokens">
-        <h4>Surface Tokens</h4>
+        <Subheading>Surface Tokens</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surface Tokens code'}
@@ -290,9 +298,9 @@ export class SurfaceTokens {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-color-input">PixelColorInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-color-input' : '#pixel-color-input'}>PixelColorInput</a></li>
       </ul>
     </section>
     </section>

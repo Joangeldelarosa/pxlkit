@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDatePickerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelDatePickerDocsMeta = {
@@ -122,10 +126,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSectionProps): React.ReactElement {
+export function PixelDatePickerDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelDatePickerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-date-picker-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-date-picker-heading'>PixelDatePicker</h2>
+      <Title id='pixel-date-picker-heading'>PixelDatePicker</Title>
       <p className="docs-lead">Accessible date input with popover calendar grid, keyboard navigation, presets, and min/max constraints.</p>
       <ul className="docs-highlights">
         <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
@@ -140,11 +148,11 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-date-picker-api">
-      <h3 id="pixel-date-picker-api">API</h3>
-      <FrameworkApi label={'PixelDatePicker API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-date-picker-api">API</Heading>
+      <FrameworkApi label={'PixelDatePicker API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-date-picker-a11y">
-      <h3 id="pixel-date-picker-a11y">Accessibility</h3>
+      <Heading id="pixel-date-picker-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>input + popover calendar (role=grid)</code></li>
@@ -152,7 +160,7 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
         <li><code>min/max enforced</code></li>
       </ul>
       <p className="docs-aria-notes">Opening moves focus to the picked day, else today; Escape, Enter and a pick return it to the trigger. The popover is a dialog named &quot;Choose date&quot;. Day cells expose aria-selected, aria-current=&quot;date&quot; (today) and aria-disabled; the calendar grid uses role=grid with explicit role=row wrappers and an aria-live month label. Moves skip disabled days and stop at min/max.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -226,7 +234,7 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-date-picker-usage">
-      <h3 id="pixel-date-picker-usage">Usage</h3>
+      <Heading id="pixel-date-picker-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelDatePicker usage'}
@@ -267,9 +275,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <p>The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today&#39;s mark can differ from the browser&#39;s.</p>
         <FrameworkCode
           variant="docs"
@@ -311,7 +319,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-with-presets">
-        <h4>With Presets</h4>
+        <Subheading>With Presets</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Presets code'}
@@ -374,7 +382,7 @@ export class WithPresets {
         />
       </article>
       <article className="docs-example" id="example-with-min-max">
-        <h4>With Min/Max</h4>
+        <Subheading>With Min/Max</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Min/Max code'}
@@ -441,11 +449,11 @@ export class WithMinMax {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
-        <li><a href="#pixel-select">PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
       </ul>
     </section>
     </section>

@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelOTPInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelOTPInputDocsMeta = {
@@ -112,10 +116,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSectionProps): React.ReactElement {
+export function PixelOTPInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelOTPInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-otp-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-otp-input-heading'>PixelOTPInput</h2>
+      <Title id='pixel-otp-input-heading'>PixelOTPInput</Title>
       <p className="docs-lead">One-time passcode input with auto-advance, paste-fill, and per-cell keyboard navigation.</p>
       <ul className="docs-highlights">
         <li>Configurable length and numeric or alphanumeric input mode</li>
@@ -130,11 +138,11 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-otp-input-api">
-      <h3 id="pixel-otp-input-api">API</h3>
-      <FrameworkApi label={'PixelOTPInput API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-otp-input-api">API</Heading>
+      <FrameworkApi label={'PixelOTPInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-otp-input-a11y">
-      <h3 id="pixel-otp-input-a11y">Accessibility</h3>
+      <Heading id="pixel-otp-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=&quot;group&quot; with aria-label for the cell collection</code></li>
@@ -143,7 +151,7 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
         <li><code>autocomplete=&quot;one-time-code&quot; on the first cell for SMS autofill</code></li>
       </ul>
       <p className="docs-aria-notes">Invalid characters are silently rejected based on the type prop. The completion event (<code>onComplete</code>, <code>@complete</code> in Vue, <code>(complete)</code> in Angular) fires once when all cells are filled.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -187,7 +195,7 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
       </table>
     </section>
     <section aria-labelledby="pixel-otp-input-usage">
-      <h3 id="pixel-otp-input-usage">Usage</h3>
+      <Heading id="pixel-otp-input-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelOTPInput usage'}
@@ -221,9 +229,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -257,7 +265,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-numeric-4">
-        <h4>4-digit Numeric</h4>
+        <Subheading>4-digit Numeric</Subheading>
         <FrameworkCode
           variant="docs"
           label={'4-digit Numeric code'}
@@ -298,7 +306,7 @@ export class Numeric4 {
         />
       </article>
       <article className="docs-example" id="example-alphanumeric">
-        <h4>Alphanumeric</h4>
+        <Subheading>Alphanumeric</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Alphanumeric code'}
@@ -339,7 +347,7 @@ export class Alphanumeric {
         />
       </article>
       <article className="docs-example" id="example-masked">
-        <h4>Masked</h4>
+        <Subheading>Masked</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Masked code'}
@@ -380,7 +388,7 @@ export class Masked {
         />
       </article>
       <article className="docs-example" id="example-with-separator">
-        <h4>With Separator</h4>
+        <Subheading>With Separator</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Separator code'}
@@ -427,10 +435,10 @@ export class WithSeparator {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-password-input">PixelPasswordInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-password-input' : '#pixel-password-input'}>PixelPasswordInput</a></li>
       </ul>
     </section>
     </section>

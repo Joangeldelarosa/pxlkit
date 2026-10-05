@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFormDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelFormDocsMeta = {
@@ -255,10 +259,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): React.ReactElement {
+export function PixelFormDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelFormDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-form-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-form-heading'>PixelForm</h2>
+      <Title id='pixel-form-heading'>PixelForm</Title>
       <p className="docs-lead">Validated form on each framework&#39;s form library (React Hook Form, VeeValidate, Angular reactive forms): its form, field, item, label, control, description and message parts auto-wire ids and aria-* across each field.</p>
       <ul className="docs-highlights">
         <li>Compound API for composable forms: form, field, item, label, control, description and message (<code>PixelForm.Root</code> + <code>.Field</code> + … in React, <code>PixelForm</code> + <code>PixelFormField</code> + … in Vue, <code>form[pxlForm]</code> + <code>[pxlFormField]</code> + … in Angular).</li>
@@ -273,18 +281,18 @@ export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): 
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-form-api">
-      <h3 id="pixel-form-api">API</h3>
-      <FrameworkApi label={'PixelForm API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-form-api">API</Heading>
+      <FrameworkApi label={'PixelForm API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-form-a11y">
-      <h3 id="pixel-form-a11y">Accessibility</h3>
+      <Heading id="pixel-form-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>form</code></li>
         <li><code>labelled-control</code></li>
       </ul>
       <p className="docs-aria-notes">Each item generates a stable id base and links the label (<code>for</code>), the control (id + aria-describedby + aria-invalid), the description (id) and the message (id, role=&quot;alert&quot; on error) automatically — authors do not pass ids manually.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -308,7 +316,7 @@ export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): 
       </table>
     </section>
     <section aria-labelledby="pixel-form-usage">
-      <h3 id="pixel-form-usage">Usage</h3>
+      <Heading id="pixel-form-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelForm usage'}
@@ -476,9 +484,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -647,13 +655,13 @@ export class Default {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-textarea">PixelTextarea</a></li>
-        <li><a href="#pixel-select">PixelSelect</a></li>
-        <li><a href="#pixel-checkbox">PixelCheckbox</a></li>
-        <li><a href="#pixel-radio-group">PixelRadioGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-textarea' : '#pixel-textarea'}>PixelTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-checkbox' : '#pixel-checkbox'}>PixelCheckbox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-radio-group' : '#pixel-radio-group'}>PixelRadioGroup</a></li>
       </ul>
     </section>
     </section>

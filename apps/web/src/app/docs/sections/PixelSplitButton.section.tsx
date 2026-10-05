@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSplitButtonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSplitButtonDocsMeta = {
@@ -85,10 +89,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsSectionProps): React.ReactElement {
+export function PixelSplitButtonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSplitButtonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-split-button-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-split-button-heading'>PixelSplitButton</h2>
+      <Title id='pixel-split-button-heading'>PixelSplitButton</Title>
       <p className="docs-lead">Composite button pairing a primary action with a chevron-triggered dropdown menu for related secondary actions.</p>
       <ul className="docs-highlights">
         <li>Primary click handler plus a menu of alternate actions in a single control</li>
@@ -102,18 +110,18 @@ export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsS
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-split-button-api">
-      <h3 id="pixel-split-button-api">API</h3>
-      <FrameworkApi label={'PixelSplitButton API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-split-button-api">API</Heading>
+      <FrameworkApi label={'PixelSplitButton API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-split-button-a11y">
-      <h3 id="pixel-split-button-a11y">Accessibility</h3>
+      <Heading id="pixel-split-button-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>menu</code></li>
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">Follows the WAI-ARIA menu button pattern, as PixelDropdown does. The chevron is a button of its own, named &quot;More options&quot;, with <code>aria-haspopup=&quot;menu&quot;</code>, <code>aria-expanded</code>, and <code>aria-controls</code> wired to the menu while it is open. The menu (<code>role=&quot;menu&quot;</code>, named by the chevron through <code>aria-labelledby</code>) takes focus as it opens (<code>tabindex=&quot;-1&quot;</code>) and points <code>aria-activedescendant</code> at the highlighted option, so assistive technology follows the arrows, Home/End and typeahead; its <code>role=&quot;menuitem&quot;</code> options are not tab stops. Escape, Tab and choosing an option return focus to the chevron; a press outside closes the menu and leaves focus where the pointer put it. The frame clips both halves, so each shows keyboard focus inside its own edge.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -192,7 +200,7 @@ export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsS
       </table>
     </section>
     <section aria-labelledby="pixel-split-button-usage">
-      <h3 id="pixel-split-button-usage">Usage</h3>
+      <Heading id="pixel-split-button-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSplitButton usage'}
@@ -248,9 +256,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -306,7 +314,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -381,7 +389,7 @@ export class Tones {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -441,7 +449,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -494,7 +502,7 @@ export class Disabled {
         />
       </article>
       <article className="docs-example" id="example-with-callbacks">
-        <h4>With Callbacks</h4>
+        <Subheading>With Callbacks</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Callbacks code'}
@@ -572,11 +580,11 @@ export class WithCallbacks {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-button">PixelButton</a></li>
-        <li><a href="#pixel-dropdown">PixelDropdown</a></li>
-        <li><a href="#pixel-icon-button">PixelIconButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-button' : '#pixel-button'}>PixelButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dropdown' : '#pixel-dropdown'}>PixelDropdown</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-icon-button' : '#pixel-icon-button'}>PixelIconButton</a></li>
       </ul>
     </section>
     </section>

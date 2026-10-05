@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCarouselDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCarouselDocsMeta = {
@@ -117,10 +121,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSectionProps): React.ReactElement {
+export function PixelCarouselDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCarouselDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-carousel-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-carousel-heading'>PixelCarousel</h2>
+      <Title id='pixel-carousel-heading'>PixelCarousel</Title>
       <p className="docs-lead">Embla-powered surface-aware carousel with horizontal or vertical orientation, optional arrows and dot pagination, keyboard navigation and reduced-motion support.</p>
       <ul className="docs-highlights">
         <li>Built on embla-carousel with full opts and plugins pass-through</li>
@@ -135,17 +143,17 @@ export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSection
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-carousel-api">
-      <h3 id="pixel-carousel-api">API</h3>
-      <FrameworkApi label={'PixelCarousel API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-carousel-api">API</Heading>
+      <FrameworkApi label={'PixelCarousel API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-carousel-a11y">
-      <h3 id="pixel-carousel-a11y">Accessibility</h3>
+      <Heading id="pixel-carousel-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>carousel</code></li>
       </ul>
       <p className="docs-aria-notes">Root element is role=&quot;region&quot; with aria-roledescription=&quot;carousel&quot; and a focusable tabIndex. Each item is role=&quot;group&quot; with aria-roledescription=&quot;slide&quot; and aria-label &quot;Slide N of M&quot;. Previous/Next buttons declare aria-label and aria-controls pointing to the viewport id. A polite live region announces the current slide index without reading slide content (per APG carousel pattern). Dots expose aria-current=&quot;true&quot; on the active slide.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -184,7 +192,7 @@ export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSection
       </table>
     </section>
     <section aria-labelledby="pixel-carousel-usage">
-      <h3 id="pixel-carousel-usage">Usage</h3>
+      <Heading id="pixel-carousel-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelCarousel usage'}
@@ -262,9 +270,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -342,7 +350,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-with-dots">
-        <h4>With dots</h4>
+        <Subheading>With dots</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With dots code'}
@@ -420,7 +428,7 @@ export class WithDots {
         />
       </article>
       <article className="docs-example" id="example-looping">
-        <h4>Looping</h4>
+        <Subheading>Looping</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Looping code'}
@@ -498,7 +506,7 @@ export class Looping {
         />
       </article>
       <article className="docs-example" id="example-vertical">
-        <h4>Vertical</h4>
+        <Subheading>Vertical</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Vertical code'}
@@ -582,7 +590,7 @@ export class Vertical {
         />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear surface</h4>
+        <Subheading>Linear surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Linear surface code'}
@@ -656,10 +664,10 @@ export class LinearSurface {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-tabs">PixelTabs</a></li>
-        <li><a href="#pixel-pagination">PixelPagination</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tabs' : '#pixel-tabs'}>PixelTabs</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pagination' : '#pixel-pagination'}>PixelPagination</a></li>
       </ul>
     </section>
     </section>

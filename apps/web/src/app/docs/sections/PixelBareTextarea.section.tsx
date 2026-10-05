@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBareTextareaDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBareTextareaDocsMeta = {
@@ -73,10 +77,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDocsSectionProps): React.ReactElement {
+export function PixelBareTextareaDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBareTextareaDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-bare-textarea-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-bare-textarea-heading'>PixelBareTextarea</h2>
+      <Title id='pixel-bare-textarea-heading'>PixelBareTextarea</Title>
       <p className="docs-lead">Unstyled escape-hatch <code>&lt;textarea&gt;</code> passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.</p>
       <ul className="docs-highlights">
         <li>Zero styling — pure passthrough to the native &lt;textarea&gt; element</li>
@@ -91,17 +99,17 @@ export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDoc
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-bare-textarea-api">
-      <h3 id="pixel-bare-textarea-api">API</h3>
-      <FrameworkApi label={'PixelBareTextarea API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-bare-textarea-api">API</Heading>
+      <FrameworkApi label={'PixelBareTextarea API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bare-textarea-a11y">
-      <h3 id="pixel-bare-textarea-a11y">Accessibility</h3>
+      <Heading id="pixel-bare-textarea-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
       <p className="docs-aria-notes">Renders a native &lt;textarea&gt; so screen readers announce the textbox role with multiline semantics automatically. Because no chrome is applied, callers MUST supply a visible &lt;label&gt; (<code>for</code>) or an aria-label so the field has an accessible name. Pair with aria-required, aria-invalid, and aria-describedby for validation flows.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -130,7 +138,7 @@ export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDoc
       </table>
     </section>
     <section aria-labelledby="pixel-bare-textarea-usage">
-      <h3 id="pixel-bare-textarea-usage">Usage</h3>
+      <Heading id="pixel-bare-textarea-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelBareTextarea usage'}
@@ -157,9 +165,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -186,7 +194,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
+        <Subheading>Uncontrolled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Uncontrolled code'}
@@ -219,7 +227,7 @@ export class Uncontrolled {}`}
         />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
+        <Subheading>Controlled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled code'}
@@ -278,7 +286,7 @@ export class Controlled {
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -314,7 +322,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-read-only">
-        <h4>Read only</h4>
+        <Subheading>Read only</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Read only code'}
@@ -356,7 +364,7 @@ export class ReadOnly {}`}
         />
       </article>
       <article className="docs-example" id="example-with-custom-styling">
-        <h4>With custom styling</h4>
+        <Subheading>With custom styling</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With custom styling code'}
@@ -403,7 +411,7 @@ export class WithCustomStyling {}`}
         />
       </article>
       <article className="docs-example" id="example-with-max-length">
-        <h4>With max length</h4>
+        <Subheading>With max length</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With max length code'}
@@ -439,7 +447,7 @@ export class WithMaxLength {}`}
         />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
+        <Subheading>Required</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Required code'}
@@ -490,11 +498,11 @@ export class Required {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-textarea">PixelTextarea</a></li>
-        <li><a href="#pixel-bare-input">PixelBareInput</a></li>
-        <li><a href="#pixel-bare-button">PixelBareButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-textarea' : '#pixel-textarea'}>PixelTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-input' : '#pixel-bare-input'}>PixelBareInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-button' : '#pixel-bare-button'}>PixelBareButton</a></li>
       </ul>
     </section>
     </section>

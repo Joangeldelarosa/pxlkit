@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFlickerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelFlickerDocsMeta = {
@@ -84,10 +88,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelFlickerDocsSection({ className }: PixelFlickerDocsSectionProps): React.ReactElement {
+export function PixelFlickerDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelFlickerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-flicker-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-flicker-heading'>PixelFlicker</h2>
+      <Title id='pixel-flicker-heading'>PixelFlicker</Title>
       <p className="docs-lead">Broken-neon-sign opacity flicker loop for retro signage and emphasis.</p>
       <ul className="docs-highlights">
         <li>Stepped opacity flicker that mimics a broken neon sign</li>
@@ -102,11 +110,11 @@ export function PixelFlickerDocsSection({ className }: PixelFlickerDocsSectionPr
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-flicker-api">
-      <h3 id="pixel-flicker-api">API</h3>
-      <FrameworkApi label={'PixelFlicker API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-flicker-api">API</Heading>
+      <FrameworkApi label={'PixelFlicker API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-flicker-a11y">
-      <h3 id="pixel-flicker-a11y">Accessibility</h3>
+      <Heading id="pixel-flicker-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -114,7 +122,7 @@ export function PixelFlickerDocsSection({ className }: PixelFlickerDocsSectionPr
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-flicker-usage">
-      <h3 id="pixel-flicker-usage">Usage</h3>
+      <Heading id="pixel-flicker-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelFlicker usage'}
@@ -151,9 +159,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -190,7 +198,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-faster-flicker">
-        <h4>Faster Flicker</h4>
+        <Subheading>Faster Flicker</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Faster Flicker code'}
@@ -227,7 +235,7 @@ export class FasterFlicker {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
-        <h4>Hover Trigger</h4>
+        <Subheading>Hover Trigger</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Hover Trigger code'}
@@ -265,11 +273,11 @@ export class HoverTrigger {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-glitch">PixelGlitch</a></li>
-        <li><a href="#pixel-pulse">PixelPulse</a></li>
-        <li><a href="#pixel-shake">PixelShake</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-glitch' : '#pixel-glitch'}>PixelGlitch</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pulse' : '#pixel-pulse'}>PixelPulse</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-shake' : '#pixel-shake'}>PixelShake</a></li>
       </ul>
     </section>
     </section>

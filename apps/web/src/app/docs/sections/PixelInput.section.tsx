@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelInputDocsMeta = {
@@ -137,10 +141,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps): React.ReactElement {
+export function PixelInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-input-heading'>PixelInput</h2>
+      <Title id='pixel-input-heading'>PixelInput</Title>
       <p className="docs-lead">Single-line text input with label, hint, error message, tone/size/surface variants, prefix/suffix slots, joinable addons, clearable button, char counter, and loading state.</p>
       <ul className="docs-highlights">
         <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code>.</li>
@@ -155,17 +163,17 @@ export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps)
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-input-api">
-      <h3 id="pixel-input-api">API</h3>
-      <FrameworkApi label={'PixelInput API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-input-api">API</Heading>
+      <FrameworkApi label={'PixelInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-input-a11y">
-      <h3 id="pixel-input-a11y">Accessibility</h3>
+      <Heading id="pixel-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
       <p className="docs-aria-notes">Sets <code>aria-invalid</code> when <code>error</code> is provided and links the hint/error text it shows via <code>aria-describedby</code>, after any ids you pass (none while neither shows). The clear button has <code>tabindex=&quot;-1&quot;</code> so keyboard users edit the value directly instead of tabbing through it.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -189,7 +197,7 @@ export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps)
       </table>
     </section>
     <section aria-labelledby="pixel-input-usage">
-      <h3 id="pixel-input-usage">Usage</h3>
+      <Heading id="pixel-input-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelInput usage'}
@@ -222,9 +230,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -257,7 +265,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
+        <Subheading>Controlled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled code'}
@@ -300,7 +308,7 @@ export class Controlled {
         />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
+        <Subheading>Uncontrolled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Uncontrolled code'}
@@ -333,7 +341,7 @@ export class Uncontrolled {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -385,7 +393,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -428,7 +436,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -468,7 +476,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-prefix-suffix">
-        <h4>Prefix &amp; Suffix</h4>
+        <Subheading>Prefix &amp; Suffix</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Prefix & Suffix code'}
@@ -525,7 +533,7 @@ export class WithPrefixSuffix {}`}
         />
       </article>
       <article className="docs-example" id="example-addons">
-        <h4>Joined Addons</h4>
+        <Subheading>Joined Addons</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Joined Addons code'}
@@ -566,7 +574,7 @@ export class WithAddons {}`}
         />
       </article>
       <article className="docs-example" id="example-clearable">
-        <h4>Clearable</h4>
+        <Subheading>Clearable</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Clearable code'}
@@ -608,7 +616,7 @@ export class Clearable {
         />
       </article>
       <article className="docs-example" id="example-loading">
-        <h4>Loading</h4>
+        <Subheading>Loading</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Loading code'}
@@ -641,7 +649,7 @@ export class Loading {}`}
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -674,7 +682,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-error">
-        <h4>With Error</h4>
+        <Subheading>With Error</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Error code'}
@@ -710,7 +718,7 @@ export class WithError {}`}
         />
       </article>
       <article className="docs-example" id="example-char-count">
-        <h4>Character Count</h4>
+        <Subheading>Character Count</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Character Count code'}
@@ -753,13 +761,13 @@ export class WithCharCount {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-password-input">PixelPasswordInput</a></li>
-        <li><a href="#pixel-textarea">PixelTextarea</a></li>
-        <li><a href="#pixel-bare-input">PixelBareInput</a></li>
-        <li><a href="#pixel-input-group">PixelInputGroup</a></li>
-        <li><a href="#pixel-number-input">PixelNumberInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-password-input' : '#pixel-password-input'}>PixelPasswordInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-textarea' : '#pixel-textarea'}>PixelTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-input' : '#pixel-bare-input'}>PixelBareInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input-group' : '#pixel-input-group'}>PixelInputGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-number-input' : '#pixel-number-input'}>PixelNumberInput</a></li>
       </ul>
     </section>
     </section>

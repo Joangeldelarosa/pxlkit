@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDividerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelDividerDocsMeta = {
@@ -67,10 +71,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelDividerDocsSection({ className }: PixelDividerDocsSectionProps): React.ReactElement {
+export function PixelDividerDocsSection({ className, headingLevel = 2 }: PixelDividerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-divider-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-divider-heading'>PixelDivider</h2>
+      <Title id='pixel-divider-heading'>PixelDivider</Title>
       <p className="docs-lead">Horizontal rule with optional centered label; pixel surface adds dotted line and diamond ornaments.</p>
       <ul className="docs-highlights">
         <li>Optional centered label between two rules</li>
@@ -85,11 +93,11 @@ export function PixelDividerDocsSection({ className }: PixelDividerDocsSectionPr
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-divider-api">
-      <h3 id="pixel-divider-api">API</h3>
-      <FrameworkApi label={'PixelDivider API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-divider-api">API</Heading>
+      <FrameworkApi label={'PixelDivider API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-divider-a11y">
-      <h3 id="pixel-divider-a11y">Accessibility</h3>
+      <Heading id="pixel-divider-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=separator with aria-orientation=horizontal when labeled; decorative &lt;hr&gt; otherwise</code></li>
@@ -97,7 +105,7 @@ export function PixelDividerDocsSection({ className }: PixelDividerDocsSectionPr
       <p className="docs-aria-notes">Non-interactive. When a label is present, the wrapper exposes role=&quot;separator&quot; and aria-label; the underlying rules are aria-hidden.</p>
     </section>
     <section aria-labelledby="pixel-divider-usage">
-      <h3 id="pixel-divider-usage">Usage</h3>
+      <Heading id="pixel-divider-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelDivider usage'}
@@ -124,9 +132,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -153,7 +161,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-with-label">
-        <h4>With Label</h4>
+        <Subheading>With Label</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Label code'}
@@ -180,7 +188,7 @@ export class WithLabel {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -235,7 +243,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-spacings">
-        <h4>Spacings</h4>
+        <Subheading>Spacings</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Spacings code'}
@@ -281,7 +289,7 @@ export class Spacings {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -321,7 +329,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-plain-rule">
-        <h4>Plain Rule</h4>
+        <Subheading>Plain Rule</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Plain Rule code'}

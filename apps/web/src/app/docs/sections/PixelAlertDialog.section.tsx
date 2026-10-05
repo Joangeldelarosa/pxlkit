@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAlertDialogDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAlertDialogDocsMeta = {
@@ -94,10 +98,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsSectionProps): React.ReactElement {
+export function PixelAlertDialogDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAlertDialogDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-alert-dialog-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-alert-dialog-heading'>PixelAlertDialog</h2>
+      <Title id='pixel-alert-dialog-heading'>PixelAlertDialog</Title>
       <p className="docs-lead">Modal confirmation dialog for destructive or irreversible actions, with async-aware action handling and Cancel-focused defaults.</p>
       <ul className="docs-highlights">
         <li>role=&quot;alertdialog&quot; + aria-modal with initial focus pinned to Cancel for safer destructive flows</li>
@@ -112,17 +120,17 @@ export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsS
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-alert-dialog-api">
-      <h3 id="pixel-alert-dialog-api">API</h3>
-      <FrameworkApi label={'PixelAlertDialog API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-alert-dialog-api">API</Heading>
+      <FrameworkApi label={'PixelAlertDialog API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-alert-dialog-a11y">
-      <h3 id="pixel-alert-dialog-a11y">Accessibility</h3>
+      <Heading id="pixel-alert-dialog-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>alertdialog</code></li>
       </ul>
       <p className="docs-aria-notes">Initial focus is placed on the Cancel button to prevent accidental confirmation of destructive actions.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -151,7 +159,7 @@ export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsS
       </table>
     </section>
     <section aria-labelledby="pixel-alert-dialog-usage">
-      <h3 id="pixel-alert-dialog-usage">Usage</h3>
+      <Heading id="pixel-alert-dialog-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelAlertDialog usage'}
@@ -220,9 +228,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -291,7 +299,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-destructive">
-        <h4>Destructive</h4>
+        <Subheading>Destructive</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Destructive code'}
@@ -366,7 +374,7 @@ export class Destructive {
         />
       </article>
       <article className="docs-example" id="example-async-action">
-        <h4>Async Action</h4>
+        <Subheading>Async Action</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Async Action code'}
@@ -457,10 +465,10 @@ export class AsyncAction {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-dialog">PixelDialog</a></li>
-        <li><a href="#pixel-portal">PixelPortal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dialog' : '#pixel-dialog'}>PixelDialog</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-portal' : '#pixel-portal'}>PixelPortal</a></li>
       </ul>
     </section>
     </section>

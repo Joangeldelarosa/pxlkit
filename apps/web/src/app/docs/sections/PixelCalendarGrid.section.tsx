@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCalendarGridDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCalendarGridDocsMeta = {
@@ -103,10 +107,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelCalendarGridDocsSection({ className }: PixelCalendarGridDocsSectionProps): React.ReactElement {
+export function PixelCalendarGridDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCalendarGridDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-calendar-grid-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-calendar-grid-heading'>PixelCalendarGrid</h2>
+      <Title id='pixel-calendar-grid-heading'>PixelCalendarGrid</Title>
       <p className="docs-lead">Standalone month grid for date selection — usable inline or composed inside date pickers and range pickers.</p>
       <ul className="docs-highlights">
         <li>Controlled or uncontrolled month navigation: <code>month</code> + <code>onMonthChange</code> (React), <code>v-model:month</code> (Vue), <code>[(month)]</code> (Angular)</li>
@@ -121,17 +129,17 @@ export function PixelCalendarGridDocsSection({ className }: PixelCalendarGridDoc
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-calendar-grid-api">
-      <h3 id="pixel-calendar-grid-api">API</h3>
-      <FrameworkApi label={'PixelCalendarGrid API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-calendar-grid-api">API</Heading>
+      <FrameworkApi label={'PixelCalendarGrid API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-calendar-grid-a11y">
-      <h3 id="pixel-calendar-grid-a11y">Accessibility</h3>
+      <Heading id="pixel-calendar-grid-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>grid</code></li>
       </ul>
       <p className="docs-aria-notes">role=grid with columnheader weekday cells and gridcell day buttons; aria-selected marks the chosen day, aria-current=&quot;date&quot; marks today, and aria-disabled marks out-of-bounds or disabled dates. Moves skip disabled days and stop at min/max. One enabled day is in the tab order. Week start, month and weekday names follow PxlKitLocaleProvider.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -205,7 +213,7 @@ export function PixelCalendarGridDocsSection({ className }: PixelCalendarGridDoc
       </table>
     </section>
     <section aria-labelledby="pixel-calendar-grid-usage">
-      <h3 id="pixel-calendar-grid-usage">Usage</h3>
+      <Heading id="pixel-calendar-grid-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelCalendarGrid usage'}
@@ -239,9 +247,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <p>Shows the current month and marks today, by the clock of whatever renders it: a server render can differ from the browser&#39;s (a page built on another day, another time zone) and fail to hydrate. For a stable server render pass month (and value or defaultValue), or render a current-month calendar in the browser only: next/dynamic with ssr: false (Next.js), ClientOnly (Nuxt), @defer (Angular).</p>
         <FrameworkCode
           variant="docs"
@@ -276,7 +284,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-with-selected-date">
-        <h4>With Selected Date</h4>
+        <Subheading>With Selected Date</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Selected Date code'}
@@ -310,7 +318,7 @@ export class WithSelectedDate {
         />
       </article>
       <article className="docs-example" id="example-with-min-max">
-        <h4>With Min/Max Bounds</h4>
+        <Subheading>With Min/Max Bounds</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Min/Max Bounds code'}
@@ -360,7 +368,7 @@ export class WithMinMax {
         />
       </article>
       <article className="docs-example" id="example-with-disabled-weekends">
-        <h4>Disabled Weekends</h4>
+        <Subheading>Disabled Weekends</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled Weekends code'}
@@ -402,7 +410,7 @@ export class WithDisabledWeekends {
         />
       </article>
       <article className="docs-example" id="example-range-preview">
-        <h4>Range Preview</h4>
+        <Subheading>Range Preview</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Range Preview code'}
@@ -438,10 +446,10 @@ export class RangePreview {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-date-picker">PixelDatePicker</a></li>
-        <li><a href="#pixel-date-range-picker">PixelDateRangePicker</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-date-picker' : '#pixel-date-picker'}>PixelDatePicker</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-date-range-picker' : '#pixel-date-range-picker'}>PixelDateRangePicker</a></li>
       </ul>
     </section>
     </section>

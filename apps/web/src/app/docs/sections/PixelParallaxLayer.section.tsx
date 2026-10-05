@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelParallaxLayerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelParallaxLayerDocsMeta = {
@@ -75,10 +79,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerDocsSectionProps): React.ReactElement {
+export function PixelParallaxLayerDocsSection({ className, headingLevel = 2 }: PixelParallaxLayerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-parallax-layer-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-parallax-layer-heading'>PixelParallaxLayer</h2>
+      <Title id='pixel-parallax-layer-heading'>PixelParallaxLayer</Title>
       <p className="docs-lead">Scroll-driven parallax wrapper that GPU-translates its children proportionally to scroll position.</p>
       <ul className="docs-highlights">
         <li>GPU-composited via translate3d for smooth 60fps motion</li>
@@ -92,11 +100,11 @@ export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerD
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-parallax-layer-api">
-      <h3 id="pixel-parallax-layer-api">API</h3>
-      <FrameworkApi label={'PixelParallaxLayer API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-parallax-layer-api">API</Heading>
+      <FrameworkApi label={'PixelParallaxLayer API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-parallax-layer-a11y">
-      <h3 id="pixel-parallax-layer-a11y">Accessibility</h3>
+      <Heading id="pixel-parallax-layer-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -105,7 +113,7 @@ export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerD
       <p className="docs-aria-notes">Parallax is decorative; consumers should gate motion or apply aria-hidden on purely decorative layers.</p>
     </section>
     <section aria-labelledby="pixel-parallax-layer-usage">
-      <h3 id="pixel-parallax-layer-usage">Usage</h3>
+      <Heading id="pixel-parallax-layer-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelParallaxLayer usage'}
@@ -144,9 +152,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default (background)</h4>
+        <Subheading>Default (background)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default (background) code'}
@@ -185,7 +193,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-foreground">
-        <h4>Foreground (reverse)</h4>
+        <Subheading>Foreground (reverse)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Foreground (reverse) code'}
@@ -224,7 +232,7 @@ export class Foreground {}`}
         />
       </article>
       <article className="docs-example" id="example-horizontal">
-        <h4>Horizontal axis</h4>
+        <Subheading>Horizontal axis</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Horizontal axis code'}

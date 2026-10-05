@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTextLinkDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTextLinkDocsMeta = {
@@ -74,10 +78,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSectionProps): React.ReactElement {
+export function PixelTextLinkDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelTextLinkDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-text-link-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-text-link-heading'>PixelTextLink</h2>
+      <Title id='pixel-text-link-heading'>PixelTextLink</Title>
       <p className="docs-lead">Inline anchor or button styled as a tone-coloured underlined link for prose, callouts, and CTAs.</p>
       <ul className="docs-highlights">
         <li>Polymorphic: an &lt;a&gt; with <code>href</code>, a &lt;button&gt; without (in Angular, <code>a[pxlTextLink]</code> or <code>button[pxlTextLink]</code>)</li>
@@ -92,18 +100,18 @@ export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSection
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-text-link-api">
-      <h3 id="pixel-text-link-api">API</h3>
-      <FrameworkApi label={'PixelTextLink API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-text-link-api">API</Heading>
+      <FrameworkApi label={'PixelTextLink API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-text-link-a11y">
-      <h3 id="pixel-text-link-a11y">Accessibility</h3>
+      <Heading id="pixel-text-link-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>link</code></li>
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">Visible focus ring via focus-visible:ring-2; renders semantic &lt;a&gt; when href is provided and &lt;button type=&quot;button&quot;&gt; otherwise so assistive tech announces the correct role. Pair external links with target/rel and consider adding a visible affordance for &quot;opens in new tab&quot;.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -132,7 +140,7 @@ export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSection
       </table>
     </section>
     <section aria-labelledby="pixel-text-link-usage">
-      <h3 id="pixel-text-link-usage">Usage</h3>
+      <Heading id="pixel-text-link-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelTextLink usage'}
@@ -159,9 +167,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -188,7 +196,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -243,7 +251,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-as-button">
-        <h4>As button</h4>
+        <Subheading>As button</Subheading>
         <FrameworkCode
           variant="docs"
           label={'As button code'}
@@ -282,7 +290,7 @@ export class AsButton {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -322,7 +330,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-external-link">
-        <h4>External link</h4>
+        <Subheading>External link</Subheading>
         <FrameworkCode
           variant="docs"
           label={'External link code'}
@@ -357,7 +365,7 @@ export class ExternalLink {}`}
         />
       </article>
       <article className="docs-example" id="example-inline-in-prose">
-        <h4>Inline in prose</h4>
+        <Subheading>Inline in prose</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Inline in prose code'}
@@ -401,10 +409,10 @@ export class InlineInProse {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-button">PixelButton</a></li>
-        <li><a href="#pixel-breadcrumb">PixelBreadcrumb</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-button' : '#pixel-button'}>PixelButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-breadcrumb' : '#pixel-breadcrumb'}>PixelBreadcrumb</a></li>
       </ul>
     </section>
     </section>

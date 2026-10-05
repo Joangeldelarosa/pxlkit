@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBadgeGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBadgeGroupDocsMeta = {
@@ -77,10 +81,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSectionProps): React.ReactElement {
+export function PixelBadgeGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBadgeGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-badge-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-badge-group-heading'>PixelBadgeGroup</h2>
+      <Title id='pixel-badge-group-heading'>PixelBadgeGroup</Title>
       <p className="docs-lead">Inline row of badges with automatic &quot;+N&quot; overflow popover when the count exceeds <code>max</code>.</p>
       <ul className="docs-highlights">
         <li>Renders the first <code>max - 1</code> badges inline; remaining items collapse into a &quot;+N&quot; trigger.</li>
@@ -94,18 +102,18 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-badge-group-api">
-      <h3 id="pixel-badge-group-api">API</h3>
-      <FrameworkApi label={'PixelBadgeGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-badge-group-api">API</Heading>
+      <FrameworkApi label={'PixelBadgeGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-badge-group-a11y">
-      <h3 id="pixel-badge-group-a11y">Accessibility</h3>
+      <Heading id="pixel-badge-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
         <li><code>disclosure</code></li>
       </ul>
       <p className="docs-aria-notes">Group landmark is only emitted when an accessible name is supplied to avoid an unlabeled &quot;group&quot; announcement. The overflow button carries aria-label=&quot;Show N more&quot;, aria-expanded, aria-haspopup=&quot;dialog&quot;, and aria-controls wired by PixelPopover; it also names the popover dialog through aria-labelledby.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -134,7 +142,7 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-badge-group-usage">
-      <h3 id="pixel-badge-group-usage">Usage</h3>
+      <Heading id="pixel-badge-group-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelBadgeGroup usage'}
@@ -177,9 +185,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -222,7 +230,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-overflow">
-        <h4>Overflow +N</h4>
+        <Subheading>Overflow +N</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Overflow +N code'}
@@ -274,7 +282,7 @@ export class Overflow {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -339,12 +347,12 @@ export class Surfaces {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-badge">PixelBadge</a></li>
-        <li><a href="#pixel-chip-group">PixelChipGroup</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
-        <li><a href="#pixel-avatar-group">PixelAvatarGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge' : '#pixel-badge'}>PixelBadge</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-chip-group' : '#pixel-chip-group'}>PixelChipGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-avatar-group' : '#pixel-avatar-group'}>PixelAvatarGroup</a></li>
       </ul>
     </section>
     </section>

@@ -375,12 +375,46 @@ describe("renderSectionModule", () => {
   it("includes Props table headings and rows", () => {
     const entry = planEntryFor(baseRec(), "/o");
     const src = renderSectionModule(entry);
-    expect(src).toContain("<h3>Props</h3>");
+    expect(src).toContain("<Heading>Props</Heading>");
     expect(src).toContain("<th scope=\"col\">Prop</th>");
     expect(src).toContain("<code>tone</code>");
     expect(src).toContain("<code>label</code>");
     // required prop gets a marker
     expect(src).toContain('docs-required');
+  });
+
+  it("titles itself at the level it is given (2 on /docs, 1 as its own page), its subsections below it", () => {
+    const src = renderSectionModule(planEntryFor(baseRec(), "/o"));
+    expect(src).toContain("  headingLevel?: 1 | 2;");
+    expect(src).toContain("  links?: 'anchors' | 'pages';");
+    expect(src).toContain(
+      "export function PixelButtonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelButtonDocsSectionProps): React.ReactElement {",
+    );
+    expect(src).toContain("  const Title = headingLevel === 1 ? 'h1' : 'h2';");
+    expect(src).toContain("  const Heading = headingLevel === 1 ? 'h2' : 'h3';");
+    expect(src).toContain("  const Subheading = headingLevel === 1 ? 'h3' : 'h4';");
+    expect(src).toContain("<Title id='pixel-button-heading'>PixelButton</Title>");
+    expect(src).toContain('<Heading id="pixel-button-a11y">Accessibility</Heading>');
+    expect(src).toContain("<Subheading>Default</Subheading>");
+    expect(src).not.toMatch(/<h[1-6][ >]/);
+  });
+
+  it("links related components to their /docs anchors, or to their pages", () => {
+    const src = renderSectionModule(planEntryFor(baseRec(), "/o"));
+    expect(src).toContain(
+      "<li><a href={links === 'pages' ? '/docs/components/link-button' : '#link-button'}>LinkButton</a></li>",
+    );
+    expect(src).toContain("<Heading>Related</Heading>");
+  });
+
+  it("takes no `links` and declares no subheading it does not use", () => {
+    const src = renderSectionModule(
+      planEntryFor(fakeRecord({ name: "PixelBare", description: "Nav bar of links.", examples: [], related: [] }), "/o"),
+    );
+    expect(src).toContain("export function PixelBareDocsSection({ className, headingLevel = 2 }: PixelBareDocsSectionProps)");
+    expect(src).not.toContain("const Subheading");
+    // The props stay in the interface: every section takes the same.
+    expect(src).toContain("  links?: 'anchors' | 'pages';");
   });
 
   it("includes A11y block + keyboard table when bindings exist", () => {
@@ -389,7 +423,7 @@ describe("renderSectionModule", () => {
     expect(src).toContain("Accessibility");
     expect(src).toContain("WCAG target:");
     expect(src).toContain("2.1 AA");
-    expect(src).toContain("<h4>Keyboard</h4>");
+    expect(src).toContain("<Subheading>Keyboard</Subheading>");
     expect(src).toContain("<kbd>Enter</kbd>");
     expect(src).toContain("<kbd>Space</kbd>");
   });
@@ -561,8 +595,8 @@ describe("generateDocsPage (e2e against tmpdir)", () => {
 
     expect(report.ok).toBe(true);
     expect(report.count).toBe(2);
-    // 2 sections + the usage-snippets modules (React, Vue, Angular)
-    expect(report.written).toBe(5);
+    // 2 sections + the usage-snippets modules (React, Vue, Angular) + the component pages' data and loaders
+    expect(report.written).toBe(7);
     expect(report.errors).toEqual([]);
 
     const a = path.join(outRoot, `PixelButton${FILE_EXT}`);
@@ -608,8 +642,8 @@ describe("generateDocsPage (e2e against tmpdir)", () => {
     });
 
     expect(report.ok).toBe(false);
-    // 1 valid section + the usage-snippets modules (React, Vue, Angular)
-    expect(report.written).toBe(4);
+    // 1 valid section + the usage-snippets modules (React, Vue, Angular) + the component pages' data and loaders
+    expect(report.written).toBe(6);
     expect(report.errors).toHaveLength(1);
     expect(report.errors[0]!.message).toMatch(/missing a string `name`/);
   });

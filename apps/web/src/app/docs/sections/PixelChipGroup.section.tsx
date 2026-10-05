@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelChipGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelChipGroupDocsMeta = {
@@ -96,10 +100,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelChipGroupDocsSection({ className }: PixelChipGroupDocsSectionProps): React.ReactElement {
+export function PixelChipGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelChipGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-chip-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-chip-group-heading'>PixelChipGroup</h2>
+      <Title id='pixel-chip-group-heading'>PixelChipGroup</Title>
       <p className="docs-lead">Controlled chip row with single-select (radiogroup) or multi-select (group of checkboxes) — wraps each PixelChip in a semantic toggle button.</p>
       <ul className="docs-highlights">
         <li>Selection is bound — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or starts from <code>defaultValue</code>; chips stay presentational.</li>
@@ -114,18 +122,18 @@ export function PixelChipGroupDocsSection({ className }: PixelChipGroupDocsSecti
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-chip-group-api">
-      <h3 id="pixel-chip-group-api">API</h3>
-      <FrameworkApi label={'PixelChipGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-chip-group-api">API</Heading>
+      <FrameworkApi label={'PixelChipGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-chip-group-a11y">
-      <h3 id="pixel-chip-group-a11y">Accessibility</h3>
+      <Heading id="pixel-chip-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>radiogroup</code></li>
         <li><code>checkbox-group</code></li>
       </ul>
       <p className="docs-aria-notes">Each child chip must declare a string <code>value</code> prop. In single (radiogroup) mode an accessible name (aria-label or aria-labelledby) is required so screen readers announce the group; multi mode renders a bare div unless a name is provided. The wrapping button owns role/aria-checked/tabindex; the PixelChip child remains purely visual. Selection and keyboard focus read apart: the linear surface rings a selected chip and sets the focus ring off it; the pixel surface frames a selected chip inside its border and lights up the chip&#39;s edge for focus.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -184,7 +192,7 @@ export function PixelChipGroupDocsSection({ className }: PixelChipGroupDocsSecti
       </table>
     </section>
     <section aria-labelledby="pixel-chip-group-usage">
-      <h3 id="pixel-chip-group-usage">Usage</h3>
+      <Heading id="pixel-chip-group-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelChipGroup usage'}
@@ -238,9 +246,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -294,7 +302,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-multi-select">
-        <h4>Multi Select</h4>
+        <Subheading>Multi Select</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Multi Select code'}
@@ -356,7 +364,7 @@ export class MultiSelect {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -429,11 +437,11 @@ export class Surfaces {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-chip">PixelChip</a></li>
-        <li><a href="#pixel-badge-group">PixelBadgeGroup</a></li>
-        <li><a href="#pixel-badge">PixelBadge</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-chip' : '#pixel-chip'}>PixelChip</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge-group' : '#pixel-badge-group'}>PixelBadgeGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge' : '#pixel-badge'}>PixelBadge</a></li>
       </ul>
     </section>
     </section>

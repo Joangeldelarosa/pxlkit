@@ -387,9 +387,9 @@ describe("extractApi over the repository's kits", () => {
     expect(source).toContain("import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';");
     expect(source).toContain(renderApiConstant("PixelSwitch", entry.api!));
     expect(source).toContain(
-      "<FrameworkApi label={'PixelSwitch API'} react={api.react} vue={api.vue} angular={api.angular} />",
+      "<FrameworkApi label={'PixelSwitch API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />",
     );
-    expect(source).toContain('<h3 id="pixel-switch-api">API</h3>');
+    expect(source).toContain('<Heading id="pixel-switch-api">API</Heading>');
     expect(source).not.toContain("No props documented yet.");
   });
 });
@@ -454,8 +454,10 @@ describe("the section's API data", () => {
   });
 
   it("passes the tabs only the frameworks that have the component", () => {
-    expect(renderApiBlock("PixelToy", "pixel-toy", toy)).toContain(
-      "<FrameworkApi label={'PixelToy API'} react={api.react} vue={api.vue} />",
+    const block = renderApiBlock("PixelToy", "pixel-toy", toy);
+    expect(block).toContain('<Heading id="pixel-toy-api">API</Heading>');
+    expect(block).toContain(
+      "<FrameworkApi label={'PixelToy API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} />",
     );
   });
 });

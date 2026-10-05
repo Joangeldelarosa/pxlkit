@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelShakeDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelShakeDocsMeta = {
@@ -90,10 +94,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps): React.ReactElement {
+export function PixelShakeDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelShakeDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-shake-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-shake-heading'>PixelShake</h2>
+      <Title id='pixel-shake-heading'>PixelShake</Title>
       <p className="docs-lead">Quick horizontal shake animation, ideal for validation errors or attention cues.</p>
       <ul className="docs-highlights">
         <li>Configurable duration, distance, repeat count, and easing</li>
@@ -107,11 +115,11 @@ export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps)
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-shake-api">
-      <h3 id="pixel-shake-api">API</h3>
-      <FrameworkApi label={'PixelShake API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-shake-api">API</Heading>
+      <FrameworkApi label={'PixelShake API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-shake-a11y">
-      <h3 id="pixel-shake-a11y">Accessibility</h3>
+      <Heading id="pixel-shake-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -119,7 +127,7 @@ export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps)
       <p className="docs-aria-notes">Animation is automatically disabled when the user has requested reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-shake-usage">
-      <h3 id="pixel-shake-usage">Usage</h3>
+      <Heading id="pixel-shake-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelShake usage'}
@@ -156,9 +164,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -195,7 +203,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-on-hover">
-        <h4>On Hover</h4>
+        <Subheading>On Hover</Subheading>
         <FrameworkCode
           variant="docs"
           label={'On Hover code'}
@@ -232,7 +240,7 @@ export class OnHover {}`}
         />
       </article>
       <article className="docs-example" id="example-strong-shake">
-        <h4>Strong Shake</h4>
+        <Subheading>Strong Shake</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Strong Shake code'}
@@ -270,11 +278,11 @@ export class StrongShake {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-bounce">PixelBounce</a></li>
-        <li><a href="#pixel-pulse">PixelPulse</a></li>
-        <li><a href="#pixel-glitch">PixelGlitch</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bounce' : '#pixel-bounce'}>PixelBounce</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pulse' : '#pixel-pulse'}>PixelPulse</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-glitch' : '#pixel-glitch'}>PixelGlitch</a></li>
       </ul>
     </section>
     </section>

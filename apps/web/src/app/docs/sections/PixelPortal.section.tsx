@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPortalDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelPortalDocsMeta = {
@@ -70,10 +74,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProps): React.ReactElement {
+export function PixelPortalDocsSection({ className, headingLevel = 2 }: PixelPortalDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-portal-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-portal-heading'>PixelPortal</h2>
+      <Title id='pixel-portal-heading'>PixelPortal</Title>
       <p className="docs-lead">SSR-safe portal primitive: renders children inline on the server and while hydrating, then portals them into document.body or a container, keeping the focus set inside them.</p>
       <ul className="docs-highlights">
         <li>SSR-safe: renders inline on the server and during hydration to avoid hydration mismatches</li>
@@ -88,11 +96,11 @@ export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProp
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-portal-api">
-      <h3 id="pixel-portal-api">API</h3>
-      <FrameworkApi label={'PixelPortal API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-portal-api">API</Heading>
+      <FrameworkApi label={'PixelPortal API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-portal-a11y">
-      <h3 id="pixel-portal-a11y">Accessibility</h3>
+      <Heading id="pixel-portal-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>SSR-safe portal</code></li>
@@ -101,7 +109,7 @@ export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProp
       <p className="docs-aria-notes">Portal content keeps its place in the component tree, so providers reach it as if it were rendered in place; in React, its events also bubble through that tree. Keyboard focus follows the document order, where the content sits in its target.</p>
     </section>
     <section aria-labelledby="pixel-portal-usage">
-      <h3 id="pixel-portal-usage">Usage</h3>
+      <Heading id="pixel-portal-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelPortal usage'}
@@ -134,9 +142,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -169,7 +177,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled (inline)</h4>
+        <Subheading>Disabled (inline)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled (inline) code'}

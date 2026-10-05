@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFileUploadDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelFileUploadDocsMeta = {
@@ -125,10 +129,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSectionProps): React.ReactElement {
+export function PixelFileUploadDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelFileUploadDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-file-upload-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-file-upload-heading'>PixelFileUpload</h2>
+      <Title id='pixel-file-upload-heading'>PixelFileUpload</Title>
       <p className="docs-lead">Dropzone + click-to-browse file uploader with accept/size/count validation, image thumbnails, and per-item removal.</p>
       <ul className="docs-highlights">
         <li>Drag-and-drop or click/keyboard to open the native file picker</li>
@@ -143,18 +151,18 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-file-upload-api">
-      <h3 id="pixel-file-upload-api">API</h3>
-      <FrameworkApi label={'PixelFileUpload API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-file-upload-api">API</Heading>
+      <FrameworkApi label={'PixelFileUpload API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-file-upload-a11y">
-      <h3 id="pixel-file-upload-a11y">Accessibility</h3>
+      <Heading id="pixel-file-upload-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button-like dropzone</code></li>
         <li><code>aria-describedby for accepted formats</code></li>
       </ul>
       <p className="docs-aria-notes">Dropzone exposes role=&quot;button&quot; with tabIndex 0 (or -1 when disabled) and, while a hint or error shows, aria-describedby pointing at it. The hidden &lt;input type=&quot;file&quot;&gt; is aria-hidden while the dropzone is active. Without the dropzone the input is the one control and tab stop: the browse button is a second &lt;label&gt; of it, so the input is named by both labels, carries the aria-describedby, and the button shows its keyboard focus.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -183,7 +191,7 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-file-upload-usage">
-      <h3 id="pixel-file-upload-usage">Usage</h3>
+      <Heading id="pixel-file-upload-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelFileUpload usage'}
@@ -246,9 +254,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -311,7 +319,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-button-mode">
-        <h4>Button mode</h4>
+        <Subheading>Button mode</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Button mode code'}
@@ -352,7 +360,7 @@ export class ButtonMode {
         />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With error</h4>
+        <Subheading>With error</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With error code'}
@@ -386,11 +394,11 @@ export class WithError {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-textarea">PixelTextarea</a></li>
-        <li><a href="#pixel-form">PixelForm</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-textarea' : '#pixel-textarea'}>PixelTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-form' : '#pixel-form'}>PixelForm</a></li>
       </ul>
     </section>
     </section>

@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelEqualHeightGridDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelEqualHeightGridDocsMeta = {
@@ -99,10 +103,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightGridDocsSectionProps): React.ReactElement {
+export function PixelEqualHeightGridDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelEqualHeightGridDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-equal-height-grid-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-equal-height-grid-heading'>PixelEqualHeightGrid</h2>
+      <Title id='pixel-equal-height-grid-heading'>PixelEqualHeightGrid</Title>
       <p className="docs-lead">Grid wrapper that forces equal-height children via a 3-row subgrid (header / body / footer).</p>
       <ul className="docs-highlights">
         <li>Inherits PixelGrid props (cols, gap, surface, etc.) minus align, which rowAlign sets</li>
@@ -116,16 +124,16 @@ export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightG
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-equal-height-grid-api">
-      <h3 id="pixel-equal-height-grid-api">API</h3>
-      <FrameworkApi label={'PixelEqualHeightGrid API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-equal-height-grid-api">API</Heading>
+      <FrameworkApi label={'PixelEqualHeightGrid API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-equal-height-grid-a11y">
-      <h3 id="pixel-equal-height-grid-a11y">Accessibility</h3>
+      <Heading id="pixel-equal-height-grid-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <p className="docs-aria-notes">Inherits semantics from the underlying PixelGrid element (defaults to &lt;div&gt;). Use the <code>as</code> prop to render a more semantic container when appropriate.</p>
     </section>
     <section aria-labelledby="pixel-equal-height-grid-usage">
-      <h3 id="pixel-equal-height-grid-usage">Usage</h3>
+      <Heading id="pixel-equal-height-grid-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelEqualHeightGrid usage'}
@@ -196,9 +204,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -269,7 +277,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-row-align-top">
-        <h4>Row Align Top</h4>
+        <Subheading>Row Align Top</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Row Align Top code'}
@@ -340,7 +348,7 @@ export class RowAlignTop {
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
+        <Subheading>Pixel Surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pixel Surface code'}
@@ -409,9 +417,9 @@ export class PixelSurface {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-grid">PixelGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-grid' : '#pixel-grid'}>PixelGrid</a></li>
       </ul>
     </section>
     </section>

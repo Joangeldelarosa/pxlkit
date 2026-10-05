@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSectionHeaderDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSectionHeaderDocsMeta = {
@@ -93,10 +97,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderDocsSectionProps): React.ReactElement {
+export function PixelSectionHeaderDocsSection({ className, headingLevel = 2 }: PixelSectionHeaderDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-section-header-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-section-header-heading'>PixelSectionHeader</h2>
+      <Title id='pixel-section-header-heading'>PixelSectionHeader</Title>
       <p className="docs-lead">Section header with eyebrow, title, description, and actions — rhythm-aware and surface-aware.</p>
       <ul className="docs-highlights">
         <li>Configurable heading level (h1–h6) preserves document outline</li>
@@ -111,11 +119,11 @@ export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderD
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-section-header-api">
-      <h3 id="pixel-section-header-api">API</h3>
-      <FrameworkApi label={'PixelSectionHeader API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-section-header-api">API</Heading>
+      <FrameworkApi label={'PixelSectionHeader API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-section-header-a11y">
-      <h3 id="pixel-section-header-a11y">Accessibility</h3>
+      <Heading id="pixel-section-header-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>Heading hierarchy via as=h1..h6</code></li>
@@ -124,7 +132,7 @@ export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderD
       <p className="docs-aria-notes">Choose <code>as</code> to match the document outline of the page. The eyebrow is visually decorative but is preserved for screen readers via sr-only prefix on the heading.</p>
     </section>
     <section aria-labelledby="pixel-section-header-usage">
-      <h3 id="pixel-section-header-usage">Usage</h3>
+      <Heading id="pixel-section-header-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSectionHeader usage'}
@@ -167,9 +175,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -212,7 +220,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-centered">
-        <h4>Centered</h4>
+        <Subheading>Centered</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Centered code'}
@@ -258,7 +266,7 @@ export class Centered {}`}
         />
       </article>
       <article className="docs-example" id="example-with-actions">
-        <h4>With Actions</h4>
+        <Subheading>With Actions</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Actions code'}
@@ -320,7 +328,7 @@ export class WithActions {}`}
         />
       </article>
       <article className="docs-example" id="example-large-hero">
-        <h4>Large Hero</h4>
+        <Subheading>Large Hero</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Large Hero code'}

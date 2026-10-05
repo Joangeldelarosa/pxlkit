@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelColorInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelColorInputDocsMeta = {
@@ -105,10 +109,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSectionProps): React.ReactElement {
+export function PixelColorInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelColorInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-color-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-color-input-heading'>PixelColorInput</h2>
+      <Title id='pixel-color-input-heading'>PixelColorInput</Title>
       <p className="docs-lead">Color picker field with a hex text input, native color swatch, and a keyboard-navigable preset grid inside a popover.</p>
       <ul className="docs-highlights">
         <li>Outputs hex, rgb(), or hsl() depending on the format prop</li>
@@ -123,11 +131,11 @@ export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSec
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-color-input-api">
-      <h3 id="pixel-color-input-api">API</h3>
-      <FrameworkApi label={'PixelColorInput API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-color-input-api">API</Heading>
+      <FrameworkApi label={'PixelColorInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-color-input-a11y">
-      <h3 id="pixel-color-input-a11y">Accessibility</h3>
+      <Heading id="pixel-color-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>popover-dialog</code></li>
@@ -135,7 +143,7 @@ export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSec
         <li><code>labelled-field</code></li>
       </ul>
       <p className="docs-aria-notes">Trigger exposes aria-label; swatches are role=button with the color value as aria-label and aria-pressed reflecting selection.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -174,7 +182,7 @@ export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-color-input-usage">
-      <h3 id="pixel-color-input-usage">Usage</h3>
+      <Heading id="pixel-color-input-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelColorInput usage'}
@@ -214,9 +222,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -256,7 +264,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-rgb-format">
-        <h4>RGB format</h4>
+        <Subheading>RGB format</Subheading>
         <FrameworkCode
           variant="docs"
           label={'RGB format code'}
@@ -298,7 +306,7 @@ export class RgbFormat {
         />
       </article>
       <article className="docs-example" id="example-custom-presets">
-        <h4>Custom presets</h4>
+        <Subheading>Custom presets</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom presets code'}
@@ -341,7 +349,7 @@ export class CustomPresets {
         />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With error</h4>
+        <Subheading>With error</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With error code'}
@@ -375,11 +383,11 @@ export class WithError {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
-        <li><a href="#field-shell">FieldShell</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/field-shell' : '#field-shell'}>FieldShell</a></li>
       </ul>
     </section>
     </section>

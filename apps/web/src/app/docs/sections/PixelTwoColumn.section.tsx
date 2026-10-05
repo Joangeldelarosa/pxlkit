@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTwoColumnDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTwoColumnDocsMeta = {
@@ -92,10 +96,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSectionProps): React.ReactElement {
+export function PixelTwoColumnDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelTwoColumnDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-two-column-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-two-column-heading'>PixelTwoColumn</h2>
+      <Title id='pixel-two-column-heading'>PixelTwoColumn</Title>
       <p className="docs-lead">Two-column grid layout with preset ratios, responsive stacking, and surface-aware transitions.</p>
       <ul className="docs-highlights">
         <li>Preset ratios (50/50, 60/40, 40/60, 70/30, 30/70) with JIT-safe class maps</li>
@@ -110,11 +118,11 @@ export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSecti
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-two-column-api">
-      <h3 id="pixel-two-column-api">API</h3>
-      <FrameworkApi label={'PixelTwoColumn API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-two-column-api">API</Heading>
+      <FrameworkApi label={'PixelTwoColumn API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-two-column-a11y">
-      <h3 id="pixel-two-column-a11y">Accessibility</h3>
+      <Heading id="pixel-two-column-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>ratio-split-container</code></li>
@@ -122,7 +130,7 @@ export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSecti
       <p className="docs-aria-notes">Renders as &lt;div&gt; with semantic neutrality; relies on inner content for landmarks and headings.</p>
     </section>
     <section aria-labelledby="pixel-two-column-usage">
-      <h3 id="pixel-two-column-usage">Usage</h3>
+      <Heading id="pixel-two-column-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelTwoColumn usage'}
@@ -161,9 +169,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -202,7 +210,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-sixty-forty">
-        <h4>Sixty Forty</h4>
+        <Subheading>Sixty Forty</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sixty Forty code'}
@@ -243,7 +251,7 @@ export class SixtyForty {}`}
         />
       </article>
       <article className="docs-example" id="example-reversed">
-        <h4>Reversed</h4>
+        <Subheading>Reversed</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Reversed code'}
@@ -284,7 +292,7 @@ export class Reversed {}`}
         />
       </article>
       <article className="docs-example" id="example-stacked-below-lg">
-        <h4>Stacked Below Lg</h4>
+        <Subheading>Stacked Below Lg</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Stacked Below Lg code'}
@@ -325,7 +333,7 @@ export class StackedBelowLg {}`}
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
+        <Subheading>Pixel Surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pixel Surface code'}
@@ -367,11 +375,11 @@ export class PixelSurface {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-grid">PixelGrid</a></li>
-        <li><a href="#pixel-stack">PixelStack</a></li>
-        <li><a href="#pixel-equal-height-grid">PixelEqualHeightGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-grid' : '#pixel-grid'}>PixelGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stack' : '#pixel-stack'}>PixelStack</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-equal-height-grid' : '#pixel-equal-height-grid'}>PixelEqualHeightGrid</a></li>
       </ul>
     </section>
     </section>

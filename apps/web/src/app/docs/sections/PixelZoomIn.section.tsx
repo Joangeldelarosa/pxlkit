@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelZoomInDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelZoomInDocsMeta = {
@@ -96,10 +100,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelZoomInDocsSection({ className }: PixelZoomInDocsSectionProps): React.ReactElement {
+export function PixelZoomInDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelZoomInDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-zoom-in-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-zoom-in-heading'>PixelZoomIn</h2>
+      <Title id='pixel-zoom-in-heading'>PixelZoomIn</Title>
       <p className="docs-lead">Scales children from a starting scale factor to 1 with a fade-in animation.</p>
       <ul className="docs-highlights">
         <li>Configurable duration, delay, easing, and start scale</li>
@@ -113,11 +121,11 @@ export function PixelZoomInDocsSection({ className }: PixelZoomInDocsSectionProp
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-zoom-in-api">
-      <h3 id="pixel-zoom-in-api">API</h3>
-      <FrameworkApi label={'PixelZoomIn API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-zoom-in-api">API</Heading>
+      <FrameworkApi label={'PixelZoomIn API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-zoom-in-a11y">
-      <h3 id="pixel-zoom-in-a11y">Accessibility</h3>
+      <Heading id="pixel-zoom-in-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -125,7 +133,7 @@ export function PixelZoomInDocsSection({ className }: PixelZoomInDocsSectionProp
       <p className="docs-aria-notes">Animation is suppressed when the user requests reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-zoom-in-usage">
-      <h3 id="pixel-zoom-in-usage">Usage</h3>
+      <Heading id="pixel-zoom-in-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelZoomIn usage'}
@@ -164,9 +172,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -205,7 +213,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-custom-start-scale">
-        <h4>Custom Start Scale</h4>
+        <Subheading>Custom Start Scale</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom Start Scale code'}
@@ -244,7 +252,7 @@ export class CustomStartScale {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
-        <h4>Hover Trigger</h4>
+        <Subheading>Hover Trigger</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Hover Trigger code'}
@@ -284,10 +292,10 @@ export class HoverTrigger {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-fade-in">PixelFadeIn</a></li>
-        <li><a href="#pixel-slide-in">PixelSlideIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-fade-in' : '#pixel-fade-in'}>PixelFadeIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-slide-in' : '#pixel-slide-in'}>PixelSlideIn</a></li>
       </ul>
     </section>
     </section>

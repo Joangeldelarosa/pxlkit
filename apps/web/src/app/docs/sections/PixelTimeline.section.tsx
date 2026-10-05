@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTimelineDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTimelineDocsMeta = {
@@ -123,10 +127,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelTimelineDocsSection({ className }: PixelTimelineDocsSectionProps): React.ReactElement {
+export function PixelTimelineDocsSection({ className, headingLevel = 2 }: PixelTimelineDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-timeline-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-timeline-heading'>PixelTimeline</h2>
+      <Title id='pixel-timeline-heading'>PixelTimeline</Title>
       <p className="docs-lead">Vertical timeline rendered as a semantic ordered list with past/active/upcoming states and surface-aware bullets and connectors.</p>
       <ul className="docs-highlights">
         <li>Semantic &lt;ol&gt;/&lt;li&gt; with aria-current=&quot;step&quot; on the active entry</li>
@@ -140,11 +148,11 @@ export function PixelTimelineDocsSection({ className }: PixelTimelineDocsSection
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-timeline-api">
-      <h3 id="pixel-timeline-api">API</h3>
-      <FrameworkApi label={'PixelTimeline API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-timeline-api">API</Heading>
+      <FrameworkApi label={'PixelTimeline API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-timeline-a11y">
-      <h3 id="pixel-timeline-a11y">Accessibility</h3>
+      <Heading id="pixel-timeline-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>semantic ol/li</code></li>
@@ -154,7 +162,7 @@ export function PixelTimelineDocsSection({ className }: PixelTimelineDocsSection
       <p className="docs-aria-notes">Decorative bullets and connector rails are aria-hidden; entry state is exposed via aria-current on the active &lt;li&gt;.</p>
     </section>
     <section aria-labelledby="pixel-timeline-usage">
-      <h3 id="pixel-timeline-usage">Usage</h3>
+      <Heading id="pixel-timeline-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelTimeline usage'}
@@ -203,9 +211,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -254,7 +262,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-dashed">
-        <h4>Dashed connectors</h4>
+        <Subheading>Dashed connectors</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Dashed connectors code'}
@@ -301,7 +309,7 @@ export class Dashed {}`}
         />
       </article>
       <article className="docs-example" id="example-right-aligned">
-        <h4>Right aligned</h4>
+        <Subheading>Right aligned</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Right aligned code'}

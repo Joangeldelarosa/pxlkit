@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBentoCellDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBentoCellDocsMeta = {
@@ -85,10 +89,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelBentoCellDocsSection({ className }: PixelBentoCellDocsSectionProps): React.ReactElement {
+export function PixelBentoCellDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBentoCellDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-bento-cell-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-bento-cell-heading'>PixelBentoCell</h2>
+      <Title id='pixel-bento-cell-heading'>PixelBentoCell</Title>
       <p className="docs-lead">Surface-aware bento grid cell with span, kind layout, and tone tokens for dashboard collages.</p>
       <ul className="docs-highlights">
         <li>Span tokens (1x1, 2x1, 1x2, 2x2, 3x1, 1x3) for collage layouts</li>
@@ -103,11 +111,11 @@ export function PixelBentoCellDocsSection({ className }: PixelBentoCellDocsSecti
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
     <section aria-labelledby="pixel-bento-cell-api">
-      <h3 id="pixel-bento-cell-api">API</h3>
-      <FrameworkApi label={'PixelBentoCell API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-bento-cell-api">API</Heading>
+      <FrameworkApi label={'PixelBentoCell API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bento-cell-a11y">
-      <h3 id="pixel-bento-cell-a11y">Accessibility</h3>
+      <Heading id="pixel-bento-cell-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>polymorphic-cell</code></li>
@@ -115,7 +123,7 @@ export function PixelBentoCellDocsSection({ className }: PixelBentoCellDocsSecti
       <p className="docs-aria-notes">Inherits semantics from the rendered element. Provide aria-label or wrap with semantic landmarks (section, article) when the cell carries standalone meaning.</p>
     </section>
     <section aria-labelledby="pixel-bento-cell-usage">
-      <h3 id="pixel-bento-cell-usage">Usage</h3>
+      <Heading id="pixel-bento-cell-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelBentoCell usage'}
@@ -182,9 +190,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -251,7 +259,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -321,7 +329,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-media-cell">
-        <h4>Media Cell</h4>
+        <Subheading>Media Cell</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Media Cell code'}
@@ -383,11 +391,11 @@ export class MediaCell {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-bento">PixelBento</a></li>
-        <li><a href="#pixel-box">PixelBox</a></li>
-        <li><a href="#pixel-grid">PixelGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bento' : '#pixel-bento'}>PixelBento</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-box' : '#pixel-box'}>PixelBox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-grid' : '#pixel-grid'}>PixelGrid</a></li>
       </ul>
     </section>
     </section>

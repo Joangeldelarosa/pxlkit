@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTableDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTableDocsMeta = {
@@ -115,10 +119,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelTableDocsSection({ className }: PixelTableDocsSectionProps): React.ReactElement {
+export function PixelTableDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelTableDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-table-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-table-heading'>PixelTable</h2>
+      <Title id='pixel-table-heading'>PixelTable</Title>
       <p className="docs-lead">Generic data table with striped rows, hover highlight, controlled sorting, single/multi row selection, sticky headers, density, loading skeletons and empty state.</p>
       <ul className="docs-highlights">
         <li>Controlled sort with header buttons + aria-sort semantics</li>
@@ -133,17 +141,17 @@ export function PixelTableDocsSection({ className }: PixelTableDocsSectionProps)
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-table-api">
-      <h3 id="pixel-table-api">API</h3>
-      <FrameworkApi label={'PixelTable API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-table-api">API</Heading>
+      <FrameworkApi label={'PixelTable API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-table-a11y">
-      <h3 id="pixel-table-a11y">Accessibility</h3>
+      <Heading id="pixel-table-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>table</code></li>
       </ul>
       <p className="docs-aria-notes">Uses native &lt;table&gt;, &lt;thead&gt;, &lt;tbody&gt;, &lt;th scope=&quot;col&quot;&gt; and aria-sort on sortable columns. Loading state exposes role=&quot;status&quot; with aria-live=&quot;polite&quot;. The multi-select header checkbox reflects indeterminate state when only some rows are selected.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -172,7 +180,7 @@ export function PixelTableDocsSection({ className }: PixelTableDocsSectionProps)
       </table>
     </section>
     <section aria-labelledby="pixel-table-usage">
-      <h3 id="pixel-table-usage">Usage</h3>
+      <Heading id="pixel-table-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelTable usage'}
@@ -252,9 +260,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -334,7 +342,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-striped">
-        <h4>Striped</h4>
+        <Subheading>Striped</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Striped code'}
@@ -414,7 +422,7 @@ export class Striped {
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel surface</h4>
+        <Subheading>Pixel surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pixel surface code'}
@@ -494,7 +502,7 @@ export class PixelSurface {
         />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear surface</h4>
+        <Subheading>Linear surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Linear surface code'}
@@ -574,7 +582,7 @@ export class LinearSurface {
         />
       </article>
       <article className="docs-example" id="example-sortable">
-        <h4>Sortable columns</h4>
+        <Subheading>Sortable columns</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sortable columns code'}
@@ -664,7 +672,7 @@ export class Sortable {
         />
       </article>
       <article className="docs-example" id="example-single-selection">
-        <h4>Single selection</h4>
+        <Subheading>Single selection</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Single selection code'}
@@ -758,7 +766,7 @@ export class SingleSelection {
         />
       </article>
       <article className="docs-example" id="example-multi-selection">
-        <h4>Multi selection</h4>
+        <Subheading>Multi selection</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Multi selection code'}
@@ -852,7 +860,7 @@ export class MultiSelection {
         />
       </article>
       <article className="docs-example" id="example-compact-density">
-        <h4>Compact density</h4>
+        <Subheading>Compact density</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Compact density code'}
@@ -932,7 +940,7 @@ export class CompactDensity {
         />
       </article>
       <article className="docs-example" id="example-comfortable-density">
-        <h4>Comfortable density</h4>
+        <Subheading>Comfortable density</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Comfortable density code'}
@@ -1012,7 +1020,7 @@ export class ComfortableDensity {
         />
       </article>
       <article className="docs-example" id="example-loading">
-        <h4>Loading</h4>
+        <Subheading>Loading</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Loading code'}
@@ -1073,7 +1081,7 @@ export class Loading {
         />
       </article>
       <article className="docs-example" id="example-empty">
-        <h4>Empty state</h4>
+        <Subheading>Empty state</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Empty state code'}
@@ -1145,7 +1153,7 @@ export class Empty {
         />
       </article>
       <article className="docs-example" id="example-sticky-header">
-        <h4>Sticky header</h4>
+        <Subheading>Sticky header</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sticky header code'}
@@ -1225,7 +1233,7 @@ export class StickyHeader {
         />
       </article>
       <article className="docs-example" id="example-custom-render">
-        <h4>Custom cell render</h4>
+        <Subheading>Custom cell render</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom cell render code'}
@@ -1316,7 +1324,7 @@ export class CustomRender {
         />
       </article>
       <article className="docs-example" id="example-clickable-rows">
-        <h4>Clickable rows</h4>
+        <Subheading>Clickable rows</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Clickable rows code'}
@@ -1420,11 +1428,11 @@ export class ClickableRows {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-data-table">PixelDataTable</a></li>
-        <li><a href="#pixel-pagination">PixelPagination</a></li>
-        <li><a href="#pixel-empty-state">PixelEmptyState</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-data-table' : '#pixel-data-table'}>PixelDataTable</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pagination' : '#pixel-pagination'}>PixelPagination</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-empty-state' : '#pixel-empty-state'}>PixelEmptyState</a></li>
       </ul>
     </section>
     </section>

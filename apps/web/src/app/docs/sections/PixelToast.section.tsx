@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToastDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelToastDocsMeta = {
@@ -73,10 +77,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelToastDocsSection({ className }: PixelToastDocsSectionProps): React.ReactElement {
+export function PixelToastDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelToastDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-toast-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-toast-heading'>PixelToast</h2>
+      <Title id='pixel-toast-heading'>PixelToast</Title>
       <p className="docs-lead">Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast() (injectToast() in Angular).</p>
       <ul className="docs-highlights">
         <li>Seven tones with matching border, text color, and HP-bar accent on pixel surface.</li>
@@ -91,14 +99,14 @@ export function PixelToastDocsSection({ className }: PixelToastDocsSectionProps)
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-toast-api">
-      <h3 id="pixel-toast-api">API</h3>
-      <FrameworkApi label={'PixelToast API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-toast-api">API</Heading>
+      <FrameworkApi label={'PixelToast API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-toast-a11y">
-      <h3 id="pixel-toast-a11y">Accessibility</h3>
+      <Heading id="pixel-toast-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <p className="docs-aria-notes">The card is not a live region: <code>PxlKitToastProvider</code> announces each toast — its title and message — in the two live regions of its viewport, assertively (<code>role=&quot;alert&quot;</code>) for critical tones like red/gold or <code>assertive</code> toasts, politely (<code>role=&quot;status&quot;</code>) for the rest. A card rendered on its own is not announced. Hovering or focusing the card holds its auto-dismiss countdown, and so do a hidden page and a window in the background, to give everyone time to read it (WCAG 2.2.1). The dismiss button has <code>aria-label=&quot;Dismiss notification&quot;</code> and a visible focus ring.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -127,7 +135,7 @@ export function PixelToastDocsSection({ className }: PixelToastDocsSectionProps)
       </table>
     </section>
     <section aria-labelledby="pixel-toast-usage">
-      <h3 id="pixel-toast-usage">Usage</h3>
+      <Heading id="pixel-toast-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelToast usage'}
@@ -182,9 +190,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -239,7 +247,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -337,7 +345,7 @@ export class Tones {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -409,7 +417,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-loading">
-        <h4>Loading</h4>
+        <Subheading>Loading</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Loading code'}
@@ -477,7 +485,7 @@ export class Loading {
         />
       </article>
       <article className="docs-example" id="example-with-action">
-        <h4>With Action</h4>
+        <Subheading>With Action</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Action code'}
@@ -553,7 +561,7 @@ export class WithAction {}`}
         />
       </article>
       <article className="docs-example" id="example-with-icon">
-        <h4>With Icon</h4>
+        <Subheading>With Icon</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Icon code'}
@@ -640,7 +648,7 @@ export class WithIcon {}`}
         />
       </article>
       <article className="docs-example" id="example-assertive">
-        <h4>Assertive</h4>
+        <Subheading>Assertive</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Assertive code'}
@@ -708,7 +716,7 @@ export class Assertive {
         />
       </article>
       <article className="docs-example" id="example-with-progress">
-        <h4>Auto-dismiss Progress</h4>
+        <Subheading>Auto-dismiss Progress</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Auto-dismiss Progress code'}
@@ -775,11 +783,11 @@ export class WithProgress {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pxl-kit-toast-provider">PxlKitToastProvider</a></li>
-        <li><a href="#pixel-alert">PixelAlert</a></li>
-        <li><a href="#pixel-alert-dialog">PixelAlertDialog</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pxl-kit-toast-provider' : '#pxl-kit-toast-provider'}>PxlKitToastProvider</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert' : '#pixel-alert'}>PixelAlert</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert-dialog' : '#pixel-alert-dialog'}>PixelAlertDialog</a></li>
       </ul>
     </section>
     </section>

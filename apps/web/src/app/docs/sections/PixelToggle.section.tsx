@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToggleDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelToggleDocsMeta = {
@@ -88,10 +92,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProps): React.ReactElement {
+export function PixelToggleDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelToggleDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-toggle-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-toggle-heading'>PixelToggle</h2>
+      <Title id='pixel-toggle-heading'>PixelToggle</Title>
       <p className="docs-lead">Two-state toggle button with aria-pressed semantics. Works standalone or as a child of PixelToggleGroup for single/multi-select toolbars.</p>
       <ul className="docs-highlights">
         <li>Standalone — <code>pressed</code> + <code>onPressedChange</code> (React), <code>v-model:pressed</code> (Vue), <code>[(pressed)]</code> (Angular) — or composed inside PixelToggleGroup</li>
@@ -106,17 +114,17 @@ export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProp
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-toggle-api">
-      <h3 id="pixel-toggle-api">API</h3>
-      <FrameworkApi label={'PixelToggle API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-toggle-api">API</Heading>
+      <FrameworkApi label={'PixelToggle API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-toggle-a11y">
-      <h3 id="pixel-toggle-a11y">Accessibility</h3>
+      <Heading id="pixel-toggle-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">Standalone toggle exposes aria-pressed reflecting the boolean state. When wrapped by a single-select PixelToggleGroup the role is overridden to &quot;radio&quot; with aria-checked so screen readers announce &quot;one of N&quot; semantics. Data attributes data-state and data-pxl-toggle-value support styling and testing hooks.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -155,7 +163,7 @@ export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProp
       </table>
     </section>
     <section aria-labelledby="pixel-toggle-usage">
-      <h3 id="pixel-toggle-usage">Usage</h3>
+      <Heading id="pixel-toggle-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelToggle usage'}
@@ -193,9 +201,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -233,7 +241,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-pressed">
-        <h4>Pressed</h4>
+        <Subheading>Pressed</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pressed code'}
@@ -271,7 +279,7 @@ export class Pressed {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -335,7 +343,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -380,11 +388,11 @@ export class Disabled {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-toggle-group">PixelToggleGroup</a></li>
-        <li><a href="#pixel-switch">PixelSwitch</a></li>
-        <li><a href="#pixel-checkbox">PixelCheckbox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toggle-group' : '#pixel-toggle-group'}>PixelToggleGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-switch' : '#pixel-switch'}>PixelSwitch</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-checkbox' : '#pixel-checkbox'}>PixelCheckbox</a></li>
       </ul>
     </section>
     </section>

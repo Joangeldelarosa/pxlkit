@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDateRangePickerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelDateRangePickerDocsMeta = {
@@ -119,10 +123,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePickerDocsSectionProps): React.ReactElement {
+export function PixelDateRangePickerDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelDateRangePickerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-date-range-picker-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-date-range-picker-heading'>PixelDateRangePicker</h2>
+      <Title id='pixel-date-range-picker-heading'>PixelDateRangePicker</Title>
       <p className="docs-lead">Accessible date range picker with one or two-month grid, hover preview, presets, and min/max constraints.</p>
       <ul className="docs-highlights">
         <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
@@ -137,11 +145,11 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-date-range-picker-api">
-      <h3 id="pixel-date-range-picker-api">API</h3>
-      <FrameworkApi label={'PixelDateRangePicker API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-date-range-picker-api">API</Heading>
+      <FrameworkApi label={'PixelDateRangePicker API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-date-range-picker-a11y">
-      <h3 id="pixel-date-range-picker-a11y">Accessibility</h3>
+      <Heading id="pixel-date-range-picker-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>two-month grid (role=grid)</code></li>
@@ -151,7 +159,7 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
         <li><code>clear button beside the trigger</code></li>
       </ul>
       <p className="docs-aria-notes">Opening moves focus to the range start, else today; Escape, a preset and picking the end return it to the trigger. The popover is a dialog named &quot;Choose date range&quot;. Each calendar panel uses role=grid with a labelled aria-live month header; day cells expose aria-selected for range edges, aria-current=&quot;date&quot; for today and aria-disabled for out-of-bound days, and one day of the two months is in the tab order. Presets render as native buttons reachable via Tab. With clearable and a range set, a native &quot;Clear range&quot; button lies over the end of the trigger, beside it rather than inside (a button cannot contain a button): it is the next tab stop, clears the range, closes an open popover and moves focus to the trigger.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -235,7 +243,7 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
       </table>
     </section>
     <section aria-labelledby="pixel-date-range-picker-usage">
-      <h3 id="pixel-date-range-picker-usage">Usage</h3>
+      <Heading id="pixel-date-range-picker-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelDateRangePicker usage'}
@@ -276,9 +284,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <p>The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today&#39;s mark can differ from the browser&#39;s.</p>
         <FrameworkCode
           variant="docs"
@@ -320,7 +328,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-with-presets">
-        <h4>With Presets</h4>
+        <Subheading>With Presets</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Presets code'}
@@ -397,7 +405,7 @@ export class WithPresets {
         />
       </article>
       <article className="docs-example" id="example-single-month">
-        <h4>Single Month</h4>
+        <Subheading>Single Month</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Single Month code'}
@@ -455,11 +463,11 @@ export class SingleMonth {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-date-picker">PixelDatePicker</a></li>
-        <li><a href="#pixel-calendar-grid">PixelCalendarGrid</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-date-picker' : '#pixel-date-picker'}>PixelDatePicker</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-calendar-grid' : '#pixel-calendar-grid'}>PixelCalendarGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
       </ul>
     </section>
     </section>

@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSwitchDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSwitchDocsMeta = {
@@ -100,10 +104,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSwitchDocsSection({ className }: PixelSwitchDocsSectionProps): React.ReactElement {
+export function PixelSwitchDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSwitchDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-switch-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-switch-heading'>PixelSwitch</h2>
+      <Title id='pixel-switch-heading'>PixelSwitch</Title>
       <p className="docs-lead">Two-state toggle switch with a sliding pixel thumb — flips a boolean setting on or off.</p>
       <ul className="docs-highlights">
         <li>Controlled — <code>checked</code> + <code>onChange</code> (React), <code>v-model:checked</code> (Vue), <code>[(checked)]</code> or forms (Angular) — or uncontrolled with <code>defaultChecked</code>.</li>
@@ -118,17 +126,17 @@ export function PixelSwitchDocsSection({ className }: PixelSwitchDocsSectionProp
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-switch-api">
-      <h3 id="pixel-switch-api">API</h3>
-      <FrameworkApi label={'PixelSwitch API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-switch-api">API</Heading>
+      <FrameworkApi label={'PixelSwitch API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-switch-a11y">
-      <h3 id="pixel-switch-a11y">Accessibility</h3>
+      <Heading id="pixel-switch-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>switch</code></li>
       </ul>
       <p className="docs-aria-notes">Uses <code>role=&quot;switch&quot;</code> with <code>aria-checked</code> reflecting the boolean state. When <code>disabled</code>, the control is both visually dimmed and functionally inert (<code>disabled</code> + <code>aria-disabled</code>). The hidden mirror input only renders while <code>checked</code> is true so unchecked switches submit as absent (standard HTML form semantics).</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -157,7 +165,7 @@ export function PixelSwitchDocsSection({ className }: PixelSwitchDocsSectionProp
       </table>
     </section>
     <section aria-labelledby="pixel-switch-usage">
-      <h3 id="pixel-switch-usage">Usage</h3>
+      <Heading id="pixel-switch-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSwitch usage'}
@@ -191,9 +199,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -227,7 +235,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-checked">
-        <h4>Checked</h4>
+        <Subheading>Checked</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Checked code'}
@@ -261,7 +269,7 @@ export class Checked {
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -323,7 +331,7 @@ export class Tones {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -373,7 +381,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -413,7 +421,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-with-form-name">
-        <h4>With Form Name</h4>
+        <Subheading>With Form Name</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Form Name code'}
@@ -459,10 +467,10 @@ export class WithFormName {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-checkbox">PixelCheckbox</a></li>
-        <li><a href="#pixel-toggle">PixelToggle</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-checkbox' : '#pixel-checkbox'}>PixelCheckbox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toggle' : '#pixel-toggle'}>PixelToggle</a></li>
       </ul>
     </section>
     </section>

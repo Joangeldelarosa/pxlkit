@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSidebarDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSidebarDocsMeta = {
@@ -91,10 +95,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionProps): React.ReactElement {
+export function PixelSidebarDocsSection({ className, headingLevel = 2 }: PixelSidebarDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-sidebar-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-sidebar-heading'>PixelSidebar</h2>
+      <Title id='pixel-sidebar-heading'>PixelSidebar</Title>
       <p className="docs-lead">Vertical navigation rail with sections, nested items, badges, and an optional collapsible width.</p>
       <ul className="docs-highlights">
         <li>Sections with optional titles and nested items up to two levels deep</li>
@@ -108,11 +116,11 @@ export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionPr
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-sidebar-api">
-      <h3 id="pixel-sidebar-api">API</h3>
-      <FrameworkApi label={'PixelSidebar API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-sidebar-api">API</Heading>
+      <FrameworkApi label={'PixelSidebar API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-sidebar-a11y">
-      <h3 id="pixel-sidebar-a11y">Accessibility</h3>
+      <Heading id="pixel-sidebar-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>nav landmark</code></li>
@@ -121,7 +129,7 @@ export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionPr
         <li><code>badge aria-label</code></li>
       </ul>
       <p className="docs-aria-notes">Collapse toggle uses aria-expanded; collapsed items expose their label via aria-label and title.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -145,7 +153,7 @@ export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionPr
       </table>
     </section>
     <section aria-labelledby="pixel-sidebar-usage">
-      <h3 id="pixel-sidebar-usage">Usage</h3>
+      <Heading id="pixel-sidebar-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSidebar usage'}
@@ -241,9 +249,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -339,7 +347,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-collapsible">
-        <h4>Collapsible</h4>
+        <Subheading>Collapsible</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Collapsible code'}
@@ -447,7 +455,7 @@ export class Collapsible {
         />
       </article>
       <article className="docs-example" id="example-nested">
-        <h4>Nested items</h4>
+        <Subheading>Nested items</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Nested items code'}
@@ -540,7 +548,7 @@ export class Nested {
         />
       </article>
       <article className="docs-example" id="example-with-footer">
-        <h4>With footer</h4>
+        <Subheading>With footer</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With footer code'}

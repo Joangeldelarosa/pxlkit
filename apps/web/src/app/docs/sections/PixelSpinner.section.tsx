@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSpinnerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSpinnerDocsMeta = {
@@ -76,10 +80,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionProps): React.ReactElement {
+export function PixelSpinnerDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSpinnerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-spinner-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-spinner-heading'>PixelSpinner</h2>
+      <Title id='pixel-spinner-heading'>PixelSpinner</Title>
       <p className="docs-lead">Compact loading indicator with surface-aware animation (stepped on pixel, smooth on linear) and tone-driven color.</p>
       <ul className="docs-highlights">
         <li>Four sizes (xs/sm/md/lg) and seven tones aligned with token palette</li>
@@ -94,11 +102,11 @@ export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionPr
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-spinner-api">
-      <h3 id="pixel-spinner-api">API</h3>
-      <FrameworkApi label={'PixelSpinner API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-spinner-api">API</Heading>
+      <FrameworkApi label={'PixelSpinner API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-spinner-a11y">
-      <h3 id="pixel-spinner-a11y">Accessibility</h3>
+      <Heading id="pixel-spinner-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>status</code></li>
@@ -106,7 +114,7 @@ export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionPr
       <p className="docs-aria-notes">Default renders role=status with aria-label=&quot;Loading&quot; and a visually-hidden label for SR. Pass <code>decorative</code> when the parent already announces busy state (e.g. button with aria-busy) to avoid double announcements. Honors prefers-reduced-motion.</p>
     </section>
     <section aria-labelledby="pixel-spinner-usage">
-      <h3 id="pixel-spinner-usage">Usage</h3>
+      <Heading id="pixel-spinner-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSpinner usage'}
@@ -133,9 +141,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -162,7 +170,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -208,7 +216,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -263,7 +271,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel surface</h4>
+        <Subheading>Pixel surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pixel surface code'}
@@ -290,7 +298,7 @@ export class PixelSurface {}`}
         />
       </article>
       <article className="docs-example" id="example-decorative">
-        <h4>Decorative (inside aria-busy parent)</h4>
+        <Subheading>Decorative (inside aria-busy parent)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Decorative (inside aria-busy parent) code'}
@@ -331,10 +339,10 @@ export class Decorative {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-alert">PixelAlert</a></li>
-        <li><a href="#pixel-toast">PixelToast</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert' : '#pixel-alert'}>PixelAlert</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toast' : '#pixel-toast'}>PixelToast</a></li>
       </ul>
     </section>
     </section>

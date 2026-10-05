@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitButtonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PxlKitButtonDocsMeta = {
@@ -83,10 +87,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionProps): React.ReactElement {
+export function PxlKitButtonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PxlKitButtonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pxl-kit-button-heading'} className={className} data-status='deprecated'>
-      <h2 id='pxl-kit-button-heading'>PxlKitButton</h2>
+      <Title id='pxl-kit-button-heading'>PxlKitButton</Title>
       <aside role="alert" className="docs-deprecation">
                 <strong>Deprecated.</strong>{' '}Renamed to PixelIconButton. The PxlKit* prefix is reserved for system primitives (providers); leaf components use the Pixel* prefix.{' '}Use <code>PixelIconButton</code> instead.{' '}Removed in v3.0.0.
       </aside>
@@ -103,17 +111,17 @@ export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionPr
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pxl-kit-button-api">
-      <h3 id="pxl-kit-button-api">API</h3>
-      <FrameworkApi label={'PxlKitButton API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pxl-kit-button-api">API</Heading>
+      <FrameworkApi label={'PxlKitButton API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-button-a11y">
-      <h3 id="pxl-kit-button-a11y">Accessibility</h3>
+      <Heading id="pxl-kit-button-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">The <code>label</code> prop is required and is wired to both aria-label and title so screen reader and tooltip discovery stay in sync for an icon-only control.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -137,7 +145,7 @@ export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionPr
       </table>
     </section>
     <section aria-labelledby="pxl-kit-button-usage">
-      <h3 id="pxl-kit-button-usage">Usage</h3>
+      <Heading id="pxl-kit-button-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PxlKitButton usage'}
@@ -183,9 +191,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -231,7 +239,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -307,7 +315,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -371,7 +379,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -434,7 +442,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -481,11 +489,11 @@ export class Disabled {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-icon-button">PixelIconButton</a></li>
-        <li><a href="#pixel-button">PixelButton</a></li>
-        <li><a href="#pixel-split-button">PixelSplitButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-icon-button' : '#pixel-icon-button'}>PixelIconButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-button' : '#pixel-button'}>PixelButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-split-button' : '#pixel-split-button'}>PixelSplitButton</a></li>
       </ul>
     </section>
     </section>

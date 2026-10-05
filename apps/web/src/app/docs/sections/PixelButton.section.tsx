@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelButtonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelButtonDocsMeta = {
@@ -93,10 +97,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProps): React.ReactElement {
+export function PixelButtonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelButtonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-button-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-button-heading'>PixelButton</h2>
+      <Title id='pixel-button-heading'>PixelButton</Title>
       <p className="docs-lead">Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and a link form for anchors and router links (<code>asChild</code> in React and Vue, <code>a[pxlButton]</code> in Angular).</p>
       <ul className="docs-highlights">
         <li>Four variants — solid, soft, outline, ghost — across seven tones</li>
@@ -111,17 +119,17 @@ export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProp
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-button-api">
-      <h3 id="pixel-button-api">API</h3>
-      <FrameworkApi label={'PixelButton API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-button-api">API</Heading>
+      <FrameworkApi label={'PixelButton API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-button-a11y">
-      <h3 id="pixel-button-a11y">Accessibility</h3>
+      <Heading id="pixel-button-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">Renders a native &lt;button&gt; by default so keyboard semantics come for free. When it styles an anchor (<code>asChild</code>, or <code>a[pxlButton]</code> in Angular), the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control; disabled buttons skip shadow/transform affordances.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -145,7 +153,7 @@ export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProp
       </table>
     </section>
     <section aria-labelledby="pixel-button-usage">
-      <h3 id="pixel-button-usage">Usage</h3>
+      <Heading id="pixel-button-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelButton usage'}
@@ -172,9 +180,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -201,7 +209,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -256,7 +264,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -299,7 +307,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-variants">
-        <h4>Variants</h4>
+        <Subheading>Variants</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Variants code'}
@@ -345,7 +353,7 @@ export class Variants {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -385,7 +393,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-with-icons">
-        <h4>With icons</h4>
+        <Subheading>With icons</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With icons code'}
@@ -443,7 +451,7 @@ export class WithIcons {}`}
         />
       </article>
       <article className="docs-example" id="example-loading">
-        <h4>Loading</h4>
+        <Subheading>Loading</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Loading code'}
@@ -483,7 +491,7 @@ export class Loading {}`}
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -523,7 +531,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-full-width">
-        <h4>Full width</h4>
+        <Subheading>Full width</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Full width code'}
@@ -560,7 +568,7 @@ export class FullWidth {}`}
         />
       </article>
       <article className="docs-example" id="example-as-child">
-        <h4>As child (link)</h4>
+        <Subheading>As child (link)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'As child (link) code'}
@@ -598,12 +606,12 @@ export class AsChild {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-icon-button">PixelIconButton</a></li>
-        <li><a href="#pxl-kit-button">PxlKitButton</a></li>
-        <li><a href="#pixel-split-button">PixelSplitButton</a></li>
-        <li><a href="#pixel-bare-button">PixelBareButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-icon-button' : '#pixel-icon-button'}>PixelIconButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pxl-kit-button' : '#pxl-kit-button'}>PxlKitButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-split-button' : '#pixel-split-button'}>PixelSplitButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-button' : '#pixel-bare-button'}>PixelBareButton</a></li>
       </ul>
     </section>
     </section>

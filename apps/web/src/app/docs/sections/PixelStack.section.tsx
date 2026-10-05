@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStackDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelStackDocsMeta = {
@@ -87,10 +91,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps): React.ReactElement {
+export function PixelStackDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelStackDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-stack-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-stack-heading'>PixelStack</h2>
+      <Title id='pixel-stack-heading'>PixelStack</Title>
       <p className="docs-lead">Polymorphic flex container with token-driven gap, direction, alignment, and surface-aware transitions.</p>
       <ul className="docs-highlights">
         <li>Direction toggle between column and row flex layouts</li>
@@ -105,11 +113,11 @@ export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps)
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-stack-api">
-      <h3 id="pixel-stack-api">API</h3>
-      <FrameworkApi label={'PixelStack API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-stack-api">API</Heading>
+      <FrameworkApi label={'PixelStack API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stack-a11y">
-      <h3 id="pixel-stack-a11y">Accessibility</h3>
+      <Heading id="pixel-stack-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>polymorphic-flex-container</code></li>
@@ -117,7 +125,7 @@ export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps)
       <p className="docs-aria-notes">Renders as &lt;div&gt; by default; inherits semantics from the <code>as</code> prop when overridden.</p>
     </section>
     <section aria-labelledby="pixel-stack-usage">
-      <h3 id="pixel-stack-usage">Usage</h3>
+      <Heading id="pixel-stack-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelStack usage'}
@@ -160,9 +168,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -205,7 +213,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-row">
-        <h4>Row</h4>
+        <Subheading>Row</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Row code'}
@@ -248,7 +256,7 @@ export class Row {}`}
         />
       </article>
       <article className="docs-example" id="example-space-between">
-        <h4>Space Between</h4>
+        <Subheading>Space Between</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Space Between code'}
@@ -288,7 +296,7 @@ export class SpaceBetween {}`}
         />
       </article>
       <article className="docs-example" id="example-wrapped">
-        <h4>Wrapped</h4>
+        <Subheading>Wrapped</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Wrapped code'}
@@ -334,7 +342,7 @@ export class Wrapped {}`}
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
+        <Subheading>Pixel Surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pixel Surface code'}
@@ -375,11 +383,11 @@ export class PixelSurface {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-cluster">PixelCluster</a></li>
-        <li><a href="#pixel-grid">PixelGrid</a></li>
-        <li><a href="#pixel-center">PixelCenter</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-cluster' : '#pixel-cluster'}>PixelCluster</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-grid' : '#pixel-grid'}>PixelGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-center' : '#pixel-center'}>PixelCenter</a></li>
       </ul>
     </section>
     </section>

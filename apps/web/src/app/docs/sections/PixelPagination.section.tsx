@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPaginationDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelPaginationDocsMeta = {
@@ -88,10 +92,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSectionProps): React.ReactElement {
+export function PixelPaginationDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelPaginationDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-pagination-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-pagination-heading'>PixelPagination</h2>
+      <Title id='pixel-pagination-heading'>PixelPagination</Title>
       <p className="docs-lead">Windowed page-number navigator with Prev/Next, ellipses, and first/last anchors for navigating long paginated collections.</p>
       <ul className="docs-highlights">
         <li>Windowed page list with ellipses to handle large totals without overflow.</li>
@@ -106,17 +114,17 @@ export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSec
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-pagination-api">
-      <h3 id="pixel-pagination-api">API</h3>
-      <FrameworkApi label={'PixelPagination API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-pagination-api">API</Heading>
+      <FrameworkApi label={'PixelPagination API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-pagination-a11y">
-      <h3 id="pixel-pagination-a11y">Accessibility</h3>
+      <Heading id="pixel-pagination-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>navigation</code></li>
       </ul>
       <p className="docs-aria-notes">Rendered as a &lt;nav&gt; landmark with a configurable aria-label. The current page button carries aria-current=&quot;page&quot;; ellipses are aria-hidden so screen readers skip decorative gaps. Prev/Next buttons disable at the edges instead of being removed, preserving layout and predictable tab order.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -145,7 +153,7 @@ export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-pagination-usage">
-      <h3 id="pixel-pagination-usage">Usage</h3>
+      <Heading id="pixel-pagination-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelPagination usage'}
@@ -179,9 +187,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -215,7 +223,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-many-pages">
-        <h4>Many Pages</h4>
+        <Subheading>Many Pages</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Many Pages code'}
@@ -249,7 +257,7 @@ export class ManyPages {
         />
       </article>
       <article className="docs-example" id="example-mid-window">
-        <h4>Mid Window</h4>
+        <Subheading>Mid Window</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Mid Window code'}
@@ -283,7 +291,7 @@ export class MidWindow {
         />
       </article>
       <article className="docs-example" id="example-more-siblings">
-        <h4>More Siblings</h4>
+        <Subheading>More Siblings</Subheading>
         <FrameworkCode
           variant="docs"
           label={'More Siblings code'}
@@ -317,7 +325,7 @@ export class MoreSiblings {
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
+        <Subheading>Pixel Surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pixel Surface code'}
@@ -351,7 +359,7 @@ export class PixelSurface {
         />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear Surface</h4>
+        <Subheading>Linear Surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Linear Surface code'}
@@ -385,7 +393,7 @@ export class LinearSurface {
         />
       </article>
       <article className="docs-example" id="example-localised-labels">
-        <h4>Localised Labels</h4>
+        <Subheading>Localised Labels</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Localised Labels code'}
@@ -442,7 +450,7 @@ export class LocalisedLabels {
         />
       </article>
       <article className="docs-example" id="example-first-page">
-        <h4>First Page</h4>
+        <Subheading>First Page</Subheading>
         <FrameworkCode
           variant="docs"
           label={'First Page code'}
@@ -469,7 +477,7 @@ export class FirstPage {}`}
         />
       </article>
       <article className="docs-example" id="example-last-page">
-        <h4>Last Page</h4>
+        <Subheading>Last Page</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Last Page code'}
@@ -496,7 +504,7 @@ export class LastPage {}`}
         />
       </article>
       <article className="docs-example" id="example-single-page">
-        <h4>Single Page</h4>
+        <Subheading>Single Page</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Single Page code'}
@@ -524,11 +532,11 @@ export class SinglePage {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-breadcrumb">PixelBreadcrumb</a></li>
-        <li><a href="#pixel-table">PixelTable</a></li>
-        <li><a href="#pixel-data-table">PixelDataTable</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-breadcrumb' : '#pixel-breadcrumb'}>PixelBreadcrumb</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-table' : '#pixel-table'}>PixelTable</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-data-table' : '#pixel-data-table'}>PixelDataTable</a></li>
       </ul>
     </section>
     </section>

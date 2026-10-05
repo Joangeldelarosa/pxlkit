@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPricingCardDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelPricingCardDocsMeta = {
@@ -105,10 +109,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsSectionProps): React.ReactElement {
+export function PixelPricingCardDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelPricingCardDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-pricing-card-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-pricing-card-heading'>PixelPricingCard</h2>
+      <Title id='pixel-pricing-card-heading'>PixelPricingCard</Title>
       <p className="docs-lead">Pricing tier card with tone-driven highlight, optional popular ribbon, feature list, and CTA slot.</p>
       <ul className="docs-highlights">
         <li>Surface-aware borders, fonts, and radii (pixel / linear)</li>
@@ -123,11 +131,11 @@ export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsS
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
     <section aria-labelledby="pixel-pricing-card-api">
-      <h3 id="pixel-pricing-card-api">API</h3>
-      <FrameworkApi label={'PixelPricingCard API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-pricing-card-api">API</Heading>
+      <FrameworkApi label={'PixelPricingCard API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-pricing-card-a11y">
-      <h3 id="pixel-pricing-card-a11y">Accessibility</h3>
+      <Heading id="pixel-pricing-card-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>semantic article</code></li>
@@ -135,7 +143,7 @@ export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsS
       <p className="docs-aria-notes">Renders as &lt;article&gt;. Strikethrough price and excluded features are announced via sr-only labels. CTA inherits its own a11y from the consumer-provided node.</p>
     </section>
     <section aria-labelledby="pixel-pricing-card-usage">
-      <h3 id="pixel-pricing-card-usage">Usage</h3>
+      <Heading id="pixel-pricing-card-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelPricingCard usage'}
@@ -199,9 +207,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -265,7 +273,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-with-price-badge">
-        <h4>With price badge</h4>
+        <Subheading>With price badge</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With price badge code'}
@@ -326,7 +334,7 @@ export class WithPriceBadge {}`}
         />
       </article>
       <article className="docs-example" id="example-popular">
-        <h4>Popular (highlighted)</h4>
+        <Subheading>Popular (highlighted)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Popular (highlighted) code'}
@@ -386,10 +394,10 @@ export class Popular {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-card">PixelCard</a></li>
-        <li><a href="#pixel-feature-card">PixelFeatureCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-card' : '#pixel-card'}>PixelCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-feature-card' : '#pixel-feature-card'}>PixelFeatureCard</a></li>
       </ul>
     </section>
     </section>

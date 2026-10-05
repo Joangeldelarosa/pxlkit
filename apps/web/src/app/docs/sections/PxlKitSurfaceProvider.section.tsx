@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitSurfaceProviderDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PxlKitSurfaceProviderDocsMeta = {
@@ -64,10 +68,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfaceProviderDocsSectionProps): React.ReactElement {
+export function PxlKitSurfaceProviderDocsSection({ className, headingLevel = 2 }: PxlKitSurfaceProviderDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pxl-kit-surface-provider-heading'} className={className} data-status='stable'>
-      <h2 id='pxl-kit-surface-provider-heading'>PxlKitSurfaceProvider</h2>
+      <Title id='pxl-kit-surface-provider-heading'>PxlKitSurfaceProvider</Title>
       <p className="docs-lead">Sets the default surface (pixel | linear) for every nested PxlKit component — React context, Vue provide/inject or Angular dependency injection.</p>
       <ul className="docs-highlights">
         <li>Switches the entire subtree between the pixel and linear aesthetics in one line</li>
@@ -81,11 +89,11 @@ export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfacePro
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pxl-kit-surface-provider-api">
-      <h3 id="pxl-kit-surface-provider-api">API</h3>
-      <FrameworkApi label={'PxlKitSurfaceProvider API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pxl-kit-surface-provider-api">API</Heading>
+      <FrameworkApi label={'PxlKitSurfaceProvider API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-surface-provider-a11y">
-      <h3 id="pxl-kit-surface-provider-a11y">Accessibility</h3>
+      <Heading id="pxl-kit-surface-provider-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>theme/surface context provider; respects color-scheme via theme tokens</code></li>
@@ -93,7 +101,7 @@ export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfacePro
       <p className="docs-aria-notes">Visual-only context provider — does not render interactive DOM and does not affect focus order or ARIA semantics of descendants.</p>
     </section>
     <section aria-labelledby="pxl-kit-surface-provider-usage">
-      <h3 id="pxl-kit-surface-provider-usage">Usage</h3>
+      <Heading id="pxl-kit-surface-provider-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PxlKitSurfaceProvider usage'}
@@ -139,9 +147,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default (Pixel)</h4>
+        <Subheading>Default (Pixel)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default (Pixel) code'}
@@ -187,7 +195,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-linear">
-        <h4>Linear</h4>
+        <Subheading>Linear</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Linear code'}
@@ -233,7 +241,7 @@ export class Linear {}`}
         />
       </article>
       <article className="docs-example" id="example-override">
-        <h4>Per-component override</h4>
+        <Subheading>Per-component override</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Per-component override code'}

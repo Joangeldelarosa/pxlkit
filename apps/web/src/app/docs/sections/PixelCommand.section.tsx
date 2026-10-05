@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCommandDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCommandDocsMeta = {
@@ -85,10 +89,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionProps): React.ReactElement {
+export function PixelCommandDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCommandDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-command-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-command-heading'>PixelCommand</h2>
+      <Title id='pixel-command-heading'>PixelCommand</Title>
       <p className="docs-lead">Command palette overlay with fuzzy search, grouped items, keyboard shortcut binding, focus trap, scroll lock and Escape-to-close.</p>
       <ul className="docs-highlights">
         <li>Configurable global shortcut (default mod+k) toggles the palette open from anywhere</li>
@@ -103,11 +111,11 @@ export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionPr
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-command-api">
-      <h3 id="pixel-command-api">API</h3>
-      <FrameworkApi label={'PixelCommand API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-command-api">API</Heading>
+      <FrameworkApi label={'PixelCommand API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-command-a11y">
-      <h3 id="pixel-command-a11y">Accessibility</h3>
+      <Heading id="pixel-command-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=&quot;dialog&quot; with aria-modal=&quot;true&quot; for the palette container</code></li>
@@ -117,7 +125,7 @@ export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionPr
         <li><code>Focus trap inside the panel and scroll lock on body while open</code></li>
       </ul>
       <p className="docs-aria-notes">Items without matching results render an emptyMessage region instead of the listbox; aria-expanded and aria-controls track whether the listbox is currently mounted.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -166,7 +174,7 @@ export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionPr
       </table>
     </section>
     <section aria-labelledby="pixel-command-usage">
-      <h3 id="pixel-command-usage">Usage</h3>
+      <Heading id="pixel-command-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelCommand usage'}
@@ -298,9 +306,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -432,7 +440,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-with-custom-shortcut">
-        <h4>Custom shortcut</h4>
+        <Subheading>Custom shortcut</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom shortcut code'}
@@ -520,7 +528,7 @@ export class WithCustomShortcut {
         />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear surface</h4>
+        <Subheading>Linear surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Linear surface code'}
@@ -609,11 +617,11 @@ export class LinearSurface {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-dropdown">PixelDropdown</a></li>
-        <li><a href="#pixel-modal">PixelModal</a></li>
-        <li><a href="#pixel-popover">PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dropdown' : '#pixel-dropdown'}>PixelDropdown</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-modal' : '#pixel-modal'}>PixelModal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
       </ul>
     </section>
     </section>

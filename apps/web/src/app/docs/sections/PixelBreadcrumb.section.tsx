@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBreadcrumbDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBreadcrumbDocsMeta = {
@@ -69,10 +73,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSectionProps): React.ReactElement {
+export function PixelBreadcrumbDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBreadcrumbDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-breadcrumb-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-breadcrumb-heading'>PixelBreadcrumb</h2>
+      <Title id='pixel-breadcrumb-heading'>PixelBreadcrumb</Title>
       <p className="docs-lead">Trail of links representing the user&#39;s location in a hierarchical site structure, with pixel-chevron or slash separators per surface.</p>
       <ul className="docs-highlights">
         <li>Renders &lt;nav&gt; + &lt;ol&gt;/&lt;li&gt; landmark with configurable aria-label.</li>
@@ -87,17 +95,17 @@ export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSec
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-breadcrumb-api">
-      <h3 id="pixel-breadcrumb-api">API</h3>
-      <FrameworkApi label={'PixelBreadcrumb API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-breadcrumb-api">API</Heading>
+      <FrameworkApi label={'PixelBreadcrumb API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-breadcrumb-a11y">
-      <h3 id="pixel-breadcrumb-a11y">Accessibility</h3>
+      <Heading id="pixel-breadcrumb-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>navigation</code></li>
       </ul>
       <p className="docs-aria-notes">Rendered as a &lt;nav&gt; landmark with a configurable aria-label (defaults to &quot;Breadcrumb&quot;). Crumbs live inside an ordered &lt;ol&gt;/&lt;li&gt; list reflecting the hierarchy. The active crumb carries aria-current=&quot;page&quot; and is rendered as a non-interactive &lt;span&gt; to convey the user&#39;s current location. Separators between crumbs use aria-hidden so screen readers skip the decorative chevron or slash.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -126,7 +134,7 @@ export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-breadcrumb-usage">
-      <h3 id="pixel-breadcrumb-usage">Usage</h3>
+      <Heading id="pixel-breadcrumb-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelBreadcrumb usage'}
@@ -176,9 +184,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -228,7 +236,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel surface</h4>
+        <Subheading>Pixel surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pixel surface code'}
@@ -278,7 +286,7 @@ export class PixelSurface {
         />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear surface</h4>
+        <Subheading>Linear surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Linear surface code'}
@@ -328,7 +336,7 @@ export class LinearSurface {
         />
       </article>
       <article className="docs-example" id="example-with-onclick">
-        <h4>With onClick</h4>
+        <Subheading>With onClick</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With onClick code'}
@@ -375,7 +383,7 @@ export class WithOnClick {
         />
       </article>
       <article className="docs-example" id="example-plain-labels">
-        <h4>Plain labels</h4>
+        <Subheading>Plain labels</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Plain labels code'}
@@ -414,7 +422,7 @@ export class PlainLabels {
         />
       </article>
       <article className="docs-example" id="example-single-crumb">
-        <h4>Single crumb</h4>
+        <Subheading>Single crumb</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Single crumb code'}
@@ -441,7 +449,7 @@ export class SingleCrumb {}`}
         />
       </article>
       <article className="docs-example" id="example-localised-label">
-        <h4>Localised label</h4>
+        <Subheading>Localised label</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Localised label code'}
@@ -491,7 +499,7 @@ export class LocalisedLabel {
         />
       </article>
       <article className="docs-example" id="example-deep-trail">
-        <h4>Deep trail</h4>
+        <Subheading>Deep trail</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Deep trail code'}
@@ -548,10 +556,10 @@ export class DeepTrail {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-pagination">PixelPagination</a></li>
-        <li><a href="#pixel-text-link">PixelTextLink</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pagination' : '#pixel-pagination'}>PixelPagination</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-text-link' : '#pixel-text-link'}>PixelTextLink</a></li>
       </ul>
     </section>
     </section>

@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPopoverDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelPopoverDocsMeta = {
@@ -163,10 +167,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionProps): React.ReactElement {
+export function PixelPopoverDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelPopoverDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-popover-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-popover-heading'>PixelPopover</h2>
+      <Title id='pixel-popover-heading'>PixelPopover</Title>
       <p className="docs-lead">Controlled floating panel anchored to a trigger, with focus return, dismiss-on-escape, and outside-click handling.</p>
       <ul className="docs-highlights">
         <li>Controlled open state for predictable behaviour: <code>open</code> + <code>onOpenChange</code> (React), <code>v-model:open</code> (Vue), <code>[(open)]</code> (Angular)</li>
@@ -181,17 +189,17 @@ export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionPr
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-popover-api">
-      <h3 id="pixel-popover-api">API</h3>
-      <FrameworkApi label={'PixelPopover API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-popover-api">API</Heading>
+      <FrameworkApi label={'PixelPopover API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-popover-a11y">
-      <h3 id="pixel-popover-a11y">Accessibility</h3>
+      <Heading id="pixel-popover-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>dialog</code></li>
       </ul>
       <p className="docs-aria-notes">Content renders with role=&quot;dialog&quot; by default; pair with aria-labelledby on Content. Set role=&quot;none&quot; when an inner widget owns semantics. While the content is open, the trigger points at it with aria-controls (Content keeps the id it is given, or gets a generated one); a trigger that sets its own aria-controls keeps it. When the content closes while it holds focus, focus returns to the trigger; after a press outside, focus follows the pointer instead.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -210,7 +218,7 @@ export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionPr
       </table>
     </section>
     <section aria-labelledby="pixel-popover-usage">
-      <h3 id="pixel-popover-usage">Usage</h3>
+      <Heading id="pixel-popover-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelPopover usage'}
@@ -272,9 +280,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -336,7 +344,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-with-arrow">
-        <h4>With arrow</h4>
+        <Subheading>With arrow</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With arrow code'}
@@ -401,7 +409,7 @@ export class WithArrow {
         />
       </article>
       <article className="docs-example" id="example-side-placement">
-        <h4>Side placement</h4>
+        <Subheading>Side placement</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Side placement code'}
@@ -469,7 +477,7 @@ export class SidePlacement {
         />
       </article>
       <article className="docs-example" id="example-interactive-content">
-        <h4>Interactive content</h4>
+        <Subheading>Interactive content</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Interactive content code'}
@@ -554,11 +562,11 @@ export class InteractiveContent {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-tooltip">PixelTooltip</a></li>
-        <li><a href="#pixel-dropdown">PixelDropdown</a></li>
-        <li><a href="#pixel-modal">PixelModal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tooltip' : '#pixel-tooltip'}>PixelTooltip</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dropdown' : '#pixel-dropdown'}>PixelDropdown</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-modal' : '#pixel-modal'}>PixelModal</a></li>
       </ul>
     </section>
     </section>

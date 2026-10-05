@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelMouseParallaxDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelMouseParallaxDocsMeta = {
@@ -75,10 +79,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxDocsSectionProps): React.ReactElement {
+export function PixelMouseParallaxDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelMouseParallaxDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-mouse-parallax-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-mouse-parallax-heading'>PixelMouseParallax</h2>
+      <Title id='pixel-mouse-parallax-heading'>PixelMouseParallax</Title>
       <p className="docs-lead">Cursor-tracking parallax layer that translates children based on mouse position with smooth lerp.</p>
       <ul className="docs-highlights">
         <li>Smoothed translate3d follow with configurable strength</li>
@@ -91,11 +99,11 @@ export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxD
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-mouse-parallax-api">
-      <h3 id="pixel-mouse-parallax-api">API</h3>
-      <FrameworkApi label={'PixelMouseParallax API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-mouse-parallax-api">API</Heading>
+      <FrameworkApi label={'PixelMouseParallax API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-mouse-parallax-a11y">
-      <h3 id="pixel-mouse-parallax-a11y">Accessibility</h3>
+      <Heading id="pixel-mouse-parallax-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>decorative-motion</code></li>
@@ -103,7 +111,7 @@ export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxD
       <p className="docs-aria-notes">Pointer-only effect with no keyboard or assistive impact. The layer holds still when the user prefers reduced motion (<code>prefers-reduced-motion: reduce</code>), and stops where it is if the preference turns on while it moves.</p>
     </section>
     <section aria-labelledby="pixel-mouse-parallax-usage">
-      <h3 id="pixel-mouse-parallax-usage">Usage</h3>
+      <Heading id="pixel-mouse-parallax-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelMouseParallax usage'}
@@ -156,9 +164,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -211,7 +219,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-inverted">
-        <h4>Inverted</h4>
+        <Subheading>Inverted</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Inverted code'}
@@ -265,11 +273,11 @@ export class Inverted {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-parallax-group">PixelParallaxGroup</a></li>
-        <li><a href="#pixel-parallax-layer">PixelParallaxLayer</a></li>
-        <li><a href="#pixel-scroll-parallax">PixelScrollParallax</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-parallax-group' : '#pixel-parallax-group'}>PixelParallaxGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-parallax-layer' : '#pixel-parallax-layer'}>PixelParallaxLayer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-scroll-parallax' : '#pixel-scroll-parallax'}>PixelScrollParallax</a></li>
       </ul>
     </section>
     </section>

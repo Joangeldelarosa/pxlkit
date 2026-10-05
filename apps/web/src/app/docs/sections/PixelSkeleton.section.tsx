@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSkeletonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSkeletonDocsMeta = {
@@ -76,10 +80,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSectionProps): React.ReactElement {
+export function PixelSkeletonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSkeletonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-skeleton-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-skeleton-heading'>PixelSkeleton</h2>
+      <Title id='pixel-skeleton-heading'>PixelSkeleton</Title>
       <p className="docs-lead">Animated loading placeholder that reserves layout space while async content resolves.</p>
       <ul className="docs-highlights">
         <li>Width/height props accept any CSS length so blocks can mirror the final content footprint.</li>
@@ -94,11 +102,11 @@ export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSection
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-skeleton-api">
-      <h3 id="pixel-skeleton-api">API</h3>
-      <FrameworkApi label={'PixelSkeleton API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-skeleton-api">API</Heading>
+      <FrameworkApi label={'PixelSkeleton API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-skeleton-a11y">
-      <h3 id="pixel-skeleton-a11y">Accessibility</h3>
+      <Heading id="pixel-skeleton-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>status</code></li>
@@ -106,7 +114,7 @@ export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSection
       <p className="docs-aria-notes">Renders with <code>role=&quot;status&quot;</code> and a polite implicit live region. Override <code>ariaLabel</code> when the placeholder represents a specific resource (e.g. &quot;Loading user profile&quot;) so assistive tech announces what is loading.</p>
     </section>
     <section aria-labelledby="pixel-skeleton-usage">
-      <h3 id="pixel-skeleton-usage">Usage</h3>
+      <Heading id="pixel-skeleton-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSkeleton usage'}
@@ -133,9 +141,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -162,7 +170,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-text-block">
-        <h4>Text Block</h4>
+        <Subheading>Text Block</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Text Block code'}
@@ -205,7 +213,7 @@ export class TextBlock {}`}
         />
       </article>
       <article className="docs-example" id="example-rounded">
-        <h4>Rounded</h4>
+        <Subheading>Rounded</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Rounded code'}
@@ -254,7 +262,7 @@ export class Rounded {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -294,7 +302,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-card-placeholder">
-        <h4>Card Placeholder</h4>
+        <Subheading>Card Placeholder</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Card Placeholder code'}
@@ -337,7 +345,7 @@ export class CardPlaceholder {}`}
         />
       </article>
       <article className="docs-example" id="example-custom-label">
-        <h4>Custom Label</h4>
+        <Subheading>Custom Label</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom Label code'}
@@ -365,11 +373,11 @@ export class CustomLabel {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-spinner">PixelSpinner</a></li>
-        <li><a href="#pixel-progress">PixelProgress</a></li>
-        <li><a href="#pixel-empty-state">PixelEmptyState</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-spinner' : '#pixel-spinner'}>PixelSpinner</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-progress' : '#pixel-progress'}>PixelProgress</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-empty-state' : '#pixel-empty-state'}>PixelEmptyState</a></li>
       </ul>
     </section>
     </section>

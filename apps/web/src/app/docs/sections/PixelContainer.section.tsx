@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelContainerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelContainerDocsMeta = {
@@ -76,10 +80,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelContainerDocsSection({ className }: PixelContainerDocsSectionProps): React.ReactElement {
+export function PixelContainerDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelContainerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-container-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-container-heading'>PixelContainer</h2>
+      <Title id='pixel-container-heading'>PixelContainer</Title>
       <p className="docs-lead">Surface-aware page section wrapper with token-driven max-width, page gutter, and vertical rhythm.</p>
       <ul className="docs-highlights">
         <li>Surface-aware tokens (pixel / linear)</li>
@@ -94,11 +102,11 @@ export function PixelContainerDocsSection({ className }: PixelContainerDocsSecti
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-container-api">
-      <h3 id="pixel-container-api">API</h3>
-      <FrameworkApi label={'PixelContainer API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-container-api">API</Heading>
+      <FrameworkApi label={'PixelContainer API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-container-a11y">
-      <h3 id="pixel-container-a11y">Accessibility</h3>
+      <Heading id="pixel-container-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>semantic-section-wrapper</code></li>
@@ -106,7 +114,7 @@ export function PixelContainerDocsSection({ className }: PixelContainerDocsSecti
       <p className="docs-aria-notes">Inherits semantics from the <code>as</code> element (defaults to <code>section</code>). When rendered as a landmark, provide aria-label or aria-labelledby for an accessible name.</p>
     </section>
     <section aria-labelledby="pixel-container-usage">
-      <h3 id="pixel-container-usage">Usage</h3>
+      <Heading id="pixel-container-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelContainer usage'}
@@ -143,9 +151,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -182,7 +190,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-narrow">
-        <h4>Narrow</h4>
+        <Subheading>Narrow</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Narrow code'}
@@ -219,7 +227,7 @@ export class Narrow {}`}
         />
       </article>
       <article className="docs-example" id="example-as-main">
-        <h4>As Main</h4>
+        <Subheading>As Main</Subheading>
         <FrameworkCode
           variant="docs"
           label={'As Main code'}
@@ -256,7 +264,7 @@ export class AsMain {}`}
         />
       </article>
       <article className="docs-example" id="example-prose-width">
-        <h4>Prose Width</h4>
+        <Subheading>Prose Width</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Prose Width code'}
@@ -294,11 +302,11 @@ export class ProseWidth {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-section">PixelSection</a></li>
-        <li><a href="#pixel-center">PixelCenter</a></li>
-        <li><a href="#pixel-box">PixelBox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-section' : '#pixel-section'}>PixelSection</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-center' : '#pixel-center'}>PixelCenter</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-box' : '#pixel-box'}>PixelBox</a></li>
       </ul>
     </section>
     </section>

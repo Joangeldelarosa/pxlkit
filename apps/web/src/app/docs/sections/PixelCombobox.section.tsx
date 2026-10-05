@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelComboboxDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelComboboxDocsMeta = {
@@ -114,10 +118,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSectionProps): React.ReactElement {
+export function PixelComboboxDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelComboboxDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-combobox-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-combobox-heading'>PixelCombobox</h2>
+      <Title id='pixel-combobox-heading'>PixelCombobox</Title>
       <p className="docs-lead">Searchable single-value combobox built on a button trigger + listbox popover with type-to-filter, optional grouping, and full keyboard navigation.</p>
       <ul className="docs-highlights">
         <li>WAI-ARIA combobox pattern — <code>role=&quot;combobox&quot;</code> trigger paired with a <code>role=&quot;listbox&quot;</code> popup and <code>aria-activedescendant</code> for highlight tracking.</li>
@@ -132,18 +140,18 @@ export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSection
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-combobox-api">
-      <h3 id="pixel-combobox-api">API</h3>
-      <FrameworkApi label={'PixelCombobox API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-combobox-api">API</Heading>
+      <FrameworkApi label={'PixelCombobox API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-combobox-a11y">
-      <h3 id="pixel-combobox-a11y">Accessibility</h3>
+      <Heading id="pixel-combobox-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>combobox</code></li>
         <li><code>listbox</code></li>
       </ul>
       <p className="docs-aria-notes">Trigger is a <code>&lt;button role=&quot;combobox&quot;&gt;</code> with <code>aria-haspopup=&quot;listbox&quot;</code>, <code>aria-expanded</code>, and <code>aria-activedescendant</code> wired to the highlighted option id. When searchable, an inner <code>role=&quot;searchbox&quot;</code> input proxies keyboard navigation to the listbox. Provide an accessible name via <code>label</code>; <code>error</code> automatically sets <code>aria-invalid</code>.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -187,7 +195,7 @@ export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSection
       </table>
     </section>
     <section aria-labelledby="pixel-combobox-usage">
-      <h3 id="pixel-combobox-usage">Usage</h3>
+      <Heading id="pixel-combobox-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelCombobox usage'}
@@ -253,9 +261,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -321,7 +329,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
+        <Subheading>Uncontrolled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Uncontrolled code'}
@@ -386,7 +394,7 @@ export class Uncontrolled {
         />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
+        <Subheading>Controlled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled code'}
@@ -457,7 +465,7 @@ export class Controlled {
         />
       </article>
       <article className="docs-example" id="example-grouped">
-        <h4>Grouped options</h4>
+        <Subheading>Grouped options</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Grouped options code'}
@@ -525,7 +533,7 @@ export class Grouped {
         />
       </article>
       <article className="docs-example" id="example-not-searchable">
-        <h4>Without search</h4>
+        <Subheading>Without search</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Without search code'}
@@ -591,7 +599,7 @@ export class NotSearchable {
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -666,7 +674,7 @@ export class Sizes {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -738,7 +746,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -804,7 +812,7 @@ export class Disabled {
         />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With error</h4>
+        <Subheading>With error</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With error code'}
@@ -870,7 +878,7 @@ export class WithError {
         />
       </article>
       <article className="docs-example" id="example-with-form-name">
-        <h4>With form name</h4>
+        <Subheading>With form name</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With form name code'}
@@ -957,7 +965,7 @@ export class WithFormName {
         />
       </article>
       <article className="docs-example" id="example-custom-empty-message">
-        <h4>Custom empty message</h4>
+        <Subheading>Custom empty message</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom empty message code'}
@@ -1026,11 +1034,11 @@ export class CustomEmptyMessage {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-select">PixelSelect</a></li>
-        <li><a href="#pixel-multi-select">PixelMultiSelect</a></li>
-        <li><a href="#pixel-dropdown">PixelDropdown</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-multi-select' : '#pixel-multi-select'}>PixelMultiSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dropdown' : '#pixel-dropdown'}>PixelDropdown</a></li>
       </ul>
     </section>
     </section>

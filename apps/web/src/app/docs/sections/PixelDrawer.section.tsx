@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDrawerDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelDrawerDocsMeta = {
@@ -194,10 +198,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProps): React.ReactElement {
+export function PixelDrawerDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelDrawerDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-drawer-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-drawer-heading'>PixelDrawer</h2>
+      <Title id='pixel-drawer-heading'>PixelDrawer</Title>
       <p className="docs-lead">Side-anchored modal panel (right/left/top/bottom) with focus trap, scroll lock and Escape-to-close.</p>
       <ul className="docs-highlights">
         <li>Four anchor sides (right/left/top/bottom) and five sizes (sm/md/lg/xl/full)</li>
@@ -212,11 +220,11 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-drawer-api">
-      <h3 id="pixel-drawer-api">API</h3>
-      <FrameworkApi label={'PixelDrawer API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-drawer-api">API</Heading>
+      <FrameworkApi label={'PixelDrawer API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-drawer-a11y">
-      <h3 id="pixel-drawer-a11y">Accessibility</h3>
+      <Heading id="pixel-drawer-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=&quot;dialog&quot; with aria-modal=&quot;true&quot;</code></li>
@@ -226,7 +234,7 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
         <li><code>Accessible name via `title` (aria-labelledby) or `aria-label`</code></li>
       </ul>
       <p className="docs-aria-notes">Dev-only warning fires when neither <code>title</code> nor <code>aria-label</code> is provided to enforce WCAG 4.1.2.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -255,7 +263,7 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
       </table>
     </section>
     <section aria-labelledby="pixel-drawer-usage">
-      <h3 id="pixel-drawer-usage">Usage</h3>
+      <Heading id="pixel-drawer-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelDrawer usage'}
@@ -337,9 +345,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -421,7 +429,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-left-side">
-        <h4>Left side, large</h4>
+        <Subheading>Left side, large</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Left side, large code'}
@@ -487,7 +495,7 @@ export class LeftSide {
         />
       </article>
       <article className="docs-example" id="example-bottom-sheet">
-        <h4>Bottom sheet</h4>
+        <Subheading>Bottom sheet</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Bottom sheet code'}
@@ -563,11 +571,11 @@ export class BottomSheet {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-modal">PixelModal</a></li>
-        <li><a href="#pixel-portal">PixelPortal</a></li>
-        <li><a href="#pixel-sheet">PixelSheet</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-modal' : '#pixel-modal'}>PixelModal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-portal' : '#pixel-portal'}>PixelPortal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-sheet' : '#pixel-sheet'}>PixelSheet</a></li>
       </ul>
     </section>
     </section>

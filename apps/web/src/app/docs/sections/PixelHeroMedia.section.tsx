@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelHeroMediaDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelHeroMediaDocsMeta = {
@@ -90,10 +94,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelHeroMediaDocsSection({ className }: PixelHeroMediaDocsSectionProps): React.ReactElement {
+export function PixelHeroMediaDocsSection({ className, headingLevel = 2 }: PixelHeroMediaDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-hero-media-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-hero-media-heading'>PixelHeroMedia</h2>
+      <Title id='pixel-hero-media-heading'>PixelHeroMedia</Title>
       <p className="docs-lead">Aspect-ratio-preserving figure slot for hero media with optional frame, tone border, and caption.</p>
       <ul className="docs-highlights">
         <li>Four ratio presets (1/1, 4/5, 16/10, 16/9) reserve layout to prevent CLS</li>
@@ -107,11 +115,11 @@ export function PixelHeroMediaDocsSection({ className }: PixelHeroMediaDocsSecti
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
     <section aria-labelledby="pixel-hero-media-api">
-      <h3 id="pixel-hero-media-api">API</h3>
-      <FrameworkApi label={'PixelHeroMedia API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-hero-media-api">API</Heading>
+      <FrameworkApi label={'PixelHeroMedia API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-hero-media-a11y">
-      <h3 id="pixel-hero-media-a11y">Accessibility</h3>
+      <Heading id="pixel-hero-media-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>figure/figcaption when caption present</code></li>
@@ -120,7 +128,7 @@ export function PixelHeroMediaDocsSection({ className }: PixelHeroMediaDocsSecti
       <p className="docs-aria-notes">Caption is rendered inside a &lt;figcaption&gt; when provided; otherwise the media stands alone inside &lt;figure&gt;.</p>
     </section>
     <section aria-labelledby="pixel-hero-media-usage">
-      <h3 id="pixel-hero-media-usage">Usage</h3>
+      <Heading id="pixel-hero-media-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelHeroMedia usage'}
@@ -171,9 +179,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -224,7 +232,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-framed">
-        <h4>Framed with caption</h4>
+        <Subheading>Framed with caption</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Framed with caption code'}
@@ -275,7 +283,7 @@ export class Framed {}`}
         />
       </article>
       <article className="docs-example" id="example-square">
-        <h4>Square (1:1)</h4>
+        <Subheading>Square (1:1)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Square (1:1) code'}

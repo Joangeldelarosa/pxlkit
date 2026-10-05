@@ -18,7 +18,15 @@
  *
  * and the usage-snippet modules the /ui-kit showcase reads: per component,
  * the example the site picks for it in
- * apps/web/src/app/ui-kit/showcase-examples.ts, else its usage lead.
+ * apps/web/src/app/ui-kit/showcase-examples.ts, else its usage lead; and the
+ * data of each component's own page, /docs/components/<slug>
+ * (_lib/component-pages.ts: its title, description and neighbours, and its
+ * section's loader).
+ *
+ * A section takes `headingLevel` (2 within /docs, where it is one entry of
+ * the reference; 1 as its component's page, where its heading is the page's
+ * h1 and its subsections follow one level up) and `links` (its related
+ * components as /docs anchors, or as their pages).
  *
  * Safety: NEVER overwrites hand-authored files. Always writes
  *   <Name>.section.tsx into a NEW `sections/` subtree; the orchestrator owns
@@ -58,6 +66,7 @@ import { selfContainedExamples } from "./extract-example-source.js";
 import { apiIndexFor, documentedNames, extractApi } from "./extract-api.js";
 import type { ComponentApi } from "./_lib/api-model.js";
 import { FRAMEWORK_API_MODULE, hasApi, renderApiBlock, renderApiConstant } from "./_lib/api-section.js";
+import { COMPONENT_PAGE_PREFIX, componentPageModules } from "./_lib/component-pages.js";
 import {
   KIT_PORTS,
   implementsInFull,
@@ -555,7 +564,7 @@ function renderKeyboardTable(rows: KeyboardEntry[]): string {
 function renderA11ySection(entry: DocsPagePlanEntry): string {
   const lines: string[] = [];
   lines.push(`    <section aria-labelledby="${entry.slug}-a11y">`);
-  lines.push(`      <h3 id="${entry.slug}-a11y">Accessibility</h3>`);
+  lines.push(`      <Heading id="${entry.slug}-a11y">Accessibility</Heading>`);
   if (entry.wcagLevel) {
     lines.push(
       `      <p>WCAG target: <strong>${escapeJsxText(entry.wcagLevel)}</strong></p>`,
@@ -573,7 +582,7 @@ function renderA11ySection(entry: DocsPagePlanEntry): string {
   }
   const kbd = renderKeyboardTable(entry.keyboard);
   if (kbd) {
-    lines.push(`      <h4>Keyboard</h4>`);
+    lines.push(`      <Subheading>Keyboard</Subheading>`);
     lines.push(kbd);
   }
   lines.push(`    </section>`);
@@ -602,7 +611,7 @@ function renderExamples(examples: ExampleEntry[]): string {
         : "";
       return [
         `      <article className="docs-example" id="example-${e.id}">`,
-        `        <h4>${escapeJsxText(e.label)}</h4>`,
+        `        <Subheading>${escapeJsxText(e.label)}</Subheading>`,
         desc + renderFrameworkCode(e.code, `${e.label} code`, "        "),
         `      </article>`,
       ].join("\n");
@@ -610,20 +619,24 @@ function renderExamples(examples: ExampleEntry[]): string {
     .join("\n");
   return [
     `    <section aria-label="Examples">`,
-    `      <h3>Examples</h3>`,
+    `      <Heading>Examples</Heading>`,
     blocks,
     `    </section>`,
   ].join("\n");
 }
 
+/** Related components: their /docs anchors, or their pages (`links="pages"`). */
 function renderRelated(related: string[]): string {
   if (related.length === 0) return "";
   const items = related
-    .map((r) => `        <li><a href="#${slugFor(r)}">${escapeJsxText(r)}</a></li>`)
+    .map((r) => {
+      const slug = slugFor(r);
+      return `        <li><a href={links === 'pages' ? '${COMPONENT_PAGE_PREFIX}${slug}' : '#${slug}'}>${escapeJsxText(r)}</a></li>`;
+    })
     .join("\n");
   return [
     `    <section aria-label="Related components">`,
-    `      <h3>Related</h3>`,
+    `      <Heading>Related</Heading>`,
     `      <ul className="docs-related">`,
     items,
     `      </ul>`,
@@ -665,6 +678,10 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
   lines.push(``);
   lines.push(`export interface ${entry.name}DocsSectionProps {`);
   lines.push(`  className?: string;`);
+  lines.push(`  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */`);
+  lines.push(`  headingLevel?: 1 | 2;`);
+  lines.push(`  /** Where its related components link: their entries on /docs, or their own pages. */`);
+  lines.push(`  links?: 'anchors' | 'pages';`);
   lines.push(`}`);
   lines.push(``);
   lines.push(
@@ -682,9 +699,7 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
     lines.push(renderApiConstant(entry.name, api));
     lines.push(``);
   }
-  lines.push(
-    `export function ${entry.name}DocsSection({ className }: ${entry.name}DocsSectionProps): React.ReactElement {`,
-  );
+  const signatureAt = lines.length;
   lines.push(`  return (`);
   // No `id` on the root: the /docs page wrapper owns the `#<slug>` anchor
   // (a literal <section id> the coverage-docs gate scans for) — emitting it
@@ -693,7 +708,7 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
     `    <section aria-labelledby={${jsxAttr(`${entry.slug}-heading`)}} className={className} data-status=${jsxAttr(entry.status)}>`,
   );
   lines.push(
-    `      <h2 id=${jsxAttr(`${entry.slug}-heading`)}>${escapeJsxText(entry.name)}</h2>`,
+    `      <Title id=${jsxAttr(`${entry.slug}-heading`)}>${escapeJsxText(entry.name)}</Title>`,
   );
 
   const banner = renderDeprecationBanner(entry.deprecation);
@@ -711,7 +726,7 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
     lines.push(renderApiBlock(entry.name, entry.slug, api));
   } else {
     lines.push(`    <section aria-label="Props">`);
-    lines.push(`      <h3>Props</h3>`);
+    lines.push(`      <Heading>Props</Heading>`);
     lines.push(renderPropsTable(entry.props));
     lines.push(`    </section>`);
   }
@@ -720,7 +735,7 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
 
   if (entry.usageSnippet) {
     lines.push(`    <section aria-labelledby="${entry.slug}-usage">`);
-    lines.push(`      <h3 id="${entry.slug}-usage">Usage</h3>`);
+    lines.push(`      <Heading id="${entry.slug}-usage">Usage</Heading>`);
     lines.push(renderFrameworkCode(entry.usageSnippet, `${entry.name} usage`, "      "));
     lines.push(`    </section>`);
   }
@@ -736,6 +751,21 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
   lines.push(`}`);
   lines.push(``);
   lines.push(`export default ${entry.name}DocsSection;`);
+  // The signature and the heading elements, now that the body says which it uses.
+  const body = lines.slice(signatureAt).join("\n");
+  const params = ["className", "headingLevel = 2", ...(body.includes("{links === 'pages'") ? ["links = 'anchors'"] : [])];
+  const headings = [
+    `  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.`,
+    `  const Title = headingLevel === 1 ? 'h1' : 'h2';`,
+    `  const Heading = headingLevel === 1 ? 'h2' : 'h3';`,
+    ...(body.includes("<Subheading") ? [`  const Subheading = headingLevel === 1 ? 'h3' : 'h4';`] : []),
+  ];
+  lines.splice(
+    signatureAt,
+    0,
+    `export function ${entry.name}DocsSection({ ${params.join(", ")} }: ${entry.name}DocsSectionProps): React.ReactElement {`,
+    ...headings,
+  );
   lines.push(``);
   return lines.join("\n");
 }
@@ -793,6 +823,7 @@ export class GenerateDocsPageGenerator extends Generator {
       content: renderSectionModule(entry),
     }));
     writes.push(...usageSnippetWrites(this.outRoot, entries, await readShowcaseExamples(ctx.repoRoot)));
+    writes.push(...componentPageWrites(this.outRoot, entries));
     return { writes };
   }
 }
@@ -914,6 +945,14 @@ export function renderUsageSnippetsModule(
   return lines.join("\n");
 }
 
+/** The modules each component's page reads: its data, and its section's loader (_lib/component-pages.ts). */
+function componentPageWrites(outRoot: string, entries: DocsPagePlanEntry[]): Array<{ path: string; content: string }> {
+  return Object.entries(componentPageModules(entries, FILE_EXT)).map(([file, content]) => ({
+    path: ensurePosix(path.join(outRoot, file)),
+    content,
+  }));
+}
+
 /** The usage snippet modules: React's, then one per port. */
 function usageSnippetWrites(
   outRoot: string,
@@ -977,7 +1016,10 @@ export async function generateDocsPage(
   }
 
   if (!opts.dryRun && entries.length > 0) {
-    for (const write of usageSnippetWrites(outRoot, entries, await readShowcaseExamples(repoRoot))) {
+    for (const write of [
+      ...usageSnippetWrites(outRoot, entries, await readShowcaseExamples(repoRoot)),
+      ...componentPageWrites(outRoot, entries),
+    ]) {
       await writeOutput(write.path, write.content);
       written++;
     }

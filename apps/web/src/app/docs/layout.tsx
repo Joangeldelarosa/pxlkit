@@ -3,6 +3,7 @@ import { JsonLd } from '@/components/JsonLd';
 import { UI_COMPONENTS_COUNT } from '@/lib/pxlkit-counts';
 import { pageMetadata } from '@/lib/seo';
 import { breadcrumbList } from '@/lib/structured-data';
+import { DocsIndexOnly } from './_docs-index-only';
 
 export const metadata: Metadata = pageMetadata({
   path: '/docs',
@@ -41,7 +42,9 @@ export const metadata: Metadata = pageMetadata({
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <JsonLd data={breadcrumbList([{ name: 'Docs', path: '/docs' }])} />
+      <DocsIndexOnly>
+        <JsonLd data={breadcrumbList([{ name: 'Docs', path: '/docs' }])} />
+      </DocsIndexOnly>
       {children}
     </>
   );

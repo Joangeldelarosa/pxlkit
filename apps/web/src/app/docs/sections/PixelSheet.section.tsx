@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSheetDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSheetDocsMeta = {
@@ -98,10 +102,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps): React.ReactElement {
+export function PixelSheetDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSheetDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-sheet-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-sheet-heading'>PixelSheet</h2>
+      <Title id='pixel-sheet-heading'>PixelSheet</Title>
       <p className="docs-lead">Mobile-first bottom/top sheet with focus trap, scroll lock, Escape-to-close and optional drag handle.</p>
       <ul className="docs-highlights">
         <li>Bottom or top anchored, four sizes (sm/md/lg/full)</li>
@@ -116,11 +124,11 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-sheet-api">
-      <h3 id="pixel-sheet-api">API</h3>
-      <FrameworkApi label={'PixelSheet API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-sheet-api">API</Heading>
+      <FrameworkApi label={'PixelSheet API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-sheet-a11y">
-      <h3 id="pixel-sheet-a11y">Accessibility</h3>
+      <Heading id="pixel-sheet-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=&quot;dialog&quot; with aria-modal=&quot;true&quot;</code></li>
@@ -130,7 +138,7 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
         <li><code>Accessible name via `title` (aria-labelledby) or `aria-label`</code></li>
       </ul>
       <p className="docs-aria-notes">Dev-only warning fires when neither <code>title</code> nor <code>aria-label</code> is provided to enforce WCAG 4.1.2. Drag handle is decorative (aria-hidden) and intended as a visual affordance only.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -159,7 +167,7 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
       </table>
     </section>
     <section aria-labelledby="pixel-sheet-usage">
-      <h3 id="pixel-sheet-usage">Usage</h3>
+      <Heading id="pixel-sheet-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSheet usage'}
@@ -220,9 +228,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -283,7 +291,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-with-drag-handle">
-        <h4>With drag handle</h4>
+        <Subheading>With drag handle</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With drag handle code'}
@@ -340,7 +348,7 @@ export class WithDragHandle {
         />
       </article>
       <article className="docs-example" id="example-top-full">
-        <h4>Top side, full height</h4>
+        <Subheading>Top side, full height</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Top side, full height code'}
@@ -403,11 +411,11 @@ export class TopFull {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-drawer">PixelDrawer</a></li>
-        <li><a href="#pixel-modal">PixelModal</a></li>
-        <li><a href="#pixel-portal">PixelPortal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-drawer' : '#pixel-drawer'}>PixelDrawer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-modal' : '#pixel-modal'}>PixelModal</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-portal' : '#pixel-portal'}>PixelPortal</a></li>
       </ul>
     </section>
     </section>

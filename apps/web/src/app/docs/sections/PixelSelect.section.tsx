@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSelectDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSelectDocsMeta = {
@@ -115,10 +119,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProps): React.ReactElement {
+export function PixelSelectDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSelectDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-select-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-select-heading'>PixelSelect</h2>
+      <Title id='pixel-select-heading'>PixelSelect</Title>
       <p className="docs-lead">Custom single-value dropdown built on a button + listbox (no native <code>&lt;select&gt;</code>) with full keyboard navigation and tone/size/surface theming.</p>
       <ul className="docs-highlights">
         <li>WAI-ARIA combobox + listbox semantics — <code>aria-expanded</code>, <code>aria-haspopup</code>, <code>aria-selected</code> wired to the trigger and options.</li>
@@ -133,18 +141,18 @@ export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProp
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-select-api">
-      <h3 id="pixel-select-api">API</h3>
-      <FrameworkApi label={'PixelSelect API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-select-api">API</Heading>
+      <FrameworkApi label={'PixelSelect API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-select-a11y">
-      <h3 id="pixel-select-a11y">Accessibility</h3>
+      <Heading id="pixel-select-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>combobox</code></li>
         <li><code>listbox</code></li>
       </ul>
       <p className="docs-aria-notes">Trigger is a <code>&lt;button role=&quot;combobox&quot;&gt;</code> paired with a <code>role=&quot;listbox&quot;</code> popup containing <code>role=&quot;option&quot;</code> children. Provide an accessible name via <code>label</code>; the hint/error it shows is linked through <code>aria-describedby</code>, after any ids you pass, and <code>error</code> automatically sets <code>aria-invalid</code>.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -198,7 +206,7 @@ export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProp
       </table>
     </section>
     <section aria-labelledby="pixel-select-usage">
-      <h3 id="pixel-select-usage">Usage</h3>
+      <Heading id="pixel-select-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSelect usage'}
@@ -255,9 +263,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -314,7 +322,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
+        <Subheading>Uncontrolled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Uncontrolled code'}
@@ -370,7 +378,7 @@ export class Uncontrolled {
         />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
+        <Subheading>Controlled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled code'}
@@ -433,7 +441,7 @@ export class Controlled {
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -508,7 +516,7 @@ export class Tones {
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -574,7 +582,7 @@ export class Sizes {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -637,7 +645,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -694,7 +702,7 @@ export class Disabled {
         />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With error</h4>
+        <Subheading>With error</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With error code'}
@@ -754,7 +762,7 @@ export class WithError {
         />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
+        <Subheading>Required</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Required code'}
@@ -812,7 +820,7 @@ export class Required {
         />
       </article>
       <article className="docs-example" id="example-with-form-name">
-        <h4>With form name</h4>
+        <Subheading>With form name</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With form name code'}
@@ -891,11 +899,11 @@ export class WithFormName {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-combobox">PixelCombobox</a></li>
-        <li><a href="#pixel-multi-select">PixelMultiSelect</a></li>
-        <li><a href="#pixel-dropdown">PixelDropdown</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-combobox' : '#pixel-combobox'}>PixelCombobox</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-multi-select' : '#pixel-multi-select'}>PixelMultiSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dropdown' : '#pixel-dropdown'}>PixelDropdown</a></li>
       </ul>
     </section>
     </section>

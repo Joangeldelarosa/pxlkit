@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelKbdDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelKbdDocsMeta = {
@@ -67,10 +71,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): React.ReactElement {
+export function PixelKbdDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelKbdDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-kbd-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-kbd-heading'>PixelKbd</h2>
+      <Title id='pixel-kbd-heading'>PixelKbd</Title>
       <p className="docs-lead">Styled keyboard shortcut indicator that renders a native <code>&lt;kbd&gt;</code> element with surface-aware framing for inline docs, hints, and command menus.</p>
       <ul className="docs-highlights">
         <li>Semantic &lt;kbd&gt; root so assistive tech announces the key role correctly.</li>
@@ -84,11 +92,11 @@ export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): Re
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-kbd-api">
-      <h3 id="pixel-kbd-api">API</h3>
-      <FrameworkApi label={'PixelKbd API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-kbd-api">API</Heading>
+      <FrameworkApi label={'PixelKbd API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-kbd-a11y">
-      <h3 id="pixel-kbd-a11y">Accessibility</h3>
+      <Heading id="pixel-kbd-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>kbd</code></li>
@@ -96,7 +104,7 @@ export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): Re
       <p className="docs-aria-notes">Renders as a native &lt;kbd&gt; element so screen readers convey the keyboard-input semantic. PixelKbd is presentational (not focusable, not actionable) — pair it with descriptive prose (e.g. &quot;Press &lt;kbd&gt;Ctrl&lt;/kbd&gt; + &lt;kbd&gt;K&lt;/kbd&gt; to open the command palette&quot;) so the shortcut is meaningful when read out of context. For key combos, render multiple PixelKbd siblings with a literal &quot;+&quot; separator marked aria-hidden.</p>
     </section>
     <section aria-labelledby="pixel-kbd-usage">
-      <h3 id="pixel-kbd-usage">Usage</h3>
+      <Heading id="pixel-kbd-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelKbd usage'}
@@ -123,9 +131,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -152,7 +160,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-common-keys">
-        <h4>Common Keys</h4>
+        <Subheading>Common Keys</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Common Keys code'}
@@ -201,7 +209,7 @@ export class CommonKeys {}`}
         />
       </article>
       <article className="docs-example" id="example-combo">
-        <h4>Combo (Ctrl + K)</h4>
+        <Subheading>Combo (Ctrl + K)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Combo (Ctrl + K) code'}
@@ -244,7 +252,7 @@ export class Combo {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -284,7 +292,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-inline-in-prose">
-        <h4>Inline in Prose</h4>
+        <Subheading>Inline in Prose</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Inline in Prose code'}
@@ -322,9 +330,9 @@ export class InlineInProse {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-code-inline">PixelCodeInline</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-code-inline' : '#pixel-code-inline'}>PixelCodeInline</a></li>
       </ul>
     </section>
     </section>

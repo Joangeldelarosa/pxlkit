@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelClusterDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelClusterDocsMeta = {
@@ -78,10 +82,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelClusterDocsSection({ className }: PixelClusterDocsSectionProps): React.ReactElement {
+export function PixelClusterDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelClusterDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-cluster-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-cluster-heading'>PixelCluster</h2>
+      <Title id='pixel-cluster-heading'>PixelCluster</Title>
       <p className="docs-lead">Horizontal wrap container for clustering inline items (chips, tags, actions) with consistent gap, alignment, and justification.</p>
       <ul className="docs-highlights">
         <li>Flex row with wrap and configurable stack gap token</li>
@@ -95,11 +103,11 @@ export function PixelClusterDocsSection({ className }: PixelClusterDocsSectionPr
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-cluster-api">
-      <h3 id="pixel-cluster-api">API</h3>
-      <FrameworkApi label={'PixelCluster API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-cluster-api">API</Heading>
+      <FrameworkApi label={'PixelCluster API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-cluster-a11y">
-      <h3 id="pixel-cluster-a11y">Accessibility</h3>
+      <Heading id="pixel-cluster-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>polymorphic-wrap-container</code></li>
@@ -107,7 +115,7 @@ export function PixelClusterDocsSection({ className }: PixelClusterDocsSectionPr
       <p className="docs-aria-notes">Polymorphic wrap container; inherits semantics from <code>as</code>. Defaults to &lt;div&gt; with no implicit role.</p>
     </section>
     <section aria-labelledby="pixel-cluster-usage">
-      <h3 id="pixel-cluster-usage">Usage</h3>
+      <Heading id="pixel-cluster-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelCluster usage'}
@@ -165,9 +173,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -225,7 +233,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-justified">
-        <h4>Justified</h4>
+        <Subheading>Justified</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Justified code'}
@@ -281,7 +289,7 @@ export class Justified {
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
+        <Subheading>Pixel Surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pixel Surface code'}
@@ -338,10 +346,10 @@ export class PixelSurface {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-stack">PixelStack</a></li>
-        <li><a href="#pixel-grid">PixelGrid</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stack' : '#pixel-stack'}>PixelStack</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-grid' : '#pixel-grid'}>PixelGrid</a></li>
       </ul>
     </section>
     </section>

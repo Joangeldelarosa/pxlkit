@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStepperDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelStepperDocsMeta = {
@@ -132,10 +136,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionProps): React.ReactElement {
+export function PixelStepperDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelStepperDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-stepper-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-stepper-heading'>PixelStepper</h2>
+      <Title id='pixel-stepper-heading'>PixelStepper</Title>
       <p className="docs-lead">Multi-step progress indicator with completed/active/pending/error/loading states, horizontal or vertical orientation, and full keyboard navigation.</p>
       <ul className="docs-highlights">
         <li>Compound API (a stepper and its steps: <code>PixelStepper.Step</code>, <code>PixelStepperStep</code> in Vue, <code>pxl-stepper-step</code> in Angular) keeps step content declarative and easy to reorder.</li>
@@ -150,17 +158,17 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-stepper-api">
-      <h3 id="pixel-stepper-api">API</h3>
-      <FrameworkApi label={'PixelStepper API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-stepper-api">API</Heading>
+      <FrameworkApi label={'PixelStepper API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stepper-a11y">
-      <h3 id="pixel-stepper-a11y">Accessibility</h3>
+      <Heading id="pixel-stepper-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>progress-steps</code></li>
       </ul>
       <p className="docs-aria-notes">The root renders role=&quot;group&quot; with a configurable ariaLabel (defaults to &quot;Progress steps&quot;). A clickable step is role=&quot;button&quot;, named by its position (&quot;Step N of M&quot;), its label and its state (current/completed/error) and described by its description. A step that is not clickable (no step click handling, or a future step when allowNextStepsSelect is false) has no role and stays out of the tab sequence; since ARIA does not let an element without a role take a name, it reads its position and state as visually hidden text around its label. The active step is marked with aria-current=&quot;step&quot;. Indicators and connectors are aria-hidden so screen readers announce only the step label and state.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -219,7 +227,7 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
       </table>
     </section>
     <section aria-labelledby="pixel-stepper-usage">
-      <h3 id="pixel-stepper-usage">Usage</h3>
+      <Heading id="pixel-stepper-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelStepper usage'}
@@ -262,9 +270,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -307,7 +315,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-interactive">
-        <h4>Interactive</h4>
+        <Subheading>Interactive</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Interactive code'}
@@ -409,7 +417,7 @@ export class Interactive {
         />
       </article>
       <article className="docs-example" id="example-vertical">
-        <h4>Vertical</h4>
+        <Subheading>Vertical</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Vertical code'}
@@ -452,7 +460,7 @@ export class Vertical {}`}
         />
       </article>
       <article className="docs-example" id="example-states">
-        <h4>States</h4>
+        <Subheading>States</Subheading>
         <FrameworkCode
           variant="docs"
           label={'States code'}
@@ -501,7 +509,7 @@ export class States {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -580,7 +588,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -644,7 +652,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-allow-next-steps-select">
-        <h4>Allow next steps</h4>
+        <Subheading>Allow next steps</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Allow next steps code'}
@@ -698,11 +706,11 @@ export class AllowNextStepsSelect {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-tabs">PixelTabs</a></li>
-        <li><a href="#pixel-progress">PixelProgress</a></li>
-        <li><a href="#pixel-breadcrumb">PixelBreadcrumb</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tabs' : '#pixel-tabs'}>PixelTabs</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-progress' : '#pixel-progress'}>PixelProgress</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-breadcrumb' : '#pixel-breadcrumb'}>PixelBreadcrumb</a></li>
       </ul>
     </section>
     </section>

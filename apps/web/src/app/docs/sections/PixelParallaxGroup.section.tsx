@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelParallaxGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelParallaxGroupDocsMeta = {
@@ -66,10 +70,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelParallaxGroupDocsSection({ className }: PixelParallaxGroupDocsSectionProps): React.ReactElement {
+export function PixelParallaxGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelParallaxGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-parallax-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-parallax-group-heading'>PixelParallaxGroup</h2>
+      <Title id='pixel-parallax-group-heading'>PixelParallaxGroup</Title>
       <p className="docs-lead">Perspective/viewport container that clips parallax children within a shared overflow-hidden, relative-positioned area.</p>
       <ul className="docs-highlights">
         <li>Establishes a shared viewport for parallax layers</li>
@@ -83,11 +91,11 @@ export function PixelParallaxGroupDocsSection({ className }: PixelParallaxGroupD
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-parallax-group-api">
-      <h3 id="pixel-parallax-group-api">API</h3>
-      <FrameworkApi label={'PixelParallaxGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-parallax-group-api">API</Heading>
+      <FrameworkApi label={'PixelParallaxGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-parallax-group-a11y">
-      <h3 id="pixel-parallax-group-a11y">Accessibility</h3>
+      <Heading id="pixel-parallax-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>decorative container</code></li>
@@ -95,7 +103,7 @@ export function PixelParallaxGroupDocsSection({ className }: PixelParallaxGroupD
       <p className="docs-aria-notes">Purely a layout/clipping container; children handle motion and respect prefers-reduced-motion individually.</p>
     </section>
     <section aria-labelledby="pixel-parallax-group-usage">
-      <h3 id="pixel-parallax-group-usage">Usage</h3>
+      <Heading id="pixel-parallax-group-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelParallaxGroup usage'}
@@ -136,9 +144,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -179,7 +187,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-as-section">
-        <h4>As Section</h4>
+        <Subheading>As Section</Subheading>
         <FrameworkCode
           variant="docs"
           label={'As Section code'}
@@ -222,10 +230,10 @@ export class AsSection {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-parallax-layer">PixelParallaxLayer</a></li>
-        <li><a href="#pixel-mouse-parallax">PixelMouseParallax</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-parallax-layer' : '#pixel-parallax-layer'}>PixelParallaxLayer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-mouse-parallax' : '#pixel-mouse-parallax'}>PixelMouseParallax</a></li>
       </ul>
     </section>
     </section>

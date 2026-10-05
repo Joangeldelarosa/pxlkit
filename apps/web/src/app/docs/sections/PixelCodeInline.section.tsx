@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCodeInlineDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCodeInlineDocsMeta = {
@@ -70,10 +74,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSectionProps): React.ReactElement {
+export function PixelCodeInlineDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCodeInlineDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-code-inline-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-code-inline-heading'>PixelCodeInline</h2>
+      <Title id='pixel-code-inline-heading'>PixelCodeInline</Title>
       <p className="docs-lead">Inline <code>&lt;code&gt;</code> element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.</p>
       <ul className="docs-highlights">
         <li>Semantic &lt;code&gt; root so assistive tech announces the inline-code role.</li>
@@ -87,11 +95,11 @@ export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSec
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-code-inline-api">
-      <h3 id="pixel-code-inline-api">API</h3>
-      <FrameworkApi label={'PixelCodeInline API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-code-inline-api">API</Heading>
+      <FrameworkApi label={'PixelCodeInline API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-code-inline-a11y">
-      <h3 id="pixel-code-inline-a11y">Accessibility</h3>
+      <Heading id="pixel-code-inline-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>code</code></li>
@@ -99,7 +107,7 @@ export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSec
       <p className="docs-aria-notes">Renders as a native &lt;code&gt; element so screen readers convey the inline-code semantic. PixelCodeInline is presentational (not focusable, not actionable) — tone is purely decorative, so the surrounding prose must carry the meaning (e.g. mark error snippets with adjacent text, not tone alone). For multi-line code blocks use a block-level &lt;pre&gt;&lt;code&gt; primitive instead.</p>
     </section>
     <section aria-labelledby="pixel-code-inline-usage">
-      <h3 id="pixel-code-inline-usage">Usage</h3>
+      <Heading id="pixel-code-inline-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelCodeInline usage'}
@@ -126,9 +134,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -155,7 +163,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -210,7 +218,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -250,7 +258,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-inline-in-prose">
-        <h4>Inline in Prose</h4>
+        <Subheading>Inline in Prose</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Inline in Prose code'}
@@ -290,7 +298,7 @@ export class InlineInProse {}`}
         />
       </article>
       <article className="docs-example" id="example-code-samples">
-        <h4>Code Samples</h4>
+        <Subheading>Code Samples</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Code Samples code'}
@@ -340,9 +348,9 @@ export class CodeSamples {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-kbd">PixelKbd</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-kbd' : '#pixel-kbd'}>PixelKbd</a></li>
       </ul>
     </section>
     </section>

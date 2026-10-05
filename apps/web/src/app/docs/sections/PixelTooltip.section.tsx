@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTooltipDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTooltipDocsMeta = {
@@ -101,10 +105,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionProps): React.ReactElement {
+export function PixelTooltipDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelTooltipDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-tooltip-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-tooltip-heading'>PixelTooltip</h2>
+      <Title id='pixel-tooltip-heading'>PixelTooltip</Title>
       <p className="docs-lead">Floating-UI-positioned tooltip that anchors a portal-rendered hint to a trigger, with hover/focus/click activation, controlled or uncontrolled open state, and configurable open/close delays.</p>
       <ul className="docs-highlights">
         <li>Auto-flip and shift via floating-ui — stays inside the viewport across all four positions.</li>
@@ -119,17 +127,17 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-tooltip-api">
-      <h3 id="pixel-tooltip-api">API</h3>
-      <FrameworkApi label={'PixelTooltip API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-tooltip-api">API</Heading>
+      <FrameworkApi label={'PixelTooltip API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-tooltip-a11y">
-      <h3 id="pixel-tooltip-a11y">Accessibility</h3>
+      <Heading id="pixel-tooltip-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>tooltip</code></li>
       </ul>
       <p className="docs-aria-notes">Floating panel has role=&quot;tooltip&quot;. While it is open, its id joins the aria-describedby of the first focusable element inside the anchor — the element a screen reader announces on focus — next to that element&#39;s own references; with nothing focusable inside, the wrapper carries it. Hover and focus triggers render a non-interactive panel (pointer-events: none) so the cursor stays on the anchor. Click triggers listen for clicks bubbling from the anchor child — the wrapper itself stays non-interactive so an interactive child (the common case) is not nested inside another control; anchor click tooltips to a button or link for keyboard support. Escape dismisses the tooltip in every trigger mode without moving the pointer or focus (WCAG 1.4.13); outside pointerdown also closes a click tooltip. Use focus or click trigger when the tooltip must be reachable without a pointer device.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -163,7 +171,7 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
       </table>
     </section>
     <section aria-labelledby="pixel-tooltip-usage">
-      <h3 id="pixel-tooltip-usage">Usage</h3>
+      <Heading id="pixel-tooltip-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelTooltip usage'}
@@ -200,9 +208,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -239,7 +247,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-positions">
-        <h4>Positions</h4>
+        <Subheading>Positions</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Positions code'}
@@ -309,7 +317,7 @@ export class Positions {}`}
         />
       </article>
       <article className="docs-example" id="example-triggers">
-        <h4>Triggers</h4>
+        <Subheading>Triggers</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Triggers code'}
@@ -370,7 +378,7 @@ export class Triggers {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -422,7 +430,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-rich-content">
-        <h4>Rich content</h4>
+        <Subheading>Rich content</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Rich content code'}
@@ -478,7 +486,7 @@ export class RichContent {}`}
         />
       </article>
       <article className="docs-example" id="example-custom-delay">
-        <h4>Custom delay</h4>
+        <Subheading>Custom delay</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom delay code'}
@@ -530,7 +538,7 @@ export class CustomDelay {}`}
         />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
+        <Subheading>Controlled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled code'}
@@ -585,7 +593,7 @@ export class Controlled {
         />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
+        <Subheading>Uncontrolled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Uncontrolled code'}
@@ -622,7 +630,7 @@ export class Uncontrolled {}`}
         />
       </article>
       <article className="docs-example" id="example-side-offset">
-        <h4>Side offset</h4>
+        <Subheading>Side offset</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Side offset code'}
@@ -675,10 +683,10 @@ export class SideOffset {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-popover">PixelPopover</a></li>
-        <li><a href="#pixel-dropdown">PixelDropdown</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-popover' : '#pixel-popover'}>PixelPopover</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-dropdown' : '#pixel-dropdown'}>PixelDropdown</a></li>
       </ul>
     </section>
     </section>

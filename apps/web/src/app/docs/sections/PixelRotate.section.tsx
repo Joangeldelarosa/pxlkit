@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelRotateDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelRotateDocsMeta = {
@@ -90,10 +94,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelRotateDocsSection({ className }: PixelRotateDocsSectionProps): React.ReactElement {
+export function PixelRotateDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelRotateDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-rotate-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-rotate-heading'>PixelRotate</h2>
+      <Title id='pixel-rotate-heading'>PixelRotate</Title>
       <p className="docs-lead">Full 360° rotation loop with configurable direction, duration, and trigger.</p>
       <ul className="docs-highlights">
         <li>Configurable duration, easing, repeat count, and animation direction</li>
@@ -107,11 +115,11 @@ export function PixelRotateDocsSection({ className }: PixelRotateDocsSectionProp
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-rotate-api">
-      <h3 id="pixel-rotate-api">API</h3>
-      <FrameworkApi label={'PixelRotate API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-rotate-api">API</Heading>
+      <FrameworkApi label={'PixelRotate API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-rotate-a11y">
-      <h3 id="pixel-rotate-a11y">Accessibility</h3>
+      <Heading id="pixel-rotate-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -119,7 +127,7 @@ export function PixelRotateDocsSection({ className }: PixelRotateDocsSectionProp
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-rotate-usage">
-      <h3 id="pixel-rotate-usage">Usage</h3>
+      <Heading id="pixel-rotate-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelRotate usage'}
@@ -156,9 +164,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -195,7 +203,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-reverse-direction">
-        <h4>Reverse Direction</h4>
+        <Subheading>Reverse Direction</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Reverse Direction code'}
@@ -232,7 +240,7 @@ export class ReverseDirection {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
-        <h4>Hover Trigger</h4>
+        <Subheading>Hover Trigger</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Hover Trigger code'}
@@ -270,11 +278,11 @@ export class HoverTrigger {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-float">PixelFloat</a></li>
-        <li><a href="#pixel-pulse">PixelPulse</a></li>
-        <li><a href="#pixel-bounce">PixelBounce</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-float' : '#pixel-float'}>PixelFloat</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pulse' : '#pixel-pulse'}>PixelPulse</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bounce' : '#pixel-bounce'}>PixelBounce</a></li>
       </ul>
     </section>
     </section>

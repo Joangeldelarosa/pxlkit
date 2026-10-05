@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBadgeDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBadgeDocsMeta = {
@@ -83,10 +87,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps): React.ReactElement {
+export function PixelBadgeDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBadgeDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-badge-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-badge-heading'>PixelBadge</h2>
+      <Title id='pixel-badge-heading'>PixelBadge</Title>
       <p className="docs-lead">Compact status indicator that labels objects with tone, variant, and optional icon — renders as a pill (linear) or chamfered tag (pixel).</p>
       <ul className="docs-highlights">
         <li>Four variants — soft (default), solid, outline, ghost — across all tone keys.</li>
@@ -101,17 +109,17 @@ export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps)
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-badge-api">
-      <h3 id="pixel-badge-api">API</h3>
-      <FrameworkApi label={'PixelBadge API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-badge-api">API</Heading>
+      <FrameworkApi label={'PixelBadge API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-badge-a11y">
-      <h3 id="pixel-badge-a11y">Accessibility</h3>
+      <Heading id="pixel-badge-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>status</code></li>
       </ul>
       <p className="docs-aria-notes">Default render is non-interactive. When it handles clicks (<code>onClick</code>, <code>@click</code> in Vue, <code>button[pxlBadge]</code> in Angular), the root is a native &lt;button type=&quot;button&quot;&gt; with a visible focus ring (focus-visible:ring-2 ring-offset). iconLeft is marked aria-hidden via inline-flex wrapper — convey meaning through the badge text, not the icon alone. For live status changes (e.g., &quot;online&quot; → &quot;offline&quot;), wrap the badge in a parent with aria-live=&quot;polite&quot;.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -135,7 +143,7 @@ export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps)
       </table>
     </section>
     <section aria-labelledby="pixel-badge-usage">
-      <h3 id="pixel-badge-usage">Usage</h3>
+      <Heading id="pixel-badge-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelBadge usage'}
@@ -162,9 +170,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -191,7 +199,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -246,7 +254,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -289,7 +297,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-variants">
-        <h4>Variants</h4>
+        <Subheading>Variants</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Variants code'}
@@ -335,7 +343,7 @@ export class Variants {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -375,7 +383,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-with-icon">
-        <h4>With Icon</h4>
+        <Subheading>With Icon</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Icon code'}
@@ -442,7 +450,7 @@ export class WithIcon {}`}
         />
       </article>
       <article className="docs-example" id="example-clickable">
-        <h4>Clickable</h4>
+        <Subheading>Clickable</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Clickable code'}
@@ -478,12 +486,12 @@ export class Clickable {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-chip">PixelChip</a></li>
-        <li><a href="#pixel-badge-group">PixelBadgeGroup</a></li>
-        <li><a href="#pixel-ribbon">PixelRibbon</a></li>
-        <li><a href="#pixel-avatar">PixelAvatar</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-chip' : '#pixel-chip'}>PixelChip</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge-group' : '#pixel-badge-group'}>PixelBadgeGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-ribbon' : '#pixel-ribbon'}>PixelRibbon</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-avatar' : '#pixel-avatar'}>PixelAvatar</a></li>
       </ul>
     </section>
     </section>

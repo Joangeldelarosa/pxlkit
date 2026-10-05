@@ -65,6 +65,12 @@ export interface FrameworkApiReferences {
 export interface FrameworkApiProps extends FrameworkApiReferences {
   /** Label of the tab list, for screen readers. */
   label: string;
+  /**
+   * The level of each component's heading when the reference lists parts:
+   * one below the heading the reference sits under (4 under a section's h3,
+   * 3 under a page's h2).
+   */
+  headingLevel?: 3 | 4;
 }
 
 /** What each framework calls the members of a component, and their absence. */
@@ -214,11 +220,20 @@ function SlotsTable({ component }: { component: ApiComponent }) {
   );
 }
 
-function ComponentApiView({ component, framework, titled }: { component: ApiComponent; framework: Framework; titled: boolean }) {
+function ComponentApiView({
+  component,
+  framework,
+  Title,
+}: {
+  component: ApiComponent;
+  framework: Framework;
+  /** The heading that names the component, when the reference lists parts. */
+  Title?: 'h3' | 'h4';
+}) {
   const members = (component.props?.length ?? 0) + (component.events?.length ?? 0) + (component.slots?.length ?? 0);
   return (
     <div className="docs-api-component">
-      {titled && <h4>{component.name}</h4>}
+      {Title && <Title>{component.name}</Title>}
       {component.selector && (
         <p>
           Selector: <code>{component.selector}</code>
@@ -243,8 +258,9 @@ function ComponentApiView({ component, framework, titled }: { component: ApiComp
  * reader's framework, and the server renders React's. Each tab starts with
  * the import, then the component and its parts.
  */
-export function FrameworkApi({ react, vue, angular, label }: FrameworkApiProps) {
+export function FrameworkApi({ react, vue, angular, label, headingLevel = 4 }: FrameworkApiProps) {
   const references: Record<Framework, ApiReference | undefined> = { react, vue, angular };
+  const Title = headingLevel === 3 ? 'h3' : 'h4';
   return (
     <FrameworkCode variant="docs" label={label} react={react.import} vue={vue?.import} angular={angular?.import}>
       {(code, framework) => {
@@ -259,7 +275,7 @@ export function FrameworkApi({ react, vue, angular, label }: FrameworkApiProps) 
                 key={component.name}
                 component={component}
                 framework={framework}
-                titled={components.length > 1}
+                Title={components.length > 1 ? Title : undefined}
               />
             ))}
           </>

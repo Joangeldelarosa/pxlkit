@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPulseDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelPulseDocsMeta = {
@@ -87,10 +91,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelPulseDocsSection({ className }: PixelPulseDocsSectionProps): React.ReactElement {
+export function PixelPulseDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelPulseDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-pulse-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-pulse-heading'>PixelPulse</h2>
+      <Title id='pixel-pulse-heading'>PixelPulse</Title>
       <p className="docs-lead">Gently scales and dims children in a recurring pulse to draw attention.</p>
       <ul className="docs-highlights">
         <li>Configurable duration, easing, and repeat count</li>
@@ -104,11 +112,11 @@ export function PixelPulseDocsSection({ className }: PixelPulseDocsSectionProps)
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-pulse-api">
-      <h3 id="pixel-pulse-api">API</h3>
-      <FrameworkApi label={'PixelPulse API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-pulse-api">API</Heading>
+      <FrameworkApi label={'PixelPulse API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-pulse-a11y">
-      <h3 id="pixel-pulse-a11y">Accessibility</h3>
+      <Heading id="pixel-pulse-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
@@ -116,7 +124,7 @@ export function PixelPulseDocsSection({ className }: PixelPulseDocsSectionProps)
       <p className="docs-aria-notes">Animation is suppressed when the user has requested reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-pulse-usage">
-      <h3 id="pixel-pulse-usage">Usage</h3>
+      <Heading id="pixel-pulse-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelPulse usage'}
@@ -153,9 +161,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -192,7 +200,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-faster-pulse">
-        <h4>Faster Pulse</h4>
+        <Subheading>Faster Pulse</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Faster Pulse code'}
@@ -229,7 +237,7 @@ export class FasterPulse {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
-        <h4>Hover Trigger</h4>
+        <Subheading>Hover Trigger</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Hover Trigger code'}
@@ -267,11 +275,11 @@ export class HoverTrigger {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-bounce">PixelBounce</a></li>
-        <li><a href="#pixel-flicker">PixelFlicker</a></li>
-        <li><a href="#pixel-glitch">PixelGlitch</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bounce' : '#pixel-bounce'}>PixelBounce</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-flicker' : '#pixel-flicker'}>PixelFlicker</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-glitch' : '#pixel-glitch'}>PixelGlitch</a></li>
       </ul>
     </section>
     </section>

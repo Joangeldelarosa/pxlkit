@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDropdownDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelDropdownDocsMeta = {
@@ -353,10 +357,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSectionProps): React.ReactElement {
+export function PixelDropdownDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelDropdownDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-dropdown-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-dropdown-heading'>PixelDropdown</h2>
+      <Title id='pixel-dropdown-heading'>PixelDropdown</Title>
       <p className="docs-lead">Button-triggered menu of actions with keyboard navigation, typeahead, and a compositional API for advanced layouts.</p>
       <ul className="docs-highlights">
         <li>Dual API: declarative <code>items[]</code> sugar and compositional <code>Root/Trigger/Content/Item</code> parts.</li>
@@ -371,18 +379,18 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-dropdown-api">
-      <h3 id="pixel-dropdown-api">API</h3>
-      <FrameworkApi label={'PixelDropdown API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-dropdown-api">API</Heading>
+      <FrameworkApi label={'PixelDropdown API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-dropdown-a11y">
-      <h3 id="pixel-dropdown-a11y">Accessibility</h3>
+      <Heading id="pixel-dropdown-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>menu</code></li>
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">Trigger exposes <code>aria-haspopup=&quot;menu&quot;</code>, <code>aria-expanded</code>, and <code>aria-controls</code> wired to the menu id while the menu is open, and names the menu through <code>aria-labelledby</code> (its own <code>id</code>, or a generated one). The open menu takes focus (<code>tabindex=&quot;-1&quot;</code>) and points <code>aria-activedescendant</code> at the highlighted item, so assistive technology follows the arrows, Home/End and typeahead. Items use <code>role=&quot;menuitem&quot;</code> — <code>menuitemcheckbox</code> and <code>menuitemradio</code> with <code>aria-checked</code> for checkbox and radio rows — with <code>aria-disabled</code> for skipped rows. Separators use <code>role=&quot;separator&quot;</code>; headers are <code>role=&quot;presentation&quot;</code>. Escape, choosing an item and Tab return focus to the trigger; a press outside closes the menu and leaves focus where the pointer put it.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -461,7 +469,7 @@ export function PixelDropdownDocsSection({ className }: PixelDropdownDocsSection
       </table>
     </section>
     <section aria-labelledby="pixel-dropdown-usage">
-      <h3 id="pixel-dropdown-usage">Usage</h3>
+      <Heading id="pixel-dropdown-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelDropdown usage'}
@@ -518,9 +526,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -577,7 +585,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -639,7 +647,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -721,7 +729,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled trigger</h4>
+        <Subheading>Disabled trigger</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled trigger code'}
@@ -754,7 +762,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-with-icons-and-shortcuts">
-        <h4>Shortcuts</h4>
+        <Subheading>Shortcuts</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Shortcuts code'}
@@ -811,7 +819,7 @@ export class WithIconsAndShortcuts {
         />
       </article>
       <article className="docs-example" id="example-headers-and-separators">
-        <h4>Headers + separators</h4>
+        <Subheading>Headers + separators</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Headers + separators code'}
@@ -871,7 +879,7 @@ export class HeadersAndSeparators {
         />
       </article>
       <article className="docs-example" id="example-checkbox-and-radio">
-        <h4>Checkbox + radio items</h4>
+        <Subheading>Checkbox + radio items</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Checkbox + radio items code'}
@@ -937,7 +945,7 @@ export class CheckboxAndRadio {
         />
       </article>
       <article className="docs-example" id="example-disabled-items">
-        <h4>Disabled items</h4>
+        <Subheading>Disabled items</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled items code'}
@@ -997,7 +1005,7 @@ export class DisabledItems {
         />
       </article>
       <article className="docs-example" id="example-composition">
-        <h4>Compositional API</h4>
+        <Subheading>Compositional API</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Compositional API code'}
@@ -1077,7 +1085,7 @@ export class Composition {
         />
       </article>
       <article className="docs-example" id="example-controlled-open">
-        <h4>Controlled open</h4>
+        <Subheading>Controlled open</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled open code'}
@@ -1140,12 +1148,12 @@ export class ControlledOpen {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-select">PixelSelect</a></li>
-        <li><a href="#pixel-menubar">PixelMenubar</a></li>
-        <li><a href="#pixel-navigation-menu">PixelNavigationMenu</a></li>
-        <li><a href="#pixel-tooltip">PixelTooltip</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-menubar' : '#pixel-menubar'}>PixelMenubar</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-navigation-menu' : '#pixel-navigation-menu'}>PixelNavigationMenu</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-tooltip' : '#pixel-tooltip'}>PixelTooltip</a></li>
       </ul>
     </section>
     </section>

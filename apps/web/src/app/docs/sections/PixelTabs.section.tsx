@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTabsDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTabsDocsMeta = {
@@ -207,10 +211,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): React.ReactElement {
+export function PixelTabsDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelTabsDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-tabs-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-tabs-heading'>PixelTabs</h2>
+      <Title id='pixel-tabs-heading'>PixelTabs</Title>
       <p className="docs-lead">Tabbed panel with roving tabindex and WAI-ARIA keyboard navigation, available as a sugar items[] API or a compositional List/Trigger/Panel API.</p>
       <ul className="docs-highlights">
         <li>Sugar API (items[]) for quick setup or compositional API (List/Trigger/Panel) for full control over rendering.</li>
@@ -225,17 +233,17 @@ export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): 
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-tabs-api">
-      <h3 id="pixel-tabs-api">API</h3>
-      <FrameworkApi label={'PixelTabs API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-tabs-api">API</Heading>
+      <FrameworkApi label={'PixelTabs API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-tabs-a11y">
-      <h3 id="pixel-tabs-a11y">Accessibility</h3>
+      <Heading id="pixel-tabs-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>tablist</code></li>
       </ul>
       <p className="docs-aria-notes">Renders role=&quot;tablist&quot; on the list container with aria-orientation reflecting the orientation prop, role=&quot;tab&quot; on each trigger with aria-selected and aria-controls wiring, and role=&quot;tabpanel&quot; on the panel with aria-labelledby pointing back at its trigger. Panels are tabIndex=0 so keyboard users can reach panel content after activating a tab. The active panel is the only one rendered by default; keepMounted preserves all panels in the DOM and uses the hidden attribute to mask inactive ones.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -294,7 +302,7 @@ export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): 
       </table>
     </section>
     <section aria-labelledby="pixel-tabs-usage">
-      <h3 id="pixel-tabs-usage">Usage</h3>
+      <Heading id="pixel-tabs-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelTabs usage'}
@@ -349,9 +357,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -406,7 +414,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
+        <Subheading>Controlled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled code'}
@@ -477,7 +485,7 @@ export class Controlled {
         />
       </article>
       <article className="docs-example" id="example-vertical">
-        <h4>Vertical</h4>
+        <Subheading>Vertical</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Vertical code'}
@@ -532,7 +540,7 @@ export class Vertical {
         />
       </article>
       <article className="docs-example" id="example-manual-activation">
-        <h4>Manual activation</h4>
+        <Subheading>Manual activation</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Manual activation code'}
@@ -594,7 +602,7 @@ export class ManualActivation {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -660,7 +668,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-scrollable">
-        <h4>Scrollable</h4>
+        <Subheading>Scrollable</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Scrollable code'}
@@ -717,7 +725,7 @@ export class Scrollable {
         />
       </article>
       <article className="docs-example" id="example-keep-mounted">
-        <h4>Keep mounted</h4>
+        <Subheading>Keep mounted</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Keep mounted code'}
@@ -779,7 +787,7 @@ export class KeepMounted {
         />
       </article>
       <article className="docs-example" id="example-compositional">
-        <h4>Compositional</h4>
+        <Subheading>Compositional</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Compositional code'}
@@ -838,11 +846,11 @@ export class Compositional {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-accordion">PixelAccordion</a></li>
-        <li><a href="#pixel-segmented">PixelSegmented</a></li>
-        <li><a href="#pixel-stepper">PixelStepper</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-accordion' : '#pixel-accordion'}>PixelAccordion</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-segmented' : '#pixel-segmented'}>PixelSegmented</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stepper' : '#pixel-stepper'}>PixelStepper</a></li>
       </ul>
     </section>
     </section>

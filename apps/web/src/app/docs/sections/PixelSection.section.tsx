@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSectionDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSectionDocsMeta = {
@@ -88,10 +92,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionProps): React.ReactElement {
+export function PixelSectionDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSectionDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-section-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-section-heading'>PixelSection</h2>
+      <Title id='pixel-section-heading'>PixelSection</Title>
       <p className="docs-lead">Bordered section with optional uppercase title row, subtitle, and surface-aware container.</p>
       <ul className="docs-highlights">
         <li>Surface-aware borders and typography</li>
@@ -105,11 +113,11 @@ export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionPr
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-section-api">
-      <h3 id="pixel-section-api">API</h3>
-      <FrameworkApi label={'PixelSection API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-section-api">API</Heading>
+      <FrameworkApi label={'PixelSection API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-section-a11y">
-      <h3 id="pixel-section-a11y">Accessibility</h3>
+      <Heading id="pixel-section-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>semantic-section</code></li>
@@ -117,7 +125,7 @@ export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionPr
       <p className="docs-aria-notes">Renders as a semantic &lt;section&gt;. When <code>title</code> is provided it becomes the section heading; consumers may add aria-labelledby externally when needed.</p>
     </section>
     <section aria-labelledby="pixel-section-usage">
-      <h3 id="pixel-section-usage">Usage</h3>
+      <Heading id="pixel-section-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSection usage'}
@@ -160,9 +168,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -205,7 +213,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-without-title">
-        <h4>Without Title</h4>
+        <Subheading>Without Title</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Without Title code'}
@@ -242,7 +250,7 @@ export class WithoutTitle {}`}
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
+        <Subheading>Pixel Surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pixel Surface code'}
@@ -279,7 +287,7 @@ export class PixelSurface {}`}
         />
       </article>
       <article className="docs-example" id="example-no-container">
-        <h4>No Container</h4>
+        <Subheading>No Container</Subheading>
         <FrameworkCode
           variant="docs"
           label={'No Container code'}
@@ -317,9 +325,9 @@ export class NoContainer {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-center">PixelCenter</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-center' : '#pixel-center'}>PixelCenter</a></li>
       </ul>
     </section>
     </section>

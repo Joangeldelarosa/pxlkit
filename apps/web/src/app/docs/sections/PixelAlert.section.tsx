@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAlertDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelAlertDocsMeta = {
@@ -86,10 +90,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps): React.ReactElement {
+export function PixelAlertDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelAlertDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-alert-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-alert-heading'>PixelAlert</h2>
+      <Title id='pixel-alert-heading'>PixelAlert</Title>
       <p className="docs-lead">Inline status banner with title, message, tone, optional icon, and action — announces itself to screen readers via role=&quot;alert&quot;.</p>
       <ul className="docs-highlights">
         <li>Seven tones (neutral, green, cyan, gold, red, purple, pink) with soft tint + matching border.</li>
@@ -104,11 +112,11 @@ export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps)
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-alert-api">
-      <h3 id="pixel-alert-api">API</h3>
-      <FrameworkApi label={'PixelAlert API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-alert-api">API</Heading>
+      <FrameworkApi label={'PixelAlert API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-alert-a11y">
-      <h3 id="pixel-alert-a11y">Accessibility</h3>
+      <Heading id="pixel-alert-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>alert</code></li>
@@ -116,7 +124,7 @@ export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps)
       <p className="docs-aria-notes">Root carries role=&quot;alert&quot; and a calculated aria-live (assertive for red/gold, polite otherwise). Icon slot is wrapped purely for layout — meaning must come from the title/message text, not the glyph. For non-urgent status (e.g. &quot;saved&quot;), pass live=&quot;polite&quot; to prevent screen-reader interruption. Action buttons are exposed as siblings of the message and receive their own focus order.</p>
     </section>
     <section aria-labelledby="pixel-alert-usage">
-      <h3 id="pixel-alert-usage">Usage</h3>
+      <Heading id="pixel-alert-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelAlert usage'}
@@ -148,9 +156,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -182,7 +190,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -237,7 +245,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -287,7 +295,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-with-icon">
-        <h4>With Icon</h4>
+        <Subheading>With Icon</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Icon code'}
@@ -349,7 +357,7 @@ export class WithIcon {}`}
         />
       </article>
       <article className="docs-example" id="example-with-action">
-        <h4>With Action</h4>
+        <Subheading>With Action</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Action code'}
@@ -426,7 +434,7 @@ export class WithAction {}`}
         />
       </article>
       <article className="docs-example" id="example-polite-live">
-        <h4>Polite Live Region</h4>
+        <Subheading>Polite Live Region</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Polite Live Region code'}
@@ -461,11 +469,11 @@ export class PoliteLive {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-toast">PixelToast</a></li>
-        <li><a href="#pixel-alert-dialog">PixelAlertDialog</a></li>
-        <li><a href="#pixel-empty-state">PixelEmptyState</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toast' : '#pixel-toast'}>PixelToast</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert-dialog' : '#pixel-alert-dialog'}>PixelAlertDialog</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-empty-state' : '#pixel-empty-state'}>PixelEmptyState</a></li>
       </ul>
     </section>
     </section>

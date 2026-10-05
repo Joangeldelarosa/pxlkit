@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStatGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelStatGroupDocsMeta = {
@@ -88,10 +92,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSectionProps): React.ReactElement {
+export function PixelStatGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelStatGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-stat-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-stat-group-heading'>PixelStatGroup</h2>
+      <Title id='pixel-stat-group-heading'>PixelStatGroup</Title>
       <p className="docs-lead">Surface-aware container that groups PixelStatCard tiles in a row with dividers or a responsive grid, with shared tone and accessible group labeling.</p>
       <ul className="docs-highlights">
         <li>Row layout with vertical dividers or grid layout with configurable columns (1–6).</li>
@@ -105,11 +113,11 @@ export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSecti
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-stat-group-api">
-      <h3 id="pixel-stat-group-api">API</h3>
-      <FrameworkApi label={'PixelStatGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-stat-group-api">API</Heading>
+      <FrameworkApi label={'PixelStatGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stat-group-a11y">
-      <h3 id="pixel-stat-group-a11y">Accessibility</h3>
+      <Heading id="pixel-stat-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
@@ -117,7 +125,7 @@ export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSecti
       <p className="docs-aria-notes">Renders as a plain &lt;div&gt; by default. When aria-label or aria-labelledby is provided, the root gains role=&quot;group&quot; to expose the collection as a named landmark to assistive tech. Without an accessible name the role is intentionally dropped to avoid an unlabeled group node. The inner stat tiles (PixelStatCard) carry their own label/value semantics.</p>
     </section>
     <section aria-labelledby="pixel-stat-group-usage">
-      <h3 id="pixel-stat-group-usage">Usage</h3>
+      <Heading id="pixel-stat-group-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelStatGroup usage'}
@@ -160,9 +168,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -205,7 +213,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-row-layout">
-        <h4>Row layout</h4>
+        <Subheading>Row layout</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Row layout code'}
@@ -248,7 +256,7 @@ export class RowLayout {}`}
         />
       </article>
       <article className="docs-example" id="example-grid-layout">
-        <h4>Grid layout</h4>
+        <Subheading>Grid layout</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Grid layout code'}
@@ -294,7 +302,7 @@ export class GridLayout {}`}
         />
       </article>
       <article className="docs-example" id="example-grid-with-gap">
-        <h4>Grid with gap</h4>
+        <Subheading>Grid with gap</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Grid with gap code'}
@@ -337,7 +345,7 @@ export class GridWithGap {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -395,7 +403,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -454,11 +462,11 @@ export class Surfaces {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-stat-card">PixelStatCard</a></li>
-        <li><a href="#pixel-badge-group">PixelBadgeGroup</a></li>
-        <li><a href="#pixel-avatar-group">PixelAvatarGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stat-card' : '#pixel-stat-card'}>PixelStatCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge-group' : '#pixel-badge-group'}>PixelBadgeGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-avatar-group' : '#pixel-avatar-group'}>PixelAvatarGroup</a></li>
       </ul>
     </section>
     </section>

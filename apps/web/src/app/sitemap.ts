@@ -1,5 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { UI_KIT_LATEST_DATE } from '@/lib/pxlkit-version';
+import { componentPagePath } from './docs/components/paths';
+import { DOCS_COMPONENT_PAGES } from './docs/sections/component-pages.generated';
 
 /**
  * Dynamic sitemap generated at build time by Next.js.
@@ -40,6 +42,11 @@ const ROUTES: Entry[] = [
   { path: '/templates/landing-full', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/templates/portfolio', changeFrequency: 'monthly', priority: 0.65 },
   { path: '/templates/ecommerce', changeFrequency: 'monthly', priority: 0.7 },
+
+  // Each component's own page, in /docs's order (generated with the docs sections).
+  ...DOCS_COMPONENT_PAGES.map(
+    ({ slug }): Entry => ({ path: componentPagePath(slug), changeFrequency: 'monthly', priority: 0.6 }),
+  ),
 ];
 
 /**

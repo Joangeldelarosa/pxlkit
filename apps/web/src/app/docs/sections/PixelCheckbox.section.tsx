@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCheckboxDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCheckboxDocsMeta = {
@@ -101,10 +105,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSectionProps): React.ReactElement {
+export function PixelCheckboxDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCheckboxDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-checkbox-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-checkbox-heading'>PixelCheckbox</h2>
+      <Title id='pixel-checkbox-heading'>PixelCheckbox</Title>
       <p className="docs-lead">Controlled boolean checkbox with a chunky pixel check mark, tone-aware fill, and optional form serialization.</p>
       <ul className="docs-highlights">
         <li>Controlled — <code>checked</code> + <code>onChange</code> (React), <code>v-model:checked</code> (Vue), <code>[(checked)]</code> or forms (Angular) — or uncontrolled with <code>defaultChecked</code></li>
@@ -119,17 +127,17 @@ export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSection
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-checkbox-api">
-      <h3 id="pixel-checkbox-api">API</h3>
-      <FrameworkApi label={'PixelCheckbox API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-checkbox-api">API</Heading>
+      <FrameworkApi label={'PixelCheckbox API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-checkbox-a11y">
-      <h3 id="pixel-checkbox-a11y">Accessibility</h3>
+      <Heading id="pixel-checkbox-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>checkbox</code></li>
       </ul>
       <p className="docs-aria-notes">Rendered as a &lt;button type=&quot;button&quot;&gt; with role=&quot;checkbox&quot; and aria-checked reflecting the boolean state. aria-disabled and aria-required mirror the disabled and required props. When a name prop is supplied a hidden &lt;input&gt; is emitted alongside so the value participates in native &lt;form&gt; submissions only while checked. Keyboard focus shows on the box: a ring in the tone on the linear surface, the box&#39;s edge on the pixel surface, whose cut corners would clip a ring.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -158,7 +166,7 @@ export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSection
       </table>
     </section>
     <section aria-labelledby="pixel-checkbox-usage">
-      <h3 id="pixel-checkbox-usage">Usage</h3>
+      <Heading id="pixel-checkbox-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelCheckbox usage'}
@@ -198,9 +206,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -240,7 +248,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-checked">
-        <h4>Checked</h4>
+        <Subheading>Checked</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Checked code'}
@@ -280,7 +288,7 @@ export class Checked {
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -399,7 +407,7 @@ export class Tones {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -459,7 +467,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -509,7 +517,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
+        <Subheading>Required</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Required code'}
@@ -550,7 +558,7 @@ export class Required {
         />
       </article>
       <article className="docs-example" id="example-with-form-name">
-        <h4>With form name</h4>
+        <Subheading>With form name</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With form name code'}
@@ -600,7 +608,7 @@ export class WithFormName {
         />
       </article>
       <article className="docs-example" id="example-group">
-        <h4>Group</h4>
+        <Subheading>Group</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Group code'}
@@ -669,11 +677,11 @@ export class Group {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-radio-group">PixelRadioGroup</a></li>
-        <li><a href="#pixel-switch">PixelSwitch</a></li>
-        <li><a href="#pixel-toggle">PixelToggle</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-radio-group' : '#pixel-radio-group'}>PixelRadioGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-switch' : '#pixel-switch'}>PixelSwitch</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toggle' : '#pixel-toggle'}>PixelToggle</a></li>
       </ul>
     </section>
     </section>

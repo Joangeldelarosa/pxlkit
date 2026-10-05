@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelNumberInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelNumberInputDocsMeta = {
@@ -138,10 +142,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsSectionProps): React.ReactElement {
+export function PixelNumberInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelNumberInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-number-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-number-input-heading'>PixelNumberInput</h2>
+      <Title id='pixel-number-input-heading'>PixelNumberInput</Title>
       <p className="docs-lead">Numeric input with spin controls, clamp behaviors, precision, prefix/suffix, and thousands-separator formatting.</p>
       <ul className="docs-highlights">
         <li>Spinbutton with ArrowUp/ArrowDown step bumps and clickable increment/decrement controls</li>
@@ -156,17 +164,17 @@ export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsS
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pixel-number-input-api">
-      <h3 id="pixel-number-input-api">API</h3>
-      <FrameworkApi label={'PixelNumberInput API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-number-input-api">API</Heading>
+      <FrameworkApi label={'PixelNumberInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-number-input-a11y">
-      <h3 id="pixel-number-input-a11y">Accessibility</h3>
+      <Heading id="pixel-number-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>spinbutton</code></li>
       </ul>
       <p className="docs-aria-notes">Renders role=&quot;spinbutton&quot; with aria-valuemin/aria-valuemax/aria-valuenow reflecting the current numeric state. Error state sets aria-invalid.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -190,7 +198,7 @@ export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsS
       </table>
     </section>
     <section aria-labelledby="pixel-number-input-usage">
-      <h3 id="pixel-number-input-usage">Usage</h3>
+      <Heading id="pixel-number-input-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelNumberInput usage'}
@@ -232,9 +240,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -276,7 +284,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-with-prefix-suffix">
-        <h4>With Prefix &amp; Suffix</h4>
+        <Subheading>With Prefix &amp; Suffix</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Prefix & Suffix code'}
@@ -339,7 +347,7 @@ export class WithPrefixSuffix {
         />
       </article>
       <article className="docs-example" id="example-thousands-separator">
-        <h4>Thousands Separator</h4>
+        <Subheading>Thousands Separator</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Thousands Separator code'}
@@ -381,7 +389,7 @@ export class ThousandsSeparator {
         />
       </article>
       <article className="docs-example" id="example-hide-controls">
-        <h4>Hide Controls</h4>
+        <Subheading>Hide Controls</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Hide Controls code'}
@@ -424,7 +432,7 @@ export class HideControls {
         />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With Error</h4>
+        <Subheading>With Error</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Error code'}
@@ -485,10 +493,10 @@ export class WithError {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-slider">PixelSlider</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-slider' : '#pixel-slider'}>PixelSlider</a></li>
       </ul>
     </section>
     </section>

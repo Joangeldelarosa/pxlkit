@@ -1544,11 +1544,12 @@ export class CreateQuest {
               components are added or removed from @pxlkit/ui-kit. */}
           <Section id="component-reference" title="Component Reference">
             <P>
-              Per-component API reference for every component of the kit — description, props,
-              accessibility contract, keyboard map, and the examples in React, Vue and Angular, all
-              generated from each component&apos;s manifest. Click an entry to
-              expand it, or deep-link with <Code>/docs#pixel-button</Code>. For live demos, head to
-              the <PixelTextLink href="/ui-kit">UI Kit showcase</PixelTextLink>.
+              Per-component reference for every component of the kit — description, accessibility
+              contract, keyboard map and the examples in React, Vue and Angular, from each
+              component&apos;s manifest, and its API in each framework (props, events, slots and
+              bindings), read from the kits&apos; sources. Click an entry to expand it, open its own
+              page, or deep-link with <Code>/docs#pixel-button</Code>. For live demos, head to the{' '}
+              <PixelTextLink href="/ui-kit">UI Kit showcase</PixelTextLink>.
             </P>
             <div className="space-y-1.5">
               <h3 className="font-pixel text-[10px] text-retro-cyan pt-4">ACTIONS (4)</h3>

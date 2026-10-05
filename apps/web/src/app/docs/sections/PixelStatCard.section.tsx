@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStatCardDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelStatCardDocsMeta = {
@@ -89,10 +93,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSectionProps): React.ReactElement {
+export function PixelStatCardDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelStatCardDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-stat-card-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-stat-card-heading'>PixelStatCard</h2>
+      <Title id='pixel-stat-card-heading'>PixelStatCard</Title>
       <p className="docs-lead">Compact metric card surfacing a label, value, optional icon and trend line for dashboards and KPI grids.</p>
       <ul className="docs-highlights">
         <li>Seven tone presets aligned with the pxlkit palette (green, cyan, gold, red, purple, pink, neutral).</li>
@@ -107,11 +115,11 @@ export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSection
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-stat-card-api">
-      <h3 id="pixel-stat-card-api">API</h3>
-      <FrameworkApi label={'PixelStatCard API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-stat-card-api">API</Heading>
+      <FrameworkApi label={'PixelStatCard API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stat-card-a11y">
-      <h3 id="pixel-stat-card-a11y">Accessibility</h3>
+      <Heading id="pixel-stat-card-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>none</code></li>
@@ -119,7 +127,7 @@ export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSection
       <p className="docs-aria-notes">Presentational card with no interactive affordances; relies on surrounding heading hierarchy and tone contrast tokens for legibility.</p>
     </section>
     <section aria-labelledby="pixel-stat-card-usage">
-      <h3 id="pixel-stat-card-usage">Usage</h3>
+      <Heading id="pixel-stat-card-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelStatCard usage'}
@@ -146,9 +154,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -175,7 +183,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -230,7 +238,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -273,7 +281,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -313,7 +321,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-icon-positions">
-        <h4>Icon positions</h4>
+        <Subheading>Icon positions</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Icon positions code'}
@@ -375,7 +383,7 @@ export class IconPositions {}`}
         />
       </article>
       <article className="docs-example" id="example-without-trend">
-        <h4>Without trend</h4>
+        <Subheading>Without trend</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Without trend code'}
@@ -402,7 +410,7 @@ export class WithoutTrend {}`}
         />
       </article>
       <article className="docs-example" id="example-toned-value-centered">
-        <h4>Toned value (centered)</h4>
+        <Subheading>Toned value (centered)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Toned value (centered) code'}
@@ -443,11 +451,11 @@ export class TonedValueCentered {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-card">PixelCard</a></li>
-        <li><a href="#pixel-stat-group">PixelStatGroup</a></li>
-        <li><a href="#pixel-sparkline">PixelSparkline</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-card' : '#pixel-card'}>PixelCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stat-group' : '#pixel-stat-group'}>PixelStatGroup</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-sparkline' : '#pixel-sparkline'}>PixelSparkline</a></li>
       </ul>
     </section>
     </section>

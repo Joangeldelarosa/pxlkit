@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStarRatingDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelStarRatingDocsMeta = {
@@ -102,10 +106,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSectionProps): React.ReactElement {
+export function PixelStarRatingDocsSection({ className, headingLevel = 2 }: PixelStarRatingDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-star-rating-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-star-rating-heading'>PixelStarRating</h2>
+      <Title id='pixel-star-rating-heading'>PixelStarRating</Title>
       <p className="docs-lead">Pixel-art star rating display with optional interactive selection and surface-aware styling.</p>
       <ul className="docs-highlights">
         <li>Renders the @pxlkit/gamification Star at 16/20/24px with crisp nearest-neighbour scaling</li>
@@ -120,18 +128,18 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
       <dt>Since</dt><dd>v2.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-star-rating-api">
-      <h3 id="pixel-star-rating-api">API</h3>
-      <FrameworkApi label={'PixelStarRating API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-star-rating-api">API</Heading>
+      <FrameworkApi label={'PixelStarRating API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-star-rating-a11y">
-      <h3 id="pixel-star-rating-a11y">Accessibility</h3>
+      <Heading id="pixel-star-rating-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>role=img with aria-label=&quot;N out of M&quot; for readonly display</code></li>
         <li><code>role=group with per-star buttons (aria-pressed) for interactive mode</code></li>
       </ul>
       <p className="docs-aria-notes">Interactive mode exposes each star as a button with aria-pressed reflecting filled state; readonly mode collapses to a single aria-labeled image.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -155,7 +163,7 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-star-rating-usage">
-      <h3 id="pixel-star-rating-usage">Usage</h3>
+      <Heading id="pixel-star-rating-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelStarRating usage'}
@@ -182,9 +190,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -211,7 +219,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-with-count">
-        <h4>With Count</h4>
+        <Subheading>With Count</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Count code'}
@@ -238,7 +246,7 @@ export class WithCount {}`}
         />
       </article>
       <article className="docs-example" id="example-green-tone">
-        <h4>Green Tone (Large)</h4>
+        <Subheading>Green Tone (Large)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Green Tone (Large) code'}
@@ -265,7 +273,7 @@ export class GreenTone {}`}
         />
       </article>
       <article className="docs-example" id="example-interactive">
-        <h4>Interactive</h4>
+        <Subheading>Interactive</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Interactive code'}
@@ -299,7 +307,7 @@ export class Interactive {
         />
       </article>
       <article className="docs-example" id="example-custom-icon">
-        <h4>Custom Icon (Heart)</h4>
+        <Subheading>Custom Icon (Heart)</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Custom Icon (Heart) code'}

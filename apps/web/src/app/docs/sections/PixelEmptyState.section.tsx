@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelEmptyStateDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelEmptyStateDocsMeta = {
@@ -77,10 +81,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelEmptyStateDocsSection({ className }: PixelEmptyStateDocsSectionProps): React.ReactElement {
+export function PixelEmptyStateDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelEmptyStateDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-empty-state-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-empty-state-heading'>PixelEmptyState</h2>
+      <Title id='pixel-empty-state-heading'>PixelEmptyState</Title>
       <p className="docs-lead">Placeholder block for empty collections or no-results states, with optional icon, title, description, and primary action.</p>
       <ul className="docs-highlights">
         <li>Centered dashed-border container that communicates absence without feeling like an error</li>
@@ -95,16 +103,16 @@ export function PixelEmptyStateDocsSection({ className }: PixelEmptyStateDocsSec
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-empty-state-api">
-      <h3 id="pixel-empty-state-api">API</h3>
-      <FrameworkApi label={'PixelEmptyState API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-empty-state-api">API</Heading>
+      <FrameworkApi label={'PixelEmptyState API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-empty-state-a11y">
-      <h3 id="pixel-empty-state-a11y">Accessibility</h3>
+      <Heading id="pixel-empty-state-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <p className="docs-aria-notes">Renders as a non-interactive &lt;div&gt; with a semantic &lt;h4&gt; for the title and a &lt;p&gt; for the description. The icon is marked aria-hidden so it is not announced. Any action passed via the action slot owns its own keyboard + screen reader semantics.</p>
     </section>
     <section aria-labelledby="pixel-empty-state-usage">
-      <h3 id="pixel-empty-state-usage">Usage</h3>
+      <Heading id="pixel-empty-state-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelEmptyState usage'}
@@ -144,9 +152,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -186,7 +194,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-with-icon">
-        <h4>With Icon</h4>
+        <Subheading>With Icon</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Icon code'}
@@ -251,7 +259,7 @@ export class WithIcon {}`}
         />
       </article>
       <article className="docs-example" id="example-with-action">
-        <h4>With Action</h4>
+        <Subheading>With Action</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Action code'}
@@ -299,7 +307,7 @@ export class WithAction {}`}
         />
       </article>
       <article className="docs-example" id="example-with-icon-and-action">
-        <h4>With Icon + Action</h4>
+        <Subheading>With Icon + Action</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Icon + Action code'}
@@ -374,7 +382,7 @@ export class WithIconAndAction {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -423,10 +431,10 @@ export class Surfaces {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-alert">PixelAlert</a></li>
-        <li><a href="#pixel-skeleton">PixelSkeleton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert' : '#pixel-alert'}>PixelAlert</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-skeleton' : '#pixel-skeleton'}>PixelSkeleton</a></li>
       </ul>
     </section>
     </section>

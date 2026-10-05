@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBoxDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBoxDocsMeta = {
@@ -87,10 +91,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): React.ReactElement {
+export function PixelBoxDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBoxDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-box-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-box-heading'>PixelBox</h2>
+      <Title id='pixel-box-heading'>PixelBox</Title>
       <p className="docs-lead">Surface-aware polymorphic container with tone, variant, padding, radius, border, and shadow controls.</p>
       <ul className="docs-highlights">
         <li>Surface-aware tokens (pixel / linear)</li>
@@ -105,11 +113,11 @@ export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): Re
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-box-api">
-      <h3 id="pixel-box-api">API</h3>
-      <FrameworkApi label={'PixelBox API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-box-api">API</Heading>
+      <FrameworkApi label={'PixelBox API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-box-a11y">
-      <h3 id="pixel-box-a11y">Accessibility</h3>
+      <Heading id="pixel-box-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>unopinionated-polymorphic-surface</code></li>
@@ -117,7 +125,7 @@ export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): Re
       <p className="docs-aria-notes">Inherits semantics from the <code>as</code> element. When <code>as</code> is a landmark (section, nav, aside, main), provide aria-label or aria-labelledby for an accessible name.</p>
     </section>
     <section aria-labelledby="pixel-box-usage">
-      <h3 id="pixel-box-usage">Usage</h3>
+      <Heading id="pixel-box-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelBox usage'}
@@ -154,9 +162,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -193,7 +201,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-outline">
-        <h4>Outline</h4>
+        <Subheading>Outline</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Outline code'}
@@ -230,7 +238,7 @@ export class Outline {}`}
         />
       </article>
       <article className="docs-example" id="example-soft">
-        <h4>Soft</h4>
+        <Subheading>Soft</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Soft code'}
@@ -267,7 +275,7 @@ export class Soft {}`}
         />
       </article>
       <article className="docs-example" id="example-as-section">
-        <h4>As Section</h4>
+        <Subheading>As Section</Subheading>
         <FrameworkCode
           variant="docs"
           label={'As Section code'}
@@ -305,11 +313,11 @@ export class AsSection {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-section">PixelSection</a></li>
-        <li><a href="#pixel-stack">PixelStack</a></li>
-        <li><a href="#pixel-cluster">PixelCluster</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-section' : '#pixel-section'}>PixelSection</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stack' : '#pixel-stack'}>PixelStack</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-cluster' : '#pixel-cluster'}>PixelCluster</a></li>
       </ul>
     </section>
     </section>

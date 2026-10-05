@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelInputGroupDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelInputGroupDocsMeta = {
@@ -89,10 +93,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSectionProps): React.ReactElement {
+export function PixelInputGroupDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelInputGroupDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-input-group-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-input-group-heading'>PixelInputGroup</h2>
+      <Title id='pixel-input-group-heading'>PixelInputGroup</Title>
       <p className="docs-lead">Visually joins multiple form controls into a single shell — strips inner borders/radii from children and adds segment dividers, so combos like country-code + phone read as one field.</p>
       <ul className="docs-highlights">
         <li>Composes any form children (input, button, select) into a single joined shell.</li>
@@ -107,17 +115,17 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-input-group-api">
-      <h3 id="pixel-input-group-api">API</h3>
-      <FrameworkApi label={'PixelInputGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-input-group-api">API</Heading>
+      <FrameworkApi label={'PixelInputGroup API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-input-group-a11y">
-      <h3 id="pixel-input-group-a11y">Accessibility</h3>
+      <Heading id="pixel-input-group-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>group</code></li>
       </ul>
       <p className="docs-aria-notes">Sets <code>role=&quot;group&quot;</code> only when given an accessible name (<code>aria-label</code> / <code>aria-labelledby</code>). Decorative addons inside should use <code>aria-hidden</code>; child controls keep their own labels. The shell clips its controls, so each shows keyboard focus inside its own edge.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -136,7 +144,7 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-input-group-usage">
-      <h3 id="pixel-input-group-usage">Usage</h3>
+      <Heading id="pixel-input-group-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelInputGroup usage'}
@@ -179,9 +187,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -224,7 +232,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-sizes">
-        <h4>Sizes</h4>
+        <Subheading>Sizes</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Sizes code'}
@@ -294,7 +302,7 @@ export class Sizes {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -352,7 +360,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-phone-with-country-code">
-        <h4>Phone with Country Code</h4>
+        <Subheading>Phone with Country Code</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Phone with Country Code code'}
@@ -408,12 +416,12 @@ export class PhoneWithCountryCode {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-bare-input">PixelBareInput</a></li>
-        <li><a href="#pixel-select">PixelSelect</a></li>
-        <li><a href="#pixel-button">PixelButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-input' : '#pixel-bare-input'}>PixelBareInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-select' : '#pixel-select'}>PixelSelect</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-button' : '#pixel-button'}>PixelButton</a></li>
       </ul>
     </section>
     </section>

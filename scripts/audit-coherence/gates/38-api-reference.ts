@@ -13,6 +13,10 @@
  *            `EMPTY_REFERENCES` below says why it takes none;
  *   - MAJOR  a section that is missing, or shows another API than the
  *            sources have (the docs were not regenerated);
+ *   - MAJOR  the modules each component's own page reads
+ *            (sections/component-pages.generated.ts and
+ *            component-sections.generated.ts) missing, or not as the
+ *            manifests would write them now;
  *   - MINOR  a reason in `EMPTY_REFERENCES` that no longer applies;
  *   - INFO   the props, events and slots without a description, per
  *            framework.
@@ -27,7 +31,8 @@ import { apiCoherenceFindings, type EmptyReferenceReasons } from '../../build-do
 import type { ApiFramework } from '../../build-docs/_lib/api-model.js';
 import { KIT_PORTS } from '../../build-docs/_lib/ports.js';
 import { documentedNames, extractApi } from '../../build-docs/extract-api.js';
-import { DEFAULT_OUT_SUBPATH, FILE_EXT } from '../../build-docs/generate-docs-page.js';
+import { componentPageModules } from '../../build-docs/_lib/component-pages.js';
+import { DEFAULT_OUT_SUBPATH, FILE_EXT, planEntryFor } from '../../build-docs/generate-docs-page.js';
 import { scanManifests } from '../../build-docs/scan-manifests.js';
 import { Gate, gateFail, gateOk, type AuditContext, type GateResult } from '../_lib/gate-base.js';
 
@@ -64,7 +69,7 @@ export class ApiReferenceGate extends Gate {
   id = 38;
   name = NAME;
   description =
-    "Every component's /docs section shows an API reference in React, Vue and Angular, read from the kits' sources and up to date, that lists its props, events and slots — or says why it takes none.";
+    "Every component's /docs section shows an API reference in React, Vue and Angular, read from the kits' sources and up to date, that lists its props, events and slots — or says why it takes none — and the component pages' modules list the manifests as they are.";
 
   async run(ctx: AuditContext): Promise<GateResult> {
     const started = performance.now();
@@ -85,6 +90,22 @@ export class ApiReferenceGate extends Gate {
       if ((await versionOf(ctx.repoRoot, port.dir)) === reactVersion) released.add(port.framework);
     }
     const findings = apiCoherenceFindings({ index, sections, released, emptyReasons: EMPTY_REFERENCES });
+    // Each component's page (/docs/components/<slug>) reads these: they list the manifests as they are.
+    for (const [fileName, expected] of Object.entries(componentPageModules(records.map((record) => planEntryFor(record, '')), FILE_EXT))) {
+      const file = `${DEFAULT_OUT_SUBPATH}/${fileName}`;
+      const absolute = path.join(ctx.repoRoot, file);
+      const actual = (await fs.pathExists(absolute)) ? await fs.readFile(absolute, 'utf8') : undefined;
+      if (actual === expected) continue;
+      findings.push({
+        severity: 'major',
+        file,
+        message:
+          actual === undefined
+            ? `${file} is missing: the component pages have no list to build from.`
+            : `${file} does not list the component pages as the manifests have them now.`,
+        suggestion: 'Run `npm run docs:build` and commit the regenerated sections.',
+      });
+    }
     const duration = Math.round(performance.now() - started);
     return findings.length === 0 ? gateOk(NAME, duration) : gateFail(NAME, findings, duration);
   }

@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitToastProviderDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PxlKitToastProviderDocsMeta = {
@@ -82,10 +86,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProviderDocsSectionProps): React.ReactElement {
+export function PxlKitToastProviderDocsSection({ className, headingLevel = 2, links = 'anchors' }: PxlKitToastProviderDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pxl-kit-toast-provider-heading'} className={className} data-status='stable'>
-      <h2 id='pxl-kit-toast-provider-heading'>PxlKitToastProvider</h2>
+      <Title id='pxl-kit-toast-provider-heading'>PxlKitToastProvider</Title>
       <p className="docs-lead">App-root toast provider that hosts the toast queue, viewport portal, and stacked/expanded visual mode — paired with useToast() (injectToast() in Angular) for imperative push/update/dismiss/promise APIs.</p>
       <ul className="docs-highlights">
         <li>Six positions (top/bottom × left/right/center) with portal-rendered viewport.</li>
@@ -100,11 +108,11 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
     <section aria-labelledby="pxl-kit-toast-provider-api">
-      <h3 id="pxl-kit-toast-provider-api">API</h3>
-      <FrameworkApi label={'PxlKitToastProvider API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pxl-kit-toast-provider-api">API</Heading>
+      <FrameworkApi label={'PxlKitToastProvider API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-toast-provider-a11y">
-      <h3 id="pxl-kit-toast-provider-a11y">Accessibility</h3>
+      <Heading id="pxl-kit-toast-provider-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>region</code></li>
@@ -112,7 +120,7 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
         <li><code>alert</code></li>
       </ul>
       <p className="docs-aria-notes">The viewport is a <code>role=&quot;region&quot;</code> landmark named after its hotkey — &quot;Notifications (F8)&quot; by default; <code>hotkey</code> sets another key or, with <code>false</code>, none — and takes focus from it (<code>tabindex=&quot;-1&quot;</code>), from where Tab reaches the toasts&#39; buttons. The hotkey works in text fields too, since F8 types nothing. Two visually hidden live regions inside the viewport, there and empty before any toast, announce the toasts: each toast&#39;s title and message are written to <code>role=&quot;status&quot;</code> — or <code>role=&quot;alert&quot;</code> for critical tones (red, gold) and <code>assertive</code> toasts — when it is pushed and when an update changes its title, message or tone (a settled promise), as new content each time, so a repeated message is read again. The cards themselves are not live regions. Toasts dismiss themselves after the provider&#39;s <code>duration</code> (4.5 s; <code>0</code> keeps them until dismissed, WCAG 2.2.1), a promise&#39;s error toast after at least 6 s; a toast&#39;s countdown holds while it is hovered or focused, while the page is hidden and while the window is in the background. Hovering or focusing the viewport expands the stacked layout. When the toast holding focus leaves, focus moves to the dismiss button of the next toast, else the previous one, else back to the element it entered the viewport from.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -146,7 +154,7 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
       </table>
     </section>
     <section aria-labelledby="pxl-kit-toast-provider-usage">
-      <h3 id="pxl-kit-toast-provider-usage">Usage</h3>
+      <Heading id="pxl-kit-toast-provider-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PxlKitToastProvider usage'}
@@ -207,9 +215,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -270,7 +278,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -342,7 +350,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-bottom-right">
-        <h4>Bottom Right</h4>
+        <Subheading>Bottom Right</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Bottom Right code'}
@@ -399,7 +407,7 @@ export class BottomRight {}`}
         />
       </article>
       <article className="docs-example" id="example-top-center">
-        <h4>Top Center</h4>
+        <Subheading>Top Center</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Top Center code'}
@@ -456,7 +464,7 @@ export class TopCenter {}`}
         />
       </article>
       <article className="docs-example" id="example-stacked">
-        <h4>Stacked</h4>
+        <Subheading>Stacked</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Stacked code'}
@@ -534,7 +542,7 @@ export class Stacked {
         />
       </article>
       <article className="docs-example" id="example-flat">
-        <h4>Flat</h4>
+        <Subheading>Flat</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Flat code'}
@@ -612,7 +620,7 @@ export class Flat {
         />
       </article>
       <article className="docs-example" id="example-pixel-surface">
-        <h4>Pixel Surface</h4>
+        <Subheading>Pixel Surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Pixel Surface code'}
@@ -685,7 +693,7 @@ export class PixelSurface {}`}
         />
       </article>
       <article className="docs-example" id="example-linear-surface">
-        <h4>Linear Surface</h4>
+        <Subheading>Linear Surface</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Linear Surface code'}
@@ -758,7 +766,7 @@ export class LinearSurface {}`}
         />
       </article>
       <article className="docs-example" id="example-loading">
-        <h4>Loading → Success</h4>
+        <Subheading>Loading → Success</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Loading → Success code'}
@@ -857,7 +865,7 @@ export class Loading {
         />
       </article>
       <article className="docs-example" id="example-promise-flow">
-        <h4>Promise Flow</h4>
+        <Subheading>Promise Flow</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Promise Flow code'}
@@ -944,7 +952,7 @@ export class PromiseFlow {
         />
       </article>
       <article className="docs-example" id="example-promise-rejected">
-        <h4>Promise Rejected</h4>
+        <Subheading>Promise Rejected</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Promise Rejected code'}
@@ -1041,7 +1049,7 @@ export class PromiseRejected {
         />
       </article>
       <article className="docs-example" id="example-max-limit">
-        <h4>Max Limit</h4>
+        <Subheading>Max Limit</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Max Limit code'}
@@ -1119,7 +1127,7 @@ export class MaxLimit {
         />
       </article>
       <article className="docs-example" id="example-with-action">
-        <h4>With Action</h4>
+        <Subheading>With Action</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Action code'}
@@ -1210,11 +1218,11 @@ export class WithAction {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-toast">PixelToast</a></li>
-        <li><a href="#pixel-alert">PixelAlert</a></li>
-        <li><a href="#pixel-alert-dialog">PixelAlertDialog</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-toast' : '#pixel-toast'}>PixelToast</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert' : '#pixel-alert'}>PixelAlert</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-alert-dialog' : '#pixel-alert-dialog'}>PixelAlertDialog</a></li>
       </ul>
     </section>
     </section>

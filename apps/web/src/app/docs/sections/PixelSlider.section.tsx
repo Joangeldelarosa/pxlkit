@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSliderDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelSliderDocsMeta = {
@@ -115,10 +119,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelSliderDocsSection({ className }: PixelSliderDocsSectionProps): React.ReactElement {
+export function PixelSliderDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelSliderDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-slider-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-slider-heading'>PixelSlider</h2>
+      <Title id='pixel-slider-heading'>PixelSlider</Title>
       <p className="docs-lead">Controlled single- or range-thumb slider with optional marks, tick grid, and per-thumb tooltips.</p>
       <ul className="docs-highlights">
         <li>Single (value: number) and range (value: [number, number]) modes share one component</li>
@@ -133,17 +141,17 @@ export function PixelSliderDocsSection({ className }: PixelSliderDocsSectionProp
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-slider-api">
-      <h3 id="pixel-slider-api">API</h3>
-      <FrameworkApi label={'PixelSlider API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-slider-api">API</Heading>
+      <FrameworkApi label={'PixelSlider API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-slider-a11y">
-      <h3 id="pixel-slider-a11y">Accessibility</h3>
+      <Heading id="pixel-slider-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>slider</code></li>
       </ul>
       <p className="docs-aria-notes">Each thumb is rendered with role=&quot;slider&quot; and exposes aria-valuemin, aria-valuemax, aria-valuenow, and an accessible label derived from the label prop. In range mode the lower thumb is constrained ≤ upper thumb on every change. Pointer interaction uses setPointerCapture so dragging tracks the cursor even when it leaves the track.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -192,7 +200,7 @@ export function PixelSliderDocsSection({ className }: PixelSliderDocsSectionProp
       </table>
     </section>
     <section aria-labelledby="pixel-slider-usage">
-      <h3 id="pixel-slider-usage">Usage</h3>
+      <Heading id="pixel-slider-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelSlider usage'}
@@ -232,9 +240,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -274,7 +282,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-range">
-        <h4>Range</h4>
+        <Subheading>Range</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Range code'}
@@ -314,7 +322,7 @@ export class Range {
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -394,7 +402,7 @@ export class Tones {
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -444,7 +452,7 @@ export class Surfaces {
         />
       </article>
       <article className="docs-example" id="example-with-min-max">
-        <h4>With min/max</h4>
+        <Subheading>With min/max</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With min/max code'}
@@ -488,7 +496,7 @@ export class WithMinMax {
         />
       </article>
       <article className="docs-example" id="example-with-marks">
-        <h4>With marks</h4>
+        <Subheading>With marks</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With marks code'}
@@ -549,7 +557,7 @@ export class WithMarks {
         />
       </article>
       <article className="docs-example" id="example-with-ticks">
-        <h4>With ticks</h4>
+        <Subheading>With ticks</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With ticks code'}
@@ -593,7 +601,7 @@ export class WithTicks {
         />
       </article>
       <article className="docs-example" id="example-with-tooltip">
-        <h4>Always tooltip</h4>
+        <Subheading>Always tooltip</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Always tooltip code'}
@@ -634,7 +642,7 @@ export class WithTooltip {
         />
       </article>
       <article className="docs-example" id="example-tooltip-on-drag">
-        <h4>Tooltip on drag</h4>
+        <Subheading>Tooltip on drag</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tooltip on drag code'}
@@ -675,7 +683,7 @@ export class TooltipOnDrag {
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -709,7 +717,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
+        <Subheading>Required</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Required code'}
@@ -751,7 +759,7 @@ export class Required {
         />
       </article>
       <article className="docs-example" id="example-range-with-marks">
-        <h4>Range with marks</h4>
+        <Subheading>Range with marks</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Range with marks code'}
@@ -811,10 +819,10 @@ export class RangeWithMarks {
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-number-input">PixelNumberInput</a></li>
-        <li><a href="#pixel-progress">PixelProgress</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-number-input' : '#pixel-number-input'}>PixelNumberInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-progress' : '#pixel-progress'}>PixelProgress</a></li>
       </ul>
     </section>
     </section>

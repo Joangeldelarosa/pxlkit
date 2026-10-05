@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBareInputDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBareInputDocsMeta = {
@@ -73,10 +77,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSectionProps): React.ReactElement {
+export function PixelBareInputDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBareInputDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-bare-input-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-bare-input-heading'>PixelBareInput</h2>
+      <Title id='pixel-bare-input-heading'>PixelBareInput</Title>
       <p className="docs-lead">Unstyled <code>&lt;input&gt;</code> primitive, the native input itself, used as an escape hatch for fully custom field compositions.</p>
       <ul className="docs-highlights">
         <li>Native <code>&lt;input&gt;</code> semantics — takes every native input attribute verbatim.</li>
@@ -90,17 +98,17 @@ export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSecti
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-bare-input-api">
-      <h3 id="pixel-bare-input-api">API</h3>
-      <FrameworkApi label={'PixelBareInput API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-bare-input-api">API</Heading>
+      <FrameworkApi label={'PixelBareInput API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bare-input-a11y">
-      <h3 id="pixel-bare-input-a11y">Accessibility</h3>
+      <Heading id="pixel-bare-input-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
       <p className="docs-aria-notes">Because this primitive is unstyled, callers MUST supply an accessible name via <code>aria-label</code>, <code>aria-labelledby</code>, or an associated <code>&lt;label&gt;</code> element. Visual focus styling is the consumer&#39;s responsibility.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -124,7 +132,7 @@ export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSecti
       </table>
     </section>
     <section aria-labelledby="pixel-bare-input-usage">
-      <h3 id="pixel-bare-input-usage">Usage</h3>
+      <Heading id="pixel-bare-input-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelBareInput usage'}
@@ -151,9 +159,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -180,7 +188,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
+        <Subheading>Uncontrolled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Uncontrolled code'}
@@ -207,7 +215,7 @@ export class Uncontrolled {}`}
         />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
+        <Subheading>Controlled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled code'}
@@ -248,7 +256,7 @@ export class Controlled {
         />
       </article>
       <article className="docs-example" id="example-email">
-        <h4>Email</h4>
+        <Subheading>Email</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Email code'}
@@ -275,7 +283,7 @@ export class Email {}`}
         />
       </article>
       <article className="docs-example" id="example-password">
-        <h4>Password</h4>
+        <Subheading>Password</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Password code'}
@@ -302,7 +310,7 @@ export class Password {}`}
         />
       </article>
       <article className="docs-example" id="example-number">
-        <h4>Number</h4>
+        <Subheading>Number</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Number code'}
@@ -333,7 +341,7 @@ export class Number {}`}
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -360,7 +368,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-read-only">
-        <h4>Read-only</h4>
+        <Subheading>Read-only</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Read-only code'}
@@ -387,7 +395,7 @@ export class ReadOnly {}`}
         />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
+        <Subheading>Required</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Required code'}
@@ -414,7 +422,7 @@ export class Required {}`}
         />
       </article>
       <article className="docs-example" id="example-with-ref">
-        <h4>With ref</h4>
+        <Subheading>With ref</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With ref code'}
@@ -463,11 +471,11 @@ export class WithRef {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-bare-textarea">PixelBareTextarea</a></li>
-        <li><a href="#pixel-bare-button">PixelBareButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-textarea' : '#pixel-bare-textarea'}>PixelBareTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-button' : '#pixel-bare-button'}>PixelBareButton</a></li>
       </ul>
     </section>
     </section>

@@ -99,6 +99,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   attributes, `ref`, attribute fallthrough). `npm run docs:build` reads it from the kits'
   sources (`scripts/build-docs/extract-api.ts`, in a worker thread), and coherence gate 38
   (`api-reference`) fails when a section shows another API than the sources have.
+- **A page for every component.** Each of the 111 components has its own statically built page,
+  `/docs/components/<slug>`, rendering its docs section on the server: the React API table and the
+  React code of every example are in the HTML, with Vue and Angular under the same tabs, and the
+  component's name is the page's one h1. Each page has its own title and description (React first,
+  within 60 and 155 characters, written by `npm run docs:build` from the manifest), a breadcrumb
+  trail with its BreadcrumbList, and links to the previous and next component in its category and
+  back to its `/docs` entry, which links to the page. The sitemap lists the 111 pages, and gate 38
+  checks that the pages' data matches the manifests.
 - **Decorative icons.** `PxlKitIcon`, `AnimatedPxlKitIcon` and `ParallaxPxlKitIcon` take `decorative`
   in React, Vue and Angular: an icon beside text that already says what it means renders `alt=""`
   (the parallax icon's container `aria-hidden`), so screen readers skip it and its name stays out

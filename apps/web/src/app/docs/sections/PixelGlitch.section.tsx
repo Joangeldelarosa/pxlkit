@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelGlitchDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelGlitchDocsMeta = {
@@ -94,10 +98,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelGlitchDocsSection({ className }: PixelGlitchDocsSectionProps): React.ReactElement {
+export function PixelGlitchDocsSection({ className, headingLevel = 2 }: PixelGlitchDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-glitch-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-glitch-heading'>PixelGlitch</h2>
+      <Title id='pixel-glitch-heading'>PixelGlitch</Title>
       <p className="docs-lead">Three-layer glitch effect (R/C ghost layers + main) with clip-path slices and color separation.</p>
       <ul className="docs-highlights">
         <li>Layered R/C color-separation ghosts for authentic CRT-glitch feel</li>
@@ -112,11 +120,11 @@ export function PixelGlitchDocsSection({ className }: PixelGlitchDocsSectionProp
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-glitch-api">
-      <h3 id="pixel-glitch-api">API</h3>
-      <FrameworkApi label={'PixelGlitch API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-glitch-api">API</Heading>
+      <FrameworkApi label={'PixelGlitch API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-glitch-a11y">
-      <h3 id="pixel-glitch-a11y">Accessibility</h3>
+      <Heading id="pixel-glitch-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>aria-hidden on decorative ghost layers</code></li>
@@ -126,7 +134,7 @@ export function PixelGlitchDocsSection({ className }: PixelGlitchDocsSectionProp
       <p className="docs-aria-notes">The copies of other content are layers marked aria-hidden, so assistive technology reads the content once, though it is in the document three times. A label is in the document once: its copies are drawn by the stylesheet, with no alternative text for assistive technology — use one for a heading. Animation is suppressed when the user prefers reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-glitch-usage">
-      <h3 id="pixel-glitch-usage">Usage</h3>
+      <Heading id="pixel-glitch-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelGlitch usage'}
@@ -163,9 +171,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -202,7 +210,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-high-intensity">
-        <h4>High intensity</h4>
+        <Subheading>High intensity</Subheading>
         <FrameworkCode
           variant="docs"
           label={'High intensity code'}
@@ -239,7 +247,7 @@ export class HighIntensity {}`}
         />
       </article>
       <article className="docs-example" id="example-hover-trigger">
-        <h4>Hover trigger</h4>
+        <Subheading>Hover trigger</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Hover trigger code'}
@@ -276,7 +284,7 @@ export class HoverTrigger {}`}
         />
       </article>
       <article className="docs-example" id="example-heading-label">
-        <h4>Heading label</h4>
+        <Subheading>Heading label</Subheading>
         <p>A label glitches with its text once in the document: the copies are drawn by the stylesheet, so a heading reads once to crawlers, copying and screen readers. Put the heading around the glitch, as a span.</p>
         <FrameworkCode
           variant="docs"

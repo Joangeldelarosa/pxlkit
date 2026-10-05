@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCardDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCardDocsMeta = {
@@ -175,10 +179,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): React.ReactElement {
+export function PixelCardDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCardDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-card-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-card-heading'>PixelCard</h2>
+      <Title id='pixel-card-heading'>PixelCard</Title>
       <p className="docs-lead">Container card with title, optional icon, description, media, ribbon badge, body, and footer — surfaces as <code>&lt;article&gt;</code>, <code>&lt;a href&gt;</code>, or <code>role=&quot;button&quot;</code> depending on props.</p>
       <ul className="docs-highlights">
         <li>Pixel + linear surfaces with optional tone tint on border and soft background</li>
@@ -192,17 +200,17 @@ export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): 
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-card-api">
-      <h3 id="pixel-card-api">API</h3>
-      <FrameworkApi label={'PixelCard API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-card-api">API</Heading>
+      <FrameworkApi label={'PixelCard API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-card-a11y">
-      <h3 id="pixel-card-a11y">Accessibility</h3>
+      <Heading id="pixel-card-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">When interactive without href, the root renders as &lt;div role=&quot;button&quot; tabindex=&quot;0&quot;&gt; with Enter/Space activation parity (&lt;article&gt; does not permit role=&quot;button&quot;). When href is set, the root renders as a native &lt;a&gt; — nesting interactive children (buttons, links) inside footer or media is invalid in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -231,7 +239,7 @@ export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): 
       </table>
     </section>
     <section aria-labelledby="pixel-card-usage">
-      <h3 id="pixel-card-usage">Usage</h3>
+      <Heading id="pixel-card-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelCard usage'}
@@ -268,9 +276,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -307,7 +315,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-headerless">
-        <h4>Headerless</h4>
+        <Subheading>Headerless</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Headerless code'}
@@ -344,7 +352,7 @@ export class Headerless {}`}
         />
       </article>
       <article className="docs-example" id="example-with-icon">
-        <h4>With Icon</h4>
+        <Subheading>With Icon</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Icon code'}
@@ -399,7 +407,7 @@ export class WithIcon {}`}
         />
       </article>
       <article className="docs-example" id="example-with-description">
-        <h4>With Description</h4>
+        <Subheading>With Description</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Description code'}
@@ -445,7 +453,7 @@ export class WithDescription {}`}
         />
       </article>
       <article className="docs-example" id="example-with-footer">
-        <h4>With Footer</h4>
+        <Subheading>With Footer</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Footer code'}
@@ -489,7 +497,7 @@ export class WithFooter {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -535,7 +543,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -575,7 +583,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-interactive">
-        <h4>Interactive</h4>
+        <Subheading>Interactive</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Interactive code'}
@@ -636,7 +644,7 @@ export class Interactive {
         />
       </article>
       <article className="docs-example" id="example-as-link">
-        <h4>As Link</h4>
+        <Subheading>As Link</Subheading>
         <FrameworkCode
           variant="docs"
           label={'As Link code'}
@@ -686,7 +694,7 @@ export class AsLink {}`}
         />
       </article>
       <article className="docs-example" id="example-with-media">
-        <h4>With Media</h4>
+        <Subheading>With Media</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Media code'}
@@ -730,7 +738,7 @@ export class WithMedia {}`}
         />
       </article>
       <article className="docs-example" id="example-with-badge">
-        <h4>With Ribbon Badge</h4>
+        <Subheading>With Ribbon Badge</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Ribbon Badge code'}
@@ -779,7 +787,7 @@ export class WithBadge {}`}
         />
       </article>
       <article className="docs-example" id="example-clamped-description">
-        <h4>Clamped Description</h4>
+        <Subheading>Clamped Description</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Clamped Description code'}
@@ -828,7 +836,7 @@ export class ClampedDescription {}`}
         />
       </article>
       <article className="docs-example" id="example-padding-scale">
-        <h4>Padding Scale</h4>
+        <Subheading>Padding Scale</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Padding Scale code'}
@@ -868,7 +876,7 @@ export class PaddingScale {}`}
         />
       </article>
       <article className="docs-example" id="example-with-subcomponents">
-        <h4>With Subcomponents</h4>
+        <Subheading>With Subcomponents</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With Subcomponents code'}
@@ -930,12 +938,12 @@ export class WithSubcomponents {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-stat-card">PixelStatCard</a></li>
-        <li><a href="#pixel-feature-card">PixelFeatureCard</a></li>
-        <li><a href="#pixel-pricing-card">PixelPricingCard</a></li>
-        <li><a href="#pixel-testimonial-card">PixelTestimonialCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-stat-card' : '#pixel-stat-card'}>PixelStatCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-feature-card' : '#pixel-feature-card'}>PixelFeatureCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-pricing-card' : '#pixel-pricing-card'}>PixelPricingCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-testimonial-card' : '#pixel-testimonial-card'}>PixelTestimonialCard</a></li>
       </ul>
     </section>
     </section>

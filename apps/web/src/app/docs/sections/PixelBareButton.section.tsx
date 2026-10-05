@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBareButtonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelBareButtonDocsMeta = {
@@ -67,10 +71,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSectionProps): React.ReactElement {
+export function PixelBareButtonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelBareButtonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-bare-button-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-bare-button-heading'>PixelBareButton</h2>
+      <Title id='pixel-bare-button-heading'>PixelBareButton</Title>
       <p className="docs-lead">Unstyled passthrough <code>&lt;button&gt;</code> primitive — escape hatch for composing custom buttons without inheriting pixel-kit visuals.</p>
       <ul className="docs-highlights">
         <li>Zero styling — renders a raw &lt;button&gt; with all native attributes forwarded</li>
@@ -85,17 +93,17 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-bare-button-api">
-      <h3 id="pixel-bare-button-api">API</h3>
-      <FrameworkApi label={'PixelBareButton API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-bare-button-api">API</Heading>
+      <FrameworkApi label={'PixelBareButton API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bare-button-a11y">
-      <h3 id="pixel-bare-button-a11y">Accessibility</h3>
+      <Heading id="pixel-bare-button-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
       <p className="docs-aria-notes">Renders a native &lt;button&gt;, so keyboard activation and focus semantics come for free. Consumer is responsible for visible focus styles, contrast, and providing aria-label when the button has no text content (e.g. icon-only triggers).</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -119,7 +127,7 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
       </table>
     </section>
     <section aria-labelledby="pixel-bare-button-usage">
-      <h3 id="pixel-bare-button-usage">Usage</h3>
+      <Heading id="pixel-bare-button-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelBareButton usage'}
@@ -146,9 +154,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -175,7 +183,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-with-custom-class">
-        <h4>With custom class</h4>
+        <Subheading>With custom class</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With custom class code'}
@@ -215,7 +223,7 @@ export class WithCustomClass {}`}
         />
       </article>
       <article className="docs-example" id="example-with-on-click">
-        <h4>With onClick</h4>
+        <Subheading>With onClick</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With onClick code'}
@@ -253,7 +261,7 @@ export class WithOnClick {
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -284,7 +292,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-submit-type">
-        <h4>Submit / reset type</h4>
+        <Subheading>Submit / reset type</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Submit / reset type code'}
@@ -329,7 +337,7 @@ export class SubmitType {}`}
         />
       </article>
       <article className="docs-example" id="example-as-icon-trigger">
-        <h4>As icon trigger</h4>
+        <Subheading>As icon trigger</Subheading>
         <FrameworkCode
           variant="docs"
           label={'As icon trigger code'}
@@ -383,11 +391,11 @@ export class AsIconTrigger {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-button">PixelButton</a></li>
-        <li><a href="#pixel-bare-input">PixelBareInput</a></li>
-        <li><a href="#pixel-bare-textarea">PixelBareTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-button' : '#pixel-button'}>PixelButton</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-input' : '#pixel-bare-input'}>PixelBareInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-textarea' : '#pixel-bare-textarea'}>PixelBareTextarea</a></li>
       </ul>
     </section>
     </section>

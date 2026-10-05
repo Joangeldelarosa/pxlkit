@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCenterDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelCenterDocsMeta = {
@@ -87,10 +91,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProps): React.ReactElement {
+export function PixelCenterDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelCenterDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-center-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-center-heading'>PixelCenter</h2>
+      <Title id='pixel-center-heading'>PixelCenter</Title>
       <p className="docs-lead">Polymorphic max-width wrapper that centers content horizontally with token-driven page gutters.</p>
       <ul className="docs-highlights">
         <li>Token-driven max-width via the containerWidth scale</li>
@@ -105,11 +113,11 @@ export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProp
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-center-api">
-      <h3 id="pixel-center-api">API</h3>
-      <FrameworkApi label={'PixelCenter API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-center-api">API</Heading>
+      <FrameworkApi label={'PixelCenter API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-center-a11y">
-      <h3 id="pixel-center-a11y">Accessibility</h3>
+      <Heading id="pixel-center-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>polymorphic-wrapper</code></li>
@@ -117,7 +125,7 @@ export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProp
       <p className="docs-aria-notes">Renders as &lt;div&gt; by default; consumers pass <code>as</code> to inherit appropriate semantics (e.g. section, main, article). No additional ARIA is required.</p>
     </section>
     <section aria-labelledby="pixel-center-usage">
-      <h3 id="pixel-center-usage">Usage</h3>
+      <Heading id="pixel-center-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelCenter usage'}
@@ -160,9 +168,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -205,7 +213,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-narrow-prose">
-        <h4>Narrow Prose</h4>
+        <Subheading>Narrow Prose</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Narrow Prose code'}
@@ -248,7 +256,7 @@ export class NarrowProse {}`}
         />
       </article>
       <article className="docs-example" id="example-text-centered">
-        <h4>Text Centered</h4>
+        <Subheading>Text Centered</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Text Centered code'}
@@ -291,7 +299,7 @@ export class TextCentered {}`}
         />
       </article>
       <article className="docs-example" id="example-as-section">
-        <h4>As Section</h4>
+        <Subheading>As Section</Subheading>
         <FrameworkCode
           variant="docs"
           label={'As Section code'}
@@ -335,10 +343,10 @@ export class AsSection {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-section">PixelSection</a></li>
-        <li><a href="#pixel-container">PixelContainer</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-section' : '#pixel-section'}>PixelSection</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-container' : '#pixel-container'}>PixelContainer</a></li>
       </ul>
     </section>
     </section>

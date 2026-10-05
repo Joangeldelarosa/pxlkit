@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelRibbonDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelRibbonDocsMeta = {
@@ -83,10 +87,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelRibbonDocsSection({ className }: PixelRibbonDocsSectionProps): React.ReactElement {
+export function PixelRibbonDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelRibbonDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-ribbon-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-ribbon-heading'>PixelRibbon</h2>
+      <Title id='pixel-ribbon-heading'>PixelRibbon</Title>
       <p className="docs-lead">Absolutely-positioned decorative ribbon for cards — surface-aware, tone-driven, with corner-tilt presets.</p>
       <ul className="docs-highlights">
         <li>Five position presets (top-center/left/right, corner-tl/tr)</li>
@@ -100,11 +108,11 @@ export function PixelRibbonDocsSection({ className }: PixelRibbonDocsSectionProp
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
     <section aria-labelledby="pixel-ribbon-api">
-      <h3 id="pixel-ribbon-api">API</h3>
-      <FrameworkApi label={'PixelRibbon API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-ribbon-api">API</Heading>
+      <FrameworkApi label={'PixelRibbon API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-ribbon-a11y">
-      <h3 id="pixel-ribbon-a11y">Accessibility</h3>
+      <Heading id="pixel-ribbon-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>Decorative text node — wrap in role=img with aria-label when content is purely visual</code></li>
@@ -113,7 +121,7 @@ export function PixelRibbonDocsSection({ className }: PixelRibbonDocsSectionProp
       <p className="docs-aria-notes">Ribbon is non-interactive; pair its message with the card heading so screen readers still convey the badge meaning.</p>
     </section>
     <section aria-labelledby="pixel-ribbon-usage">
-      <h3 id="pixel-ribbon-usage">Usage</h3>
+      <Heading id="pixel-ribbon-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelRibbon usage'}
@@ -162,9 +170,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -213,7 +221,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-corner-tilted">
-        <h4>Corner tilted</h4>
+        <Subheading>Corner tilted</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Corner tilted code'}
@@ -264,7 +272,7 @@ export class CornerTilted {}`}
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -341,7 +349,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-position-left">
-        <h4>Position left</h4>
+        <Subheading>Position left</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Position left code'}
@@ -393,10 +401,10 @@ export class PositionLeft {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-badge">PixelBadge</a></li>
-        <li><a href="#pixel-card">PixelCard</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-badge' : '#pixel-badge'}>PixelBadge</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-card' : '#pixel-card'}>PixelCard</a></li>
       </ul>
     </section>
     </section>

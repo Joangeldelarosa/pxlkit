@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFadeInDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelFadeInDocsMeta = {
@@ -93,10 +97,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelFadeInDocsSection({ className }: PixelFadeInDocsSectionProps): React.ReactElement {
+export function PixelFadeInDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelFadeInDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-fade-in-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-fade-in-heading'>PixelFadeIn</h2>
+      <Title id='pixel-fade-in-heading'>PixelFadeIn</Title>
       <p className="docs-lead">Fades children from opacity 0 to 1 with configurable duration, delay, easing, and trigger.</p>
       <ul className="docs-highlights">
         <li>Mount, hover, click, or in-view triggers</li>
@@ -111,11 +119,11 @@ export function PixelFadeInDocsSection({ className }: PixelFadeInDocsSectionProp
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
     <section aria-labelledby="pixel-fade-in-api">
-      <h3 id="pixel-fade-in-api">API</h3>
-      <FrameworkApi label={'PixelFadeIn API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-fade-in-api">API</Heading>
+      <FrameworkApi label={'PixelFadeIn API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-fade-in-a11y">
-      <h3 id="pixel-fade-in-a11y">Accessibility</h3>
+      <Heading id="pixel-fade-in-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>prefers-reduced-motion</code></li>
@@ -123,7 +131,7 @@ export function PixelFadeInDocsSection({ className }: PixelFadeInDocsSectionProp
       <p className="docs-aria-notes">Animation is suppressed when the user prefers reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-fade-in-usage">
-      <h3 id="pixel-fade-in-usage">Usage</h3>
+      <Heading id="pixel-fade-in-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelFadeIn usage'}
@@ -162,9 +170,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -203,7 +211,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-delayed">
-        <h4>Delayed</h4>
+        <Subheading>Delayed</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Delayed code'}
@@ -242,7 +250,7 @@ export class Delayed {}`}
         />
       </article>
       <article className="docs-example" id="example-on-hover">
-        <h4>On Hover</h4>
+        <Subheading>On Hover</Subheading>
         <FrameworkCode
           variant="docs"
           label={'On Hover code'}
@@ -282,11 +290,11 @@ export class OnHover {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-slide-in">PixelSlideIn</a></li>
-        <li><a href="#pixel-scale-in">PixelScaleIn</a></li>
-        <li><a href="#pixel-blur-in">PixelBlurIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-slide-in' : '#pixel-slide-in'}>PixelSlideIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-scale-in' : '#pixel-scale-in'}>PixelScaleIn</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-blur-in' : '#pixel-blur-in'}>PixelBlurIn</a></li>
       </ul>
     </section>
     </section>

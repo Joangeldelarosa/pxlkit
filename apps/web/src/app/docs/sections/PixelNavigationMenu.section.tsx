@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelNavigationMenuDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelNavigationMenuDocsMeta = {
@@ -76,10 +80,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMenuDocsSectionProps): React.ReactElement {
+export function PixelNavigationMenuDocsSection({ className, headingLevel = 2 }: PixelNavigationMenuDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-navigation-menu-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-navigation-menu-heading'>PixelNavigationMenu</h2>
+      <Title id='pixel-navigation-menu-heading'>PixelNavigationMenu</Title>
       <p className="docs-lead">Accessible nav landmark with optional mega-panel submenus, keyboard navigation, and surface-aware styling.</p>
       <ul className="docs-highlights">
         <li>Horizontal or vertical orientation</li>
@@ -94,18 +102,18 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
     <section aria-labelledby="pixel-navigation-menu-api">
-      <h3 id="pixel-navigation-menu-api">API</h3>
-      <FrameworkApi label={'PixelNavigationMenu API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-navigation-menu-api">API</Heading>
+      <FrameworkApi label={'PixelNavigationMenu API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-navigation-menu-a11y">
-      <h3 id="pixel-navigation-menu-a11y">Accessibility</h3>
+      <Heading id="pixel-navigation-menu-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>disclosure</code></li>
         <li><code>link</code></li>
       </ul>
       <p className="docs-aria-notes">Follows the WAI-ARIA disclosure navigation pattern, without menu roles (those are for application menus): a <code>&lt;nav&gt;</code> landmark — give it a unique <code>ariaLabel</code> when the page has more than one (WCAG 2.4.6) — holding a list of links, and of buttons with <code>aria-expanded</code> and <code>aria-controls</code> for the items with <code>content</code>. Each panel is a plain container rendered right after its button, inside the same list item, so Tab moves from the button into the open panel; the shared viewport is only drawn below the whole list. A click, or Enter / Space on the button, toggles the panel; focus alone never opens it. A mouse pointing at an item opens its panel — touch and pen pointers do not, so a tap opens it once — and the pointer leaving the menu closes that panel, unless a click on its button kept it open: a panel opened by a click stays open until a click on its button or another one, or Escape. A panel that closes while focus is inside it hands focus back to its button. An item with both an <code>href</code> and <code>content</code> is a button whose activation toggles the panel instead of navigating.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -179,7 +187,7 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
       </table>
     </section>
     <section aria-labelledby="pixel-navigation-menu-usage">
-      <h3 id="pixel-navigation-menu-usage">Usage</h3>
+      <Heading id="pixel-navigation-menu-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelNavigationMenu usage'}
@@ -257,9 +265,9 @@ export class Default {
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -337,7 +345,7 @@ export class Default {
         />
       </article>
       <article className="docs-example" id="example-vertical">
-        <h4>Vertical</h4>
+        <Subheading>Vertical</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Vertical code'}
@@ -385,7 +393,7 @@ export class Vertical {
         />
       </article>
       <article className="docs-example" id="example-inline-panels">
-        <h4>Inline Panels</h4>
+        <Subheading>Inline Panels</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Inline Panels code'}

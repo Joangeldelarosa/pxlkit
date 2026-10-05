@@ -8,6 +8,10 @@ import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTextareaDocsSectionProps {
   className?: string;
+  /** The level of the section's heading: 2 within /docs, 1 as the component's own page. Its subsections follow one level below. */
+  headingLevel?: 1 | 2;
+  /** Where its related components link: their entries on /docs, or their own pages. */
+  links?: 'anchors' | 'pages';
 }
 
 export const PixelTextareaDocsMeta = {
@@ -114,10 +118,14 @@ const api: FrameworkApiReferences = {
   },
 };
 
-export function PixelTextareaDocsSection({ className }: PixelTextareaDocsSectionProps): React.ReactElement {
+export function PixelTextareaDocsSection({ className, headingLevel = 2, links = 'anchors' }: PixelTextareaDocsSectionProps): React.ReactElement {
+  // h2, h3 and h4 within /docs; h1, h2 and h3 as the component's own page.
+  const Title = headingLevel === 1 ? 'h1' : 'h2';
+  const Heading = headingLevel === 1 ? 'h2' : 'h3';
+  const Subheading = headingLevel === 1 ? 'h3' : 'h4';
   return (
     <section aria-labelledby={'pixel-textarea-heading'} className={className} data-status='stable'>
-      <h2 id='pixel-textarea-heading'>PixelTextarea</h2>
+      <Title id='pixel-textarea-heading'>PixelTextarea</Title>
       <p className="docs-lead">Multi-line text input with label, hint, error chrome plus optional auto-grow and character counter.</p>
       <ul className="docs-highlights">
         <li>Label / hint / error chrome via FieldShell — same DX as PixelInput</li>
@@ -132,17 +140,17 @@ export function PixelTextareaDocsSection({ className }: PixelTextareaDocsSection
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
     <section aria-labelledby="pixel-textarea-api">
-      <h3 id="pixel-textarea-api">API</h3>
-      <FrameworkApi label={'PixelTextarea API'} react={api.react} vue={api.vue} angular={api.angular} />
+      <Heading id="pixel-textarea-api">API</Heading>
+      <FrameworkApi label={'PixelTextarea API'} headingLevel={headingLevel === 1 ? 3 : 4} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-textarea-a11y">
-      <h3 id="pixel-textarea-a11y">Accessibility</h3>
+      <Heading id="pixel-textarea-a11y">Accessibility</Heading>
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
       <p className="docs-aria-notes">Wraps a native &lt;textarea&gt; so multiline textbox semantics are announced by assistive tech automatically. The label prop is wired through FieldShell, error toggles aria-invalid, and the hint/error it shows is exposed via aria-describedby, after any ids you pass. The counter uses aria-live=&quot;polite&quot; so screen readers announce updates without stealing focus.</p>
-      <h4>Keyboard</h4>
+      <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>
           <tr>
@@ -171,7 +179,7 @@ export function PixelTextareaDocsSection({ className }: PixelTextareaDocsSection
       </table>
     </section>
     <section aria-labelledby="pixel-textarea-usage">
-      <h3 id="pixel-textarea-usage">Usage</h3>
+      <Heading id="pixel-textarea-usage">Usage</Heading>
       <FrameworkCode
         variant="docs"
         label={'PixelTextarea usage'}
@@ -204,9 +212,9 @@ export class Default {}`}
       />
     </section>
     <section aria-label="Examples">
-      <h3>Examples</h3>
+      <Heading>Examples</Heading>
       <article className="docs-example" id="example-default">
-        <h4>Default</h4>
+        <Subheading>Default</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
@@ -239,7 +247,7 @@ export class Default {}`}
         />
       </article>
       <article className="docs-example" id="example-uncontrolled">
-        <h4>Uncontrolled</h4>
+        <Subheading>Uncontrolled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Uncontrolled code'}
@@ -272,7 +280,7 @@ export class Uncontrolled {}`}
         />
       </article>
       <article className="docs-example" id="example-controlled">
-        <h4>Controlled</h4>
+        <Subheading>Controlled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Controlled code'}
@@ -321,7 +329,7 @@ export class Controlled {
         />
       </article>
       <article className="docs-example" id="example-tones">
-        <h4>Tones</h4>
+        <Subheading>Tones</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Tones code'}
@@ -376,7 +384,7 @@ export class Tones {}`}
         />
       </article>
       <article className="docs-example" id="example-surfaces">
-        <h4>Surfaces</h4>
+        <Subheading>Surfaces</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Surfaces code'}
@@ -416,7 +424,7 @@ export class Surfaces {}`}
         />
       </article>
       <article className="docs-example" id="example-with-error">
-        <h4>With error</h4>
+        <Subheading>With error</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With error code'}
@@ -462,7 +470,7 @@ export class WithError {}`}
         />
       </article>
       <article className="docs-example" id="example-disabled">
-        <h4>Disabled</h4>
+        <Subheading>Disabled</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Disabled code'}
@@ -495,7 +503,7 @@ export class Disabled {}`}
         />
       </article>
       <article className="docs-example" id="example-autosize">
-        <h4>Autosize</h4>
+        <Subheading>Autosize</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Autosize code'}
@@ -540,7 +548,7 @@ export class Autosize {
         />
       </article>
       <article className="docs-example" id="example-with-char-count">
-        <h4>With char count</h4>
+        <Subheading>With char count</Subheading>
         <FrameworkCode
           variant="docs"
           label={'With char count code'}
@@ -584,7 +592,7 @@ export class WithCharCount {
         />
       </article>
       <article className="docs-example" id="example-required">
-        <h4>Required</h4>
+        <Subheading>Required</Subheading>
         <FrameworkCode
           variant="docs"
           label={'Required code'}
@@ -619,10 +627,10 @@ export class Required {}`}
       </article>
     </section>
     <section aria-label="Related components">
-      <h3>Related</h3>
+      <Heading>Related</Heading>
       <ul className="docs-related">
-        <li><a href="#pixel-input">PixelInput</a></li>
-        <li><a href="#pixel-bare-textarea">PixelBareTextarea</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-input' : '#pixel-input'}>PixelInput</a></li>
+        <li><a href={links === 'pages' ? '/docs/components/pixel-bare-textarea' : '#pixel-bare-textarea'}>PixelBareTextarea</a></li>
       </ul>
     </section>
     </section>
