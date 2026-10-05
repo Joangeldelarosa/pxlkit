@@ -101,7 +101,7 @@ export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSec
       <h2 id='pixel-radio-group-heading'>PixelRadioGroup</h2>
       <p className="docs-lead">Single-select grouped radios with a pixel dot indicator, fieldset/legend semantics, and tone + surface variants.</p>
       <ul className="docs-highlights">
-        <li>Controlled via value + onChange(next: string) over a list of options.</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — over a list of options.</li>
         <li>Renders as a real &lt;fieldset&gt; with role=&quot;radiogroup&quot; and a &lt;legend&gt; from label.</li>
         <li>Seven tones and pixel/linear surfaces share the kit-wide design tokens.</li>
         <li>Optional name emits a hidden input so it serializes inside native forms.</li>

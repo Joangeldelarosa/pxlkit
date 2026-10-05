@@ -108,7 +108,7 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
         <li>Focus trap, scroll lock and Escape-to-close out of the box</li>
         <li>Optional drag handle affordance for touch dismissal</li>
         <li>WCAG 4.1.2 compliant: requires <code>title</code> or <code>aria-label</code> for accessible name</li>
-        <li>Surface-aware borders inherited from theme context</li>
+        <li>Surface-aware borders from the nearest PxlKitSurfaceProvider</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

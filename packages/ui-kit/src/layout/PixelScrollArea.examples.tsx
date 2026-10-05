@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelScrollArea } from './PixelScrollArea';
 
 export function Default() {

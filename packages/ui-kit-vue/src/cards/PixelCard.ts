@@ -68,7 +68,7 @@ export type PixelCardProps = ExtractPublicPropTypes<typeof cardProps>;
  * </PixelCard>
  * <PixelCard title="Open" interactive @click="open">…</PixelCard>
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelCard',
   inheritAttrs: false,
   props: cardProps,

@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelBounce } from './PixelBounce';
 
 export function Default() {

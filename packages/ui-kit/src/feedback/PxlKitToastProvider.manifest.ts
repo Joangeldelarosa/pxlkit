@@ -24,7 +24,7 @@ export default defineManifest({
   since: '1.8.0',
   status: 'stable',
   description:
-    'App-root toast provider that hosts the toast queue, viewport portal, and stacked/expanded visual mode — paired with useToast() for imperative push/update/dismiss/promise APIs.',
+    'App-root toast provider that hosts the toast queue, viewport portal, and stacked/expanded visual mode — paired with useToast() (injectToast() in Angular) for imperative push/update/dismiss/promise APIs.',
   highlights: [
     'Six positions (top/bottom × left/right/center) with portal-rendered viewport.',
     'Sonner-style stacked mode: collapsed cards peek behind the front, hover/focus expands the stack.',

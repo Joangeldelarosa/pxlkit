@@ -28,7 +28,7 @@ export type PixelTimelineProps = ExtractPublicPropTypes<typeof timelineProps>;
  *   <PixelTimelineItem label="Packed" time="11:20" />
  * </PixelTimeline>
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelTimeline',
   props: timelineProps,
   slots: Object as SlotsType<{

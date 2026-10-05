@@ -77,7 +77,7 @@ export function PixelToastDocsSection({ className }: PixelToastDocsSectionProps)
   return (
     <section aria-labelledby={'pixel-toast-heading'} className={className} data-status='stable'>
       <h2 id='pixel-toast-heading'>PixelToast</h2>
-      <p className="docs-lead">Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast().</p>
+      <p className="docs-lead">Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast() (injectToast() in Angular).</p>
       <ul className="docs-highlights">
         <li>Seven tones with matching border, text color, and HP-bar accent on pixel surface.</li>
         <li>Auto-dismiss with a visual progress bar; hover, focus, a hidden page or a background window pause the countdown.</li>

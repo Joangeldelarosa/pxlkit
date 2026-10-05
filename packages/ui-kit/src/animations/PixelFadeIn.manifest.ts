@@ -12,8 +12,8 @@ export default defineManifest({
     'Mount, hover, click, or in-view triggers',
     'Configurable duration, delay, easing, and fill-mode',
     'Iteration count supports finite or infinite repeats',
-    'onComplete callback fires after the final iteration',
-    'Respects prefers-reduced-motion via useReducedMotion',
+    'Signals the end of its last iteration: `onComplete` (React), `@complete` (Vue), `(complete)` (Angular)',
+    'Respects prefers-reduced-motion automatically',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

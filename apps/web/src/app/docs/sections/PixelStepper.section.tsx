@@ -50,10 +50,9 @@ const api: FrameworkApiReferences = {
           { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner in the indicator.' },
           { name: 'completed', type: 'boolean', default: 'false', description: 'Marks the step done, with a check mark.' },
           { name: 'error', type: 'boolean', default: 'false', description: 'Marks the step failed, with a cross; wins over `completed`.' },
-          { name: 'children', type: 'React.ReactNode', description: 'Not rendered: a step shows its `label`, `description` and `icon`.' },
         ],
         notes: [
-          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `children`.',
           '`ref` points to `<div>`.',
         ],
       },
@@ -139,10 +138,10 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
       <h2 id='pixel-stepper-heading'>PixelStepper</h2>
       <p className="docs-lead">Multi-step progress indicator with completed/active/pending/error/loading states, horizontal or vertical orientation, and full keyboard navigation.</p>
       <ul className="docs-highlights">
-        <li>Compound API (PixelStepper + PixelStepper.Step) keeps step content declarative and easy to reorder.</li>
+        <li>Compound API (a stepper and its steps: <code>PixelStepper.Step</code>, <code>PixelStepperStep</code> in Vue, <code>pxl-stepper-step</code> in Angular) keeps step content declarative and easy to reorder.</li>
         <li>Per-step states (completed, active, pending, error, loading) with tone-mapped indicators and connectors.</li>
         <li>Horizontal or vertical orientation with roving focus, Arrow/Home/End keys, and Enter/Space activation.</li>
-        <li>Optional onStepClick handler with allowNextStepsSelect gate so future steps stay locked until allowed.</li>
+        <li>Optional step clicks (<code>onStepClick</code>, <code>@step-click</code> in Vue, <code>clickable</code> + <code>(stepClick)</code> in Angular) with allowNextStepsSelect gate so future steps stay locked until allowed.</li>
         <li>Surface-aware (pixel/linear) and size-aware (sm/md/lg), inheriting kit-wide tokens and focus rings.</li>
       </ul>
     <dl className="docs-meta">
@@ -160,7 +159,7 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
       <ul className="docs-aria-patterns">
         <li><code>progress-steps</code></li>
       </ul>
-      <p className="docs-aria-notes">The root renders role=&quot;group&quot; with a configurable ariaLabel (defaults to &quot;Progress steps&quot;). A clickable step is role=&quot;button&quot;, named by its position (&quot;Step N of M&quot;), its label and its state (current/completed/error) and described by its description. A step that is not clickable (no onStepClick, or a future step when allowNextStepsSelect is false) has no role and stays out of the tab sequence; since ARIA does not let an element without a role take a name, it reads its position and state as visually hidden text around its label. The active step is marked with aria-current=&quot;step&quot;. Indicators and connectors are aria-hidden so screen readers announce only the step label and state.</p>
+      <p className="docs-aria-notes">The root renders role=&quot;group&quot; with a configurable ariaLabel (defaults to &quot;Progress steps&quot;). A clickable step is role=&quot;button&quot;, named by its position (&quot;Step N of M&quot;), its label and its state (current/completed/error) and described by its description. A step that is not clickable (no step click handling, or a future step when allowNextStepsSelect is false) has no role and stays out of the tab sequence; since ARIA does not let an element without a role take a name, it reads its position and state as visually hidden text around its label. The active step is marked with aria-current=&quot;step&quot;. Indicators and connectors are aria-hidden so screen readers announce only the step label and state.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

@@ -10,13 +10,13 @@ export default defineManifest({
   since: '1.8.0',
   status: 'stable',
   description:
-    'shadcn-style compound wrapper around react-hook-form: Root / Field / Item / Label / Control / Description / Message auto-wire ids and aria-* across each field.',
+    'Validated form on each framework\'s form library (React Hook Form, VeeValidate, Angular reactive forms): its form, field, item, label, control, description and message parts auto-wire ids and aria-* across each field.',
   highlights: [
-    'Compound API (`PixelForm.Root` + `.Field` + `.Item` + `.Label` + `.Control` + `.Description` + `.Message`) for composable forms.',
+    'Compound API for composable forms: form, field, item, label, control, description and message (`PixelForm.Root` + `.Field` + … in React, `PixelForm` + `PixelFormField` + … in Vue, `form[pxlForm]` + `[pxlFormField]` + … in Angular).',
     'Auto-generates linked ids and wires `aria-describedby` + `aria-invalid` on the controlled field.',
-    'Uses `react-hook-form` `Controller` under the hood — works with any input that accepts `value`/`onChange`/`ref`.',
-    '`Message` auto-renders the field error when present; falls back to children otherwise.',
-    'Surface-aware: `surface` prop on Root/Label/Description/Message follows kit-wide design tokens.',
+    'Built on each framework\'s form library — React Hook Form, VeeValidate, Angular reactive forms — so any control it binds works: `value`/`onChange`/`ref` in React, `v-model` in Vue, a `ControlValueAccessor` in Angular.',
+    'The message shows the field error, as an alert, while there is one; in React and Vue, content you give it shows instead.',
+    'Surface-aware: a `surface` on the form, label, description or message follows kit-wide design tokens.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
@@ -30,7 +30,7 @@ export default defineManifest({
       { key: 'Enter', does: 'Submit the form from any focused input.' },
     ],
     notes:
-      'Each `PixelForm.Item` generates a stable `useId()` base and links the Label (htmlFor), Control (id + aria-describedby + aria-invalid), Description (id), and Message (id, role="alert" on error) automatically — authors do not pass ids manually.',
+      'Each item generates a stable id base and links the label (`for`), the control (id + aria-describedby + aria-invalid), the description (id) and the message (id, role="alert" on error) automatically — authors do not pass ids manually.',
   },
   related: [
     'PixelInput',

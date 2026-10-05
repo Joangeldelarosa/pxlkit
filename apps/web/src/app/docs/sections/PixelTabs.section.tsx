@@ -27,7 +27,7 @@ const api: FrameworkApiReferences = {
       {
         name: 'PixelTabs',
         props: [
-          { name: 'items', type: 'TabItem[]', description: 'Sugar API. When omitted, use <PixelTabs.List>/<PixelTabs.Trigger>/<PixelTabs.Panel>.' },
+          { name: 'items', type: 'TabItem[]', description: 'The tabs as data. Without them, compose `PixelTabs.List`, `PixelTabs.Trigger` and `PixelTabs.Panel`.' },
           { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial active tab id. Canonical name; aliases `defaultTab`.' },
           { name: 'defaultTab', type: 'string', deprecated: 'Use `defaultValue` instead. Retained as alias for one minor.' },
           { name: 'value', type: 'string', description: 'Controlled active tab id. When set, `defaultValue` is ignored.' },

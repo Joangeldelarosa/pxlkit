@@ -2,18 +2,19 @@
  * PixelIconButton (and PxlKitButton, its deprecated alias) — a square,
  * icon-only button named by its required label.
  */
-import { cn, focusRing, sizeSquare, surfaceClasses, toneMap, type Size, type Surface, type Tone } from '../../common';
+import { cn, cornerShadowClasses, focusRing, sizeSquare, surfaceClasses, toneMap, type Size, type Surface, type Tone } from '../../common';
 
 export interface IconButtonOptions {
   tone: Tone;
   size: Size;
-  /** A disabled button drops its shadows. */
+  /** A disabled button drops its shadows and holds still. */
   disabled: boolean;
 }
 
 /** The square button. */
 export function iconButtonClasses(surface: Surface, { tone, size, disabled }: IconButtonOptions): string {
   const s = surfaceClasses(surface);
+  const c = cornerShadowClasses(surface);
   const t = toneMap[tone];
   return cn(
     'inline-flex items-center justify-center focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
@@ -27,9 +28,9 @@ export function iconButtonClasses(surface: Surface, { tone, size, disabled }: Ic
     t.hover,
     focusRing,
     t.ring,
-    !disabled && s.shadow,
-    !disabled && s.shadowHover,
-    !disabled && s.shadowActive,
+    !disabled && c.shadow,
+    !disabled && c.shadowHover,
+    !disabled && c.shadowActive,
   );
 }
 

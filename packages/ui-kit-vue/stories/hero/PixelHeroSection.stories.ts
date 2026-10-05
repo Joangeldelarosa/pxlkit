@@ -11,6 +11,7 @@ import SplitExample from '../../examples/hero/PixelHeroSection/Split.vue';
 import CompactExample from '../../examples/hero/PixelHeroSection/Compact.vue';
 import TypewriterHeadlineExample from '../../examples/hero/PixelHeroSection/TypewriterHeadline.vue';
 import GlitchHeadlineExample from '../../examples/hero/PixelHeroSection/GlitchHeadline.vue';
+import HeadingLevelExample from '../../examples/hero/PixelHeroSection/HeadingLevel.vue';
 
 const meta: Meta = {
   title: 'UI Kit / Hero / PixelHeroSection',
@@ -83,6 +84,18 @@ export const GlitchHeadline: Story = {
   parameters: {
     docs: {
       source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelHeroSection } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <PixelHeroSection\n    density="compact"\n    min-height="sm"\n    headline="Signal lost"\n    headline-effect="glitch"\n    subline="The headline glitches, and holds still for readers who prefer reduced motion."\n    tone="red"\n  />\n</template>' },
+    },
+  },
+};
+
+/** Heading level */
+export const HeadingLevel: Story = {
+  name: 'Heading level',
+  tags: ['example-heading-level'],
+  render: () => HeadingLevelExample,
+  parameters: {
+    docs: {
+      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelHeroSection } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <PixelHeroSection\n    as="h2"\n    density="compact"\n    min-height="sm"\n    eyebrow="Embedded"\n    headline="A hero inside a page"\n    subline="Its headline is an h2, under the page\'s own h1."\n  />\n</template>' },
     },
   },
 };

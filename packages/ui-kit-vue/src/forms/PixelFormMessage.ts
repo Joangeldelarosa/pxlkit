@@ -24,7 +24,7 @@ function hasContent(nodes: VNode[]): boolean {
  * @example
  * <PixelFormMessage />
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelFormMessage',
   props: messageProps,
   slots: Object as SlotsType<{

@@ -109,9 +109,9 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
       <p className="docs-lead">Pixel-art star rating display with optional interactive selection and surface-aware styling.</p>
       <ul className="docs-highlights">
         <li>Renders the @pxlkit/gamification Star at 16/20/24px with crisp nearest-neighbour scaling</li>
-        <li>Gold or green tone tokens for readonly and interactive states, surface-aware via useEffectiveSurface</li>
+        <li>Gold or green tone tokens for readonly and interactive states, surface-aware (pixel / linear)</li>
         <li>Optional showCount label renders &quot;N/M&quot; beside the stars</li>
-        <li>Interactive mode exposes per-star buttons with onChange callback</li>
+        <li>Interactive mode exposes per-star buttons; bind the rating with <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular)</li>
         <li>Polymorphic starIcon prop swaps in any sibling-pack glyph without forking</li>
       </ul>
     <dl className="docs-meta">

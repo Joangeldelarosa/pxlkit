@@ -96,8 +96,8 @@ export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps)
         <li>Direction toggle between column and row flex layouts</li>
         <li>Token-based gap scale via stackGap for consistent rhythm</li>
         <li>Alignment and justification helpers including baseline and space variants</li>
-        <li>Surface-aware transitions through useEffectiveSurface</li>
-        <li>Polymorphic via the <code>as</code> prop to render any intrinsic element</li>
+        <li>Surface-aware transitions</li>
+        <li>Polymorphic via the <code>as</code> prop to render any intrinsic element (in Angular, the element you put <code>pxlStack</code> on)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

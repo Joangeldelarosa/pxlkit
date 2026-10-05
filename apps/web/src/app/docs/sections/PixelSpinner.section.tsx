@@ -86,7 +86,7 @@ export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionPr
         <li>Surface-aware: 8-step pixel rotation vs smooth linear sweep</li>
         <li>Respects prefers-reduced-motion (freezes animation, keeps shape)</li>
         <li>role=status with sr-only label by default; decorative mode for nested use</li>
-        <li>forwardRef to the host span; SSR-safe and tree-shakable</li>
+        <li>SSR-safe and tree-shakable</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

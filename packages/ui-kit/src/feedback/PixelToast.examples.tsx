@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelToast } from './PixelToast';
 import type { ToastItem } from './PxlKitToastProvider';
 import { PixelButton } from '../actions';

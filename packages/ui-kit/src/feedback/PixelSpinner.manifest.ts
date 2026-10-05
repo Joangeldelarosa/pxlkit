@@ -22,7 +22,7 @@ export default defineManifest({
     'Surface-aware: 8-step pixel rotation vs smooth linear sweep',
     'Respects prefers-reduced-motion (freezes animation, keeps shape)',
     'role=status with sr-only label by default; decorative mode for nested use',
-    'forwardRef to the host span; SSR-safe and tree-shakable',
+    'SSR-safe and tree-shakable',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

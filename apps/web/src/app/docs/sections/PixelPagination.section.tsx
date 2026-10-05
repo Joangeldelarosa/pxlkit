@@ -98,7 +98,7 @@ export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSec
         <li>Configurable siblings to widen or tighten the visible window around the current page.</li>
         <li>Prev/Next buttons auto-disable at the edges (page 1 and last page).</li>
         <li>Localised prevLabel, nextLabel, and ariaLabel for i18n.</li>
-        <li>Pixel and linear surfaces follow ambient surface context.</li>
+        <li>Pixel and linear surfaces follow the nearest PxlKitSurfaceProvider.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

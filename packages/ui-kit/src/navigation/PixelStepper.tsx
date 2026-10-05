@@ -86,8 +86,6 @@ export interface PixelStepperStepProps
   completed?: boolean;
   /** Marks the step failed, with a cross; wins over `completed`. */
   error?: boolean;
-  /** Not rendered: a step shows its `label`, `description` and `icon`. */
-  children?: React.ReactNode;
 }
 
 export const PixelStepperStep = forwardRef<HTMLDivElement, PixelStepperStepProps>(
@@ -99,7 +97,6 @@ export const PixelStepperStep = forwardRef<HTMLDivElement, PixelStepperStepProps
       loading = false,
       completed = false,
       error = false,
-      children: _children,
       className,
       onClick,
       ...rest

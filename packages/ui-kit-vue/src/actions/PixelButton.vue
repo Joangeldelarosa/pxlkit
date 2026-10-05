@@ -2,6 +2,7 @@
 import { computed, ref, useTemplateRef, watch, type VNode } from 'vue';
 import {
   cn,
+  cornerShadowClasses,
   focusRing,
   sizeClass,
   surfaceClasses,
@@ -67,6 +68,8 @@ const surface = useEffectiveSurface(() => props.surface);
 
 const classes = computed(() => {
   const s = surfaceClasses(surface.value);
+  // No drop shadow on pixel, whose cut corners clip it: the nudge and press alone.
+  const c = cornerShadowClasses(surface.value);
   const t = toneMap[props.tone];
   const isGhost = props.variant === 'ghost';
   const isOutline = props.variant === 'outline';
@@ -76,10 +79,10 @@ const classes = computed(() => {
   const variantClasses = isGhost
     ? cn('border border-transparent bg-transparent', t.hover)
     : isOutline
-      ? cn(s.border, t.border, 'bg-transparent', t.hover, enabled && s.shadow, enabled && s.shadowHover)
+      ? cn(s.border, t.border, 'bg-transparent', t.hover, enabled && c.shadow, enabled && c.shadowHover)
       : isSoft
-        ? cn(s.border, t.border, t.soft, t.hover, enabled && s.shadow, enabled && s.shadowHover)
-        : cn(s.border, t.border, t.bg, t.hover, enabled && s.shadow, enabled && s.shadowHover);
+        ? cn(s.border, t.border, t.soft, t.hover, enabled && c.shadow, enabled && c.shadowHover)
+        : cn(s.border, t.border, t.bg, t.hover, enabled && c.shadow, enabled && c.shadowHover);
 
   return cn(
     'inline-flex items-center justify-center font-medium focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
@@ -92,7 +95,7 @@ const classes = computed(() => {
     t.text,
     props.fullWidth && 'w-full',
     variantClasses,
-    enabled && (isGhost || isOutline ? 'active:scale-[0.97]' : s.shadowActive),
+    enabled && (isGhost || isOutline ? 'active:scale-[0.97]' : c.shadowActive),
   );
 });
 

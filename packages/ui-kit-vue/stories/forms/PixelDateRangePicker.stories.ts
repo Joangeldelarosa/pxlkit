@@ -25,13 +25,14 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-/** Default */
+/** Default — The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today's mark can differ from the browser's. */
 export const Default: Story = {
   name: 'Default',
   tags: ['example-default'],
   render: () => DefaultExample,
   parameters: {
     docs: {
+      description: { story: 'The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today\'s mark can differ from the browser\'s.' },
       source: { language: 'html', code: '<script setup lang="ts">\nimport { ref } from \'vue\';\nimport { PixelDateRangePicker, type DateRangeValue } from \'@pxlkit/ui-kit-vue\';\n\nconst range = ref<DateRangeValue>({});\n</script>\n\n<template>\n  <PixelDateRangePicker v-model="range" label="Date range" placeholder="Select date range" />\n</template>' },
     },
   },

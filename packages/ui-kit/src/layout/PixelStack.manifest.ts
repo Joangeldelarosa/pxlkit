@@ -19,8 +19,8 @@ export default defineManifest({
     'Direction toggle between column and row flex layouts',
     'Token-based gap scale via stackGap for consistent rhythm',
     'Alignment and justification helpers including baseline and space variants',
-    'Surface-aware transitions through useEffectiveSurface',
-    'Polymorphic via the `as` prop to render any intrinsic element',
+    'Surface-aware transitions',
+    'Polymorphic via the `as` prop to render any intrinsic element (in Angular, the element you put `pxlStack` on)',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

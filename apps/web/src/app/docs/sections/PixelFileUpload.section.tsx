@@ -132,9 +132,9 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
       <p className="docs-lead">Dropzone + click-to-browse file uploader with accept/size/count validation, image thumbnails, and per-item removal.</p>
       <ul className="docs-highlights">
         <li>Drag-and-drop or click/keyboard to open the native file picker</li>
-        <li>Validates against accept, maxSize, and maxFiles with onReject callback</li>
+        <li>Validates against accept, maxSize, and maxFiles and reports the rejected files (<code>onReject</code>, <code>@reject</code> in Vue, <code>(reject)</code> in Angular)</li>
         <li>Image previews via object URLs with automatic revoke on unmount</li>
-        <li>Controlled or uncontrolled file list via useControllableState</li>
+        <li>Controlled file list — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
         <li>Surface-aware styling with size, label, hint, and error props</li>
       </ul>
     <dl className="docs-meta">

@@ -49,7 +49,7 @@ export class InlineInProse {}
   imports: [PixelCodeInline],
   template: `
     <div class="flex flex-col gap-2">
-      <div>Import: <code pxlCodeInline>import &#123; PixelCodeInline &#125; from '&#64;pxlkit/ui'</code></div>
+      <div>Import: <code pxlCodeInline>import &#123; PixelCodeInline &#125; from '&#64;pxlkit/ui-kit'</code></div>
       <div>Hotkey: <code pxlCodeInline tone="purple">Ctrl+K</code></div>
       <div>Error: <code pxlCodeInline tone="red">EACCES</code></div>
     </div>

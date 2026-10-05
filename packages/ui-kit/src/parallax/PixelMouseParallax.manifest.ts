@@ -11,9 +11,8 @@ export default defineManifest({
     'Cursor-tracking parallax layer that translates children based on mouse position with smooth lerp.',
   highlights: [
     'Smoothed translate3d follow with configurable strength',
-    'Invert mode to repel children from the cursor',
+    'Invert mode to repel its content from the cursor',
     'GPU-accelerated via will-change-transform',
-    'Forwards ref to the underlying div',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

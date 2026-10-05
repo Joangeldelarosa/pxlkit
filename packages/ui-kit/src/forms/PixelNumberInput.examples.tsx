@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PixelNumberInput } from './PixelNumberInput';
 
 export function Default() {

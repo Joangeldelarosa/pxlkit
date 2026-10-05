@@ -11,6 +11,7 @@ import {
   type HeroHeadlineEffect,
   type HeroMinHeight,
   type HeroVariant,
+  type SectionHeaderLevel,
   type Surface,
   type ToneKey,
 } from '@pxlkit/ui-kit-core';
@@ -22,8 +23,13 @@ import PixelContainer from '../layout/PixelContainer.vue';
 import PixelTwoColumn from '../layout/PixelTwoColumn.vue';
 
 const heroSectionProps = {
-  /** The `<h1>`. */
+  /** The headline: the page's `<h1>`, unless `as` sets another level. */
   headline: { type: String, required: true },
+  /**
+   * Element of the headline. A hero embedded under the page's own `<h1>`
+   * (a demo, a template) takes a lower level.
+   */
+  as: { type: String as PropType<SectionHeaderLevel>, default: 'h1' },
   /** `centered` and `parallax` centre the text; `split` puts the `media` slot in a column beside it. */
   variant: { type: String as PropType<HeroVariant>, default: 'centered' },
   /** Small upper-cased line above the headline, in the tone. */
@@ -49,11 +55,12 @@ const heroSectionProps = {
 export type PixelHeroSectionProps = ExtractPublicPropTypes<typeof heroSectionProps>;
 
 /**
- * The opening `<section>` of a page: an eyebrow, the `<h1>` headline, a
- * subline, a row of calls to action, an install snippet and a meta line,
- * with media in a column beside the text (`split`), behind it as a
- * decorative layer (`parallax`) or below it. Attributes go to the section;
- * an `aria-label` makes it a labelled landmark.
+ * The opening `<section>` of a page: an eyebrow, the headline (an `<h1>`
+ * unless `as` says otherwise), a subline, a row of calls to action, an
+ * install snippet and a meta line, with media in a column beside the text
+ * (`split`), behind it as a decorative layer (`parallax`) or below it.
+ * Attributes go to the section; an `aria-label` makes it a labelled
+ * landmark.
  *
  * @example
  * <PixelHeroSection eyebrow="Introducing" headline="Pixel-perfect retro UI" variant="split">
@@ -61,7 +68,7 @@ export type PixelHeroSectionProps = ExtractPublicPropTypes<typeof heroSectionPro
  *   <template #media><img src="/shot.png" alt="" /></template>
  * </PixelHeroSection>
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelHeroSection',
   props: heroSectionProps,
   slots: Object as SlotsType<{
@@ -97,14 +104,20 @@ export default defineComponent({
           slots['primary-cta']?.(),
           slots['secondary-cta']?.(),
         ]);
+      // One heading, its text once, whatever the effect: the glitch goes inside
+      // the heading, as a span, and its copies of the text are drawn by CSS.
       const headline = h(
-        'h1',
+        props.as,
         { class: c.headline },
-        props.headlineEffect === 'typewriter' ? h(PixelTypewriter, { label: props.headline, tone: 'inherit' }) : props.headline,
+        props.headlineEffect === 'typewriter'
+          ? h(PixelTypewriter, { label: props.headline, tone: 'inherit' })
+          : props.headlineEffect === 'glitch'
+            ? h(PixelGlitch, { as: 'span', label: props.headline })
+            : props.headline,
       );
       const text = h('div', { class: c.text }, [
         props.eyebrow ? h('span', { class: c.eyebrow }, props.eyebrow) : null,
-        props.headlineEffect === 'glitch' ? h(PixelGlitch, null, () => headline) : headline,
+        headline,
         props.subline ? h('p', { class: c.subline }, props.subline) : null,
         ctas,
         slots.install && h('div', { class: c.install }, slots.install()),

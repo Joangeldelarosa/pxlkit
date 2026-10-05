@@ -85,8 +85,8 @@ export function PixelClusterDocsSection({ className }: PixelClusterDocsSectionPr
       <p className="docs-lead">Horizontal wrap container for clustering inline items (chips, tags, actions) with consistent gap, alignment, and justification.</p>
       <ul className="docs-highlights">
         <li>Flex row with wrap and configurable stack gap token</li>
-        <li>Surface-aware via useEffectiveSurface for transitions</li>
-        <li>Polymorphic via <code>as</code> to render as any intrinsic element</li>
+        <li>Surface-aware transitions</li>
+        <li>Polymorphic via <code>as</code> to render as any intrinsic element (in Angular, the element you put <code>pxlCluster</code> on)</li>
         <li>Align and justify props mirror flexbox semantics</li>
       </ul>
     <dl className="docs-meta">

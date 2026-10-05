@@ -52,12 +52,29 @@ describe('PixelButton', () => {
     expect(wrapper.text()).toBe('Plain text');
   });
 
+  it('moves a pixel button on hover and press without a drop shadow, which its cut corners would clip', () => {
+    const press = { solid: 'pxl-nudge-active', soft: 'pxl-nudge-active', outline: 'active:scale-[0.97]' } as const;
+    for (const [variant, pressed] of Object.entries(press) as Array<[keyof typeof press, string]>) {
+      const classes = mount(PixelButton, { props: { variant } }).classes();
+      expect(classes).toEqual(expect.arrayContaining(['pxl-corner-sm', 'pxl-nudge-hover', pressed]));
+      for (const shadow of ['pxl-shadow', 'pxl-shadow-hover', 'pxl-shadow-active']) expect(classes).not.toContain(shadow);
+    }
+  });
+
+  it('keeps the linear shadows', () => {
+    const classes = mount(PixelButton, { props: { surface: 'linear', variant: 'soft' } }).classes();
+    expect(classes).toEqual(expect.arrayContaining(['shadow-sm', 'hover:shadow-md', 'active:shadow-sm']));
+  });
+
   it('drops shadows and press feedback when disabled', () => {
-    const enabled = mount(PixelButton, { props: { variant: 'soft' } });
-    const disabled = mount(PixelButton, { props: { variant: 'soft', disabled: true } });
-    expect(enabled.classes()).toContain('pxl-shadow');
-    expect(disabled.classes()).not.toContain('pxl-shadow');
-    expect(disabled.classes()).not.toContain('pxl-shadow-active');
+    for (const surface of ['pixel', 'linear'] as const) {
+      const enabled = mount(PixelButton, { props: { surface, variant: 'soft' } });
+      const disabled = mount(PixelButton, { props: { surface, variant: 'soft', disabled: true } });
+      expect(enabled.classes()).toContain(surface === 'pixel' ? 'pxl-nudge-active' : 'shadow-sm');
+      for (const name of ['pxl-shadow', 'pxl-shadow-active', 'pxl-nudge-hover', 'pxl-nudge-active', 'shadow-sm', 'hover:shadow-md', 'active:shadow-sm']) {
+        expect(disabled.classes()).not.toContain(name);
+      }
+    }
   });
 
   it('rings keyboard focus, keeping an outline for forced-colors mode, which drops the ring', () => {

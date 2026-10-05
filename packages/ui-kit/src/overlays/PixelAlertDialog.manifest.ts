@@ -15,7 +15,7 @@ export default defineManifest({
     'role="alertdialog" + aria-modal with initial focus pinned to Cancel for safer destructive flows',
     'Async onAction with pending state, spinner, and stays open on rejection when onError is provided',
     'Destructive tone variant switches the action accent to red',
-    'Surface-aware styling via useEffectiveSurface (pixel chrome vs. modern)',
+    'Surface-aware styling (pixel chrome vs. linear)',
     'Scroll lock, focus trap, and Escape-to-close baked in',
   ],
   examples: [

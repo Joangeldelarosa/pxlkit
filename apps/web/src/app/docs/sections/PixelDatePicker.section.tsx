@@ -128,7 +128,7 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
       <h2 id='pixel-date-picker-heading'>PixelDatePicker</h2>
       <p className="docs-lead">Accessible date input with popover calendar grid, keyboard navigation, presets, and min/max constraints.</p>
       <ul className="docs-highlights">
-        <li>Controlled and uncontrolled usage via value/defaultValue + onChange</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
         <li>Popover calendar with roving tabindex and full keyboard navigation</li>
         <li>Min/max bounds plus disabledDates (array or predicate)</li>
         <li>Optional quick-select presets and clearable trigger</li>
@@ -270,6 +270,7 @@ export class Default {
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
+        <p>The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today&#39;s mark can differ from the browser&#39;s.</p>
         <FrameworkCode
           variant="docs"
           label={'Default code'}

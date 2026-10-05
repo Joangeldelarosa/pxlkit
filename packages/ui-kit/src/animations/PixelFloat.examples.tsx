@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelFloat } from './PixelFloat';
 
 export function Default() {

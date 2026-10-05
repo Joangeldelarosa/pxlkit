@@ -26,7 +26,7 @@ const meta: Meta = {
   parameters: {
     controls: { disable: true },
     docs: {
-      description: { component: 'Unstyled, forwardRef-enabled `<input>` primitive used as an escape hatch for fully custom field compositions.' },
+      description: { component: 'Unstyled `<input>` primitive, the native input itself, used as an escape hatch for fully custom field compositions.' },
     },
   },
 };
@@ -149,7 +149,7 @@ export const WithRef: Story = {
   render: () => ({ props: { example: WithRefExample }, template: '<ng-container *ngComponentOutlet="example" />' }),
   parameters: {
     docs: {
-      source: { language: 'typescript', code: 'import { Component, ElementRef, viewChild } from \'@angular/core\';\nimport { PixelBareInput } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelBareInput],\n  template: `<input pxlBareInput #field placeholder="Focus me via ref" />`,\n})\nexport class WithRef {\n  // The directive\'s host is the native input itself.\n  readonly field = viewChild.required<ElementRef<HTMLInputElement>>(\'field\');\n}' },
+      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelBareInput, PixelButton } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelBareInput, PixelButton],\n  template: `\n    <div class="flex items-center gap-2">\n      <input pxlBareInput #field placeholder="Focus me via ref" />\n      <button pxlButton size="sm" (click)="field.focus()">Focus</button>\n    </div>\n  `,\n})\nexport class WithRef {}' },
     },
   },
 };

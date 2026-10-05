@@ -29,13 +29,14 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-/** Default */
+/** Default — Shows the current month and marks today, by the clock of whatever renders it: a server render can differ from the browser's (a page built on another day, another time zone) and fail to hydrate. For a stable server render pass month (and value or defaultValue), or render a current-month calendar in the browser only: next/dynamic with ssr: false (Next.js), ClientOnly (Nuxt), @defer (Angular). */
 export const Default: Story = {
   name: 'Default',
   tags: ['example-default'],
   render: () => ({ props: { example: DefaultExample }, template: '<ng-container *ngComponentOutlet="example" />' }),
   parameters: {
     docs: {
+      description: { story: 'Shows the current month and marks today, by the clock of whatever renders it: a server render can differ from the browser\'s (a page built on another day, another time zone) and fail to hydrate. For a stable server render pass month (and value or defaultValue), or render a current-month calendar in the browser only: next/dynamic with ssr: false (Next.js), ClientOnly (Nuxt), @defer (Angular).' },
       source: { language: 'typescript', code: 'import { Component, signal } from \'@angular/core\';\nimport { PixelCalendarGrid } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelCalendarGrid],\n  template: `<pxl-calendar-grid [(value)]="value" />`,\n})\nexport class Default {\n  readonly value = signal<Date | null>(null);\n}' },
     },
   },

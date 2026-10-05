@@ -12,12 +12,13 @@ import {
   type HeroHeadlineEffect,
   type HeroMinHeight,
   type HeroVariant,
+  type SectionHeaderLevel,
   type Surface,
   type ToneKey,
 } from '@pxlkit/ui-kit-core';
 import { withDefault } from '../_internal/coercion';
 import { PxlOutlet, type PxlContent } from '../_internal/outlet';
-import { PixelGlitch, PixelGlitchContent } from '../animations/pixel-glitch';
+import { PixelGlitch } from '../animations/pixel-glitch';
 import { PixelTypewriter } from '../animations/pixel-typewriter';
 import { PixelCluster } from '../layout/pixel-cluster';
 import { PixelContainer } from '../layout/pixel-container';
@@ -25,12 +26,12 @@ import { PixelTwoColumn } from '../layout/pixel-two-column';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 
 /**
- * The opening `<section>` of a page: an eyebrow, the `<h1>` headline, a
- * subline, a row of calls to action, an install snippet and a meta line,
- * with media in a column beside the text (`split`), behind it as a
- * decorative layer (`parallax`) or below it. The calls to action, install,
- * meta and media take text or an `<ng-template>`; an `aria-label` on the
- * section makes it a labelled landmark.
+ * The opening `<section>` of a page: an eyebrow, the headline (an `<h1>`
+ * unless `as` says otherwise), a subline, a row of calls to action, an
+ * install snippet and a meta line, with media in a column beside the text
+ * (`split`), behind it as a decorative layer (`parallax`) or below it. The
+ * calls to action, install, meta and media take text or an `<ng-template>`;
+ * an `aria-label` on the section makes it a labelled landmark.
  *
  * @example
  * <section pxlHeroSection eyebrow="Introducing" headline="Pixel-perfect retro UI" variant="split" [primaryCta]="start" [media]="shot"></section>
@@ -39,7 +40,7 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
  */
 @Component({
   selector: 'section[pxlHeroSection]',
-  imports: [NgTemplateOutlet, PxlOutlet, PixelCluster, PixelContainer, PixelGlitch, PixelGlitchContent, PixelTwoColumn, PixelTypewriter],
+  imports: [NgTemplateOutlet, PxlOutlet, PixelCluster, PixelContainer, PixelGlitch, PixelTwoColumn, PixelTypewriter],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class]': 'classes().root' },
   template: `
@@ -80,12 +81,25 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
         @if (eyebrow()) {
           <span [class]="classes().eyebrow">{{ eyebrow() }}</span>
         }
-        @if (headlineEffect() === 'glitch') {
-          <pxl-glitch>
-            <ng-container *pxlGlitchContent [ngTemplateOutlet]="headlineBlock" />
-          </pxl-glitch>
-        } @else {
-          <ng-container [ngTemplateOutlet]="headlineBlock" />
+        @switch (level()) {
+          @case ('h2') {
+            <h2 [class]="classes().headline"><ng-container [ngTemplateOutlet]="headlineText" /></h2>
+          }
+          @case ('h3') {
+            <h3 [class]="classes().headline"><ng-container [ngTemplateOutlet]="headlineText" /></h3>
+          }
+          @case ('h4') {
+            <h4 [class]="classes().headline"><ng-container [ngTemplateOutlet]="headlineText" /></h4>
+          }
+          @case ('h5') {
+            <h5 [class]="classes().headline"><ng-container [ngTemplateOutlet]="headlineText" /></h5>
+          }
+          @case ('h6') {
+            <h6 [class]="classes().headline"><ng-container [ngTemplateOutlet]="headlineText" /></h6>
+          }
+          @default {
+            <h1 [class]="classes().headline"><ng-container [ngTemplateOutlet]="headlineText" /></h1>
+          }
         }
         @if (subline()) {
           <p [class]="classes().subline">{{ subline() }}</p>
@@ -104,11 +118,20 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
         }
       </div>
     </ng-template>
-    <ng-template #headlineBlock>
-      @if (headlineEffect() === 'typewriter') {
-        <h1 [class]="classes().headline"><pxl-typewriter [label]="headline()" tone="inherit" /></h1>
-      } @else {
-        <h1 [class]="classes().headline">{{ headline() }}</h1>
+    <!-- One heading, its text once, whatever the effect: the glitch goes
+         inside the heading, as a span, and its copies of the text are drawn
+         by CSS. -->
+    <ng-template #headlineText>
+      @switch (headlineEffect()) {
+        @case ('typewriter') {
+          <pxl-typewriter [label]="headline()" tone="inherit" />
+        }
+        @case ('glitch') {
+          <span pxlGlitch [label]="headline()"></span>
+        }
+        @default {
+          <ng-container>{{ headline() }}</ng-container>
+        }
       }
     </ng-template>
     <ng-template #mediaColumn>
@@ -117,8 +140,15 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
   `,
 })
 export class PixelHeroSection {
-  /** The `<h1>`. */
+  /** The headline: the page's `<h1>`, unless `as` sets another level. */
   readonly headline = input.required<string>();
+  /**
+   * Element of the headline. A hero embedded under the page's own `<h1>`
+   * (a demo, a template) takes a lower level.
+   */
+  readonly as = input<SectionHeaderLevel, SectionHeaderLevel | undefined>('h1', {
+    transform: withDefault<SectionHeaderLevel>('h1'),
+  });
   /** `centered` and `parallax` centre the text; `split` puts the `media` in a column beside it. */
   readonly variant = input<HeroVariant, HeroVariant | undefined>('centered', {
     transform: withDefault<HeroVariant>('centered'),
@@ -160,6 +190,8 @@ export class PixelHeroSection {
 
   /** @internal */
   protected readonly effectiveSurface = injectEffectiveSurface(() => this.surface());
+  /** @internal The headline's level (`as` is a keyword in templates). */
+  protected readonly level = computed(() => this.as());
   /** @internal */
   protected readonly align = computed(() => heroAlign(this.variant()));
   /** @internal */

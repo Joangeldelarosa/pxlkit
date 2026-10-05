@@ -35,6 +35,7 @@ describe('PixelTypewriter', () => {
     const wrapper = mount(PixelTypewriter, { props: { label: 'HELLO', speed: 10, delay: 20 } });
     await nextTick();
     expect(typed(wrapper.element)).toBe('▌');
+    expect(wrapper.find('[class~="motion-safe:animate-pulse"]').text()).toBe('▌');
     expect(spoken(wrapper.element)).toBe('HELLO');
     await vi.advanceTimersByTimeAsync(50);
     expect(typed(wrapper.element)).toBe('HEL▌');
@@ -42,7 +43,7 @@ describe('PixelTypewriter', () => {
     expect(typed(wrapper.element)).toBe('HELLO');
     await vi.advanceTimersByTimeAsync(500);
     expect(wrapper.emitted('complete')).toHaveLength(1);
-    expect(wrapper.find('.animate-pulse').exists()).toBe(false);
+    expect(wrapper.find('[class~="motion-safe:animate-pulse"]').exists()).toBe(false);
   });
 
   it('types its label rather than the deprecated text, in its tone, without a caret if asked', async () => {
@@ -73,7 +74,7 @@ describe('PixelTypewriter', () => {
   it('renders the caret on the server without starting to type', async () => {
     const timeout = vi.spyOn(globalThis, 'setTimeout');
     const html = await renderToString(createSSRApp({ render: () => h(PixelTypewriter, { label: 'HI' }) }));
-    expect(html).toContain('<span aria-hidden="true"><span class="animate-pulse">▌</span></span>');
+    expect(html).toContain('<span aria-hidden="true"><span class="motion-safe:animate-pulse">▌</span></span>');
     expect(timeout).not.toHaveBeenCalled();
   });
 

@@ -101,9 +101,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Doc comments for the kits' props and slots.** About 500 props across 65 React components and
   the slots and props of 37 Vue components gained descriptions (comments only), which editors
   show on hover and the API reference prints; TSDoc coverage (gate 27) rose from 50% to 99%.
+- **A heading level for the hero, one heading for the glitch.** In the three kits `PixelHeroSection`
+  takes `as` (`h1`–`h6`), so a hero inside a page that has its `h1` takes `as="h2"`, and `PixelGlitch`
+  takes `label` and `as`, so a glitch headline is one heading with its text in it once.
 
 ### Changed
 
+- `@pxlkit/ui-kit` is tree-shakeable — one ES module per source module, shared chunks and
+  `"sideEffects": ["*.css"]`; an app importing one component bundles 6.0 KB of the kit instead of
+  362.3 KB — and every built file starts with `'use client'`, so Next.js App Router Server
+  Components render it directly. The Vue kit's `defineComponent` components are marked pure, so
+  bundlers drop the ones an app does not import.
+- Docs: the manifests' highlights, descriptions and accessibility notes name each framework's API,
+  since the component reference shows them for React, Vue and Angular.
+- Coherence gate 06 (`consistency-version`) checks that each icon pack reads its `version` from
+  `package.json` — a literal that differs is a blocker, a matching one major — and the packs now do,
+  so their exported version cannot drift from the published one.
 - `@pxlkit/core`: `react` and `react-dom` are optional peer dependencies — only the
   React components need them.
 - `@pxlkit/ui-kit`: tokens, class maps, the theme stylesheet, locale data and the focus
@@ -323,6 +336,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   server render instead of the reader's clock, which differs once the year turns, and the landing
   hero holds still from its first render after a client-side navigation for readers who prefer
   reduced motion.
+- `@pxlkit/ui-kit` (and the Vue and Angular kits): on the pixel surface, buttons, icon buttons,
+  interactive feature cards and boxes carry no drop shadow. Their cut corners clipped it, and inside
+  them it drew a second copy of the label, icon and border, visible in the light theme; the buttons
+  still move on hover and press. On the linear surface the hero headline, the section header title
+  and the pricing amount are bold, as intended — the display face's semibold won over them. The
+  glitch hero headline renders one `<h1>` instead of three, a `.dark` palette override reaches the
+  utilities, server-rendered animations hold still from the first paint for readers who prefer
+  reduced motion, and the examples compile under strict TypeScript and link to pxlkit.xyz.
 
 ## [ui-kit 2.1.1] - 2026-08-08 — Bordered surface-token fix
 

@@ -92,7 +92,7 @@ export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps)
         <li>Four variants — soft (default), solid, outline, ghost — across all tone keys.</li>
         <li>Three sizes (sm/md/lg) with consistent vertical rhythm and font scale.</li>
         <li>Optional iconLeft slot for status dots, glyphs, or counters.</li>
-        <li>Becomes a native &lt;button&gt; with focus ring and hover when onClick is provided.</li>
+        <li>Becomes a native &lt;button&gt; with focus ring and hover when it handles clicks (<code>onClick</code> in React, <code>@click</code> in Vue, <code>&lt;button pxlBadge&gt;</code> in Angular).</li>
         <li>Surface-aware: pixel chamfered border + pixel font, or linear pill.</li>
       </ul>
     <dl className="docs-meta">
@@ -110,7 +110,7 @@ export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps)
       <ul className="docs-aria-patterns">
         <li><code>status</code></li>
       </ul>
-      <p className="docs-aria-notes">Default render is a non-interactive &lt;span&gt;. When onClick is set, the root becomes a native &lt;button type=&quot;button&quot;&gt; with a visible focus ring (focus-visible:ring-2 ring-offset). iconLeft is marked aria-hidden via inline-flex wrapper — convey meaning through the badge text, not the icon alone. For live status changes (e.g., &quot;online&quot; → &quot;offline&quot;), wrap the badge in a parent with aria-live=&quot;polite&quot;.</p>
+      <p className="docs-aria-notes">Default render is non-interactive. When it handles clicks (<code>onClick</code>, <code>@click</code> in Vue, <code>button[pxlBadge]</code> in Angular), the root is a native &lt;button type=&quot;button&quot;&gt; with a visible focus ring (focus-visible:ring-2 ring-offset). iconLeft is marked aria-hidden via inline-flex wrapper — convey meaning through the badge text, not the icon alone. For live status changes (e.g., &quot;online&quot; → &quot;offline&quot;), wrap the badge in a parent with aria-live=&quot;polite&quot;.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

@@ -79,7 +79,7 @@ export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSec
         <li>Semantic &lt;code&gt; root so assistive tech announces the inline-code role.</li>
         <li>Tone-tinted border, background, and text for at-a-glance categorisation (neutral, cyan, green, gold, red, purple, pink).</li>
         <li>Surface-aware: pixel chamfered border + pixel font, or linear pill.</li>
-        <li>Composable inline — accepts any ReactNode children for icons or multi-token snippets.</li>
+        <li>Composable inline — takes any inline content, such as icons or multi-token snippets.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -300,7 +300,7 @@ export function CodeSamples() {
   return (
     <div className="flex flex-col gap-2">
       <div>
-        Import: <PixelCodeInline>{\`import { PixelCodeInline } from '@pxlkit/ui'\`}</PixelCodeInline>
+        Import: <PixelCodeInline>{\`import { PixelCodeInline } from '@pxlkit/ui-kit'\`}</PixelCodeInline>
       </div>
       <div>
         Hotkey: <PixelCodeInline tone="purple">Ctrl+K</PixelCodeInline>
@@ -317,7 +317,7 @@ import { PixelCodeInline } from '@pxlkit/ui-kit-vue';
 
 <template>
   <div class="flex flex-col gap-2">
-    <div>Import: <PixelCodeInline>import { PixelCodeInline } from '@pxlkit/ui'</PixelCodeInline></div>
+    <div>Import: <PixelCodeInline>import { PixelCodeInline } from '@pxlkit/ui-kit'</PixelCodeInline></div>
     <div>Hotkey: <PixelCodeInline tone="purple">Ctrl+K</PixelCodeInline></div>
     <div>Error: <PixelCodeInline tone="red">EACCES</PixelCodeInline></div>
   </div>
@@ -329,7 +329,7 @@ import { PixelCodeInline } from '@pxlkit/ui-kit-angular';
   imports: [PixelCodeInline],
   template: \`
     <div class="flex flex-col gap-2">
-      <div>Import: <code pxlCodeInline>import &#123; PixelCodeInline &#125; from '&#64;pxlkit/ui'</code></div>
+      <div>Import: <code pxlCodeInline>import &#123; PixelCodeInline &#125; from '&#64;pxlkit/ui-kit'</code></div>
       <div>Hotkey: <code pxlCodeInline tone="purple">Ctrl+K</code></div>
       <div>Error: <code pxlCodeInline tone="red">EACCES</code></div>
     </div>

@@ -106,7 +106,7 @@ export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): 
         <li>Four visual variants (soft, solid, outline, ghost) across the full tone palette</li>
         <li>Three sizes (sm, md, lg) with consistent padding + typography rhythm</li>
         <li>Optional leading icon slot and built-in deletable X button with stop-propagation</li>
-        <li>Renders as &lt;button&gt; when onClick is set for native keyboard + screen reader semantics</li>
+        <li>Renders as a &lt;button&gt; when it handles clicks (<code>onClick</code> in React, <code>@click</code> in Vue, <code>&lt;button pxlChip&gt;</code> in Angular) for native keyboard + screen reader semantics</li>
         <li>Pixel + linear surface variants share identical API and chamfered/pill geometry</li>
       </ul>
     <dl className="docs-meta">
@@ -124,7 +124,7 @@ export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): 
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders as a &lt;button&gt; only when onClick is provided so non-interactive chips stay as &lt;span&gt;. The delete X is a &lt;button&gt; with aria-label &quot;Remove &lt;label&gt;&quot; that never fires onClick; a button cannot contain a button, so on a clickable chip the label and the X are sibling buttons inside a &lt;span&gt; frame. On a clickable deletable chip the frame shows the label button&#39;s keyboard focus; the X shows its own.</p>
+      <p className="docs-aria-notes">Renders as a &lt;button&gt; only when it handles clicks (<code>onClick</code>, <code>@click</code> in Vue, <code>button[pxlChip]</code> or <code>clickable</code> in Angular), so non-interactive chips stay static. The delete X is a &lt;button&gt; with aria-label &quot;Remove &lt;label&gt;&quot; that never fires the chip click; a button cannot contain a button, so on a clickable chip the label and the X are sibling buttons inside a &lt;span&gt; frame. On a clickable deletable chip the frame shows the label button&#39;s keyboard focus; the X shows its own.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

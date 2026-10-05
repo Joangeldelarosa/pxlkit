@@ -25,13 +25,13 @@
 ### PixelBadge
 - stable · since 1.0.0
 - Compact status indicator that labels objects with tone, variant, and optional icon — renders as a pill (linear) or chamfered tag (pixel).
-- Four variants — soft (default), solid, outline, ghost — across all tone keys. · Three sizes (sm/md/lg) with consistent vertical rhythm and font scale. · Optional iconLeft slot for status dots, glyphs, or counters. · Becomes a native <button> with focus ring and hover when onClick is provided. · Surface-aware: pixel chamfered border + pixel font, or linear pill.
+- Four variants — soft (default), solid, outline, ghost — across all tone keys. · Three sizes (sm/md/lg) with consistent vertical rhythm and font scale. · Optional iconLeft slot for status dots, glyphs, or counters. · Becomes a native <button> with focus ring and hover when it handles clicks (`onClick` in React, `@click` in Vue, `<button pxlBadge>` in Angular). · Surface-aware: pixel chamfered border + pixel font, or linear pill.
 - related: PixelChip, PixelBadgeGroup, PixelRibbon, PixelAvatar
 
 ### PixelBadgeGroup
 - stable · since 1.9.0
 - Inline row of badges with automatic "+N" overflow popover when the count exceeds `max`.
-- Renders the first `max - 1` badges inline; remaining items collapse into a "+N" trigger. · Overflow trigger opens a PixelPopover with the hidden badges, surface-matched. · Wrapper becomes `role="group"` when an accessible name (aria-label or aria-labelledby) is provided. · Surface-aware: pixel chamfered radius + pixel font or linear pill, propagated to the popover. · Forwarded ref to the underlying div and full passthrough of HTMLAttributes.
+- Renders the first `max - 1` badges inline; remaining items collapse into a "+N" trigger. · Overflow trigger opens a PixelPopover with the hidden badges, surface-matched. · Wrapper becomes `role="group"` when an accessible name (aria-label or aria-labelledby) is provided. · Surface-aware: pixel chamfered radius + pixel font or linear pill, propagated to the popover.
 - related: PixelBadge, PixelChipGroup, PixelPopover, PixelAvatarGroup
 
 ### PixelBarChart
@@ -49,25 +49,25 @@
 ### PixelChip
 - stable · since 1.0.0
 - Compact label tag for representing tags, filters, or selections, optionally clickable or removable via an inline delete control.
-- Four visual variants (soft, solid, outline, ghost) across the full tone palette · Three sizes (sm, md, lg) with consistent padding + typography rhythm · Optional leading icon slot and built-in deletable X button with stop-propagation · Renders as <button> when onClick is set for native keyboard + screen reader semantics · Pixel + linear surface variants share identical API and chamfered/pill geometry
+- Four visual variants (soft, solid, outline, ghost) across the full tone palette · Three sizes (sm, md, lg) with consistent padding + typography rhythm · Optional leading icon slot and built-in deletable X button with stop-propagation · Renders as a <button> when it handles clicks (`onClick` in React, `@click` in Vue, `<button pxlChip>` in Angular) for native keyboard + screen reader semantics · Pixel + linear surface variants share identical API and chamfered/pill geometry
 - related: PixelBadge, PixelChipGroup, PixelToggle
 
 ### PixelChipGroup
 - stable · since 1.9.0
 - Controlled chip row with single-select (radiogroup) or multi-select (group of checkboxes) — wraps each PixelChip in a semantic toggle button.
-- Controlled value/onChange API drives selection — chips stay presentational. · Single mode renders role=radiogroup with roving tabindex + arrow / Home / End navigation. · Multi mode renders role=checkbox per chip with aria-checked and Space/Enter toggle. · Surface-aware: forwards pixel or linear surface to chip wrappers for consistent borders. · aria-label / aria-labelledby make the group an accessible landmark.
+- Selection is bound — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or starts from `defaultValue`; chips stay presentational. · Single mode renders role=radiogroup with roving tabindex + arrow / Home / End navigation. · Multi mode renders role=checkbox per chip with aria-checked and Space/Enter toggle. · Surface-aware: forwards pixel or linear surface to chip wrappers for consistent borders. · aria-label / aria-labelledby make the group an accessible landmark.
 - related: PixelChip, PixelBadgeGroup, PixelBadge
 
 ### PixelCodeInline
 - stable · since 1.0.0
 - Inline `<code>` element with tone tinting and surface-aware framing for highlighting commands, identifiers, and short snippets in flowing prose.
-- Semantic <code> root so assistive tech announces the inline-code role. · Tone-tinted border, background, and text for at-a-glance categorisation (neutral, cyan, green, gold, red, purple, pink). · Surface-aware: pixel chamfered border + pixel font, or linear pill. · Composable inline — accepts any ReactNode children for icons or multi-token snippets.
+- Semantic <code> root so assistive tech announces the inline-code role. · Tone-tinted border, background, and text for at-a-glance categorisation (neutral, cyan, green, gold, red, purple, pink). · Surface-aware: pixel chamfered border + pixel font, or linear pill. · Composable inline — takes any inline content, such as icons or multi-token snippets.
 - related: PixelKbd
 
 ### PixelCollapsible
 - stable · since 1.0.0
 - Toggleable disclosure block with a tone-coloured chevron header that reveals or hides arbitrary content.
-- Single-section disclosure pattern with animated chevron rotation · Seven brand tones applied to the header button (neutral default) · Surface-aware typography (pixel vs linear) via shared surface context · Uncontrolled state with `defaultOpen` for SSR-friendly initial render · SSR-safe and tree-shakable; renders children only when expanded
+- Single-section disclosure pattern with animated chevron rotation · Seven brand tones applied to the header button (neutral default) · Surface-aware typography (pixel vs linear) · Uncontrolled state with `defaultOpen` for SSR-friendly initial render · SSR-safe and tree-shakable; renders its content only when expanded
 - related: PixelAccordion, PixelTabs
 
 ### PixelColorSwatch
@@ -85,7 +85,7 @@
 ### PixelKbd
 - stable · since 1.0.0
 - Styled keyboard shortcut indicator that renders a native `<kbd>` element with surface-aware framing for inline docs, hints, and command menus.
-- Semantic <kbd> root so assistive tech announces the key role correctly. · Surface-aware: pixel chamfered border + pixel font, or linear pill. · Drop-shadow depth tuned per surface for a tactile keycap feel. · Composable inline — accepts any ReactNode children to support icons or multi-character keys.
+- Semantic <kbd> root so assistive tech announces the key role correctly. · Surface-aware: pixel chamfered border + pixel font, or linear pill. · Drop-shadow depth tuned per surface for a tactile keycap feel. · Composable inline — takes any inline content, such as icons or multi-character keys.
 - related: PixelCodeInline
 
 ### PixelSparkline
@@ -97,7 +97,7 @@
 ### PixelStatGroup
 - stable · since 1.9.0
 - Surface-aware container that groups PixelStatCard tiles in a row with dividers or a responsive grid, with shared tone and accessible group labeling.
-- Row layout with vertical dividers or grid layout with configurable columns (1–6). · Tone-driven border color shared by the container and inter-cell dividers. · Surface-aware: pixel chamfered border + pixel radius, or linear rounded corners. · Adopts role="group" automatically when aria-label or aria-labelledby is provided. · Forwards ref to the underlying div and spreads native HTMLAttributes.
+- Row layout with vertical dividers or grid layout with configurable columns (1–6). · Tone-driven border color shared by the container and inter-cell dividers. · Surface-aware: pixel chamfered border + pixel radius, or linear rounded corners. · Adopts role="group" automatically when aria-label or aria-labelledby is provided.
 - related: PixelStatCard, PixelBadgeGroup, PixelAvatarGroup
 
 ### PixelTable
@@ -109,7 +109,7 @@
 ### PixelTextLink
 - stable · since 1.0.0
 - Inline anchor or button styled as a tone-coloured underlined link for prose, callouts, and CTAs.
-- Polymorphic: renders <a> when `href` is provided, <button type="button"> otherwise · Seven brand tones (cyan default) with consistent focus ring and hover behaviour · Surface-aware typography (pixel vs linear) via shared surface context · Forwards native anchor/button attributes (target, rel, onClick, aria-*, etc.) · SSR-safe and tree-shakable; zero runtime state
+- Polymorphic: an <a> with `href`, a <button> without (in Angular, `a[pxlTextLink]` or `button[pxlTextLink]`) · Seven brand tones (cyan default) with consistent focus ring and hover behaviour · Surface-aware typography (pixel vs linear) · Takes native anchor/button attributes and listeners (target, rel, aria-*, click, etc.) · SSR-safe and tree-shakable; zero runtime state
 - related: PixelButton, PixelBreadcrumb
 
 ### PixelTimeline

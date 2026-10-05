@@ -87,9 +87,9 @@ export function PixelCollapsibleDocsSection({ className }: PixelCollapsibleDocsS
       <ul className="docs-highlights">
         <li>Single-section disclosure pattern with animated chevron rotation</li>
         <li>Seven brand tones applied to the header button (neutral default)</li>
-        <li>Surface-aware typography (pixel vs linear) via shared surface context</li>
+        <li>Surface-aware typography (pixel vs linear)</li>
         <li>Uncontrolled state with <code>defaultOpen</code> for SSR-friendly initial render</li>
-        <li>SSR-safe and tree-shakable; renders children only when expanded</li>
+        <li>SSR-safe and tree-shakable; renders its content only when expanded</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

@@ -1,4 +1,3 @@
-import React from 'react'
 import { PixelHeroSection } from './PixelHeroSection'
 
 export function Default() {
@@ -58,6 +57,19 @@ export function GlitchHeadline() {
       headlineEffect="glitch"
       subline="The headline glitches, and holds still for readers who prefer reduced motion."
       tone="red"
+    />
+  )
+}
+
+export function HeadingLevel() {
+  return (
+    <PixelHeroSection
+      as="h2"
+      density="compact"
+      minHeight="sm"
+      eyebrow="Embedded"
+      headline="A hero inside a page"
+      subline="Its headline is an h2, under the page's own h1."
     />
   )
 }

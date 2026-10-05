@@ -14,7 +14,7 @@ export default defineManifest({
   highlights: [
     'Sets lang on a wrapper so CSS text-transform handles Turkish i → İ correctly',
     'Builds Google Fonts URL with the correct subsets (latin-ext for Turkish)',
-    'Exposes locale-aware upper() and lower() helpers via usePxlKitLocale()',
+    'Exposes locale-aware upper() and lower() helpers via usePxlKitLocale() (injectPxlKitLocale() in Angular)',
     'Supports BCP 47 locales en and tr out of the box',
   ],
   examples: [
@@ -27,7 +27,7 @@ export default defineManifest({
     patterns: ['sets lang/dir context for descendants; no direct ARIA'],
     keyboard: [],
     notes:
-      'Wraps children in a div with lang={locale} so assistive tech and CSS text-transform pick up the correct language. For Next.js apps, also set lang on the <html> tag.',
+      'Wraps its content in a layout-neutral element carrying `lang` (in Angular, the host element) so assistive tech and CSS text-transform pick up the correct language. In server-rendered apps (Next.js, Nuxt, Angular SSR), also set lang on the <html> tag.',
   },
   related: [],
   apiStability: 'stable',

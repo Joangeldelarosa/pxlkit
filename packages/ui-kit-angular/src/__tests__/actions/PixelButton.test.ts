@@ -56,15 +56,53 @@ describe('PixelButton', () => {
     expect(clicked).toHaveBeenCalledTimes(1);
   });
 
-  it('drops shadows and press feedback when disabled', async () => {
-    @Component({ imports: [PixelButton], template: '<button pxlButton variant="soft" disabled>Off</button>' })
+  it('moves a pixel button on hover and press without a drop shadow, which its cut corners would clip', async () => {
+    @Component({
+      imports: [PixelButton],
+      template: `
+        <button pxlButton variant="solid">Solid</button>
+        <button pxlButton variant="soft">Soft</button>
+        <button pxlButton variant="outline">Outline</button>
+      `,
+    })
     class Host {}
     const fixture = TestBed.createComponent(Host);
     await fixture.whenStable();
-    const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
-    expect(button.classList.contains('pxl-shadow')).toBe(false);
-    expect(button.classList.contains('pxl-shadow-active')).toBe(false);
-    expect(button.disabled).toBe(true);
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[];
+    const pressed = ['pxl-nudge-active', 'pxl-nudge-active', 'active:scale-[0.97]'];
+    for (const [index, button] of buttons.entries()) {
+      const classes = Array.from(button.classList);
+      expect(classes).toEqual(expect.arrayContaining(['pxl-corner-sm', 'pxl-nudge-hover', pressed[index]!]));
+      for (const shadow of ['pxl-shadow', 'pxl-shadow-hover', 'pxl-shadow-active']) expect(classes).not.toContain(shadow);
+    }
+  });
+
+  it('keeps the linear shadows', async () => {
+    @Component({ imports: [PixelButton], template: '<button pxlButton surface="linear" variant="soft">Go</button>' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const classes = Array.from((fixture.nativeElement as HTMLElement).querySelector('button')!.classList);
+    expect(classes).toEqual(expect.arrayContaining(['shadow-sm', 'hover:shadow-md', 'active:shadow-sm']));
+  });
+
+  it('drops shadows and press feedback when disabled', async () => {
+    @Component({
+      imports: [PixelButton],
+      template: `
+        <button pxlButton variant="soft" disabled>Off</button>
+        <button pxlButton surface="linear" variant="soft" disabled>Off</button>
+      `,
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    for (const button of Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[]) {
+      for (const name of ['pxl-shadow', 'pxl-shadow-active', 'pxl-nudge-hover', 'pxl-nudge-active', 'shadow-sm', 'hover:shadow-md', 'active:shadow-sm']) {
+        expect(button.classList.contains(name)).toBe(false);
+      }
+      expect(button.disabled).toBe(true);
+    }
   });
 
   it('rings keyboard focus, keeping an outline for forced-colors mode, which drops the ring', async () => {

@@ -79,7 +79,7 @@ export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSec
         <li>Active crumb marked with aria-current=&quot;page&quot; and emphasised typography.</li>
         <li>Per-item href (link), onClick (button), or plain label — choose per crumb.</li>
         <li>Pixel surface uses a crisp-edged chevron SVG; linear surface uses a slash separator.</li>
-        <li>SSR-safe, tree-shakable, and inherits ambient surface context.</li>
+        <li>SSR-safe, tree-shakable, and follows the nearest PxlKitSurfaceProvider.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

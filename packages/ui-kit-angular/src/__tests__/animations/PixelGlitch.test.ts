@@ -40,6 +40,55 @@ describe('PixelGlitch', () => {
     expect(angular.map((state) => state.match(/GLITCH/g)!.length)).toEqual([1, 3, 1]);
   });
 
+  it('sits on a span inside a heading, its layers spans too, as React does with as="span"', async () => {
+    const ReactGlitch = reactAnimation('PixelGlitch');
+    const ReactHost = () => createElement('h2', null, createElement(ReactGlitch, { as: 'span' }, 'SIGNAL'));
+    @Component({
+      imports: [PixelGlitch, PixelGlitchContent],
+      template: `<h2><span pxlGlitch><ng-container *pxlGlitchContent>SIGNAL</ng-container></span></h2>`,
+    })
+    class AngularHost {}
+    const { react, angular } = await compareWithReact({ react: ReactHost, angular: AngularHost }, []);
+    expect(angular).toEqual(react);
+    const fixture = TestBed.createComponent(AngularHost);
+    await fixture.whenStable();
+    const heading = (fixture.nativeElement as HTMLElement).querySelector('h2')!;
+    expect(Array.from(heading.querySelectorAll('*'), (element) => element.tagName)).toEqual(['SPAN', 'SPAN', 'SPAN', 'SPAN']);
+    expect(heading.querySelector('span > span:last-child')!.className).toBe('block');
+  });
+
+  it('holds a label once and has the stylesheet draw its copies while it plays, as in React', async () => {
+    const ReactGlitch = reactAnimation('PixelGlitch');
+    const ReactHost = () =>
+      createElement('h2', null, createElement(ReactGlitch, { as: 'span', label: 'SIGNAL', intensity: 6, duration: 2000 }));
+    @Component({
+      imports: [PixelGlitch],
+      template: `<h2><span pxlGlitch label="SIGNAL" [intensity]="6" [duration]="2000"></span></h2>`,
+    })
+    class AngularHost {}
+    const { react, angular } = await compareWithReact(
+      { react: ReactHost, angular: AngularHost },
+      [
+        { action: 'reduced-motion', reduce: false },
+        { action: 'reduced-motion', reduce: true },
+      ],
+      { reducedMotion: true },
+    );
+    expect(angular).toEqual(react);
+    expect(angular.map((state) => state.match(/SIGNAL/g)!.length)).toEqual([2, 2, 2]);
+    const fixture = TestBed.createComponent(AngularHost);
+    await fixture.whenStable();
+    const heading = (fixture.nativeElement as HTMLElement).querySelector('h2')!;
+    const glitch = heading.querySelector('span')!;
+    expect(heading.textContent).toBe('SIGNAL');
+    expect(glitch.dataset['text']).toBe('SIGNAL');
+    expect(Array.from(glitch.classList).sort()).toEqual(['inline-block', 'overflow-visible', 'pxl-glitch-copies', 'relative']);
+    expect(glitch.style.getPropertyValue('--pxl-glitch-x')).toBe('6px');
+    expect(glitch.style.getPropertyValue('--pxl-glitch-duration')).toBe('2000ms');
+    expect(glitch.children).toHaveLength(1);
+    expect(heading.querySelectorAll('[aria-hidden]')).toHaveLength(0);
+  });
+
   it('repeats its marked content in the two ghost layers, hidden from assistive technology, while it plays', async () => {
     @Component({
       imports: [PixelGlitch, PixelGlitchContent],

@@ -17,7 +17,7 @@ const meta: Meta = {
   parameters: {
     controls: { disable: true },
     docs: {
-      description: { component: 'shadcn-style compound wrapper around react-hook-form: Root / Field / Item / Label / Control / Description / Message auto-wire ids and aria-* across each field.' },
+      description: { component: 'Validated form on each framework\'s form library (React Hook Form, VeeValidate, Angular reactive forms): its form, field, item, label, control, description and message parts auto-wire ids and aria-* across each field.' },
     },
   },
 };

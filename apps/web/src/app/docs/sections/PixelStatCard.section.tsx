@@ -98,8 +98,8 @@ export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSection
         <li>Seven tone presets aligned with the pxlkit palette (green, cyan, gold, red, purple, pink, neutral).</li>
         <li>Three sizes (sm/md/lg) that scale padding, value, label and trend typography in lockstep.</li>
         <li>Icon position aware: top, left, right or bottom-left layouts without prop drilling.</li>
-        <li>Surface-aware (pixel vs linear) — inherits the ambient surface context or override per-card.</li>
-        <li>Pure presentational + SSR-safe — no client hooks, fully tree-shakable.</li>
+        <li>Surface-aware (pixel vs linear) — follows the nearest PxlKitSurfaceProvider or a per-card override.</li>
+        <li>Pure presentational + SSR-safe — no client state, fully tree-shakable.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

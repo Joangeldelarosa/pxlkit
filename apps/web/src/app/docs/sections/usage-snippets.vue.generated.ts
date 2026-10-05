@@ -1313,7 +1313,7 @@ import { PixelTextLink } from '@pxlkit/ui-kit-vue';
 </script>
 
 <template>
-  <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>
+  <PixelTextLink href="https://pxlkit.xyz">Read the docs</PixelTextLink>
 </template>`,
   'pixel-textarea': `<script setup lang="ts">
 import { PixelTextarea } from '@pxlkit/ui-kit-vue';

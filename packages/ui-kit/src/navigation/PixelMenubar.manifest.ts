@@ -13,7 +13,7 @@ export default defineManifest({
     'Nested submenus with right-arrow open / left-arrow close',
     'WAI-ARIA menubar keyboard model: arrows, Home/End, Enter/Space, Escape and Tab',
     'Shortcut labels and disabled / separator items',
-    'Surface-aware (border, radius, font) via Surface context',
+    'Surface-aware (border, radius, font)',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

@@ -37,7 +37,7 @@ export const Default: Story = {
   render: () => ({ props: { example: DefaultExample }, template: '<ng-container *ngComponentOutlet="example" />' }),
   parameters: {
     docs: {
-      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelTextLink } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelTextLink],\n  template: `<a pxlTextLink href="https://pxlkit.dev">Read the docs</a>`,\n})\nexport class Default {}' },
+      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelTextLink } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelTextLink],\n  template: `<a pxlTextLink href="https://pxlkit.xyz">Read the docs</a>`,\n})\nexport class Default {}' },
     },
   },
 };
@@ -85,7 +85,7 @@ export const ExternalLink: Story = {
   render: () => ({ props: { example: ExternalLinkExample }, template: '<ng-container *ngComponentOutlet="example" />' }),
   parameters: {
     docs: {
-      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelTextLink } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelTextLink],\n  template: `<a pxlTextLink href="https://pxlkit.dev" target="_blank" rel="noopener noreferrer">Open in new tab</a>`,\n})\nexport class ExternalLink {}' },
+      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelTextLink } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelTextLink],\n  template: `<a pxlTextLink href="https://pxlkit.xyz" target="_blank" rel="noopener noreferrer">Open in new tab</a>`,\n})\nexport class ExternalLink {}' },
     },
   },
 };
@@ -97,7 +97,7 @@ export const InlineInProse: Story = {
   render: () => ({ props: { example: InlineInProseExample }, template: '<ng-container *ngComponentOutlet="example" />' }),
   parameters: {
     docs: {
-      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelTextLink } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelTextLink],\n  template: `\n    <p class="max-w-md">\n      Built with <a pxlTextLink href="https://pxlkit.dev" tone="green">pxlkit</a>, a tone-coloured component library for\n      retro interfaces.\n    </p>\n  `,\n})\nexport class InlineInProse {}' },
+      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelTextLink } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelTextLink],\n  template: `\n    <p class="max-w-md">\n      Built with <a pxlTextLink href="https://pxlkit.xyz" tone="green">pxlkit</a>, a tone-coloured component library for\n      retro interfaces.\n    </p>\n  `,\n})\nexport class InlineInProse {}' },
     },
   },
 };

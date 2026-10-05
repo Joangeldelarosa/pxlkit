@@ -20,10 +20,10 @@ describe('PixelIconFrame', () => {
     const fixture = TestBed.createComponent(Host);
     await fixture.whenStable();
     const frame = (fixture.nativeElement as HTMLElement).querySelector('pxl-icon-frame')!;
-    expect(frame.classList.contains('animate-pulse')).toBe(true);
+    expect(frame.classList.contains('motion-safe:animate-pulse')).toBe(true);
     for (const list of lists) list.fire(true);
     await fixture.whenStable();
-    expect(frame.classList.contains('animate-pulse')).toBe(false);
+    expect(frame.classList.contains('motion-safe:animate-pulse')).toBe(false);
   });
 
   it('hides the icon and the accent from assistive technology, the accent in its corner', async () => {

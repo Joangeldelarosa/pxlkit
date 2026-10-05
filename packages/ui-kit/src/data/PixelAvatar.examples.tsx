@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelAvatar } from './PixelAvatar';
 
 export function Default() {

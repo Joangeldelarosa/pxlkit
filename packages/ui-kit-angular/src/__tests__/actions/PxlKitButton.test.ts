@@ -48,7 +48,7 @@ describe('PxlKitButton', () => {
     expect(button.getAttribute('title')).toBe('Preferences');
   });
 
-  it('falls back to its defaults for unset inputs, disables the button and drops its shadows', async () => {
+  it('falls back to its defaults for unset inputs, disables the button and drops its moves', async () => {
     @Component({
       imports: [PxlKitButton],
       template: `
@@ -62,12 +62,14 @@ describe('PxlKitButton', () => {
     const [enabled, disabled] = Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[];
     expect(enabled!.classList).toContain('text-retro-cyan');
     expect(enabled!.classList).toContain('h-10');
-    expect(enabled!.classList).toContain('pxl-shadow');
+    expect(enabled!.classList).toContain('pxl-nudge-hover');
+    expect(enabled!.classList).toContain('pxl-nudge-active');
+    expect(enabled!.classList).not.toContain('pxl-shadow');
     expect(enabled!.disabled).toBe(false);
     expect(enabled!.textContent!.trim()).toBe('+');
     expect(disabled!.classList).toContain('text-retro-red');
     expect(disabled!.classList).toContain('h-8');
-    expect(disabled!.classList).not.toContain('pxl-shadow');
+    for (const name of ['pxl-shadow', 'pxl-nudge-hover', 'pxl-nudge-active']) expect(disabled!.classList).not.toContain(name);
     expect(disabled!.disabled).toBe(true);
   });
 
@@ -84,5 +86,24 @@ describe('PxlKitButton', () => {
     await fixture.whenStable();
     (fixture.nativeElement.querySelector('button') as HTMLButtonElement).click();
     expect(clicked).toHaveBeenCalledTimes(1);
+  });
+
+  it('moves a pixel button on hover and press without a drop shadow, which its cut corners would clip, and keeps the linear shadows', async () => {
+    @Component({
+      imports: [PixelIconButton],
+      template: `
+        <button pxlIconButton label="Go" icon="+"></button>
+        <button pxlIconButton label="Go" icon="+" surface="linear"></button>
+      `,
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const [pixel, linear] = (Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[]).map((button) =>
+      Array.from(button.classList),
+    );
+    expect(pixel).toEqual(expect.arrayContaining(['pxl-corner-sm', 'pxl-nudge-hover', 'pxl-nudge-active']));
+    for (const shadow of ['pxl-shadow', 'pxl-shadow-hover', 'pxl-shadow-active']) expect(pixel).not.toContain(shadow);
+    expect(linear).toEqual(expect.arrayContaining(['shadow-sm', 'hover:shadow-md', 'active:shadow-sm']));
   });
 });

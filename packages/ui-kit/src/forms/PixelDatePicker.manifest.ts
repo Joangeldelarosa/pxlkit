@@ -9,14 +9,20 @@ export default defineManifest({
   description:
     'Accessible date input with popover calendar grid, keyboard navigation, presets, and min/max constraints.',
   highlights: [
-    'Controlled and uncontrolled usage via value/defaultValue + onChange',
+    'Controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`',
     'Popover calendar with roving tabindex and full keyboard navigation',
     'Min/max bounds plus disabledDates (array or predicate)',
     'Optional quick-select presets and clearable trigger',
     'Surface-aware styling with FieldShell label/hint/error wiring',
   ],
   examples: [
-    { id: 'default', label: 'Default', Component: Default },
+    {
+      id: 'default',
+      label: 'Default',
+      description:
+        'The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today\'s mark can differ from the browser\'s.',
+      Component: Default,
+    },
     { id: 'with-presets', label: 'With Presets', Component: WithPresets },
     { id: 'with-min-max', label: 'With Min/Max', Component: WithMinMax },
   ],

@@ -23,7 +23,7 @@ export default defineManifest({
   description:
     'Single-line text input with label, hint, error message, tone/size/surface variants, prefix/suffix slots, joinable addons, clearable button, char counter, and loading state.',
   highlights: [
-    'Controlled or uncontrolled — works with `value`/`onChange` or `defaultValue`.',
+    'Controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`.',
     'Inside-shell `prefix`/`suffix` slots plus outside-shell `addonLeft`/`addonRight` for joined groups.',
     'Optional `clearable` × button, `loading` spinner, and `showCount` character counter.',
     '`tone`, `size`, and `surface` follow the kit-wide design tokens.',
@@ -53,7 +53,7 @@ export default defineManifest({
       { key: 'Enter', does: 'Submit the surrounding form (native browser behavior).' },
     ],
     notes:
-      'Sets `aria-invalid` when `error` is provided and links the hint/error text it shows via `aria-describedby`, after any ids you pass (none while neither shows). The clear button is `tabIndex={-1}` so keyboard users edit the value directly instead of tabbing through it.',
+      'Sets `aria-invalid` when `error` is provided and links the hint/error text it shows via `aria-describedby`, after any ids you pass (none while neither shows). The clear button has `tabindex="-1"` so keyboard users edit the value directly instead of tabbing through it.',
   },
   related: [
     'PixelPasswordInput',

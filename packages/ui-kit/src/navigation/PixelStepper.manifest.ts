@@ -20,10 +20,10 @@ export default defineManifest({
   description:
     'Multi-step progress indicator with completed/active/pending/error/loading states, horizontal or vertical orientation, and full keyboard navigation.',
   highlights: [
-    'Compound API (PixelStepper + PixelStepper.Step) keeps step content declarative and easy to reorder.',
+    'Compound API (a stepper and its steps: `PixelStepper.Step`, `PixelStepperStep` in Vue, `pxl-stepper-step` in Angular) keeps step content declarative and easy to reorder.',
     'Per-step states (completed, active, pending, error, loading) with tone-mapped indicators and connectors.',
     'Horizontal or vertical orientation with roving focus, Arrow/Home/End keys, and Enter/Space activation.',
-    'Optional onStepClick handler with allowNextStepsSelect gate so future steps stay locked until allowed.',
+    'Optional step clicks (`onStepClick`, `@step-click` in Vue, `clickable` + `(stepClick)` in Angular) with allowNextStepsSelect gate so future steps stay locked until allowed.',
     'Surface-aware (pixel/linear) and size-aware (sm/md/lg), inheriting kit-wide tokens and focus rings.',
   ],
   examples: [
@@ -51,7 +51,7 @@ export default defineManifest({
       { key: 'Space', does: 'Activates the focused step (when clickable).' },
     ],
     notes:
-      'The root renders role="group" with a configurable ariaLabel (defaults to "Progress steps"). A clickable step is role="button", named by its position ("Step N of M"), its label and its state (current/completed/error) and described by its description. A step that is not clickable (no onStepClick, or a future step when allowNextStepsSelect is false) has no role and stays out of the tab sequence; since ARIA does not let an element without a role take a name, it reads its position and state as visually hidden text around its label. The active step is marked with aria-current="step". Indicators and connectors are aria-hidden so screen readers announce only the step label and state.',
+      'The root renders role="group" with a configurable ariaLabel (defaults to "Progress steps"). A clickable step is role="button", named by its position ("Step N of M"), its label and its state (current/completed/error) and described by its description. A step that is not clickable (no step click handling, or a future step when allowNextStepsSelect is false) has no role and stays out of the tab sequence; since ARIA does not let an element without a role take a name, it reads its position and state as visually hidden text around its label. The active step is marked with aria-current="step". Indicators and connectors are aria-hidden so screen readers announce only the step label and state.',
   },
   related: ['PixelTabs', 'PixelProgress', 'PixelBreadcrumb'],
   apiStability: 'stable',

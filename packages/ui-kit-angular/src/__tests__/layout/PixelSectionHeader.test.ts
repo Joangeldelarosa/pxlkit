@@ -32,6 +32,11 @@ describe('PixelSectionHeader', () => {
     await fixture.whenStable();
     expect(header.querySelector('h4')?.textContent?.trim()).toBe('Pricing');
     expect(header.querySelector('[aria-hidden="true"]')).toBeNull();
+    for (const level of ['h5', 'h6'] as const) {
+      fixture.componentInstance.level.set(level);
+      await fixture.whenStable();
+      expect(header.querySelector(level)?.textContent?.trim()).toBe('Pricing');
+    }
     fixture.componentInstance.level.set(undefined);
     await fixture.whenStable();
     expect(header.querySelector('h2')?.textContent?.trim()).toBe('Pricing');

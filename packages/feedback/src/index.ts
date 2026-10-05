@@ -1,4 +1,5 @@
 import type { IconPack } from '@pxlkit/core/vanilla';
+import packageJson from '../package.json';
 
 export {
   CheckCircle,
@@ -78,6 +79,10 @@ import { Caution } from './icons/caution';
 import { ShieldCross } from './icons/shield-cross';
 import { ShieldExclamation } from './icons/shield-exclamation';
 
+// The published version: package.json is its one source. Read here, outside
+// the pack, so a bundler still drops the pack when nothing imports it.
+const { version } = packageJson;
+
 export const FeedbackPack: IconPack = {
   id: 'feedback',
   name: 'Feedback',
@@ -109,6 +114,6 @@ export const FeedbackPack: IconPack = {
     DoubleCheck, Badge, Ribbon, FeedbackTarget, TargetHit,
     Bug, BugFixed, Caution, ShieldCross, ShieldExclamation,
   ],
-  version: '1.2.5',
+  version,
   author: 'pxlkit',
 };

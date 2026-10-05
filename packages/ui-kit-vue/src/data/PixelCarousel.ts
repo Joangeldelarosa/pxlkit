@@ -73,7 +73,7 @@ export type PixelCarouselProps = ExtractPublicPropTypes<typeof carouselProps>;
  *   <PixelCarouselItem>…</PixelCarouselItem>
  * </PixelCarousel>
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelCarousel',
   props: carouselProps,
   emits: {

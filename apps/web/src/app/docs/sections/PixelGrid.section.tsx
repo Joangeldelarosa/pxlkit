@@ -108,8 +108,8 @@ export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): 
         <li>Numeric or responsive column spec (base/sm/md/lg/xl)</li>
         <li>Asymmetric colGap/rowGap via stack-gap tokens</li>
         <li>autoFit / autoFill with configurable minColWidth</li>
-        <li>Polymorphic via <code>as</code>; inherits semantics from rendered element</li>
-        <li>Surface-aware transition classes via useEffectiveSurface</li>
+        <li>Polymorphic via <code>as</code> (in Angular, the element you put <code>pxlGrid</code> on); inherits semantics from rendered element</li>
+        <li>Surface-aware transition classes</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

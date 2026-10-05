@@ -28,7 +28,7 @@ export function singleElementChild(nodes: VNode[] | undefined): VNode | null {
  * listeners are chained) — the counterpart of the React kit's
  * `cloneElement`-based slot pattern.
  */
-export const Slot = defineComponent({
+export const Slot = /* @__PURE__ */ defineComponent({
   name: 'PxlSlot',
   inheritAttrs: false,
   setup(_, { attrs, slots }) {

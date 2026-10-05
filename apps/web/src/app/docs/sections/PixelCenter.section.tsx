@@ -95,9 +95,9 @@ export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProp
       <ul className="docs-highlights">
         <li>Token-driven max-width via the containerWidth scale</li>
         <li>Token-driven horizontal padding via the pageGutter scale</li>
-        <li>Polymorphic via the <code>as</code> prop — inherits semantics from the chosen element</li>
+        <li>Polymorphic via the <code>as</code> prop (in Angular, the element you put <code>pxlCenter</code> on) — inherits semantics from the chosen element</li>
         <li>Optional text alignment helper (left / center / right)</li>
-        <li>Surface-aware transition tokens through useEffectiveSurface</li>
+        <li>Surface-aware transition tokens</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

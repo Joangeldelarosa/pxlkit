@@ -111,7 +111,7 @@ export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsS
       <h2 id='pixel-pricing-card-heading'>PixelPricingCard</h2>
       <p className="docs-lead">Pricing tier card with tone-driven highlight, optional popular ribbon, feature list, and CTA slot.</p>
       <ul className="docs-highlights">
-        <li>Surface-aware borders, fonts, and radii via useEffectiveSurface</li>
+        <li>Surface-aware borders, fonts, and radii (pixel / linear)</li>
         <li>Tone tokens drive price color, highlight glow, and feature checks</li>
         <li>Optional popular ribbon with its own tone override</li>
         <li>Feature list supports included/excluded states with tooltip + a11y labels</li>

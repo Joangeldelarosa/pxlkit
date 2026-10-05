@@ -15,7 +15,7 @@ export default defineManifest({
   description:
     'Bordered section with optional uppercase title row, subtitle, and surface-aware container.',
   highlights: [
-    'Surface-aware borders and typography via useEffectiveSurface',
+    'Surface-aware borders and typography',
     'Optional title (uppercased via locale) and subtitle row',
     'Configurable container max-width or full-bleed with page gutter',
     'Vertical rhythm token controls spacing between sections',

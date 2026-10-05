@@ -103,7 +103,7 @@ export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsS
         <li>role=&quot;alertdialog&quot; + aria-modal with initial focus pinned to Cancel for safer destructive flows</li>
         <li>Async onAction with pending state, spinner, and stays open on rejection when onError is provided</li>
         <li>Destructive tone variant switches the action accent to red</li>
-        <li>Surface-aware styling via useEffectiveSurface (pixel chrome vs. modern)</li>
+        <li>Surface-aware styling (pixel chrome vs. linear)</li>
         <li>Scroll lock, focus trap, and Escape-to-close baked in</li>
       </ul>
     <dl className="docs-meta">

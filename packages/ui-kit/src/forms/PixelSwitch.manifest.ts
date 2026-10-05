@@ -16,7 +16,7 @@ export default defineManifest({
   description:
     'Two-state toggle switch with a sliding pixel thumb — flips a boolean setting on or off.',
   highlights: [
-    'Controlled boolean via `checked` + `onChange(next)`.',
+    'Controlled — `checked` + `onChange` (React), `v-model:checked` (Vue), `[(checked)]` or forms (Angular) — or uncontrolled with `defaultChecked`.',
     'Tone and surface follow the kit-wide tokens (`pixel` keeps square corners, `linear` rounds the track).',
     'Optional `name`/`value`/`required` mirror the state into a hidden input for native form submission.',
     'Accessible: renders as `role="switch"` with `aria-checked`, `aria-disabled`, and `aria-required`.',

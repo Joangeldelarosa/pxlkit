@@ -259,13 +259,13 @@ export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): 
   return (
     <section aria-labelledby={'pixel-form-heading'} className={className} data-status='stable'>
       <h2 id='pixel-form-heading'>PixelForm</h2>
-      <p className="docs-lead">shadcn-style compound wrapper around react-hook-form: Root / Field / Item / Label / Control / Description / Message auto-wire ids and aria-* across each field.</p>
+      <p className="docs-lead">Validated form on each framework&#39;s form library (React Hook Form, VeeValidate, Angular reactive forms): its form, field, item, label, control, description and message parts auto-wire ids and aria-* across each field.</p>
       <ul className="docs-highlights">
-        <li>Compound API (<code>PixelForm.Root</code> + <code>.Field</code> + <code>.Item</code> + <code>.Label</code> + <code>.Control</code> + <code>.Description</code> + <code>.Message</code>) for composable forms.</li>
+        <li>Compound API for composable forms: form, field, item, label, control, description and message (<code>PixelForm.Root</code> + <code>.Field</code> + … in React, <code>PixelForm</code> + <code>PixelFormField</code> + … in Vue, <code>form[pxlForm]</code> + <code>[pxlFormField]</code> + … in Angular).</li>
         <li>Auto-generates linked ids and wires <code>aria-describedby</code> + <code>aria-invalid</code> on the controlled field.</li>
-        <li>Uses <code>react-hook-form</code> <code>Controller</code> under the hood — works with any input that accepts <code>value</code>/<code>onChange</code>/<code>ref</code>.</li>
-        <li><code>Message</code> auto-renders the field error when present; falls back to children otherwise.</li>
-        <li>Surface-aware: <code>surface</code> prop on Root/Label/Description/Message follows kit-wide design tokens.</li>
+        <li>Built on each framework&#39;s form library — React Hook Form, VeeValidate, Angular reactive forms — so any control it binds works: <code>value</code>/<code>onChange</code>/<code>ref</code> in React, <code>v-model</code> in Vue, a <code>ControlValueAccessor</code> in Angular.</li>
+        <li>The message shows the field error, as an alert, while there is one; in React and Vue, content you give it shows instead.</li>
+        <li>Surface-aware: a <code>surface</code> on the form, label, description or message follows kit-wide design tokens.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -283,7 +283,7 @@ export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): 
         <li><code>form</code></li>
         <li><code>labelled-control</code></li>
       </ul>
-      <p className="docs-aria-notes">Each <code>PixelForm.Item</code> generates a stable <code>useId()</code> base and links the Label (htmlFor), Control (id + aria-describedby + aria-invalid), Description (id), and Message (id, role=&quot;alert&quot; on error) automatically — authors do not pass ids manually.</p>
+      <p className="docs-aria-notes">Each item generates a stable id base and links the label (<code>for</code>), the control (id + aria-describedby + aria-invalid), the description (id) and the message (id, role=&quot;alert&quot; on error) automatically — authors do not pass ids manually.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

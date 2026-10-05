@@ -26,7 +26,7 @@ import { PixelTabsPanel } from './PixelTabsPanel';
 
 /** Public prop bag for {@link PixelTabs}. */
 export interface PixelTabsProps {
-  /** Sugar API. When omitted, use <PixelTabs.List>/<PixelTabs.Trigger>/<PixelTabs.Panel>. */
+  /** The tabs as data. Without them, compose `PixelTabs.List`, `PixelTabs.Trigger` and `PixelTabs.Panel`. */
   items?: TabItem[];
   /** Uncontrolled initial active tab id. Canonical name; aliases `defaultTab`. */
   defaultValue?: string;

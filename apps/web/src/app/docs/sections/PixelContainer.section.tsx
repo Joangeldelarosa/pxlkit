@@ -82,11 +82,11 @@ export function PixelContainerDocsSection({ className }: PixelContainerDocsSecti
       <h2 id='pixel-container-heading'>PixelContainer</h2>
       <p className="docs-lead">Surface-aware page section wrapper with token-driven max-width, page gutter, and vertical rhythm.</p>
       <ul className="docs-highlights">
-        <li>Surface-aware tokens via useEffectiveSurface (retro / pixel)</li>
+        <li>Surface-aware tokens (pixel / linear)</li>
         <li>Token-driven maxWidth, padding x (gutter), and padding y (section rhythm)</li>
-        <li>Polymorphic <code>as</code> for semantic landmarks (section, main, header, footer, article, aside, div)</li>
+        <li>Polymorphic <code>as</code> for semantic landmarks (section, main, header, footer, article, aside, div); in Angular, the element you put <code>pxlContainer</code> on</li>
         <li>Composes PixelCenter internally for consistent horizontal centering</li>
-        <li>SSR-safe and forwards refs to the underlying element</li>
+        <li>SSR-safe, with no client state</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

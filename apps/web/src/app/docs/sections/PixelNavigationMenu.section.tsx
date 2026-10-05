@@ -85,8 +85,8 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
         <li>Horizontal or vertical orientation</li>
         <li>Optional shared viewport panel or inline per-item panels</li>
         <li>WAI-ARIA disclosure navigation: each panel follows its button in the tab order, with Arrow/Home/End/Escape keys</li>
-        <li>Surface-aware via useEffectiveSurface</li>
-        <li>SSR-safe, ref-forwarded nav landmark</li>
+        <li>Surface-aware (pixel / linear)</li>
+        <li>SSR-safe nav landmark</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

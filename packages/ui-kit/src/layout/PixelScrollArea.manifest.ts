@@ -10,7 +10,7 @@ export default defineManifest({
   description:
     'Surface-aware scroll container with styled scrollbar, configurable visibility and dimensions.',
   highlights: [
-    'Surface-aware scrollbar palette (retro / pixel) via useEffectiveSurface',
+    'Surface-aware scrollbar palette (pixel / linear)',
     'Scrollbar visibility modes: auto, always, scroll, hover',
     '`maxHeight` caps content before scrolling kicks in',
     '`scrollbarSize` and `offsetScrollbars` (stable gutter) for layout stability',

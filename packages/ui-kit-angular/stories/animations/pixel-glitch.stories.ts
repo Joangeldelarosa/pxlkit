@@ -10,6 +10,7 @@ import {
   Default as DefaultExample,
   HighIntensity as HighIntensityExample,
   HoverTrigger as HoverTriggerExample,
+  HeadingLabel as HeadingLabelExample,
 } from '../../examples/animations/pixel-glitch.examples';
 
 const meta: Meta = {
@@ -59,6 +60,19 @@ export const HoverTrigger: Story = {
   parameters: {
     docs: {
       source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelGlitch, PixelGlitchContent } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelGlitch, PixelGlitchContent],\n  template: `\n    <pxl-glitch trigger="hover">\n      <span *pxlGlitchContent class="text-2xl font-bold">HOVER ME</span>\n    </pxl-glitch>\n  `,\n})\nexport class HoverTrigger {}' },
+    },
+  },
+};
+
+/** Heading label — A label glitches with its text once in the document: the copies are drawn by the stylesheet, so a heading reads once to crawlers, copying and screen readers. Put the heading around the glitch, as a span. */
+export const HeadingLabel: Story = {
+  name: 'Heading label',
+  tags: ['example-heading-label'],
+  render: () => ({ props: { example: HeadingLabelExample }, template: '<ng-container *ngComponentOutlet="example" />' }),
+  parameters: {
+    docs: {
+      description: { story: 'A label glitches with its text once in the document: the copies are drawn by the stylesheet, so a heading reads once to crawlers, copying and screen readers. Put the heading around the glitch, as a span.' },
+      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelGlitch } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelGlitch],\n  template: `\n    <h2 class="text-2xl font-bold">\n      <span pxlGlitch label="SIGNAL LOST"></span>\n    </h2>\n  `,\n})\nexport class HeadingLabel {}' },
     },
   },
 };

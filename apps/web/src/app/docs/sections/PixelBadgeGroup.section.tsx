@@ -87,7 +87,6 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
         <li>Overflow trigger opens a PixelPopover with the hidden badges, surface-matched.</li>
         <li>Wrapper becomes <code>role=&quot;group&quot;</code> when an accessible name (aria-label or aria-labelledby) is provided.</li>
         <li>Surface-aware: pixel chamfered radius + pixel font or linear pill, propagated to the popover.</li>
-        <li>Forwarded ref to the underlying div and full passthrough of HTMLAttributes.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

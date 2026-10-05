@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelShake } from './PixelShake';
 
 export function Default() {

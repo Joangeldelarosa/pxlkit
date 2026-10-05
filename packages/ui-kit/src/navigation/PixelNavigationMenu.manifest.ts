@@ -15,8 +15,8 @@ export default defineManifest({
     'Horizontal or vertical orientation',
     'Optional shared viewport panel or inline per-item panels',
     'WAI-ARIA disclosure navigation: each panel follows its button in the tab order, with Arrow/Home/End/Escape keys',
-    'Surface-aware via useEffectiveSurface',
-    'SSR-safe, ref-forwarded nav landmark',
+    'Surface-aware (pixel / linear)',
+    'SSR-safe nav landmark',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

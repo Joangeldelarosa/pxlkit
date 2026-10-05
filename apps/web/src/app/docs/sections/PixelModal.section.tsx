@@ -107,7 +107,7 @@ export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps)
       <p className="docs-lead">Centered modal dialog with title bar, optional description and footer, surface-aware chrome, focus trap, scroll lock, and async close support.</p>
       <ul className="docs-highlights">
         <li>Five sizes (sm/md/lg/xl/full) with surface-aware chrome — pixel renders an old-school window, linear a flat card</li>
-        <li>Focus trap, scroll lock, and Escape-to-close come built in via shared hooks</li>
+        <li>Focus trap, scroll lock, and Escape-to-close come built in</li>
         <li>Optional description wired via aria-describedby and optional footer slot for actions</li>
         <li>asyncClose awaits a promise (with loading affordance on the close button) before unmounting</li>
         <li>Portals to document.body by default; accepts a custom container override</li>

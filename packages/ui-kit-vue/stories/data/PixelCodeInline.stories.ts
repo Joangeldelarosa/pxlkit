@@ -82,7 +82,7 @@ export const CodeSamples: Story = {
   render: () => CodeSamplesExample,
   parameters: {
     docs: {
-      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelCodeInline } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <div class="flex flex-col gap-2">\n    <div>Import: <PixelCodeInline>import { PixelCodeInline } from \'@pxlkit/ui\'</PixelCodeInline></div>\n    <div>Hotkey: <PixelCodeInline tone="purple">Ctrl+K</PixelCodeInline></div>\n    <div>Error: <PixelCodeInline tone="red">EACCES</PixelCodeInline></div>\n  </div>\n</template>' },
+      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelCodeInline } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <div class="flex flex-col gap-2">\n    <div>Import: <PixelCodeInline>import { PixelCodeInline } from \'@pxlkit/ui-kit\'</PixelCodeInline></div>\n    <div>Hotkey: <PixelCodeInline tone="purple">Ctrl+K</PixelCodeInline></div>\n    <div>Error: <PixelCodeInline tone="red">EACCES</PixelCodeInline></div>\n  </div>\n</template>' },
     },
   },
 };

@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelBox } from './PixelBox';
 
 export function Default() {

@@ -27,7 +27,7 @@ export default defineManifest({
     'Optional autosize between minRows and maxRows, scrolling beyond the cap',
     'Character counter (showCount) — total or N/max with overflow styling',
     'Full tone + surface (pixel/linear) theming aligned with the rest of forms',
-    'Controlled and uncontrolled value patterns, ref forwards to <textarea>',
+    'Controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

@@ -27,15 +27,17 @@ const api: FrameworkApiReferences = {
       {
         name: 'PixelGlitch',
         props: [
-          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to glitch.' },
+          { name: 'children', type: 'React.ReactNode', description: 'Content to glitch: each colour copy repeats it.' },
+          { name: 'label', type: 'string', description: "Text to glitch, in place of `children`: it is in the document once — the stylesheet draws its colour copies — so a heading's text reads once to crawlers, copying and text extraction." },
           { name: 'duration', type: 'number', default: '3000', description: 'Length of one full glitch loop in milliseconds. Default `3000`.' },
           { name: 'intensity', type: 'number', default: '4', description: 'Maximum horizontal displacement (pixels) of the ghost layers. Default `4`.' },
           { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
           { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
-          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+          { name: 'as', type: "'div' | 'span'", default: "'div'", description: "Element of the wrapper and its layers. `'span'` puts the glitch inside phrasing content, such as a heading: wrap the heading around it, as the layers repeat whatever they hold. Default `'div'`." },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapper.' },
         ],
         notes: [
-          '`ref` points to `<div>`.',
+          '`ref` points to its element (`HTMLElement`).',
         ],
       },
     ],
@@ -46,18 +48,17 @@ const api: FrameworkApiReferences = {
       {
         name: 'PixelGlitch',
         props: [
+          { name: 'label', type: 'string', description: "Text to glitch, in place of the default slot: it is in the document once — the stylesheet draws its colour copies — so a heading's text reads once to crawlers, copying and text extraction." },
           { name: 'duration', type: 'number', default: '3000', description: 'Length of one full glitch loop in milliseconds.' },
           { name: 'intensity', type: 'number', default: '4', description: 'Maximum horizontal displacement (pixels) of the layers.' },
           { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+          { name: 'as', type: "'div' | 'span'", default: "'div'", description: "Element of the wrapper and its layers. `'span'` puts the glitch inside phrasing content, such as a heading: wrap the heading around it, as the layers repeat whatever they hold." },
         ],
         events: [
           { name: 'complete', description: "After the final iteration of the content's layer." },
         ],
         slots: [
           { name: 'default', description: 'Content to glitch, rendered once per layer.' },
-        ],
-        notes: [
-          'Other attributes and listeners fall through to its root `<div>`.',
         ],
       },
     ],
@@ -67,16 +68,18 @@ const api: FrameworkApiReferences = {
     components: [
       {
         name: 'PixelGlitch',
-        selector: 'pxl-glitch',
+        selector: 'pxl-glitch, span[pxlGlitch]',
         props: [
           { name: 'duration', type: 'number', default: '3000', accepts: 'unknown', description: 'Length of one full glitch loop in milliseconds.' },
           { name: 'intensity', type: 'number', default: '4', accepts: 'unknown', description: 'Maximum horizontal displacement (pixels) of the layers.' },
           { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+          { name: 'label', type: 'string', description: "Text to glitch, in place of the content: it is in the document once — the stylesheet draws its colour copies — so a heading's text reads once to crawlers, copying and text extraction." },
         ],
         events: [
           { name: 'complete', description: "After the final iteration of the content's layer." },
         ],
         notes: [
+          'As an attribute, it goes on a native `<span>`, which keeps its own attributes and events.',
           'Projects its content (`<ng-content>`).',
         ],
       },
@@ -99,9 +102,9 @@ export function PixelGlitchDocsSection({ className }: PixelGlitchDocsSectionProp
       <ul className="docs-highlights">
         <li>Layered R/C color-separation ghosts for authentic CRT-glitch feel</li>
         <li>Configurable duration and horizontal displacement intensity</li>
-        <li>Animation trigger modes: mount, hover, in-view, manual</li>
-        <li>Respects prefers-reduced-motion via shared animation hooks</li>
-        <li>SSR-safe forwardRef wrapper around any children</li>
+        <li>Animation trigger modes: mount, hover, click, focus, in-view, manual</li>
+        <li>Holds still when the user prefers reduced motion, from the server-rendered first paint on</li>
+        <li>Glitches any content, or a label held once in the document for a heading: its copies are drawn by CSS</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -117,9 +120,10 @@ export function PixelGlitchDocsSection({ className }: PixelGlitchDocsSectionProp
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>aria-hidden on decorative ghost layers</code></li>
+        <li><code>a label&#39;s copies drawn by CSS, without alternative text</code></li>
         <li><code>respects prefers-reduced-motion</code></li>
       </ul>
-      <p className="docs-aria-notes">Ghost layers are marked aria-hidden so assistive tech reads only the underlying content. Animation is suppressed when the user prefers reduced motion.</p>
+      <p className="docs-aria-notes">The copies of other content are layers marked aria-hidden, so assistive technology reads the content once, though it is in the document three times. A label is in the document once: its copies are drawn by the stylesheet, with no alternative text for assistive technology — use one for a heading. Animation is suppressed when the user prefers reduced motion.</p>
     </section>
     <section aria-labelledby="pixel-glitch-usage">
       <h3 id="pixel-glitch-usage">Usage</h3>
@@ -269,6 +273,44 @@ import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class HoverTrigger {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-heading-label">
+        <h4>Heading label</h4>
+        <p>A label glitches with its text once in the document: the copies are drawn by the stylesheet, so a heading reads once to crawlers, copying and screen readers. Put the heading around the glitch, as a span.</p>
+        <FrameworkCode
+          variant="docs"
+          label={'Heading label code'}
+          react={`import { PixelGlitch } from '@pxlkit/ui-kit';
+
+export function HeadingLabel() {
+  return (
+    <h2 className="text-2xl font-bold">
+      <PixelGlitch as="span" label="SIGNAL LOST" />
+    </h2>
+  );
+}`}
+          vue={`<script setup lang="ts">
+import { PixelGlitch } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <h2 class="text-2xl font-bold">
+    <PixelGlitch as="span" label="SIGNAL LOST" />
+  </h2>
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelGlitch } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelGlitch],
+  template: \`
+    <h2 class="text-2xl font-bold">
+      <span pxlGlitch label="SIGNAL LOST"></span>
+    </h2>
+  \`,
+})
+export class HeadingLabel {}`}
         />
       </article>
     </section>

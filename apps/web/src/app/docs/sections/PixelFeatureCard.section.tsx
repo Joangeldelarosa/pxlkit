@@ -148,7 +148,7 @@ export function PixelFeatureCardDocsSection({ className }: PixelFeatureCardDocsS
         <li><code>button</code></li>
         <li><code>link</code></li>
       </ul>
-      <p className="docs-aria-notes">Semantic &lt;article&gt; by default. When interactive without href, the root becomes &lt;div role=&quot;button&quot; tabIndex=&#123;0&#125;&gt; with Enter/Space activation parity (&lt;article&gt; does not permit role=&quot;button&quot;). When href is set, the root renders as a native &lt;a&gt; with the entire card as the click target — nesting interactive children (PixelButton, PixelTextLink) inside footer is invalid HTML in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.</p>
+      <p className="docs-aria-notes">Semantic &lt;article&gt; by default. When interactive without href, the root becomes &lt;div role=&quot;button&quot; tabindex=&quot;0&quot;&gt; with Enter/Space activation parity (&lt;article&gt; does not permit role=&quot;button&quot;). When href is set, the root renders as a native &lt;a&gt; with the entire card as the click target — nesting interactive children (PixelButton, PixelTextLink) inside footer is invalid HTML in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

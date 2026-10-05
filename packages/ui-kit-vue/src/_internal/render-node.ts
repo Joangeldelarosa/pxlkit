@@ -10,7 +10,7 @@ import { defineComponent, type PropType, type VNode, type VNodeChild } from 'vue
 export type PxlNode = string | number | VNode | (() => VNodeChild);
 
 /** Renders a {@link PxlNode} in place (no wrapper element). */
-export const RenderNode = defineComponent({
+export const RenderNode = /* @__PURE__ */ defineComponent({
   name: 'PxlRenderNode',
   props: {
     node: { type: [String, Number, Object, Function] as PropType<PxlNode | null | undefined>, default: undefined },

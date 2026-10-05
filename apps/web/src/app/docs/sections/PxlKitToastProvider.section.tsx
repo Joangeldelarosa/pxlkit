@@ -86,7 +86,7 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
   return (
     <section aria-labelledby={'pxl-kit-toast-provider-heading'} className={className} data-status='stable'>
       <h2 id='pxl-kit-toast-provider-heading'>PxlKitToastProvider</h2>
-      <p className="docs-lead">App-root toast provider that hosts the toast queue, viewport portal, and stacked/expanded visual mode — paired with useToast() for imperative push/update/dismiss/promise APIs.</p>
+      <p className="docs-lead">App-root toast provider that hosts the toast queue, viewport portal, and stacked/expanded visual mode — paired with useToast() (injectToast() in Angular) for imperative push/update/dismiss/promise APIs.</p>
       <ul className="docs-highlights">
         <li>Six positions (top/bottom × left/right/center) with portal-rendered viewport.</li>
         <li>Sonner-style stacked mode: collapsed cards peek behind the front, hover/focus expands the stack.</li>

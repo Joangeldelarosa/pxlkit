@@ -102,7 +102,7 @@ export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSecti
         <li>Responsive stacking below sm, md, or lg breakpoints</li>
         <li>Reverse order toggle to flip visual order without changing markup semantics</li>
         <li>Token-based gap scale via stackGap for consistent rhythm</li>
-        <li>Surface-aware transitions through useEffectiveSurface</li>
+        <li>Surface-aware transitions</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

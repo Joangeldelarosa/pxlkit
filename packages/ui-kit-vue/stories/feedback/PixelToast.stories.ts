@@ -22,7 +22,7 @@ const meta: Meta = {
   parameters: {
     controls: { disable: true },
     docs: {
-      description: { component: 'Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast().' },
+      description: { component: 'Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast() (injectToast() in Angular).' },
     },
   },
 };

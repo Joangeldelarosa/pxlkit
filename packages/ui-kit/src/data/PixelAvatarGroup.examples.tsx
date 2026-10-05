@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelAvatarGroup } from './PixelAvatarGroup';
 import { PixelAvatar } from './PixelAvatar';
 

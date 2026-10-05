@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelTimeline, PixelTimelineItem } from './PixelTimeline';
 
 export function Default() {

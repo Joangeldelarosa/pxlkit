@@ -97,7 +97,7 @@ export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSec
       <h2 id='pixel-scroll-area-heading'>PixelScrollArea</h2>
       <p className="docs-lead">Surface-aware scroll container with styled scrollbar, configurable visibility and dimensions.</p>
       <ul className="docs-highlights">
-        <li>Surface-aware scrollbar palette (retro / pixel) via useEffectiveSurface</li>
+        <li>Surface-aware scrollbar palette (pixel / linear)</li>
         <li>Scrollbar visibility modes: auto, always, scroll, hover</li>
         <li><code>maxHeight</code> caps content before scrolling kicks in</li>
         <li><code>scrollbarSize</code> and <code>offsetScrollbars</code> (stable gutter) for layout stability</li>

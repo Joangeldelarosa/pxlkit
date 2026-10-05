@@ -21,7 +21,7 @@ export default defineManifest({
     'Centered modal dialog with title bar, optional description and footer, surface-aware chrome, focus trap, scroll lock, and async close support.',
   highlights: [
     'Five sizes (sm/md/lg/xl/full) with surface-aware chrome — pixel renders an old-school window, linear a flat card',
-    'Focus trap, scroll lock, and Escape-to-close come built in via shared hooks',
+    'Focus trap, scroll lock, and Escape-to-close come built in',
     'Optional description wired via aria-describedby and optional footer slot for actions',
     'asyncClose awaits a promise (with loading affordance on the close button) before unmounting',
     'Portals to document.body by default; accepts a custom container override',

@@ -4,7 +4,7 @@ import { PixelTextLink } from '@pxlkit/ui-kit-vue';
 
 <template>
   <p class="max-w-md">
-    Built with <PixelTextLink href="https://pxlkit.dev" tone="green">pxlkit</PixelTextLink>, a tone-coloured component
+    Built with <PixelTextLink href="https://pxlkit.xyz" tone="green">pxlkit</PixelTextLink>, a tone-coloured component
     library for retro interfaces.
   </p>
 </template>

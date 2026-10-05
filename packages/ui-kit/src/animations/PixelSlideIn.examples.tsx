@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelSlideIn } from './PixelSlideIn';
 
 export function Default() {

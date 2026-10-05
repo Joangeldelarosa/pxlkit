@@ -80,9 +80,9 @@ export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDoc
       <p className="docs-lead">Unstyled escape-hatch <code>&lt;textarea&gt;</code> passthrough for building custom multi-line inputs without the opinionated PixelTextarea chrome.</p>
       <ul className="docs-highlights">
         <li>Zero styling — pure passthrough to the native &lt;textarea&gt; element</li>
-        <li>Forwards every standard TextareaHTMLAttributes prop (value, rows, maxLength, etc.)</li>
-        <li>forwardRef-friendly: refs land on the underlying HTMLTextAreaElement</li>
-        <li>SSR-safe and tree-shakable; no runtime state or context</li>
+        <li>Takes every native textarea attribute (value, rows, maxlength, etc.)</li>
+        <li>Its element is the native &lt;textarea&gt;: a ref in React, <code>$el</code> in Vue, the <code>textarea[pxlBareTextarea]</code> element in Angular</li>
+        <li>SSR-safe and tree-shakable; no runtime state</li>
         <li>Ideal for composing bespoke field chrome while keeping native form semantics</li>
       </ul>
     <dl className="docs-meta">
@@ -100,7 +100,7 @@ export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDoc
       <ul className="docs-aria-patterns">
         <li><code>textbox</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders a native &lt;textarea&gt; so screen readers announce the textbox role with multiline semantics automatically. Because no chrome is applied, callers MUST supply a visible &lt;label&gt; (htmlFor) or an aria-label so the field has an accessible name. Pair with aria-required, aria-invalid, and aria-describedby for validation flows.</p>
+      <p className="docs-aria-notes">Renders a native &lt;textarea&gt; so screen readers announce the textbox role with multiline semantics automatically. Because no chrome is applied, callers MUST supply a visible &lt;label&gt; (<code>for</code>) or an aria-label so the field has an accessible name. Pair with aria-required, aria-invalid, and aria-describedby for validation flows.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

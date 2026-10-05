@@ -10,7 +10,7 @@ import { usePopoverContext } from '../../overlay-foundation/_internal/popover-co
  * `preventDefault()` first, as the field's buttons do. Unlike
  * `PixelPopoverTrigger`, it adds no ARIA: the combobox carries the popup's.
  */
-export const ListboxField = defineComponent({
+export const ListboxField = /* @__PURE__ */ defineComponent({
   name: 'PxlListboxField',
   slots: Object as SlotsType<{ default?: () => VNode[] }>,
   setup(_, { slots }) {

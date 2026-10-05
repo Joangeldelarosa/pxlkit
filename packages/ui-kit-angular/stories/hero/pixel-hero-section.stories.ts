@@ -12,6 +12,7 @@ import {
   Compact as CompactExample,
   TypewriterHeadline as TypewriterHeadlineExample,
   GlitchHeadline as GlitchHeadlineExample,
+  HeadingLevel as HeadingLevelExample,
 } from '../../examples/hero/pixel-hero-section.examples';
 
 const meta: Meta = {
@@ -85,6 +86,18 @@ export const GlitchHeadline: Story = {
   parameters: {
     docs: {
       source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelHeroSection } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelHeroSection],\n  template: `\n    <section\n      pxlHeroSection\n      density="compact"\n      minHeight="sm"\n      headline="Signal lost"\n      headlineEffect="glitch"\n      subline="The headline glitches, and holds still for readers who prefer reduced motion."\n      tone="red"\n    ></section>\n  `,\n})\nexport class GlitchHeadline {}' },
+    },
+  },
+};
+
+/** Heading level */
+export const HeadingLevel: Story = {
+  name: 'Heading level',
+  tags: ['example-heading-level'],
+  render: () => ({ props: { example: HeadingLevelExample }, template: '<ng-container *ngComponentOutlet="example" />' }),
+  parameters: {
+    docs: {
+      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelHeroSection } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelHeroSection],\n  template: `\n    <section\n      pxlHeroSection\n      as="h2"\n      density="compact"\n      minHeight="sm"\n      eyebrow="Embedded"\n      headline="A hero inside a page"\n      subline="Its headline is an h2, under the page\'s own h1."\n    ></section>\n  `,\n})\nexport class HeadingLevel {}' },
     },
   },
 };

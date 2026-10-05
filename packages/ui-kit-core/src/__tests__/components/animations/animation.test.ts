@@ -22,7 +22,9 @@ import {
   rotateStyle,
   shakeStyle,
   slideInStyle,
+  spinnerAnimation,
   zoomInStyle,
+  type AnimationStyle,
   type AnimationTrigger,
   type AnimationTriggerState,
 } from '../../../index';
@@ -30,6 +32,45 @@ import {
 const still = { reducedMotion: false };
 const idle = ANIMATION_TRIGGER_IDLE;
 const all: AnimationTriggerState = { hovered: true, focused: true, inView: true, clicked: true };
+const theme = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../../../styles.css'), 'utf8');
+
+/** The inline styles the animation components set while they play (the glitch's three layers among them). */
+function playingStyles(): AnimationStyle[] {
+  const glitch = glitchStyles({ duration: 3000, intensity: 4 });
+  return [
+    bounceStyle({ duration: 800, repeat: 'infinite', height: 8, easing: 'ease' }),
+    fadeInStyle({ duration: 400, delay: 0, repeat: 1, easing: 'ease', fillMode: 'both' }),
+    flickerStyle({ duration: 2200, repeat: 'infinite' }),
+    floatStyle({ duration: 2200, distance: 6, repeat: 'infinite', easing: 'ease-in-out' }),
+    glitch.red,
+    glitch.cyan,
+    glitch.main,
+    pulseStyle({ duration: 2000, repeat: 'infinite', easing: 'ease-in-out' }),
+    rotateStyle({ duration: 1800, repeat: 'infinite', direction: 'normal', easing: 'linear' }),
+    shakeStyle({ duration: 450, distance: 2, repeat: 1, easing: 'linear' }),
+    ...(['up', 'down', 'left', 'right'] as const).map((from) =>
+      slideInStyle({ from, duration: 350, delay: 0, distance: 10, repeat: 1, easing: 'ease', fillMode: 'both' }),
+    ),
+    zoomInStyle({ duration: 320, delay: 0, startScale: 0.92, repeat: 1, easing: 'ease', fillMode: 'both' }),
+  ];
+}
+
+/** Selector and declarations of each rule in the stylesheet's `@media <condition>` block. */
+function mediaRules(condition: string): Array<[selector: string, declarations: string]> {
+  const start = theme.indexOf(`@media ${condition} {`);
+  if (start < 0) return [];
+  const open = theme.indexOf('{', start);
+  let depth = 0;
+  let close = open;
+  for (let i = open; i < theme.length; i++) {
+    if (theme[i] === '{') depth++;
+    if (theme[i] === '}' && --depth === 0) {
+      close = i;
+      break;
+    }
+  }
+  return Array.from(theme.slice(open + 1, close).matchAll(/([^{}]+)\{([^{}]*)\}/g), (m) => [m[1]!.trim(), m[2]!.trim()]);
+}
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -47,27 +88,46 @@ describe('animation values', () => {
   });
 
   it('animates with keyframes the stylesheet defines', () => {
-    const theme = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../../../styles.css'), 'utf8');
-    const glitch = glitchStyles({ duration: 3000, intensity: 4 });
-    const styles = [
-      bounceStyle({ duration: 800, repeat: 'infinite', height: 8, easing: 'ease' }),
-      fadeInStyle({ duration: 400, delay: 0, repeat: 1, easing: 'ease', fillMode: 'both' }),
-      flickerStyle({ duration: 2200, repeat: 'infinite' }),
-      floatStyle({ duration: 2200, distance: 6, repeat: 'infinite', easing: 'ease-in-out' }),
-      glitch.red,
-      glitch.cyan,
-      glitch.main,
-      pulseStyle({ duration: 2000, repeat: 'infinite', easing: 'ease-in-out' }),
-      rotateStyle({ duration: 1800, repeat: 'infinite', direction: 'normal', easing: 'linear' }),
-      shakeStyle({ duration: 450, distance: 2, repeat: 1, easing: 'linear' }),
-      ...(['up', 'down', 'left', 'right'] as const).map((from) =>
-        slideInStyle({ from, duration: 350, delay: 0, distance: 10, repeat: 1, easing: 'ease', fillMode: 'both' }),
-      ),
-      zoomInStyle({ duration: 320, delay: 0, startScale: 0.92, repeat: 1, easing: 'ease', fillMode: 'both' }),
-    ];
-    for (const { animation } of styles) {
+    for (const { animation } of playingStyles()) {
       const [keyframes] = animation.split(' ');
       expect(theme).toMatch(new RegExp(`@keyframes ${keyframes}\\s*\\{`));
+    }
+  });
+
+  it('holds still for a reader who prefers reduced motion, before the page hydrates too', () => {
+    // Server markup is rendered for a reader who allows motion: the
+    // stylesheet stops the animation it carries inline, however a framework
+    // or the browser writes the style, and drops the glitch's colour copies,
+    // which would cover the text once still.
+    const rules = mediaRules('(prefers-reduced-motion: reduce)');
+    const [stop] = rules.find(([, declarations]) => declarations === 'animation: none !important;') ?? [];
+    const [hide] = rules.find(([, declarations]) => declarations === 'display: none !important;') ?? [];
+    expect(stop).toBeDefined();
+    expect(hide).toBeDefined();
+    const element = document.createElement('span');
+    const spinners = (['pixel', 'linear'] as const).map((surface) => ({ animation: spinnerAnimation(surface, still)! }));
+    for (const { animation } of [...playingStyles(), ...spinners]) {
+      const [keyframes] = animation.split(' ');
+      for (const written of [
+        `animation:${animation}`,
+        `--pxl-glitch-x: 4px; animation: ${animation};`,
+        `animation-name: ${keyframes}; animation-duration: 1s;`,
+      ]) {
+        element.setAttribute('style', written);
+        expect(element.matches(stop!), written).toBe(true);
+      }
+    }
+    // A label's copies, drawn by the stylesheet, go too.
+    expect(hide!.split(/,\s*/)).toEqual(expect.arrayContaining(['.pxl-glitch-copies::before', '.pxl-glitch-copies::after']));
+    const glitch = glitchStyles({ duration: 3000, intensity: 4 });
+    for (const [layer, hidden] of [[glitch.red, true], [glitch.cyan, true], [glitch.main, false]] as const) {
+      element.setAttribute('style', `animation:${layer.animation}`);
+      expect(element.matches(hide!), layer.animation).toBe(hidden);
+    }
+    for (const other of ['--pxl-scrollbar-size:8px', 'animation:spin 1s linear infinite', 'opacity:0.5']) {
+      element.setAttribute('style', other);
+      expect(element.matches(stop!), other).toBe(false);
+      expect(element.matches(hide!), other).toBe(false);
     }
   });
 });

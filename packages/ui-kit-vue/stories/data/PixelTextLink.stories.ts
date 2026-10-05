@@ -35,7 +35,7 @@ export const Default: Story = {
   render: () => DefaultExample,
   parameters: {
     docs: {
-      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelTextLink } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>\n</template>' },
+      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelTextLink } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <PixelTextLink href="https://pxlkit.xyz">Read the docs</PixelTextLink>\n</template>' },
     },
   },
 };
@@ -83,7 +83,7 @@ export const ExternalLink: Story = {
   render: () => ExternalLinkExample,
   parameters: {
     docs: {
-      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelTextLink } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <PixelTextLink href="https://pxlkit.dev" target="_blank" rel="noopener noreferrer">Open in new tab</PixelTextLink>\n</template>' },
+      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelTextLink } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <PixelTextLink href="https://pxlkit.xyz" target="_blank" rel="noopener noreferrer">Open in new tab</PixelTextLink>\n</template>' },
     },
   },
 };
@@ -95,7 +95,7 @@ export const InlineInProse: Story = {
   render: () => InlineInProseExample,
   parameters: {
     docs: {
-      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelTextLink } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <p class="max-w-md">\n    Built with <PixelTextLink href="https://pxlkit.dev" tone="green">pxlkit</PixelTextLink>, a tone-coloured component\n    library for retro interfaces.\n  </p>\n</template>' },
+      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelTextLink } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <p class="max-w-md">\n    Built with <PixelTextLink href="https://pxlkit.xyz" tone="green">pxlkit</PixelTextLink>, a tone-coloured component\n    library for retro interfaces.\n  </p>\n</template>' },
     },
   },
 };

@@ -4,6 +4,6 @@ import { PixelButton } from '@pxlkit/ui-kit-vue';
 
 <template>
   <PixelButton as-child tone="cyan">
-    <a href="https://pxlkit.dev" target="_blank" rel="noreferrer">External link</a>
+    <a href="https://pxlkit.xyz" target="_blank" rel="noreferrer">External link</a>
   </PixelButton>
 </template>

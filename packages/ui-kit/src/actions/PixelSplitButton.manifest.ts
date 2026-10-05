@@ -18,7 +18,7 @@ export default defineManifest({
   highlights: [
     'Primary click handler plus a menu of alternate actions in a single control',
     'Inherits tone + surface theming from the design system',
-    'Closes on outside click via useClickOutside',
+    'Its menu closes on an outside press, Escape or Tab',
     'aria-haspopup="menu" + aria-expanded on the chevron trigger',
   ],
   examples: [

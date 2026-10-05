@@ -98,7 +98,6 @@ export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSecti
         <li>Tone-driven border color shared by the container and inter-cell dividers.</li>
         <li>Surface-aware: pixel chamfered border + pixel radius, or linear rounded corners.</li>
         <li>Adopts role=&quot;group&quot; automatically when aria-label or aria-labelledby is provided.</li>
-        <li>Forwards ref to the underlying div and spreads native HTMLAttributes.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

@@ -23,7 +23,6 @@ export default defineManifest({
     'Tone-driven border color shared by the container and inter-cell dividers.',
     'Surface-aware: pixel chamfered border + pixel radius, or linear rounded corners.',
     'Adopts role="group" automatically when aria-label or aria-labelledby is provided.',
-    'Forwards ref to the underlying div and spreads native HTMLAttributes.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

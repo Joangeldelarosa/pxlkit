@@ -535,7 +535,7 @@ export function Default() {
   );
 }`,
   'pixel-date-range-picker': `import { useState } from 'react';
-import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [range, setRange] = useState<DateRangeValue>({});
@@ -1449,7 +1449,7 @@ export function Default() {
   'pixel-text-link': `import { PixelTextLink } from '@pxlkit/ui-kit';
 
 export function Default() {
-  return <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>;
+  return <PixelTextLink href="https://pxlkit.xyz">Read the docs</PixelTextLink>;
 }`,
   'pixel-textarea': `import { PixelTextarea } from '@pxlkit/ui-kit';
 

@@ -5,7 +5,7 @@ import { defineComponent, h, type PropType } from 'vue';
  * left out — for markup that only some states wrap. Attributes go to the
  * wrapper.
  */
-export const Wrap = defineComponent({
+export const Wrap = /* @__PURE__ */ defineComponent({
   name: 'PxlWrap',
   inheritAttrs: false,
   props: {

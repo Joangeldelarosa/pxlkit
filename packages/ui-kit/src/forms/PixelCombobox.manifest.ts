@@ -25,9 +25,9 @@ export default defineManifest({
     'Searchable single-value combobox built on a button trigger + listbox popover with type-to-filter, optional grouping, and full keyboard navigation.',
   highlights: [
     'WAI-ARIA combobox pattern — `role="combobox"` trigger paired with a `role="listbox"` popup and `aria-activedescendant` for highlight tracking.',
-    'Type-to-filter search input is opt-out (`searchable={false}`) for short lists where filtering adds friction.',
+    'Type-to-filter search input is opt-out (`searchable` set to false) for short lists where filtering adds friction.',
     'Optional `group` field on options renders sticky group headings in the listbox without breaking keyboard navigation.',
-    'Controlled or uncontrolled — `value` + `onChange` or `defaultValue`; integrates with native forms via hidden `name` input.',
+    'Controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`; a hidden `name` input joins native forms.',
     'Tone-free surface theming (pixel/linear) and shared size scale (sm/md/lg) match the rest of the input family.',
   ],
   examples: [

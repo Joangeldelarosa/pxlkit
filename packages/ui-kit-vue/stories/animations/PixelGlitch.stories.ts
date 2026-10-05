@@ -9,6 +9,7 @@ import { PixelGlitch } from '@pxlkit/ui-kit-vue';
 import DefaultExample from '../../examples/animations/PixelGlitch/Default.vue';
 import HighIntensityExample from '../../examples/animations/PixelGlitch/HighIntensity.vue';
 import HoverTriggerExample from '../../examples/animations/PixelGlitch/HoverTrigger.vue';
+import HeadingLabelExample from '../../examples/animations/PixelGlitch/HeadingLabel.vue';
 
 const meta: Meta = {
   title: 'UI Kit / Animations / PixelGlitch',
@@ -57,6 +58,19 @@ export const HoverTrigger: Story = {
   parameters: {
     docs: {
       source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelGlitch } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <PixelGlitch trigger="hover">\n    <span class="text-2xl font-bold">HOVER ME</span>\n  </PixelGlitch>\n</template>' },
+    },
+  },
+};
+
+/** Heading label — A label glitches with its text once in the document: the copies are drawn by the stylesheet, so a heading reads once to crawlers, copying and screen readers. Put the heading around the glitch, as a span. */
+export const HeadingLabel: Story = {
+  name: 'Heading label',
+  tags: ['example-heading-label'],
+  render: () => HeadingLabelExample,
+  parameters: {
+    docs: {
+      description: { story: 'A label glitches with its text once in the document: the copies are drawn by the stylesheet, so a heading reads once to crawlers, copying and screen readers. Put the heading around the glitch, as a span.' },
+      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelGlitch } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <h2 class="text-2xl font-bold">\n    <PixelGlitch as="span" label="SIGNAL LOST" />\n  </h2>\n</template>' },
     },
   },
 };

@@ -1,4 +1,5 @@
 import type { IconPack } from '@pxlkit/core/vanilla';
+import packageJson from '../package.json';
 
 export {
   Sun,
@@ -84,6 +85,10 @@ import { LightningStrike } from './icons/lightning-strike';
 import { PulsingSun } from './icons/pulsing-sun';
 import { WindGust } from './icons/wind-gust';
 
+// The published version: package.json is its one source. Read here, outside
+// the pack, so a bundler still drops the pack when nothing imports it.
+const { version } = packageJson;
+
 export const WeatherPack: IconPack = {
   id: 'weather',
   name: 'Weather',
@@ -106,6 +111,6 @@ export const WeatherPack: IconPack = {
     // New animated
     SpinningTornado, DriftingFog, FallingSnow, LightningStrike, PulsingSun, WindGust,
   ],
-  version: '1.2.4',
+  version,
   author: 'pxlkit',
 };

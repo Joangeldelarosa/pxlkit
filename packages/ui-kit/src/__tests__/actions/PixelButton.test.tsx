@@ -148,3 +148,34 @@ describe('PixelButton — keyboard focus', () => {
     expect(classes.filter((c) => c.endsWith('outline-none'))).toEqual([]);
   });
 });
+
+describe('PixelButton — shadows and moves', () => {
+  const DROP_SHADOWS = ['pxl-shadow', 'pxl-shadow-hover', 'pxl-shadow-active'];
+
+  it('moves a pixel button on hover and press without a drop shadow, which its cut corners would clip', () => {
+    const press = { solid: 'pxl-nudge-active', soft: 'pxl-nudge-active', outline: 'active:scale-[0.97]' } as const;
+    for (const [variant, pressed] of Object.entries(press) as Array<[keyof typeof press, string]>) {
+      const { getByRole, unmount } = render(<PixelButton variant={variant}>Go</PixelButton>);
+      const classes = getByRole('button').className.split(' ');
+      expect(classes).toEqual(expect.arrayContaining(['pxl-corner-sm', 'pxl-nudge-hover', pressed]));
+      for (const shadow of DROP_SHADOWS) expect(classes).not.toContain(shadow);
+      unmount();
+    }
+  });
+
+  it('keeps the linear shadows', () => {
+    const classes = render(<PixelButton surface="linear" variant="soft">Go</PixelButton>).getByRole('button').className.split(' ');
+    expect(classes).toEqual(expect.arrayContaining(['shadow-sm', 'hover:shadow-md', 'active:shadow-sm']));
+  });
+
+  it('holds a disabled button still, with no shadow', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const { getByRole, unmount } = render(<PixelButton surface={surface} variant="soft" disabled>Go</PixelButton>);
+      const classes = getByRole('button').className.split(' ');
+      for (const name of [...DROP_SHADOWS, 'pxl-nudge-hover', 'pxl-nudge-active', 'shadow-sm', 'hover:shadow-md', 'active:shadow-sm']) {
+        expect(classes).not.toContain(name);
+      }
+      unmount();
+    }
+  });
+});

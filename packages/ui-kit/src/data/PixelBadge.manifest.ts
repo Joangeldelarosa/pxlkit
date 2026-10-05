@@ -23,7 +23,7 @@ export default defineManifest({
     'Four variants — soft (default), solid, outline, ghost — across all tone keys.',
     'Three sizes (sm/md/lg) with consistent vertical rhythm and font scale.',
     'Optional iconLeft slot for status dots, glyphs, or counters.',
-    'Becomes a native <button> with focus ring and hover when onClick is provided.',
+    'Becomes a native <button> with focus ring and hover when it handles clicks (`onClick` in React, `@click` in Vue, `<button pxlBadge>` in Angular).',
     'Surface-aware: pixel chamfered border + pixel font, or linear pill.',
   ],
   examples: [
@@ -44,7 +44,7 @@ export default defineManifest({
       { key: 'Space', does: 'Activates the badge when onClick is provided.', when: 'interactive (onClick set)' },
     ],
     notes:
-      'Default render is a non-interactive <span>. When onClick is set, the root becomes a native <button type="button"> with a visible focus ring (focus-visible:ring-2 ring-offset). iconLeft is marked aria-hidden via inline-flex wrapper — convey meaning through the badge text, not the icon alone. For live status changes (e.g., "online" → "offline"), wrap the badge in a parent with aria-live="polite".',
+      'Default render is non-interactive. When it handles clicks (`onClick`, `@click` in Vue, `button[pxlBadge]` in Angular), the root is a native <button type="button"> with a visible focus ring (focus-visible:ring-2 ring-offset). iconLeft is marked aria-hidden via inline-flex wrapper — convey meaning through the badge text, not the icon alone. For live status changes (e.g., "online" → "offline"), wrap the badge in a parent with aria-live="polite".',
   },
   related: ['PixelChip', 'PixelBadgeGroup', 'PixelRibbon', 'PixelAvatar'],
   apiStability: 'stable',

@@ -96,7 +96,7 @@ export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps)
         <li>Surface-aware: pixel adds a left HP-bar accent stripe and chamfered border; linear stays rounded.</li>
         <li>Smart aria-live default — red/gold use &quot;assertive&quot;, everything else &quot;polite&quot;. Overridable via live prop.</li>
         <li>Optional icon and action slots for quick triage (e.g. Retry, Dismiss).</li>
-        <li>SSR-safe, ref-forwarded, no client state.</li>
+        <li>SSR-safe, no client state.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

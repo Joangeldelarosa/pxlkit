@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PixelPopover } from './PixelPopover';
 
 export function Default() {

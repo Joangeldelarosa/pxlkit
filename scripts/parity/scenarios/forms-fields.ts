@@ -27,6 +27,12 @@ export const scenarios: ParityScenario[] = [
     ],
   },
   {
+    component: 'PixelBareInput',
+    example: 'WithRef',
+    name: 'takes focus through its ref when the button asks',
+    steps: [{ action: 'click', target: 'button' }],
+  },
+  {
     component: 'PixelBareTextarea',
     example: 'Controlled',
     name: 'reports every edit to its controller',

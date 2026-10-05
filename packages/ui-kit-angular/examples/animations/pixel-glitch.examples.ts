@@ -30,3 +30,13 @@ export class HighIntensity {}
   `,
 })
 export class HoverTrigger {}
+
+@Component({
+  imports: [PixelGlitch],
+  template: `
+    <h2 class="text-2xl font-bold">
+      <span pxlGlitch label="SIGNAL LOST"></span>
+    </h2>
+  `,
+})
+export class HeadingLabel {}

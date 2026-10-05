@@ -98,11 +98,21 @@ describe('PixelHeroSection', () => {
       wrapper.unmount();
     });
 
-    it('glitches the headline, whose copies are hidden from assistive technology', () => {
+    // Regression: the glitch wrapped the heading and repeated it in its two
+    // colour layers, so the page had three <h1>.
+    // Regression: the glitch wrapped the heading and repeated it in its two
+    // colour layers, so the page had three <h1>; inside the heading, the
+    // layers still put its text in the document three times.
+    it('glitches the headline inside its one heading, its text once, the copies drawn by CSS', () => {
       const wrapper = mount(PixelHeroSection, { props: { headline: 'Signal lost', headlineEffect: 'glitch' } });
-      const headings = wrapper.findAll('h1');
-      expect(headings).toHaveLength(3);
-      expect(headings.filter((heading) => heading.element.closest('[aria-hidden="true"]'))).toHaveLength(2);
+      expect(wrapper.findAll('h1, h2, h3, h4, h5, h6')).toHaveLength(1);
+      const heading = wrapper.get('h1');
+      expect(heading.element.textContent).toBe('Signal lost');
+      expect(heading.findAll('[aria-hidden]')).toHaveLength(0);
+      const glitch = heading.element.firstElementChild as HTMLElement;
+      expect(glitch.tagName).toBe('SPAN');
+      expect(glitch.dataset.text).toBe('Signal lost');
+      expect(glitch.classList.contains('pxl-glitch-copies')).toBe(true);
       wrapper.unmount();
     });
 
@@ -111,6 +121,24 @@ describe('PixelHeroSection', () => {
       expect(wrapper.get('h1').element.innerHTML).toBe('Plain');
       wrapper.unmount();
     });
+  });
+
+  it('sets the headline at the level `as` gives, in the same type, with any effect', () => {
+    const wrapper = mount(() => [
+      h(PixelHeroSection, { headline: 'Default' }),
+      h(PixelHeroSection, { as: 'h2', headline: 'Plain' }),
+      h(PixelHeroSection, { as: 'h3', headline: 'Typed', headlineEffect: 'typewriter' }),
+      h(PixelHeroSection, { as: 'h6', headline: 'Glitched', headlineEffect: 'glitch' }),
+    ]);
+    expect(wrapper.findAll('h1, h2, h3, h4, h5, h6').map((heading) => heading.element.tagName)).toEqual([
+      'H1',
+      'H2',
+      'H3',
+      'H6',
+    ]);
+    expect(wrapper.get('h2').classes()).toEqual(wrapper.get('h1').classes());
+    expect(wrapper.get('h6').text()).toContain('Glitched');
+    wrapper.unmount();
   });
 });
 

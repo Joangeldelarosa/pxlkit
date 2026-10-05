@@ -8,6 +8,19 @@ function getSteps(container: HTMLElement): HTMLElement[] {
 }
 
 describe('PixelStepper', () => {
+  // A step shows its label, description and icon, as in Vue and Angular: it
+  // has no content of its own (its type took children it never rendered).
+  it('takes no children in a step', () => {
+    const { container } = render(
+      <PixelStepper active={0}>
+        {/* @ts-expect-error — a step has no content of its own */}
+        <PixelStepper.Step label="Account">Ignored</PixelStepper.Step>
+      </PixelStepper>,
+    );
+    expect(getSteps(container)[0]).toHaveTextContent('Account');
+    expect(container).not.toHaveTextContent('Ignored');
+  });
+
   it('renders N steps', () => {
     const { container } = render(
       <PixelStepper active={0}>

@@ -86,7 +86,7 @@ export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSection
         <li>Pixel and linear surfaces match the rest of the kit — sharp pixel corners or smooth rounded fills.</li>
         <li><code>rounded</code> flips between square/avatar shapes (circle on linear, 2px chamfer on pixel).</li>
         <li>Ships with <code>role=&quot;status&quot;</code> and an overridable <code>ariaLabel</code> for screen-reader-friendly loading.</li>
-        <li>Forwards refs and arbitrary div attributes — drop it anywhere a placeholder block is needed.</li>
+        <li>Takes any native attribute — drop it anywhere a placeholder block is needed.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

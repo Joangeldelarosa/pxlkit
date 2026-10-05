@@ -18,7 +18,7 @@ const meta: Meta = {
   parameters: {
     controls: { disable: true },
     docs: {
-      description: { component: 'SSR-safe portal primitive: renders children inline on the server and while hydrating, then portals them into document.body or a container. Content mounted later on the client is portaled from its first render.' },
+      description: { component: 'SSR-safe portal primitive: renders children inline on the server and while hydrating, then portals them into document.body or a container, keeping the focus set inside them.' },
     },
   },
 };

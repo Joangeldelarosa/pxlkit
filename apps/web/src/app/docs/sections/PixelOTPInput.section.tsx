@@ -142,7 +142,7 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
         <li><code>inputmode=numeric|text matches the accepted character set</code></li>
         <li><code>autocomplete=&quot;one-time-code&quot; on the first cell for SMS autofill</code></li>
       </ul>
-      <p className="docs-aria-notes">Invalid characters are silently rejected based on the type prop. onComplete fires once when all cells are filled.</p>
+      <p className="docs-aria-notes">Invalid characters are silently rejected based on the type prop. The completion event (<code>onComplete</code>, <code>@complete</code> in Vue, <code>(complete)</code> in Angular) fires once when all cells are filled.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

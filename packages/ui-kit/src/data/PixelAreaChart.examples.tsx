@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelAreaChart } from './PixelAreaChart';
 
 const sample = [

@@ -41,17 +41,28 @@ describe('feature card recipes', () => {
     expect(featureCardClasses('linear', { ...BASE, bordered: false }).root).toBe(
       `relative p-5 flex flex-col ${surfaceClasses('linear').transition}`,
     );
-    const interactive = classesOf(featureCardClasses('pixel', { ...BASE, interactive: true }).root);
-    expect(interactive).toEqual(
-      expect.arrayContaining([
-        'cursor-pointer',
-        'hover:-translate-y-[2px]',
-        'pxl-shadow-hover',
-        'focus-visible:ring-2',
-        'focus-visible:ring-retro-cyan/60',
-        'focus-visible:outline-hidden',
-      ]),
-    );
+    for (const surface of ['pixel', 'linear'] as const) {
+      const interactive = classesOf(featureCardClasses(surface, { ...BASE, interactive: true }).root);
+      expect(interactive).toEqual(
+        expect.arrayContaining([
+          'cursor-pointer',
+          'hover:-translate-y-[2px]',
+          'focus-visible:ring-2',
+          'focus-visible:ring-retro-cyan/60',
+          'focus-visible:outline-hidden',
+        ]),
+      );
+    }
+  });
+
+  it('lifts a pixel card alone, without the drop shadow its cut corners would clip, and a linear one with its shadow', () => {
+    for (const bordered of [true, false]) {
+      const pixel = classesOf(featureCardClasses('pixel', { ...BASE, bordered, interactive: true }).root);
+      expect(pixel).toContain('hover:-translate-y-[2px]');
+      for (const shadow of ['pxl-shadow', 'pxl-shadow-hover', 'pxl-shadow-active', 'pxl-nudge-hover']) expect(pixel).not.toContain(shadow);
+    }
+    const linear = classesOf(featureCardClasses('linear', { ...BASE, interactive: true }).root);
+    expect(linear).toEqual(expect.arrayContaining(['hover:-translate-y-[2px]', surfaceClasses('linear').shadowHover]));
   });
 
   it('frames the icon in the tone, at its size', () => {

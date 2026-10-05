@@ -24,6 +24,15 @@ describe('PixelStepper', () => {
     expect(stepsOf(wrapper)[1]!.attributes('aria-current')).toBe('step');
   });
 
+  it('shows a step\'s label, description and icon only: a step has no content of its own, as in React', () => {
+    const wrapper = mount(PixelStepper, {
+      props: { active: 0 },
+      slots: { default: () => [h(PixelStepperStep, { label: 'Account' }, { default: () => 'Ignored' })] },
+    });
+    expect(stepsOf(wrapper)[0]!.text()).toContain('Account');
+    expect(wrapper.text()).not.toContain('Ignored');
+  });
+
   it('keeps every step out of the tab order without a step handler', () => {
     const wrapper = mount(PixelStepper, { props: { active: 0 }, slots: { default: () => steps(2) } });
     expect(stepsOf(wrapper).map((step) => step.attributes('tabindex'))).toEqual([undefined, undefined]);

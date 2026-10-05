@@ -15,14 +15,20 @@ export default defineManifest({
   description:
     'Standalone month grid for date selection — usable inline or composed inside date pickers and range pickers.',
   highlights: [
-    'Controlled or uncontrolled month navigation via month / onMonthChange',
+    'Controlled or uncontrolled month navigation: `month` + `onMonthChange` (React), `v-model:month` (Vue), `[(month)]` (Angular)',
     'Min/max date bounds plus custom disabledDates (array or predicate)',
     'Optional rangePreview prop highlights start/end + in-range cells',
     'Full keyboard nav: Arrows, Home/End, PageUp/PageDown, Enter/Space',
-    'Surface-aware via useEffectiveSurface — inherits container theme',
+    'Surface-aware (pixel / linear) — follows the nearest PxlKitSurfaceProvider',
   ],
   examples: [
-    { id: 'default', label: 'Default', Component: Default },
+    {
+      id: 'default',
+      label: 'Default',
+      description:
+        'Shows the current month and marks today, by the clock of whatever renders it: a server render can differ from the browser\'s (a page built on another day, another time zone) and fail to hydrate. For a stable server render pass month (and value or defaultValue), or render a current-month calendar in the browser only: next/dynamic with ssr: false (Next.js), ClientOnly (Nuxt), @defer (Angular).',
+      Component: Default,
+    },
     { id: 'with-selected-date', label: 'With Selected Date', Component: WithSelectedDate },
     { id: 'with-min-max', label: 'With Min/Max Bounds', Component: WithMinMax },
     { id: 'with-disabled-weekends', label: 'Disabled Weekends', Component: WithDisabledWeekends },

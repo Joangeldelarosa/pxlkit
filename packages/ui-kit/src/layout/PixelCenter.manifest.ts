@@ -17,9 +17,9 @@ export default defineManifest({
   highlights: [
     'Token-driven max-width via the containerWidth scale',
     'Token-driven horizontal padding via the pageGutter scale',
-    'Polymorphic via the `as` prop — inherits semantics from the chosen element',
+    'Polymorphic via the `as` prop (in Angular, the element you put `pxlCenter` on) — inherits semantics from the chosen element',
     'Optional text alignment helper (left / center / right)',
-    'Surface-aware transition tokens through useEffectiveSurface',
+    'Surface-aware transition tokens',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

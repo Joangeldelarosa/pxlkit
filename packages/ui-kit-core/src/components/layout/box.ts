@@ -2,7 +2,7 @@
  * PixelBox — a surface-aware container: padding, radius, a tinted fill and
  * an optional border and shadow.
  */
-import { cn, surfaceClasses, type Surface, type Tone, type Variant } from '../../common';
+import { cn, cornerShadowClasses, surfaceClasses, type Surface, type Tone, type Variant } from '../../common';
 import { tone as toneTokens } from '../../tokens';
 
 export type BoxPadding = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -36,7 +36,10 @@ export interface BoxOptions {
   radius?: BoxRadius;
   /** Draw the tone border; on for `outline`, off otherwise, when left out. `ghost` has none. */
   border?: boolean;
-  /** Surface drop shadow. */
+  /**
+   * Surface drop shadow. A pixel box shows it with a `radius` only: its
+   * default corners are cut, and a drop shadow cannot show past them.
+   */
   shadow?: boolean;
 }
 
@@ -57,7 +60,7 @@ export function boxClasses(
     fill,
     showBorder && s.border,
     showBorder && toneBorder,
-    shadow && s.shadow,
+    shadow && (radius ? s.shadow : cornerShadowClasses(surface).shadow),
   );
 }
 

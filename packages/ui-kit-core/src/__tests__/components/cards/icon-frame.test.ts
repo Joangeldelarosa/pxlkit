@@ -44,8 +44,12 @@ describe('icon frame recipes', () => {
   });
 
   it('pulses when animated, unless the user prefers reduced motion', () => {
-    expect(classesOf(iconFrameClasses('pixel', { ...BASE, animated: true }).root)).toContain('animate-pulse');
-    expect(classesOf(iconFrameClasses('pixel', { ...BASE, animated: true, reducedMotion: true }).root)).not.toContain('animate-pulse');
-    expect(classesOf(iconFrameClasses('pixel', BASE).root)).not.toContain('animate-pulse');
+    // A motion-safe variant: still for that reader before the page hydrates
+    // too, when the server markup still holds it.
+    const pulse = 'motion-safe:animate-pulse';
+    expect(classesOf(iconFrameClasses('pixel', { ...BASE, animated: true }).root)).toContain(pulse);
+    expect(classesOf(iconFrameClasses('pixel', { ...BASE, animated: true }).root)).not.toContain('animate-pulse');
+    expect(classesOf(iconFrameClasses('pixel', { ...BASE, animated: true, reducedMotion: true }).root)).not.toContain(pulse);
+    expect(classesOf(iconFrameClasses('pixel', BASE).root)).not.toContain(pulse);
   });
 });

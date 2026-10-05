@@ -74,13 +74,13 @@ export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProp
   return (
     <section aria-labelledby={'pixel-portal-heading'} className={className} data-status='stable'>
       <h2 id='pixel-portal-heading'>PixelPortal</h2>
-      <p className="docs-lead">SSR-safe portal primitive: renders children inline on the server and while hydrating, then portals them into document.body or a container. Content mounted later on the client is portaled from its first render.</p>
+      <p className="docs-lead">SSR-safe portal primitive: renders children inline on the server and while hydrating, then portals them into document.body or a container, keeping the focus set inside them.</p>
       <ul className="docs-highlights">
         <li>SSR-safe: renders inline on the server and during hydration to avoid hydration mismatches</li>
-        <li>Content mounted after hydration is portaled from its first render, so focus set inside it stays put</li>
+        <li>Focus set inside the content stays put as the content reaches its target</li>
         <li>Targets document.body by default; the container prop picks another element</li>
-        <li>Can be disabled to keep children inline (useful for testing or conditional portaling)</li>
-        <li>Preserves React tree context so focus, events, and providers flow normally</li>
+        <li>Can be disabled to keep its content inline (useful for testing or conditional portaling)</li>
+        <li>The content keeps its place in the component tree, so providers still reach it (in React, its events also bubble through that tree)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -96,9 +96,9 @@ export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProp
       <p>WCAG target: <strong>2.1 AA</strong></p>
       <ul className="docs-aria-patterns">
         <li><code>SSR-safe portal</code></li>
-        <li><code>focus order preserved via React tree</code></li>
+        <li><code>context preserved through the component tree</code></li>
       </ul>
-      <p className="docs-aria-notes">Portal content remains in the React tree, so focus order, events, and context providers behave as if the children were rendered in place.</p>
+      <p className="docs-aria-notes">Portal content keeps its place in the component tree, so providers reach it as if it were rendered in place; in React, its events also bubble through that tree. Keyboard focus follows the document order, where the content sits in its target.</p>
     </section>
     <section aria-labelledby="pixel-portal-usage">
       <h3 id="pixel-portal-usage">Usage</h3>

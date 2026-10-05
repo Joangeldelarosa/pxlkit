@@ -14,8 +14,7 @@ export default defineManifest({
   highlights: [
     'Establishes a shared viewport for parallax layers',
     'Applies position: relative and overflow: hidden automatically',
-    'Polymorphic tag: div, section, header, or main',
-    'Forwarded ref for imperative access',
+    'Polymorphic tag: div, section, header, or main (in Angular, the element you put `pxlParallaxGroup` on)',
     'SSR-safe — no measurement or window APIs',
   ],
   examples: [

@@ -94,7 +94,7 @@ export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionPr
         <li>Configurable global shortcut (default mod+k) toggles the palette open from anywhere</li>
         <li>Grouped items with headings, icons, keywords for search, and per-item keyboard hints</li>
         <li>Full keyboard navigation: ArrowUp/Down, Home/End, Enter to select, Escape to close</li>
-        <li>Surface-aware chrome (pixel vs linear) inherited from theme context</li>
+        <li>Surface-aware chrome (pixel vs linear) from the nearest PxlKitSurfaceProvider</li>
         <li>Combobox + listbox a11y pattern with aria-activedescendant for assistive tech</li>
       </ul>
     <dl className="docs-meta">

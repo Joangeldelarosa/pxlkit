@@ -94,7 +94,7 @@ export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionPr
       <h2 id='pixel-section-heading'>PixelSection</h2>
       <p className="docs-lead">Bordered section with optional uppercase title row, subtitle, and surface-aware container.</p>
       <ul className="docs-highlights">
-        <li>Surface-aware borders and typography via useEffectiveSurface</li>
+        <li>Surface-aware borders and typography</li>
         <li>Optional title (uppercased via locale) and subtitle row</li>
         <li>Configurable container max-width or full-bleed with page gutter</li>
         <li>Vertical rhythm token controls spacing between sections</li>

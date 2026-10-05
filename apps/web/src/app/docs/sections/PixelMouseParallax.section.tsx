@@ -82,9 +82,8 @@ export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxD
       <p className="docs-lead">Cursor-tracking parallax layer that translates children based on mouse position with smooth lerp.</p>
       <ul className="docs-highlights">
         <li>Smoothed translate3d follow with configurable strength</li>
-        <li>Invert mode to repel children from the cursor</li>
+        <li>Invert mode to repel its content from the cursor</li>
         <li>GPU-accelerated via will-change-transform</li>
-        <li>Forwards ref to the underlying div</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

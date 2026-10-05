@@ -6,6 +6,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { build } from 'esbuild';
 import { describe, expect, it } from 'vitest';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -31,6 +32,21 @@ function filesUnder(dir: string): string[] {
     const path = join(dir, name);
     return statSync(path).isDirectory() ? filesUnder(path) : [path];
   });
+}
+
+/** Minified bytes an application keeps for an entry: the kit and its dependencies, Vue left out. */
+async function keptBytes(imports: string): Promise<number> {
+  const result = await build({
+    stdin: { contents: imports.replace('KIT', JSON.stringify(resolve(packageDir, entry.default))), resolveDir: packageDir, loader: 'js' },
+    bundle: true,
+    minify: true,
+    format: 'esm',
+    write: false,
+    logLevel: 'silent',
+    external: ['vue'],
+    define: { 'process.env.NODE_ENV': '"production"' },
+  });
+  return result.outputFiles[0]!.contents.length;
 }
 
 // Loads and server-renders the built bundle: seconds of work on a busy CI
@@ -69,6 +85,16 @@ describe('@pxlkit/ui-kit-vue package', { timeout: 30_000 }, () => {
     const css = read('styles.css');
     expect(css).toContain('@import "@pxlkit/ui-kit-core/styles.css";');
     expect(css).toContain('@source "./dist";');
+  });
+
+  it('lets an application keep only the components it imports', async () => {
+    // A component that nothing imports goes: the render-function ones are
+    // pure definitions too (`/* @__PURE__ */ defineComponent(…)`), which
+    // bundlers that do not follow Vue's own annotation (esbuild, webpack)
+    // kept with everything they reach — over 18% of the kit for one button.
+    const all = await keptBytes('import * as kit from KIT; console.log(kit);');
+    const one = await keptBytes('import { PixelButton } from KIT; console.log(PixelButton);');
+    expect(one / all).toBeLessThan(0.05);
   });
 
   it('renders from the built bundle', async () => {

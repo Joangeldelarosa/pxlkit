@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelCodeInline } from './PixelCodeInline';
 
 export function Default() {
@@ -41,7 +40,7 @@ export function CodeSamples() {
   return (
     <div className="flex flex-col gap-2">
       <div>
-        Import: <PixelCodeInline>{`import { PixelCodeInline } from '@pxlkit/ui'`}</PixelCodeInline>
+        Import: <PixelCodeInline>{`import { PixelCodeInline } from '@pxlkit/ui-kit'`}</PixelCodeInline>
       </div>
       <div>
         Hotkey: <PixelCodeInline tone="purple">Ctrl+K</PixelCodeInline>

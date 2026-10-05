@@ -120,7 +120,9 @@ export function pricingCardClasses(
     ),
     priceRow: 'mt-4 flex flex-wrap items-baseline gap-2',
     previousPrice: cn('line-through text-sm text-retro-muted', s.font),
-    amount: cn('text-3xl sm:text-4xl font-bold', t.text, s.fontDisplay),
+    // Bold on both surfaces: linear's display face carries its own weight
+    // (semibold), so the amount takes its tracking alone.
+    amount: cn('text-3xl sm:text-4xl font-bold', t.text, surface === 'pixel' ? s.fontDisplay : 'tracking-tight'),
     period: cn('text-sm text-retro-muted', s.font),
     priceBadge: 'self-center',
     features: cn('mt-4 space-y-2', s.font),

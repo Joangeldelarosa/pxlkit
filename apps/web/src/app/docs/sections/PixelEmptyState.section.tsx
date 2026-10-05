@@ -86,8 +86,8 @@ export function PixelEmptyStateDocsSection({ className }: PixelEmptyStateDocsSec
         <li>Centered dashed-border container that communicates absence without feeling like an error</li>
         <li>Optional icon slot rendered with cyan accent and aria-hidden so it stays decorative</li>
         <li>Action slot for a primary recovery CTA (create, refresh, retry)</li>
-        <li>Pixel + linear surface variants share identical API and inherit the surface from context</li>
-        <li>SSR-safe and tree-shakable; no client-only hooks beyond surface inheritance</li>
+        <li>Pixel + linear surface variants share identical API and follow the nearest PxlKitSurfaceProvider</li>
+        <li>SSR-safe and tree-shakable; no client state</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

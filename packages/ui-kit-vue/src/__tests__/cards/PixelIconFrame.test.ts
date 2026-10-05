@@ -17,18 +17,18 @@ describe('PixelIconFrame', () => {
     const lists = installMatchMedia(() => false);
     const wrapper = mount(PixelIconFrame, { props: { animated: true }, slots: { icon: () => 'i' } });
     await nextTick();
-    expect(wrapper.classes()).toContain('animate-pulse');
+    expect(wrapper.classes()).toContain('motion-safe:animate-pulse');
     for (const list of lists) list.fire(true);
     await nextTick();
-    expect(wrapper.classes()).not.toContain('animate-pulse');
+    expect(wrapper.classes()).not.toContain('motion-safe:animate-pulse');
   });
 
   it('never pulses when reduced motion is already on, nor when not animated', async () => {
     installMatchMedia((query) => query === '(prefers-reduced-motion: reduce)');
     const reduced = mount(PixelIconFrame, { props: { animated: true } });
     await nextTick();
-    expect(reduced.classes()).not.toContain('animate-pulse');
-    expect(mount(PixelIconFrame).classes()).not.toContain('animate-pulse');
+    expect(reduced.classes()).not.toContain('motion-safe:animate-pulse');
+    expect(mount(PixelIconFrame).classes()).not.toContain('motion-safe:animate-pulse');
   });
 
   it('hides the icon and the accent from assistive technology, the accent in its corner', () => {

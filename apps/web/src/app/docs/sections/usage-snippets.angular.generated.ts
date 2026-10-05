@@ -1537,7 +1537,7 @@ import { PixelTextLink } from '@pxlkit/ui-kit-angular';
 
 @Component({
   imports: [PixelTextLink],
-  template: \`<a pxlTextLink href="https://pxlkit.dev">Read the docs</a>\`,
+  template: \`<a pxlTextLink href="https://pxlkit.xyz">Read the docs</a>\`,
 })
 export class Default {}`,
   'pixel-textarea': `import { Component } from '@angular/core';

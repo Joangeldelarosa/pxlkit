@@ -24,7 +24,7 @@
 ### PixelPricingCard
 - stable · since 1.7.0
 - Pricing tier card with tone-driven highlight, optional popular ribbon, feature list, and CTA slot.
-- Surface-aware borders, fonts, and radii via useEffectiveSurface · Tone tokens drive price color, highlight glow, and feature checks · Optional popular ribbon with its own tone override · Feature list supports included/excluded states with tooltip + a11y labels · Strikethrough price exposed to assistive tech via sr-only label
+- Surface-aware borders, fonts, and radii (pixel / linear) · Tone tokens drive price color, highlight glow, and feature checks · Optional popular ribbon with its own tone override · Feature list supports included/excluded states with tooltip + a11y labels · Strikethrough price exposed to assistive tech via sr-only label
 - related: PixelCard, PixelFeatureCard
 
 ### PixelRibbon
@@ -36,12 +36,12 @@
 ### PixelStarRating
 - stable · since 2.0.0
 - Pixel-art star rating display with optional interactive selection and surface-aware styling.
-- Renders the @pxlkit/gamification Star at 16/20/24px with crisp nearest-neighbour scaling · Gold or green tone tokens for readonly and interactive states, surface-aware via useEffectiveSurface · Optional showCount label renders "N/M" beside the stars · Interactive mode exposes per-star buttons with onChange callback · Polymorphic starIcon prop swaps in any sibling-pack glyph without forking
+- Renders the @pxlkit/gamification Star at 16/20/24px with crisp nearest-neighbour scaling · Gold or green tone tokens for readonly and interactive states, surface-aware (pixel / linear) · Optional showCount label renders "N/M" beside the stars · Interactive mode exposes per-star buttons; bind the rating with `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) · Polymorphic starIcon prop swaps in any sibling-pack glyph without forking
 
 ### PixelStatCard
 - stable · since 1.0.0
 - Compact metric card surfacing a label, value, optional icon and trend line for dashboards and KPI grids.
-- Seven tone presets aligned with the pxlkit palette (green, cyan, gold, red, purple, pink, neutral). · Three sizes (sm/md/lg) that scale padding, value, label and trend typography in lockstep. · Icon position aware: top, left, right or bottom-left layouts without prop drilling. · Surface-aware (pixel vs linear) — inherits the ambient surface context or override per-card. · Pure presentational + SSR-safe — no client hooks, fully tree-shakable.
+- Seven tone presets aligned with the pxlkit palette (green, cyan, gold, red, purple, pink, neutral). · Three sizes (sm/md/lg) that scale padding, value, label and trend typography in lockstep. · Icon position aware: top, left, right or bottom-left layouts without prop drilling. · Surface-aware (pixel vs linear) — follows the nearest PxlKitSurfaceProvider or a per-card override. · Pure presentational + SSR-safe — no client state, fully tree-shakable.
 - related: PixelCard, PixelStatGroup, PixelSparkline
 
 ### PixelTestimonialCard

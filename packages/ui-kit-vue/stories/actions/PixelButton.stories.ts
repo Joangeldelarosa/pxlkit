@@ -24,7 +24,7 @@ const meta: Meta = {
   parameters: {
     controls: { disable: true },
     docs: {
-      description: { component: 'Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and an asChild slot pattern for wrapping links or routers.' },
+      description: { component: 'Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and a link form for anchors and router links (`asChild` in React and Vue, `a[pxlButton]` in Angular).' },
     },
   },
 };
@@ -147,7 +147,7 @@ export const AsChild: Story = {
   render: () => AsChildExample,
   parameters: {
     docs: {
-      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelButton } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <PixelButton as-child tone="cyan">\n    <a href="https://pxlkit.dev" target="_blank" rel="noreferrer">External link</a>\n  </PixelButton>\n</template>' },
+      source: { language: 'html', code: '<script setup lang="ts">\nimport { PixelButton } from \'@pxlkit/ui-kit-vue\';\n</script>\n\n<template>\n  <PixelButton as-child tone="cyan">\n    <a href="https://pxlkit.xyz" target="_blank" rel="noreferrer">External link</a>\n  </PixelButton>\n</template>' },
     },
   },
 };

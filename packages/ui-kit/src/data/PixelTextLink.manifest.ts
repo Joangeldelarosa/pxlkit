@@ -19,10 +19,10 @@ export default defineManifest({
   description:
     'Inline anchor or button styled as a tone-coloured underlined link for prose, callouts, and CTAs.',
   highlights: [
-    'Polymorphic: renders <a> when `href` is provided, <button type="button"> otherwise',
+    'Polymorphic: an <a> with `href`, a <button> without (in Angular, `a[pxlTextLink]` or `button[pxlTextLink]`)',
     'Seven brand tones (cyan default) with consistent focus ring and hover behaviour',
-    'Surface-aware typography (pixel vs linear) via shared surface context',
-    'Forwards native anchor/button attributes (target, rel, onClick, aria-*, etc.)',
+    'Surface-aware typography (pixel vs linear)',
+    'Takes native anchor/button attributes and listeners (target, rel, aria-*, click, etc.)',
     'SSR-safe and tree-shakable; zero runtime state',
   ],
   examples: [

@@ -47,7 +47,7 @@ export type PixelBadgeGroupProps = ExtractPublicPropTypes<typeof badgeGroupProps
  *   <PixelBadge v-for="tag in tags" :key="tag">{{ tag }}</PixelBadge>
  * </PixelBadgeGroup>
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelBadgeGroup',
   props: badgeGroupProps,
   slots: Object as SlotsType<{

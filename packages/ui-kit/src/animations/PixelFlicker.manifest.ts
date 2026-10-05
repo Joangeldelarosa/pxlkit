@@ -12,7 +12,7 @@ export default defineManifest({
     'Stepped opacity flicker that mimics a broken neon sign',
     'Configurable duration and repeat count',
     'Trigger modes: mount, hover, click, focus, inView, or controlled',
-    'Forwards refs and merges with internal trigger observers',
+    'Signals the end of its last iteration: `onComplete` (React), `@complete` (Vue), `(complete)` (Angular)',
     'Respects prefers-reduced-motion automatically',
   ],
   examples: [

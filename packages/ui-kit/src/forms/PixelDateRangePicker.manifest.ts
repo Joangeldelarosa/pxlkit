@@ -9,14 +9,20 @@ export default defineManifest({
   description:
     'Accessible date range picker with one or two-month grid, hover preview, presets, and min/max constraints.',
   highlights: [
-    'Controlled and uncontrolled usage via value/defaultValue + onChange',
+    'Controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`',
     'One or two-month calendar with hover preview while picking',
     'Auto-swap of from/to when the second pick precedes the first',
     'Optional quick-select presets and clearable trigger',
     'Surface-aware styling with FieldShell label/hint/error wiring',
   ],
   examples: [
-    { id: 'default', label: 'Default', Component: Default },
+    {
+      id: 'default',
+      label: 'Default',
+      description:
+        'The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today\'s mark can differ from the browser\'s.',
+      Component: Default,
+    },
     { id: 'with-presets', label: 'With Presets', Component: WithPresets },
     { id: 'single-month', label: 'Single Month', Component: SingleMonth },
   ],

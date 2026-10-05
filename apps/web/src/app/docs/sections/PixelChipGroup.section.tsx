@@ -102,7 +102,7 @@ export function PixelChipGroupDocsSection({ className }: PixelChipGroupDocsSecti
       <h2 id='pixel-chip-group-heading'>PixelChipGroup</h2>
       <p className="docs-lead">Controlled chip row with single-select (radiogroup) or multi-select (group of checkboxes) — wraps each PixelChip in a semantic toggle button.</p>
       <ul className="docs-highlights">
-        <li>Controlled value/onChange API drives selection — chips stay presentational.</li>
+        <li>Selection is bound — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or starts from <code>defaultValue</code>; chips stay presentational.</li>
         <li>Single mode renders role=radiogroup with roving tabindex + arrow / Home / End navigation.</li>
         <li>Multi mode renders role=checkbox per chip with aria-checked and Space/Enter toggle.</li>
         <li>Surface-aware: forwards pixel or linear surface to chip wrappers for consistent borders.</li>

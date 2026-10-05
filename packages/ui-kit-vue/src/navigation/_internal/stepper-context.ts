@@ -44,7 +44,7 @@ export function useStepPosition(): Readonly<PixelStepperPosition> {
  * position, so a step still finds it when the consumer wraps
  * `PixelStepperStep` in a component of their own.
  */
-export const StepPosition = defineComponent({
+export const StepPosition = /* @__PURE__ */ defineComponent({
   name: 'PxlStepPosition',
   props: {
     index: { type: Number, required: true },

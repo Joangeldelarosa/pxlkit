@@ -148,7 +148,7 @@ export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsS
         <li>Configurable clamp behavior (strict, on-blur, or none) with min/max bounds</li>
         <li>Precision rounding avoids floating-point artifacts (e.g. 0.1 + 0.2)</li>
         <li>Optional prefix, suffix, and thousands-separator with parse-aware display</li>
-        <li>Surface/tone aware, controlled or uncontrolled via useControllableState</li>
+        <li>Surface/tone aware; controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

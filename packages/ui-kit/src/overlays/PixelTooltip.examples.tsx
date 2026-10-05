@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PixelTooltip } from './PixelTooltip';
 import { PixelButton } from '../actions';
 

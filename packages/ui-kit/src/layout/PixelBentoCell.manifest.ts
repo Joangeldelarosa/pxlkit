@@ -13,7 +13,7 @@ export default defineManifest({
     'Span tokens (1x1, 2x1, 1x2, 2x2, 3x1, 1x3) for collage layouts',
     'Kind presets (feature / stat / compact / media) drive internal flex layout',
     'Tone-aware border + background + text via shared token system',
-    'Surface-aware (retro / pixel) via useEffectiveSurface',
+    'Surface-aware (pixel / linear)',
     'Pairs with PixelBento parent grid for column + gap control',
   ],
   examples: [

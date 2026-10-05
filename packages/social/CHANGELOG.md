@@ -5,6 +5,10 @@
 
 ## 1.2.5 — 2026-10-03
 
+### Changed
+
+- The pack's `version` is read from `package.json` when it is built, so it cannot drift from the published version; the built file carries only the version string.
+
 ### Fixed
 
 - The icon type annotations now resolve from the React-free `@pxlkit/core/vanilla` entry instead of the root entry, so Vue, Angular and plain TypeScript projects type-check this package without React's type declarations — even with `skipLibCheck: false`. Runtime output is unchanged (the package still ships plain data with no imports).

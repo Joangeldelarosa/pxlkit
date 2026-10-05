@@ -75,7 +75,7 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
       <ul className="docs-highlights">
         <li>Zero styling — renders a raw &lt;button&gt; with all native attributes forwarded</li>
         <li>Defaults type=&quot;button&quot; to prevent accidental form submissions</li>
-        <li>Forwards refs to the underlying HTMLButtonElement</li>
+        <li>Its element is the native &lt;button&gt; itself, for focus and measurement: a ref in React, <code>$el</code> in Vue, the <code>button[pxlBareButton]</code> element in Angular</li>
         <li>Ideal for icon triggers, custom-styled CTAs, or wrapping inside compound components</li>
         <li>Tree-shakable and SSR-safe</li>
       </ul>

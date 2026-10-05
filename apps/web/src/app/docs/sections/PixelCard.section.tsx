@@ -201,7 +201,7 @@ export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): 
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">When interactive without href, the root renders as &lt;div role=&quot;button&quot; tabIndex=&#123;0&#125;&gt; with Enter/Space activation parity (&lt;article&gt; does not permit role=&quot;button&quot;). When href is set, the root renders as a native &lt;a&gt; — nesting interactive children (buttons, links) inside footer or media is invalid in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.</p>
+      <p className="docs-aria-notes">When interactive without href, the root renders as &lt;div role=&quot;button&quot; tabindex=&quot;0&quot;&gt; with Enter/Space activation parity (&lt;article&gt; does not permit role=&quot;button&quot;). When href is set, the root renders as a native &lt;a&gt; — nesting interactive children (buttons, links) inside footer or media is invalid in href mode and breaks screen reader navigation. Focus-visible ring is provided automatically in both interactive modes.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>

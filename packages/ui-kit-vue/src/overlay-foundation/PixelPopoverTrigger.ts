@@ -11,9 +11,12 @@ import { usePopoverContext } from './_internal/popover-context.js';
  * disabled trigger ignores clicks, as React does with a click dispatched to a
  * disabled button.
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelPopoverTrigger',
-  slots: Object as SlotsType<{ default?: () => VNode[] }>,
+  slots: Object as SlotsType<{
+    /** The element that opens the popover: one element, such as a button. */
+    default?: () => VNode[];
+  }>,
   setup(_, { slots }) {
     const context = usePopoverContext('PixelPopoverTrigger');
     return () => {

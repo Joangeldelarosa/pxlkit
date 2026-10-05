@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelDivider } from '../layout';
 
 export function Default() {

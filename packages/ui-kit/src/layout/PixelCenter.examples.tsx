@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelCenter } from './PixelCenter';
 
 export function Default() {

@@ -27,7 +27,7 @@ const api: FrameworkApiReferences = {
       {
         name: 'PxlKitLocaleProvider',
         props: [
-          { name: 'locale', type: "'en' | 'tr'", default: "'en'", description: 'BCP 47 locale tag.' },
+          { name: 'locale', type: "'en' | 'tr'", default: "'en'", description: "BCP 47 locale tag. Default `'en'`." },
           { name: 'children', type: 'React.ReactNode', required: true, description: 'The part of the app that follows the locale.' },
         ],
       },
@@ -75,7 +75,7 @@ export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProvi
       <ul className="docs-highlights">
         <li>Sets lang on a wrapper so CSS text-transform handles Turkish i → İ correctly</li>
         <li>Builds Google Fonts URL with the correct subsets (latin-ext for Turkish)</li>
-        <li>Exposes locale-aware upper() and lower() helpers via usePxlKitLocale()</li>
+        <li>Exposes locale-aware upper() and lower() helpers via usePxlKitLocale() (injectPxlKitLocale() in Angular)</li>
         <li>Supports BCP 47 locales en and tr out of the box</li>
       </ul>
     <dl className="docs-meta">
@@ -93,7 +93,7 @@ export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProvi
       <ul className="docs-aria-patterns">
         <li><code>sets lang/dir context for descendants; no direct ARIA</code></li>
       </ul>
-      <p className="docs-aria-notes">Wraps children in a div with lang=&#123;locale&#125; so assistive tech and CSS text-transform pick up the correct language. For Next.js apps, also set lang on the &lt;html&gt; tag.</p>
+      <p className="docs-aria-notes">Wraps its content in a layout-neutral element carrying <code>lang</code> (in Angular, the host element) so assistive tech and CSS text-transform pick up the correct language. In server-rendered apps (Next.js, Nuxt, Angular SSR), also set lang on the &lt;html&gt; tag.</p>
     </section>
     <section aria-labelledby="pxl-kit-locale-provider-usage">
       <h3 id="pxl-kit-locale-provider-usage">Usage</h3>

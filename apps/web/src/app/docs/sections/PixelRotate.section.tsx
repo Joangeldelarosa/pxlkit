@@ -98,7 +98,7 @@ export function PixelRotateDocsSection({ className }: PixelRotateDocsSectionProp
       <ul className="docs-highlights">
         <li>Configurable duration, easing, repeat count, and animation direction</li>
         <li>Trigger modes: mount, hover, focus, viewport</li>
-        <li>Forwards refs and merges with internal trigger observers</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
         <li>Respects prefers-reduced-motion automatically</li>
       </ul>
     <dl className="docs-meta">

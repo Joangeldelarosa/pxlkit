@@ -12,7 +12,7 @@ export default defineManifest({
   description:
     'Controlled chip row with single-select (radiogroup) or multi-select (group of checkboxes) — wraps each PixelChip in a semantic toggle button.',
   highlights: [
-    'Controlled value/onChange API drives selection — chips stay presentational.',
+    'Selection is bound — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or starts from `defaultValue`; chips stay presentational.',
     'Single mode renders role=radiogroup with roving tabindex + arrow / Home / End navigation.',
     'Multi mode renders role=checkbox per chip with aria-checked and Space/Enter toggle.',
     'Surface-aware: forwards pixel or linear surface to chip wrappers for consistent borders.',

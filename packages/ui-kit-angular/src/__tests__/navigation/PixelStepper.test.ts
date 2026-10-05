@@ -13,6 +13,23 @@ const key = (element: HTMLElement, name: string) =>
   element.dispatchEvent(new KeyboardEvent('keydown', { key: name, bubbles: true, cancelable: true }));
 
 describe('PixelStepper', () => {
+  it("shows a step's label, description and icon only: a step has no content of its own, as in React", async () => {
+    @Component({
+      imports: [PixelStepper, PixelStepperStep],
+      template: `
+        <pxl-stepper [active]="0">
+          <pxl-stepper-step label="Account">Ignored</pxl-stepper-step>
+        </pxl-stepper>
+      `,
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(stepsOf(root)[0]!.textContent).toContain('Account');
+    expect(root.textContent).not.toContain('Ignored');
+  });
+
   it('emits (stepClick) for steps up to the active one when clickable, without moving the active step', async () => {
     @Component({
       imports: [PixelStepper, PixelStepperStep],

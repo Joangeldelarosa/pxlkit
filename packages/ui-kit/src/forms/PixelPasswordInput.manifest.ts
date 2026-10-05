@@ -24,7 +24,7 @@ export default defineManifest({
     'Inline visibility toggle with localizable labels via toggleLabels',
     'Label, hint, and error slots wired through the shared FieldShell',
     'Tone, size, and surface variants matched to PixelInput',
-    'Forwarded ref to the underlying <input> for form-library integration',
+    'Fits form libraries: a ref on the native <input> (React), `v-model` (Vue), `ngModel` or reactive forms (Angular)',
     'Toggle button reflects state via aria-pressed for assistive tech',
   ],
   examples: [

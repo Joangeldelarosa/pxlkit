@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelParallaxLayer } from './PixelParallaxLayer';
 
 export function Default() {

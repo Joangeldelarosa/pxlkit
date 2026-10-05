@@ -24,7 +24,7 @@ const meta: Meta = {
   parameters: {
     controls: { disable: true },
     docs: {
-      description: { component: 'Unstyled, forwardRef-enabled `<input>` primitive used as an escape hatch for fully custom field compositions.' },
+      description: { component: 'Unstyled `<input>` primitive, the native input itself, used as an escape hatch for fully custom field compositions.' },
     },
   },
 };
@@ -147,7 +147,7 @@ export const WithRef: Story = {
   render: () => WithRefExample,
   parameters: {
     docs: {
-      source: { language: 'html', code: '<script setup lang="ts">\nimport { useTemplateRef } from \'vue\';\nimport { PixelBareInput } from \'@pxlkit/ui-kit-vue\';\n\n// The component\'s root element (`$el`) is the native input.\nconst field = useTemplateRef<InstanceType<typeof PixelBareInput>>(\'field\');\n</script>\n\n<template>\n  <PixelBareInput ref="field" placeholder="Focus me via ref" />\n</template>' },
+      source: { language: 'html', code: '<script setup lang="ts">\nimport { useTemplateRef } from \'vue\';\nimport { PixelBareInput, PixelButton } from \'@pxlkit/ui-kit-vue\';\n\n// The component\'s root element (`$el`) is the native input.\nconst field = useTemplateRef<InstanceType<typeof PixelBareInput>>(\'field\');\n</script>\n\n<template>\n  <div class="flex items-center gap-2">\n    <PixelBareInput ref="field" placeholder="Focus me via ref" />\n    <PixelButton size="sm" @click="field?.$el.focus()">Focus</PixelButton>\n  </div>\n</template>' },
     },
   },
 };

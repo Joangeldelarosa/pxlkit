@@ -98,7 +98,7 @@ export function PixelBounceDocsSection({ className }: PixelBounceDocsSectionProp
       <ul className="docs-highlights">
         <li>Configurable bounce height, duration, easing, and repeat count</li>
         <li>Trigger modes: mount, hover, focus, viewport</li>
-        <li>Forwards refs and merges with internal trigger observers</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
         <li>Respects prefers-reduced-motion automatically</li>
       </ul>
     <dl className="docs-meta">

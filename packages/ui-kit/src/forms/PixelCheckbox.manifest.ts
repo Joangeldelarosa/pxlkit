@@ -19,7 +19,7 @@ export default defineManifest({
   description:
     'Controlled boolean checkbox with a chunky pixel check mark, tone-aware fill, and optional form serialization.',
   highlights: [
-    'Fully controlled via checked + onChange(next: boolean)',
+    'Controlled — `checked` + `onChange` (React), `v-model:checked` (Vue), `[(checked)]` or forms (Angular) — or uncontrolled with `defaultChecked`',
     'Seven tones via the shared toneMap palette',
     'Pixel and linear surface variants share the same API',
     'Hidden mirror input lets it participate in native <form> submissions when name is set',

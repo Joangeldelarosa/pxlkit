@@ -3,7 +3,7 @@ import { PixelTextLink } from '@pxlkit/ui-kit-angular';
 
 @Component({
   imports: [PixelTextLink],
-  template: `<a pxlTextLink href="https://pxlkit.dev">Read the docs</a>`,
+  template: `<a pxlTextLink href="https://pxlkit.xyz">Read the docs</a>`,
 })
 export class Default {}
 
@@ -46,7 +46,7 @@ export class Surfaces {}
 
 @Component({
   imports: [PixelTextLink],
-  template: `<a pxlTextLink href="https://pxlkit.dev" target="_blank" rel="noopener noreferrer">Open in new tab</a>`,
+  template: `<a pxlTextLink href="https://pxlkit.xyz" target="_blank" rel="noopener noreferrer">Open in new tab</a>`,
 })
 export class ExternalLink {}
 
@@ -54,7 +54,7 @@ export class ExternalLink {}
   imports: [PixelTextLink],
   template: `
     <p class="max-w-md">
-      Built with <a pxlTextLink href="https://pxlkit.dev" tone="green">pxlkit</a>, a tone-coloured component library for
+      Built with <a pxlTextLink href="https://pxlkit.xyz" tone="green">pxlkit</a>, a tone-coloured component library for
       retro interfaces.
     </p>
   `,

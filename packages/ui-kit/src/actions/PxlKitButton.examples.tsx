@@ -1,4 +1,3 @@
-import React from 'react';
 import { PxlKitButton } from '../actions';
 
 const StarIcon = () => (

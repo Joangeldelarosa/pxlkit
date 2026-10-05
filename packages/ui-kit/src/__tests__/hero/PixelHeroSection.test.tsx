@@ -95,11 +95,20 @@ describe('PixelHeroSection', () => {
       expect(container.querySelectorAll('h1')).toHaveLength(1);
     });
 
-    it('glitches the headline, whose copies are hidden from assistive technology', () => {
+    // Regression: the glitch wrapped the heading and repeated it in its two
+    // colour layers, so the page had three <h1>; inside the heading, the
+    // layers still put its text in the document three times.
+    it('glitches the headline inside its one heading, its text once, the copies drawn by CSS', () => {
       const { container } = render(<PixelHeroSection headline="Signal lost" headlineEffect="glitch" />);
-      expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-      const copies = [...container.querySelectorAll('h1')].filter((h1) => h1.closest('[aria-hidden="true"]'));
-      expect(copies).toHaveLength(2);
+      expect(container.querySelectorAll('h1, h2, h3, h4, h5, h6')).toHaveLength(1);
+      const heading = screen.getByRole('heading', { level: 1, name: 'Signal lost' });
+      expect(heading.textContent).toBe('Signal lost');
+      expect(heading.querySelectorAll('[aria-hidden]')).toHaveLength(0);
+      const glitch = heading.firstElementChild as HTMLElement;
+      expect(glitch.tagName).toBe('SPAN');
+      expect(glitch.dataset.text).toBe('Signal lost');
+      expect(glitch.classList.contains('pxl-glitch-copies')).toBe(true);
+      expect((glitch.firstElementChild as HTMLElement).style.animation).toContain('pxl-glitch');
     });
 
     it('holds still when the user prefers reduced motion', () => {
@@ -107,6 +116,7 @@ describe('PixelHeroSection', () => {
       try {
         const { container, unmount } = render(<PixelHeroSection headline="Signal lost" headlineEffect="glitch" />);
         expect(container.querySelectorAll('h1')).toHaveLength(1);
+        expect(container.querySelector('.pxl-glitch-copies')).toBeNull();
         unmount();
         render(<PixelHeroSection headline="Loading" headlineEffect="typewriter" />);
         const heading = screen.getByRole('heading', { level: 1, name: 'Loading' });
@@ -120,6 +130,22 @@ describe('PixelHeroSection', () => {
       const { container } = render(<PixelHeroSection headline="Plain" />);
       expect(container.querySelector('h1')!.innerHTML).toBe('Plain');
     });
+  });
+
+  it('sets the headline at the level `as` gives, in the same type, with any effect', () => {
+    const { container } = render(
+      <>
+        <PixelHeroSection headline="Default" />
+        <PixelHeroSection as="h2" headline="Plain" />
+        <PixelHeroSection as="h3" headline="Typed" headlineEffect="typewriter" />
+        <PixelHeroSection as="h6" headline="Glitched" headlineEffect="glitch" />
+      </>,
+    );
+    const h1 = screen.getByRole('heading', { level: 1, name: 'Default' });
+    expect(screen.getByRole('heading', { level: 2, name: 'Plain' }).className).toBe(h1.className);
+    expect(screen.getByRole('heading', { level: 3, name: 'Typed' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 6, name: 'Glitched' })).toBeInTheDocument();
+    expect(container.querySelectorAll('h1, h2, h3, h4, h5, h6')).toHaveLength(4);
   });
 });
 

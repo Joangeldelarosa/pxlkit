@@ -98,7 +98,7 @@ export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSec
         <li>Configurable speed, delay, and blinking caret</li>
         <li>Tone-aware text color via shared tone tokens</li>
         <li>Animation trigger modes: mount, view, hover, click</li>
-        <li>onComplete callback fires when full text is rendered</li>
+        <li>Signals when the full text is typed: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -115,7 +115,7 @@ export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSec
       <ul className="docs-aria-patterns">
         <li><code>respects prefers-reduced-motion</code></li>
       </ul>
-      <p className="docs-aria-notes">Caret and the character-by-character animation are aria-hidden; the complete string is exposed to assistive tech from the first render via a visually hidden span. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and onComplete fires once.</p>
+      <p className="docs-aria-notes">Caret and the character-by-character animation are aria-hidden; the complete string is exposed to assistive tech from the first render via a visually hidden span. When the user prefers reduced motion, the typing animation is skipped: the full text renders immediately and the completion event fires once.</p>
     </section>
     <section aria-labelledby="pixel-typewriter-usage">
       <h3 id="pixel-typewriter-usage">Usage</h3>

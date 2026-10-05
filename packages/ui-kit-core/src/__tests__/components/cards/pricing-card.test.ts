@@ -55,6 +55,19 @@ describe('pricing card recipes', () => {
     expect(PRICING_PREVIOUS_PRICE_LABEL).toBe('Previous price ');
   });
 
+  // Regression: linear's display face carries `font-semibold`, which
+  // Tailwind emits after `font-bold`, so the linear amount was semibold.
+  it('sets the amount bold on both surfaces, in the display face', () => {
+    const weight = /^font-(thin|extralight|light|normal|medium|semibold|bold|extrabold|black)$/;
+    for (const surface of ['pixel', 'linear'] as const) {
+      const classes = pricingCardClasses(surface, BASE).amount.split(' ');
+      expect(classes.filter((name) => weight.test(name))).toEqual(['font-bold']);
+      const face = surfaceClasses(surface).fontDisplay.split(' ').filter((name) => !weight.test(name));
+      expect(classes).toEqual(expect.arrayContaining(face));
+    }
+    expect(pricingCardClasses('linear', { ...BASE, tone: 'gold' }).amount).toBe(`text-3xl sm:text-4xl font-bold ${tone.gold.text} tracking-tight`);
+  });
+
   it('lays out the head, the list, the spacer, the call to action and the footer', () => {
     const classes = pricingCardClasses('linear', { ...BASE, tone: 'purple' });
     expect(classes.head).toBe('flex flex-col');

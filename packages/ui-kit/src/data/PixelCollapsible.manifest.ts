@@ -20,9 +20,9 @@ export default defineManifest({
   highlights: [
     'Single-section disclosure pattern with animated chevron rotation',
     'Seven brand tones applied to the header button (neutral default)',
-    'Surface-aware typography (pixel vs linear) via shared surface context',
+    'Surface-aware typography (pixel vs linear)',
     'Uncontrolled state with `defaultOpen` for SSR-friendly initial render',
-    'SSR-safe and tree-shakable; renders children only when expanded',
+    'SSR-safe and tree-shakable; renders its content only when expanded',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

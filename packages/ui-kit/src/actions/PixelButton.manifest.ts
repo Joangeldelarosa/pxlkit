@@ -18,13 +18,13 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and an asChild slot pattern for wrapping links or routers.',
+    'Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and a link form for anchors and router links (`asChild` in React and Vue, `a[pxlButton]` in Angular).',
   highlights: [
     'Four variants — solid, soft, outline, ghost — across seven tones',
     'Loading state pins the rendered width to prevent collapse when text swaps to spinner',
-    'asChild slot pattern lets you wrap <a>/<Link> while keeping all styling',
+    'Styles a link or router link as the button: `asChild` in React and Vue, `<a pxlButton>` in Angular',
     'Pixel and linear surfaces inherit from PxlKitSurfaceProvider',
-    'Forwards refs and accepts every native <button> attribute',
+    'Accepts every native <button> attribute',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },
@@ -47,7 +47,7 @@ export default defineManifest({
       { key: 'Space', does: 'Activates the button' },
     ],
     notes:
-      'Renders a native <button> by default so keyboard semantics come for free. When using asChild with an anchor, the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control; disabled buttons skip shadow/transform affordances.',
+      'Renders a native <button> by default so keyboard semantics come for free. When it styles an anchor (`asChild`, or `a[pxlButton]` in Angular), the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control; disabled buttons skip shadow/transform affordances.',
   },
   related: ['PixelIconButton', 'PxlKitButton', 'PixelSplitButton', 'PixelBareButton'],
   apiStability: 'stable',

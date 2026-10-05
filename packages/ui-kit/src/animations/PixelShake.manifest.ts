@@ -12,8 +12,7 @@ export default defineManifest({
     'Configurable duration, distance, repeat count, and easing',
     'Trigger on mount, hover, click, focus, in-view, or controlled boolean',
     'Respects prefers-reduced-motion automatically',
-    'onComplete callback fires after the final iteration',
-    'Forwards ref to the wrapping div',
+    'Signals the end of its last iteration: `onComplete` (React), `@complete` (Vue), `(complete)` (Angular)',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

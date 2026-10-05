@@ -1,4 +1,5 @@
 import React, { forwardRef, useRef, useState } from 'react';
+import { cornerShadowClasses } from '@pxlkit/ui-kit-core';
 import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 import {
   Tone, Size, Surface, Variant, cn,
@@ -71,6 +72,8 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
 ) {
   const surface = useEffectiveSurface(surfaceProp);
   const s = surfaceClasses(surface);
+  // No drop shadow on pixel, whose cut corners clip it: the nudge and press alone.
+  const c = cornerShadowClasses(surface);
   const t = toneMap[tone];
   const isGhost = variant === 'ghost';
   const isOutline = variant === 'outline';
@@ -93,10 +96,10 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
   const variantClasses = isGhost
     ? cn('border border-transparent bg-transparent', t.hover)
     : isOutline
-      ? cn(s.border, t.border, 'bg-transparent', t.hover, !rest.disabled && s.shadow, !rest.disabled && s.shadowHover)
+      ? cn(s.border, t.border, 'bg-transparent', t.hover, !rest.disabled && c.shadow, !rest.disabled && c.shadowHover)
       : isSoft
-        ? cn(s.border, t.border, t.soft, t.hover, !rest.disabled && s.shadow, !rest.disabled && s.shadowHover)
-        : cn(s.border, t.border, t.bg, t.hover, !rest.disabled && s.shadow, !rest.disabled && s.shadowHover);
+        ? cn(s.border, t.border, t.soft, t.hover, !rest.disabled && c.shadow, !rest.disabled && c.shadowHover)
+        : cn(s.border, t.border, t.bg, t.hover, !rest.disabled && c.shadow, !rest.disabled && c.shadowHover);
 
   const mergedClassName = cn(
     'inline-flex items-center justify-center font-medium focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
@@ -107,7 +110,7 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
     t.text,
     fullWidth && 'w-full',
     variantClasses,
-    !rest.disabled && (isGhost || isOutline ? 'active:scale-[0.97]' : s.shadowActive),
+    !rest.disabled && (isGhost || isOutline ? 'active:scale-[0.97]' : c.shadowActive),
     className,
   );
 

@@ -27,13 +27,14 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-/** Default */
+/** Default — Shows the current month and marks today, by the clock of whatever renders it: a server render can differ from the browser's (a page built on another day, another time zone) and fail to hydrate. For a stable server render pass month (and value or defaultValue), or render a current-month calendar in the browser only: next/dynamic with ssr: false (Next.js), ClientOnly (Nuxt), @defer (Angular). */
 export const Default: Story = {
   name: 'Default',
   tags: ['example-default'],
   render: () => DefaultExample,
   parameters: {
     docs: {
+      description: { story: 'Shows the current month and marks today, by the clock of whatever renders it: a server render can differ from the browser\'s (a page built on another day, another time zone) and fail to hydrate. For a stable server render pass month (and value or defaultValue), or render a current-month calendar in the browser only: next/dynamic with ssr: false (Next.js), ClientOnly (Nuxt), @defer (Angular).' },
       source: { language: 'html', code: '<script setup lang="ts">\nimport { ref } from \'vue\';\nimport { PixelCalendarGrid } from \'@pxlkit/ui-kit-vue\';\n\nconst value = ref<Date | null>(null);\n</script>\n\n<template>\n  <PixelCalendarGrid v-model="value" />\n</template>' },
     },
   },

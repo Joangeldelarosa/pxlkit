@@ -83,3 +83,18 @@ export class TypewriterHeadline {}
 })
 export class GlitchHeadline {}
 
+@Component({
+  imports: [PixelHeroSection],
+  template: `
+    <section
+      pxlHeroSection
+      as="h2"
+      density="compact"
+      minHeight="sm"
+      eyebrow="Embedded"
+      headline="A hero inside a page"
+      subline="Its headline is an h2, under the page's own h1."
+    ></section>
+  `,
+})
+export class HeadingLevel {}

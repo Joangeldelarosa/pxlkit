@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelBento } from './PixelBento';
 import { PixelBentoCell } from './PixelBentoCell';
 

@@ -112,7 +112,7 @@ const api: FrameworkApiReferences = {
       {
         name: 'PixelPopoverTrigger',
         slots: [
-          { name: 'default' },
+          { name: 'default', description: 'The element that opens the popover: one element, such as a button.' },
         ],
       },
     ],
@@ -169,7 +169,7 @@ export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionPr
       <h2 id='pixel-popover-heading'>PixelPopover</h2>
       <p className="docs-lead">Controlled floating panel anchored to a trigger, with focus return, dismiss-on-escape, and outside-click handling.</p>
       <ul className="docs-highlights">
-        <li>Controlled open/onOpenChange API for predictable state</li>
+        <li>Controlled open state for predictable behaviour: <code>open</code> + <code>onOpenChange</code> (React), <code>v-model:open</code> (Vue), <code>[(open)]</code> (Angular)</li>
         <li>Floating-UI placement with side, align, and sideOffset</li>
         <li>closeOnEscape and closeOnOutsideClick dismissal</li>
         <li>Portal-rendered content with surface-aware theming</li>

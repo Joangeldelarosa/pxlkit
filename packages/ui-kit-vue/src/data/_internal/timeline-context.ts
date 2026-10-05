@@ -36,7 +36,7 @@ export function useTimelinePosition(): Readonly<PixelTimelinePosition> {
  * its position, so an entry still finds it when the consumer wraps
  * `PixelTimelineItem` in a component of their own.
  */
-export const TimelinePosition = defineComponent({
+export const TimelinePosition = /* @__PURE__ */ defineComponent({
   name: 'PxlTimelinePosition',
   props: {
     index: { type: Number, required: true },

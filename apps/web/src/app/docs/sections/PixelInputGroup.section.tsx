@@ -29,7 +29,7 @@ const api: FrameworkApiReferences = {
         props: [
           { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Height of the shell.' },
           { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
-          { name: 'aria-label', type: 'string', description: 'Accessible name for the group. Strongly recommended since this primitive visually joins multiple form controls (e.g. country code + phone) — without an accessible name a screen reader user has no idea what the group represents. In dev, a missing name on a group of >1 child logs a warning.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the group. Strongly recommended since this primitive visually joins multiple form controls (e.g. country code + phone) — without an accessible name a screen reader user has no idea what the group represents. In development, a group of more than one child without a name logs a warning.' },
           { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group, in place of `aria-label`.' },
           { name: 'children', type: 'React.ReactNode', required: true, description: 'The controls to join; each element is joined, text is dropped.' },
         ],
@@ -99,7 +99,7 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
         <li><code>size</code> and <code>surface</code> props inherit the kit-wide design tokens.</li>
         <li>Accessible: applies <code>role=&quot;group&quot;</code> only when an <code>aria-label</code>/<code>aria-labelledby</code> is provided.</li>
         <li>Dev-mode warning when a multi-child group is missing an accessible name.</li>
-        <li>Preserves child <code>className</code> (consumer styles win over the join overrides).</li>
+        <li>Keeps the classes of each control alongside the join classes.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

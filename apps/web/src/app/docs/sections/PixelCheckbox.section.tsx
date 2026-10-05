@@ -107,7 +107,7 @@ export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSection
       <h2 id='pixel-checkbox-heading'>PixelCheckbox</h2>
       <p className="docs-lead">Controlled boolean checkbox with a chunky pixel check mark, tone-aware fill, and optional form serialization.</p>
       <ul className="docs-highlights">
-        <li>Fully controlled via checked + onChange(next: boolean)</li>
+        <li>Controlled — <code>checked</code> + <code>onChange</code> (React), <code>v-model:checked</code> (Vue), <code>[(checked)]</code> or forms (Angular) — or uncontrolled with <code>defaultChecked</code></li>
         <li>Seven tones via the shared toneMap palette</li>
         <li>Pixel and linear surface variants share the same API</li>
         <li>Hidden mirror input lets it participate in native &lt;form&gt; submissions when name is set</li>

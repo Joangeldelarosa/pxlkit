@@ -17,12 +17,15 @@ export type TypewriterTone = Tone | 'inherit';
 export interface TypewriterClasses {
   /** The wrapper: monospace, in the tone colour — none for `'inherit'`. */
   root: string;
-  /** The blinking caret. */
+  /**
+   * The blinking caret — still for a reader who prefers reduced motion,
+   * before the page hydrates too (the component then drops it).
+   */
   caret: string;
 }
 
 export function typewriterClasses(tone: TypewriterTone): TypewriterClasses {
-  return { root: tone === 'inherit' ? '' : cn('font-mono', toneMap[tone].text), caret: 'animate-pulse' };
+  return { root: tone === 'inherit' ? '' : cn('font-mono', toneMap[tone].text), caret: 'motion-safe:animate-pulse' };
 }
 
 /**

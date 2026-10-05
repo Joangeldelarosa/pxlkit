@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { PixelDateRangePicker, DateRangeValue } from './PixelDateRangePicker';
+import { useState } from 'react';
+import { PixelDateRangePicker, type DateRangeValue } from './PixelDateRangePicker';
 
 export function Default() {
   const [range, setRange] = useState<DateRangeValue>({});

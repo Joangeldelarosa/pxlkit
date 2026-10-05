@@ -1,4 +1,3 @@
-import React from 'react'
 import { PixelPortal } from './PixelPortal'
 
 export function Default() {

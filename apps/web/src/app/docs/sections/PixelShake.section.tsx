@@ -99,8 +99,7 @@ export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps)
         <li>Configurable duration, distance, repeat count, and easing</li>
         <li>Trigger on mount, hover, click, focus, in-view, or controlled boolean</li>
         <li>Respects prefers-reduced-motion automatically</li>
-        <li>onComplete callback fires after the final iteration</li>
-        <li>Forwards ref to the wrapping div</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

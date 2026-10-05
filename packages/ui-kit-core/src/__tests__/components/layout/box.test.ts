@@ -54,6 +54,21 @@ describe('box recipes', () => {
     expect(boxClasses('linear', { tone: 'neutral', variant: 'solid', padding: 'xl', radius: 'full', shadow: true })).toBe(
       `px-8 py-6 rounded-full ${tone.neutral.bg} ${linear.shadow}`,
     );
+    expect(boxClasses('linear', { tone: 'neutral', variant: 'solid', padding: 'xl', shadow: true })).toBe(
+      `px-8 py-6 ${linear.radiusLg} ${tone.neutral.bg} ${linear.shadow}`,
+    );
+  });
+
+  it('shows the pixel drop shadow only on a box whose radius leaves its corners whole', () => {
+    // The default corners are cut, and a drop shadow cannot show past them.
+    expect(boxClasses('pixel', { tone: 'neutral', variant: 'solid', padding: 'md', shadow: true })).toBe(
+      `px-4 py-3 ${pixel.radiusLg} ${tone.neutral.bg}`,
+    );
+    for (const radius of ['none', 'sm', 'md', 'lg', 'full'] as const) {
+      expect(boxClasses('pixel', { tone: 'neutral', variant: 'solid', padding: 'md', radius, shadow: true })).toBe(
+        `px-4 py-3 rounded-${radius} ${tone.neutral.bg} ${pixel.shadow}`,
+      );
+    }
   });
 
   it('warns about a landmark box without an accessible name', () => {

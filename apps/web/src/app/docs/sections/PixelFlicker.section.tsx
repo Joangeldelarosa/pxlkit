@@ -93,7 +93,7 @@ export function PixelFlickerDocsSection({ className }: PixelFlickerDocsSectionPr
         <li>Stepped opacity flicker that mimics a broken neon sign</li>
         <li>Configurable duration and repeat count</li>
         <li>Trigger modes: mount, hover, click, focus, inView, or controlled</li>
-        <li>Forwards refs and merges with internal trigger observers</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
         <li>Respects prefers-reduced-motion automatically</li>
       </ul>
     <dl className="docs-meta">

@@ -33,7 +33,7 @@ const api: FrameworkApiReferences = {
           { name: 'padding', type: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Padding scale.' },
           { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg' | 'full'", description: "Fixed radius; the surface's large radius when unset." },
           { name: 'border', type: 'boolean', description: "Whether to render a border. Defaults to `true` when `variant === 'outline'` (outlines without a border are meaningless), `false` otherwise. Pass `true` to force a border on `solid`/`soft`/`ghost`; pass `false` to force-off on outline. Note: when polymorphic `as` is a landmark element (`section`, `nav`, `aside`, `main`), supply `aria-label` or `aria-labelledby` for a11y." },
-          { name: 'shadow', type: 'boolean', default: 'false', description: 'Surface drop shadow.' },
+          { name: 'shadow', type: 'boolean', default: 'false', description: 'Surface drop shadow. On pixel it shows with a `radius` only: the default corners are cut, and a drop shadow cannot show past them.' },
           { name: 'as', type: "'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'main' | 'nav'", description: 'Element to render.' },
         ],
         notes: [
@@ -55,7 +55,7 @@ const api: FrameworkApiReferences = {
           { name: 'padding', type: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Padding scale.' },
           { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg' | 'full'", description: "Fixed radius; the surface's large radius when unset." },
           { name: 'border', type: 'boolean', description: 'Draw the tone border; on for `outline`, off otherwise, when unset.' },
-          { name: 'shadow', type: 'boolean', default: 'false', description: 'Surface drop shadow.' },
+          { name: 'shadow', type: 'boolean', default: 'false', description: 'Surface drop shadow. On pixel it shows with a `radius` only: the default corners are cut, and a drop shadow cannot show past them.' },
           { name: 'as', type: "'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'main' | 'nav'", default: "'div'", description: 'Element to render.' },
         ],
         slots: [
@@ -77,7 +77,7 @@ const api: FrameworkApiReferences = {
           { name: 'padding', type: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Padding scale.' },
           { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg' | 'full'", description: "Fixed radius; the surface's large radius when unset." },
           { name: 'border', type: 'boolean', accepts: 'unknown', description: 'Draw the tone border; on for `outline`, off otherwise, when unset.' },
-          { name: 'shadow', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface drop shadow.' },
+          { name: 'shadow', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface drop shadow. On pixel it shows with a `radius` only: the default corners are cut, and a drop shadow cannot show past them.' },
         ],
         notes: [
           'Goes on any element, which keeps its own attributes and events.',
@@ -93,9 +93,9 @@ export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): Re
       <h2 id='pixel-box-heading'>PixelBox</h2>
       <p className="docs-lead">Surface-aware polymorphic container with tone, variant, padding, radius, border, and shadow controls.</p>
       <ul className="docs-highlights">
-        <li>Surface-aware tokens via useEffectiveSurface (retro / pixel)</li>
+        <li>Surface-aware tokens (pixel / linear)</li>
         <li>Tone + variant matrix (solid / soft / outline / ghost)</li>
-        <li>Polymorphic <code>as</code> for semantic landmarks (section, nav, aside, main, header, footer, article)</li>
+        <li>Polymorphic <code>as</code> for semantic landmarks (section, nav, aside, main, header, footer, article); in Angular, the element you put <code>pxlBox</code> on</li>
         <li>Dev-time a11y warning when rendered as a landmark without an accessible name</li>
         <li>Padding and radius scale tokens with sensible defaults</li>
       </ul>

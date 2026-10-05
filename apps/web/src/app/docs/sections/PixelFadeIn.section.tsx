@@ -102,8 +102,8 @@ export function PixelFadeInDocsSection({ className }: PixelFadeInDocsSectionProp
         <li>Mount, hover, click, or in-view triggers</li>
         <li>Configurable duration, delay, easing, and fill-mode</li>
         <li>Iteration count supports finite or infinite repeats</li>
-        <li>onComplete callback fires after the final iteration</li>
-        <li>Respects prefers-reduced-motion via useReducedMotion</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
+        <li>Respects prefers-reduced-motion automatically</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

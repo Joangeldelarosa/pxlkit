@@ -124,7 +124,7 @@ export function PixelTextareaDocsSection({ className }: PixelTextareaDocsSection
         <li>Optional autosize between minRows and maxRows, scrolling beyond the cap</li>
         <li>Character counter (showCount) — total or N/max with overflow styling</li>
         <li>Full tone + surface (pixel/linear) theming aligned with the rest of forms</li>
-        <li>Controlled and uncontrolled value patterns, ref forwards to &lt;textarea&gt;</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

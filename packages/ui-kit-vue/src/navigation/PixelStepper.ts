@@ -63,7 +63,7 @@ export type PixelStepperProps = ExtractPublicPropTypes<typeof stepperProps>;
  *   <PixelStepperStep label="Profile" />
  * </PixelStepper>
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelStepper',
   props: stepperProps,
   slots: Object as SlotsType<{

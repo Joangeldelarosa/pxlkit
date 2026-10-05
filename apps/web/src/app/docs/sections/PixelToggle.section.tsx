@@ -94,11 +94,11 @@ export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProp
       <h2 id='pixel-toggle-heading'>PixelToggle</h2>
       <p className="docs-lead">Two-state toggle button with aria-pressed semantics. Works standalone or as a child of PixelToggleGroup for single/multi-select toolbars.</p>
       <ul className="docs-highlights">
-        <li>Standalone controlled (pressed + onPressedChange) or composed inside PixelToggleGroup</li>
-        <li>Inherits size, variant, and surface from a parent PixelToggleGroup context</li>
+        <li>Standalone — <code>pressed</code> + <code>onPressedChange</code> (React), <code>v-model:pressed</code> (Vue), <code>[(pressed)]</code> (Angular) — or composed inside PixelToggleGroup</li>
+        <li>Inherits size, variant, and surface from a parent PixelToggleGroup</li>
         <li>Cyan tone pressed state with surface-aware borders, radius, and transitions</li>
         <li>Renders as role=&quot;radio&quot; with aria-checked inside a single-select group, aria-pressed otherwise</li>
-        <li>Forwards refs and registers with the group for roving-tabindex keyboard navigation</li>
+        <li>Registers with the group for roving-tabindex keyboard navigation</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

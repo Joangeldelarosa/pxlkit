@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { PixelButton } from '../actions';
 import { PixelBareInput } from './PixelBareInput';
 
 export function Default() {
@@ -50,12 +51,11 @@ export function Required() {
 export function WithRef() {
   const ref = React.useRef<HTMLInputElement>(null);
   return (
-    <PixelBareInput
-      ref={ref}
-      placeholder="Focus me via ref"
-      onFocus={() => {
-        /* ref attached */
-      }}
-    />
+    <div className="flex items-center gap-2">
+      <PixelBareInput ref={ref} placeholder="Focus me via ref" />
+      <PixelButton size="sm" onClick={() => ref.current?.focus()}>
+        Focus
+      </PixelButton>
+    </div>
   );
 }

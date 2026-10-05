@@ -4,7 +4,7 @@ import { PixelCodeInline } from '@pxlkit/ui-kit-vue';
 
 <template>
   <div class="flex flex-col gap-2">
-    <div>Import: <PixelCodeInline>import { PixelCodeInline } from '@pxlkit/ui'</PixelCodeInline></div>
+    <div>Import: <PixelCodeInline>import { PixelCodeInline } from '@pxlkit/ui-kit'</PixelCodeInline></div>
     <div>Hotkey: <PixelCodeInline tone="purple">Ctrl+K</PixelCodeInline></div>
     <div>Error: <PixelCodeInline tone="red">EACCES</PixelCodeInline></div>
   </div>

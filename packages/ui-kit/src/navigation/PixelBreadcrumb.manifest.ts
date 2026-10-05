@@ -25,7 +25,7 @@ export default defineManifest({
     'Active crumb marked with aria-current="page" and emphasised typography.',
     'Per-item href (link), onClick (button), or plain label — choose per crumb.',
     'Pixel surface uses a crisp-edged chevron SVG; linear surface uses a slash separator.',
-    'SSR-safe, tree-shakable, and inherits ambient surface context.',
+    'SSR-safe, tree-shakable, and follows the nearest PxlKitSurfaceProvider.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

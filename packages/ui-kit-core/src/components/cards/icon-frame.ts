@@ -62,7 +62,8 @@ export function iconFrameClasses(
       t.soft,
       t.text,
       shape === 'circle' ? 'rounded-full' : shape === 'rounded' ? 'rounded-md' : s.radius,
-      animated && !reducedMotion && 'animate-pulse',
+      // Still before hydration too, for a reader who prefers reduced motion.
+      animated && !reducedMotion && 'motion-safe:animate-pulse',
     ),
     icon: 'inline-flex items-center justify-center',
     accent: cn(

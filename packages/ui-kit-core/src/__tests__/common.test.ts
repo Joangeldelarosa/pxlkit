@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   cn,
+  cornerShadowClasses,
   focusRing,
   inputBase,
   pixelDot,
@@ -48,6 +49,23 @@ describe('surfaceClasses', () => {
       expect(Object.keys(s).sort()).toEqual([...SURFACE_KEYS].sort());
       for (const key of SURFACE_KEYS) expect(s[key]).toMatch(/\S/);
     }
+  });
+});
+
+describe('cornerShadowClasses', () => {
+  it('gives a pixel element no drop shadow, which its cut corners would clip, only the hover nudge and press', () => {
+    expect(cornerShadowClasses('pixel')).toEqual({ shadow: '', shadowHover: 'pxl-nudge-hover', shadowActive: 'pxl-nudge-active' });
+    expect(cornerShadowClasses()).toEqual(cornerShadowClasses('pixel'));
+  });
+
+  it('keeps the linear shadows', () => {
+    const { shadow, shadowHover, shadowActive } = surfaceClasses('linear');
+    expect(cornerShadowClasses('linear')).toEqual({ shadow, shadowHover, shadowActive });
+  });
+
+  it('leaves the surface tokens as they are', () => {
+    const pixel = surfaceClasses('pixel');
+    expect([pixel.shadow, pixel.shadowHover, pixel.shadowActive]).toEqual(['pxl-shadow', 'pxl-shadow-hover', 'pxl-shadow-active']);
   });
 });
 

@@ -109,7 +109,7 @@ export function PixelSlideInDocsSection({ className }: PixelSlideInDocsSectionPr
         <li>Mount, hover, click, or in-view triggers</li>
         <li>Configurable duration, delay, distance, easing, and fill-mode</li>
         <li>Iteration count supports finite or infinite repeats</li>
-        <li>Respects prefers-reduced-motion via useReducedMotion</li>
+        <li>Respects prefers-reduced-motion automatically</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

@@ -21,7 +21,7 @@ export default defineManifest({
     'Semantic <kbd> root so assistive tech announces the key role correctly.',
     'Surface-aware: pixel chamfered border + pixel font, or linear pill.',
     'Drop-shadow depth tuned per surface for a tactile keycap feel.',
-    'Composable inline — accepts any ReactNode children to support icons or multi-character keys.',
+    'Composable inline — takes any inline content, such as icons or multi-character keys.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

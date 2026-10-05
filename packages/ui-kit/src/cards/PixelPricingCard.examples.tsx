@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelPricingCard } from './PixelPricingCard';
 import { PixelBadge } from '../data/PixelBadge';
 

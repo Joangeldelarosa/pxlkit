@@ -35,7 +35,7 @@ const api: FrameworkApiReferences = {
           { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Type scale.' },
           { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: 'Gaps between the blocks.' },
           { name: 'actions', type: 'React.ReactNode', description: 'Buttons or links under the description.' },
-          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4'", default: "'h2'", description: 'Heading level of the title.' },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h2'", description: 'Heading level of the title.' },
           { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
         ],
         notes: [
@@ -58,7 +58,7 @@ const api: FrameworkApiReferences = {
           { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Start-aligned, or centred with a capped width.' },
           { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Type scale.' },
           { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: 'Gaps between the blocks.' },
-          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4'", default: "'h2'", description: 'Heading level of the title.' },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h2'", description: 'Heading level of the title.' },
           { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
         ],
         slots: [
@@ -85,7 +85,7 @@ const api: FrameworkApiReferences = {
           { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Start-aligned, or centred with a capped width.' },
           { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Type scale.' },
           { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: 'Gaps between the blocks.' },
-          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4'", default: "'h2'", description: 'Heading level of the title.' },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h2'", description: 'Heading level of the title.' },
           { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
         ],
       },
@@ -99,11 +99,11 @@ export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderD
       <h2 id='pixel-section-header-heading'>PixelSectionHeader</h2>
       <p className="docs-lead">Section header with eyebrow, title, description, and actions — rhythm-aware and surface-aware.</p>
       <ul className="docs-highlights">
-        <li>Configurable heading level (h1–h4) preserves document outline</li>
+        <li>Configurable heading level (h1–h6) preserves document outline</li>
         <li>Size and spacing scales (sm/md/lg, tight/normal/loose) use shared rhythm tokens</li>
         <li>Optional eyebrow is decorative (aria-hidden) with sr-only restatement in the heading</li>
         <li>Tone-aware title coloring via ToneKey</li>
-        <li>Surface-aware typography via useEffectiveSurface</li>
+        <li>Surface-aware typography</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

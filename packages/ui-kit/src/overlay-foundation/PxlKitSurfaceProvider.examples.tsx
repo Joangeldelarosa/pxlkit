@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelButton } from '../actions';
 import { PxlKitSurfaceProvider } from './PxlKitSurfaceProvider';
 

@@ -123,7 +123,7 @@ export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProp
       <ul className="docs-highlights">
         <li>WAI-ARIA combobox + listbox semantics — <code>aria-expanded</code>, <code>aria-haspopup</code>, <code>aria-selected</code> wired to the trigger and options.</li>
         <li>Full keyboard support: ArrowUp/Down, Home/End, Enter/Space to select, Escape to close, Tab to dismiss.</li>
-        <li>Controlled or uncontrolled — <code>value</code> + <code>onChange</code> or <code>defaultValue</code>; emits the selected option value as a string.</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code>; the value is the selected option value, as a string.</li>
         <li>Form-friendly — hidden mirror input lets the value participate in native <code>&lt;form&gt;</code> submissions via <code>name</code>.</li>
         <li>Tone, size, and surface (pixel/linear) variants share the same primitives as the rest of the input family.</li>
       </ul>

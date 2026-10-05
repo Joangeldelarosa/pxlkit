@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelContainer } from './PixelContainer';
 
 export function Default() {

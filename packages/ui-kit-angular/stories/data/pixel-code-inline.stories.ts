@@ -84,7 +84,7 @@ export const CodeSamples: Story = {
   render: () => ({ props: { example: CodeSamplesExample }, template: '<ng-container *ngComponentOutlet="example" />' }),
   parameters: {
     docs: {
-      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelCodeInline } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelCodeInline],\n  template: `\n    <div class="flex flex-col gap-2">\n      <div>Import: <code pxlCodeInline>import &#123; PixelCodeInline &#125; from \'&#64;pxlkit/ui\'</code></div>\n      <div>Hotkey: <code pxlCodeInline tone="purple">Ctrl+K</code></div>\n      <div>Error: <code pxlCodeInline tone="red">EACCES</code></div>\n    </div>\n  `,\n})\nexport class CodeSamples {}' },
+      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelCodeInline } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelCodeInline],\n  template: `\n    <div class="flex flex-col gap-2">\n      <div>Import: <code pxlCodeInline>import &#123; PixelCodeInline &#125; from \'&#64;pxlkit/ui-kit\'</code></div>\n      <div>Hotkey: <code pxlCodeInline tone="purple">Ctrl+K</code></div>\n      <div>Error: <code pxlCodeInline tone="red">EACCES</code></div>\n    </div>\n  `,\n})\nexport class CodeSamples {}' },
     },
   },
 };

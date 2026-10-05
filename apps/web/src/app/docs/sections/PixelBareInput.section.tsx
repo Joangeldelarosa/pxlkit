@@ -77,10 +77,10 @@ export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSecti
   return (
     <section aria-labelledby={'pixel-bare-input-heading'} className={className} data-status='stable'>
       <h2 id='pixel-bare-input-heading'>PixelBareInput</h2>
-      <p className="docs-lead">Unstyled, forwardRef-enabled <code>&lt;input&gt;</code> primitive used as an escape hatch for fully custom field compositions.</p>
+      <p className="docs-lead">Unstyled <code>&lt;input&gt;</code> primitive, the native input itself, used as an escape hatch for fully custom field compositions.</p>
       <ul className="docs-highlights">
-        <li>Native <code>&lt;input&gt;</code> semantics — accepts every <code>InputHTMLAttributes</code> prop verbatim.</li>
-        <li>forwardRef passthrough exposes the underlying <code>HTMLInputElement</code> for measurement, focus, or imperative APIs.</li>
+        <li>Native <code>&lt;input&gt;</code> semantics — takes every native input attribute verbatim.</li>
+        <li>Its element is the native <code>&lt;input&gt;</code>, for measurement, focus, or imperative APIs: a ref in React, <code>$el</code> in Vue, the <code>input[pxlBareInput]</code> element in Angular.</li>
         <li>Zero styling — pair with parent surfaces (PixelInputGroup, PixelFieldset) when building bespoke field widgets.</li>
         <li>SSR-safe and tree-shakable — no client effects or runtime dependencies.</li>
       </ul>
@@ -419,42 +419,46 @@ export class Required {}`}
           variant="docs"
           label={'With ref code'}
           react={`import * as React from 'react';
-import { PixelBareInput } from '@pxlkit/ui-kit';
+import { PixelButton, PixelBareInput } from '@pxlkit/ui-kit';
 
 export function WithRef() {
   const ref = React.useRef<HTMLInputElement>(null);
   return (
-    <PixelBareInput
-      ref={ref}
-      placeholder="Focus me via ref"
-      onFocus={() => {
-        /* ref attached */
-      }}
-    />
+    <div className="flex items-center gap-2">
+      <PixelBareInput ref={ref} placeholder="Focus me via ref" />
+      <PixelButton size="sm" onClick={() => ref.current?.focus()}>
+        Focus
+      </PixelButton>
+    </div>
   );
 }`}
           vue={`<script setup lang="ts">
 import { useTemplateRef } from 'vue';
-import { PixelBareInput } from '@pxlkit/ui-kit-vue';
+import { PixelBareInput, PixelButton } from '@pxlkit/ui-kit-vue';
 
 // The component's root element (\`$el\`) is the native input.
 const field = useTemplateRef<InstanceType<typeof PixelBareInput>>('field');
 </script>
 
 <template>
-  <PixelBareInput ref="field" placeholder="Focus me via ref" />
+  <div class="flex items-center gap-2">
+    <PixelBareInput ref="field" placeholder="Focus me via ref" />
+    <PixelButton size="sm" @click="field?.$el.focus()">Focus</PixelButton>
+  </div>
 </template>`}
-          angular={`import { Component, ElementRef, viewChild } from '@angular/core';
-import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+          angular={`import { Component } from '@angular/core';
+import { PixelBareInput, PixelButton } from '@pxlkit/ui-kit-angular';
 
 @Component({
-  imports: [PixelBareInput],
-  template: \`<input pxlBareInput #field placeholder="Focus me via ref" />\`,
+  imports: [PixelBareInput, PixelButton],
+  template: \`
+    <div class="flex items-center gap-2">
+      <input pxlBareInput #field placeholder="Focus me via ref" />
+      <button pxlButton size="sm" (click)="field.focus()">Focus</button>
+    </div>
+  \`,
 })
-export class WithRef {
-  // The directive's host is the native input itself.
-  readonly field = viewChild.required<ElementRef<HTMLInputElement>>('field');
-}`}
+export class WithRef {}`}
         />
       </article>
     </section>

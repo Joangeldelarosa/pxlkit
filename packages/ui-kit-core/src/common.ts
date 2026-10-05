@@ -72,7 +72,7 @@ const SURFACE_TOKENS: Record<Surface, SurfaceClasses> = {
     radius: 'pxl-corner-sm',
     radiusLg: 'pxl-corner-md',
     radiusFull: 'pxl-corner-sm',
-    // drop-shadow follows the staircase silhouette
+    // A drop shadow, which a cut corner clips: see `cornerShadowClasses`
     shadow: 'pxl-shadow',
     shadowHover: 'pxl-shadow-hover',
     shadowActive: 'pxl-shadow-active',
@@ -104,6 +104,22 @@ const SURFACE_TOKENS: Record<Surface, SurfaceClasses> = {
  */
 export function surfaceClasses(surface: Surface = 'pixel'): SurfaceClasses {
   return SURFACE_TOKENS[surface];
+}
+
+/**
+ * `shadow`, `shadowHover` and `shadowActive` for an element with the
+ * surface's corners (`radius`, `radiusLg`). Pixel cuts them, and a drop
+ * shadow cannot show past a cut corner — inside one it doubles the text and
+ * border — so on pixel there is no shadow, only the hover nudge and press
+ * of `pxl-shadow-hover` / `pxl-shadow-active`. Linear keeps its shadows.
+ * @example
+ * const c = cornerShadowClasses(surface);
+ * cn(s.radius, c.shadow, c.shadowHover, c.shadowActive);
+ */
+export function cornerShadowClasses(surface: Surface = 'pixel'): Pick<SurfaceClasses, 'shadow' | 'shadowHover' | 'shadowActive'> {
+  if (surface === 'pixel') return { shadow: '', shadowHover: 'pxl-nudge-hover', shadowActive: 'pxl-nudge-active' };
+  const { shadow, shadowHover, shadowActive } = SURFACE_TOKENS[surface];
+  return { shadow, shadowHover, shadowActive };
 }
 
 /** Joins the truthy class names with a space. */

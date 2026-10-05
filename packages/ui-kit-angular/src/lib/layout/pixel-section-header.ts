@@ -51,6 +51,12 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
         @case ('h4') {
           <h4 [class]="classes().title"><ng-container *ngTemplateOutlet="heading" /></h4>
         }
+        @case ('h5') {
+          <h5 [class]="classes().title"><ng-container *ngTemplateOutlet="heading" /></h5>
+        }
+        @case ('h6') {
+          <h6 [class]="classes().title"><ng-container *ngTemplateOutlet="heading" /></h6>
+        }
         @default {
           <h2 [class]="classes().title"><ng-container *ngTemplateOutlet="heading" /></h2>
         }

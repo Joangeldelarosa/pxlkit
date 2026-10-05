@@ -121,9 +121,9 @@ export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSection
       <p className="docs-lead">Searchable single-value combobox built on a button trigger + listbox popover with type-to-filter, optional grouping, and full keyboard navigation.</p>
       <ul className="docs-highlights">
         <li>WAI-ARIA combobox pattern — <code>role=&quot;combobox&quot;</code> trigger paired with a <code>role=&quot;listbox&quot;</code> popup and <code>aria-activedescendant</code> for highlight tracking.</li>
-        <li>Type-to-filter search input is opt-out (<code>searchable=&#123;false&#125;</code>) for short lists where filtering adds friction.</li>
+        <li>Type-to-filter search input is opt-out (<code>searchable</code> set to false) for short lists where filtering adds friction.</li>
         <li>Optional <code>group</code> field on options renders sticky group headings in the listbox without breaking keyboard navigation.</li>
-        <li>Controlled or uncontrolled — <code>value</code> + <code>onChange</code> or <code>defaultValue</code>; integrates with native forms via hidden <code>name</code> input.</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code>; a hidden <code>name</code> input joins native forms.</li>
         <li>Tone-free surface theming (pixel/linear) and shared size scale (sm/md/lg) match the rest of the input family.</li>
       </ul>
     <dl className="docs-meta">

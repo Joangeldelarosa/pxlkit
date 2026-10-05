@@ -34,7 +34,7 @@ export interface FeatureCardOptions {
   orientation: FeatureCardOrientation;
   /** Surface border, radius and background. */
   bordered: boolean;
-  /** Hover lift, shadow and focus ring — an interactive card or a link. */
+  /** Hover lift (and shadow, on linear) and focus ring — an interactive card or a link. */
   interactive: boolean;
   iconSize: FeatureCardIconSize;
   /** The badge; its row keeps its height, invisible, without one. */
@@ -79,7 +79,8 @@ export function featureCardClasses(
       s.transition,
       bordered && 'border-retro-border bg-retro-surface/40',
       interactive && 'cursor-pointer hover:-translate-y-[2px]',
-      interactive && s.shadowHover,
+      // Pixel lifts alone: its shadow is a drop shadow, which cut corners clip and which doubles the text.
+      interactive && surface === 'linear' && s.shadowHover,
       interactive &&
         'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-retro-bg focus-visible:ring-retro-cyan/60',
     ),

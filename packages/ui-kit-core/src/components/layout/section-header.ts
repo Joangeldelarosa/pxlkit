@@ -8,8 +8,8 @@ import { rhythm, tone as toneTokens, type ToneKey } from '../../tokens';
 export type SectionHeaderAlign = 'start' | 'center';
 export type SectionHeaderSize = 'sm' | 'md' | 'lg';
 export type SectionHeaderSpacing = 'tight' | 'normal' | 'loose';
-/** Heading level of the title. */
-export type SectionHeaderLevel = 'h1' | 'h2' | 'h3' | 'h4';
+/** Heading level of the title — and of PixelHeroSection's headline. */
+export type SectionHeaderLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
 
 export const sectionHeaderTitleSizeClasses: Record<SectionHeaderSize, string> = {
   sm: 'text-xl sm:text-2xl',
@@ -90,9 +90,11 @@ export function sectionHeaderClasses(
       'uppercase tracking-[0.18em]',
       titleTone ? toneTokens[titleTone].text : 'text-retro-muted',
     ),
+    // Bold on both surfaces: linear's display face carries its own weight
+    // (semibold), so the title takes its tracking alone.
     title: cn(
       sectionHeaderTitleSizeClasses[size],
-      s.fontDisplay,
+      surface === 'pixel' ? s.fontDisplay : 'tracking-tight',
       'font-bold leading-tight',
       titleTone ? toneTokens[titleTone].text : 'text-retro-text',
       eyebrow && sp.eyebrowToTitle,

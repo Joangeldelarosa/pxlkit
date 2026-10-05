@@ -18,7 +18,7 @@ export default defineManifest({
   description:
     'Single-select grouped radios with a pixel dot indicator, fieldset/legend semantics, and tone + surface variants.',
   highlights: [
-    'Controlled via value + onChange(next: string) over a list of options.',
+    'Controlled — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — over a list of options.',
     'Renders as a real <fieldset> with role="radiogroup" and a <legend> from label.',
     'Seven tones and pixel/linear surfaces share the kit-wide design tokens.',
     'Optional name emits a hidden input so it serializes inside native forms.',

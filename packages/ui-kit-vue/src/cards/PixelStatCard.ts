@@ -43,7 +43,7 @@ export type PixelStatCardProps = ExtractPublicPropTypes<typeof statCardProps>;
  *   <template #icon><span aria-hidden="true">$</span></template>
  * </PixelStatCard>
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelStatCard',
   props: statCardProps,
   slots: Object as SlotsType<{

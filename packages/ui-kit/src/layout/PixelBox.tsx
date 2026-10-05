@@ -30,7 +30,10 @@ export interface PixelBoxProps
    * `nav`, `aside`, `main`), supply `aria-label` or `aria-labelledby` for a11y.
    */
   border?: boolean;
-  /** Surface drop shadow. */
+  /**
+   * Surface drop shadow. On pixel it shows with a `radius` only: the
+   * default corners are cut, and a drop shadow cannot show past them.
+   */
   shadow?: boolean;
   /** Element to render. */
   as?: BoxElement;

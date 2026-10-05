@@ -9,7 +9,7 @@ export default defineManifest({
   description:
     'Controlled floating panel anchored to a trigger, with focus return, dismiss-on-escape, and outside-click handling.',
   highlights: [
-    'Controlled open/onOpenChange API for predictable state',
+    'Controlled open state for predictable behaviour: `open` + `onOpenChange` (React), `v-model:open` (Vue), `[(open)]` (Angular)',
     'Floating-UI placement with side, align, and sideOffset',
     'closeOnEscape and closeOnOutsideClick dismissal',
     'Portal-rendered content with surface-aware theming',

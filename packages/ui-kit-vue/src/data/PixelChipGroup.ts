@@ -46,7 +46,7 @@ function chipValue(chip: VNode): string | undefined {
  *   <PixelChip value="vue" label="Vue" />
  * </PixelChipGroup>
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelChipGroup',
   props: chipGroupProps,
   emits: {

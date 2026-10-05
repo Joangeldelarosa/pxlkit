@@ -109,11 +109,11 @@ export function PixelCalendarGridDocsSection({ className }: PixelCalendarGridDoc
       <h2 id='pixel-calendar-grid-heading'>PixelCalendarGrid</h2>
       <p className="docs-lead">Standalone month grid for date selection — usable inline or composed inside date pickers and range pickers.</p>
       <ul className="docs-highlights">
-        <li>Controlled or uncontrolled month navigation via month / onMonthChange</li>
+        <li>Controlled or uncontrolled month navigation: <code>month</code> + <code>onMonthChange</code> (React), <code>v-model:month</code> (Vue), <code>[(month)]</code> (Angular)</li>
         <li>Min/max date bounds plus custom disabledDates (array or predicate)</li>
         <li>Optional rangePreview prop highlights start/end + in-range cells</li>
         <li>Full keyboard nav: Arrows, Home/End, PageUp/PageDown, Enter/Space</li>
-        <li>Surface-aware via useEffectiveSurface — inherits container theme</li>
+        <li>Surface-aware (pixel / linear) — follows the nearest PxlKitSurfaceProvider</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -242,6 +242,7 @@ export class Default {
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
+        <p>Shows the current month and marks today, by the clock of whatever renders it: a server render can differ from the browser&#39;s (a page built on another day, another time zone) and fail to hydrate. For a stable server render pass month (and value or defaultValue), or render a current-month calendar in the browser only: next/dynamic with ssr: false (Next.js), ClientOnly (Nuxt), @defer (Angular).</p>
         <FrameworkCode
           variant="docs"
           label={'Default code'}

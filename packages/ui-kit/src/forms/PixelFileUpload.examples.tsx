@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PixelFileUpload } from './PixelFileUpload';
 
 export function Default() {

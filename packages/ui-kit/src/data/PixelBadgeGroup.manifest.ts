@@ -16,7 +16,6 @@ export default defineManifest({
     'Overflow trigger opens a PixelPopover with the hidden badges, surface-matched.',
     'Wrapper becomes `role="group"` when an accessible name (aria-label or aria-labelledby) is provided.',
     'Surface-aware: pixel chamfered radius + pixel font or linear pill, propagated to the popover.',
-    'Forwarded ref to the underlying div and full passthrough of HTMLAttributes.',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

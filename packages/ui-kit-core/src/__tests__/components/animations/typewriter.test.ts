@@ -2,13 +2,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TYPEWRITER_CARET, toneMap, typeText, typewriterClasses } from '../../../index';
 
 describe('typewriter recipes', () => {
-  it('sets the text in monospace, in the tone colour, with a blinking caret', () => {
-    expect(typewriterClasses('cyan')).toEqual({ root: `font-mono ${toneMap.cyan.text}`, caret: 'animate-pulse' });
+  it('sets the text in monospace, in the tone colour, with a caret that blinks unless motion is reduced', () => {
+    // A motion-safe variant: still for a reader who prefers reduced motion
+    // before the page hydrates too, when the server markup still holds it.
+    expect(typewriterClasses('cyan')).toEqual({ root: `font-mono ${toneMap.cyan.text}`, caret: 'motion-safe:animate-pulse' });
     expect(TYPEWRITER_CARET).toBe('▌');
   });
 
   it('keeps the font and colour of the text around it for the inherit tone', () => {
-    expect(typewriterClasses('inherit')).toEqual({ root: '', caret: 'animate-pulse' });
+    expect(typewriterClasses('inherit')).toEqual({ root: '', caret: 'motion-safe:animate-pulse' });
   });
 });
 

@@ -1,5 +1,5 @@
-import { Component, ElementRef, signal, viewChild } from '@angular/core';
-import { PixelBareInput } from '@pxlkit/ui-kit-angular';
+import { Component, signal } from '@angular/core';
+import { PixelBareInput, PixelButton } from '@pxlkit/ui-kit-angular';
 
 @Component({
   imports: [PixelBareInput],
@@ -60,10 +60,12 @@ export class ReadOnly {}
 export class Required {}
 
 @Component({
-  imports: [PixelBareInput],
-  template: `<input pxlBareInput #field placeholder="Focus me via ref" />`,
+  imports: [PixelBareInput, PixelButton],
+  template: `
+    <div class="flex items-center gap-2">
+      <input pxlBareInput #field placeholder="Focus me via ref" />
+      <button pxlButton size="sm" (click)="field.focus()">Focus</button>
+    </div>
+  `,
 })
-export class WithRef {
-  // The directive's host is the native input itself.
-  readonly field = viewChild.required<ElementRef<HTMLInputElement>>('field');
-}
+export class WithRef {}

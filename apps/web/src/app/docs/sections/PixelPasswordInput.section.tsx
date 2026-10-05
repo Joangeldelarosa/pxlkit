@@ -118,7 +118,7 @@ export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputD
         <li>Inline visibility toggle with localizable labels via toggleLabels</li>
         <li>Label, hint, and error slots wired through the shared FieldShell</li>
         <li>Tone, size, and surface variants matched to PixelInput</li>
-        <li>Forwarded ref to the underlying &lt;input&gt; for form-library integration</li>
+        <li>Fits form libraries: a ref on the native &lt;input&gt; (React), <code>v-model</code> (Vue), <code>ngModel</code> or reactive forms (Angular)</li>
         <li>Toggle button reflects state via aria-pressed for assistive tech</li>
       </ul>
     <dl className="docs-meta">

@@ -27,20 +27,21 @@ const api: FrameworkApiReferences = {
       {
         name: 'PixelHeroSection',
         props: [
-          { name: 'variant', type: "'centered' | 'split' | 'parallax'", default: "'centered'" },
-          { name: 'eyebrow', type: 'string' },
-          { name: 'headline', type: 'string', required: true },
+          { name: 'variant', type: "'centered' | 'split' | 'parallax'", default: "'centered'", description: "`'centered'` and `'parallax'` centre the text; `'split'` puts the `media` in a column beside it. Default `'centered'`." },
+          { name: 'eyebrow', type: 'string', description: 'Small upper-cased line above the headline, in the tone.' },
+          { name: 'headline', type: 'string', required: true, description: "The headline: the page's `<h1>`, unless `as` sets another level." },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h1'", description: "Element of the headline. Default `'h1'`, the page's heading: a hero embedded under the page's own `<h1>` (a demo, a template) takes a lower level." },
           { name: 'headlineEffect', type: "'typewriter' | 'glitch' | 'none'", default: "'none'", description: "Animates the headline: `'typewriter'` types it out once — screen readers get the whole headline from the start — and `'glitch'` plays PixelGlitch over it. Both hold still when the user prefers reduced motion. Default `'none'`." },
-          { name: 'subline', type: 'string' },
-          { name: 'primaryCta', type: 'React.ReactNode' },
-          { name: 'secondaryCta', type: 'React.ReactNode' },
-          { name: 'install', type: 'React.ReactNode' },
-          { name: 'meta', type: 'React.ReactNode' },
-          { name: 'media', type: 'React.ReactNode' },
-          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'" },
-          { name: 'density', type: "'compact' | 'comfortable'", default: "'comfortable'" },
-          { name: 'minHeight', type: "'sm' | 'md' | 'lg' | 'fullscreen'", default: "'md'" },
-          { name: 'surface', type: "'pixel' | 'linear'" },
+          { name: 'subline', type: 'string', description: 'Paragraph under the headline.' },
+          { name: 'primaryCta', type: 'React.ReactNode', description: 'First call to action.' },
+          { name: 'secondaryCta', type: 'React.ReactNode', description: 'Second call to action, after the first.' },
+          { name: 'install', type: 'React.ReactNode', description: 'Install snippet under the calls to action.' },
+          { name: 'meta', type: 'React.ReactNode', description: 'Meta line at the end of the text.' },
+          { name: 'media', type: 'React.ReactNode', description: 'Media, placed by the `variant`: beside the text, behind it or below it.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: "Tone of the eyebrow. Default `'neutral'`." },
+          { name: 'density', type: "'compact' | 'comfortable'", default: "'comfortable'", description: "Type sizes and vertical rhythm. Default `'comfortable'`." },
+          { name: 'minHeight', type: "'sm' | 'md' | 'lg' | 'fullscreen'", default: "'md'", description: "Minimum height of the section. Default `'md'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
         ],
         notes: [
           'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
@@ -55,7 +56,8 @@ const api: FrameworkApiReferences = {
       {
         name: 'PixelHeroSection',
         props: [
-          { name: 'headline', type: 'string', required: true, description: 'The `<h1>`.' },
+          { name: 'headline', type: 'string', required: true, description: "The headline: the page's `<h1>`, unless `as` sets another level." },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h1'", description: "Element of the headline. A hero embedded under the page's own `<h1>` (a demo, a template) takes a lower level." },
           { name: 'variant', type: "'centered' | 'split' | 'parallax'", default: "'centered'", description: '`centered` and `parallax` centre the text; `split` puts the `media` slot in a column beside it.' },
           { name: 'eyebrow', type: 'string', description: 'Small upper-cased line above the headline, in the tone.' },
           { name: 'headlineEffect', type: "'typewriter' | 'glitch' | 'none'", default: "'none'", description: "Animates the headline: `'typewriter'` types it out once — screen readers get the whole headline from the start — and `'glitch'` plays PixelGlitch over it. Both hold still when the user prefers reduced motion." },
@@ -82,7 +84,8 @@ const api: FrameworkApiReferences = {
         name: 'PixelHeroSection',
         selector: 'section[pxlHeroSection]',
         props: [
-          { name: 'headline', type: 'string', required: true, description: 'The `<h1>`.' },
+          { name: 'headline', type: 'string', required: true, description: "The headline: the page's `<h1>`, unless `as` sets another level." },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'", default: "'h1'", description: "Element of the headline. A hero embedded under the page's own `<h1>` (a demo, a template) takes a lower level." },
           { name: 'variant', type: "'centered' | 'split' | 'parallax'", default: "'centered'", description: '`centered` and `parallax` centre the text; `split` puts the `media` in a column beside it.' },
           { name: 'eyebrow', type: 'string', description: 'Small upper-cased line above the headline, in the tone.' },
           { name: 'headlineEffect', type: "'typewriter' | 'glitch' | 'none'", default: "'none'", description: "Animates the headline: `'typewriter'` types it out once — screen readers get the whole headline from the start — and `'glitch'` plays the glitch over it. Both hold still when the user prefers reduced motion." },
@@ -115,7 +118,7 @@ export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsS
         <li>Density-aware vertical rhythm (compact / comfortable) and tunable min-height</li>
         <li>Tone tokens for eyebrow accent + surface-aware typography and transitions</li>
         <li>Composable slots: eyebrow, primary/secondary CTA, install, meta and media</li>
-        <li>Semantic &lt;section&gt; with forwarded ref to HTMLElement</li>
+        <li>Semantic &lt;section&gt; whose headline level is yours to set (<code>as</code>, h1 by default)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -132,7 +135,7 @@ export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsS
       <ul className="docs-aria-patterns">
         <li><code>region</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders a <code>&lt;section&gt;</code> whose headline is the page&#39;s <code>&lt;h1&gt;</code>. A section is a landmark only once it has an accessible name: give the hero an <code>aria-label</code> (it reaches the <code>&lt;section&gt;</code>) when it should be one, for instance on a page with several landmarks.</p>
+      <p className="docs-aria-notes">Renders a <code>&lt;section&gt;</code> whose headline is the page&#39;s <code>&lt;h1&gt;</code>, or the level <code>as</code> sets for a hero embedded under the page&#39;s own <code>&lt;h1&gt;</code>. The headline is one heading with every effect: the glitch&#39;s colour copies are <code>aria-hidden</code> spans inside it. A section is a landmark only once it has an accessible name: give the hero an <code>aria-label</code> (it reaches the <code>&lt;section&gt;</code>) when it should be one, for instance on a page with several landmarks.</p>
     </section>
     <section aria-labelledby="pixel-hero-section-usage">
       <h3 id="pixel-hero-section-usage">Usage</h3>
@@ -450,6 +453,59 @@ import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
   \`,
 })
 export class GlitchHeadline {}`}
+        />
+      </article>
+      <article className="docs-example" id="example-heading-level">
+        <h4>Heading level</h4>
+        <FrameworkCode
+          variant="docs"
+          label={'Heading level code'}
+          react={`import { PixelHeroSection } from '@pxlkit/ui-kit';
+
+export function HeadingLevel() {
+  return (
+    <PixelHeroSection
+      as="h2"
+      density="compact"
+      minHeight="sm"
+      eyebrow="Embedded"
+      headline="A hero inside a page"
+      subline="Its headline is an h2, under the page's own h1."
+    />
+  )
+}`}
+          vue={`<script setup lang="ts">
+import { PixelHeroSection } from '@pxlkit/ui-kit-vue';
+</script>
+
+<template>
+  <PixelHeroSection
+    as="h2"
+    density="compact"
+    min-height="sm"
+    eyebrow="Embedded"
+    headline="A hero inside a page"
+    subline="Its headline is an h2, under the page's own h1."
+  />
+</template>`}
+          angular={`import { Component } from '@angular/core';
+import { PixelHeroSection } from '@pxlkit/ui-kit-angular';
+
+@Component({
+  imports: [PixelHeroSection],
+  template: \`
+    <section
+      pxlHeroSection
+      as="h2"
+      density="compact"
+      minHeight="sm"
+      eyebrow="Embedded"
+      headline="A hero inside a page"
+      subline="Its headline is an h2, under the page's own h1."
+    ></section>
+  \`,
+})
+export class HeadingLevel {}`}
         />
       </article>
     </section>

@@ -1,4 +1,3 @@
-import React from 'react'
 import { PixelSpinner } from './PixelSpinner'
 
 export function Default() {

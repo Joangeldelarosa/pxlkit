@@ -97,13 +97,13 @@ export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProp
   return (
     <section aria-labelledby={'pixel-button-heading'} className={className} data-status='stable'>
       <h2 id='pixel-button-heading'>PixelButton</h2>
-      <p className="docs-lead">Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and an asChild slot pattern for wrapping links or routers.</p>
+      <p className="docs-lead">Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and a link form for anchors and router links (<code>asChild</code> in React and Vue, <code>a[pxlButton]</code> in Angular).</p>
       <ul className="docs-highlights">
         <li>Four variants — solid, soft, outline, ghost — across seven tones</li>
         <li>Loading state pins the rendered width to prevent collapse when text swaps to spinner</li>
-        <li>asChild slot pattern lets you wrap &lt;a&gt;/&lt;Link&gt; while keeping all styling</li>
+        <li>Styles a link or router link as the button: <code>asChild</code> in React and Vue, <code>&lt;a pxlButton&gt;</code> in Angular</li>
         <li>Pixel and linear surfaces inherit from PxlKitSurfaceProvider</li>
-        <li>Forwards refs and accepts every native &lt;button&gt; attribute</li>
+        <li>Accepts every native &lt;button&gt; attribute</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>
@@ -120,7 +120,7 @@ export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProp
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders a native &lt;button&gt; by default so keyboard semantics come for free. When using asChild with an anchor, the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control; disabled buttons skip shadow/transform affordances.</p>
+      <p className="docs-aria-notes">Renders a native &lt;button&gt; by default so keyboard semantics come for free. When it styles an anchor (<code>asChild</code>, or <code>a[pxlButton]</code> in Angular), the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control; disabled buttons skip shadow/transform affordances.</p>
       <h4>Keyboard</h4>
       <table className="docs-keyboard">
         <thead>
@@ -569,7 +569,7 @@ export class FullWidth {}`}
 export function AsChild() {
   return (
     <PixelButton asChild tone="cyan">
-      <a href="https://pxlkit.dev" target="_blank" rel="noreferrer">
+      <a href="https://pxlkit.xyz" target="_blank" rel="noreferrer">
         External link
       </a>
     </PixelButton>
@@ -581,7 +581,7 @@ import { PixelButton } from '@pxlkit/ui-kit-vue';
 
 <template>
   <PixelButton as-child tone="cyan">
-    <a href="https://pxlkit.dev" target="_blank" rel="noreferrer">External link</a>
+    <a href="https://pxlkit.xyz" target="_blank" rel="noreferrer">External link</a>
   </PixelButton>
 </template>`}
           angular={`import { Component } from '@angular/core';
@@ -590,7 +590,7 @@ import { PixelButton } from '@pxlkit/ui-kit-angular';
 @Component({
   imports: [PixelButton],
   template: \`
-    <a pxlButton tone="cyan" href="https://pxlkit.dev" target="_blank" rel="noreferrer">External link</a>
+    <a pxlButton tone="cyan" href="https://pxlkit.xyz" target="_blank" rel="noreferrer">External link</a>
   \`,
 })
 export class AsChild {}`}

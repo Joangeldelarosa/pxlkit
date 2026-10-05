@@ -39,7 +39,10 @@ export class PixelBox {
   readonly radius = input<BoxRadius>();
   /** Draw the tone border; on for `outline`, off otherwise, when unset. */
   readonly border = input<boolean | undefined, unknown>(undefined, { transform: optionalBoolean });
-  /** Surface drop shadow. */
+  /**
+   * Surface drop shadow. On pixel it shows with a `radius` only: the
+   * default corners are cut, and a drop shadow cannot show past them.
+   */
   readonly shadow = input(false, { transform: booleanOr(false) });
 
   private readonly effectiveSurface = injectEffectiveSurface(() => this.surface());

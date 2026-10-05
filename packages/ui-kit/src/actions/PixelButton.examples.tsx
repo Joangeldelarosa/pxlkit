@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelButton } from '../actions';
 
 export function Default() {
@@ -92,7 +91,7 @@ export function FullWidth() {
 export function AsChild() {
   return (
     <PixelButton asChild tone="cyan">
-      <a href="https://pxlkit.dev" target="_blank" rel="noreferrer">
+      <a href="https://pxlkit.xyz" target="_blank" rel="noreferrer">
         External link
       </a>
     </PixelButton>

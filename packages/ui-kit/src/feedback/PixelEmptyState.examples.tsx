@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelEmptyState } from '../feedback';
 import { PixelButton } from '../actions';
 

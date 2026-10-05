@@ -80,10 +80,10 @@ export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSection
       <h2 id='pixel-text-link-heading'>PixelTextLink</h2>
       <p className="docs-lead">Inline anchor or button styled as a tone-coloured underlined link for prose, callouts, and CTAs.</p>
       <ul className="docs-highlights">
-        <li>Polymorphic: renders &lt;a&gt; when <code>href</code> is provided, &lt;button type=&quot;button&quot;&gt; otherwise</li>
+        <li>Polymorphic: an &lt;a&gt; with <code>href</code>, a &lt;button&gt; without (in Angular, <code>a[pxlTextLink]</code> or <code>button[pxlTextLink]</code>)</li>
         <li>Seven brand tones (cyan default) with consistent focus ring and hover behaviour</li>
-        <li>Surface-aware typography (pixel vs linear) via shared surface context</li>
-        <li>Forwards native anchor/button attributes (target, rel, onClick, aria-*, etc.)</li>
+        <li>Surface-aware typography (pixel vs linear)</li>
+        <li>Takes native anchor/button attributes and listeners (target, rel, aria-*, click, etc.)</li>
         <li>SSR-safe and tree-shakable; zero runtime state</li>
       </ul>
     <dl className="docs-meta">
@@ -139,21 +139,21 @@ export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSection
         react={`import { PixelTextLink } from '@pxlkit/ui-kit';
 
 export function Default() {
-  return <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>;
+  return <PixelTextLink href="https://pxlkit.xyz">Read the docs</PixelTextLink>;
 }`}
         vue={`<script setup lang="ts">
 import { PixelTextLink } from '@pxlkit/ui-kit-vue';
 </script>
 
 <template>
-  <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>
+  <PixelTextLink href="https://pxlkit.xyz">Read the docs</PixelTextLink>
 </template>`}
         angular={`import { Component } from '@angular/core';
 import { PixelTextLink } from '@pxlkit/ui-kit-angular';
 
 @Component({
   imports: [PixelTextLink],
-  template: \`<a pxlTextLink href="https://pxlkit.dev">Read the docs</a>\`,
+  template: \`<a pxlTextLink href="https://pxlkit.xyz">Read the docs</a>\`,
 })
 export class Default {}`}
       />
@@ -168,21 +168,21 @@ export class Default {}`}
           react={`import { PixelTextLink } from '@pxlkit/ui-kit';
 
 export function Default() {
-  return <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>;
+  return <PixelTextLink href="https://pxlkit.xyz">Read the docs</PixelTextLink>;
 }`}
           vue={`<script setup lang="ts">
 import { PixelTextLink } from '@pxlkit/ui-kit-vue';
 </script>
 
 <template>
-  <PixelTextLink href="https://pxlkit.dev">Read the docs</PixelTextLink>
+  <PixelTextLink href="https://pxlkit.xyz">Read the docs</PixelTextLink>
 </template>`}
           angular={`import { Component } from '@angular/core';
 import { PixelTextLink } from '@pxlkit/ui-kit-angular';
 
 @Component({
   imports: [PixelTextLink],
-  template: \`<a pxlTextLink href="https://pxlkit.dev">Read the docs</a>\`,
+  template: \`<a pxlTextLink href="https://pxlkit.xyz">Read the docs</a>\`,
 })
 export class Default {}`}
         />
@@ -331,7 +331,7 @@ export class Surfaces {}`}
 export function ExternalLink() {
   return (
     <PixelTextLink
-      href="https://pxlkit.dev"
+      href="https://pxlkit.xyz"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -344,14 +344,14 @@ import { PixelTextLink } from '@pxlkit/ui-kit-vue';
 </script>
 
 <template>
-  <PixelTextLink href="https://pxlkit.dev" target="_blank" rel="noopener noreferrer">Open in new tab</PixelTextLink>
+  <PixelTextLink href="https://pxlkit.xyz" target="_blank" rel="noopener noreferrer">Open in new tab</PixelTextLink>
 </template>`}
           angular={`import { Component } from '@angular/core';
 import { PixelTextLink } from '@pxlkit/ui-kit-angular';
 
 @Component({
   imports: [PixelTextLink],
-  template: \`<a pxlTextLink href="https://pxlkit.dev" target="_blank" rel="noopener noreferrer">Open in new tab</a>\`,
+  template: \`<a pxlTextLink href="https://pxlkit.xyz" target="_blank" rel="noopener noreferrer">Open in new tab</a>\`,
 })
 export class ExternalLink {}`}
         />
@@ -367,7 +367,7 @@ export function InlineInProse() {
   return (
     <p className="max-w-md">
       Built with{' '}
-      <PixelTextLink href="https://pxlkit.dev" tone="green">
+      <PixelTextLink href="https://pxlkit.xyz" tone="green">
         pxlkit
       </PixelTextLink>
       , a tone-coloured component library for retro interfaces.
@@ -380,7 +380,7 @@ import { PixelTextLink } from '@pxlkit/ui-kit-vue';
 
 <template>
   <p class="max-w-md">
-    Built with <PixelTextLink href="https://pxlkit.dev" tone="green">pxlkit</PixelTextLink>, a tone-coloured component
+    Built with <PixelTextLink href="https://pxlkit.xyz" tone="green">pxlkit</PixelTextLink>, a tone-coloured component
     library for retro interfaces.
   </p>
 </template>`}
@@ -391,7 +391,7 @@ import { PixelTextLink } from '@pxlkit/ui-kit-angular';
   imports: [PixelTextLink],
   template: \`
     <p class="max-w-md">
-      Built with <a pxlTextLink href="https://pxlkit.dev" tone="green">pxlkit</a>, a tone-coloured component library for
+      Built with <a pxlTextLink href="https://pxlkit.xyz" tone="green">pxlkit</a>, a tone-coloured component library for
       retro interfaces.
     </p>
   \`,

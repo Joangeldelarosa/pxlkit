@@ -22,7 +22,8 @@ export interface PixelInputGroupProps extends React.HTMLAttributes<HTMLDivElemen
    * Accessible name for the group. Strongly recommended since this primitive
    * visually joins multiple form controls (e.g. country code + phone) — without
    * an accessible name a screen reader user has no idea what the group represents.
-   * In dev, a missing name on a group of >1 child logs a warning.
+   * In development, a group of more than one child without a name logs a
+   * warning.
    */
   'aria-label'?: string;
   /** Id of the element that names the group, in place of `aria-label`. */

@@ -1,14 +1,25 @@
 {
   "name": "@pxlkit/ui-kit",
   "version": "2.2.0",
-  "description": "Production-grade React UI kit with retro-future aesthetic: 111 production-ready components, WCAG 2.1 AA, surface system (pixel/linear), dark mode, 30-gate coherence audit, full SSOT documentation.",
+  "description": "Retro pixel-art React UI kit: 111 production-ready components (forms, modals, tables, charts, toasts). TypeScript, Tailwind v4. Also for Vue & Angular.",
   "author": {
     "name": "Joangel De La Rosa",
     "url": "https://github.com/joangeldelarosa"
   },
   "license": "MIT",
-  "repository": "https://github.com/Joangeldelarosa/pxlkit",
+  "homepage": "https://pxlkit.xyz/ui-kit",
+  "bugs": {
+    "url": "https://github.com/Joangeldelarosa/pxlkit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joangeldelarosa/pxlkit.git",
+    "directory": "packages/ui-kit"
+  },
   "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -86,29 +97,28 @@
     "zod": "^4.4.3"
   },
   "keywords": [
-    "pixel-art",
-    "ui-kit",
     "react",
-    "components",
-    "retro",
-    "pxlkit",
+    "react-components",
     "react-ui-kit",
     "react-component-library",
+    "ui-kit",
+    "ui-components",
+    "component-library",
+    "design-system",
+    "pixel-art",
+    "pixel-art-ui",
+    "retro",
+    "retro-ui",
+    "8-bit",
+    "8bit",
+    "tailwindcss",
     "tailwind-css",
     "typescript",
-    "pixel-buttons",
-    "pixel-forms",
-    "pixel-modal",
-    "pixel-table",
-    "retro-design-system",
-    "toast-notifications",
-    "dark-mode",
-    "accessible-ui",
-    "mit-react-ui",
+    "nextjs",
     "tree-shakeable",
-    "next-js",
+    "accessible",
+    "dark-mode",
     "game-ui",
-    "indie-game-ui",
-    "8-bit-ui"
+    "pxlkit"
   ]
 }

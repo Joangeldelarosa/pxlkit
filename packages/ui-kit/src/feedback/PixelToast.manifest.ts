@@ -19,7 +19,7 @@ export default defineManifest({
   since: '1.0.0',
   status: 'stable',
   description:
-    'Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast().',
+    'Single toast notification card with title, message, tone, optional icon/action, loading spinner, and an auto-dismiss countdown bar — usually rendered by PxlKitToastProvider via useToast() (injectToast() in Angular).',
   highlights: [
     'Seven tones with matching border, text color, and HP-bar accent on pixel surface.',
     'Auto-dismiss with a visual progress bar; hover, focus, a hidden page or a background window pause the countdown.',

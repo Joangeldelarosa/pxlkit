@@ -125,7 +125,7 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
       <h2 id='pixel-date-range-picker-heading'>PixelDateRangePicker</h2>
       <p className="docs-lead">Accessible date range picker with one or two-month grid, hover preview, presets, and min/max constraints.</p>
       <ul className="docs-highlights">
-        <li>Controlled and uncontrolled usage via value/defaultValue + onChange</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — or uncontrolled with <code>defaultValue</code></li>
         <li>One or two-month calendar with hover preview while picking</li>
         <li>Auto-swap of from/to when the second pick precedes the first</li>
         <li>Optional quick-select presets and clearable trigger</li>
@@ -240,7 +240,7 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
         variant="docs"
         label={'PixelDateRangePicker usage'}
         react={`import { useState } from 'react';
-import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [range, setRange] = useState<DateRangeValue>({});
@@ -279,11 +279,12 @@ export class Default {
       <h3>Examples</h3>
       <article className="docs-example" id="example-default">
         <h4>Default</h4>
+        <p>The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today&#39;s mark can differ from the browser&#39;s.</p>
         <FrameworkCode
           variant="docs"
           label={'Default code'}
           react={`import { useState } from 'react';
-import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit';
 
 export function Default() {
   const [range, setRange] = useState<DateRangeValue>({});
@@ -324,7 +325,7 @@ export class Default {
           variant="docs"
           label={'With Presets code'}
           react={`import { useState } from 'react';
-import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit';
 
 export function WithPresets() {
   const [range, setRange] = useState<DateRangeValue>({});
@@ -401,7 +402,7 @@ export class WithPresets {
           variant="docs"
           label={'Single Month code'}
           react={`import { useState } from 'react';
-import { PixelDateRangePicker, DateRangeValue } from '@pxlkit/ui-kit';
+import { PixelDateRangePicker, type DateRangeValue } from '@pxlkit/ui-kit';
 
 export function SingleMonth() {
   const [range, setRange] = useState<DateRangeValue>({});

@@ -26,7 +26,7 @@ const meta: Meta = {
   parameters: {
     controls: { disable: true },
     docs: {
-      description: { component: 'Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and an asChild slot pattern for wrapping links or routers.' },
+      description: { component: 'Versatile button primitive with tone, size, variant, surface, icon slots, loading state, and a link form for anchors and router links (`asChild` in React and Vue, `a[pxlButton]` in Angular).' },
     },
   },
 };
@@ -149,7 +149,7 @@ export const AsChild: Story = {
   render: () => ({ props: { example: AsChildExample }, template: '<ng-container *ngComponentOutlet="example" />' }),
   parameters: {
     docs: {
-      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelButton } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelButton],\n  template: `\n    <a pxlButton tone="cyan" href="https://pxlkit.dev" target="_blank" rel="noreferrer">External link</a>\n  `,\n})\nexport class AsChild {}' },
+      source: { language: 'typescript', code: 'import { Component } from \'@angular/core\';\nimport { PixelButton } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelButton],\n  template: `\n    <a pxlButton tone="cyan" href="https://pxlkit.xyz" target="_blank" rel="noreferrer">External link</a>\n  `,\n})\nexport class AsChild {}' },
     },
   },
 };

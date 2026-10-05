@@ -27,13 +27,14 @@ const meta: Meta = {
 export default meta;
 type Story = StoryObj;
 
-/** Default */
+/** Default — The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today's mark can differ from the browser's. */
 export const Default: Story = {
   name: 'Default',
   tags: ['example-default'],
   render: () => ({ props: { example: DefaultExample }, template: '<ng-container *ngComponentOutlet="example" />' }),
   parameters: {
     docs: {
+      description: { story: 'The calendar renders when the popover opens, in the browser: a server render holds the trigger alone, so no current month or today\'s mark can differ from the browser\'s.' },
       source: { language: 'typescript', code: 'import { Component, signal } from \'@angular/core\';\nimport { PixelDatePicker } from \'@pxlkit/ui-kit-angular\';\n\n@Component({\n  imports: [PixelDatePicker],\n  template: `<pxl-date-picker label="Pick a date" placeholder="Select date" [(value)]="date" />`,\n})\nexport class Default {\n  readonly date = signal<Date | null>(null);\n}' },
     },
   },

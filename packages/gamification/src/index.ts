@@ -57,6 +57,7 @@ export { FloatingSkull } from './icons/floating-skull';
 export { CardDraw } from './icons/card-draw';
 
 import type { IconPack } from '@pxlkit/core/vanilla';
+import packageJson from '../package.json';
 import { Trophy } from './icons/trophy';
 import { Star } from './icons/star';
 import { Sword } from './icons/sword';
@@ -109,6 +110,10 @@ import { CoinFlip } from './icons/coin-flip';
 import { FloatingSkull } from './icons/floating-skull';
 import { CardDraw } from './icons/card-draw';
 
+// The published version: package.json is its one source. Read here, outside
+// the pack, so a bundler still drops the pack when nothing imports it.
+const { version } = packageJson;
+
 /**
  * The Gamification icon pack.
  * Contains icons for game mechanics, achievements, rewards, and RPG elements.
@@ -130,6 +135,6 @@ export const GamificationPack: IconPack = {
     // New animated
     GlowingSword, FloatingGem, HeartPulse, CoinFlip, FloatingSkull, CardDraw,
   ],
-  version: '1.2.4',
+  version,
   author: 'pxlkit',
 };

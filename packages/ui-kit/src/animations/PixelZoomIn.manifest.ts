@@ -11,8 +11,8 @@ export default defineManifest({
   highlights: [
     'Configurable duration, delay, easing, and start scale',
     'Supports mount, hover, and view-based triggers',
-    'Respects prefers-reduced-motion via shared animation hook',
-    'Forwards ref to the wrapping div and fires onComplete after final iteration',
+    'Respects prefers-reduced-motion automatically',
+    'Signals the end of its last iteration: `onComplete` (React), `@complete` (Vue), `(complete)` (Angular)',
   ],
   examples: [
     { id: 'default', label: 'Default', Component: Default },

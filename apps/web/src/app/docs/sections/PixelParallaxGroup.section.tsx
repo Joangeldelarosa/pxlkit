@@ -74,8 +74,7 @@ export function PixelParallaxGroupDocsSection({ className }: PixelParallaxGroupD
       <ul className="docs-highlights">
         <li>Establishes a shared viewport for parallax layers</li>
         <li>Applies position: relative and overflow: hidden automatically</li>
-        <li>Polymorphic tag: div, section, header, or main</li>
-        <li>Forwarded ref for imperative access</li>
+        <li>Polymorphic tag: div, section, header, or main (in Angular, the element you put <code>pxlParallaxGroup</code> on)</li>
         <li>SSR-safe — no measurement or window APIs</li>
       </ul>
     <dl className="docs-meta">

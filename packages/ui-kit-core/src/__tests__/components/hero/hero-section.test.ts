@@ -17,6 +17,8 @@ import {
   tone,
 } from '../../../index';
 
+const FONT_WEIGHT = /^font-(thin|extralight|light|normal|medium|semibold|bold|extrabold|black)$/;
+
 describe('hero section layout', () => {
   it('centres the text of centered and parallax heroes and start-aligns split ones', () => {
     expect(heroAlign('centered')).toBe('center');
@@ -102,13 +104,25 @@ describe('hero section recipes', () => {
       root: `relative w-full flex flex-col justify-center min-h-screen ${s.transition}`,
       text: 'flex flex-col',
       eyebrow: `text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] max-w-full break-words ${tone.neutral.text}`,
-      headline: `text-3xl sm:text-4xl lg:text-5xl ${s.fontDisplay} font-bold leading-tight text-retro-text max-w-full break-words`,
+      headline: 'text-3xl sm:text-4xl lg:text-5xl tracking-tight font-bold leading-tight text-retro-text max-w-full break-words',
       subline: `text-base sm:text-lg ${s.font} text-retro-muted leading-relaxed max-w-prose break-words mt-2`,
       ctas: 'mt-5',
       install: 'mt-6',
       meta: 'mt-4',
       media: 'mt-10 w-full',
     });
+  });
+
+  // Regression: linear's display face carries `font-semibold`, which
+  // Tailwind emits after `font-bold`, so the linear headline was semibold.
+  it('sets the headline bold on both surfaces, in the display face', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const { headline } = heroSectionClasses(surface, { tone: 'cyan', density: 'comfortable', minHeight: 'md', align: 'start', hasEyebrow: false });
+      const classes = headline.split(' ');
+      expect(classes.filter((name) => FONT_WEIGHT.test(name))).toEqual(['font-bold']);
+      const face = surfaceClasses(surface).fontDisplay.split(' ').filter((name) => !FONT_WEIGHT.test(name));
+      expect(classes).toEqual(expect.arrayContaining(face));
+    }
   });
 
   // Regression: the eyebrow's `tracking-[0.18em]` followed the display

@@ -1,4 +1,3 @@
-import React from 'react';
 import { PxlKitLocaleProvider } from './PxlKitLocaleProvider';
 
 export function Default() {

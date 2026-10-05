@@ -104,8 +104,8 @@ export function PixelZoomInDocsSection({ className }: PixelZoomInDocsSectionProp
       <ul className="docs-highlights">
         <li>Configurable duration, delay, easing, and start scale</li>
         <li>Supports mount, hover, and view-based triggers</li>
-        <li>Respects prefers-reduced-motion via shared animation hook</li>
-        <li>Forwards ref to the wrapping div and fires onComplete after final iteration</li>
+        <li>Respects prefers-reduced-motion automatically</li>
+        <li>Signals the end of its last iteration: <code>onComplete</code> (React), <code>@complete</code> (Vue), <code>(complete)</code> (Angular)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

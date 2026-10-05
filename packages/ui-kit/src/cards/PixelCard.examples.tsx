@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelCard } from './PixelCard';
 
 export function Default() {

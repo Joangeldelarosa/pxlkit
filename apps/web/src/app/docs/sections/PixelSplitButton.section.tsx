@@ -93,7 +93,7 @@ export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsS
       <ul className="docs-highlights">
         <li>Primary click handler plus a menu of alternate actions in a single control</li>
         <li>Inherits tone + surface theming from the design system</li>
-        <li>Closes on outside click via useClickOutside</li>
+        <li>Its menu closes on an outside press, Escape or Tab</li>
         <li>aria-haspopup=&quot;menu&quot; + aria-expanded on the chevron trigger</li>
       </ul>
     <dl className="docs-meta">

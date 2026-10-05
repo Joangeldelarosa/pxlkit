@@ -11,9 +11,9 @@ export default defineManifest({
     'Dropzone + click-to-browse file uploader with accept/size/count validation, image thumbnails, and per-item removal.',
   highlights: [
     'Drag-and-drop or click/keyboard to open the native file picker',
-    'Validates against accept, maxSize, and maxFiles with onReject callback',
+    'Validates against accept, maxSize, and maxFiles and reports the rejected files (`onReject`, `@reject` in Vue, `(reject)` in Angular)',
     'Image previews via object URLs with automatic revoke on unmount',
-    'Controlled or uncontrolled file list via useControllableState',
+    'Controlled file list — `value` + `onChange` (React), `v-model` (Vue), `[(value)]` or forms (Angular) — or uncontrolled with `defaultValue`',
     'Surface-aware styling with size, label, hint, and error props',
   ],
   examples: [

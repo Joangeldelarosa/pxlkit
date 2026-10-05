@@ -7,13 +7,13 @@
 ### PixelMouseParallax
 - stable · since 1.6.0
 - Cursor-tracking parallax layer that translates children based on mouse position with smooth lerp.
-- Smoothed translate3d follow with configurable strength · Invert mode to repel children from the cursor · GPU-accelerated via will-change-transform · Forwards ref to the underlying div
+- Smoothed translate3d follow with configurable strength · Invert mode to repel its content from the cursor · GPU-accelerated via will-change-transform
 - related: PixelParallaxGroup, PixelParallaxLayer, PixelScrollParallax
 
 ### PixelParallaxGroup
 - stable · since 1.6.0
 - Perspective/viewport container that clips parallax children within a shared overflow-hidden, relative-positioned area.
-- Establishes a shared viewport for parallax layers · Applies position: relative and overflow: hidden automatically · Polymorphic tag: div, section, header, or main · Forwarded ref for imperative access · SSR-safe — no measurement or window APIs
+- Establishes a shared viewport for parallax layers · Applies position: relative and overflow: hidden automatically · Polymorphic tag: div, section, header, or main (in Angular, the element you put `pxlParallaxGroup` on) · SSR-safe — no measurement or window APIs
 - related: PixelParallaxLayer, PixelMouseParallax
 
 ### PixelParallaxLayer

@@ -37,7 +37,7 @@ export type PixelAvatarGroupProps = ExtractPublicPropTypes<typeof avatarGroupPro
  *   <PixelAvatar v-for="user in users" :key="user.id" :name="user.name" />
  * </PixelAvatarGroup>
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelAvatarGroup',
   props: avatarGroupProps,
   slots: Object as SlotsType<{

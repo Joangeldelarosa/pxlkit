@@ -203,8 +203,8 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
         <li>Four anchor sides (right/left/top/bottom) and five sizes (sm/md/lg/xl/full)</li>
         <li>Focus trap, scroll lock and Escape-to-close out of the box</li>
         <li>WCAG 4.1.2 compliant: requires <code>title</code> or <code>aria-label</code> for accessible name</li>
-        <li>Surface-aware borders inherited from theme context</li>
-        <li>Composable subparts: PixelDrawer.Header / Body / Footer</li>
+        <li>Surface-aware borders from the nearest PxlKitSurfaceProvider</li>
+        <li>Composable subparts: header, body and footer (<code>PixelDrawer.Header</code> in React, <code>PixelDrawerHeader</code> in Vue, <code>pxl-drawer-header</code> in Angular, and so on)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

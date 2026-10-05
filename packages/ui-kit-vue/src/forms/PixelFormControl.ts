@@ -13,7 +13,7 @@ import { useFormField, useFormItem } from './_internal/form-context.js';
  * @example
  * <PixelFormControl><PixelInput v-bind="field" /></PixelFormControl>
  */
-export default defineComponent({
+export default /* @__PURE__ */ defineComponent({
   name: 'PixelFormControl',
   inheritAttrs: false,
   slots: Object as SlotsType<{

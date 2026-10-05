@@ -77,7 +77,7 @@ export function PixelMenubarDocsSection({ className }: PixelMenubarDocsSectionPr
         <li>Nested submenus with right-arrow open / left-arrow close</li>
         <li>WAI-ARIA menubar keyboard model: arrows, Home/End, Enter/Space, Escape and Tab</li>
         <li>Shortcut labels and disabled / separator items</li>
-        <li>Surface-aware (border, radius, font) via Surface context</li>
+        <li>Surface-aware (border, radius, font)</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

@@ -103,7 +103,7 @@ export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSecti
       <h2 id='pixel-segmented-heading'>PixelSegmented</h2>
       <p className="docs-lead">Single-select segmented control for toggling between a small set of mutually exclusive options inline.</p>
       <ul className="docs-highlights">
-        <li>Controlled via value + onChange(next: string) over a list of options.</li>
+        <li>Controlled — <code>value</code> + <code>onChange</code> (React), <code>v-model</code> (Vue), <code>[(value)]</code> or forms (Angular) — over a list of options.</li>
         <li>Compact horizontal layout for 2-5 options that share visual real estate.</li>
         <li>Seven tones and pixel/linear surfaces share the kit-wide design tokens.</li>
         <li>Optional name emits a hidden input so it serializes inside native forms.</li>

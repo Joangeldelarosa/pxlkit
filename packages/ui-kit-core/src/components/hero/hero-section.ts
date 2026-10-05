@@ -123,9 +123,11 @@ export function heroSectionClasses(
       'uppercase tracking-[0.18em] max-w-full break-words',
       toneTokens[tone].text,
     ),
+    // Bold on both surfaces: linear's display face carries its own weight
+    // (semibold), so the headline takes its tracking alone.
     headline: cn(
       heroHeadlineSizeClasses[density],
-      s.fontDisplay,
+      surface === 'pixel' ? s.fontDisplay : 'tracking-tight',
       'font-bold leading-tight text-retro-text max-w-full break-words',
       hasEyebrow && space.eyebrowToHeadline,
     ),

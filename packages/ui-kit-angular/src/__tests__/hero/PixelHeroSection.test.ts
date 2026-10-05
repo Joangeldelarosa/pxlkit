@@ -6,7 +6,7 @@
 import { Component, signal } from '@angular/core';
 import { TestBed, type ComponentFixture } from '@angular/core/testing';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { PixelHeroSection, type HeroHeadlineEffect, type HeroVariant } from '../../public-api';
+import { PixelHeroSection, type HeroHeadlineEffect, type HeroVariant, type SectionHeaderLevel } from '../../public-api';
 
 @Component({
   imports: [PixelHeroSection],
@@ -137,18 +137,51 @@ describe('PixelHeroSection', () => {
       expect(section.querySelectorAll('h1')).toHaveLength(1);
     });
 
-    it('glitches the headline, whose copies are hidden from assistive technology', async () => {
+    // Regression: the glitch wrapped the heading and repeated it in its two
+    // colour layers, so the page had three <h1>; inside the heading, the
+    // layers still put its text in the document three times.
+    it('glitches the headline inside its one heading, its text once, the copies drawn by CSS', async () => {
       const { section } = await renderEffect('glitch', 'Signal lost');
-      const headings = Array.from(section.querySelectorAll('h1'));
-      expect(headings).toHaveLength(3);
-      expect(headings.filter((heading) => heading.closest('[aria-hidden="true"]'))).toHaveLength(2);
-      expect(headings.every((heading) => heading.textContent === 'Signal lost')).toBe(true);
+      expect(section.querySelectorAll('h1, h2, h3, h4, h5, h6')).toHaveLength(1);
+      const heading = section.querySelector('h1')!;
+      expect(heading.textContent).toBe('Signal lost');
+      expect(heading.querySelectorAll('[aria-hidden]')).toHaveLength(0);
+      const glitch = heading.querySelector('span')!;
+      expect(glitch.dataset['text']).toBe('Signal lost');
+      expect(glitch.classList.contains('pxl-glitch-copies')).toBe(true);
     });
 
     it('renders the plain headline by default', async () => {
       const { section } = await renderEffect('none', 'Plain');
-      expect(section.querySelector('h1')!.innerHTML).toBe('Plain');
+      const heading = section.querySelector('h1')!;
+      expect(heading.children).toHaveLength(0);
+      expect(heading.textContent).toBe('Plain');
     });
+  });
+
+  it('sets the headline at the level `as` gives, in the same type, with any effect', async () => {
+    @Component({
+      imports: [PixelHeroSection],
+      template: `
+        <section pxlHeroSection headline="Default"></section>
+        <section pxlHeroSection as="h2" headline="Plain"></section>
+        <section pxlHeroSection as="h3" headline="Typed" headlineEffect="typewriter"></section>
+        <section pxlHeroSection [as]="level()" headline="Glitched" headlineEffect="glitch"></section>
+      `,
+    })
+    class LevelHost {
+      readonly level = signal<SectionHeaderLevel | undefined>('h6');
+    }
+    const fixture = TestBed.createComponent(LevelHost);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    const levels = () => Array.from(root.querySelectorAll('h1, h2, h3, h4, h5, h6'), (heading) => heading.tagName);
+    expect(levels()).toEqual(['H1', 'H2', 'H3', 'H6']);
+    expect(root.querySelector('h2')!.className).toBe(root.querySelector('h1')!.className);
+    expect(root.querySelector('h6')!.textContent).toContain('Glitched');
+    fixture.componentInstance.level.set(undefined);
+    await fixture.whenStable();
+    expect(levels()).toEqual(['H1', 'H2', 'H3', 'H1']);
   });
 });
 

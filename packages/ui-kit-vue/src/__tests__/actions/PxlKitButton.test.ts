@@ -28,13 +28,21 @@ describe('PxlKitButton', () => {
     expect(wrapper.classes()).toEqual(expect.arrayContaining(['h-8', 'w-8', 'text-retro-red']));
   });
 
-  it('disables the button and drops its shadows', () => {
+  it('disables the button and drops its moves', () => {
     const enabled = mount(PxlKitButton, { props: { label: 'Go' } });
     const disabled = mount(PxlKitButton, { props: { label: 'Go', disabled: true } });
     expect(enabled.attributes('disabled')).toBeUndefined();
-    expect(enabled.classes()).toContain('pxl-shadow');
+    expect(enabled.classes()).toEqual(expect.arrayContaining(['pxl-nudge-hover', 'pxl-nudge-active']));
     expect((disabled.element as HTMLButtonElement).disabled).toBe(true);
-    expect(disabled.classes()).not.toContain('pxl-shadow');
+    for (const name of ['pxl-shadow', 'pxl-nudge-hover', 'pxl-nudge-active']) expect(disabled.classes()).not.toContain(name);
+  });
+
+  it('moves a pixel button on hover and press without a drop shadow, which its cut corners would clip', () => {
+    const classes = mount(PxlKitButton, { props: { label: 'Go' } }).classes();
+    expect(classes).toContain('pxl-corner-sm');
+    for (const shadow of ['pxl-shadow', 'pxl-shadow-hover', 'pxl-shadow-active']) expect(classes).not.toContain(shadow);
+    const linear = mount(PxlKitButton, { props: { label: 'Go', surface: 'linear' } }).classes();
+    expect(linear).toEqual(expect.arrayContaining(['shadow-sm', 'hover:shadow-md', 'active:shadow-sm']));
   });
 
   it('passes attributes and listeners through to the button', async () => {

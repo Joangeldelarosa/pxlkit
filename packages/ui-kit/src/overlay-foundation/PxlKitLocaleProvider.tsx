@@ -42,10 +42,7 @@ export function usePxlKitLocale(): PxlKitLocaleContextValue {
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 export interface PxlKitLocaleProviderProps {
-  /**
-   * BCP 47 locale tag.
-   * @default "en"
-   */
+  /** BCP 47 locale tag. Default `'en'`. */
   locale?: PxlKitLocale;
   /** The part of the app that follows the locale. */
   children: React.ReactNode;

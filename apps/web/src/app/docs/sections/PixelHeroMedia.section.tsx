@@ -99,7 +99,7 @@ export function PixelHeroMediaDocsSection({ className }: PixelHeroMediaDocsSecti
         <li>Four ratio presets (1/1, 4/5, 16/10, 16/9) reserve layout to prevent CLS</li>
         <li>Optional framed border driven by surface + tone tokens</li>
         <li>Renders as semantic figure/figcaption when caption is provided</li>
-        <li>Surface-aware via useEffectiveSurface for light/dark contexts</li>
+        <li>Surface-aware (pixel / linear) frame and corners</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

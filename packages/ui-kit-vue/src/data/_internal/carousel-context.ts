@@ -18,7 +18,7 @@ export function useCarouselPosition(): Readonly<CarouselPosition> | null {
  * its position, so a slide still finds it when the consumer wraps
  * `PixelCarouselItem` in a component of their own.
  */
-export const CarouselSlidePosition = defineComponent({
+export const CarouselSlidePosition = /* @__PURE__ */ defineComponent({
   name: 'PxlCarouselSlidePosition',
   props: {
     index: { type: Number, required: true },

@@ -107,7 +107,7 @@ export class FullWidth {}
 @Component({
   imports: [PixelButton],
   template: `
-    <a pxlButton tone="cyan" href="https://pxlkit.dev" target="_blank" rel="noreferrer">External link</a>
+    <a pxlButton tone="cyan" href="https://pxlkit.xyz" target="_blank" rel="noreferrer">External link</a>
   `,
 })
 export class AsChild {}

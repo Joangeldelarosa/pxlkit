@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelBadge } from './PixelBadge';
 
 export function Default() {

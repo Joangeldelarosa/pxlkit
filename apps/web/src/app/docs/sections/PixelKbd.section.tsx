@@ -76,7 +76,7 @@ export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): Re
         <li>Semantic &lt;kbd&gt; root so assistive tech announces the key role correctly.</li>
         <li>Surface-aware: pixel chamfered border + pixel font, or linear pill.</li>
         <li>Drop-shadow depth tuned per surface for a tactile keycap feel.</li>
-        <li>Composable inline — accepts any ReactNode children to support icons or multi-character keys.</li>
+        <li>Composable inline — takes any inline content, such as icons or multi-character keys.</li>
       </ul>
     <dl className="docs-meta">
       <dt>Status</dt><dd>stable</dd>

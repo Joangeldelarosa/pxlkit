@@ -1,4 +1,3 @@
-import React from 'react';
 import { PixelBarChart } from './PixelBarChart';
 
 const sample = [

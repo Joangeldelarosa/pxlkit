@@ -25,7 +25,7 @@ export default defineManifest({
     'Auto-flip and shift via floating-ui — stays inside the viewport across all four positions.',
     'Three trigger modes (hover, focus, click) — click variant accepts pointer events and dismisses on outside click or Escape.',
     'Portal-rendered so it escapes overflow/transform ancestors without z-index gymnastics.',
-    'Controlled (`open` + `onOpenChange`) or uncontrolled (`defaultOpen`) — uses useControllableState internally.',
+    'Controlled — `open` + `onOpenChange` (React), `v-model:open` (Vue), `[(open)]` (Angular) — or uncontrolled (`defaultOpen`).',
     'Surface-aware (pixel/linear) and inherits from PxlKitSurfaceProvider when no surface prop is passed.',
   ],
   examples: [
