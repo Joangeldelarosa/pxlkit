@@ -72,7 +72,7 @@ export const dropdownItemLabelClasses = 'flex-1 truncate';
 export function dropdownShortcutClasses(surface: Surface): string {
   const s = surfaceClasses(surface);
   return cn(
-    'ml-3 inline-flex items-center gap-0.5 border px-1.5 py-0.5 text-[10px] text-retro-muted',
+    'ml-3 inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] text-retro-muted',
     s.border,
     s.radius,
     'border-retro-border',

@@ -63,3 +63,23 @@ describe('PixelProgress', () => {
     expect(root.querySelector('#none')!.children).toHaveLength(1);
   });
 });
+
+describe('PixelProgress — indeterminate, reduced motion', () => {
+  it('pulses only for a reader who allows motion: the linear fill holds still at 70 %, the pixel blocks at theirs', async () => {
+    @Component({
+      imports: [PixelProgress],
+      template: '<pxl-progress data-testid="linear" surface="linear" [value]="10" indeterminate /><pxl-progress data-testid="pixel" [value]="10" indeterminate />',
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const bar = (id: string) => (fixture.nativeElement as HTMLElement).querySelector(`[data-testid="${id}"] [role="progressbar"]`)!;
+    const fill = Array.from(bar('linear').firstElementChild!.classList);
+    expect(fill).toEqual(expect.arrayContaining(['motion-safe:animate-pulse', 'motion-reduce:opacity-70']));
+    expect(fill).not.toContain('animate-pulse');
+    for (const block of Array.from(bar('pixel').children)) {
+      expect(Array.from(block.classList)).toEqual(expect.arrayContaining(['opacity-70', 'motion-safe:animate-pulse']));
+      expect(Array.from(block.classList)).not.toContain('animate-pulse');
+    }
+  });
+});

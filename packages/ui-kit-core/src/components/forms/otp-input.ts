@@ -3,7 +3,7 @@
  * accepts, how typing, Backspace, the arrows and a paste change the code and
  * move focus, and the classes of the cells.
  */
-import { cn, focusRing, inputBase, sizeHeight, surfaceClasses, toneMap, type Size, type Surface } from '../../common';
+import { cn, fieldBase, focusRing, sizeHeight, surfaceClasses, toneMap, type Size, type Surface } from '../../common';
 
 /** The characters a passcode accepts: digits, or digits and letters. */
 export type OtpInputVariant = 'numeric' | 'alphanumeric';
@@ -124,7 +124,7 @@ const otpCellSizeClasses: Record<Size, string> = {
 
 // A text field's look but its full width: `w-full` would beat the cell's
 // width, as nothing merges the two and Tailwind emits `w-full` last.
-const cellBase = inputBase
+const cellBase = fieldBase
   .split(' ')
   .filter((name) => name !== 'w-full')
   .join(' ');

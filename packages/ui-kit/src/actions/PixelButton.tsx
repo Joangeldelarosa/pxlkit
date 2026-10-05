@@ -93,13 +93,17 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
     prevLoading.current = !!loading;
   }, [loading]);
 
+  // Hover and press feedback only while the button can be pressed: a disabled
+  // or loading one holds still, and a disabled one drops its shadow too.
+  const enabled = !rest.disabled;
+  const moves = enabled && !loading;
   const variantClasses = isGhost
     ? cn('border border-transparent bg-transparent', t.hover)
     : isOutline
-      ? cn(s.border, t.border, 'bg-transparent', t.hover, !rest.disabled && c.shadow, !rest.disabled && c.shadowHover)
+      ? cn(s.border, t.border, 'bg-transparent', t.hover, enabled && c.shadow, moves && c.shadowHover)
       : isSoft
-        ? cn(s.border, t.border, t.soft, t.hover, !rest.disabled && c.shadow, !rest.disabled && c.shadowHover)
-        : cn(s.border, t.border, t.bg, t.hover, !rest.disabled && c.shadow, !rest.disabled && c.shadowHover);
+        ? cn(s.border, t.border, t.soft, t.hover, enabled && c.shadow, moves && c.shadowHover)
+        : cn(s.border, t.border, t.bg, t.hover, enabled && c.shadow, moves && c.shadowHover);
 
   const mergedClassName = cn(
     'inline-flex items-center justify-center font-medium focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
@@ -110,7 +114,7 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
     t.text,
     fullWidth && 'w-full',
     variantClasses,
-    !rest.disabled && (isGhost || isOutline ? 'active:scale-[0.97]' : c.shadowActive),
+    moves && (isGhost || isOutline ? 'active:scale-[0.97]' : c.shadowActive),
     className,
   );
 
@@ -124,7 +128,7 @@ export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(funct
         <span
           data-testid="pxl-button-spinner"
           aria-hidden
-          className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent"
+          className="inline-block h-3.5 w-3.5 motion-safe:animate-spin rounded-full border-2 border-current border-r-transparent"
         />
       ) : (
         iconLeft

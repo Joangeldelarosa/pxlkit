@@ -14,8 +14,9 @@ import { useEffectiveSurface } from '../composables/surface.js';
 /**
  * Progress bar (`role="progressbar"`, 0–100): ten segmented HP-bar blocks on
  * the pixel surface, a smooth filled track on the linear one. The label names
- * the bar ("Progress" without one); while indeterminate the bar pulses,
- * drops `aria-valuenow` and sets `aria-busy`.
+ * the bar ("Progress" without one); while indeterminate the bar pulses (it
+ * holds still, at 70 %, for a reader who prefers reduced motion), drops
+ * `aria-valuenow` and sets `aria-busy`.
  *
  * @example
  * <PixelProgress :value="60" label="HP" />

@@ -307,3 +307,14 @@ export const focusRing = 'focus-visible:ring-2 focus-visible:ring-offset-2 focus
  */
 export const inputBase =
   'w-full border bg-retro-surface/40 focus:bg-retro-surface/70 text-retro-text font-mono transition-all focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed';
+
+/**
+ * `inputBase` without its border width and font family, for a field that
+ * takes both from its surface (`SurfaceClasses.border` and `.font`): its
+ * class list then sets each once, rather than leaving the winner to the
+ * order the stylesheet holds the classes in.
+ */
+export const fieldBase = inputBase
+  .split(' ')
+  .filter((name) => name !== 'border' && name !== 'font-mono')
+  .join(' ');

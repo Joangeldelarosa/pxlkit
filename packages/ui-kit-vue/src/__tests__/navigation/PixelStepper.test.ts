@@ -97,3 +97,15 @@ describe('PixelStepper', () => {
     expect(wrapper.classes()).toEqual(expect.arrayContaining(['max-w-md', 'w-full']));
   });
 });
+
+describe('PixelStepper — loading step', () => {
+  it('turns the spinner of a loading step only for a reader who allows motion', () => {
+    const wrapper = mount(PixelStepper, {
+      props: { active: 0 },
+      slots: { default: () => [h(PixelStepperStep, { label: 'Upload', loading: true }), h(PixelStepperStep, { label: 'Done' })] },
+    });
+    const classes = (wrapper.get('[data-pxl-step-icon="loading"]').attributes('class') ?? '').split(' ');
+    expect(classes).toContain('motion-safe:animate-spin');
+    expect(classes).not.toContain('animate-spin');
+  });
+});

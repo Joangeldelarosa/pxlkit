@@ -157,13 +157,13 @@ const buttonFocusRing = 'rounded-[2px] focus-visible:outline-hidden focus-visibl
 export function multiSelectClasses(surface: Surface, { size, invalid, open }: MultiSelectClassOptions): MultiSelectClasses {
   const s = surfaceClasses(surface);
   return {
-    // A text field's look (`inputBase`, `focusRing`), with its focus states
+    // A text field's look (`fieldBase`, `focusRing`), with its focus states
     // taken from the controls inside: Tailwind only generates the classes it
     // finds verbatim, so they are spelled out. On the pixel surface the cut
     // corners would clip the ring, so the field's edge lights up instead.
     field: cn(
       'flex w-full cursor-default select-none items-center justify-between gap-2 px-3',
-      'border bg-retro-surface/40 focus-within:bg-retro-surface/70 text-retro-text font-mono transition-all',
+      'bg-retro-surface/40 focus-within:bg-retro-surface/70 text-retro-text transition-all',
       surface === 'pixel'
         ? 'has-[[role=combobox]:focus-visible]:pxl-focus-inset'
         : 'has-[[role=combobox]:focus-visible]:ring-2 has-[[role=combobox]:focus-visible]:ring-offset-2 has-[[role=combobox]:focus-visible]:ring-offset-retro-bg has-[[role=combobox]:focus-visible]:ring-retro-border/60',

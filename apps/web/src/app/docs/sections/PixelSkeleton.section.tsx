@@ -111,7 +111,7 @@ export function PixelSkeletonDocsSection({ className, headingLevel = 2, links = 
       <ul className="docs-aria-patterns">
         <li><code>status</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders with <code>role=&quot;status&quot;</code> and a polite implicit live region. Override <code>ariaLabel</code> when the placeholder represents a specific resource (e.g. &quot;Loading user profile&quot;) so assistive tech announces what is loading.</p>
+      <p className="docs-aria-notes">Renders with <code>role=&quot;status&quot;</code> and a polite implicit live region. Override <code>ariaLabel</code> when the placeholder represents a specific resource (e.g. &quot;Loading user profile&quot;) so assistive tech announces what is loading. The pulse plays only for a reader who allows motion: under <code>prefers-reduced-motion: reduce</code> the block holds still, from the server-rendered markup on.</p>
     </section>
     <section aria-labelledby="pixel-skeleton-usage">
       <Heading id="pixel-skeleton-usage">Usage</Heading>

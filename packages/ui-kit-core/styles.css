@@ -130,6 +130,27 @@
 @keyframes pxl-zoom-in{from{opacity:0;transform:scale(var(--pxl-zoom-start,.92))}to{opacity:1;transform:scale(1)}}
 @keyframes pxl-flicker{0%,100%{opacity:1}8%{opacity:.85}16%{opacity:1}32%{opacity:.65}40%{opacity:1}58%{opacity:.8}66%{opacity:1}82%{opacity:.55}90%{opacity:1}}
 
+/* ─── PixelDrawer's entrance ──────────────────────────────────
+ * The panel slides in from off-screen on its side to its place.
+ * Its recipe names these in an arbitrary animation
+ * (`motion-safe:animate-[pxl-drawer-in-right_180ms_ease-out]`),
+ * for which Tailwind emits no keyframes, so they are plain ones.
+ * `motion-safe:` leaves a reader who prefers reduced motion a drawer
+ * that is simply there.
+ * ──────────────────────────────────────────────────────────── */
+@keyframes pxl-drawer-in-right {
+  from { transform: translateX(100%); }
+}
+@keyframes pxl-drawer-in-left {
+  from { transform: translateX(-100%); }
+}
+@keyframes pxl-drawer-in-top {
+  from { transform: translateY(-100%); }
+}
+@keyframes pxl-drawer-in-bottom {
+  from { transform: translateY(100%); }
+}
+
 /* ─── PixelGlitch on text ─────────────────────────────────────
  * A glitch given a `label` holds that text once, in its content's
  * layer. While it plays (.pxl-glitch-copies), its two colour copies

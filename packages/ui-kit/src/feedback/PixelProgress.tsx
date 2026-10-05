@@ -28,7 +28,10 @@ export interface PixelProgressProps {
   showValue?: boolean;
   /** Surface override; falls back to nearest provider. */
   surface?: Surface;
-  /** When `true`, switches to indeterminate animation (visual only — ARIA still reports value). */
+  /**
+   * Unknown-duration work: the bar pulses (it holds still, at 70 %, for a reader
+   * who prefers reduced motion), `aria-valuenow` is dropped and `aria-busy` set.
+   */
   indeterminate?: boolean;
 }
 

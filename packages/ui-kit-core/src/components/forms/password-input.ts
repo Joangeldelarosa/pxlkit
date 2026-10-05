@@ -1,5 +1,5 @@
 /** PixelPasswordInput — the password field and its show / hide toggle. */
-import { cn, focusRing, inputBase, sizeHeight, surfaceClasses, toneMap, type Size, type Surface, type Tone } from '../../common';
+import { cn, fieldBase, focusRing, sizeHeight, surfaceClasses, toneMap, type Size, type Surface, type Tone } from '../../common';
 import { fieldBorderClass } from './input';
 
 export interface PasswordInputClassOptions {
@@ -24,7 +24,7 @@ export function passwordInputClasses(surface: Surface, options: PasswordInputCla
   return {
     shell: 'relative block',
     input: cn(
-      inputBase,
+      fieldBase,
       s.font,
       s.border,
       s.radius,

@@ -47,7 +47,7 @@ export default defineManifest({
       { key: 'Space', does: 'Activates the button' },
     ],
     notes:
-      'Renders a native <button> by default so keyboard semantics come for free. When it styles an anchor (`asChild`, or `a[pxlButton]` in Angular), the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control; disabled buttons skip shadow/transform affordances.',
+      'Renders a native <button> by default so keyboard semantics come for free. When it styles an anchor (`asChild`, or `a[pxlButton]` in Angular), the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control and holds it still, with no hover or press feedback; a disabled button also drops its shadow.',
   },
   related: ['PixelIconButton', 'PxlKitButton', 'PixelSplitButton', 'PixelBareButton'],
   apiStability: 'stable',

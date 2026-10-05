@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -60,6 +60,39 @@ describe('theme palettes', () => {
       expect(body).toBeDefined();
       const declared = new Map([...body!.matchAll(/--color-(retro-[a-z-]+):\s*([^;]+);/g)].map((m) => [m[1]!, m[2]!.trim()]));
       for (const name of names) expect(declared.get(name), `.${selector} --color-${name}`).toBe(`var(--${name})`);
+    }
+  });
+});
+
+describe('keyframes', () => {
+  const components = resolve(dirname(fileURLToPath(import.meta.url)), '../components');
+  const recipes = readdirSync(components, { recursive: true, encoding: 'utf8' })
+    .filter((file) => file.endsWith('.ts'))
+    .map((file) => readFileSync(resolve(components, file), 'utf8'))
+    .join('\n');
+  const defined = (name: string) => new RegExp(`@keyframes ${name}\\s*\\{`).test(theme);
+
+  // An arbitrary animation (`animate-[name_180ms_ease-out]`) names keyframes
+  // Tailwind does not emit: the stylesheet has to.
+  it('defines every keyframes a recipe names in an arbitrary animation', () => {
+    const named = [...new Set([...recipes.matchAll(/animate-\[([a-z][a-z0-9-]*)_/g)].map((m) => m[1]!))];
+    expect(named).toEqual(expect.arrayContaining(['pxl-drawer-in-right', 'pxl-drawer-in-left', 'pxl-drawer-in-top', 'pxl-drawer-in-bottom']));
+    expect(named.filter((name) => !defined(name))).toEqual([]);
+  });
+
+  it('defines the keyframes every theme animation plays, or leaves them to Tailwind', () => {
+    const builtIn = ['spin', 'ping', 'pulse', 'bounce'];
+    const played = [...theme.matchAll(/--animate-[a-z0-9-]+:\s*([a-z][a-z0-9-]*)\s/g)].map((m) => m[1]!);
+    expect(played.length).toBeGreaterThan(0);
+    expect(played.filter((name) => !builtIn.includes(name) && !defined(name))).toEqual([]);
+  });
+
+  it('slides the drawer in from off-screen on its side to its place', () => {
+    const from = { right: 'translateX(100%)', left: 'translateX(-100%)', top: 'translateY(-100%)', bottom: 'translateY(100%)' };
+    for (const [side, transform] of Object.entries(from)) {
+      const rule = block(new RegExp(`@keyframes pxl-drawer-in-${side}\\s*\\{`));
+      // The rule up to its first closing brace: the `from` frame; the panel's own place is the end.
+      expect(rule, side).toBe(`from { transform: ${transform};`);
     }
   });
 });

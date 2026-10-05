@@ -29,3 +29,10 @@ describe('PixelRibbon', () => {
     expect(wrapper.text()).toBe('Sale');
   });
 });
+
+describe('PixelRibbon — letter spacing', () => {
+  it('spaces its label wide on linear too, where the display face is tight', () => {
+    const tracking = (classes: string[]) => classes.filter((name) => name.startsWith('tracking-'));
+    expect(tracking(mount(PixelRibbon, { props: { surface: 'linear' }, slots: { default: () => 'New' } }).classes())).toEqual(['tracking-wider']);
+  });
+});

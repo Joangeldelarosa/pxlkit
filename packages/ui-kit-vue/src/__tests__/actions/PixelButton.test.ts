@@ -83,3 +83,20 @@ describe('PixelButton', () => {
     expect(classes.filter((c) => c.endsWith('outline-none'))).toEqual([]);
   });
 });
+
+describe('PixelButton — loading', () => {
+  it('holds a loading button still: no hover or press feedback, its resting look kept', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const classes = mount(PixelButton, { props: { surface, variant: 'soft', loading: true } }).classes();
+      for (const name of ['pxl-nudge-hover', 'pxl-nudge-active', 'hover:shadow-md', 'active:shadow-sm']) expect(classes).not.toContain(name);
+      if (surface === 'linear') expect(classes).toContain('shadow-sm');
+    }
+    expect(mount(PixelButton, { props: { variant: 'outline', loading: true } }).classes()).not.toContain('active:scale-[0.97]');
+  });
+
+  it('turns its spinner only for a reader who allows motion, from the server markup on', () => {
+    const spinner = mount(PixelButton, { props: { loading: true } }).get('[data-testid="pxl-button-spinner"]').classes();
+    expect(spinner).toContain('motion-safe:animate-spin');
+    expect(spinner).not.toContain('animate-spin');
+  });
+});

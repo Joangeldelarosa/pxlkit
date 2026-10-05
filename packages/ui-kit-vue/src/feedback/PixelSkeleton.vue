@@ -5,8 +5,9 @@ import { useEffectiveSurface } from '../composables/surface.js';
 
 /**
  * Pulsing loading placeholder (`role="status"`) that reserves the space of
- * the content it stands for. Classes, styles and other attributes fall
- * through to the block; a `style` wins over `width` / `height`.
+ * the content it stands for; it holds still for a reader who prefers reduced
+ * motion. Classes, styles and other attributes fall through to the block; a
+ * `style` wins over `width` / `height`.
  *
  * @example
  * <PixelSkeleton width="10rem" aria-label="Loading user profile" />

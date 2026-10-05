@@ -60,7 +60,7 @@ describe('PixelInput', () => {
     const loading = mount(PixelInput, { props: { defaultValue: 'abc', clearable: true, loading: true } });
     expect(loading.find('[aria-label="Clear input"]').exists()).toBe(false);
     expect(loading.find('input').element.disabled).toBe(true);
-    expect(loading.find('.animate-spin').exists()).toBe(true);
+    expect(loading.find('[class~="motion-safe:animate-spin"]').exists()).toBe(true);
   });
 
   it('renders the prefix, suffix and addon slots, and the legacy icon slot', () => {
@@ -153,5 +153,21 @@ describe('PixelInput', () => {
     await nextTick();
     expect(control.attributes()).not.toHaveProperty('aria-describedby');
     wrapper.unmount();
+  });
+});
+
+describe('PixelInput — one class per property', () => {
+  it("takes its surface's font family and border width, once each", () => {
+    for (const [surface, family, border] of [['pixel', 'font-mono', 'border-2'], ['linear', 'font-sans', 'border']] as const) {
+      const classes = mount(PixelInput, { props: { surface, defaultValue: '' } }).get('input').classes();
+      expect(classes.filter((name) => /^font-(sans|serif|mono|pixel)$/.test(name))).toEqual([family]);
+      expect(classes.filter((name) => /^border(-[0248])?$/.test(name))).toEqual([border]);
+    }
+  });
+
+  it('turns its loading spinner only for a reader who allows motion', () => {
+    const wrapper = mount(PixelInput, { props: { defaultValue: '', loading: true } });
+    expect(wrapper.find('[class~="motion-safe:animate-spin"]').exists()).toBe(true);
+    expect(wrapper.find('.animate-spin').exists()).toBe(false);
   });
 });

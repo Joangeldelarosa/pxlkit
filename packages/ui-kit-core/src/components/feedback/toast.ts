@@ -89,7 +89,7 @@ export interface ToastClasses {
   stripe: string;
   /** The leading slot, in the tone colour. */
   leading: string;
-  /** The spinner in the leading slot while loading. */
+  /** The spinner in the leading slot while loading; it turns only for a reader who allows motion. */
   spinner: string;
   /** The column of title, message and action. */
   body: string;
@@ -119,7 +119,7 @@ export function toastClasses(surface: Surface, tone: ToastTone): ToastClasses {
     row: cn('flex items-start gap-2.5 p-3 pl-4', surface === 'pixel' && 'pl-5'),
     stripe: cn('absolute left-0 top-0 bottom-0 w-1', t.fill),
     leading: cn('mt-0.5 shrink-0 inline-flex items-center justify-center', t.text),
-    spinner: cn('inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-r-transparent', t.text),
+    spinner: cn('inline-block h-3 w-3 motion-safe:animate-spin rounded-full border-2 border-current border-r-transparent', t.text),
     body: 'flex-1 min-w-0',
     title: cn('text-xs font-semibold truncate', s.font, t.text),
     message: 'mt-1 text-sm text-retro-muted',

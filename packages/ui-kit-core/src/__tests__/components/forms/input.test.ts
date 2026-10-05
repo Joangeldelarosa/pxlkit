@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  fieldBase,
   fieldBorderClass,
   focusRing,
-  inputBase,
   inputClasses,
   inputControlClasses,
   sizeHeight,
@@ -39,7 +39,7 @@ describe('input recipes', () => {
         const s = surfaceClasses(surface);
         expect(inputControlClasses(surface, { ...plain, size, tone: 'cyan' })).toBe(
           [
-            inputBase,
+            fieldBase,
             s.font,
             s.border,
             s.radius,
@@ -86,6 +86,7 @@ describe('input recipes', () => {
     expect(c.clearButton).toContain('hover:text-retro-text');
     expect(c.clearIcon).toBe('h-3 w-3');
     expect(c.suffix).toBe(`pointer-events-none inline-flex items-center justify-center shrink-0 ${surfaceClasses('pixel').font}`);
-    expect(c.spinner).toContain('animate-spin');
+    expect(c.spinner.split(' ')).toContain('motion-safe:animate-spin');
+    expect(c.spinner.split(' ')).not.toContain('animate-spin');
   });
 });

@@ -5,9 +5,9 @@ import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-pr
 
 /**
  * Pulsing loading placeholder (`role="status"`) that reserves the space of
- * the content it stands for. The host is the block: classes and attributes
- * set on it stay, and `[style.width]` / `[style.height]` bindings win over
- * the inputs.
+ * the content it stands for; it holds still for a reader who prefers reduced
+ * motion. The host is the block: classes and attributes set on it stay, and
+ * `[style.width]` / `[style.height]` bindings win over the inputs.
  *
  * @example
  * <pxl-skeleton width="10rem" ariaLabel="Loading user profile" />

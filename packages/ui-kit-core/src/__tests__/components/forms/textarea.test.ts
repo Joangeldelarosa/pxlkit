@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   autosizeTextarea,
+  fieldBase,
   focusRing,
-  inputBase,
   surfaceClasses,
   textareaClasses,
   toneMap,
@@ -31,7 +31,7 @@ describe('textarea recipes', () => {
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
       expect(textareaClasses(surface, { tone: 'green', invalid: false, autosize: false })).toBe(
-        `${inputBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${focusRing} ${toneMap.green.ring} min-h-24 px-3 py-2 text-sm border-retro-border-strong`,
+        `${fieldBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${focusRing} ${toneMap.green.ring} min-h-24 px-3 py-2 text-sm border-retro-border-strong`,
       );
     }
   });

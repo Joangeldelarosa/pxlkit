@@ -3,7 +3,7 @@
  * them: parsing what the user types, formatting the value back, clamping and
  * stepping.
  */
-import { cn, focusRing, inputBase, sizeHeight, surfaceClasses, toneMap, type Size, type Surface, type Tone } from '../../common';
+import { cn, fieldBase, focusRing, sizeHeight, surfaceClasses, toneMap, type Size, type Surface, type Tone } from '../../common';
 import { fieldBorderClass } from './input';
 
 /** When a number outside `[min, max]` is pulled back: while typing, on blur, or never. */
@@ -148,7 +148,7 @@ export function numberInputClasses(surface: Surface, options: NumberInputClassOp
   return {
     shell: 'relative block',
     input: cn(
-      inputBase,
+      fieldBase,
       s.font,
       s.border,
       s.radius,

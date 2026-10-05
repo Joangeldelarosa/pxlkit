@@ -421,3 +421,13 @@ describe('PixelToast — auto-dismiss countdown', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('PixelToast — loading spinner', () => {
+  it('turns the spinner of a loading toast only for a reader who allows motion', () => {
+    const { container } = render(<PixelToast toast={{ id: 'l', title: 'Saving', loading: true }} onDismiss={() => {}} />);
+    const spinner = container.querySelector('[role="presentation"]')!;
+    const classes = spinner.className.split(' ');
+    expect(classes).toContain('motion-safe:animate-spin');
+    expect(classes).not.toContain('animate-spin');
+  });
+});

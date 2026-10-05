@@ -1,5 +1,5 @@
 /** PixelTextarea — the multi-line field and its auto-grow behaviour. */
-import { cn, focusRing, inputBase, surfaceClasses, toneMap, type Surface, type Tone } from '../../common';
+import { cn, fieldBase, focusRing, surfaceClasses, toneMap, type Surface, type Tone } from '../../common';
 import { fieldBorderClass } from './input';
 
 export interface TextareaClassOptions {
@@ -14,7 +14,7 @@ export interface TextareaClassOptions {
 export function textareaClasses(surface: Surface, options: TextareaClassOptions): string {
   const s = surfaceClasses(surface);
   return cn(
-    inputBase,
+    fieldBase,
     s.font,
     s.border,
     s.radius,

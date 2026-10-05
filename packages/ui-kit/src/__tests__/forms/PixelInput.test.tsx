@@ -115,8 +115,9 @@ describe('PixelInput — upgrades', () => {
     const { container } = render(<PixelInput loading defaultValue="" />);
     const input = container.querySelector('input') as HTMLInputElement;
     expect(input.disabled).toBe(true);
-    // Spinner is the animate-spin element
-    expect(container.querySelector('.animate-spin')).toBeTruthy();
+    // The spinner turns only for a reader who allows motion.
+    expect(container.querySelector('[class~="motion-safe:animate-spin"]')).toBeTruthy();
+    expect(container.querySelector('.animate-spin')).toBeNull();
   });
 
   it('loading hides the clear button even when value is set', () => {
@@ -160,5 +161,17 @@ describe('PixelInput — hint / error description (regression)', () => {
     rerender(field('We never share it'));
     expect(input).toHaveAttribute('aria-describedby', 'email-rules email-msg');
     expect(input).toHaveAccessibleDescription('Work addresses only We never share it');
+  });
+});
+
+describe('PixelInput — one class per property', () => {
+  it("takes its surface's font family and border width, once each", () => {
+    for (const [surface, family, border] of [['pixel', 'font-mono', 'border-2'], ['linear', 'font-sans', 'border']] as const) {
+      const { container, unmount } = render(<PixelInput surface={surface} defaultValue="" />);
+      const classes = container.querySelector('input')!.className.split(' ');
+      expect(classes.filter((name) => /^font-(sans|serif|mono|pixel)$/.test(name))).toEqual([family]);
+      expect(classes.filter((name) => /^border(-[0248])?$/.test(name))).toEqual([border]);
+      unmount();
+    }
   });
 });

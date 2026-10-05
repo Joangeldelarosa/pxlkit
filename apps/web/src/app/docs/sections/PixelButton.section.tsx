@@ -128,7 +128,7 @@ export function PixelButtonDocsSection({ className, headingLevel = 2, links = 'a
       <ul className="docs-aria-patterns">
         <li><code>button</code></li>
       </ul>
-      <p className="docs-aria-notes">Renders a native &lt;button&gt; by default so keyboard semantics come for free. When it styles an anchor (<code>asChild</code>, or <code>a[pxlButton]</code> in Angular), the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control; disabled buttons skip shadow/transform affordances.</p>
+      <p className="docs-aria-notes">Renders a native &lt;button&gt; by default so keyboard semantics come for free. When it styles an anchor (<code>asChild</code>, or <code>a[pxlButton]</code> in Angular), the consumer is responsible for ensuring the wrapped element exposes button-equivalent semantics if non-navigational. Loading auto-disables the control and holds it still, with no hover or press feedback; a disabled button also drops its shadow.</p>
       <Subheading>Keyboard</Subheading>
       <table className="docs-keyboard">
         <thead>

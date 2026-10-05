@@ -49,3 +49,13 @@ describe('PixelAvatarGroup', () => {
     expect(wrapper.text()).toBe('AB');
   });
 });
+
+describe('PixelAvatarGroup — "+N" font', () => {
+  it('sets the "+N" in the pixel face on pixel and in the surface font on linear, one family each', () => {
+    for (const [surface, expected] of [['pixel', 'font-pixel'], ['linear', 'font-sans']] as const) {
+      const wrapper = mount(PixelAvatarGroup, { props: { surface, max: 2 }, slots: { default: () => avatars(['Ana', 'Bo', 'Cy']) } });
+      const family = Array.from(overflowTile(wrapper)!.classList).filter((name) => /^font-(sans|serif|mono|pixel)$/.test(name));
+      expect(family).toEqual([expected]);
+    }
+  });
+});

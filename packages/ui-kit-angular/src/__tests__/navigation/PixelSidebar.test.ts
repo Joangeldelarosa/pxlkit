@@ -103,3 +103,16 @@ describe('PixelSidebar', () => {
     expect(host.lastElementChild!.textContent!.trim()).toBe('v2');
   });
 });
+
+describe('PixelSidebar — section titles', () => {
+  it('spaces a section title wide on linear too, where the display face is tight', async () => {
+    const tracking = (element: Element) => Array.from(element.classList).filter((name) => name.startsWith('tracking-'));
+    @Component({ imports: [PixelSidebar], template: '<pxl-sidebar surface="linear" [sections]="sections" />' })
+    class Host {
+      readonly sections = SECTIONS;
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    expect(tracking(fixture.nativeElement.querySelector('h3'))).toEqual(['tracking-wider']);
+  });
+});

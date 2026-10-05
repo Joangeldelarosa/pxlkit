@@ -20,7 +20,7 @@ export default defineManifest({
   highlights: [
     'Semantic <kbd> root so assistive tech announces the key role correctly.',
     'Surface-aware: pixel chamfered border + pixel font, or linear pill.',
-    'Drop-shadow depth tuned per surface for a tactile keycap feel.',
+    'Keycap depth per surface for a tactile feel: a thick bottom edge on pixel, a soft drop shadow on linear.',
     'Composable inline — takes any inline content, such as icons or multi-character keys.',
   ],
   examples: [

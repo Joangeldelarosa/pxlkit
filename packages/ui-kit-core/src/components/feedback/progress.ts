@@ -39,14 +39,16 @@ export function progressClasses(surface: Surface, tone: Tone, { indeterminate }:
       surface === 'pixel'
         ? cn('flex gap-0.5 p-0.5', s.border, s.radius, 'border-retro-border/60 bg-retro-surface/60')
         : 'h-2.5 overflow-hidden rounded-full border border-retro-border bg-retro-surface/80',
-    fill: cn('h-full rounded-full transition-all duration-500', t.bg, indeterminate && 'animate-pulse'),
+    // Indeterminate, it pulses — or, for a reader who prefers reduced motion,
+    // holds still at 70 % as the pixel blocks do, so it does not read as full.
+    fill: cn('h-full rounded-full transition-all duration-500', t.bg, indeterminate && 'motion-safe:animate-pulse motion-reduce:opacity-70'),
   };
 }
 
 /**
  * Classes of the pixel surface's ten blocks: a block is filled once the value
  * covers it, half-lit while the value is inside it, and every block pulses
- * while indeterminate.
+ * while indeterminate (still, at 70 %, for a reader who prefers reduced motion).
  */
 export function progressSegmentClasses(value: number, tone: Tone, { indeterminate }: { indeterminate: boolean }): string[] {
   const fill = toneMap[tone].fill;
@@ -57,7 +59,7 @@ export function progressSegmentClasses(value: number, tone: Tone, { indeterminat
     return cn(
       'h-2 flex-1 rounded-[1px] transition-all duration-150',
       indeterminate
-        ? cn(fill, 'opacity-70 animate-pulse')
+        ? cn(fill, 'opacity-70 motion-safe:animate-pulse')
         : filled
           ? fill
           : partial

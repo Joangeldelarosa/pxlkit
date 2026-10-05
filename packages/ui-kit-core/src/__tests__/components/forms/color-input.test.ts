@@ -6,10 +6,10 @@ import {
   colorPresetClasses,
   colorPresetKeydown,
   colorSwatchHex,
+  fieldBase,
   focusRing,
   formatColor,
   hexToRgb,
-  inputBase,
   isColorPresetSelected,
   normalizeHex,
   rgbToHsl,
@@ -108,9 +108,9 @@ describe('colour input recipes', () => {
       const s = surfaceClasses(surface);
       const c = colorInputClasses(surface, { size: 'sm', invalid: false, hasValue: true });
       expect(c.trigger).toBe(
-        `${inputBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} ${focusRing} flex items-center gap-2 px-2 text-left border-retro-border-strong`,
+        `${fieldBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} ${focusRing} flex items-center gap-2 px-2 text-left border-retro-border-strong`,
       );
-      expect(c.hex).toBe(`${inputBase} ${s.font} ${s.border} ${s.radius} h-8 flex-1 px-2 text-xs ${focusRing} border-retro-border-strong`);
+      expect(c.hex).toBe(`${fieldBase} ${s.font} ${s.border} ${s.radius} h-8 flex-1 px-2 text-xs ${focusRing} border-retro-border-strong`);
       expect(c.native).toBe(`h-8 w-10 cursor-pointer bg-transparent p-0 ${s.border} ${s.radius} border-retro-border-strong`);
       expect(colorInputClasses(surface, { size: 'md', invalid: true, hasValue: true }).hex).toContain('border-retro-red/60');
     }

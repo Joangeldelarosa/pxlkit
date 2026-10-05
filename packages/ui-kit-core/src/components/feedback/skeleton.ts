@@ -1,4 +1,4 @@
-/** PixelSkeleton — a pulsing loading placeholder block. */
+/** PixelSkeleton — a pulsing loading placeholder block (still under reduced motion). */
 import { cn, surfaceClasses, type Surface } from '../../common';
 
 /** Accessible name of a skeleton without its own label. */
@@ -13,5 +13,7 @@ export const SKELETON_DEFAULT_HEIGHT = '1rem';
  */
 export function skeletonClasses(surface: Surface, { rounded }: { rounded: boolean }): string {
   const radius = rounded ? (surface === 'pixel' ? 'rounded-[2px]' : 'rounded-full') : surfaceClasses(surface).radius;
-  return cn('animate-pulse bg-retro-surface/80', radius);
+  // Still, as a plain block, for a reader who prefers reduced motion — from
+  // the server markup on, as `motion-safe:` needs no script.
+  return cn('motion-safe:animate-pulse bg-retro-surface/80', radius);
 }

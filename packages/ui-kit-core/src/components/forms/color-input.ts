@@ -4,7 +4,7 @@
  * parsing and conversions, the value a pick writes in each format, the
  * presets grid's keys, and the class recipes.
  */
-import { cn, focusRing, inputBase, sizeHeight, surfaceClasses, type Size, type Surface } from '../../common';
+import { cn, fieldBase, focusRing, sizeHeight, surfaceClasses, type Size, type Surface } from '../../common';
 import { fieldBorderClass } from './input';
 
 /** How a picked colour is written: `#rrggbb`, `rgb(r, g, b)` or `hsl(h, s%, l%)`. */
@@ -179,7 +179,7 @@ export function colorInputClasses(surface: Surface, { size, invalid, hasValue }:
   return {
     anchor: 'relative block',
     trigger: cn(
-      inputBase,
+      fieldBase,
       s.font,
       s.border,
       s.radius,
@@ -198,7 +198,7 @@ export function colorInputClasses(surface: Surface, { size, invalid, hasValue }:
     pickers: 'mb-2 flex items-center gap-2',
     native: cn('h-8 w-10 cursor-pointer bg-transparent p-0', s.border, s.radius, 'border-retro-border-strong'),
     hexLabel: cn('sr-only', s.font),
-    hex: cn(inputBase, s.font, s.border, s.radius, 'h-8 flex-1 px-2 text-xs', focusRing, fieldBorderClass(invalid)),
+    hex: cn(fieldBase, s.font, s.border, s.radius, 'h-8 flex-1 px-2 text-xs', focusRing, fieldBorderClass(invalid)),
     presets: 'grid grid-cols-8 gap-1',
   };
 }

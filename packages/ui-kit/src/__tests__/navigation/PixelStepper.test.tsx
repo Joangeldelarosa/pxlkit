@@ -180,3 +180,18 @@ describe('PixelStepper', () => {
     ]);
   });
 });
+
+describe('PixelStepper — loading step', () => {
+  it('turns the spinner of a loading step only for a reader who allows motion', () => {
+    const { container } = render(
+      <PixelStepper active={0}>
+        <PixelStepper.Step label="Upload" loading />
+        <PixelStepper.Step label="Done" />
+      </PixelStepper>,
+    );
+    const spinner = container.querySelector('[data-pxl-step-icon="loading"]')!;
+    const classes = spinner.getAttribute('class')!.split(' ');
+    expect(classes).toContain('motion-safe:animate-spin');
+    expect(classes).not.toContain('animate-spin');
+  });
+});

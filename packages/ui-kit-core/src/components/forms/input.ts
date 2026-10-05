@@ -4,8 +4,8 @@
  */
 import {
   cn,
+  fieldBase,
   focusRing,
-  inputBase,
   sizeHeight,
   surfaceClasses,
   toneMap,
@@ -43,7 +43,7 @@ export function inputControlClasses(surface: Surface, options: InputControlOptio
   // button and trailing content share the right side.
   const rightSlots = (options.trailing ? 1 : 0) + (options.clearButton ? 1 : 0);
   return cn(
-    inputBase,
+    fieldBase,
     s.font,
     s.border,
     s.radius,
@@ -71,7 +71,7 @@ export interface InputClasses {
   clearIcon: string;
   /** Trailing content (suffix or spinner). */
   suffix: string;
-  /** Spinner that replaces the suffix while loading. */
+  /** Spinner that replaces the suffix while loading; it turns only for a reader who allows motion. */
   spinner: string;
   /** Row joining the addons to the shell. */
   addons: string;
@@ -97,7 +97,7 @@ export function inputClasses(surface: Surface, size: Size): InputClasses {
     clearButton: 'inline-flex items-center justify-center text-retro-muted hover:text-retro-text',
     clearIcon: 'h-3 w-3',
     suffix: cn('pointer-events-none inline-flex items-center justify-center shrink-0', s.font),
-    spinner: 'inline-block h-3 w-3 animate-spin border-2 border-retro-muted border-t-transparent rounded-full',
+    spinner: 'inline-block h-3 w-3 motion-safe:animate-spin border-2 border-retro-muted border-t-transparent rounded-full',
     addons: 'flex w-full items-stretch',
     addonLeft: cn(addon, 'border-retro-border-strong rounded-r-none border-r-0'),
     addonRight: cn(addon, 'border-retro-border-strong rounded-l-none border-l-0'),

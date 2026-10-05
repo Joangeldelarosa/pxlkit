@@ -76,3 +76,11 @@ describe('PixelSidebar', () => {
     expect(getByText('Security')).toBeTruthy();
   });
 });
+
+describe('PixelSidebar — section titles', () => {
+  it('spaces a section title wide on linear too, where the display face is tight', () => {
+    const tracking = (el: Element) => el.className.split(' ').filter((name) => name.startsWith('tracking-'));
+    const { getByText } = render(<PixelSidebar surface="linear" sections={makeSections()} />);
+    expect(tracking(getByText('Main'))).toEqual(['tracking-wider']);
+  });
+});

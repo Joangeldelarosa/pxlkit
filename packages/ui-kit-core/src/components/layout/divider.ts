@@ -2,7 +2,7 @@
  * PixelDivider — a horizontal rule, or two rules around a label. The pixel
  * surface draws dotted rules (and diamond ornaments around the label).
  */
-import { cn, surfaceClasses, toneMap, type Surface, type Tone } from '../../common';
+import { cn, toneMap, type Surface, type Tone } from '../../common';
 
 export type DividerSpacing = 'none' | 'sm' | 'md' | 'lg';
 
@@ -35,7 +35,8 @@ export function dividerClasses(surface: Surface, spacing: DividerSpacing, tone: 
     line: cn(rule, 'flex-1 border-retro-border/40'),
     label: cn(
       'text-[10px] uppercase tracking-wider inline-flex items-center gap-1.5',
-      pixel ? 'font-pixel' : surfaceClasses(surface).fontDisplay,
+      // Linear's display weight without its letter-spacing: the label sets its own.
+      pixel ? 'font-pixel' : 'font-semibold',
       toneMap[tone].text,
     ),
   };

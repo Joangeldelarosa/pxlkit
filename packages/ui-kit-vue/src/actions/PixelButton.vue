@@ -74,15 +74,18 @@ const classes = computed(() => {
   const isGhost = props.variant === 'ghost';
   const isOutline = props.variant === 'outline';
   const isSoft = props.variant === 'soft';
+  // Hover and press feedback only while the button can be pressed: a disabled
+  // or loading one holds still, and a disabled one drops its shadow too.
   const enabled = !props.disabled;
+  const moves = enabled && !props.loading;
 
   const variantClasses = isGhost
     ? cn('border border-transparent bg-transparent', t.hover)
     : isOutline
-      ? cn(s.border, t.border, 'bg-transparent', t.hover, enabled && c.shadow, enabled && c.shadowHover)
+      ? cn(s.border, t.border, 'bg-transparent', t.hover, enabled && c.shadow, moves && c.shadowHover)
       : isSoft
-        ? cn(s.border, t.border, t.soft, t.hover, enabled && c.shadow, enabled && c.shadowHover)
-        : cn(s.border, t.border, t.bg, t.hover, enabled && c.shadow, enabled && c.shadowHover);
+        ? cn(s.border, t.border, t.soft, t.hover, enabled && c.shadow, moves && c.shadowHover)
+        : cn(s.border, t.border, t.bg, t.hover, enabled && c.shadow, moves && c.shadowHover);
 
   return cn(
     'inline-flex items-center justify-center font-medium focus-visible:outline-hidden disabled:opacity-50 disabled:cursor-not-allowed',
@@ -95,7 +98,7 @@ const classes = computed(() => {
     t.text,
     props.fullWidth && 'w-full',
     variantClasses,
-    enabled && (isGhost || isOutline ? 'active:scale-[0.97]' : c.shadowActive),
+    moves && (isGhost || isOutline ? 'active:scale-[0.97]' : c.shadowActive),
   );
 });
 
@@ -130,7 +133,7 @@ watch(
       v-if="loading"
       data-testid="pxl-button-spinner"
       aria-hidden="true"
-      class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent"
+      class="inline-block h-3.5 w-3.5 motion-safe:animate-spin rounded-full border-2 border-current border-r-transparent"
     />
     <slot v-else name="icon-left" />
     <span><slot /></span>

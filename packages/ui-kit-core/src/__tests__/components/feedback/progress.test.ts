@@ -46,7 +46,11 @@ describe('progress recipes', () => {
     expect(classes.header).toBe('flex items-center justify-between text-xs text-retro-muted font-sans');
     expect(classes.value).toBe(toneMap.cyan.text);
     expect(classes.fill).toBe(`h-full rounded-full transition-all duration-500 ${toneMap.cyan.bg}`);
-    expect(progressClasses('linear', 'cyan', indeterminate).fill).toContain('animate-pulse');
+    // Pulsing, unless the reader prefers reduced motion: then it holds still,
+    // at 70 % as the pixel blocks do, so it does not read as a full bar.
+    const fill = progressClasses('linear', 'cyan', indeterminate).fill.split(' ');
+    expect(fill).toEqual(expect.arrayContaining(['motion-safe:animate-pulse', 'motion-reduce:opacity-70']));
+    expect(fill).not.toContain('animate-pulse');
   });
 
   it('fills a block per 10 %, half-lights the one the value is in and dims the rest', () => {
@@ -63,7 +67,7 @@ describe('progress recipes', () => {
 
   it('pulses every block while indeterminate', () => {
     for (const classes of progressSegmentClasses(0, 'red', indeterminate)) {
-      expect(classes).toBe(`h-2 flex-1 rounded-[1px] transition-all duration-150 ${toneMap.red.fill} opacity-70 animate-pulse`);
+      expect(classes).toBe(`h-2 flex-1 rounded-[1px] transition-all duration-150 ${toneMap.red.fill} opacity-70 motion-safe:animate-pulse`);
     }
   });
 });

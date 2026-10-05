@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { datePickerClasses, focusRing, inputBase, sizeHeight, surfaceClasses, toneMap, type Surface } from '../../../index';
+import { datePickerClasses, fieldBase, focusRing, sizeHeight, surfaceClasses, toneMap, type Surface } from '../../../index';
 
 const SURFACES: Surface[] = ['pixel', 'linear'];
 
@@ -7,7 +7,7 @@ describe('date picker recipes', () => {
   // Regression: the placeholder's `text-retro-muted` followed the field's
   // `text-retro-text`, which Tailwind emits later, so it was never muted.
   it('composes the trigger from the surface and size, red with an error and muted while it shows the placeholder', () => {
-    const base = inputBase
+    const base = fieldBase
       .split(' ')
       .filter((name) => name !== 'text-retro-text')
       .join(' ');

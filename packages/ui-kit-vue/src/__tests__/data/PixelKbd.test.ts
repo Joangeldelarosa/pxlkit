@@ -18,3 +18,14 @@ describe('PixelKbd', () => {
     expect(wrapper.attributes('aria-label')).toBe('Command');
   });
 });
+
+describe('PixelKbd — keycap depth', () => {
+  it('gives the pixel keycap a deeper bottom edge, where a shadow would be clipped, and the linear one a drop shadow', () => {
+    const pixel = mount(PixelKbd, { slots: { default: () => 'K' } }).classes();
+    expect(pixel).toEqual(expect.arrayContaining(['border-b-4', 'border-b-retro-border-strong']));
+    expect(pixel.filter((name) => name.startsWith('shadow-'))).toEqual([]);
+    const linear = mount(PixelKbd, { props: { surface: 'linear' }, slots: { default: () => 'K' } }).classes();
+    expect(linear).toContain('shadow-[0_1px_0_0_rgba(0,0,0,0.15)]');
+    expect(linear).not.toContain('border-b-4');
+  });
+});

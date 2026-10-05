@@ -46,3 +46,14 @@ describe('PixelRibbon', () => {
     expect(stepped!.style.transform).toBe('translateY(2px)');
   });
 });
+
+describe('PixelRibbon — letter spacing', () => {
+  it('spaces its label wide on linear too, where the display face is tight', async () => {
+    const tracking = (element: Element) => Array.from(element.classList).filter((name) => name.startsWith('tracking-'));
+    @Component({ imports: [PixelRibbon], template: '<pxl-ribbon surface="linear">New</pxl-ribbon>' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    expect(tracking(fixture.nativeElement.querySelector('pxl-ribbon'))).toEqual(['tracking-wider']);
+  });
+});

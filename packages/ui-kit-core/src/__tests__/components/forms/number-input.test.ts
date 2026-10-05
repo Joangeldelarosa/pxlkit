@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   clampNumber,
+  fieldBase,
   focusRing,
   formatNumberInput,
-  inputBase,
   numberInputAtLimit,
   numberInputClasses,
   parseNumberInput,
@@ -105,7 +105,7 @@ describe('number input recipes', () => {
     for (const surface of SURFACES) {
       const s = surfaceClasses(surface);
       expect(numberInputClasses(surface, { ...plain, tone: 'cyan', size: 'lg' }).input).toBe(
-        `${inputBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.lg} ${focusRing} ${toneMap.cyan.ring} border-retro-border-strong pl-3 pr-16`,
+        `${fieldBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.lg} ${focusRing} ${toneMap.cyan.ring} border-retro-border-strong pl-3 pr-16`,
       );
     }
     const input = (options: Partial<NumberInputClassOptions>) =>

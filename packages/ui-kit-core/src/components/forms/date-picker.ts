@@ -4,7 +4,7 @@
  * below. PixelDateRangePicker shares its recipes; the grid's own are
  * PixelCalendarGrid's.
  */
-import { cn, focusRing, inputBase, sizeHeight, surfaceClasses, toneMap, type Size, type Surface } from '../../common';
+import { cn, fieldBase, focusRing, sizeHeight, surfaceClasses, toneMap, type Size, type Surface } from '../../common';
 import { fieldBorderClass } from './input';
 
 export interface DatePickerClassOptions {
@@ -43,7 +43,7 @@ export interface DatePickerClasses {
 
 // A text field's look but its text colour, which the placeholder mutes: as
 // nothing merges the two, Tailwind would emit `text-retro-text` last.
-const triggerBase = inputBase
+const triggerBase = fieldBase
   .split(' ')
   .filter((name) => name !== 'text-retro-text')
   .join(' ');

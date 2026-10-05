@@ -52,3 +52,14 @@ describe('PixelDivider', () => {
     expect(ornaments('linear')).toHaveLength(0);
   });
 });
+
+describe('PixelDivider — label letter spacing', () => {
+  it('spaces the label wide on linear too, where the display face is tight', async () => {
+    const tracking = (element: Element) => Array.from(element.classList).filter((name) => name.startsWith('tracking-'));
+    @Component({ imports: [PixelDivider], template: '<pxl-divider surface="linear" label="Section" />' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    expect(tracking(fixture.nativeElement.querySelector('[role="separator"] > span'))).toEqual(['tracking-wider']);
+  });
+});

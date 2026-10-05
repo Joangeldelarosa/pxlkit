@@ -179,3 +179,24 @@ describe('PixelButton — shadows and moves', () => {
     }
   });
 });
+
+describe('PixelButton — loading', () => {
+  it('holds a loading button still: no hover or press feedback, its resting look kept', () => {
+    for (const surface of ['pixel', 'linear'] as const) {
+      const { getByRole, unmount } = render(<PixelButton surface={surface} variant="soft" loading>Save</PixelButton>);
+      const classes = getByRole('button').className.split(' ');
+      for (const name of ['pxl-nudge-hover', 'pxl-nudge-active', 'hover:shadow-md', 'active:shadow-sm']) expect(classes).not.toContain(name);
+      if (surface === 'linear') expect(classes).toContain('shadow-sm');
+      unmount();
+    }
+    const outline = render(<PixelButton variant="outline" loading>Save</PixelButton>).getByRole('button').className.split(' ');
+    expect(outline).not.toContain('active:scale-[0.97]');
+  });
+
+  it('turns its spinner only for a reader who allows motion, from the server markup on', () => {
+    const { getByTestId } = render(<PixelButton loading>Save</PixelButton>);
+    const spinner = getByTestId('pxl-button-spinner').className.split(' ');
+    expect(spinner).toContain('motion-safe:animate-spin');
+    expect(spinner).not.toContain('animate-spin');
+  });
+});

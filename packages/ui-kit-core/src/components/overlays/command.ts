@@ -150,7 +150,7 @@ export function commandClasses(surface: Surface): CommandClasses {
     icon: 'inline-flex h-4 w-4 shrink-0 items-center justify-center text-retro-muted',
     label: 'flex-1 truncate',
     shortcut: cn(
-      'ml-2 inline-flex items-center gap-0.5 border px-1.5 py-0.5 text-[10px] text-retro-muted',
+      'ml-2 inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] text-retro-muted',
       s.border,
       s.radius,
       'border-retro-border',

@@ -83,7 +83,7 @@ export function PixelKbdDocsSection({ className, headingLevel = 2, links = 'anch
       <ul className="docs-highlights">
         <li>Semantic &lt;kbd&gt; root so assistive tech announces the key role correctly.</li>
         <li>Surface-aware: pixel chamfered border + pixel font, or linear pill.</li>
-        <li>Drop-shadow depth tuned per surface for a tactile keycap feel.</li>
+        <li>Keycap depth per surface for a tactile feel: a thick bottom edge on pixel, a soft drop shadow on linear.</li>
         <li>Composable inline — takes any inline content, such as icons or multi-character keys.</li>
       </ul>
     <dl className="docs-meta">

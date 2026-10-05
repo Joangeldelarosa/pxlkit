@@ -31,3 +31,11 @@ describe('PixelDivider', () => {
     expect(wrapper.find('hr').classes()).not.toContain('border-dotted');
   });
 });
+
+describe('PixelDivider — label letter spacing', () => {
+  it('spaces the label wide on linear too, where the display face is tight', () => {
+    const tracking = (classes: string[]) => classes.filter((name) => name.startsWith('tracking-'));
+    const label = mount(PixelDivider, { props: { surface: 'linear', label: 'Section' } }).get('[role="separator"] > span');
+    expect(tracking(label.classes())).toEqual(['tracking-wider']);
+  });
+});

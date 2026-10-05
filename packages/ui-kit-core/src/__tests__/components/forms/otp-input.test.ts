@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  fieldBase,
   focusRing,
-  inputBase,
   isOtpComplete,
   otpCellLabel,
   otpCells,
@@ -100,7 +100,7 @@ describe('OTP input recipes', () => {
       expect(c.root).toBe(`inline-flex max-w-full flex-wrap items-center ${s.font}`);
       expect(c.cell).toBe(
         [
-          inputBase.replace('w-full ', ''),
+          fieldBase.replace('w-full ', ''),
           s.font,
           s.border,
           s.radius,

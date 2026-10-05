@@ -237,7 +237,7 @@ export const menubarSubmenuArrowClasses = 'text-retro-muted';
 export function menubarShortcutClasses(surface: Surface): string {
   const s = surfaceClasses(surface);
   return cn(
-    'ml-2 inline-flex items-center gap-0.5 border px-1.5 py-0.5 text-[10px] text-retro-muted',
+    'ml-2 inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] text-retro-muted',
     s.border,
     s.radius,
     'border-retro-border',

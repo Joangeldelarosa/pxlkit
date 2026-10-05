@@ -3,8 +3,8 @@ import { kbdClasses, type Surface } from '@pxlkit/ui-kit-core';
 import { injectEffectiveSurface } from '../overlay-foundation/pxl-kit-surface-provider';
 
 /**
- * Keyboard key drawn as a keycap, framed and shadowed per surface. Put it on
- * a `<kbd>` element.
+ * Keyboard key drawn as a keycap, framed and given depth per surface. Put it
+ * on a `<kbd>` element.
  *
  * @example
  * <kbd pxlKbd>Ctrl</kbd> <span aria-hidden="true">+</span> <kbd pxlKbd>K</kbd>

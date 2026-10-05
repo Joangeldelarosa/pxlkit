@@ -226,3 +226,27 @@ describe('PixelInput', () => {
     expect(control.hasAttribute('aria-describedby')).toBe(false);
   });
 });
+
+describe('PixelInput — one class per property', () => {
+  it("takes its surface's font family and border width, once each", async () => {
+    @Component({ imports: [PixelInput], template: '<pxl-input data-testid="pixel" /><pxl-input data-testid="linear" surface="linear" />' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    for (const [surface, family, border] of [['pixel', 'font-mono', 'border-2'], ['linear', 'font-sans', 'border']] as const) {
+      const classes = Array.from(inputOf((fixture.nativeElement as HTMLElement).querySelector(`[data-testid="${surface}"]`)!).classList);
+      expect(classes.filter((name) => /^font-(sans|serif|mono|pixel)$/.test(name))).toEqual([family]);
+      expect(classes.filter((name) => /^border(-[0248])?$/.test(name))).toEqual([border]);
+    }
+  });
+
+  it('turns its loading spinner only for a reader who allows motion', async () => {
+    @Component({ imports: [PixelInput], template: '<pxl-input loading />' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('[class~="motion-safe:animate-spin"]')).not.toBeNull();
+    expect(root.querySelector('.animate-spin')).toBeNull();
+  });
+});

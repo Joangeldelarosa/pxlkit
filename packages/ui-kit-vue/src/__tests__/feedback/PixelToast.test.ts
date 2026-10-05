@@ -48,7 +48,7 @@ describe('PixelToast', () => {
 
   it('leads with a spinner and shows no countdown while loading', () => {
     const wrapper = mountToast({ loading: true, icon: 'plain icon', duration: 4500 });
-    expect(wrapper.find('[data-pxl-toast-leading] [role="presentation"].animate-spin').exists()).toBe(true);
+    expect(wrapper.find('[data-pxl-toast-leading] [role="presentation"][class~="motion-safe:animate-spin"]').exists()).toBe(true);
     expect(wrapper.attributes('data-loading')).toBe('true');
     expect(wrapper.find('.h-0\\.5').exists()).toBe(false);
   });
@@ -175,5 +175,13 @@ describe('PixelToast — auto-dismiss countdown', () => {
     wrapper.unmount();
     vi.advanceTimersByTime(2000);
     expect(emitted.dismiss).toBeUndefined();
+  });
+});
+
+describe('PixelToast — loading spinner', () => {
+  it('turns the spinner of a loading toast only for a reader who allows motion', () => {
+    const classes = mountToast({ loading: true }).get('[role="presentation"]').classes();
+    expect(classes).toContain('motion-safe:animate-spin');
+    expect(classes).not.toContain('animate-spin');
   });
 });

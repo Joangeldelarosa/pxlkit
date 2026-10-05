@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  fieldBase,
   focusRing,
-  inputBase,
   passwordInputClasses,
   sizeHeight,
   surfaceClasses,
@@ -19,7 +19,7 @@ describe('password input recipes', () => {
       for (const size of SIZES) {
         const s = surfaceClasses(surface);
         expect(passwordInputClasses(surface, { tone: 'gold', size, invalid: false }).input).toBe(
-          `${inputBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight[size]} ${focusRing} ${toneMap.gold.ring} border-retro-border-strong px-3 pr-16`,
+          `${fieldBase} ${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight[size]} ${focusRing} ${toneMap.gold.ring} border-retro-border-strong px-3 pr-16`,
         );
       }
     }

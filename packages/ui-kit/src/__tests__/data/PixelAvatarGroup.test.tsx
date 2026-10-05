@@ -73,3 +73,20 @@ describe('PixelAvatarGroup', () => {
     expect(group.innerHTML).toMatch(/-ml-/);
   });
 });
+
+describe('PixelAvatarGroup — "+N" font', () => {
+  it('sets the "+N" in the pixel face on pixel and in the surface font on linear, one family each', () => {
+    const family = (el: Element) => el.className.split(' ').filter((name) => /^font-(sans|serif|mono|pixel)$/.test(name));
+    for (const [surface, expected] of [['pixel', 'font-pixel'], ['linear', 'font-sans']] as const) {
+      const { getByText, unmount } = render(
+        <PixelAvatarGroup surface={surface} max={2}>
+          <Avatar label="A" />
+          <Avatar label="B" />
+          <Avatar label="C" />
+        </PixelAvatarGroup>,
+      );
+      expect(family(getByText('2 more users').parentElement!)).toEqual([expected]);
+      unmount();
+    }
+  });
+});

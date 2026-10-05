@@ -82,6 +82,18 @@ describe('PixelProgress — linear surface (smooth bar)', () => {
     render(<PixelProgress value={10} surface="linear" indeterminate />);
     const fill = screen.getByRole('progressbar').firstElementChild as HTMLElement;
     expect(fill.style.width).toBe('100%');
-    expect(fill.className).toContain('animate-pulse');
+    const classes = fill.className.split(' ');
+    // Still, at 70 %, for a reader who prefers reduced motion.
+    expect(classes).toEqual(expect.arrayContaining(['motion-safe:animate-pulse', 'motion-reduce:opacity-70']));
+    expect(classes).not.toContain('animate-pulse');
+  });
+
+  it('pulses the pixel blocks only for a reader who allows motion', () => {
+    render(<PixelProgress value={10} indeterminate />);
+    for (const block of Array.from(screen.getByRole('progressbar').children)) {
+      const classes = block.className.split(' ');
+      expect(classes).toEqual(expect.arrayContaining(['opacity-70', 'motion-safe:animate-pulse']));
+      expect(classes).not.toContain('animate-pulse');
+    }
   });
 });

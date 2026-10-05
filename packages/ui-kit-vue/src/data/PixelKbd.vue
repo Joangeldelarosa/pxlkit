@@ -3,7 +3,7 @@ import { computed, type VNode } from 'vue';
 import { kbdClasses, type Surface } from '@pxlkit/ui-kit-core';
 import { useEffectiveSurface } from '../composables/surface.js';
 
-/** Keyboard key (`<kbd>`) drawn as a keycap, framed and shadowed per surface. */
+/** Keyboard key (`<kbd>`) drawn as a keycap, framed and given depth per surface. */
 export interface PixelKbdProps {
   /** Visual surface override. */
   surface?: Surface;

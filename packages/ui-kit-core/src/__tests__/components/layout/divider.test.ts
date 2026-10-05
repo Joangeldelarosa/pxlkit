@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dividerClasses, dividerSpacingClasses, surfaceClasses, toneMap } from '../../../index';
+import { dividerClasses, dividerSpacingClasses, toneMap } from '../../../index';
 
 describe('divider recipes', () => {
   it('draws a dotted rule on the pixel surface and a thin solid one on the linear surface', () => {
@@ -16,11 +16,10 @@ describe('divider recipes', () => {
     expect(dividerClasses('pixel', 'none', 'neutral').separator).toBe('flex items-center gap-3');
   });
 
-  it('sets the label in the surface display face and the tone colour', () => {
+  it('sets the label in the surface display face, at its own letter-spacing, and the tone colour', () => {
     const base = 'text-[10px] uppercase tracking-wider inline-flex items-center gap-1.5';
     expect(dividerClasses('pixel', 'none', 'cyan').label).toBe(`${base} font-pixel ${toneMap.cyan.text}`);
-    expect(dividerClasses('linear', 'none', 'gold').label).toBe(
-      `${base} ${surfaceClasses('linear').fontDisplay} ${toneMap.gold.text}`,
-    );
+    // Linear's display weight, without the tight letter-spacing of its face.
+    expect(dividerClasses('linear', 'none', 'gold').label).toBe(`${base} font-semibold ${toneMap.gold.text}`);
   });
 });

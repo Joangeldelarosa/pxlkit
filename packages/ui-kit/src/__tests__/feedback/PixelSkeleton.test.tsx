@@ -58,3 +58,12 @@ describe('PixelSkeleton — DOM pass-through', () => {
     expect(el.getAttribute('role')).toBe('status');
   });
 });
+
+describe('PixelSkeleton — reduced motion', () => {
+  it('pulses only for a reader who allows motion, and stays visible, still, otherwise', () => {
+    render(<PixelSkeleton />);
+    const classes = screen.getByRole('status').className.split(' ');
+    expect(classes).toContain('motion-safe:animate-pulse');
+    expect(classes).not.toContain('animate-pulse');
+  });
+});

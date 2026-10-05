@@ -21,10 +21,12 @@ describe('PixelKbd — rendering', () => {
 });
 
 describe('PixelKbd — surface', () => {
-  it('default pixel surface uses the deeper 2px keycap shadow + mono font', () => {
+  it('default pixel surface gives the keycap a deeper bottom edge + mono font', () => {
     const { container } = render(<PixelKbd>⌘</PixelKbd>);
     const kbd = container.querySelector('kbd') as HTMLElement;
-    expect(kbd.className).toContain('shadow-[0_2px_0_0_rgba(0,0,0,0.25)]');
+    // A shadow would be clipped by the cut corners: the depth is the bottom edge.
+    expect(kbd.className.split(' ')).toEqual(expect.arrayContaining(['border-b-4', 'border-b-retro-border-strong']));
+    expect(kbd.className).not.toContain('shadow-');
     expect(kbd.className).toContain('font-mono');
     expect(kbd.className).toContain('pxl-corner-sm');
   });

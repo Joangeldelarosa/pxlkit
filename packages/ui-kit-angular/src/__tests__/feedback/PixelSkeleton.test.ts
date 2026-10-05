@@ -42,3 +42,15 @@ describe('PixelSkeleton', () => {
     expect(custom.getAttribute('data-testid')).toBe('skeleton');
   });
 });
+
+describe('PixelSkeleton — reduced motion', () => {
+  it('pulses only for a reader who allows motion, and stays visible, still, otherwise', async () => {
+    @Component({ imports: [PixelSkeleton], template: '<pxl-skeleton />' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const classes = Array.from((fixture.nativeElement as HTMLElement).querySelector('pxl-skeleton')!.classList);
+    expect(classes).toContain('motion-safe:animate-pulse');
+    expect(classes).not.toContain('animate-pulse');
+  });
+});

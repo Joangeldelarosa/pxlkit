@@ -79,3 +79,10 @@ describe('PixelSidebar', () => {
     expect(wrapper.classes()).toEqual(expect.arrayContaining(['h-96', 'w-56']));
   });
 });
+
+describe('PixelSidebar — section titles', () => {
+  it('spaces a section title wide on linear too, where the display face is tight', () => {
+    const tracking = (classes: string[]) => classes.filter((name) => name.startsWith('tracking-'));
+    expect(tracking(mount(PixelSidebar, { props: { surface: 'linear', sections: SECTIONS } }).get('h3').classes())).toEqual(['tracking-wider']);
+  });
+});

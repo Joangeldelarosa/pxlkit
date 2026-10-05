@@ -70,7 +70,11 @@ export function sidebarSectionClasses(index: number): string {
 
 /** The heading of a section, hidden while collapsed. */
 export function sidebarSectionTitleClasses(surface: Surface): string {
-  return cn('px-3 pb-1 text-[10px] uppercase tracking-wider text-retro-muted', surfaceClasses(surface).fontDisplay);
+  return cn(
+    'px-3 pb-1 text-[10px] uppercase tracking-wider text-retro-muted',
+    // Linear's display weight without its letter-spacing: the title sets its own.
+    surface === 'pixel' ? surfaceClasses(surface).fontDisplay : 'font-semibold',
+  );
 }
 
 /** The items of a section. */

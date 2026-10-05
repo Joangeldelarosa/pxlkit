@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -129,6 +129,25 @@ describe('animation values', () => {
       expect(element.matches(stop!), other).toBe(false);
       expect(element.matches(hide!), other).toBe(false);
     }
+  });
+});
+
+describe('motion in the recipes', () => {
+  const components = resolve(dirname(fileURLToPath(import.meta.url)), '../../../components');
+  // Every `animate-spin` / `animate-pulse` … plays only for a reader who allows
+  // motion: through `motion-safe:`, which holds the server markup still too, or
+  // behind the component's `reducedMotion` flag.
+  it('animates only for a reader who allows motion', () => {
+    const offenders = readdirSync(components, { recursive: true, encoding: 'utf8' })
+      .filter((file) => file.endsWith('.ts'))
+      .flatMap((file) =>
+        readFileSync(resolve(components, file), 'utf8')
+          .split('\n')
+          .map((line, index) => ({ file, line: index + 1, text: line }))
+          .filter(({ text }) => /(?<![\w:-])animate-(spin|pulse|ping|bounce)\b/.test(text) && !/reducedMotion/.test(text)),
+      )
+      .map(({ file, line, text }) => `${file}:${line} ${text.trim()}`);
+    expect(offenders).toEqual([]);
   });
 });
 

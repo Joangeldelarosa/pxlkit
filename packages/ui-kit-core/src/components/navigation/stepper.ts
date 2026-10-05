@@ -196,7 +196,7 @@ export interface StepClasses {
   number: string;
   /** The check mark, the cross or the custom icon in the indicator. */
   icon: string;
-  /** The spinner in the indicator while loading. */
+  /** The spinner in the indicator while loading; it turns only for a reader who allows motion. */
   spinner: string;
   /** Holds the label and the description. */
   body: string;
@@ -231,7 +231,7 @@ export function stepClasses(surface: Surface, { orientation, size, state, clicka
     ),
     number: cn('font-semibold', s.font, t.text),
     icon: cn('inline-flex', t.text),
-    spinner: cn('animate-spin h-3.5 w-3.5', t.text),
+    spinner: cn('motion-safe:animate-spin h-3.5 w-3.5', t.text),
     body: cn('flex flex-col', vertical ? 'items-start pt-0.5' : 'items-center'),
     label: cn(stepLabelSizeClasses[size], s.font, 'font-semibold leading-tight', state === 'pending' ? 'text-retro-muted' : t.text),
     description: cn(stepDescriptionSizeClasses[size], s.font, 'mt-0.5 text-retro-muted leading-snug'),

@@ -39,3 +39,16 @@ describe('PixelProgress', () => {
     expect(mount(PixelProgress, { props: { value: 75, showValue: false } }).element.children).toHaveLength(1);
   });
 });
+
+describe('PixelProgress — indeterminate, reduced motion', () => {
+  it('pulses only for a reader who allows motion: the linear fill holds still at 70 %, the pixel blocks at theirs', () => {
+    const fill = mount(PixelProgress, { props: { value: 10, surface: 'linear', indeterminate: true } }).get('[role="progressbar"] > div').classes();
+    expect(fill).toEqual(expect.arrayContaining(['motion-safe:animate-pulse', 'motion-reduce:opacity-70']));
+    expect(fill).not.toContain('animate-pulse');
+    const blocks = mount(PixelProgress, { props: { value: 10, indeterminate: true } }).findAll('[role="progressbar"] > div');
+    for (const block of blocks) {
+      expect(block.classes()).toEqual(expect.arrayContaining(['opacity-70', 'motion-safe:animate-pulse']));
+      expect(block.classes()).not.toContain('animate-pulse');
+    }
+  });
+});

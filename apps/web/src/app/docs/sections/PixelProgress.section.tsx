@@ -36,7 +36,7 @@ const api: FrameworkApiReferences = {
           { name: 'label', type: 'string', description: 'Optional label rendered above the bar. Also used as the progressbar\'s accessible name; falls back to "Progress" when omitted.' },
           { name: 'showValue', type: 'boolean', default: 'true', description: 'Whether to show the numeric percentage on the right. Defaults to `true`.' },
           { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; falls back to nearest provider.' },
-          { name: 'indeterminate', type: 'boolean', default: 'false', description: 'When `true`, switches to indeterminate animation (visual only — ARIA still reports value).' },
+          { name: 'indeterminate', type: 'boolean', default: 'false', description: 'Unknown-duration work: the bar pulses (it holds still, at 70 %, for a reader who prefers reduced motion), `aria-valuenow` is dropped and `aria-busy` set.' },
         ],
         notes: [
           '`ref` points to `<div>`.',
@@ -113,7 +113,7 @@ export function PixelProgressDocsSection({ className, headingLevel = 2, links = 
       <ul className="docs-aria-patterns">
         <li><code>progressbar</code></li>
       </ul>
-      <p className="docs-aria-notes">Exposes role=&quot;progressbar&quot; with aria-valuemin=0 and aria-valuemax=100; aria-valuenow is set from the clamped value. The label prop is forwarded to aria-label, falling back to &quot;Progress&quot; when omitted so the progressbar always has an accessible name. In indeterminate mode aria-valuenow is omitted and aria-busy is set to true so assistive tech announces unknown-duration work. The 10-segment pixel surface is purely visual — assistive tech reads the same progressbar attributes as the linear surface.</p>
+      <p className="docs-aria-notes">Exposes role=&quot;progressbar&quot; with aria-valuemin=0 and aria-valuemax=100; aria-valuenow is set from the clamped value. The label prop is forwarded to aria-label, falling back to &quot;Progress&quot; when omitted so the progressbar always has an accessible name. In indeterminate mode aria-valuenow is omitted and aria-busy is set to true so assistive tech announces unknown-duration work; the bar pulses only for a reader who allows motion, and under <code>prefers-reduced-motion: reduce</code> holds still at 70 % opacity. The 10-segment pixel surface is purely visual — assistive tech reads the same progressbar attributes as the linear surface.</p>
     </section>
     <section aria-labelledby="pixel-progress-usage">
       <Heading id="pixel-progress-usage">Usage</Heading>

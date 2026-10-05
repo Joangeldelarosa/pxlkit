@@ -378,6 +378,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   glitch hero headline renders one `<h1>` instead of three, a `.dark` palette override reaches the
   utilities, server-rendered animations hold still from the first paint for readers who prefer
   reduced motion, and the examples compile under strict TypeScript and link to pxlkit.xyz.
+- `@pxlkit/ui-kit` (and the Vue and Angular kits): `PixelDrawer` slides in from its side, as its
+  classes always asked — the stylesheet never defined the keyframes they named, so the panel
+  appeared at once. A loading `PixelButton` holds still under the pointer, like a disabled one.
+  `PixelSkeleton`, an indeterminate `PixelProgress` and the spinners of a loading button, input,
+  stepper step and toast hold still for readers who prefer reduced motion, from the
+  server-rendered markup on, as `PixelSpinner` does. On the pixel surface `PixelKbd` shows its
+  depth as a thicker bottom edge; its drop shadow fell outside the cut corners. Class lists that
+  set one property twice (a linear ribbon's or divider label's letter-spacing, the text fields'
+  border width and font family) set it once; they render as before.
 - Site and README claims: "zero runtime deps" (the kits need Tailwind CSS v4), the Indie license's
   "lifetime updates" (a lifetime license with the updates available at purchase, as
   `COMMERCIAL_TERMS` says), 6 icon packs and 6 tones (there are 7 of each), a hard-coded gate count,

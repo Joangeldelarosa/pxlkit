@@ -159,7 +159,7 @@ describe('stepper recipes', () => {
     const parts = stepClasses('linear', { ...BASE, state: 'active' });
     expect(classesOf(parts.number)).toEqual(expect.arrayContaining(['font-semibold', 'font-sans', 'text-retro-cyan']));
     expect(parts.icon).toBe('inline-flex text-retro-cyan');
-    expect(parts.spinner).toBe('animate-spin h-3.5 w-3.5 text-retro-cyan');
+    expect(parts.spinner).toBe('motion-safe:animate-spin h-3.5 w-3.5 text-retro-cyan');
     expect(classesOf(stepClasses('pixel', { ...BASE, orientation: 'vertical' }).body)).toEqual(
       expect.arrayContaining(['items-start', 'pt-0.5']),
     );

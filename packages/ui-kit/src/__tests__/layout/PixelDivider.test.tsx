@@ -70,3 +70,11 @@ describe('PixelDivider — spacing', () => {
     expect(getByRole('separator').className).toContain('py-10');
   });
 });
+
+describe('PixelDivider — label letter spacing', () => {
+  it('spaces the label wide on linear too, where the display face is tight', () => {
+    const tracking = (el: Element) => el.className.split(' ').filter((name) => name.startsWith('tracking-'));
+    const { getByText } = render(<PixelDivider surface="linear" label="Section" />);
+    expect(tracking(getByText('Section'))).toEqual(['tracking-wider']);
+  });
+});

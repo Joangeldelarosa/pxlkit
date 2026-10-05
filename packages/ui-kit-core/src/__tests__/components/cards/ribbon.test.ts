@@ -62,7 +62,8 @@ describe('ribbon recipes', () => {
           'inline-flex items-center px-2 py-1 text-[10px] font-semibold uppercase tracking-wider',
           s.border,
           s.radius,
-          s.fontDisplay,
+          // The pixel face; on linear the weight above is the display face.
+          ...(surface === 'pixel' ? [s.fontDisplay] : []),
           t.fill,
           t.border,
           'text-retro-bg',

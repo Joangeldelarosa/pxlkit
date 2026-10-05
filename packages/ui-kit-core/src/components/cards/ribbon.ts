@@ -87,7 +87,9 @@ export function ribbonClasses(surface: Surface, { position, tone, offset, tilt }
     'inline-flex items-center px-2 py-1 text-[10px] font-semibold uppercase tracking-wider',
     s.border,
     s.radius,
-    s.fontDisplay,
+    // The pixel face; on linear the display face is the weight above, and its
+    // tight letter-spacing would compete with the ribbon's wide one.
+    surface === 'pixel' && s.fontDisplay,
     t.fill,
     t.border,
     ribbonTextClass(tone),

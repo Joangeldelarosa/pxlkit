@@ -21,11 +21,19 @@ describe('PixelSkeleton', () => {
     });
     const style = (wrapper.element as HTMLElement).style;
     expect([style.width, style.height, style.opacity]).toEqual(['10rem', '1rem', '0.5']);
-    expect(wrapper.classes()).toEqual(expect.arrayContaining(['custom', 'animate-pulse']));
+    expect(wrapper.classes()).toEqual(expect.arrayContaining(['custom', 'motion-safe:animate-pulse']));
     expect(wrapper.attributes('data-testid')).toBe('skeleton');
   });
 
   it('rounds into a circle on the linear surface', () => {
     expect(mount(PixelSkeleton, { props: { rounded: true, surface: 'linear' } }).classes()).toContain('rounded-full');
+  });
+});
+
+describe('PixelSkeleton — reduced motion', () => {
+  it('pulses only for a reader who allows motion, and stays visible, still, otherwise', () => {
+    const classes = mount(PixelSkeleton).classes();
+    expect(classes).toContain('motion-safe:animate-pulse');
+    expect(classes).not.toContain('animate-pulse');
   });
 });

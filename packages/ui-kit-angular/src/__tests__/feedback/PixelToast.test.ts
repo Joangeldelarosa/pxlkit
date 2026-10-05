@@ -99,7 +99,7 @@ describe('PixelToast', () => {
     expect(text.querySelector('[data-pxl-toast-leading]')!.textContent).toBe('plain');
     expect(text.querySelector('.mt-2\\.5')!.textContent).toBe('See details');
     const loading = document.getElementById('loading')!;
-    expect(loading.querySelector('[data-pxl-toast-leading] [role="presentation"].animate-spin')).not.toBeNull();
+    expect(loading.querySelector('[data-pxl-toast-leading] [role="presentation"][class~="motion-safe:animate-spin"]')).not.toBeNull();
     expect(loading.getAttribute('data-loading')).toBe('true');
     expect(loading.querySelector('.h-0\\.5')).toBeNull();
   });
@@ -221,5 +221,16 @@ describe('PixelToast', () => {
     fixture.destroy();
     expect(cleared).toHaveBeenCalledWith(started.mock.results[countdown]!.value);
     expect(host.dismissed).toBe(0);
+  });
+});
+
+describe('PixelToast — loading spinner', () => {
+  it('turns the spinner of a loading toast only for a reader who allows motion', async () => {
+    const { host, settle } = await render(Host);
+    host.toast.set({ id: 't', title: 'Saving', loading: true, duration: 0 });
+    await settle();
+    const classes = Array.from(card().querySelector('[role="presentation"]')!.classList);
+    expect(classes).toContain('motion-safe:animate-spin');
+    expect(classes).not.toContain('animate-spin');
   });
 });

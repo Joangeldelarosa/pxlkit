@@ -65,3 +65,28 @@ describe('PixelAvatarGroup', () => {
     expect(root.querySelectorAll('[data-shape]')).toHaveLength(0);
   });
 });
+
+describe('PixelAvatarGroup — "+N" font', () => {
+  it('sets the "+N" in the pixel face on pixel and in the surface font on linear, one family each', async () => {
+    @Component({
+      imports: PARTS,
+      template: `
+        <pxl-avatar-group data-testid="pixel" [max]="2">
+          <pxl-avatar *pxlAvatarGroupItem name="Ana" /><pxl-avatar *pxlAvatarGroupItem name="Bo" /><pxl-avatar *pxlAvatarGroupItem name="Cy" />
+        </pxl-avatar-group>
+        <pxl-avatar-group data-testid="linear" surface="linear" [max]="2">
+          <pxl-avatar *pxlAvatarGroupItem name="Ana" /><pxl-avatar *pxlAvatarGroupItem name="Bo" /><pxl-avatar *pxlAvatarGroupItem name="Cy" />
+        </pxl-avatar-group>
+      `,
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const family = (id: string) => {
+      const tile = (fixture.nativeElement as HTMLElement).querySelector(`[data-testid="${id}"] .sr-only`)!.parentElement!;
+      return Array.from(tile.classList).filter((name) => /^font-(sans|serif|mono|pixel)$/.test(name));
+    };
+    expect(family('pixel')).toEqual(['font-pixel']);
+    expect(family('linear')).toEqual(['font-sans']);
+  });
+});

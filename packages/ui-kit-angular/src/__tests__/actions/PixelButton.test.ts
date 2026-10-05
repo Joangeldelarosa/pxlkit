@@ -115,3 +115,37 @@ describe('PixelButton', () => {
     expect(classes.filter((c) => c.endsWith('outline-none'))).toEqual([]);
   });
 });
+
+describe('PixelButton — loading', () => {
+  it('holds a loading button still: no hover or press feedback, its resting look kept', async () => {
+    @Component({
+      imports: [PixelButton],
+      template: `
+        <button pxlButton variant="soft" loading>Save</button>
+        <button pxlButton surface="linear" variant="soft" loading>Save</button>
+        <button pxlButton variant="outline" loading>Save</button>
+      `,
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const [pixel, linear, outline] = (Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[]).map((button) =>
+      Array.from(button.classList),
+    );
+    for (const classes of [pixel!, linear!]) {
+      for (const name of ['pxl-nudge-hover', 'pxl-nudge-active', 'hover:shadow-md', 'active:shadow-sm']) expect(classes).not.toContain(name);
+    }
+    expect(linear).toContain('shadow-sm');
+    expect(outline).not.toContain('active:scale-[0.97]');
+  });
+
+  it('turns its spinner only for a reader who allows motion, from the server markup on', async () => {
+    @Component({ imports: [PixelButton], template: '<button pxlButton loading>Save</button>' })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const spinner = Array.from((fixture.nativeElement as HTMLElement).querySelector('[data-testid="pxl-button-spinner"]')!.classList);
+    expect(spinner).toContain('motion-safe:animate-spin');
+    expect(spinner).not.toContain('animate-spin');
+  });
+});

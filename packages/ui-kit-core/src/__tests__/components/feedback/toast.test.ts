@@ -90,7 +90,8 @@ describe('toast recipes', () => {
   it('tints the leading slot, the spinner and the countdown bar with the tone', () => {
     const classes = toastClasses('pixel', 'gold');
     expect(classes.leading).toContain(toneMap.gold.text);
-    expect(classesOf(classes.spinner)).toEqual(expect.arrayContaining(['animate-spin', toneMap.gold.text]));
+    expect(classesOf(classes.spinner)).toEqual(expect.arrayContaining(['motion-safe:animate-spin', toneMap.gold.text]));
+    expect(classesOf(classes.spinner)).not.toContain('animate-spin');
     expect(classes.bar).toBe(`h-full transition-[width] ease-linear ${toneMap.gold.fill}`);
     expect(classes.track).toBe('absolute inset-x-0 bottom-0 h-0.5 bg-retro-surface/40');
     expect(classes.body).toBe('flex-1 min-w-0');

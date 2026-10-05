@@ -142,7 +142,7 @@ describe('multi-select recipes', () => {
       expect(multiSelectClasses(surface, { size: 'sm', invalid: false, open: false }).field).toBe(
         [
           'flex w-full cursor-default select-none items-center justify-between gap-2 px-3',
-          'border bg-retro-surface/40 focus-within:bg-retro-surface/70 text-retro-text font-mono transition-all',
+          'bg-retro-surface/40 focus-within:bg-retro-surface/70 text-retro-text transition-all',
           focus[surface],
           'has-[[role=combobox]:disabled]:opacity-50 has-[[role=combobox]:disabled]:cursor-not-allowed',
           `${s.font} ${s.border} ${s.radius} ${s.transition} ${sizeHeight.sm} border-retro-border-strong`,

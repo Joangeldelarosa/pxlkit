@@ -137,3 +137,19 @@ describe('PixelStepper', () => {
     expect(root.querySelectorAll('hr')).toHaveLength(2);
   });
 });
+
+describe('PixelStepper — loading step', () => {
+  it('turns the spinner of a loading step only for a reader who allows motion', async () => {
+    @Component({
+      imports: [PixelStepper, PixelStepperStep],
+      template: '<pxl-stepper [active]="0"><pxl-stepper-step label="Upload" loading /><pxl-stepper-step label="Done" /></pxl-stepper>',
+    })
+    class Host {}
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const spinner = (fixture.nativeElement as HTMLElement).querySelector('[data-pxl-step-icon="loading"]')!;
+    const classes = (spinner.getAttribute('class') ?? '').split(' ');
+    expect(classes).toContain('motion-safe:animate-spin');
+    expect(classes).not.toContain('animate-spin');
+  });
+});
