@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelColorInputDocsSectionProps {
@@ -17,6 +18,92 @@ export const PixelColorInputDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelColorInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelColorInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelColorInput',
+        props: [
+          { name: 'value', type: 'string', description: 'The colour; leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial colour while uncontrolled.' },
+          { name: 'onChange', type: '(next: string) => void', description: 'Called with the colour picked or typed, in `format`.' },
+          { name: 'format', type: "'hex' | 'rgb' | 'hsl'", default: "'hex'", description: 'How a picked colour is written: `#rrggbb`, `rgb(r, g, b)` or `hsl(h, s%, l%)`.' },
+          { name: 'presets', type: 'string[]', description: 'The preset colours; sixteen greys and hues by default.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger, which it also names.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the colour.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelColorInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelColorInput',
+        props: [
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'The colour (`v-model`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial colour while uncontrolled.' },
+          { name: 'format', type: "'hex' | 'rgb' | 'hsl'", default: "'hex'", description: 'How a picked colour is written: `#rrggbb`, `rgb(r, g, b)` or `hsl(h, s%, l%)`.' },
+          { name: 'presets', type: 'string[]', description: 'The preset colours; sixteen greys and hues by default.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger, which it also names.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the colour.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The colour picked or typed, in `format`.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the trigger button.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelColorInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelColorInput',
+        selector: 'pxl-color-input',
+        props: [
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'The colour (`[(value)]`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial colour while uncontrolled.' },
+          { name: 'format', type: "'hex' | 'rgb' | 'hsl'", default: "'hex'", description: 'How a picked colour is written: `#rrggbb`, `rgb(r, g, b)` or `hsl(h, s%, l%)`.' },
+          { name: 'presets', type: 'string[]', description: 'The preset colours; sixteen greys and hues by default.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger, which it also names.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the colour.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the trigger; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +122,9 @@ export function PixelColorInputDocsSection({ className }: PixelColorInputDocsSec
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-color-input-api">
+      <h3 id="pixel-color-input-api">API</h3>
+      <FrameworkApi label={'PixelColorInput API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-color-input-a11y">
       <h3 id="pixel-color-input-a11y">Accessibility</h3>

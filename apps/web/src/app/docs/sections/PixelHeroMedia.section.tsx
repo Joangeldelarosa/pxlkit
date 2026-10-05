@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelHeroMediaDocsSectionProps {
@@ -17,6 +18,77 @@ export const PixelHeroMediaDocsMeta = {
   since: '1.7.0',
   deprecated: false,
 } as const;
+
+/** PixelHeroMedia's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelHeroMedia } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelHeroMedia',
+        props: [
+          { name: 'ratio', type: "'1/1' | '4/5' | '16/10' | '16/9'", default: "'16/10'", description: 'Aspect ratio of the figure.' },
+          { name: 'anchor', type: "'center' | 'baseline-headline'", default: "'center'", description: "Centred across its row, or on the row's end beside a headline." },
+          { name: 'framed', type: 'boolean', default: 'false', description: "Draw the surface border and radius in the tone's border colour." },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the frame.' },
+          { name: 'caption', type: 'string', description: 'Caption under the media, in a `<figcaption>`.' },
+          { name: 'captionClassName', type: 'string', description: 'Optional className applied to the inner caption (figcaption).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The media.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelHeroMedia } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelHeroMedia',
+        props: [
+          { name: 'ratio', type: "'1/1' | '4/5' | '16/10' | '16/9'", default: "'16/10'", description: 'Aspect ratio of the figure.' },
+          { name: 'anchor', type: "'center' | 'baseline-headline'", default: "'center'", description: "Centred across its row, or on the row's end beside a headline." },
+          { name: 'framed', type: 'boolean', default: 'false', description: "Draw the surface border and radius in the tone's border colour." },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the frame.' },
+          { name: 'caption', type: 'string', description: 'Caption under the media, in a `<figcaption>`.' },
+          { name: 'captionClass', type: 'string', description: "Extra classes for the caption (the React kit's `captionClassName`)." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The media.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<figure>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelHeroMedia } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelHeroMedia',
+        selector: 'figure[pxlHeroMedia]',
+        props: [
+          { name: 'ratio', type: "'1/1' | '4/5' | '16/10' | '16/9'", default: "'16/10'", description: 'Aspect ratio of the figure.' },
+          { name: 'anchor', type: "'center' | 'baseline-headline'", default: "'center'", description: "Centred across its row, or on the row's end beside a headline." },
+          { name: 'framed', type: 'boolean', default: 'false', accepts: 'unknown', description: "Draw the surface border and radius in the tone's border colour." },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the frame.' },
+          { name: 'caption', type: 'string', description: 'Caption under the media, in a `<figcaption>`.' },
+          { name: 'captionClass', type: 'string', description: "Extra classes for the caption (the React kit's `captionClassName`)." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on a native `<figure>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelHeroMediaDocsSection({ className }: PixelHeroMediaDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +106,9 @@ export function PixelHeroMediaDocsSection({ className }: PixelHeroMediaDocsSecti
       <dt>Category</dt><dd>hero</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-hero-media-api">
+      <h3 id="pixel-hero-media-api">API</h3>
+      <FrameworkApi label={'PixelHeroMedia API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-hero-media-a11y">
       <h3 id="pixel-hero-media-a11y">Accessibility</h3>

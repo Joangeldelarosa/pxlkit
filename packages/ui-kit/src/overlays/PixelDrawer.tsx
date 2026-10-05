@@ -22,22 +22,37 @@ import { useScrollLock } from '../hooks/useScrollLock';
 import { useEscape } from '../hooks/useEscape';
 
 export interface PixelDrawerProps {
+  /** Whether the drawer is visible; set it from `onOpenChange`. */
   open: boolean;
+  /** Called with `false` when the drawer asks to close (Escape, the backdrop). */
   onOpenChange: (open: boolean) => void;
+  /** Edge of the viewport the drawer is anchored to. */
   side?: DrawerSide;
+  /** Width (left / right) or height (top / bottom) preset. */
   size?: DrawerSize;
+  /** Dim the page behind the drawer. */
   overlay?: boolean;
+  /** Close when the backdrop is clicked. */
   dismissOnOverlay?: boolean;
+  /** Keep Tab focus inside the drawer while it is open. */
   trapFocus?: boolean;
+  /** Accessible name of the dialog (visually hidden). */
   title?: string;
+  /** Accessible description of the dialog (visually hidden). */
   description?: string;
   /**
    * Accessible name fallback when `title` is omitted. WCAG 4.1.2 requires
    * every `role="dialog"` to expose a name; supply `title` OR `aria-label`.
    */
   'aria-label'?: string;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Portal target; `document.body` when left out. */
   container?: HTMLElement | null;
+  /**
+   * The drawer content — typically `PixelDrawer.Header`, `PixelDrawer.Body` and
+   * `PixelDrawer.Footer`.
+   */
   children: React.ReactNode;
 }
 
@@ -145,6 +160,7 @@ PixelDrawerRoot.displayName = 'PixelDrawer';
 
 export interface PixelDrawerHeaderProps
   extends React.HTMLAttributes<HTMLDivElement> {
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -195,6 +211,7 @@ PixelDrawerBody.displayName = 'PixelDrawer.Body';
 
 export interface PixelDrawerFooterProps
   extends React.HTMLAttributes<HTMLDivElement> {
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

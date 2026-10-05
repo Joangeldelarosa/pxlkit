@@ -39,7 +39,10 @@ const props = withDefaults(defineProps<PixelCenterProps>(), {
   surface: undefined,
   bordered: false,
 });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The centred content. */
+  default?(): VNode[];
+}>();
 
 const surface = useEffectiveSurface(() => props.surface);
 const classes = computed(() =>

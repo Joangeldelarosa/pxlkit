@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelZoomInDocsSectionProps {
@@ -17,6 +18,83 @@ export const PixelZoomInDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelZoomIn's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelZoomIn } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelZoomIn',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to zoom in.' },
+          { name: 'duration', type: 'number', default: '320', description: 'Animation duration in milliseconds. Default `320`.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Animation delay in milliseconds. Default `0`.' },
+          { name: 'startScale', type: 'number', default: '0.92', description: 'Starting `scale()` factor. Default `0.92`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`. Default `1`." },
+          { name: 'easing', type: 'string', default: "'cubic-bezier(.2,.9,.2,1)'", description: "CSS `animation-timing-function`. Default `'cubic-bezier(.2,.9,.2,1)'`." },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: "CSS `animation-fill-mode`. Default `'both'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelZoomIn } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelZoomIn',
+        props: [
+          { name: 'duration', type: 'number', default: '320', description: 'Animation duration in milliseconds.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Animation delay in milliseconds.' },
+          { name: 'startScale', type: 'number', default: '0.92', description: 'Starting `scale()` factor.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'cubic-bezier(.2,.9,.2,1)'", description: 'CSS `animation-timing-function`.' },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: 'CSS `animation-fill-mode`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to zoom in.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelZoomIn } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelZoomIn',
+        selector: 'pxl-zoom-in',
+        props: [
+          { name: 'duration', type: 'number', default: '320', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'delay', type: 'number', default: '0', accepts: 'unknown', description: 'Animation delay in milliseconds.' },
+          { name: 'startScale', type: 'number', default: '0.92', accepts: 'unknown', description: 'Starting `scale()` factor.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'cubic-bezier(.2,.9,.2,1)'", description: 'CSS `animation-timing-function`.' },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: 'CSS `animation-fill-mode`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelZoomInDocsSection({ className }: PixelZoomInDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +112,9 @@ export function PixelZoomInDocsSection({ className }: PixelZoomInDocsSectionProp
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-zoom-in-api">
+      <h3 id="pixel-zoom-in-api">API</h3>
+      <FrameworkApi label={'PixelZoomIn API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-zoom-in-a11y">
       <h3 id="pixel-zoom-in-a11y">Accessibility</h3>

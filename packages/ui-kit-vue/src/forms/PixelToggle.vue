@@ -34,7 +34,10 @@ const emit = defineEmits<{
   /** The new pressed state of a standalone toggle, after each press. */
   'update:pressed': [pressed: boolean];
 }>();
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Toggle label. */
+  default?(): VNode[];
+}>();
 
 const group = useToggleGroupContext();
 const surface = useEffectiveSurface(() => props.surface ?? group?.surface.value);

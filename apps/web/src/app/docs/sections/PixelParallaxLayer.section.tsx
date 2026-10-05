@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelParallaxLayerDocsSectionProps {
@@ -17,6 +18,62 @@ export const PixelParallaxLayerDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelParallaxLayer's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelParallaxLayer } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelParallaxLayer',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content of the layer.' },
+          { name: 'speed', type: 'number', default: '0.5', description: 'Parallax multiplier. 0 = no movement, 1 = full scroll speed, negative = reverse.' },
+          { name: 'axis', type: "'x' | 'y' | 'both'", default: "'y'", description: 'Axis to translate on. Default `"y"`.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the wrapper.' },
+          { name: 'style', type: 'React.CSSProperties', description: 'Inline styles of the wrapper.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelParallaxLayer } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelParallaxLayer',
+        props: [
+          { name: 'speed', type: 'number', default: '0.5', description: 'Multiplier of the scroll: 0 holds the layer in place, 1 moves it at scroll speed, a negative one reverses it.' },
+          { name: 'axis', type: "'x' | 'y' | 'both'", default: "'y'", description: 'Axis the layer moves along.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content of the layer.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelParallaxLayer } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelParallaxLayer',
+        selector: 'pxl-parallax-layer',
+        props: [
+          { name: 'speed', type: 'number', default: '0.5', accepts: 'unknown', description: 'Multiplier of the scroll: 0 holds the layer in place, 1 moves it at scroll speed, a negative one reverses it.' },
+          { name: 'axis', type: "'x' | 'y' | 'both'", default: "'y'", description: 'Axis the layer moves along.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +91,9 @@ export function PixelParallaxLayerDocsSection({ className }: PixelParallaxLayerD
       <dt>Category</dt><dd>parallax</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-parallax-layer-api">
+      <h3 id="pixel-parallax-layer-api">API</h3>
+      <FrameworkApi label={'PixelParallaxLayer API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-parallax-layer-a11y">
       <h3 id="pixel-parallax-layer-a11y">Accessibility</h3>

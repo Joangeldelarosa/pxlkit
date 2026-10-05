@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFormDocsSectionProps {
@@ -17,6 +18,242 @@ export const PixelFormDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelForm's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelForm } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelForm',
+        props: [
+          { name: 'form', type: 'UseFormReturn<T>', required: true, description: "The form: what React Hook Form's `useForm` returns." },
+          { name: 'onSubmit', type: '(data: T) => void | Promise<void>', required: true, description: "Called with the form's values, once a submission finds no error." },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The fields.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the `<form>`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          '`ref` points to `<form>`.',
+          '`PixelForm.Root` is the same component.',
+        ],
+      },
+      {
+        name: 'PixelForm.Field',
+        props: [
+          { name: 'name', type: 'TName', required: true, description: "Path of the field in the form's values." },
+          { name: 'rules', type: "Omit<RegisterOptions<TFieldValues, TName>, 'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'>", description: "Validation rules: React Hook Form's `rules` (`required`, `min`, `max`, `minLength`, `maxLength`, `pattern`, `validate`)." },
+          { name: 'defaultValue', type: "UseControllerProps<TFieldValues, TName>['defaultValue']", description: "Initial value, where the form's `defaultValues` have none." },
+          { name: 'shouldUnregister', type: 'boolean', description: "Drops the field's value from the form when it unmounts; by default the value stays." },
+          { name: 'render', type: '(args: { field: ControllerRenderProps<TFieldValues, TName>; fieldState: ControllerFieldState }) => React.ReactElement', required: true, description: "Renders the control: gets the field's props (`field`: its value, change and blur handlers, name and ref) and its state (`fieldState`)." },
+        ],
+      },
+      {
+        name: 'PixelForm.Item',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: '`PixelForm.Label`, `PixelForm.Control`, `PixelForm.Description` and `PixelForm.Message`.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelForm.Label',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<label>` (`LabelHTMLAttributes<HTMLLabelElement>`).',
+          '`ref` points to `<label>`.',
+        ],
+      },
+      {
+        name: 'PixelForm.Control',
+        props: [
+          { name: 'children', type: 'React.ReactElement', required: true, description: "The control: one element, which gets the field's `id`, `aria-describedby` and `aria-invalid`." },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+      {
+        name: 'PixelForm.Description',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<p>` (`HTMLAttributes<HTMLParagraphElement>`).',
+          '`ref` points to `<p>`.',
+        ],
+      },
+      {
+        name: 'PixelForm.Message',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<p>` (`HTMLAttributes<HTMLParagraphElement>`).',
+          '`ref` points to `<p>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelForm, PixelFormControl, PixelFormDescription, PixelFormField, PixelFormItem, PixelFormLabel, PixelFormMessage } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelForm',
+        props: [
+          { name: 'form', type: 'FormContext<TValues>', required: true, description: "The form: what VeeValidate's `useForm` returns." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'submit', payload: 'values: TValues', description: "The form's values, once a submission finds no error." },
+        ],
+        slots: [
+          { name: 'default', description: 'The fields.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<form>`.',
+        ],
+      },
+      {
+        name: 'PixelFormControl',
+        slots: [
+          { name: 'default', description: 'The control: one element or component.' },
+        ],
+      },
+      {
+        name: 'PixelFormDescription',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The description text.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<p>`.',
+        ],
+      },
+      {
+        name: 'PixelFormField',
+        props: [
+          { name: 'name', type: 'string', required: true, description: "Path of the field in the form's values." },
+          { name: 'rules', type: 'RuleExpression<TValue>', description: 'VeeValidate rules: a function returning `true` or a message, an array of them, or a schema.' },
+          { name: 'defaultValue', type: 'TValue', description: "Initial value, where the form's `initialValues` have none." },
+          { name: 'shouldUnregister', type: 'boolean', default: 'false', description: "Drops the field's value from the form when it unmounts; by default the value stays." },
+        ],
+        slots: [
+          { name: 'default', props: '{ field: PixelFormFieldBinding<TValue>; fieldState: PixelFormFieldState }', description: "The field's item: bind `field` to its control." },
+        ],
+      },
+      {
+        name: 'PixelFormItem',
+        slots: [
+          { name: 'default', description: '`PixelFormLabel`, `PixelFormControl`, `PixelFormDescription` and `PixelFormMessage`.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelFormLabel',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The label text.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<label>`.',
+        ],
+      },
+      {
+        name: 'PixelFormMessage',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'A message to show in place of the error.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelForm, PixelFormControl, PixelFormDescription, PixelFormField, PixelFormItem, PixelFormLabel, PixelFormMessage } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelForm',
+        selector: 'form[pxlForm]',
+        props: [
+          { name: 'pxlForm', type: 'TGroup', required: true, description: "The form's model." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'submitted', payload: "TGroup['value']", description: "The form's value, once a submission finds no error (pending validators are waited for)." },
+        ],
+        notes: [
+          'Goes on a native `<form>`, which keeps its own attributes and events.',
+          'Exported as `pxlForm`: `#ref="pxlForm"` gives a template reference to it.',
+        ],
+      },
+      {
+        name: 'PixelFormControl',
+        selector: '[pxlFormControl]',
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+      {
+        name: 'PixelFormDescription',
+        selector: 'p[pxlFormDescription]',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on a native `<p>`, which keeps its own attributes and events.',
+        ],
+      },
+      {
+        name: 'PixelFormField',
+        selector: '[pxlFormField]',
+        props: [
+          { name: 'pxlFormField', type: 'string', required: true, description: "Name of the field's control in the form's group." },
+          { name: 'messages', type: 'Record<string, string>', description: "The message to show for each error key the control's validators report." },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+          'Exported as `pxlFormField`: `#ref="pxlFormField"` gives a template reference to it.',
+        ],
+      },
+      {
+        name: 'PixelFormItem',
+        selector: 'pxl-form-item',
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelFormLabel',
+        selector: 'label[pxlFormLabel]',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on a native `<label>`, which keeps its own attributes and events.',
+        ],
+      },
+      {
+        name: 'PixelFormMessage',
+        selector: 'pxl-form-message',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +272,9 @@ export function PixelFormDocsSection({ className }: PixelFormDocsSectionProps): 
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-form-api">
+      <h3 id="pixel-form-api">API</h3>
+      <FrameworkApi label={'PixelForm API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-form-a11y">
       <h3 id="pixel-form-a11y">Accessibility</h3>

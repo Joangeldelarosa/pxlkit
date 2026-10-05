@@ -13,7 +13,7 @@ export interface PixelIconButtonProps extends Omit<React.ButtonHTMLAttributes<HT
   label: string;
   /** Color tone (maps to `toneMap`). */
   tone?: Tone;
-  /** Visual size (`xs`–`xl`); produces a square via `sizeSquare`. */
+  /** Visual size; the button is a square of it (`sizeSquare`). */
   size?: Size;
   /** Surface aesthetic override; defaults to nearest provider. */
   surface?: Surface;

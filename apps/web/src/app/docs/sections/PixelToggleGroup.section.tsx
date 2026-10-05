@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToggleGroupDocsSectionProps {
@@ -17,6 +18,92 @@ export const PixelToggleGroupDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelToggleGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelToggleGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelToggleGroup',
+        props: [
+          { name: 'type', type: "'single' | 'multiple'", default: "'single'", description: '`single`: one value, a radiogroup of radios; `multiple`: any number of values, pressed buttons.' },
+          { name: 'value', type: 'string | string[]', description: "Value: a string in single mode (`''` for none), an array in multiple mode; leave unset for an uncontrolled group." },
+          { name: 'defaultValue', type: 'string | string[]', description: 'Initial value while uncontrolled; nothing pressed by default.' },
+          { name: 'onChange', type: '((next: string) => void) | ((next: string[]) => void)', description: 'Called with the new value, after each press.' },
+          { name: 'rovingFocus', type: 'boolean', default: 'false', description: 'Only one toggle is in the tab order; the arrow keys, Home and End move between them.' },
+          { name: 'loop', type: 'boolean', default: 'false', description: 'The arrow keys wrap from the last toggle to the first and back.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the toggles.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'soft'", description: 'Variant of the toggles.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toggles; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible label for the toolbar / radiogroup.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The `PixelToggle`s.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelToggleGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelToggleGroup',
+        props: [
+          { name: 'type', type: "'single' | 'multiple'", description: '`single`: one value, a radiogroup of radios; `multiple`: any number of values, pressed buttons. Default `single`.' },
+          { name: 'modelValue', type: 'ToggleGroupValue<T>', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled group.' },
+          { name: 'defaultValue', type: 'ToggleGroupValue<T>', description: 'Initial value while uncontrolled; nothing pressed by default.' },
+          { name: 'rovingFocus', type: 'boolean', default: 'false', description: 'Only one toggle is in the tab order; the arrow keys, Home and End move between them.' },
+          { name: 'loop', type: 'boolean', default: 'false', description: 'The arrow keys wrap from the last toggle to the first and back.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the toggles.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'soft'", description: 'Variant of the toggles.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toggles; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name of the group (`aria-label`).' },
+          { name: 'ariaLabelledby', type: 'string', description: 'Id of the element that names the group (`aria-labelledby`).' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: ToggleGroupValue<T>', description: 'The new value, after each press.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The `PixelToggle`s.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelToggleGroup } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelToggleGroup',
+        selector: 'pxl-toggle-group',
+        props: [
+          { name: 'type', type: "'single' | 'multiple'", default: "'single'", description: '`single`: one value, a radiogroup of radios; `multiple`: any number of values, pressed buttons.' },
+          { name: 'value', type: 'string | string[]', binding: '[(value)]', description: "Value (`[(value)]`): a string in single mode (`''` for none), an array in multiple mode; leave unset for an uncontrolled group." },
+          { name: 'defaultValue', type: 'string | string[]', description: 'Initial value while uncontrolled; nothing pressed by default.' },
+          { name: 'rovingFocus', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Only one toggle is in the tab order; the arrow keys, Home and End move between them.' },
+          { name: 'loop', type: 'boolean', default: 'false', accepts: 'unknown', description: 'The arrow keys wrap from the last toggle to the first and back.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the toggles.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'soft'", description: 'Variant of the toggles.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toggles; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the group.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string | string[]', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string | string[]`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +121,9 @@ export function PixelToggleGroupDocsSection({ className }: PixelToggleGroupDocsS
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-toggle-group-api">
+      <h3 id="pixel-toggle-group-api">API</h3>
+      <FrameworkApi label={'PixelToggleGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-toggle-group-a11y">
       <h3 id="pixel-toggle-group-a11y">Accessibility</h3>

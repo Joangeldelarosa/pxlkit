@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelScrollAreaDocsSectionProps {
@@ -17,6 +18,78 @@ export const PixelScrollAreaDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelScrollArea's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelScrollArea } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelScrollArea',
+        props: [
+          { name: 'maxHeight', type: 'string | number', description: 'Height cap before the content scrolls: pixels, or any CSS length.' },
+          { name: 'variant', type: "'auto' | 'always' | 'scroll' | 'hover'", description: 'Canonical structural variant (scrollbar visibility mode).' },
+          { name: 'type', type: "'auto' | 'always' | 'scroll' | 'hover'", deprecated: 'Use `variant` instead. Retained as alias for one minor.' },
+          { name: 'offsetScrollbars', type: 'boolean', default: 'false', description: "Keep the scrollbar's room reserved, so content never shifts." },
+          { name: 'scrollbarSize', type: 'number', description: 'Scrollbar thickness in pixels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+          { name: 'aria-label', type: 'string', description: "Accessible name for the scrollable region. Required for keyboard users to understand what they've landed on. Provide either `aria-label` or `aria-labelledby`. In dev, a missing label logs a warning." },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the region, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The content that scrolls.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelScrollArea } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelScrollArea',
+        props: [
+          { name: 'maxHeight', type: 'string | number', description: 'Height cap before the content scrolls: pixels, or any CSS length.' },
+          { name: 'variant', type: "'auto' | 'always' | 'scroll' | 'hover'", description: 'When the scrollbar shows.' },
+          { name: 'type', type: "'auto' | 'always' | 'scroll' | 'hover'", deprecated: 'Use `variant`.' },
+          { name: 'offsetScrollbars', type: 'boolean', default: 'false', description: "Keep the scrollbar's room reserved, so content never shifts." },
+          { name: 'scrollbarSize', type: 'number', description: 'Scrollbar thickness in pixels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The content that scrolls.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelScrollArea } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelScrollArea',
+        selector: 'pxl-scroll-area',
+        props: [
+          { name: 'maxHeight', type: 'string | number', description: 'Height cap before the content scrolls: pixels, or any CSS length.' },
+          { name: 'variant', type: "'auto' | 'always' | 'scroll' | 'hover'", description: 'When the scrollbar shows.' },
+          { name: 'type', type: "'auto' | 'always' | 'scroll' | 'hover'", deprecated: 'Use `variant`.' },
+          { name: 'offsetScrollbars', type: 'boolean', default: 'false', accepts: 'unknown', description: "Keep the scrollbar's room reserved, so content never shifts." },
+          { name: 'scrollbarSize', type: 'number', accepts: 'number | `${number}`', description: 'Scrollbar thickness in pixels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border and radius.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +108,9 @@ export function PixelScrollAreaDocsSection({ className }: PixelScrollAreaDocsSec
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-scroll-area-api">
+      <h3 id="pixel-scroll-area-api">API</h3>
+      <FrameworkApi label={'PixelScrollArea API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-scroll-area-a11y">
       <h3 id="pixel-scroll-area-a11y">Accessibility</h3>

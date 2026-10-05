@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelComboboxDocsSectionProps {
@@ -17,6 +18,101 @@ export const PixelComboboxDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelCombobox's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCombobox } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCombobox',
+        props: [
+          { name: 'value', type: 'string', description: 'Selected value; leave unset for an uncontrolled combobox.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'onChange', type: '(next: string) => void', description: 'Called with the value of the option the user selected.' },
+          { name: 'options', type: 'PixelComboboxOption[]', required: true, description: 'The options of the listbox.' },
+          { name: 'searchable', type: 'boolean', default: 'true', description: 'Shows the search field that filters the options.' },
+          { name: 'placeholder', type: 'string', default: "'Select…'", description: 'Text shown while nothing is selected.' },
+          { name: 'emptyMessage', type: 'string', default: "'No results.'", description: 'Shown in place of the listbox when nothing matches the search.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the combobox and greys out the trigger.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCombobox } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCombobox',
+        props: [
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Selected value (`v-model`); leave unset for an uncontrolled combobox.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'options', type: 'PixelComboboxOption[]', required: true, description: 'The options of the listbox.' },
+          { name: 'searchable', type: 'boolean', default: 'true', description: 'Shows the search field that filters the options.' },
+          { name: 'placeholder', type: 'string', default: "'Select…'", description: 'Text shown while nothing is selected.' },
+          { name: 'emptyMessage', type: 'string', default: "'No results.'", description: 'Shown in place of the listbox when nothing matches the search.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the combobox and greys out the trigger.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The value of the option the user selected.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the combobox trigger.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCombobox } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCombobox',
+        selector: 'pxl-combobox',
+        props: [
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Selected value (`[(value)]`); leave unset for an uncontrolled combobox.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'options', type: 'PixelComboboxOption[]', required: true, description: 'The options of the listbox.' },
+          { name: 'searchable', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Shows the search field that filters the options.' },
+          { name: 'placeholder', type: 'string', default: "'Select…'", description: 'Text shown while nothing is selected.' },
+          { name: 'emptyMessage', type: 'string', default: "'No results.'", description: 'Shown in place of the listbox when nothing matches the search.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the combobox and greys out the trigger.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the trigger; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +131,9 @@ export function PixelComboboxDocsSection({ className }: PixelComboboxDocsSection
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-combobox-api">
+      <h3 id="pixel-combobox-api">API</h3>
+      <FrameworkApi label={'PixelCombobox API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-combobox-a11y">
       <h3 id="pixel-combobox-a11y">Accessibility</h3>

@@ -42,7 +42,10 @@ const props = withDefaults(defineProps<PixelScrollAreaProps>(), {
   surface: undefined,
   bordered: false,
 });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The content that scrolls. */
+  default?(): VNode[];
+}>();
 
 const attrs = useAttrs();
 const surface = useEffectiveSurface(() => props.surface);

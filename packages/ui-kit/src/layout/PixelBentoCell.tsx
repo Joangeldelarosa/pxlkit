@@ -6,6 +6,7 @@ import { cn, Surface, useEffectiveSurface } from '../common';
 import { ToneKey } from '../tokens';
 
 export interface PixelBentoCellProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Columns × rows the cell spans. */
   span?: BentoSpan;
   /** Canonical structural variant. */
   variant?: BentoKind;
@@ -13,7 +14,9 @@ export interface PixelBentoCellProps extends React.HTMLAttributes<HTMLDivElement
    * @deprecated Use `variant` instead. Retained as alias for one minor.
    */
   kind?: BentoKind;
+  /** Tone of the chrome. */
   tone?: ToneKey;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
   bordered?: boolean;

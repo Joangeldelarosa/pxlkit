@@ -28,16 +28,30 @@ import { usePxlKitLocale } from '../locale';
    ────────────────────────────────────────────────────────────────────────── */
 
 export interface PixelCalendarGridProps {
+  /** The picked day, `null` for none; leave unset for an uncontrolled grid. */
   value?: Date | null;
+  /** Initial day while uncontrolled. */
   defaultValue?: Date | null;
+  /** Called with the day picked, at its start. */
   onChange?: (date: Date) => void;
+  /** First day that can be picked. */
   minDate?: Date;
+  /** Last day that can be picked. */
   maxDate?: Date;
+  /** Days that cannot be picked: a list, or a test of each day. */
   disabledDates?: Date[] | ((d: Date) => boolean);
+  /** Draws a day's cell content in place of its number. */
   renderDay?: (d: Date) => React.ReactNode;
+  /** The month on show (any day of it); leave unset to start on the picked day's, else today's. */
   month?: Date;
+  /**
+   * Called with the first day of the month shown next (the navigation buttons, or focus leaving the
+   * month).
+   */
   onMonthChange?: (m: Date) => void;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** A range to highlight: from `from` to `to`, or to `hover` while `to` is not picked. */
   rangePreview?: { from?: Date; to?: Date; hover?: Date };
   /** Optional hook for tests. */
   ['data-testid']?: string;

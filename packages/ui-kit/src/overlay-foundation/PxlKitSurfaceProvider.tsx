@@ -21,7 +21,9 @@ export function PxlKitSurfaceProvider({
   surface = 'pixel',
   children,
 }: {
+  /** Surface of every nested component that does not set its own. */
   surface?: Surface;
+  /** The part of the app the surface applies to. */
   children: React.ReactNode;
 }) {
   return (

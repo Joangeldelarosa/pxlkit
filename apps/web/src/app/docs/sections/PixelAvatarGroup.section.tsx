@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAvatarGroupDocsSectionProps {
@@ -17,6 +18,70 @@ export const PixelAvatarGroupDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelAvatarGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelAvatarGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelAvatarGroup',
+        props: [
+          { name: 'max', type: 'number', default: '5', description: 'Most places the row shows; beyond it, the last place becomes a "+N" tile.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Slot size — match it to the avatars inside.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the "+N" tile.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the avatar landmark. Without one, role=group is dropped.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The avatars.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelAvatarGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelAvatarGroup',
+        props: [
+          { name: 'max', type: 'number', default: '5', description: 'Most places the row shows; beyond it, the last place becomes a "+N" tile.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Slot size — match it to the avatars inside.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the "+N" tile.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The avatars.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelAvatarGroup, PixelAvatarGroupItem } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelAvatarGroup',
+        selector: 'pxl-avatar-group',
+        props: [
+          { name: 'max', type: 'number', default: '5', accepts: 'unknown', description: 'Most places the row shows; beyond it, the last place becomes a "+N" tile.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Slot size — match it to the avatars inside.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the "+N" tile.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+      {
+        name: 'PixelAvatarGroupItem',
+        selector: '[pxlAvatarGroupItem]',
+        notes: [
+          'Structural: write it as `*pxlAvatarGroupItem` on the content, or on an `<ng-template>`.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +100,9 @@ export function PixelAvatarGroupDocsSection({ className }: PixelAvatarGroupDocsS
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-avatar-group-api">
+      <h3 id="pixel-avatar-group-api">API</h3>
+      <FrameworkApi label={'PixelAvatarGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-avatar-group-a11y">
       <h3 id="pixel-avatar-group-a11y">Accessibility</h3>

@@ -8,7 +8,10 @@ const props = defineProps<{
   /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }>();
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Header content, such as the title. */
+  default?(): VNode[];
+}>();
 
 const surface = useEffectiveSurface(() => props.surface);
 const classes = computed(() => drawerHeaderClasses(surface.value));

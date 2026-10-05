@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelKbdDocsSectionProps {
@@ -17,6 +18,54 @@ export const PixelKbdDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelKbd's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelKbd } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelKbd',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Key label (e.g. "⌘", "K", "Esc").' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelKbd } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelKbd',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Key label (`⌘`, `K`, `Esc`).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<kbd>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelKbd } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelKbd',
+        selector: 'kbd[pxlKbd]',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        notes: [
+          'Goes on a native `<kbd>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +83,9 @@ export function PixelKbdDocsSection({ className }: PixelKbdDocsSectionProps): Re
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-kbd-api">
+      <h3 id="pixel-kbd-api">API</h3>
+      <FrameworkApi label={'PixelKbd API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-kbd-a11y">
       <h3 id="pixel-kbd-a11y">Accessibility</h3>

@@ -30,7 +30,12 @@ import { PixelPopover } from '../overlay-foundation/PixelPopover';
    ────────────────────────────────────────────────────────────────────────── */
 
 export interface PixelBadgeGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Most places the row shows; beyond it, the last place becomes a "+N" button that opens a popover
+   * with the rest.
+   */
   max?: number;
+  /** Surface override, for the row and its popover; defaults to the nearest provider. */
   surface?: Surface;
   /**
    * Optional accessible name for the group. When provided, the wrapper renders
@@ -38,7 +43,9 @@ export interface PixelBadgeGroupProps extends React.HTMLAttributes<HTMLDivElemen
    * plain div to avoid an unlabeled group announcement.
    */
   'aria-label'?: string;
+  /** Id of the element that names the group, in place of `aria-label`. */
   'aria-labelledby'?: string;
+  /** The badges. */
   children: React.ReactNode;
 }
 

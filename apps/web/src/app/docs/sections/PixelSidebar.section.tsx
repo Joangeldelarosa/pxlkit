@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSidebarDocsSectionProps {
@@ -17,6 +18,78 @@ export const PixelSidebarDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelSidebar's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSidebar } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSidebar',
+        props: [
+          { name: 'collapsible', type: 'boolean', description: 'Shows the collapse toggle in the header row.' },
+          { name: 'defaultCollapsed', type: 'boolean', description: 'Initial collapsed state while uncontrolled.' },
+          { name: 'collapsed', type: 'boolean', description: 'Collapsed state; leave unset for an uncontrolled rail.' },
+          { name: 'onCollapsedChange', type: '(next: boolean) => void', description: 'Called with the collapsed state the toggle asks for.' },
+          { name: 'sections', type: 'PixelSidebarSectionProps[]', required: true, description: 'The sections, in order.' },
+          { name: 'header', type: 'React.ReactNode', description: 'Header content beside the toggle (hidden while collapsed).' },
+          { name: 'footer', type: 'React.ReactNode', description: 'Footer row content.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSidebar } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSidebar',
+        props: [
+          { name: 'collapsible', type: 'boolean', default: 'false', description: 'Shows the collapse toggle in the header row.' },
+          { name: 'defaultCollapsed', type: 'boolean', default: 'false', description: 'Initial collapsed state while uncontrolled.' },
+          { name: 'collapsed', type: 'boolean', binding: 'v-model:collapsed', description: 'Collapsed state (`v-model:collapsed`); leave unset for an uncontrolled rail.' },
+          { name: 'sections', type: 'PixelSidebarSectionProps[]', required: true, description: 'The sections, in order.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'update:collapsed', payload: 'collapsed: boolean', description: 'The collapsed state the toggle asks for, for `v-model:collapsed`.' },
+        ],
+        slots: [
+          { name: 'header', description: 'Header content beside the toggle (hidden while collapsed).' },
+          { name: 'footer', description: 'Footer row content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<nav>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSidebar } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSidebar',
+        selector: 'pxl-sidebar',
+        props: [
+          { name: 'collapsible', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows the collapse toggle in the header row.' },
+          { name: 'defaultCollapsed', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Initial collapsed state while uncontrolled.' },
+          { name: 'collapsed', type: 'boolean', binding: '[(collapsed)]', description: 'Collapsed state (`[(collapsed)]`); leave unset for an uncontrolled rail.' },
+          { name: 'sections', type: 'PixelSidebarSectionProps[]', required: true, description: 'The sections, in order.' },
+          { name: 'header', type: 'string | TemplateRef<any>', description: 'Header content beside the toggle (hidden while collapsed).' },
+          { name: 'footer', type: 'string | TemplateRef<any>', description: 'Footer row content.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'collapsedChange', payload: 'boolean', description: 'The new `collapsed`: the event half of `[(collapsed)]`.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +107,9 @@ export function PixelSidebarDocsSection({ className }: PixelSidebarDocsSectionPr
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-sidebar-api">
+      <h3 id="pixel-sidebar-api">API</h3>
+      <FrameworkApi label={'PixelSidebar API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-sidebar-a11y">
       <h3 id="pixel-sidebar-a11y">Accessibility</h3>

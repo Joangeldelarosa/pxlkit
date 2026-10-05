@@ -18,11 +18,17 @@ type PixelTextLinkCommon = {
 };
 
 type PixelTextLinkAnchorProps = PixelTextLinkCommon
-  & { href: string }
+  & {
+    /** Link target; without one the link is a button. */
+    href: string;
+  }
   & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'className' | 'children'>;
 
 type PixelTextLinkButtonProps = PixelTextLinkCommon
-  & { href?: undefined }
+  & {
+    /** Link target; without one the link is a button. */
+    href?: undefined;
+  }
   & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'children'>;
 
 export type PixelTextLinkProps = PixelTextLinkAnchorProps | PixelTextLinkButtonProps;

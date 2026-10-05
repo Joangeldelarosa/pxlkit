@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelMultiSelectDocsSectionProps {
@@ -17,6 +18,101 @@ export const PixelMultiSelectDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelMultiSelect's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelMultiSelect } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelMultiSelect',
+        props: [
+          { name: 'value', type: 'string[]', description: 'The selected values, in the order picked; leave unset for an uncontrolled multi-select.' },
+          { name: 'defaultValue', type: 'string[]', description: 'Initial values while uncontrolled.' },
+          { name: 'onChange', type: '(next: string[]) => void', description: 'Called with the selected values after every toggle, removal or clear.' },
+          { name: 'options', type: 'PixelMultiSelectOption[]', required: true, description: 'The options of the listbox.' },
+          { name: 'searchable', type: 'boolean', default: 'false', description: 'Shows a search field that filters the options.' },
+          { name: 'max', type: 'number', description: 'Most values that can be selected.' },
+          { name: 'placeholder', type: 'string', default: "'Select…'", description: 'Text shown while nothing is selected.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a button that clears the selection while there is one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Hidden-input `name`. Multiple values are serialized as repeated `<input type="hidden" name={name}>` entries; read with `FormData.getAll(name)`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelMultiSelect } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelMultiSelect',
+        props: [
+          { name: 'modelValue', type: 'string[]', binding: 'v-model', description: 'The selected values, in the order picked (`v-model`); leave unset for an uncontrolled multi-select.' },
+          { name: 'defaultValue', type: 'string[]', description: 'Initial values while uncontrolled.' },
+          { name: 'options', type: 'PixelMultiSelectOption[]', required: true, description: 'The options of the listbox.' },
+          { name: 'searchable', type: 'boolean', default: 'false', description: 'Shows a search field that filters the options.' },
+          { name: 'max', type: 'number', description: 'Most values that can be selected.' },
+          { name: 'placeholder', type: 'string', default: "'Select…'", description: 'Text shown while nothing is selected.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a button that clears the selection while there is one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — one hidden input per value submits the selection.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'values: string[]', description: 'The selected values after every toggle, removal or clear.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the combobox trigger.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelMultiSelect } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelMultiSelect',
+        selector: 'pxl-multi-select',
+        props: [
+          { name: 'value', type: 'string[]', binding: '[(value)]', description: 'The selected values, in the order picked (`[(value)]`); leave unset for an uncontrolled multi-select.' },
+          { name: 'defaultValue', type: 'string[]', description: 'Initial values while uncontrolled.' },
+          { name: 'options', type: 'PixelMultiSelectOption[]', required: true, description: 'The options of the listbox.' },
+          { name: 'searchable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows a search field that filters the options.' },
+          { name: 'max', type: 'number', accepts: 'unknown', description: 'Most values that can be selected.' },
+          { name: 'placeholder', type: 'string', default: "'Select…'", description: 'Text shown while nothing is selected.' },
+          { name: 'clearable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows a button that clears the selection while there is one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — one hidden input per value submits the selection.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the trigger; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string[]', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string[]`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +131,9 @@ export function PixelMultiSelectDocsSection({ className }: PixelMultiSelectDocsS
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-multi-select-api">
+      <h3 id="pixel-multi-select-api">API</h3>
+      <FrameworkApi label={'PixelMultiSelect API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-multi-select-a11y">
       <h3 id="pixel-multi-select-a11y">Accessibility</h3>

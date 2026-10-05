@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDateRangePickerDocsSectionProps {
@@ -17,6 +18,106 @@ export const PixelDateRangePickerDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelDateRangePicker's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelDateRangePicker } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelDateRangePicker',
+        props: [
+          { name: 'value', type: 'DateRangeValue', description: 'The range; leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'DateRangeValue', description: 'Initial range while uncontrolled.' },
+          { name: 'onChange', type: '(next: DateRangeValue) => void', description: 'Called with the range after every change: its start alone after a first pick, `{}` once cleared.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'presets', type: '{ label: string; value: { from: Date; to: Date } }[]', description: 'Quick picks of whole ranges, shown above the months.' },
+          { name: 'numberOfMonths', type: '1 | 2', default: '2', description: 'Months shown side by side.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'placeholder', type: 'string', default: "'Select date range'", description: 'Text shown while no range is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: "Adds a clear button over the trigger's end and a Clear button under the months while a range is set." },
+          { name: 'name', type: 'string', description: 'Form field name — hidden inputs submit `name.from` and `name.to` as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'data-testid', type: 'string', description: '`data-testid` of the trigger.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelDateRangePicker } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelDateRangePicker',
+        props: [
+          { name: 'modelValue', type: 'DateRangeValue', binding: 'v-model', description: 'The range (`v-model`); leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'DateRangeValue', description: 'Initial range while uncontrolled.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'presets', type: 'PixelDateRangePickerPreset[]', description: 'Quick picks of whole ranges, shown above the months.' },
+          { name: 'numberOfMonths', type: '1 | 2', default: '2', description: 'Months shown side by side.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'placeholder', type: 'string', default: "'Select date range'", description: 'Text shown while no range is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: "Adds a clear button over the trigger's end and a Clear button under the months while a range is set." },
+          { name: 'name', type: 'string', description: 'Form field name — hidden inputs submit `name.from` and `name.to` as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'range: DateRangeValue', description: 'The range after every change: its start alone after a first pick, `{}` once cleared.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the trigger button.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelDateRangePicker } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelDateRangePicker',
+        selector: 'pxl-date-range-picker',
+        props: [
+          { name: 'value', type: 'DateRangeValue', binding: '[(value)]', description: 'The range (`[(value)]`); leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'DateRangeValue', description: 'Initial range while uncontrolled.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'presets', type: 'PixelDateRangePickerPreset[]', description: 'Quick picks of whole ranges, shown above the months.' },
+          { name: 'numberOfMonths', type: '1 | 2', default: '2', description: 'Months shown side by side.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'placeholder', type: 'string', default: "'Select date range'", description: 'Text shown while no range is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', accepts: 'unknown', description: "Adds a clear button over the trigger's end and a Clear button under the months while a range is set." },
+          { name: 'name', type: 'string', description: 'Form field name — hidden inputs submit `name.from` and `name.to` as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the trigger; its hint / error is added while one shows.' },
+          { name: 'data-testid', type: 'string', description: '`data-testid` of the trigger.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'DateRangeValue', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`DateRangeValue`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePickerDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +136,9 @@ export function PixelDateRangePickerDocsSection({ className }: PixelDateRangePic
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-date-range-picker-api">
+      <h3 id="pixel-date-range-picker-api">API</h3>
+      <FrameworkApi label={'PixelDateRangePicker API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-date-range-picker-a11y">
       <h3 id="pixel-date-range-picker-a11y">Accessibility</h3>

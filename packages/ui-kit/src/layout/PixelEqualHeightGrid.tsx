@@ -11,6 +11,7 @@ import { cn, useEffectiveSurface } from '../common';
 import { PixelGrid, PixelGridProps } from './PixelGrid';
 
 export interface PixelEqualHeightGridProps extends Omit<PixelGridProps, 'align'> {
+  /** `stretch` gives every item of a row the row's height; `top` keeps their own. */
   rowAlign?: EqualHeightGridRowAlign;
 }
 

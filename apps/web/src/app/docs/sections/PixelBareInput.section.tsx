@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBareInputDocsSectionProps {
@@ -17,6 +18,60 @@ export const PixelBareInputDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelBareInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBareInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBareInput',
+        notes: [
+          'Also takes the native attributes and event handlers of `<input>` (`InputHTMLAttributes<HTMLInputElement>`).',
+          '`ref` points to `<input>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBareInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBareInput',
+        props: [
+          { name: 'modelValue', type: 'string | number', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string | number', description: 'Initial value while uncontrolled.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new value, on every edit.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<input>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBareInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBareInput',
+        selector: 'input[pxlBareInput]',
+        props: [
+          { name: 'value', type: 'string | number', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string | number', description: 'Initial value while uncontrolled.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string | number', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'Goes on a native `<input>`, which keeps its own attributes and events.',
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +89,9 @@ export function PixelBareInputDocsSection({ className }: PixelBareInputDocsSecti
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bare-input-api">
+      <h3 id="pixel-bare-input-api">API</h3>
+      <FrameworkApi label={'PixelBareInput API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bare-input-a11y">
       <h3 id="pixel-bare-input-a11y">Accessibility</h3>

@@ -30,7 +30,10 @@ const props = withDefaults(defineProps<PixelClusterProps>(), {
   as: 'div',
   surface: undefined,
 });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The items. */
+  default?(): VNode[];
+}>();
 
 const surface = useEffectiveSurface(() => props.surface);
 const classes = computed(() =>

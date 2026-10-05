@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelChipGroupDocsSectionProps {
@@ -17,6 +18,83 @@ export const PixelChipGroupDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelChipGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelChipGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelChipGroup',
+        props: [
+          { name: 'value', type: 'string[]', description: 'Controlled selection.' },
+          { name: 'defaultValue', type: 'string[]', description: 'Uncontrolled initial selection.' },
+          { name: 'onChange', type: '(next: string[]) => void', description: 'Called with the new selection, after each change.' },
+          { name: 'multiple', type: 'boolean', default: 'false', description: 'Any number of chips can be selected (checkboxes) instead of one (radios).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name (required when single-select so SR users hear the group).' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The chips, each with a `value`; other content renders as is.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelChipGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelChipGroup',
+        props: [
+          { name: 'modelValue', type: 'string[]', binding: 'v-model', description: 'Selected chip values (`v-model`); leave unset for an uncontrolled group.' },
+          { name: 'defaultValue', type: 'string[]', description: 'Initial selection while uncontrolled.' },
+          { name: 'multiple', type: 'boolean', default: 'false', description: 'Any number of chips can be selected (checkboxes) instead of one (radios).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'selection: string[]', description: 'The new selection, after each change.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The chips, each with a `value`; other content renders as is.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelChipGroup, PixelChipGroupItem } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelChipGroup',
+        selector: 'pxl-chip-group',
+        props: [
+          { name: 'value', type: 'string[]', binding: '[(value)]', description: 'Selected chip values (`[(value)]`); leave unset for an uncontrolled group.' },
+          { name: 'defaultValue', type: 'string[]', description: 'Initial selection while uncontrolled.' },
+          { name: 'multiple', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Any number of chips can be selected (checkboxes) instead of one (radios).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string[]', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string[]`).',
+        ],
+      },
+      {
+        name: 'PixelChipGroupItem',
+        selector: '[pxlChipGroupItem]',
+        props: [
+          { name: 'pxlChipGroupItem', type: 'string', required: true, description: "Value of the chip in the group's selection." },
+        ],
+        notes: [
+          'Structural: write it as `*pxlChipGroupItem` on the content, or on an `<ng-template>`.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelChipGroupDocsSection({ className }: PixelChipGroupDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +113,9 @@ export function PixelChipGroupDocsSection({ className }: PixelChipGroupDocsSecti
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-chip-group-api">
+      <h3 id="pixel-chip-group-api">API</h3>
+      <FrameworkApi label={'PixelChipGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-chip-group-a11y">
       <h3 id="pixel-chip-group-a11y">Accessibility</h3>

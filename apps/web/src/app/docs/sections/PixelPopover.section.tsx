@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPopoverDocsSectionProps {
@@ -17,6 +18,150 @@ export const PixelPopoverDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelPopover's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelPopover } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelPopover',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the popover is open; set it from `onOpenChange`.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', required: true, description: 'Called with the open state the trigger, Escape or a press outside asks for.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: '`PixelPopover.Trigger` and `PixelPopover.Content`.' },
+          { name: 'side', type: "'top' | 'bottom' | 'left' | 'right'", default: "'bottom'", description: 'Side of the trigger the content opens on; flips when there is no room.' },
+          { name: 'align', type: "'start' | 'center' | 'end'", default: "'center'", description: 'Alignment of the content along that side.' },
+          { name: 'sideOffset', type: 'number', default: '8', description: 'Gap between trigger and content, in px.' },
+          { name: 'closeOnEscape', type: 'boolean', default: 'true', description: 'Close when Escape is pressed.' },
+          { name: 'closeOnOutsideClick', type: 'boolean', default: 'true', description: 'Close on a press outside the trigger and the content.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'haspopup', type: "'dialog' | 'listbox' | 'menu' | 'tree' | 'grid'", default: "'dialog'", description: "ARIA `aria-haspopup` value advertised on the trigger. Default `'dialog'`. Set to `'listbox'` for combobox patterns, `'menu'` for menu patterns, etc." },
+          { name: 'role', type: "'dialog' | 'none' | 'listbox' | 'menu'", default: "'dialog'", description: "Role applied to the content element. Default `'dialog'`. Set to `'none'` (or any non-dialog value) when the popover wraps an inner widget that owns the semantics (e.g. a listbox inside a combobox)." },
+        ],
+      },
+      {
+        name: 'PixelPopover.Trigger',
+        props: [
+          { name: 'children', type: 'React.ReactElement', required: true, description: 'The trigger: one element, which toggles the popover and gets its `aria-expanded`, `aria-haspopup` and `aria-controls`.' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+      {
+        name: 'PixelPopover.Content',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: "Surface override; defaults to the popover's." },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelPopover.Arrow',
+        notes: [
+          'Also takes the native attributes and event handlers of `<span>` (`HTMLAttributes<HTMLSpanElement>`).',
+          '`ref` points to `<span>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelPopover, PixelPopoverArrow, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelPopover',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the popover is open (`v-model:open`).' },
+          { name: 'side', type: "'top' | 'bottom' | 'left' | 'right'", default: "'bottom'", description: 'Side of the trigger the content opens on; flips when there is no room.' },
+          { name: 'align', type: "'start' | 'center' | 'end'", default: "'center'", description: 'Alignment of the content along that side.' },
+          { name: 'sideOffset', type: 'number', default: '8', description: 'Gap between trigger and content, in px.' },
+          { name: 'closeOnEscape', type: 'boolean', default: 'true', description: 'Close when Escape is pressed.' },
+          { name: 'closeOnOutsideClick', type: 'boolean', default: 'true', description: 'Close on a press outside the trigger and the content.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'haspopup', type: "'dialog' | 'listbox' | 'menu' | 'tree' | 'grid'", default: "'dialog'", description: '`aria-haspopup` advertised on the trigger: `listbox` for combobox patterns, `menu` for menus. A value set on the trigger element wins.' },
+          { name: 'role', type: "'dialog' | 'none' | 'listbox' | 'menu'", default: "'dialog'", description: 'Role of the content. Set `none` when an inner widget owns the semantics (e.g. a listbox inside a combobox).' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: 'The requested open state.' },
+        ],
+        slots: [
+          { name: 'default', description: '`PixelPopoverTrigger` and `PixelPopoverContent`.' },
+        ],
+      },
+      {
+        name: 'PixelPopoverArrow',
+        notes: [
+          'Other attributes and listeners fall through to its root `<span>`.',
+        ],
+      },
+      {
+        name: 'PixelPopoverContent',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: "Surface override; defaults to the popover's." },
+        ],
+        slots: [
+          { name: 'default', description: "The panel's content." },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the panel element while the popover is open.',
+        ],
+      },
+      {
+        name: 'PixelPopoverTrigger',
+        slots: [
+          { name: 'default' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelPopover, PixelPopoverArrow, PixelPopoverContent, PixelPopoverTrigger } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelPopover',
+        selector: 'pxl-popover',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the popover is open (`[(open)]`).' },
+          { name: 'side', type: "'top' | 'bottom' | 'left' | 'right'", default: "'bottom'", description: 'Side of the trigger the content opens on; flips when there is no room.' },
+          { name: 'align', type: "'start' | 'center' | 'end'", default: "'center'", description: 'Alignment of the content along that side.' },
+          { name: 'sideOffset', type: 'number', default: '8', accepts: 'unknown', description: 'Gap between trigger and content, in px.' },
+          { name: 'closeOnEscape', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Close when Escape is pressed.' },
+          { name: 'closeOnOutsideClick', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Close on a press outside the trigger and the content.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'haspopup', type: "'dialog' | 'listbox' | 'menu' | 'tree' | 'grid'", default: "'dialog'", description: '`aria-haspopup` advertised on the trigger: `listbox` for combobox patterns, `menu` for menus. A static `aria-haspopup` on the trigger wins.' },
+          { name: 'role', type: "'dialog' | 'none' | 'listbox' | 'menu'", default: "'dialog'", description: 'Role of the content. Set `none` when an inner widget owns the semantics (e.g. a listbox inside a combobox).' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: 'The open state the trigger, Escape or a press outside asks for; the popover shows it once `open` changes to it, as `[(open)]` does.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      { name: 'PixelPopoverArrow', selector: 'pxl-popover-arrow' },
+      {
+        name: 'PixelPopoverContent',
+        selector: '[pxlPopoverContent]',
+        props: [
+          { name: 'pxlPopoverContent', type: "'pixel' | 'linear'", accepts: "'pixel' | 'linear' | '' | null", description: "Surface override; defaults to the popover's." },
+        ],
+        notes: [
+          'Structural: write it as `*pxlPopoverContent` on the content, or on an `<ng-template>`.',
+        ],
+      },
+      {
+        name: 'PixelPopoverTrigger',
+        selector: '[pxlPopoverTrigger]',
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +180,9 @@ export function PixelPopoverDocsSection({ className }: PixelPopoverDocsSectionPr
       <dt>Category</dt><dd>overlay-foundation</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-popover-api">
+      <h3 id="pixel-popover-api">API</h3>
+      <FrameworkApi label={'PixelPopover API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-popover-a11y">
       <h3 id="pixel-popover-a11y">Accessibility</h3>

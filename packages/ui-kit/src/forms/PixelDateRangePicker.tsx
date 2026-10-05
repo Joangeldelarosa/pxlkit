@@ -44,22 +44,45 @@ export type { DateRangeValue } from '@pxlkit/ui-kit-core';
    ────────────────────────────────────────────────────────────────────────── */
 
 export interface PixelDateRangePickerProps {
+  /** The range; leave unset for an uncontrolled picker. */
   value?: DateRangeValue;
+  /** Initial range while uncontrolled. */
   defaultValue?: DateRangeValue;
+  /**
+   * Called with the range after every change: its start alone after a first pick, `{}` once
+   * cleared.
+   */
   onChange?: (next: DateRangeValue) => void;
+  /** First day that can be picked. */
   min?: Date;
+  /** Last day that can be picked. */
   max?: Date;
+  /** Quick picks of whole ranges, shown above the months. */
   presets?: { label: string; value: { from: Date; to: Date } }[];
+  /** Months shown side by side. */
   numberOfMonths?: 1 | 2;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Trigger height. */
   size?: 'sm' | 'md' | 'lg';
+  /** Label rendered above the trigger. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; marks the trigger invalid. */
   error?: string;
+  /** Text shown while no range is picked. */
   placeholder?: string;
+  /**
+   * Adds a clear button over the trigger's end and a Clear button under the months while a range is
+   * set.
+   */
   clearable?: boolean;
+  /** Form field name — hidden inputs submit `name.from` and `name.to` as `YYYY-MM-DD`. */
   name?: string;
+  /** `id` of the trigger; generated when left out. */
   id?: string;
+  /** `data-testid` of the trigger. */
   ['data-testid']?: string;
 }
 

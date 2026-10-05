@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSheetDocsSectionProps {
@@ -17,6 +18,85 @@ export const PixelSheetDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelSheet's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSheet } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSheet',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the sheet is visible; set it from `onOpenChange`.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', required: true, description: 'Called with `false` when the sheet asks to close (Escape, the backdrop).' },
+          { name: 'side', type: "'bottom' | 'top'", default: "'bottom'", description: 'Edge of the viewport the sheet is docked to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'full'", default: "'md'", description: 'Height preset.' },
+          { name: 'dragHandle', type: 'boolean', default: 'false', description: 'Draw a drag handle affordance (decorative).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'title', type: 'string', description: 'Title shown at the top; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name fallback when `title` is omitted. WCAG 4.1.2 requires every `role="dialog"` to expose a name; supply `title` OR `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Body content.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSheet } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSheet',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the sheet is visible (`v-model:open`).' },
+          { name: 'side', type: "'bottom' | 'top'", default: "'bottom'", description: 'Edge of the viewport the sheet is docked to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'full'", default: "'md'", description: 'Height preset.' },
+          { name: 'dragHandle', type: 'boolean', default: 'false', description: 'Draw a drag handle affordance (decorative).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'title', type: 'string', description: 'Title shown at the top; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name when there is no `title` — every dialog needs one (WCAG 4.1.2).' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: '`false` when the sheet asks to close (Escape, backdrop), for `v-model:open`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Body content.' },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the sheet panel while it is open.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSheet } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSheet',
+        selector: 'pxl-sheet',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the sheet is visible (`[(open)]`).' },
+          { name: 'side', type: "'bottom' | 'top'", default: "'bottom'", description: 'Edge of the viewport the sheet is docked to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'full'", default: "'md'", description: 'Height preset.' },
+          { name: 'dragHandle', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Draw a drag handle affordance (decorative).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'title', type: 'string', description: 'Title shown at the top; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name when there is no `title` — every dialog needs one (WCAG 4.1.2).' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: '`false` when the sheet asks to close (Escape, backdrop), for `[(open)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +115,9 @@ export function PixelSheetDocsSection({ className }: PixelSheetDocsSectionProps)
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-sheet-api">
+      <h3 id="pixel-sheet-api">API</h3>
+      <FrameworkApi label={'PixelSheet API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-sheet-a11y">
       <h3 id="pixel-sheet-a11y">Accessibility</h3>

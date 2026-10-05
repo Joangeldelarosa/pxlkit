@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelNumberInputDocsSectionProps {
@@ -17,6 +18,125 @@ export const PixelNumberInputDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelNumberInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelNumberInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelNumberInput',
+        props: [
+          { name: 'value', type: 'number', description: 'Value; leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'number', description: 'Initial value while uncontrolled.' },
+          { name: 'onChange', type: '(next: number) => void', description: 'Called with the new number, after each step, edit that reads as a number, or settle on blur.' },
+          { name: 'min', type: 'number', description: 'Lowest value.' },
+          { name: 'max', type: 'number', description: 'Highest value.' },
+          { name: 'step', type: 'number', default: '1', description: 'Amount each step adds or removes.' },
+          { name: 'precision', type: 'number', description: 'Decimals shown, and the value is rounded to.' },
+          { name: 'clampBehavior', type: "'strict' | 'blur' | 'none'", default: "'blur'", description: 'When a value outside `min` / `max` is pulled back: while typing, on blur, or never.' },
+          { name: 'prefix', type: 'string', description: 'Text inside the field on the left (`$`).' },
+          { name: 'suffix', type: 'string', description: 'Text inside the field on the right (`USD`).' },
+          { name: 'thousandsSeparator', type: 'string', description: 'Groups the integer digits (`,` shows `1,500,000`).' },
+          { name: 'allowNegative', type: 'boolean', default: 'true', description: 'Accepts negative numbers.' },
+          { name: 'hideControls', type: 'boolean', default: 'false', description: 'Hides the stepper buttons.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the field.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<input>` (`InputHTMLAttributes<HTMLInputElement>`), except `type`.',
+          '`ref` points to `<input>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelNumberInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelNumberInput',
+        props: [
+          { name: 'modelValue', type: 'number', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'number', description: 'Initial value while uncontrolled.' },
+          { name: 'min', type: 'number', description: 'Lowest value.' },
+          { name: 'max', type: 'number', description: 'Highest value.' },
+          { name: 'step', type: 'number', default: '1', description: 'Amount each step adds or removes.' },
+          { name: 'precision', type: 'number', description: 'Decimals shown, and the value is rounded to.' },
+          { name: 'clampBehavior', type: "'strict' | 'blur' | 'none'", default: "'blur'", description: 'When a value outside `min` / `max` is pulled back: while typing, on blur, or never.' },
+          { name: 'prefix', type: 'string', description: 'Text inside the field on the left (`$`).' },
+          { name: 'suffix', type: 'string', description: 'Text inside the field on the right (`USD`).' },
+          { name: 'thousandsSeparator', type: 'string', description: 'Groups the integer digits (`,` shows `1,500,000`).' },
+          { name: 'allowNegative', type: 'boolean', default: 'true', description: 'Accepts negative numbers.' },
+          { name: 'hideControls', type: 'boolean', default: 'false', description: 'Hides the stepper buttons.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the field.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the field and its steppers.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the number.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+          { name: 'placeholder', type: 'string', description: 'Text shown while the field is empty.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: number', description: 'The new number, after each step, edit that reads as a number, or settle on blur.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<input>`.',
+          'Its template ref exposes `element`: the native input.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelNumberInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelNumberInput',
+        selector: 'pxl-number-input',
+        props: [
+          { name: 'value', type: 'number', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'number', accepts: 'unknown', description: 'Initial value while uncontrolled.' },
+          { name: 'min', type: 'number', accepts: 'unknown', description: 'Lowest value.' },
+          { name: 'max', type: 'number', accepts: 'unknown', description: 'Highest value.' },
+          { name: 'step', type: 'number', default: '1', accepts: 'unknown', description: 'Amount each step adds or removes.' },
+          { name: 'precision', type: 'number', accepts: 'unknown', description: 'Decimals shown, and the value is rounded to.' },
+          { name: 'clampBehavior', type: "'strict' | 'blur' | 'none'", default: "'blur'", description: 'When a value outside `min` / `max` is pulled back: while typing, on blur, or never.' },
+          { name: 'prefix', type: 'string', description: 'Text inside the field on the left (`$`).' },
+          { name: 'suffix', type: 'string', description: 'Text inside the field on the right (`USD`).' },
+          { name: 'thousandsSeparator', type: 'string', description: 'Groups the integer digits (`,` shows `1,500,000`).' },
+          { name: 'allowNegative', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Accepts negative numbers.' },
+          { name: 'hideControls', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Hides the stepper buttons.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the field.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the field and its steppers.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the number.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+          { name: 'placeholder', type: 'string', description: 'Text shown while the field is empty.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the field required.' },
+          { name: 'readonly', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the field read-only.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the field when no `label` is shown.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the input; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'number', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`number`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +155,9 @@ export function PixelNumberInputDocsSection({ className }: PixelNumberInputDocsS
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-number-input-api">
+      <h3 id="pixel-number-input-api">API</h3>
+      <FrameworkApi label={'PixelNumberInput API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-number-input-a11y">
       <h3 id="pixel-number-input-a11y">Accessibility</h3>

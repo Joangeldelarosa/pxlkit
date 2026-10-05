@@ -29,11 +29,17 @@ import { useControllableState } from '../hooks/useControllableState';
 
 /** Public prop bag for {@link PixelOTPInput}. */
 export interface PixelOTPInputProps {
+  /** Number of cells. */
   length?: number;
+  /** Code; leave unset for an uncontrolled input. */
   value?: string;
+  /** Initial code while uncontrolled. */
   defaultValue?: string;
+  /** Called with the new code, after every edit. */
   onChange?: (next: string) => void;
+  /** Called with the code each time it comes to fill every cell. */
   onComplete?: (full: string) => void;
+  /** Hides the characters, as a password field does. */
   mask?: boolean;
   /** Canonical structural variant. */
   variant?: 'numeric' | 'alphanumeric';
@@ -41,11 +47,17 @@ export interface PixelOTPInputProps {
    * @deprecated Use `variant` instead. Retained as alias for one minor.
    */
   type?: 'numeric' | 'alphanumeric';
+  /** Focuses the first cell once mounted. */
   autoFocus?: boolean;
+  /** Shown between two cells, hidden from assistive technology. */
   separator?: React.ReactNode;
+  /** Cell size. */
   size?: 'sm' | 'md' | 'lg';
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Form field name — a hidden input submits the code. */
   name?: string;
+  /** Disables every cell. */
   disabled?: boolean;
 }
 

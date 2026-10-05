@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelChipDocsSectionProps {
@@ -17,6 +18,84 @@ export const PixelChipDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelChip's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelChip } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelChip',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Chip label.' },
+          { name: 'value', type: 'string', description: 'Selection value consumed by a wrapping PixelChipGroup. Never rendered to the DOM.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: "Tone tint. Defaults to `'cyan'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'variant', type: "'soft' | 'solid' | 'outline' | 'ghost'", default: "'soft'", description: 'Variant axis shared with PixelBadge.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Size scale. Defaults to `'md'`." },
+          { name: 'iconLeft', type: 'React.ReactNode', description: 'Optional leading icon.' },
+          { name: 'onRemove', type: '() => void', description: 'Legacy alias for `onDelete`.' },
+          { name: 'deletable', type: 'boolean', description: 'When true (or when onDelete is provided), renders an X button on the right.' },
+          { name: 'onDelete', type: '() => void', description: 'Called when the X button is activated.' },
+          { name: 'onClick', type: 'React.MouseEventHandler<HTMLElement>', description: 'When provided the root renders as a `<button>`. With a delete handler too, a button cannot contain a button, so the label and the X become sibling buttons in a `<span>` frame that draws the chip; the label button takes the ref and the other props, the frame takes `className`.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelChip } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelChip',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Chip label.' },
+          { name: 'value', type: 'string', description: 'Selection value read by a wrapping `PixelChipGroup`; never rendered.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone tint.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'variant', type: "'soft' | 'solid' | 'outline' | 'ghost'", default: "'soft'", description: 'Variant axis shared with PixelBadge.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size scale.' },
+          { name: 'deletable', type: 'boolean', description: '`false` hides the delete button even with a `delete` listener.' },
+          { name: 'onClick', type: '(event: MouseEvent) => void', binding: '@click', description: 'Click handler (`@click`). Declared as a prop because its presence changes the element: with one the chip is a `<button type="button">`.' },
+          { name: 'onDelete', type: '() => void', binding: '@delete', description: 'Delete handler (`@delete`), called by the delete button. Declared as a prop because its presence shows that button.' },
+          { name: 'onRemove', type: '() => void', binding: '@remove', description: 'Legacy alias of `onDelete` (`@remove`).' },
+        ],
+        slots: [
+          { name: 'icon-left', description: 'Leading icon.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelChip } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelChip',
+        selector: 'pxl-chip, button[pxlChip]',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Chip label.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone tint.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'variant', type: "'soft' | 'solid' | 'outline' | 'ghost'", default: "'soft'", description: 'Variant axis shared with PixelBadge.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size scale.' },
+          { name: 'iconLeft', type: 'string | TemplateRef<any>', description: 'Optional leading icon.' },
+          { name: 'deletable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows the delete (×) button — on a `<pxl-chip>`: a `button[pxlChip]` cannot hold a second button.' },
+          { name: 'clickable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the label of a `<pxl-chip>` a button of its own, which emits `(clicked)` — for a clickable chip that is also `deletable`; a clickable chip without a delete button is a `button[pxlChip]`.' },
+        ],
+        events: [
+          { name: 'clicked', payload: 'MouseEvent', description: 'The label button of a `clickable` chip was clicked.' },
+          { name: 'delete', description: 'The delete button was activated.' },
+        ],
+        notes: [
+          'As an attribute, it goes on a native `<button>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +114,9 @@ export function PixelChipDocsSection({ className }: PixelChipDocsSectionProps): 
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-chip-api">
+      <h3 id="pixel-chip-api">API</h3>
+      <FrameworkApi label={'PixelChip API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-chip-a11y">
       <h3 id="pixel-chip-a11y">Accessibility</h3>

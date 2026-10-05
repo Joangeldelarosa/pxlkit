@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBareButtonDocsSectionProps {
@@ -17,6 +18,54 @@ export const PixelBareButtonDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelBareButton's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBareButton } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBareButton',
+        notes: [
+          "Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`); `type` defaults to `'button'`.",
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBareButton } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBareButton',
+        props: [
+          { name: 'type', type: "'button' | 'submit' | 'reset'", default: "'button'", description: 'Native `type`; `button` unless set.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Button content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<button>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBareButton } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBareButton',
+        selector: 'button[pxlBareButton]',
+        props: [
+          { name: 'type', type: "'button' | 'submit' | 'reset'", default: "'button'", description: 'Native `type`; `button` unless set.' },
+        ],
+        notes: [
+          'Goes on a native `<button>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +84,9 @@ export function PixelBareButtonDocsSection({ className }: PixelBareButtonDocsSec
       <dt>Category</dt><dd>actions</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bare-button-api">
+      <h3 id="pixel-bare-button-api">API</h3>
+      <FrameworkApi label={'PixelBareButton API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bare-button-a11y">
       <h3 id="pixel-bare-button-a11y">Accessibility</h3>

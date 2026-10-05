@@ -13,7 +13,10 @@ export interface PixelParallaxGroupProps {
 }
 
 withDefaults(defineProps<PixelParallaxGroupProps>(), { as: 'div' });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The layers (`PixelParallaxLayer`, `PixelMouseParallax`). */
+  default?(): VNode[];
+}>();
 </script>
 
 <template>

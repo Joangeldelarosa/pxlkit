@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCenterDocsSectionProps {
@@ -17,6 +18,74 @@ export const PixelCenterDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelCenter's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCenter } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCenter',
+        props: [
+          { name: 'maxWidth', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full'", default: "'5xl'", description: 'Width cap (`containerWidth`).' },
+          { name: 'gutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal padding (`pageGutter`).' },
+          { name: 'align', type: "'left' | 'center' | 'right'", description: 'Text alignment of the centered content (canonical).' },
+          { name: 'text', type: "'left' | 'center' | 'right'", deprecated: 'Use `align` instead. Retained as alias for one minor.' },
+          { name: 'inline', type: 'boolean', default: 'false', description: '`inline-block` instead of `block`.' },
+          { name: 'as', type: 'keyof React.JSX.IntrinsicElements', description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCenter } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCenter',
+        props: [
+          { name: 'maxWidth', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full'", default: "'5xl'", description: 'Width cap (`containerWidth`).' },
+          { name: 'gutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal padding (`pageGutter`).' },
+          { name: 'align', type: "'left' | 'center' | 'right'", description: 'Text alignment of the centred content.' },
+          { name: 'text', type: "'left' | 'center' | 'right'", deprecated: 'Use `align`.' },
+          { name: 'inline', type: 'boolean', default: 'false', description: '`inline-block` instead of `block`.' },
+          { name: 'as', type: 'string', default: "'div'", description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The centred content.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCenter } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCenter',
+        selector: '[pxlCenter]',
+        props: [
+          { name: 'maxWidth', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full'", default: "'5xl'", description: 'Width cap (`containerWidth`).' },
+          { name: 'gutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal padding (`pageGutter`).' },
+          { name: 'align', type: "'left' | 'center' | 'right'", description: 'Text alignment of the centred content.' },
+          { name: 'text', type: "'left' | 'center' | 'right'", deprecated: 'Use `align`.' },
+          { name: 'inline', type: 'boolean', default: 'false', accepts: 'unknown', description: '`inline-block` instead of `block`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border and radius.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +104,9 @@ export function PixelCenterDocsSection({ className }: PixelCenterDocsSectionProp
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-center-api">
+      <h3 id="pixel-center-api">API</h3>
+      <FrameworkApi label={'PixelCenter API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-center-a11y">
       <h3 id="pixel-center-a11y">Accessibility</h3>

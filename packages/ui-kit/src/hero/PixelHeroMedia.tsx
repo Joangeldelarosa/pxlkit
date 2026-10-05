@@ -13,14 +13,21 @@ import { cn, Surface, useEffectiveSurface } from '../common';
 import { ToneKey } from '../tokens';
 
 export interface PixelHeroMediaProps extends React.HTMLAttributes<HTMLElement> {
+  /** Aspect ratio of the figure. */
   ratio?: HeroMediaRatio;
+  /** Centred across its row, or on the row's end beside a headline. */
   anchor?: HeroMediaAnchor;
+  /** Draw the surface border and radius in the tone's border colour. */
   framed?: boolean;
+  /** Tone of the frame. */
   tone?: ToneKey;
+  /** Caption under the media, in a `<figcaption>`. */
   caption?: string;
   /** Optional className applied to the inner caption (figcaption). */
   captionClassName?: string;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** The media. */
   children: React.ReactNode;
 }
 

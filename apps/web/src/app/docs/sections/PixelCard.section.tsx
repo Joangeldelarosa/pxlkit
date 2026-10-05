@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCardDocsSectionProps {
@@ -17,6 +18,162 @@ export const PixelCardDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelCard's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCard } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCard',
+        props: [
+          { name: 'title', type: 'string', description: 'Heading rendered inside the auto-generated header. Omit for a headerless container/well card.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Optional leading icon for the auto-generated header.' },
+          { name: 'children', type: 'React.ReactNode', description: 'Card body content.' },
+          { name: 'footer', type: 'React.ReactNode', description: 'Optional footer slot rendered after the body with a divider.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override. Inherits from provider when omitted.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", description: 'Optional tone tint applied to border + soft background.' },
+          { name: 'interactive', type: 'boolean', description: 'When true, adds a hover lift + focus ring. If no `href` is set, an `onClick` is REQUIRED — the card renders with `role="button"` + `tabIndex={0}` + Enter/Space activation for keyboard parity.' },
+          { name: 'media', type: 'React.ReactNode', description: 'Top media slot rendered above the header. Clipped by overflow:hidden.' },
+          { name: 'badge', type: '{ label: string; tone?: ToneKey }', description: 'Corner ribbon badge — renders `PixelRibbon`.' },
+          { name: 'description', type: 'string', description: 'Muted paragraph rendered under the title.' },
+          { name: 'descriptionLines', type: '2 | 3 | 4', description: 'Apply `line-clamp-N` + `min-h-[N em]` to the description.' },
+          { name: 'href', type: 'string', description: 'When provided, the root renders as `<a href>` instead of `<article>`. ⚠️ Nesting interactive children (PixelButton, PixelTextLink, etc.) inside `footer` / `media` / `children` is invalid HTML in href mode — screen readers cannot navigate nested interactives inside an anchor. Render those outside the card when you need an actionable area.' },
+          { name: 'target', type: "'_self' | '_blank' | '_parent' | '_top' | (string & {})", description: 'Anchor target — only meaningful when `href` is set.' },
+          { name: 'rel', type: 'string', description: 'Anchor rel — only meaningful when `href` is set.' },
+          { name: 'padding', type: "'none' | 'sm' | 'md' | 'lg'", description: 'Padding scale; default keeps the legacy `p-4` rhythm.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — a card should look like a card.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement | HTMLAnchorElement`).',
+        ],
+      },
+      {
+        name: 'PixelCard.Header',
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+        ],
+      },
+      {
+        name: 'PixelCard.Body',
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+        ],
+      },
+      {
+        name: 'PixelCard.Footer',
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCard, PixelCardBody, PixelCardFooter, PixelCardHeader } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCard',
+        props: [
+          { name: 'title', type: 'string', description: 'Heading of the title header; leave it out for a plain container.' },
+          { name: 'description', type: 'string', description: 'Muted paragraph under the title.' },
+          { name: 'descriptionLines', type: '2 | 3 | 4', description: 'Clamps the description to 2, 3 or 4 lines, keeping their height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", description: 'Tone tint of the border and background.' },
+          { name: 'interactive', type: 'boolean', default: 'false', description: 'Hover lift and focus ring. Without an `href` the card is a button in the tab order, which Enter and Space activate: give it a `click` listener.' },
+          { name: 'badge', type: 'CardBadge', description: 'Corner ribbon (`PixelRibbon`): its label and tone.' },
+          { name: 'href', type: 'string', description: 'Makes the card a link. A link cannot hold buttons or links: keep them out of the card.' },
+          { name: 'target', type: 'string', description: 'Link target, with `href`.' },
+          { name: 'rel', type: 'string', description: 'Link relationship, with `href`.' },
+          { name: 'padding', type: "'none' | 'sm' | 'md' | 'lg'", description: 'Padding scale; `p-4` when unset.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border, radius and background.' },
+          { name: 'onClick', type: '(event: MouseEvent | KeyboardEvent) => void', binding: '@click', description: 'Click handler (`@click`). Declared as a prop because an interactive card calls it on Enter and Space too, with the keyboard event.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The body; a `PixelCardHeader` among its direct children replaces the title header.' },
+          { name: 'icon', description: 'Leading icon of the title header.' },
+          { name: 'media', description: 'Media strip above the header, clipped and outside the padding.' },
+          { name: 'footer', description: 'Footer under a divider.' },
+        ],
+      },
+      {
+        name: 'PixelCardBody',
+        slots: [
+          { name: 'default', description: 'Body content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelCardFooter',
+        slots: [
+          { name: 'default', description: 'Footer content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<footer>`.',
+        ],
+      },
+      {
+        name: 'PixelCardHeader',
+        slots: [
+          { name: 'default', description: 'Header content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<header>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCard, PixelCardBody, PixelCardFooter, PixelCardHeader } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCard',
+        selector: 'pxl-card, a[pxlCard], div[pxlCard]',
+        props: [
+          { name: 'title', type: 'string', description: 'Heading of the title header; leave it out for a plain container.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Leading icon of the title header.' },
+          { name: 'footer', type: 'string | TemplateRef<any>', description: 'Footer under a divider.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", description: 'Tone tint of the border and background.' },
+          { name: 'interactive', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Hover lift and focus ring; a card that is not a link becomes a button.' },
+          { name: 'media', type: 'string | TemplateRef<any>', description: 'Media strip above the header, clipped and outside the padding.' },
+          { name: 'badge', type: 'CardBadge', description: 'Corner ribbon (`<pxl-ribbon>`): its label and tone.' },
+          { name: 'description', type: 'string', description: 'Muted paragraph under the title.' },
+          { name: 'descriptionLines', type: '2 | 3 | 4', accepts: "2 | 3 | 4 | '2' | '3' | '4'", description: 'Clamps the description to 2, 3 or 4 lines, keeping their height.' },
+          { name: 'padding', type: "'none' | 'sm' | 'md' | 'lg'", description: 'Padding scale; `p-4` when unset.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border, radius and background.' },
+        ],
+        notes: [
+          'As an attribute, it goes on a native `<a>` or `<div>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelCardBody',
+        selector: 'pxl-card-body',
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelCardFooter',
+        selector: 'pxl-card-footer',
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelCardHeader',
+        selector: 'pxl-card-header',
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +191,9 @@ export function PixelCardDocsSection({ className }: PixelCardDocsSectionProps): 
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-card-api">
+      <h3 id="pixel-card-api">API</h3>
+      <FrameworkApi label={'PixelCard API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-card-a11y">
       <h3 id="pixel-card-a11y">Accessibility</h3>

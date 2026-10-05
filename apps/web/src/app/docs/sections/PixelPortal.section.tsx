@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPortalDocsSectionProps {
@@ -17,6 +18,57 @@ export const PixelPortalDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelPortal's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelPortal } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelPortal',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to render in the target.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Target element; `document.body` when left out.' },
+          { name: 'disabled', type: 'boolean', description: 'Keep the content in place.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelPortal } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelPortal',
+        props: [
+          { name: 'container', type: 'HTMLElement | null', description: 'Target element; `document.body` when left out.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Keep the content in place.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to render in the target.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelPortal } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelPortal',
+        selector: '[pxlPortal]',
+        props: [
+          { name: 'pxlPortalContainer', type: 'HTMLElement | null', description: 'Target element; `document.body` when left out.' },
+          { name: 'pxlPortalDisabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Keep the content in place.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +87,9 @@ export function PixelPortalDocsSection({ className }: PixelPortalDocsSectionProp
       <dt>Category</dt><dd>overlay-foundation</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-portal-api">
+      <h3 id="pixel-portal-api">API</h3>
+      <FrameworkApi label={'PixelPortal API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-portal-a11y">
       <h3 id="pixel-portal-a11y">Accessibility</h3>

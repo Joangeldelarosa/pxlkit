@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCarouselDocsSectionProps {
@@ -17,6 +18,104 @@ export const PixelCarouselDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelCarousel's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCarousel } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCarousel',
+        props: [
+          { name: 'opts', type: "Omit<EmblaOptionsType, 'axis'>", description: 'Full embla options surface (see embla-carousel docs). Common subset: `loop`, `align`, `slidesToScroll`, `startIndex`, `dragFree`, `containScroll`, `inViewThreshold`. `axis` is set internally from `orientation`.' },
+          { name: 'plugins', type: 'EmblaPluginType[]', description: 'Optional embla plugins (autoplay, autoScroll, etc.).' },
+          { name: 'setApi', type: '(api: EmblaCarouselType | undefined) => void', description: 'Receives the embla API once ready; called again with `undefined` on unmount.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Slides side by side, or stacked.' },
+          { name: 'showArrows', type: 'boolean', default: 'true', description: 'Previous and next buttons.' },
+          { name: 'showDots', type: 'boolean', default: 'false', description: 'A dot per slide, to go to it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the carousel region (required for landmark navigation).' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The slides (`PixelCarousel.Item`).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelCarousel.Item',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: "The slide's content." },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCarousel',
+        props: [
+          { name: 'opts', type: 'PixelCarouselOptions', description: 'Embla options (see the embla-carousel docs): `loop`, `align`, `slidesToScroll`, `startIndex`, `dragFree`, `containScroll`, … The axis follows `orientation`.' },
+          { name: 'plugins', type: 'PixelCarouselPlugin[]', description: 'Embla plugins (autoplay, auto scroll, …).' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Slides side by side, or stacked.' },
+          { name: 'showArrows', type: 'boolean', default: 'true', description: 'Previous and next buttons.' },
+          { name: 'showDots', type: 'boolean', default: 'false', description: 'A dot per slide, to go to it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'api', payload: 'api: EmblaCarouselType | undefined', description: "Embla's API once it runs, then `undefined` when the carousel unmounts." },
+        ],
+        slots: [
+          { name: 'default', description: 'The slides (`PixelCarouselItem`).' },
+        ],
+      },
+      {
+        name: 'PixelCarouselItem',
+        slots: [
+          { name: 'default', description: "The slide's content." },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCarousel, PixelCarouselItem } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCarousel',
+        selector: 'pxl-carousel',
+        props: [
+          { name: 'opts', type: 'PixelCarouselOptions', description: 'Embla options (see the embla-carousel docs): `loop`, `align`, `slidesToScroll`, `startIndex`, `dragFree`, `containScroll`, … The axis follows `orientation`.' },
+          { name: 'plugins', type: 'PixelCarouselPlugin[]', description: 'Embla plugins (autoplay, auto scroll, …).' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Slides side by side, or stacked.' },
+          { name: 'showArrows', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Previous and next buttons.' },
+          { name: 'showDots', type: 'boolean', default: 'false', accepts: 'unknown', description: 'A dot per slide, to go to it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'api', payload: 'EmblaCarouselType | undefined', description: "Embla's API once it runs, then `undefined` when the carousel is destroyed." },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelCarouselItem',
+        selector: 'pxl-carousel-item',
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +134,9 @@ export function PixelCarouselDocsSection({ className }: PixelCarouselDocsSection
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-carousel-api">
+      <h3 id="pixel-carousel-api">API</h3>
+      <FrameworkApi label={'PixelCarousel API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-carousel-a11y">
       <h3 id="pixel-carousel-a11y">Accessibility</h3>

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBentoCellDocsSectionProps {
@@ -17,6 +18,72 @@ export const PixelBentoCellDocsMeta = {
   since: '1.7.0',
   deprecated: false,
 } as const;
+
+/** PixelBentoCell's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBentoCell } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBentoCell',
+        props: [
+          { name: 'span', type: "'1x1' | '2x1' | '1x2' | '2x2' | '3x1' | '1x3'", default: "'1x1'", description: 'Columns × rows the cell spans.' },
+          { name: 'variant', type: "'feature' | 'stat' | 'compact' | 'media'", description: 'Canonical structural variant.' },
+          { name: 'kind', type: "'feature' | 'stat' | 'compact' | 'media'", deprecated: 'Use `variant` instead. Retained as alias for one minor.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the chrome.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBentoCell } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBentoCell',
+        props: [
+          { name: 'span', type: "'1x1' | '2x1' | '1x2' | '2x2' | '3x1' | '1x3'", default: "'1x1'", description: 'Columns × rows the cell spans.' },
+          { name: 'variant', type: "'feature' | 'stat' | 'compact' | 'media'", description: 'Inner layout of the cell.' },
+          { name: 'kind', type: "'feature' | 'stat' | 'compact' | 'media'", deprecated: 'Use `variant`.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the chrome.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border, radius and tone tint.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Cell content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBentoCell } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBentoCell',
+        selector: 'pxl-bento-cell',
+        props: [
+          { name: 'span', type: "'1x1' | '2x1' | '1x2' | '2x2' | '3x1' | '1x3'", default: "'1x1'", description: 'Columns × rows the cell spans.' },
+          { name: 'variant', type: "'feature' | 'stat' | 'compact' | 'media'", description: 'Inner layout of the cell.' },
+          { name: 'kind', type: "'feature' | 'stat' | 'compact' | 'media'", deprecated: 'Use `variant`.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the chrome.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border, radius and tone tint.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelBentoCellDocsSection({ className }: PixelBentoCellDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +102,9 @@ export function PixelBentoCellDocsSection({ className }: PixelBentoCellDocsSecti
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bento-cell-api">
+      <h3 id="pixel-bento-cell-api">API</h3>
+      <FrameworkApi label={'PixelBentoCell API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bento-cell-a11y">
       <h3 id="pixel-bento-cell-a11y">Accessibility</h3>

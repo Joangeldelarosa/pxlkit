@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitToastProviderDocsSectionProps {
@@ -17,6 +18,69 @@ export const PxlKitToastProviderDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PxlKitToastProvider's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PxlKitToastProvider } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PxlKitToastProvider',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The part of the app that shows toasts: `useToast()` works inside it.' },
+          { name: 'position', type: "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'", default: "'top-right'", description: 'Corner, or edge centre, of the screen the toasts appear at.' },
+          { name: 'max', type: 'number', default: '5', description: 'Maximum simultaneous toasts. Oldest is dropped if exceeded. Defaults to 5.' },
+          { name: 'duration', type: 'number', default: '4500', description: "Auto-dismiss delay, in ms, of the toasts that set no `duration` of their own; `0` keeps them until dismissed. Defaults to 4500. A promise's error toast stays at least 6 s, unless this is `0`." },
+          { name: 'hotkey', type: 'string | false', default: "'F8'", description: "Key that moves focus to the toasts, written like `F8` or `alt+t`, or `false` for none. Defaults to `F8`; the viewport's accessible name tells it." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toasts; defaults to the nearest provider.' },
+          { name: 'stacked', type: 'boolean', default: 'true', description: 'Sonner-style stacked-offset visual: toasts collapse into a small stack showing only the front card; hover expands them into a vertical list. Defaults to `true`.' },
+          { name: 'stackVisible', type: 'number', default: '2', description: 'How many additional cards peek behind the front when stacked. Defaults to 2.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PxlKitToastProvider } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PxlKitToastProvider',
+        props: [
+          { name: 'position', type: "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'", default: "'top-right'", description: 'Corner, or edge centre, of the screen the toasts appear at.' },
+          { name: 'max', type: 'number', default: '5', description: 'Maximum simultaneous toasts. Oldest is dropped if exceeded.' },
+          { name: 'duration', type: 'number', default: '4500', description: "Auto-dismiss delay, in ms, of the toasts that set no `duration` of their own; `0` keeps them until dismissed. A promise's error toast stays at least 6 s, unless this is `0`." },
+          { name: 'hotkey', type: 'string | false', default: "'F8'", description: "Key that moves focus to the toasts, written like `F8` or `alt+t`, or `false` for none; the viewport's accessible name tells it." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toasts; defaults to the nearest provider.' },
+          { name: 'stacked', type: 'boolean', default: 'true', description: 'Sonner-style stacked-offset visual: toasts collapse into a small stack showing only the front card; hovering or focusing it expands it into a vertical list.' },
+          { name: 'stackVisible', type: 'number', default: '2', description: 'How many additional cards peek behind the front when stacked.' },
+        ],
+        slots: [
+          { name: 'default', props: "Omit<UseToastReturn, 'toasts'> & { toasts: readonly ToastItem[] }", description: 'The part of the app that shows toasts; receives the toast API, with `toasts` unwrapped.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PxlKitToastProvider } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PxlKitToastProvider',
+        selector: 'pxl-toast-provider',
+        props: [
+          { name: 'position', type: "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'", default: "'top-right'", description: 'Corner, or edge centre, of the screen the toasts appear at.' },
+          { name: 'max', type: 'number', default: '5', accepts: 'unknown', description: 'Maximum simultaneous toasts. Oldest is dropped if exceeded.' },
+          { name: 'duration', type: 'number', default: '4500', accepts: 'unknown', description: "Auto-dismiss delay, in ms, of the toasts that set no `duration` of their own; `0` keeps them until dismissed. A promise's error toast stays at least 6 s, unless this is `0`." },
+          { name: 'hotkey', type: 'string | false', default: "'F8'", description: "Key that moves focus to the toasts, written like `F8` or `alt+t`, or `false` for none; the viewport's accessible name tells it." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface of the toasts; defaults to the nearest provider.' },
+          { name: 'stacked', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Sonner-style stacked-offset visual: toasts collapse into a small stack showing only the front card; hovering or focusing it expands it into a vertical list.' },
+          { name: 'stackVisible', type: 'number', default: '2', accepts: 'unknown', description: 'How many additional cards peek behind the front when stacked.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProviderDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +99,9 @@ export function PxlKitToastProviderDocsSection({ className }: PxlKitToastProvide
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pxl-kit-toast-provider-api">
+      <h3 id="pxl-kit-toast-provider-api">API</h3>
+      <FrameworkApi label={'PxlKitToastProvider API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-toast-provider-a11y">
       <h3 id="pxl-kit-toast-provider-a11y">Accessibility</h3>

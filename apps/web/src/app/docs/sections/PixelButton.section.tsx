@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelButtonDocsSectionProps {
@@ -17,6 +18,80 @@ export const PixelButtonDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelButton's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelButton } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelButton',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: 'Full Variant union — `solid` | `soft` | `outline` | `ghost`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to nearest provider.' },
+          { name: 'iconLeft', type: 'React.ReactNode', description: 'Leading icon node; replaced by a spinner while `loading` is true.' },
+          { name: 'iconRight', type: 'React.ReactNode', description: 'Trailing icon node.' },
+          { name: 'loading', type: 'boolean', description: 'When true, swaps the left icon for a spinner and force-disables the button.' },
+          { name: 'fullWidth', type: 'boolean', description: "Stretch to fill the parent's inline axis (`w-full`)." },
+          { name: 'asChild', type: 'boolean', description: 'Render the children as the root element (Radix Slot pattern). Expects a SINGLE React element child; receives merged className, ref, and onClick. Useful for `<Link>` / `<a>` wrappers without sacrificing the styling.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`).',
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelButton } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelButton',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: '`solid` | `soft` | `outline` | `ghost`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to the nearest provider.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Swaps the left icon for a spinner and disables the button.' },
+          { name: 'fullWidth', type: 'boolean', default: 'false', description: "Stretch to fill the parent's inline axis (`w-full`)." },
+          { name: 'asChild', type: 'boolean', default: 'false', description: 'Render the single element of the default slot as the root instead of a `<button>`; it receives the button classes and every attribute and listener. Useful for `<a>` / `<RouterLink>` wrappers.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Native `disabled`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Button label.' },
+          { name: 'icon-left', description: 'Leading icon; replaced by a spinner while `loading`.' },
+          { name: 'icon-right', description: 'Trailing icon.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelButton } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelButton',
+        selector: 'button[pxlButton], a[pxlButton]',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: '`solid` | `soft` | `outline` | `ghost`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to the nearest provider.' },
+          { name: 'iconLeft', type: 'string | TemplateRef<any>', description: 'Leading icon; replaced by a spinner while `loading`.' },
+          { name: 'iconRight', type: 'string | TemplateRef<any>', description: 'Trailing icon.' },
+          { name: 'loading', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Swaps the left icon for a spinner and disables the button.' },
+          { name: 'fullWidth', type: 'boolean', default: 'false', accepts: 'unknown', description: "Stretch to fill the parent's inline axis (`w-full`)." },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Native `disabled` (buttons only).' },
+        ],
+        notes: [
+          'Goes on a native `<button>` or `<a>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +110,9 @@ export function PixelButtonDocsSection({ className }: PixelButtonDocsSectionProp
       <dt>Category</dt><dd>actions</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-button-api">
+      <h3 id="pixel-button-api">API</h3>
+      <FrameworkApi label={'PixelButton API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-button-a11y">
       <h3 id="pixel-button-a11y">Accessibility</h3>

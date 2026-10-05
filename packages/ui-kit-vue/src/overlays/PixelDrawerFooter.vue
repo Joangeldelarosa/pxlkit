@@ -8,7 +8,10 @@ const props = defineProps<{
   /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }>();
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Footer content, such as the actions. */
+  default?(): VNode[];
+}>();
 
 const surface = useEffectiveSurface(() => props.surface);
 const classes = computed(() => drawerFooterClasses(surface.value));

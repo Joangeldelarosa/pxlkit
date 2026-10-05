@@ -47,7 +47,10 @@ const props = withDefaults(defineProps<PixelBoxProps>(), {
   shadow: false,
   as: 'div',
 });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Box content. */
+  default?(): VNode[];
+}>();
 
 const attrs = useAttrs();
 const surface = useEffectiveSurface(() => props.surface);

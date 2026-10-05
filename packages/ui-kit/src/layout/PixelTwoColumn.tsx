@@ -12,15 +12,25 @@ import { cn, Surface, useEffectiveSurface } from '../common';
 import { StackGapKey } from '../tokens';
 
 export interface PixelTwoColumnProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Width of the left column against the right one. */
   ratio?: TwoColumnRatio;
+  /** Gap token (`stackGap`). */
   gap?: StackGapKey;
+  /** Show the right column first (CSS `order`; the DOM order stays). */
   reverse?: boolean;
+  /** Breakpoint below which the columns stack. */
   stackBelow?: TwoColumnBreakpoint;
+  /** Block-axis alignment of the columns. */
   align?: GridAlign;
+  /** Content of the left column. */
   left: React.ReactNode;
+  /** Content of the right column. */
   right: React.ReactNode;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Element to render. */
   as?: keyof React.JSX.IntrinsicElements;
+  /** Surface border and radius. */
   bordered?: boolean;
 }
 

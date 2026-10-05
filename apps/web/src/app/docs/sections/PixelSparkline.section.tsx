@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSparklineDocsSectionProps {
@@ -17,6 +18,71 @@ export const PixelSparklineDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelSparkline's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSparkline } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSparkline',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series. Points are spread evenly; `x` only labels them, and one whose `y` is not finite is left out.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the line and the area.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '120×32, 240×60 or 360×96 px.' },
+          { name: 'showArea', type: 'boolean', default: 'false', description: 'Fills the area under the line, faintly.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<svg>` (`SVGAttributes<SVGSVGElement>`).',
+          '`ref` points to `<svg>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSparkline } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSparkline',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series. Points are spread evenly; `x` only labels them, and one whose `y` is not finite is left out.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the line and the area.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '120×32, 240×60 or 360×96 px.' },
+          { name: 'showArea', type: 'boolean', default: 'false', description: 'Fills the area under the line, faintly.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius around the chart.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name; a summary of the series when unset.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<svg>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSparkline } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSparkline',
+        selector: 'svg[pxlSparkline]',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series. Points are spread evenly; `x` only labels them, and one whose `y` is not finite is left out.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the line and the area.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '120×32, 240×60 or 360×96 px.' },
+          { name: 'showArea', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Fills the area under the line, faintly.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border and radius around the chart.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name; a summary of the series when unset.' },
+        ],
+        notes: [
+          'Goes on a native `<svg>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSparklineDocsSection({ className }: PixelSparklineDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +101,9 @@ export function PixelSparklineDocsSection({ className }: PixelSparklineDocsSecti
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-sparkline-api">
+      <h3 id="pixel-sparkline-api">API</h3>
+      <FrameworkApi label={'PixelSparkline API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-sparkline-a11y">
       <h3 id="pixel-sparkline-a11y">Accessibility</h3>

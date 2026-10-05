@@ -14,7 +14,9 @@ import {
 } from '../common';
 
 export interface PixelInputGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Height of the shell. */
   size?: 'sm' | 'md' | 'lg';
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /**
    * Accessible name for the group. Strongly recommended since this primitive
@@ -23,7 +25,9 @@ export interface PixelInputGroupProps extends React.HTMLAttributes<HTMLDivElemen
    * In dev, a missing name on a group of >1 child logs a warning.
    */
   'aria-label'?: string;
+  /** Id of the element that names the group, in place of `aria-label`. */
   'aria-labelledby'?: string;
+  /** The controls to join; each element is joined, text is dropped. */
   children: React.ReactNode;
 }
 

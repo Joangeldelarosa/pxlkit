@@ -9,7 +9,8 @@
  * mirrors the existing showcase but with deeper docs detail:
  *   - Status / deprecation banner (when applicable)
  *   - Component name + description
- *   - Full Props table (name, type, required, default, description)
+ *   - API reference in React, Vue and Angular (extract-api.ts: props,
+ *     events, slots, bindings), under the same framework tabs as the code
  *   - A11y block (WCAG level, ARIA patterns, notes)
  *   - Keyboard bindings table (key, action, when)
  *   - Usage lead + examples: each example's code, self-contained, in React
@@ -54,6 +55,9 @@ import {
 import { createLogger, type Logger } from "./_lib/logger.js";
 import { findComponentDirs } from "./_lib/scan-fs.js";
 import { selfContainedExamples } from "./extract-example-source.js";
+import { apiIndexFor, documentedNames, extractApi } from "./extract-api.js";
+import type { ComponentApi } from "./_lib/api-model.js";
+import { FRAMEWORK_API_MODULE, hasApi, renderApiBlock, renderApiConstant } from "./_lib/api-section.js";
 import {
   KIT_PORTS,
   implementsInFull,
@@ -138,6 +142,8 @@ export interface DocsPagePlanEntry {
   highlights: string[];
   /** Props normalized as a flat table. */
   props: PropEntry[];
+  /** The component's API per framework, read from the kits' sources; in place of `props` when set. */
+  api?: ComponentApi;
   /** WCAG level, e.g. "2.1 AA". */
   wcagLevel: string;
   /** ARIA patterns array. */
@@ -649,6 +655,10 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
   const lines: string[] = [];
   lines.push(FILE_BANNER);
   lines.push(`import * as React from 'react';`);
+  const api = hasApi(entry.api) ? entry.api : undefined;
+  if (api) {
+    lines.push(`import { FrameworkApi, type FrameworkApiReferences } from '${FRAMEWORK_API_MODULE}';`);
+  }
   if (entry.usageSnippet || entry.examples.length > 0) {
     lines.push(`import { FrameworkCode } from '@/components/FrameworkCode';`);
   }
@@ -668,6 +678,10 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
   lines.push(`  deprecated: ${entry.deprecation.deprecated ? "true" : "false"},`);
   lines.push(`} as const;`);
   lines.push(``);
+  if (api) {
+    lines.push(renderApiConstant(entry.name, api));
+    lines.push(``);
+  }
   lines.push(
     `export function ${entry.name}DocsSection({ className }: ${entry.name}DocsSectionProps): React.ReactElement {`,
   );
@@ -693,10 +707,14 @@ export function renderSectionModule(entry: DocsPagePlanEntry): string {
 
   lines.push(renderMeta(entry));
 
-  lines.push(`    <section aria-label="Props">`);
-  lines.push(`      <h3>Props</h3>`);
-  lines.push(renderPropsTable(entry.props));
-  lines.push(`    </section>`);
+  if (api) {
+    lines.push(renderApiBlock(entry.name, entry.slug, api));
+  } else {
+    lines.push(`    <section aria-label="Props">`);
+    lines.push(`      <h3>Props</h3>`);
+    lines.push(renderPropsTable(entry.props));
+    lines.push(`    </section>`);
+  }
 
   lines.push(renderA11ySection(entry));
 
@@ -763,9 +781,12 @@ export class GenerateDocsPageGenerator extends Generator {
 
   async run(ctx: GeneratorContext): Promise<GeneratorResult> {
     const ports = await readPorts(ctx.repoRoot);
+    const apis = await apiIndexFor(ctx);
     const entries: DocsPagePlanEntry[] = [];
     for (const rec of ctx.manifests) {
-      entries.push(planEntryFor(rec, this.outRoot, await exampleSourcesOf(ctx.repoRoot, rec, ports)));
+      const entry = planEntryFor(rec, this.outRoot, await exampleSourcesOf(ctx.repoRoot, rec, ports));
+      entry.api = apis.get(entry.name);
+      entries.push(entry);
     }
     const writes = entries.map((entry) => ({
       path: entry.outFile,
@@ -933,9 +954,11 @@ export async function generateDocsPage(
   let skipped = 0;
 
   const ports = await readPorts(repoRoot);
+  const apis = await extractApi(repoRoot, documentedNames(manifests));
   for (const rec of manifests) {
     try {
       const entry = planEntryFor(rec, outRoot, await exampleSourcesOf(repoRoot, rec, ports));
+      entry.api = apis.get(entry.name);
       entries.push(entry);
       if (opts.dryRun) {
         skipped++;

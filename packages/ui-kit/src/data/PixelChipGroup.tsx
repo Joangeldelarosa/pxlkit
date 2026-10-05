@@ -43,12 +43,17 @@ export interface PixelChipGroupProps
   value?: string[];
   /** Uncontrolled initial selection. */
   defaultValue?: string[];
+  /** Called with the new selection, after each change. */
   onChange?: (next: string[]) => void;
+  /** Any number of chips can be selected (checkboxes) instead of one (radios). */
   multiple?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Accessible name (required when single-select so SR users hear the group). */
   'aria-label'?: string;
+  /** Id of the element that names the group, in place of `aria-label`. */
   'aria-labelledby'?: string;
+  /** The chips, each with a `value`; other content renders as is. */
   children: React.ReactNode;
 }
 

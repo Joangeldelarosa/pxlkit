@@ -56,7 +56,10 @@ const emit = defineEmits<{
   /** Every open state the menu asks for, for `v-model:open`. */
   'update:open': [open: boolean];
 }>();
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The trigger and the menu (`PixelDropdownTrigger`, `PixelDropdownContent`). */
+  default?(): VNode[];
+}>();
 
 const surface = useEffectiveSurface(() => props.surface);
 const [open, setOpen] = useControllableState({

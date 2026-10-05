@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTabsDocsSectionProps {
@@ -17,6 +18,194 @@ export const PixelTabsDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelTabs's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTabs } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTabs',
+        props: [
+          { name: 'items', type: 'TabItem[]', description: 'Sugar API. When omitted, use <PixelTabs.List>/<PixelTabs.Trigger>/<PixelTabs.Panel>.' },
+          { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial active tab id. Canonical name; aliases `defaultTab`.' },
+          { name: 'defaultTab', type: 'string', deprecated: 'Use `defaultValue` instead. Retained as alias for one minor.' },
+          { name: 'value', type: 'string', description: 'Controlled active tab id. When set, `defaultValue` is ignored.' },
+          { name: 'onChange', type: '(id: string) => void', description: 'Fires whenever the active tab changes (controlled or uncontrolled).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface treatment override.' },
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label for the tablist.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction for the tab list + keyboard nav.' },
+          { name: 'keepMounted', type: 'boolean', default: 'false', description: 'When true, all panels render in the DOM (hidden via CSS).' },
+          { name: 'scrollable', type: 'boolean', default: 'false', description: 'When true, the tablist scrolls horizontally with a fade-mask. Ignored for vertical orientation.' },
+          { name: 'activationMode', type: "'automatic' | 'manual'", default: "'automatic'", description: "'automatic' (default) selects on focus. 'manual' requires Enter/Space." },
+          { name: 'children', type: 'React.ReactNode', description: 'Compositional children. Ignored when `items` is provided.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelTabs.List',
+        props: [
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label announced for the tablist.' },
+          { name: 'scrollable', type: 'boolean', default: 'false', description: 'When true, the tablist scrolls horizontally with a fade-mask. Ignored for vertical orientation.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `role`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelTabs.Trigger',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Tab id this trigger controls — must match a PixelTabsPanel value.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Optional leading icon node.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`), except `role`.',
+          '`ref` points to `<button>`.',
+        ],
+      },
+      {
+        name: 'PixelTabs.Panel',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Tab id this panel belongs to — must match a PixelTabsTrigger value.' },
+          { name: 'keepMounted', type: 'boolean', description: "Override the root's keepMounted setting for this panel." },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `role`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTabs, PixelTabsList, PixelTabsPanel, PixelTabsTrigger } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTabs',
+        props: [
+          { name: 'items', type: 'TabItem[]', description: 'Shorthand; leave out to compose List / Trigger / Panel yourself.' },
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Active tab id (`v-model`); leave unset for uncontrolled tabs.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial active tab while uncontrolled.' },
+          { name: 'defaultTab', type: 'string', deprecated: 'Use `defaultValue`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label of the tablist.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction of the tab list and of arrow-key navigation.' },
+          { name: 'keepMounted', type: 'boolean', default: 'false', description: 'Keep every panel in the DOM (hidden) instead of only the active one.' },
+          { name: 'scrollable', type: 'boolean', default: 'false', description: 'Horizontal tab list scrolls with a fade mask (ignored when vertical).' },
+          { name: 'activationMode', type: "'automatic' | 'manual'", default: "'automatic'", description: '`automatic` selects on focus; `manual` waits for Enter / Space.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'id: string', description: 'The newly active tab id.' },
+        ],
+        slots: [
+          { name: 'default', description: '`PixelTabsList` and the `PixelTabsPanel`s, in place of `items`.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelTabsList',
+        props: [
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label of the tablist.' },
+          { name: 'scrollable', type: 'boolean', default: 'false', description: 'Scroll horizontally with a fade mask (ignored when vertical).' },
+        ],
+        slots: [
+          { name: 'default', description: 'The triggers (`PixelTabsTrigger`).' },
+        ],
+      },
+      {
+        name: 'PixelTabsPanel',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Id of the tab — matches a `PixelTabsTrigger` value.' },
+          { name: 'keepMounted', type: 'boolean', description: "Override the root's `keep-mounted` for this panel." },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface-aware border and radius chrome.' },
+        ],
+        slots: [
+          { name: 'default', description: "The panel's content." },
+        ],
+      },
+      {
+        name: 'PixelTabsTrigger',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Id of the tab — matches a `PixelTabsPanel` value.' },
+        ],
+        slots: [
+          { name: 'default', description: "The tab's label." },
+          { name: 'icon', description: 'Leading icon.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<button>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTabs, PixelTabsList, PixelTabsPanel, PixelTabsTrigger } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTabs',
+        selector: 'pxl-tabs',
+        props: [
+          { name: 'items', type: 'TabItem[]', description: 'Shorthand; leave out to compose list, triggers and panels yourself.' },
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Active tab id (`[(value)]`); leave unset for uncontrolled tabs.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial active tab while uncontrolled.' },
+          { name: 'defaultTab', type: 'string', deprecated: 'Use `defaultValue`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label of the tablist.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction of the tab list and of arrow-key navigation.' },
+          { name: 'keepMounted', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Keep every panel in the DOM (hidden) instead of only the active one.' },
+          { name: 'scrollable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Horizontal tab list scrolls with a fade mask (ignored when vertical).' },
+          { name: 'activationMode', type: "'automatic' | 'manual'", default: "'automatic'", description: '`automatic` selects on focus; `manual` waits for Enter / Space.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelTabsList',
+        selector: 'pxl-tabs-list',
+        props: [
+          { name: 'ariaLabel', type: 'string', default: "'Tabs'", description: 'Accessible label of the tablist.' },
+          { name: 'scrollable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Scroll horizontally with a fade mask (ignored when vertical).' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelTabsPanel',
+        selector: 'pxl-tabs-panel',
+        props: [
+          { name: 'value', type: 'string', required: true, description: "Id of the tab — matches a trigger's value." },
+          { name: 'keepMounted', type: 'boolean', accepts: 'unknown', description: "Override the root's `keepMounted` for this panel." },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface-aware border and radius chrome.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelTabsTrigger',
+        selector: 'button[pxlTabsTrigger]',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Id of the tab — matches a `<pxl-tabs-panel>` value.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Leading icon.' },
+        ],
+        notes: [
+          'Goes on a native `<button>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +224,9 @@ export function PixelTabsDocsSection({ className }: PixelTabsDocsSectionProps): 
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-tabs-api">
+      <h3 id="pixel-tabs-api">API</h3>
+      <FrameworkApi label={'PixelTabs API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-tabs-a11y">
       <h3 id="pixel-tabs-a11y">Accessibility</h3>

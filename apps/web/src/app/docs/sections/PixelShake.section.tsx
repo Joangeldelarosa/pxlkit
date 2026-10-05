@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelShakeDocsSectionProps {
@@ -17,6 +18,77 @@ export const PixelShakeDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelShake's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelShake } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelShake',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to shake.' },
+          { name: 'duration', type: 'number', default: '450', description: 'Animation duration in milliseconds. Default `450`.' },
+          { name: 'distance', type: 'number', default: '2', description: 'Horizontal travel distance in pixels. Default `2`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`. Default `1`." },
+          { name: 'easing', type: 'string', default: "'linear'", description: "CSS `animation-timing-function`. Default `'linear'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelShake } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelShake',
+        props: [
+          { name: 'duration', type: 'number', default: '450', description: 'Animation duration in milliseconds.' },
+          { name: 'distance', type: 'number', default: '2', description: 'Horizontal travel distance in pixels.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'linear'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to shake.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelShake } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelShake',
+        selector: 'pxl-shake',
+        props: [
+          { name: 'duration', type: 'number', default: '450', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'distance', type: 'number', default: '2', accepts: 'unknown', description: 'Horizontal travel distance in pixels.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'linear'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +107,9 @@ export function PixelShakeDocsSection({ className }: PixelShakeDocsSectionProps)
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-shake-api">
+      <h3 id="pixel-shake-api">API</h3>
+      <FrameworkApi label={'PixelShake API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-shake-a11y">
       <h3 id="pixel-shake-a11y">Accessibility</h3>

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSegmentedDocsSectionProps {
@@ -17,6 +18,84 @@ export const PixelSegmentedDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelSegmented's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSegmented } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSegmented',
+        props: [
+          { name: 'label', type: 'string', description: 'Caption rendered above the segmented control. Omitted when empty.' },
+          { name: 'value', type: 'string', required: true, description: 'Active option value.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'Segment items.' },
+          { name: 'onChange', type: '(next: string) => void', required: true, description: 'Fires with the new value when a segment is clicked.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every segment.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: "Visual tone for the active segment. Default: `'green'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'name', type: 'string', description: 'Form-serialization name.' },
+          { name: 'required', type: 'boolean', description: 'Marks the field as required for native form validation.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the group; use it when no visible `label` is rendered.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSegmented } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSegmented',
+        props: [
+          { name: 'label', type: 'string', description: 'Caption above the segments; omitted when empty.' },
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Selected value (`v-model`); leave unset for an uncontrolled control.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'The segments.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every segment.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the selected segment.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'required', type: 'boolean', default: 'false', description: 'Marks the field as required for native form validation.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name of the segments when no visible `label` is shown.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The value of the segment the user picked.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSegmented } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSegmented',
+        selector: 'pxl-segmented',
+        props: [
+          { name: 'label', type: 'string', description: 'Caption above the segments; omitted when empty.' },
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Selected value (`[(value)]`); leave unset for an uncontrolled control.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'The segments.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables every segment.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the selected segment.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the field as required for native form validation.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the segments when no visible `label` is shown.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +114,9 @@ export function PixelSegmentedDocsSection({ className }: PixelSegmentedDocsSecti
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-segmented-api">
+      <h3 id="pixel-segmented-api">API</h3>
+      <FrameworkApi label={'PixelSegmented API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-segmented-a11y">
       <h3 id="pixel-segmented-a11y">Accessibility</h3>

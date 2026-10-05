@@ -25,13 +25,21 @@ import { cn, Surface, useEffectiveSurface } from '../common';
 import { ToneKey } from '../tokens';
 
 export interface PixelSidebarItemProps {
+  /** Unique among its siblings. */
   id: string;
+  /** Text of the item; its accessible name and tooltip while the sidebar is collapsed. */
   label: string;
+  /** Icon before the label, hidden from assistive technology. */
   icon?: React.ReactNode;
+  /** Badge after the label: its text and tone. */
   badge?: { label: string; tone?: ToneKey };
+  /** Link target: the item is a link; without one it is a button. */
   href?: string;
+  /** Called when the item is pressed; only a button calls it (an item with `href` is a link). */
   onSelect?: () => void;
+  /** Marks the current page (`aria-current="page"`). */
   active?: boolean;
+  /** Child items, listed below it while the sidebar is expanded. */
   nested?: PixelSidebarItemProps[];
 }
 
@@ -42,17 +50,26 @@ export interface PixelSidebarSectionProps {
    * @deprecated Use `label` instead. Retained as alias for one minor.
    */
   title?: string;
+  /** The section's items. */
   items: PixelSidebarItemProps[];
 }
 
 export interface PixelSidebarProps extends React.HTMLAttributes<HTMLElement> {
+  /** Shows the collapse toggle in the header row. */
   collapsible?: boolean;
+  /** Initial collapsed state while uncontrolled. */
   defaultCollapsed?: boolean;
+  /** Collapsed state; leave unset for an uncontrolled rail. */
   collapsed?: boolean;
+  /** Called with the collapsed state the toggle asks for. */
   onCollapsedChange?: (next: boolean) => void;
+  /** The sections, in order. */
   sections: PixelSidebarSectionProps[];
+  /** Header content beside the toggle (hidden while collapsed). */
   header?: React.ReactNode;
+  /** Footer row content. */
   footer?: React.ReactNode;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

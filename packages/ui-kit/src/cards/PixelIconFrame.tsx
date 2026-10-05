@@ -12,12 +12,19 @@ import { ToneKey } from '../tokens';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 export interface PixelIconFrameProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** The icon. */
   icon: React.ReactNode;
+  /** Width and height, in px. */
   size?: FrameSize;
+  /** Tone of the border, fill and icon. */
   tone?: ToneKey;
+  /** `square` keeps the surface's corners. */
   shape?: FrameShape;
+  /** Badge in a corner: its content and corner (top right by default). */
   accent?: { icon: React.ReactNode; position?: AccentPosition };
+  /** Pulses, unless the user prefers reduced motion. */
   animated?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

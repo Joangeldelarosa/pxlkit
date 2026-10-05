@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBadgeDocsSectionProps {
@@ -17,6 +18,70 @@ export const PixelBadgeDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelBadge's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBadge } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBadge',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Badge content.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: "Tone tint. Defaults to `'green'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'variant', type: "'soft' | 'solid' | 'outline' | 'ghost'", default: "'soft'", description: 'Variant axis: soft (default), solid, outline, ghost.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Size scale. Defaults to `'md'`." },
+          { name: 'iconLeft', type: 'React.ReactNode', description: 'Optional leading icon.' },
+          { name: 'onClick', type: 'React.MouseEventHandler<HTMLElement>', description: 'When provided the root renders as a `<button>` for keyboard / SR parity.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBadge } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBadge',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone tint.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'variant', type: "'soft' | 'solid' | 'outline' | 'ghost'", default: "'soft'", description: 'Variant axis: soft (default), solid, outline, ghost.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size scale.' },
+          { name: 'onClick', type: '(event: MouseEvent) => void', binding: '@click', description: 'Click handler (`@click`). Declared as a prop because its presence changes the element: with one the badge is a `<button type="button">`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Badge content.' },
+          { name: 'icon-left', description: 'Leading icon.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBadge } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBadge',
+        selector: 'pxl-badge, button[pxlBadge]',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone tint.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'variant', type: "'soft' | 'solid' | 'outline' | 'ghost'", default: "'soft'", description: 'Variant axis: soft (default), solid, outline, ghost.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size scale.' },
+          { name: 'iconLeft', type: 'string | TemplateRef<any>', description: 'Optional leading icon.' },
+        ],
+        notes: [
+          'As an attribute, it goes on a native `<button>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +100,9 @@ export function PixelBadgeDocsSection({ className }: PixelBadgeDocsSectionProps)
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-badge-api">
+      <h3 id="pixel-badge-api">API</h3>
+      <FrameworkApi label={'PixelBadge API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-badge-a11y">
       <h3 id="pixel-badge-a11y">Accessibility</h3>

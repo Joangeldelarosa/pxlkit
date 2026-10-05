@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTextareaDocsSectionProps {
@@ -17,6 +18,101 @@ export const PixelTextareaDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelTextarea's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTextarea } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTextarea',
+        props: [
+          { name: 'label', type: 'string', description: 'Floating label rendered above the textarea.' },
+          { name: 'hint', type: 'string', description: 'Helper text shown below the field. Hidden when `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message shown below the field; flips visual state to invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: "Visual tone for focus ring + border emphasis. Default: `'neutral'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'autosize', type: 'boolean', description: 'Auto-grow the textarea with content (between `minRows` and `maxRows`).' },
+          { name: 'minRows', type: 'number', default: '3', description: 'Minimum visible rows when `autosize` is on. Defaults to `3`.' },
+          { name: 'maxRows', type: 'number', description: 'Max rows before scrolling. Optional cap.' },
+          { name: 'showCount', type: 'boolean | { max?: number }', description: 'Render a character counter under the textarea. `true` shows `N`; `{ max }` shows `N/max`.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<textarea>` (`TextareaHTMLAttributes<HTMLTextAreaElement>`).',
+          '`ref` points to `<textarea>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTextarea } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTextarea',
+        props: [
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled textarea.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the textarea.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the textarea invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'autosize', type: 'boolean', default: 'false', description: 'Grows with the content, between `minRows` and `maxRows` lines.' },
+          { name: 'minRows', type: 'number', default: '3', description: 'Lines shown at least while `autosize` is on.' },
+          { name: 'maxRows', type: 'number', description: 'Lines shown at most while `autosize` is on; it scrolls past them.' },
+          { name: 'showCount', type: 'boolean | { max?: number }', default: 'false', description: 'Character counter under the textarea: `true` shows `N`, `{ max }` shows `N/max` and caps the length.' },
+          { name: 'id', type: 'string', description: '`id` of the textarea; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new value, on every edit.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<textarea>`.',
+          'Its template ref exposes `element`: the native textarea.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTextarea } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTextarea',
+        selector: 'pxl-textarea',
+        props: [
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled textarea.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the textarea.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the textarea invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'autosize', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Grows with the content, between `minRows` and `maxRows` lines.' },
+          { name: 'minRows', type: 'number', default: '3', accepts: 'unknown', description: 'Lines shown at least while `autosize` is on.' },
+          { name: 'maxRows', type: 'number', accepts: 'unknown', description: 'Lines shown at most while `autosize` is on; it scrolls past them.' },
+          { name: 'showCount', type: 'boolean | { max?: number }', default: 'false', accepts: "boolean | { max?: number } | ''", description: 'Character counter under the textarea: `true` shows `N`, `{ max }` shows `N/max` and caps the length.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the textarea.' },
+          { name: 'id', type: 'string', description: '`id` of the textarea; generated when left out.' },
+          { name: 'name', type: 'string', description: 'Native `name` of the textarea.' },
+          { name: 'placeholder', type: 'string', description: 'Native `placeholder`.' },
+          { name: 'rows', type: 'number', accepts: 'unknown', description: 'Native `rows`; `minRows` while `autosize` is on and this is left out.' },
+          { name: 'minlength', type: 'number', accepts: 'unknown', description: 'Native `minlength`.' },
+          { name: 'maxlength', type: 'number', accepts: 'unknown', description: 'Native `maxlength`; defaults to the `showCount` limit.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the textarea required.' },
+          { name: 'readonly', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the textarea read-only.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the textarea when no `label` is shown.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the textarea; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelTextareaDocsSection({ className }: PixelTextareaDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +131,9 @@ export function PixelTextareaDocsSection({ className }: PixelTextareaDocsSection
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-textarea-api">
+      <h3 id="pixel-textarea-api">API</h3>
+      <FrameworkApi label={'PixelTextarea API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-textarea-a11y">
       <h3 id="pixel-textarea-a11y">Accessibility</h3>

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPaginationDocsSectionProps {
@@ -17,6 +18,75 @@ export const PixelPaginationDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelPagination's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelPagination } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelPagination',
+        props: [
+          { name: 'page', type: 'number', required: true, description: 'Current page (1-indexed).' },
+          { name: 'total', type: 'number', required: true, description: 'Total number of pages.' },
+          { name: 'onChange', type: '(next: number) => void', required: true, description: 'Fires when the user picks a new page.' },
+          { name: 'siblings', type: 'number', default: '1', description: 'Sibling pages to show around the current. Defaults to 1.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface treatment override.' },
+          { name: 'ariaLabel', type: 'string', default: "'Pagination'", description: 'Accessible label for the nav region.' },
+          { name: 'prevLabel', type: 'string', default: "'Prev'", description: 'Localised label for the Prev button.' },
+          { name: 'nextLabel', type: 'string', default: "'Next'", description: 'Localised label for the Next button.' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelPagination } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelPagination',
+        props: [
+          { name: 'page', type: 'number', required: true, binding: 'v-model:page', description: 'Current page, from 1 (`v-model:page`).' },
+          { name: 'total', type: 'number', required: true, description: 'Number of pages.' },
+          { name: 'siblings', type: 'number', default: '1', description: 'Pages shown on each side of the current one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Pagination'", description: 'Accessible name of the landmark.' },
+          { name: 'prevLabel', type: 'string', default: "'Prev'", description: 'Label of the previous-page button.' },
+          { name: 'nextLabel', type: 'string', default: "'Next'", description: 'Label of the next-page button.' },
+        ],
+        events: [
+          { name: 'update:page', payload: 'page: number', description: 'The page the user picked, for `v-model:page`.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<nav>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelPagination } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelPagination',
+        selector: 'pxl-pagination',
+        props: [
+          { name: 'page', type: 'number', required: true, binding: '[(page)]', description: 'Current page, from 1 (`[(page)]`).' },
+          { name: 'total', type: 'number', required: true, accepts: 'unknown', description: 'Number of pages.' },
+          { name: 'siblings', type: 'number', default: '1', accepts: 'unknown', description: 'Pages shown on each side of the current one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Pagination'", description: 'Accessible name of the landmark.' },
+          { name: 'prevLabel', type: 'string', default: "'Prev'", description: 'Label of the previous-page button.' },
+          { name: 'nextLabel', type: 'string', default: "'Next'", description: 'Label of the next-page button.' },
+        ],
+        events: [
+          { name: 'pageChange', payload: 'number', description: 'The new `page`: the event half of `[(page)]`.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +105,9 @@ export function PixelPaginationDocsSection({ className }: PixelPaginationDocsSec
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-pagination-api">
+      <h3 id="pixel-pagination-api">API</h3>
+      <FrameworkApi label={'PixelPagination API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-pagination-a11y">
       <h3 id="pixel-pagination-a11y">Accessibility</h3>

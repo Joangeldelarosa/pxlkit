@@ -10,6 +10,7 @@ import {
 import { cn, Surface, useEffectiveSurface } from '../common';
 
 export interface PixelScrollAreaProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'type'> {
+  /** Height cap before the content scrolls: pixels, or any CSS length. */
   maxHeight?: string | number;
   /** Canonical structural variant (scrollbar visibility mode). */
   variant?: ScrollAreaVariant;
@@ -17,8 +18,11 @@ export interface PixelScrollAreaProps extends Omit<React.HTMLAttributes<HTMLDivE
    * @deprecated Use `variant` instead. Retained as alias for one minor.
    */
   type?: ScrollAreaVariant;
+  /** Keep the scrollbar's room reserved, so content never shifts. */
   offsetScrollbars?: boolean;
+  /** Scrollbar thickness in pixels. */
   scrollbarSize?: number;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
   bordered?: boolean;
@@ -28,7 +32,9 @@ export interface PixelScrollAreaProps extends Omit<React.HTMLAttributes<HTMLDivE
    * `aria-labelledby`. In dev, a missing label logs a warning.
    */
   'aria-label'?: string;
+  /** Id of the element that names the region, in place of `aria-label`. */
   'aria-labelledby'?: string;
+  /** The content that scrolls. */
   children: React.ReactNode;
 }
 

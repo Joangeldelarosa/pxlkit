@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTooltipDocsSectionProps {
@@ -17,6 +18,88 @@ export const PixelTooltipDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelTooltip's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTooltip } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTooltip',
+        props: [
+          { name: 'content', type: 'React.ReactNode', description: 'Tooltip body. Accepts any ReactNode; falls back to `PixelTooltipProps.label` when omitted.' },
+          { name: 'label', type: 'string', description: 'Backwards-compat string alias for `PixelTooltipProps.content`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The element the tooltip is anchored to.' },
+          { name: 'position', type: "'top' | 'bottom' | 'left' | 'right'", default: "'top'", description: 'Preferred placement. floating-ui will flip/shift away from viewport edges.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override. Falls back to nearest `<PxlKitProvider>` surface.' },
+          { name: 'delay', type: 'number | { open?: number; close?: number }', description: 'Open/close delays in ms. A bare `number` is treated as `{ open }` for backwards-compat with the previous API. Defaults to `{ open: 200, close: 100 }`.' },
+          { name: 'open', type: 'boolean', description: 'Controlled open state. When provided, the tooltip ignores its internal state.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Initial open state when uncontrolled.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', description: 'Called whenever the tooltip wants to change open state (controlled or uncontrolled).' },
+          { name: 'trigger', type: "'hover' | 'click' | 'focus'", default: "'hover'", description: "How the tooltip opens. Default `'hover'`." },
+          { name: 'sideOffset', type: 'number', default: '8', description: 'Distance in px from the trigger. Default `8`.' },
+        ],
+        notes: [
+          '`ref` points to `<span>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTooltip } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTooltip',
+        props: [
+          { name: 'label', type: 'string', description: 'Text of the tooltip; the `content` slot takes richer content.' },
+          { name: 'position', type: "'top' | 'bottom' | 'left' | 'right'", default: "'top'", description: 'Preferred side of the trigger; the tooltip flips and shifts to stay in view.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'delay', type: 'number | { open?: number; close?: number }', description: 'Open / close delays in ms (default `{ open: 200, close: 100 }`); a bare number is the open delay.' },
+          { name: 'open', type: 'boolean', binding: 'v-model:open', description: 'Whether the tooltip is open (`v-model:open`); leave unset for an uncontrolled tooltip.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Initial open state while uncontrolled.' },
+          { name: 'trigger', type: "'hover' | 'click' | 'focus'", default: "'hover'", description: 'What opens it: `hover` (and focus), `focus` only, or `click` to toggle.' },
+          { name: 'sideOffset', type: 'number', default: '8', description: 'Gap between the trigger and the tooltip, in px.' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: 'Every open state the tooltip asks for, for `v-model:open`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The trigger the tooltip is anchored to — an interactive element for click tooltips.' },
+          { name: 'content', description: 'Tooltip content, in place of `label`.' },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the wrapper around the trigger.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTooltip } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTooltip',
+        selector: 'pxl-tooltip',
+        props: [
+          { name: 'content', type: 'string | TemplateRef<any>', description: 'Tooltip content: text or an `<ng-template>`, in place of `label`.' },
+          { name: 'label', type: 'string', description: 'Text of the tooltip.' },
+          { name: 'position', type: "'top' | 'bottom' | 'left' | 'right'", default: "'top'", description: 'Preferred side of the trigger; the tooltip flips and shifts to stay in view.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'delay', type: 'number | { open?: number; close?: number }', description: 'Open / close delays in ms (default `{ open: 200, close: 100 }`); a bare number is the open delay.' },
+          { name: 'open', type: 'boolean', binding: '[(open)]', description: 'Whether the tooltip is open (`[(open)]`); leave unset for an uncontrolled tooltip.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Initial open state while uncontrolled.' },
+          { name: 'trigger', type: "'hover' | 'click' | 'focus'", default: "'hover'", description: 'What opens it: `hover` (and focus), `focus` only, or `click` to toggle.' },
+          { name: 'sideOffset', type: 'number', default: '8', accepts: 'unknown', description: 'Gap between the trigger and the tooltip, in px.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: 'Every open state the tooltip asks for (hover, focus, a click, Escape, a press outside), for `[(open)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +118,9 @@ export function PixelTooltipDocsSection({ className }: PixelTooltipDocsSectionPr
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-tooltip-api">
+      <h3 id="pixel-tooltip-api">API</h3>
+      <FrameworkApi label={'PixelTooltip API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-tooltip-a11y">
       <h3 id="pixel-tooltip-a11y">Accessibility</h3>

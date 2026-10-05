@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTestimonialCardDocsSectionProps {
@@ -17,6 +18,86 @@ export const PixelTestimonialCardDocsMeta = {
   since: '1.7.0',
   deprecated: false,
 } as const;
+
+/** PixelTestimonialCard's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTestimonialCard } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTestimonialCard',
+        props: [
+          { name: 'quote', type: 'string', required: true, description: 'The quote, set between curly quotation marks.' },
+          { name: 'name', type: 'string', required: true, description: 'Who said it.' },
+          { name: 'role', type: 'string', description: 'Their role, before the company.' },
+          { name: 'company', type: 'string', description: 'Their company.' },
+          { name: 'avatar', type: '{ src?: string; name: string; tone?: ToneKey }', description: 'Photo, or the name and tone of the initials; the initials of `name` without one.' },
+          { name: 'stars', type: 'number', description: 'Star rating out of 5; none for 0 or unset.' },
+          { name: 'verified', type: 'boolean', default: 'false', description: 'Shows the VERIFIED badge.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the initials.' },
+          { name: 'variant', type: "'card' | 'quote' | 'slider'", default: "'card'", description: '`card` draws the surface chrome; `quote` and `slider` leave it out.' },
+          { name: 'quoteSize', type: "'compact' | 'normal' | 'long'", default: "'normal'", description: 'Minimum height of the quote.' },
+          { name: 'actions', type: 'React.ReactNode', description: 'Actions under the quote (a link to the full story).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTestimonialCard } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTestimonialCard',
+        props: [
+          { name: 'quote', type: 'string', required: true, description: 'The quote, set between curly quotation marks.' },
+          { name: 'name', type: 'string', required: true, description: 'Who said it.' },
+          { name: 'role', type: 'string', description: 'Their role, before the company.' },
+          { name: 'company', type: 'string', description: 'Their company.' },
+          { name: 'avatar', type: 'TestimonialAvatar', description: 'Photo, or the name and tone of the initials; the initials of `name` without one.' },
+          { name: 'stars', type: 'number', description: 'Star rating out of 5; none for 0 or unset.' },
+          { name: 'verified', type: 'boolean', default: 'false', description: 'Shows the VERIFIED badge.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the initials.' },
+          { name: 'variant', type: "'card' | 'quote' | 'slider'", default: "'card'", description: '`card` draws the surface chrome; `quote` and `slider` leave it out.' },
+          { name: 'quoteSize', type: "'compact' | 'normal' | 'long'", default: "'normal'", description: 'Minimum height of the quote.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'actions', description: 'Actions under the quote (a link to the full story).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<article>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTestimonialCard } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTestimonialCard',
+        selector: 'pxl-testimonial-card',
+        props: [
+          { name: 'quote', type: 'string', required: true, description: 'The quote, set between curly quotation marks.' },
+          { name: 'name', type: 'string', required: true, description: 'Who said it.' },
+          { name: 'role', type: 'string', description: 'Their role, before the company.' },
+          { name: 'company', type: 'string', description: 'Their company.' },
+          { name: 'avatar', type: 'TestimonialAvatar', description: 'Photo, or the name and tone of the initials; the initials of `name` without one.' },
+          { name: 'stars', type: 'number', accepts: 'unknown', description: 'Star rating out of 5; none for 0 or unset.' },
+          { name: 'verified', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows the VERIFIED badge.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the initials.' },
+          { name: 'variant', type: "'card' | 'quote' | 'slider'", default: "'card'", description: '`card` draws the surface chrome; `quote` and `slider` leave it out.' },
+          { name: 'quoteSize', type: "'compact' | 'normal' | 'long'", default: "'normal'", description: 'Minimum height of the quote.' },
+          { name: 'actions', type: 'string | TemplateRef<any>', description: 'Actions under the quote (a link to the full story).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelTestimonialCardDocsSection({ className }: PixelTestimonialCardDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +115,9 @@ export function PixelTestimonialCardDocsSection({ className }: PixelTestimonialC
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-testimonial-card-api">
+      <h3 id="pixel-testimonial-card-api">API</h3>
+      <FrameworkApi label={'PixelTestimonialCard API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-testimonial-card-a11y">
       <h3 id="pixel-testimonial-card-a11y">Accessibility</h3>

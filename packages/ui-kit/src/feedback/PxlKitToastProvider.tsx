@@ -116,7 +116,9 @@ export function useToast(): UseToastReturn {
    ────────────────────────────────────────────────────────────────────────── */
 
 export interface PxlKitToastProviderProps {
+  /** The part of the app that shows toasts: `useToast()` works inside it. */
   children: React.ReactNode;
+  /** Corner, or edge centre, of the screen the toasts appear at. */
   position?: ToastPosition;
   /** Maximum simultaneous toasts. Oldest is dropped if exceeded. Defaults to 5. */
   max?: number;
@@ -131,6 +133,7 @@ export interface PxlKitToastProviderProps {
    * `false` for none. Defaults to `F8`; the viewport's accessible name tells it.
    */
   hotkey?: string | false;
+  /** Surface of the toasts; defaults to the nearest provider. */
   surface?: Surface;
   /**
    * Sonner-style stacked-offset visual: toasts collapse into a small stack

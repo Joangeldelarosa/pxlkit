@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBreadcrumbDocsSectionProps {
@@ -17,6 +18,56 @@ export const PixelBreadcrumbDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelBreadcrumb's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBreadcrumb } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBreadcrumb',
+        props: [
+          { name: 'items', type: 'PixelBreadcrumbItem[]', required: true, description: 'Crumbs in order, from root to current page.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface treatment override.' },
+          { name: 'ariaLabel', type: 'string', default: "'Breadcrumb'", description: 'Accessible label for the nav region.' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBreadcrumb } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBreadcrumb',
+        props: [
+          { name: 'items', type: 'PixelBreadcrumbItem[]', required: true, description: 'Crumbs in order, from the root to the current page.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Breadcrumb'", description: 'Accessible name of the landmark.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<nav>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBreadcrumb } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBreadcrumb',
+        selector: 'pxl-breadcrumb',
+        props: [
+          { name: 'items', type: 'PixelBreadcrumbItem[]', required: true, description: 'Crumbs in order, from the root to the current page.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Breadcrumb'", description: 'Accessible name of the landmark.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +86,9 @@ export function PixelBreadcrumbDocsSection({ className }: PixelBreadcrumbDocsSec
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-breadcrumb-api">
+      <h3 id="pixel-breadcrumb-api">API</h3>
+      <FrameworkApi label={'PixelBreadcrumb API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-breadcrumb-a11y">
       <h3 id="pixel-breadcrumb-a11y">Accessibility</h3>

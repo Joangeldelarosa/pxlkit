@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTimelineDocsSectionProps {
@@ -17,6 +18,110 @@ export const PixelTimelineDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelTimeline's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTimeline',
+        props: [
+          { name: 'active', type: 'number', description: 'Index of the current entry: the ones before it are past, the ones after it upcoming.' },
+          { name: 'bulletSize', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Bullet size.' },
+          { name: 'align', type: "'left' | 'right'", default: "'left'", description: 'Side the bullets and the rail sit on.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The entries (`PixelTimelineItem`).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<ol>` (`HTMLAttributes<HTMLOListElement>`).',
+          '`ref` points to `<ol>`.',
+        ],
+      },
+      {
+        name: 'PixelTimelineItem',
+        props: [
+          { name: 'label', type: 'string', description: 'Canonical label for the item.' },
+          { name: 'title', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'bullet', type: 'React.ReactNode', description: 'Content of the bullet.' },
+          { name: 'time', type: 'string', description: 'Time or date beside the label.' },
+          { name: 'lineVariant', type: "'solid' | 'dashed' | 'dotted'", default: "'solid'", description: 'Line style of the rail down to the next entry.' },
+          { name: 'children', type: 'React.ReactNode', description: 'Description below the label.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<li>` (`HTMLAttributes<HTMLLIElement>`).',
+          '`ref` points to `<li>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTimeline',
+        props: [
+          { name: 'active', type: 'number', description: 'Index of the current entry: the ones before it are past, the ones after it upcoming.' },
+          { name: 'bulletSize', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Bullet size.' },
+          { name: 'align', type: "'left' | 'right'", default: "'left'", description: 'Side the bullets and the rail sit on.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The entries.' },
+        ],
+      },
+      {
+        name: 'PixelTimelineItem',
+        props: [
+          { name: 'label', type: 'string', description: 'Entry label.' },
+          { name: 'title', type: 'string', deprecated: 'Use `label`.' },
+          { name: 'time', type: 'string', description: 'Time or date beside the label.' },
+          { name: 'lineVariant', type: "'solid' | 'dashed' | 'dotted'", default: "'solid'", description: 'Line style of the rail down to the next entry.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Description below the label.' },
+          { name: 'bullet', description: 'Content of the bullet.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<li>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTimeline, PixelTimelineItem } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTimeline',
+        selector: 'ol[pxlTimeline]',
+        props: [
+          { name: 'active', type: 'number', accepts: 'unknown', description: 'Index of the current entry: the ones before it are past, the ones after it upcoming.' },
+          { name: 'bulletSize', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Bullet size.' },
+          { name: 'align', type: "'left' | 'right'", default: "'left'", description: 'Side the bullets and the rail sit on.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on a native `<ol>`, which keeps its own attributes and events.',
+        ],
+      },
+      {
+        name: 'PixelTimelineItem',
+        selector: 'li[pxlTimelineItem]',
+        props: [
+          { name: 'label', type: 'string', description: 'Entry label.' },
+          { name: 'title', type: 'string', deprecated: 'Use `label`.' },
+          { name: 'time', type: 'string', description: 'Time or date beside the label.' },
+          { name: 'lineVariant', type: "'solid' | 'dashed' | 'dotted'", default: "'solid'", description: 'Line style of the rail down to the next entry.' },
+          { name: 'bullet', type: 'string | TemplateRef<any>', description: 'Content of the bullet.' },
+          { name: 'description', type: 'string | TemplateRef<any>', description: 'Description below the label.' },
+        ],
+        notes: [
+          'Goes on a native `<li>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelTimelineDocsSection({ className }: PixelTimelineDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +139,9 @@ export function PixelTimelineDocsSection({ className }: PixelTimelineDocsSection
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-timeline-api">
+      <h3 id="pixel-timeline-api">API</h3>
+      <FrameworkApi label={'PixelTimeline API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-timeline-a11y">
       <h3 id="pixel-timeline-a11y">Accessibility</h3>

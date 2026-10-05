@@ -27,8 +27,11 @@ import type { ToastItem } from './PxlKitToastProvider';
 /** Public prop bag for the individual {@link PixelToast} card. Usually used
  *  through {@link useToast}, but exported for advanced custom rendering. */
 export interface PixelToastProps {
+  /** The toast to show. */
   toast: ToastItem;
+  /** Called when the dismiss button is pressed, or the countdown runs out. */
   onDismiss: () => void;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

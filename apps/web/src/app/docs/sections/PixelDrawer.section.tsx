@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDrawerDocsSectionProps {
@@ -17,6 +18,181 @@ export const PixelDrawerDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelDrawer's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelDrawer } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelDrawer',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the drawer is visible; set it from `onOpenChange`.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', required: true, description: 'Called with `false` when the drawer asks to close (Escape, the backdrop).' },
+          { name: 'side', type: "'right' | 'left' | 'top' | 'bottom'", default: "'right'", description: 'Edge of the viewport the drawer is anchored to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width (left / right) or height (top / bottom) preset.' },
+          { name: 'overlay', type: 'boolean', default: 'true', description: 'Dim the page behind the drawer.' },
+          { name: 'dismissOnOverlay', type: 'boolean', default: 'true', description: 'Close when the backdrop is clicked.' },
+          { name: 'trapFocus', type: 'boolean', default: 'true', description: 'Keep Tab focus inside the drawer while it is open.' },
+          { name: 'title', type: 'string', description: 'Accessible name of the dialog (visually hidden).' },
+          { name: 'description', type: 'string', description: 'Accessible description of the dialog (visually hidden).' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name fallback when `title` is omitted. WCAG 4.1.2 requires every `role="dialog"` to expose a name; supply `title` OR `aria-label`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Portal target; `document.body` when left out.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The drawer content — typically `PixelDrawer.Header`, `PixelDrawer.Body` and `PixelDrawer.Footer`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDrawer.Header',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDrawer.Body',
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDrawer.Footer',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelDrawer',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the drawer is visible (`v-model:open`).' },
+          { name: 'side', type: "'right' | 'left' | 'top' | 'bottom'", default: "'right'", description: 'Edge of the viewport the drawer is anchored to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width (left / right) or height (top / bottom) preset.' },
+          { name: 'overlay', type: 'boolean', default: 'true', description: 'Dim the page behind the drawer.' },
+          { name: 'dismissOnOverlay', type: 'boolean', default: 'true', description: 'Close when the backdrop is clicked.' },
+          { name: 'trapFocus', type: 'boolean', default: 'true', description: 'Keep Tab focus inside the drawer while it is open.' },
+          { name: 'title', type: 'string', description: 'Accessible name of the dialog (visually hidden).' },
+          { name: 'description', type: 'string', description: 'Accessible description of the dialog (visually hidden).' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name when there is no `title` — every dialog needs one (WCAG 4.1.2).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Portal target; `document.body` when left out.' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: '`false` when the drawer asks to close (Escape, backdrop), for `v-model:open`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The drawer content — typically header, body and footer parts.' },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the drawer panel while it is open.',
+        ],
+      },
+      {
+        name: 'PixelDrawerBody',
+        slots: [
+          { name: 'default', description: 'Body content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDrawerFooter',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Footer content, such as the actions.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelDrawerHeader',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Header content, such as the title.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelDrawer, PixelDrawerBody, PixelDrawerFooter, PixelDrawerHeader } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelDrawer',
+        selector: 'pxl-drawer',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the drawer is visible (`[(open)]`).' },
+          { name: 'side', type: "'right' | 'left' | 'top' | 'bottom'", default: "'right'", description: 'Edge of the viewport the drawer is anchored to.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width (left / right) or height (top / bottom) preset.' },
+          { name: 'overlay', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Dim the page behind the drawer.' },
+          { name: 'dismissOnOverlay', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Close when the backdrop is clicked.' },
+          { name: 'trapFocus', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Keep Tab focus inside the drawer while it is open.' },
+          { name: 'title', type: 'string', description: 'Accessible name of the dialog (visually hidden).' },
+          { name: 'description', type: 'string', description: 'Accessible description of the dialog (visually hidden).' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name when there is no `title` — every dialog needs one (WCAG 4.1.2).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Portal target; `document.body` when left out.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: '`false` when the drawer asks to close (Escape, backdrop), for `[(open)]`.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelDrawerBody',
+        selector: 'pxl-drawer-body',
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelDrawerFooter',
+        selector: 'pxl-drawer-footer',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelDrawerHeader',
+        selector: 'pxl-drawer-header',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +211,9 @@ export function PixelDrawerDocsSection({ className }: PixelDrawerDocsSectionProp
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-drawer-api">
+      <h3 id="pixel-drawer-api">API</h3>
+      <FrameworkApi label={'PixelDrawer API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-drawer-a11y">
       <h3 id="pixel-drawer-a11y">Accessibility</h3>

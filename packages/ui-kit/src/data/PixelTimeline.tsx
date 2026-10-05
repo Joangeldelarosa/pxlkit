@@ -41,9 +41,13 @@ export interface PixelTimelineItemProps extends React.HTMLAttributes<HTMLLIEleme
    * @deprecated Use `label` instead. Retained as alias for one minor.
    */
   title?: string;
+  /** Content of the bullet. */
   bullet?: React.ReactNode;
+  /** Time or date beside the label. */
   time?: string;
+  /** Line style of the rail down to the next entry. */
   lineVariant?: PixelTimelineLineVariant;
+  /** Description below the label. */
   children?: React.ReactNode;
 }
 
@@ -114,10 +118,15 @@ export const PixelTimelineItem = forwardRef<HTMLLIElement, PixelTimelineItemProp
 PixelTimelineItem.displayName = 'PixelTimelineItem';
 
 export interface PixelTimelineProps extends React.HTMLAttributes<HTMLOListElement> {
+  /** Index of the current entry: the ones before it are past, the ones after it upcoming. */
   active?: number;
+  /** Bullet size. */
   bulletSize?: PixelTimelineBulletSize;
+  /** Side the bullets and the rail sit on. */
   align?: PixelTimelineAlign;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** The entries (`PixelTimelineItem`). */
   children: React.ReactNode;
 }
 

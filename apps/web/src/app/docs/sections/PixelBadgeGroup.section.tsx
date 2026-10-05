@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBadgeGroupDocsSectionProps {
@@ -17,6 +18,64 @@ export const PixelBadgeGroupDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelBadgeGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBadgeGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBadgeGroup',
+        props: [
+          { name: 'max', type: 'number', default: '5', description: 'Most places the row shows; beyond it, the last place becomes a "+N" button that opens a popover with the rest.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override, for the row and its popover; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Optional accessible name for the group. When provided, the wrapper renders `role="group"` so SR users can navigate the landmark; otherwise it stays a plain div to avoid an unlabeled group announcement.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The badges.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBadgeGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBadgeGroup',
+        props: [
+          { name: 'max', type: 'number', default: '5', description: 'Most places the row shows; beyond it, the last place becomes a "+N" button that opens a popover with the rest.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override, for the row and its popover; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The badges.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBadgeGroup, PixelBadgeGroupItem } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBadgeGroup',
+        selector: 'pxl-badge-group',
+        props: [
+          { name: 'max', type: 'number', default: '5', accepts: 'unknown', description: 'Most places the row shows; beyond it, the last place becomes a "+N" button that opens a popover with the rest.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override, for the row and its popover; defaults to the nearest provider.' },
+        ],
+      },
+      {
+        name: 'PixelBadgeGroupItem',
+        selector: '[pxlBadgeGroupItem]',
+        notes: [
+          'Structural: write it as `*pxlBadgeGroupItem` on the content, or on an `<ng-template>`.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +94,9 @@ export function PixelBadgeGroupDocsSection({ className }: PixelBadgeGroupDocsSec
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-badge-group-api">
+      <h3 id="pixel-badge-group-api">API</h3>
+      <FrameworkApi label={'PixelBadgeGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-badge-group-a11y">
       <h3 id="pixel-badge-group-a11y">Accessibility</h3>

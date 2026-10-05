@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSpinnerDocsSectionProps {
@@ -17,6 +18,63 @@ export const PixelSpinnerDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelSpinner's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSpinner } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSpinner',
+        props: [
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Box size.' },
+          { name: 'label', type: 'string', default: "'Loading'", description: 'Accessible name.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour.' },
+          { name: 'decorative', type: 'boolean', default: 'false', description: 'When `true`, renders as pure decoration (aria-hidden, no role, no label). Use inside an already-announcing parent (e.g. a `<button loading>` that declares `aria-busy="true"`) to avoid double announcements. NOTE: when using PixelSpinner as a standalone loading indicator (not decorative), the consumer MUST set `aria-busy="true"` on the loading container per WAI-ARIA — the spinner alone isn\'t enough context.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<span>` (`HTMLAttributes<HTMLSpanElement>`).',
+          '`ref` points to `<span>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSpinner } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSpinner',
+        props: [
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Box size.' },
+          { name: 'label', type: 'string', default: "'Loading'", description: 'Accessible name.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour.' },
+          { name: 'decorative', type: 'boolean', default: 'false', description: 'Pure decoration (`aria-hidden`, no role, no label), for a parent that already announces its busy state (a button with `aria-busy="true"`). A standalone spinner needs `aria-busy="true"` on the container that loads.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<span>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSpinner } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSpinner',
+        selector: 'pxl-spinner',
+        props: [
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg'", default: "'md'", description: 'Box size.' },
+          { name: 'label', type: 'string', default: "'Loading'", description: 'Accessible name.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour.' },
+          { name: 'decorative', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Pure decoration (`aria-hidden`, no role, no label), for a parent that already announces its busy state (a button with `aria-busy="true"`). A standalone spinner needs `aria-busy="true"` on the container that loads.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +93,9 @@ export function PixelSpinnerDocsSection({ className }: PixelSpinnerDocsSectionPr
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-spinner-api">
+      <h3 id="pixel-spinner-api">API</h3>
+      <FrameworkApi label={'PixelSpinner API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-spinner-a11y">
       <h3 id="pixel-spinner-a11y">Accessibility</h3>

@@ -6,10 +6,15 @@ import { cn, Surface, useEffectiveSurface } from '../common';
 import { StackGapKey } from '../tokens';
 
 export interface PixelClusterProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Gap token (`stackGap`). */
   gap?: StackGapKey;
+  /** Cross-axis alignment. */
   align?: StackAlign;
+  /** Main-axis distribution. */
   justify?: StackJustify;
+  /** Element to render. */
   as?: keyof React.JSX.IntrinsicElements;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

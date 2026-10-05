@@ -17,7 +17,10 @@ export interface PixelMouseParallaxProps {
 }
 
 const props = withDefaults(defineProps<PixelMouseParallaxProps>(), { strength: 20, invert: false });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The content that moves with the pointer. */
+  default?(): VNode[];
+}>();
 
 const layer = useTemplateRef<HTMLElement>('layer');
 const reducedMotion = useReducedMotion();

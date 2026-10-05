@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelInputDocsSectionProps {
@@ -17,6 +18,124 @@ export const PixelInputDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelInput',
+        props: [
+          { name: 'label', type: 'string', description: 'Floating label rendered above the input shell.' },
+          { name: 'hint', type: 'string', description: 'Helper text shown below the field. Hidden when `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message shown below the field; flips visual state to invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: "Visual tone for focus ring + border emphasis. Default: `'neutral'`." },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Field height token. Default: `'md'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Legacy left-icon slot, rendered inside the input shell. Equivalent to `prefix`.' },
+          { name: 'prefix', type: 'React.ReactNode', description: 'Content rendered INSIDE the input shell on the left (icon or short text).' },
+          { name: 'suffix', type: 'React.ReactNode', description: 'Content rendered INSIDE the input shell on the right (icon or short text).' },
+          { name: 'addonLeft', type: 'React.ReactNode', description: 'Element rendered OUTSIDE the input shell and joined to its left edge (e.g. button/select).' },
+          { name: 'addonRight', type: 'React.ReactNode', description: 'Element rendered OUTSIDE the input shell and joined to its right edge.' },
+          { name: 'clearable', type: 'boolean', description: 'When true, shows a clear (×) button while the value is non-empty.' },
+          { name: 'onClear', type: '() => void', description: 'Callback fired when the clear button is clicked.' },
+          { name: 'showCount', type: 'boolean | { max?: number }', description: 'Render a character counter under the input. `true` shows `N`; `{ max }` shows `N/max`.' },
+          { name: 'loading', type: 'boolean', description: 'When true, replaces the suffix with a spinner and disables the input.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<input>` (`InputHTMLAttributes<HTMLInputElement>`).',
+          '`ref` points to `<input>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelInput',
+        props: [
+          { name: 'modelValue', type: 'string | number', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string | number', description: 'Initial value while uncontrolled.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the input shell.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a clear (×) button while the value is not empty.' },
+          { name: 'showCount', type: 'boolean | { max?: number }', default: 'false', description: 'Character counter under the input: `true` shows `N`, `{ max }` shows `N/max` and caps the length.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Replaces the suffix with a spinner and disables the input.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the input.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new value, on every edit and when cleared.' },
+          { name: 'clear', description: 'The clear button was pressed.' },
+        ],
+        slots: [
+          { name: 'prefix', description: 'Content inside the shell on the left (icon or short text).' },
+          { name: 'icon', description: 'Legacy alias of `#prefix`.' },
+          { name: 'suffix', description: 'Content inside the shell on the right; replaced by a spinner while `loading`.' },
+          { name: 'addon-left', description: 'Element outside the shell, joined to its left edge.' },
+          { name: 'addon-right', description: 'Element outside the shell, joined to its right edge.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<input>`.',
+          'Its template ref exposes `element`: the native input.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelInput',
+        selector: 'pxl-input',
+        props: [
+          { name: 'value', type: 'string | number', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string | number', description: 'Initial value while uncontrolled.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the input shell.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'prefix', type: 'string | TemplateRef<any>', description: 'Content inside the shell on the left (icon or short text).' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Legacy alias of `prefix`.' },
+          { name: 'suffix', type: 'string | TemplateRef<any>', description: 'Content inside the shell on the right; replaced by a spinner while `loading`.' },
+          { name: 'addonLeft', type: 'string | TemplateRef<any>', description: 'Element outside the shell, joined to its left edge.' },
+          { name: 'addonRight', type: 'string | TemplateRef<any>', description: 'Element outside the shell, joined to its right edge.' },
+          { name: 'clearable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows a clear (×) button while the value is not empty.' },
+          { name: 'showCount', type: 'boolean | { max?: number }', default: 'false', accepts: "boolean | { max?: number } | ''", description: 'Character counter under the input: `true` shows `N`, `{ max }` shows `N/max` and caps the length.' },
+          { name: 'loading', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Replaces the suffix with a spinner and disables the input.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the input.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+          { name: 'name', type: 'string', description: 'Native `name` of the input.' },
+          { name: 'type', type: 'string', description: 'Native `type` of the input (`text` when left out).' },
+          { name: 'placeholder', type: 'string', description: 'Native `placeholder`.' },
+          { name: 'autocomplete', type: 'string', description: 'Native `autocomplete` hint.' },
+          { name: 'pattern', type: 'string', description: 'Native `pattern` for validation.' },
+          { name: 'minlength', type: 'number', accepts: 'unknown', description: 'Native `minlength`.' },
+          { name: 'maxlength', type: 'number', accepts: 'unknown', description: 'Native `maxlength`; defaults to the `showCount` limit.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the input required.' },
+          { name: 'readonly', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the input read-only.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the input when no `label` is shown.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the input; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'clear', description: 'The clear button was pressed.' },
+          { name: 'valueChange', payload: 'string | number', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +154,9 @@ export function PixelInputDocsSection({ className }: PixelInputDocsSectionProps)
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-input-api">
+      <h3 id="pixel-input-api">API</h3>
+      <FrameworkApi label={'PixelInput API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-input-a11y">
       <h3 id="pixel-input-a11y">Accessibility</h3>

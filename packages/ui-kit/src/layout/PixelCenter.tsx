@@ -6,7 +6,9 @@ import { cn, Surface, useEffectiveSurface } from '../common';
 import { ContainerWidth, PageGutter } from '../tokens';
 
 export interface PixelCenterProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'align'> {
+  /** Width cap (`containerWidth`). */
   maxWidth?: ContainerWidth;
+  /** Horizontal padding (`pageGutter`). */
   gutter?: PageGutter;
   /** Text alignment of the centered content (canonical). */
   align?: CenterAlign;
@@ -14,9 +16,13 @@ export interface PixelCenterProps extends Omit<React.HTMLAttributes<HTMLDivEleme
    * @deprecated Use `align` instead. Retained as alias for one minor.
    */
   text?: CenterAlign;
+  /** `inline-block` instead of `block`. */
   inline?: boolean;
+  /** Element to render. */
   as?: keyof React.JSX.IntrinsicElements;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Surface border and radius. */
   bordered?: boolean;
 }
 

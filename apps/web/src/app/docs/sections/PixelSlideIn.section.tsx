@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSlideInDocsSectionProps {
@@ -17,6 +18,86 @@ export const PixelSlideInDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelSlideIn's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSlideIn } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSlideIn',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to slide in.' },
+          { name: 'from', type: "'up' | 'down' | 'left' | 'right'", default: "'down'", description: "Edge to slide from. Default `'down'`." },
+          { name: 'duration', type: 'number', default: '350', description: 'Animation duration in milliseconds. Default `350`.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Animation delay in milliseconds. Default `0`.' },
+          { name: 'distance', type: 'number', default: '10', description: 'Translate distance in pixels. Default `10`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`. Default `1`." },
+          { name: 'easing', type: 'string', default: "'ease'", description: "CSS `animation-timing-function`. Default `'ease'`." },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: "CSS `animation-fill-mode`. Default `'both'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSlideIn } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSlideIn',
+        props: [
+          { name: 'from', type: "'up' | 'down' | 'left' | 'right'", default: "'down'", description: 'Edge to slide from.' },
+          { name: 'duration', type: 'number', default: '350', description: 'Animation duration in milliseconds.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Animation delay in milliseconds.' },
+          { name: 'distance', type: 'number', default: '10', description: 'Translate distance in pixels.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease'", description: 'CSS `animation-timing-function`.' },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: 'CSS `animation-fill-mode`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to slide in.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSlideIn } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSlideIn',
+        selector: 'pxl-slide-in',
+        props: [
+          { name: 'from', type: "'up' | 'down' | 'left' | 'right'", default: "'down'", description: 'Edge to slide from.' },
+          { name: 'duration', type: 'number', default: '350', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'delay', type: 'number', default: '0', accepts: 'unknown', description: 'Animation delay in milliseconds.' },
+          { name: 'distance', type: 'number', default: '10', accepts: 'unknown', description: 'Translate distance in pixels.' },
+          { name: 'repeat', type: "number | 'infinite'", default: '1', accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease'", description: 'CSS `animation-timing-function`.' },
+          { name: 'fillMode', type: "'none' | 'forwards' | 'backwards' | 'both'", default: "'both'", description: 'CSS `animation-fill-mode`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSlideInDocsSection({ className }: PixelSlideInDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +116,9 @@ export function PixelSlideInDocsSection({ className }: PixelSlideInDocsSectionPr
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-slide-in-api">
+      <h3 id="pixel-slide-in-api">API</h3>
+      <FrameworkApi label={'PixelSlideIn API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-slide-in-a11y">
       <h3 id="pixel-slide-in-a11y">Accessibility</h3>

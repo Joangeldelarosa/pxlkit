@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelModalDocsSectionProps {
@@ -17,6 +18,87 @@ export const PixelModalDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelModal's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelModal } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelModal',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the modal is currently visible.' },
+          { name: 'title', type: 'string', required: true, description: 'Modal title shown in the header.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Modal body content.' },
+          { name: 'onClose', type: '() => void', required: true, description: 'Called when the user requests to close the modal.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: "Width preset. Default `'md'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override. Falls back to nearest `<PxlKitProvider>` surface.' },
+          { name: 'closeLabel', type: 'string', default: "'Close'", description: "Optional override for the close button's accessible label." },
+          { name: 'footer', type: 'React.ReactNode', description: 'Optional footer node, rendered at the bottom separated by a surface-aware divider.' },
+          { name: 'description', type: 'React.ReactNode', description: 'Optional description, wired via `aria-describedby` for AT users.' },
+          { name: 'asyncClose', type: '() => Promise<void>', description: 'When provided, the close button awaits this promise (and shows a loading state) before the consumer-controlled `onClose` is invoked. Lets callers persist or animate-out before unmounting.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Optional portal container override. Defaults to `document.body`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelModal } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelModal',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the modal is visible (`v-model:open`).' },
+          { name: 'title', type: 'string', required: true, description: 'Title shown in the header; it names the dialog.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width preset.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'closeLabel', type: 'string', default: "'Close'", description: 'Accessible label of the close button.' },
+          { name: 'asyncClose', type: '() => Promise<void>', description: 'Awaited before the modal closes — the close button shows a busy state meanwhile. Lets you persist or animate out first.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Portal target; `document.body` when left out.' },
+        ],
+        events: [
+          { name: 'close', description: 'The user asked to close the modal (close button, Escape, backdrop).' },
+          { name: 'update:open', payload: 'open: boolean', description: '`false` when the modal asks to close, for `v-model:open`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Body content.' },
+          { name: 'description', description: 'Description under the title, wired via `aria-describedby`.' },
+          { name: 'footer', description: 'Actions at the bottom, set off by a divider.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelModal } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelModal',
+        selector: 'pxl-modal',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the modal is visible (`[(open)]`).' },
+          { name: 'title', type: 'string', required: true, description: 'Title shown in the header; it names the dialog.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg' | 'xl' | 'full'", default: "'md'", description: 'Width preset.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'closeLabel', type: 'string', default: "'Close'", description: 'Accessible label of the close button.' },
+          { name: 'description', type: 'string | TemplateRef<any>', description: 'Description under the title, wired via `aria-describedby`.' },
+          { name: 'footer', type: 'string | TemplateRef<any>', description: 'Actions at the bottom, set off by a divider.' },
+          { name: 'asyncClose', type: '() => Promise<void>', description: 'Awaited before the modal closes — the close button shows a busy state meanwhile. Lets you persist or animate out first.' },
+          { name: 'container', type: 'HTMLElement | null', description: 'Portal target; `document.body` when left out.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: '`false` when the modal asks to close (close button, Escape, backdrop), for `[(open)]`.' },
+          { name: 'closed', description: 'The user asked to close the modal (close button, Escape, backdrop).' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +117,9 @@ export function PixelModalDocsSection({ className }: PixelModalDocsSectionProps)
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-modal-api">
+      <h3 id="pixel-modal-api">API</h3>
+      <FrameworkApi label={'PixelModal API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-modal-a11y">
       <h3 id="pixel-modal-a11y">Accessibility</h3>

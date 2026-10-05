@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStarRatingDocsSectionProps {
@@ -17,6 +18,89 @@ export const PixelStarRatingDocsMeta = {
   since: '2.0.0',
   deprecated: false,
 } as const;
+
+/** PixelStarRating's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelStarRating } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelStarRating',
+        props: [
+          { name: 'value', type: 'number', description: 'Controlled rating value (0..max).' },
+          { name: 'defaultValue', type: 'number', description: 'Uncontrolled initial rating value (0..max).' },
+          { name: 'max', type: 'number', default: '5', description: 'Total number of stars rendered. Default 5.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size of each star — maps to 16 / 20 / 24 px for sm / md / lg.' },
+          { name: 'tone', type: "'gold' | 'green'", default: "'gold'", description: 'Color tone applied to filled stars.' },
+          { name: 'showCount', type: 'boolean', default: 'false', description: 'When true, renders "N/M" beside the stars.' },
+          { name: 'interactive', type: 'boolean', default: 'false', description: 'When true, exposes each star as a button that updates the rating on click.' },
+          { name: 'onChange', type: '(next: number) => void', description: 'Called with the new rating when the user clicks a star (interactive only).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Override the ambient surface (pixel | linear).' },
+          { name: 'starIcon', type: 'ReactNode | ((args: { filled: boolean; size: number; tone: StarTone }) => ReactNode)', description: 'Polymorphic escape hatch. Replace the default gamification Star glyph with any custom node, or a render function called per-star with `{ filled, size, tone }` so the caller can choose a different sibling pack icon (Heart, Coin, Crown…) without forking the component. - `undefined` (default) → render the gamification `Star` for filled positions and the inline outlined rect-SVG for empty ones. - `ReactNode` → render for filled positions only; empty positions continue to use the outlined fallback for the empty-state silhouette. - `(args) => ReactNode` → render for both filled and empty positions, giving full control over the glyph in every state.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelStarRating } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelStarRating',
+        props: [
+          { name: 'modelValue', type: 'number', binding: 'v-model', description: 'The rating (`v-model`), from 0 to `max`; leave unset for an uncontrolled rating.' },
+          { name: 'defaultValue', type: 'number', description: 'Initial rating while uncontrolled.' },
+          { name: 'max', type: 'number', default: '5', description: 'Number of stars.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Star size: 16, 20 or 24 px.' },
+          { name: 'tone', type: "'gold' | 'green'", default: "'gold'", description: 'Colour of the filled stars.' },
+          { name: 'showCount', type: 'boolean', default: 'false', description: 'Shows "N/M" beside the stars.' },
+          { name: 'interactive', type: 'boolean', default: 'false', description: 'Makes each star a button that rates.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: number', description: 'The rating of the star the user clicked.' },
+        ],
+        slots: [
+          { name: 'star-icon', props: 'StarIconProps', description: 'Glyph of the filled stars, in place of the Star icon.' },
+          { name: 'empty-star-icon', props: 'StarIconProps', description: 'Glyph of the empty stars, in place of the dimmed Star icon.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelStarRating } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelStarRating',
+        selector: 'pxl-star-rating',
+        props: [
+          { name: 'value', type: 'number', binding: '[(value)]', description: 'The rating (`[(value)]`), from 0 to `max`; leave unset for an uncontrolled rating.' },
+          { name: 'defaultValue', type: 'number', default: '0', accepts: 'unknown', description: 'Initial rating while uncontrolled.' },
+          { name: 'max', type: 'number', default: '5', accepts: 'unknown', description: 'Number of stars.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Star size: 16, 20 or 24 px.' },
+          { name: 'tone', type: "'gold' | 'green'", default: "'gold'", description: 'Colour of the filled stars.' },
+          { name: 'showCount', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows "N/M" beside the stars.' },
+          { name: 'interactive', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes each star a button that rates.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'starIcon', type: 'PxlContent<PixelStarIconContext>', description: 'Glyph of the filled stars, in place of the Star icon.' },
+          { name: 'emptyStarIcon', type: 'PxlContent<PixelStarIconContext>', description: 'Glyph of the empty stars, in place of the dimmed Star icon.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'number', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`number`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +119,9 @@ export function PixelStarRatingDocsSection({ className }: PixelStarRatingDocsSec
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v2.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-star-rating-api">
+      <h3 id="pixel-star-rating-api">API</h3>
+      <FrameworkApi label={'PixelStarRating API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-star-rating-a11y">
       <h3 id="pixel-star-rating-a11y">Accessibility</h3>

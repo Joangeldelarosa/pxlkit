@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelGlitchDocsSectionProps {
@@ -17,6 +18,78 @@ export const PixelGlitchDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelGlitch's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelGlitch } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelGlitch',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to glitch.' },
+          { name: 'duration', type: 'number', default: '3000', description: 'Length of one full glitch loop in milliseconds. Default `3000`.' },
+          { name: 'intensity', type: 'number', default: '4', description: 'Maximum horizontal displacement (pixels) of the ghost layers. Default `4`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelGlitch } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelGlitch',
+        props: [
+          { name: 'duration', type: 'number', default: '3000', description: 'Length of one full glitch loop in milliseconds.' },
+          { name: 'intensity', type: 'number', default: '4', description: 'Maximum horizontal displacement (pixels) of the layers.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: "After the final iteration of the content's layer." },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to glitch, rendered once per layer.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelGlitch, PixelGlitchContent } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelGlitch',
+        selector: 'pxl-glitch',
+        props: [
+          { name: 'duration', type: 'number', default: '3000', accepts: 'unknown', description: 'Length of one full glitch loop in milliseconds.' },
+          { name: 'intensity', type: 'number', default: '4', accepts: 'unknown', description: 'Maximum horizontal displacement (pixels) of the layers.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: "After the final iteration of the content's layer." },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelGlitchContent',
+        selector: '[pxlGlitchContent]',
+        notes: [
+          'Structural: write it as `*pxlGlitchContent` on the content, or on an `<ng-template>`.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelGlitchDocsSection({ className }: PixelGlitchDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +108,9 @@ export function PixelGlitchDocsSection({ className }: PixelGlitchDocsSectionProp
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-glitch-api">
+      <h3 id="pixel-glitch-api">API</h3>
+      <FrameworkApi label={'PixelGlitch API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-glitch-a11y">
       <h3 id="pixel-glitch-a11y">Accessibility</h3>

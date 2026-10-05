@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelNavigationMenuDocsSectionProps {
@@ -17,6 +18,63 @@ export const PixelNavigationMenuDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelNavigationMenu's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelNavigationMenu } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelNavigationMenu',
+        props: [
+          { name: 'items', type: 'PixelNavigationMenuItem[]', required: true, description: 'The items, in order.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Items in a row or a column; also the arrow keys that move between them.' },
+          { name: 'viewport', type: 'boolean', default: 'true', description: 'One shared panel below the list, instead of a panel under each item.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Main navigation'", description: 'Accessible name for the nav landmark. Required when more than one nav lands on the same page (WCAG 2.4.6). Defaults to "Main navigation".' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`), except `children`.',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelNavigationMenu } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelNavigationMenu',
+        props: [
+          { name: 'items', type: 'PixelNavigationMenuItem[]', required: true, description: 'The items, in order.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Items in a row or a column; also the arrow keys that move between them.' },
+          { name: 'viewport', type: 'boolean', default: 'true', description: 'One shared panel below the list, instead of a panel under each item.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Main navigation'", description: 'Accessible name of the landmark — give each navigation landmark of a page its own.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<nav>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelNavigationMenu } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelNavigationMenu',
+        selector: 'pxl-navigation-menu',
+        props: [
+          { name: 'items', type: 'PixelNavigationMenuItem[]', required: true, description: 'The items, in order.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Items in a row or a column; also the arrow keys that move between them.' },
+          { name: 'viewport', type: 'boolean', default: 'true', accepts: 'unknown', description: 'One shared panel below the list, instead of a panel under each item.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Main navigation'", description: 'Accessible name of the landmark — give each navigation landmark of a page its own.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMenuDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +93,9 @@ export function PixelNavigationMenuDocsSection({ className }: PixelNavigationMen
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-navigation-menu-api">
+      <h3 id="pixel-navigation-menu-api">API</h3>
+      <FrameworkApi label={'PixelNavigationMenu API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-navigation-menu-a11y">
       <h3 id="pixel-navigation-menu-a11y">Accessibility</h3>

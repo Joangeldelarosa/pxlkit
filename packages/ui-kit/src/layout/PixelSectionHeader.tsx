@@ -12,15 +12,25 @@ import { cn, Surface, useEffectiveSurface } from '../common';
 import { ToneKey } from '../tokens';
 
 export interface PixelSectionHeaderProps extends Omit<React.HTMLAttributes<HTMLElement>, 'title'> {
+  /** Small uppercase line above the title. */
   eyebrow?: string;
+  /** The heading. */
   title: string;
+  /** Tone of the title and eyebrow. */
   titleTone?: ToneKey;
+  /** Paragraph under the title. */
   description?: string;
+  /** Start-aligned, or centred with a capped width. */
   align?: SectionHeaderAlign;
+  /** Type scale. */
   size?: SectionHeaderSize;
+  /** Gaps between the blocks. */
   spacing?: SectionHeaderSpacing;
+  /** Buttons or links under the description. */
   actions?: React.ReactNode;
+  /** Heading level of the title. */
   as?: SectionHeaderLevel;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

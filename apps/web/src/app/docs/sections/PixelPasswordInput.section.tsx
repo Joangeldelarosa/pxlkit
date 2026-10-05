@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPasswordInputDocsSectionProps {
@@ -17,6 +18,96 @@ export const PixelPasswordInputDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelPasswordInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelPasswordInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelPasswordInput',
+        props: [
+          { name: 'label', type: 'string', description: 'Floating label rendered above the input shell.' },
+          { name: 'hint', type: 'string', description: 'Helper text shown below the field. Hidden when `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message shown below the field; flips visual state to invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: "Visual tone for focus ring + border emphasis. Default: `'neutral'`." },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Field height token. Default: `'md'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'toggleLabels', type: '[string, string]', default: "['Show', 'Hide']", description: 'Text for the visibility toggle, in `[showLabel, hideLabel]` form.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<input>` (`InputHTMLAttributes<HTMLInputElement>`), except `type`.',
+          '`ref` points to `<input>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelPasswordInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelPasswordInput',
+        props: [
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the input.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'toggleLabels', type: '[string, string]', default: "['Show', 'Hide']", description: 'Text of the toggle, as `[showLabel, hideLabel]`.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the input and the toggle.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new value, on every edit.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<input>`.',
+          'Its template ref exposes `element`: the native input.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelPasswordInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelPasswordInput',
+        selector: 'pxl-password-input',
+        props: [
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the input.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the input invalid.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Field height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'toggleLabels', type: '[string, string]', default: "['Show', 'Hide']", description: 'Text of the toggle, as `[showLabel, hideLabel]`.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the input and the toggle.' },
+          { name: 'id', type: 'string', description: '`id` of the input; generated when left out.' },
+          { name: 'name', type: 'string', description: 'Native `name` of the input.' },
+          { name: 'placeholder', type: 'string', description: 'Native `placeholder`.' },
+          { name: 'autocomplete', type: 'string', description: 'Native `autocomplete` hint (`current-password`, `new-password`).' },
+          { name: 'minlength', type: 'number', accepts: 'unknown', description: 'Native `minlength`.' },
+          { name: 'maxlength', type: 'number', accepts: 'unknown', description: 'Native `maxlength`.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the input required.' },
+          { name: 'readonly', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the input read-only.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the input when no `label` is shown.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the input; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +126,9 @@ export function PixelPasswordInputDocsSection({ className }: PixelPasswordInputD
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-password-input-api">
+      <h3 id="pixel-password-input-api">API</h3>
+      <FrameworkApi label={'PixelPasswordInput API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-password-input-a11y">
       <h3 id="pixel-password-input-a11y">Accessibility</h3>

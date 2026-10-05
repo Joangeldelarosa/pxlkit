@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelRibbonDocsSectionProps {
@@ -17,6 +18,70 @@ export const PixelRibbonDocsMeta = {
   since: '1.7.0',
   deprecated: false,
 } as const;
+
+/** PixelRibbon's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelRibbon } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelRibbon',
+        props: [
+          { name: 'position', type: "'top-center' | 'top-left' | 'top-right' | 'corner-tl' | 'corner-tr'", default: "'top-center'", description: 'Where the ribbon sits on its container.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'gold'", description: 'Tone of the opaque fill.' },
+          { name: 'offset', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "How far a top ribbon rises above the container's edge." },
+          { name: 'tilt', type: 'number', description: 'Tilt in degrees; the corners lean outwards by 12° when unset.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: "The ribbon's text." },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelRibbon } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelRibbon',
+        props: [
+          { name: 'position', type: "'top-center' | 'top-left' | 'top-right' | 'corner-tl' | 'corner-tr'", default: "'top-center'", description: 'Where the ribbon sits on its container.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'gold'", description: 'Tone of the opaque fill.' },
+          { name: 'offset', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "How far a top ribbon rises above the container's edge." },
+          { name: 'tilt', type: 'number', description: 'Tilt in degrees; the corners lean outwards by 12° when unset.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: "The ribbon's text." },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelRibbon } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelRibbon',
+        selector: 'pxl-ribbon',
+        props: [
+          { name: 'position', type: "'top-center' | 'top-left' | 'top-right' | 'corner-tl' | 'corner-tr'", default: "'top-center'", description: 'Where the ribbon sits on its container.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'gold'", description: 'Tone of the opaque fill.' },
+          { name: 'offset', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "How far a top ribbon rises above the container's edge." },
+          { name: 'tilt', type: 'number', accepts: 'unknown', description: 'Tilt in degrees; the corners lean outwards by 12° when unset.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelRibbonDocsSection({ className }: PixelRibbonDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +99,9 @@ export function PixelRibbonDocsSection({ className }: PixelRibbonDocsSectionProp
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-ribbon-api">
+      <h3 id="pixel-ribbon-api">API</h3>
+      <FrameworkApi label={'PixelRibbon API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-ribbon-a11y">
       <h3 id="pixel-ribbon-a11y">Accessibility</h3>

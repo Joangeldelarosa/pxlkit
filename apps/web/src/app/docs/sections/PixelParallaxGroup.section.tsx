@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelParallaxGroupDocsSectionProps {
@@ -17,6 +18,53 @@ export const PixelParallaxGroupDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelParallaxGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelParallaxGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelParallaxGroup',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The layers (`PixelParallaxLayer`, `PixelMouseParallax`).' },
+          { name: 'className', type: 'string', description: 'Extra classes on the root element.' },
+          { name: 'style', type: 'React.CSSProperties', description: 'Inline styles of the root element.' },
+          { name: 'as', type: "'div' | 'section' | 'header' | 'main'", default: "'div'", description: 'HTML tag to render. Default `"div"`.' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelParallaxGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelParallaxGroup',
+        props: [
+          { name: 'as', type: "'div' | 'section' | 'header' | 'main'", default: "'div'", description: 'Element to render.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The layers (`PixelParallaxLayer`, `PixelMouseParallax`).' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelParallaxGroup } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelParallaxGroup',
+        selector: '[pxlParallaxGroup]',
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelParallaxGroupDocsSection({ className }: PixelParallaxGroupDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +83,9 @@ export function PixelParallaxGroupDocsSection({ className }: PixelParallaxGroupD
       <dt>Category</dt><dd>parallax</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-parallax-group-api">
+      <h3 id="pixel-parallax-group-api">API</h3>
+      <FrameworkApi label={'PixelParallaxGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-parallax-group-a11y">
       <h3 id="pixel-parallax-group-a11y">Accessibility</h3>

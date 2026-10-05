@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTextLinkDocsSectionProps {
@@ -17,6 +18,61 @@ export const PixelTextLinkDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelTextLink's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTextLink } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTextLink',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Link content.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: "Tone tint. Defaults to `'cyan'`." },
+          { name: 'className', type: 'string', description: 'Extra class names.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'href', type: 'string | undefined', description: 'Link target; without one the link is a button.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<a>` (`AnchorHTMLAttributes<HTMLAnchorElement>`).',
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTextLink } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTextLink',
+        props: [
+          { name: 'href', type: 'string', description: 'Link target; without one the link is a button.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone tint.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Link content.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTextLink } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTextLink',
+        selector: 'a[pxlTextLink], button[pxlTextLink]',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone tint.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        notes: [
+          'Goes on a native `<a>` or `<button>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +91,9 @@ export function PixelTextLinkDocsSection({ className }: PixelTextLinkDocsSection
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-text-link-api">
+      <h3 id="pixel-text-link-api">API</h3>
+      <FrameworkApi label={'PixelTextLink API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-text-link-a11y">
       <h3 id="pixel-text-link-a11y">Accessibility</h3>

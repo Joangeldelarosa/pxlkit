@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelGridDocsSectionProps {
@@ -17,6 +18,86 @@ export const PixelGridDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelGrid's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelGrid } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelGrid',
+        props: [
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', default: "'16rem'", description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the items.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'as', type: 'keyof React.JSX.IntrinsicElements', description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelGrid } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelGrid',
+        props: [
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', default: "'16rem'", description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the items.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'as', type: 'string', default: "'div'", description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The items.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelGrid } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelGrid',
+        selector: '[pxlGrid]',
+        props: [
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', accepts: "1 | 2 | 3 | 4 | 5 | 6 | 12 | '1' | '2' | '3' | '4' | '5' | '6' | '12' | GridResponsiveColumns", description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', accepts: "1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'", description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', default: 'false', accepts: 'unknown', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', default: 'false', accepts: 'unknown', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', default: "'16rem'", description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the items.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +116,9 @@ export function PixelGridDocsSection({ className }: PixelGridDocsSectionProps): 
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-grid-api">
+      <h3 id="pixel-grid-api">API</h3>
+      <FrameworkApi label={'PixelGrid API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-grid-a11y">
       <h3 id="pixel-grid-a11y">Accessibility</h3>

@@ -35,16 +35,22 @@ export interface PixelCarouselProps extends React.HTMLAttributes<HTMLDivElement>
   plugins?: EmblaPluginType[];
   /** Receives the embla API once ready; called again with `undefined` on unmount. */
   setApi?: (api: EmblaCarouselType | undefined) => void;
+  /** Slides side by side, or stacked. */
   orientation?: CarouselOrientation;
+  /** Previous and next buttons. */
   showArrows?: boolean;
+  /** A dot per slide, to go to it. */
   showDots?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Accessible name for the carousel region (required for landmark navigation). */
   'aria-label'?: string;
+  /** The slides (`PixelCarousel.Item`). */
   children: React.ReactNode;
 }
 
 interface PixelCarouselItemProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** The slide's content. */
   children: React.ReactNode;
 }
 

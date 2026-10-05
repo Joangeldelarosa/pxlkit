@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSectionHeaderDocsSectionProps {
@@ -17,6 +18,80 @@ export const PixelSectionHeaderDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelSectionHeader's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSectionHeader } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSectionHeader',
+        props: [
+          { name: 'eyebrow', type: 'string', description: 'Small uppercase line above the title.' },
+          { name: 'title', type: 'string', required: true, description: 'The heading.' },
+          { name: 'titleTone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", description: 'Tone of the title and eyebrow.' },
+          { name: 'description', type: 'string', description: 'Paragraph under the title.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Start-aligned, or centred with a capped width.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Type scale.' },
+          { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: 'Gaps between the blocks.' },
+          { name: 'actions', type: 'React.ReactNode', description: 'Buttons or links under the description.' },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4'", default: "'h2'", description: 'Heading level of the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSectionHeader } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSectionHeader',
+        props: [
+          { name: 'eyebrow', type: 'string', description: 'Small uppercase line above the title.' },
+          { name: 'title', type: 'string', required: true, description: 'The heading.' },
+          { name: 'titleTone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", description: 'Tone of the title and eyebrow.' },
+          { name: 'description', type: 'string', description: 'Paragraph under the title.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Start-aligned, or centred with a capped width.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Type scale.' },
+          { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: 'Gaps between the blocks.' },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4'", default: "'h2'", description: 'Heading level of the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'actions', description: 'Buttons or links under the description.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<header>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSectionHeader } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSectionHeader',
+        selector: 'pxl-section-header',
+        props: [
+          { name: 'title', type: 'string', required: true, description: 'The heading.' },
+          { name: 'eyebrow', type: 'string', description: 'Small uppercase line above the title.' },
+          { name: 'titleTone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", description: 'Tone of the title and eyebrow.' },
+          { name: 'description', type: 'string', description: 'Paragraph under the title.' },
+          { name: 'actions', type: 'string | TemplateRef<any>', description: 'Buttons or links under the description.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Start-aligned, or centred with a capped width.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Type scale.' },
+          { name: 'spacing', type: "'tight' | 'normal' | 'loose'", default: "'normal'", description: 'Gaps between the blocks.' },
+          { name: 'as', type: "'h1' | 'h2' | 'h3' | 'h4'", default: "'h2'", description: 'Heading level of the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +110,9 @@ export function PixelSectionHeaderDocsSection({ className }: PixelSectionHeaderD
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-section-header-api">
+      <h3 id="pixel-section-header-api">API</h3>
+      <FrameworkApi label={'PixelSectionHeader API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-section-header-a11y">
       <h3 id="pixel-section-header-a11y">Accessibility</h3>

@@ -14,19 +14,28 @@ import { useScrollLock } from '../hooks/useScrollLock';
 
 /** Public prop bag for {@link PixelSheet}. */
 export interface PixelSheetProps {
+  /** Whether the sheet is visible; set it from `onOpenChange`. */
   open: boolean;
+  /** Called with `false` when the sheet asks to close (Escape, the backdrop). */
   onOpenChange: (open: boolean) => void;
+  /** Edge of the viewport the sheet is docked to. */
   side?: SheetSide;
+  /** Height preset. */
   size?: SheetSize;
+  /** Draw a drag handle affordance (decorative). */
   dragHandle?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Title shown at the top; it names the dialog. */
   title?: string;
+  /** Text under the title, wired via `aria-describedby`. */
   description?: string;
   /**
    * Accessible name fallback when `title` is omitted. WCAG 4.1.2 requires
    * every `role="dialog"` to expose a name; supply `title` OR `aria-label`.
    */
   'aria-label'?: string;
+  /** Body content. */
   children: React.ReactNode;
 }
 

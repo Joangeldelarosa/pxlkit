@@ -10,12 +10,15 @@ import { cn } from '../common';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 export interface PixelParallaxLayerProps {
+  /** Content of the layer. */
   children: React.ReactNode;
   /** Parallax multiplier. 0 = no movement, 1 = full scroll speed, negative = reverse. */
   speed?: number;
   /** Axis to translate on. Default `"y"`. */
   axis?: ParallaxAxis;
+  /** Extra classes on the wrapper. */
   className?: string;
+  /** Inline styles of the wrapper. */
   style?: React.CSSProperties;
 }
 

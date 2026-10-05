@@ -10,12 +10,15 @@ import { cn } from '../common';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 export interface PixelMouseParallaxProps {
+  /** The content that moves with the pointer. */
   children: React.ReactNode;
   /** Max travel distance in px. */
   strength?: number;
   /** If true, moves away from cursor instead of towards. */
   invert?: boolean;
+  /** Extra classes on the wrapper. */
   className?: string;
+  /** Inline styles of the wrapper. */
   style?: React.CSSProperties;
 }
 

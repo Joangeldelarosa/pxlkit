@@ -2,8 +2,11 @@ import React, { forwardRef, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 
 export interface PixelPortalProps {
+  /** Content to render in the target. */
   children: React.ReactNode;
+  /** Target element; `document.body` when left out. */
   container?: HTMLElement | null;
+  /** Keep the content in place. */
   disabled?: boolean;
 }
 

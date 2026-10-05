@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPulseDocsSectionProps {
@@ -17,6 +18,74 @@ export const PixelPulseDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelPulse's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelPulse } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelPulse',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to pulse.' },
+          { name: 'duration', type: 'number', default: '2000', description: 'Animation duration in milliseconds. Default `2000`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", description: "Iteration count: a number or `'infinite'`. Default `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease-in-out'", description: "CSS `animation-timing-function`. Default `'ease-in-out'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelPulse } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelPulse',
+        props: [
+          { name: 'duration', type: 'number', default: '2000', description: 'Animation duration in milliseconds.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease-in-out'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to pulse.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelPulse } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelPulse',
+        selector: 'pxl-pulse',
+        props: [
+          { name: 'duration', type: 'number', default: '2000', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'easing', type: 'string', default: "'ease-in-out'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelPulseDocsSection({ className }: PixelPulseDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +103,9 @@ export function PixelPulseDocsSection({ className }: PixelPulseDocsSectionProps)
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-pulse-api">
+      <h3 id="pixel-pulse-api">API</h3>
+      <FrameworkApi label={'PixelPulse API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-pulse-a11y">
       <h3 id="pixel-pulse-a11y">Accessibility</h3>

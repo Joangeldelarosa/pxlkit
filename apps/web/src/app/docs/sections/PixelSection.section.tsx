@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSectionDocsSectionProps {
@@ -17,6 +18,75 @@ export const PixelSectionDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelSection's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSection } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSection',
+        props: [
+          { name: 'title', type: 'string', description: 'Title rendered as an uppercase heading row at the top of the section.' },
+          { name: 'subtitle', type: 'string', description: 'Optional subtitle below the title.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Section content.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Falls back to nearest <PxlKitSurface>.' },
+          { name: 'container', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full' | false", default: "'5xl'", description: 'Inner container max-width. Pass `false` to skip the centered container wrapper.' },
+          { name: 'verticalPadding', type: "'none' | 'sm' | 'md' | 'lg' | 'xl'", default: "'xl'", description: 'Vertical padding token (margin between consecutive sections).' },
+          { name: 'horizontalGutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal gutter token (used only when `container` is `false`).' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSection } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSection',
+        props: [
+          { name: 'title', type: 'string', description: 'Heading row at the top of the section, upper-cased for the locale.' },
+          { name: 'subtitle', type: 'string', description: 'Line under the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'container', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full' | false", default: "'5xl'", description: 'Width of the centred column (`containerWidth`), or `false` for the full width.' },
+          { name: 'verticalPadding', type: "'none' | 'sm' | 'md' | 'lg' | 'xl'", default: "'xl'", description: 'Vertical padding (`sectionRhythm`).' },
+          { name: 'horizontalGutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal padding (`pageGutter`) of the column, or of the section without one.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border, radius and card tint.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Section content.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<section>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSection } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSection',
+        selector: 'pxl-section',
+        props: [
+          { name: 'title', type: 'string', description: 'Heading row at the top of the section, upper-cased for the locale.' },
+          { name: 'subtitle', type: 'string', description: 'Line under the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'container', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full' | false", default: "'5xl'", description: 'Width of the centred column (`containerWidth`), or `false` for the full width.' },
+          { name: 'verticalPadding', type: "'none' | 'sm' | 'md' | 'lg' | 'xl'", default: "'xl'", description: 'Vertical padding (`sectionRhythm`).' },
+          { name: 'horizontalGutter', type: "0 | 'sm' | 'md' | 'lg' | 'xl'", default: "'lg'", description: 'Horizontal padding (`pageGutter`) of the column, or of the section without one.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border, radius and card tint.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +104,9 @@ export function PixelSectionDocsSection({ className }: PixelSectionDocsSectionPr
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-section-api">
+      <h3 id="pixel-section-api">API</h3>
+      <FrameworkApi label={'PixelSection API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-section-a11y">
       <h3 id="pixel-section-a11y">Accessibility</h3>

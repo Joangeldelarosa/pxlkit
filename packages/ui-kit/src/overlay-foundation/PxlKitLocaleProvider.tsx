@@ -47,6 +47,7 @@ export interface PxlKitLocaleProviderProps {
    * @default "en"
    */
   locale?: PxlKitLocale;
+  /** The part of the app that follows the locale. */
   children: React.ReactNode;
 }
 

@@ -84,6 +84,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   in Vue, a props table read from the components' types. The React Storybook moves from 8.6
   to 10 — which Angular 20 needs — with controls, actions, backgrounds, viewport and
   interactions now in Storybook's core.
+- **An API reference for every component, in React, Vue and Angular.** Each `/docs` component
+  section lists the component's props — type, default, whether it is required, description and
+  deprecation — under the same framework tabs as its code, in place of "No props documented
+  yet." In Vue it also lists the events and their payloads, the slots and their props and the
+  `v-model` bindings; in Angular the selector, the inputs (with what a transform accepts), the
+  outputs, the `[(x)]` bindings, projected content and form-control support. Compound
+  components list their parts, and every framework says what the component passes on (native
+  attributes, `ref`, attribute fallthrough). `npm run docs:build` reads it from the kits'
+  sources (`scripts/build-docs/extract-api.ts`, in a worker thread), and coherence gate 38
+  (`api-reference`) fails when a section shows another API than the sources have.
+- **Doc comments for the kits' props and slots.** About 500 props across 65 React components and
+  the slots and props of 37 Vue components gained descriptions (comments only), which editors
+  show on hover and the API reference prints; TSDoc coverage (gate 27) rose from 50% to 99%.
 
 ### Changed
 

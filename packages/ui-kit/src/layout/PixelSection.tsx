@@ -16,6 +16,7 @@ export interface PixelSectionProps {
   title?: string;
   /** Optional subtitle below the title. */
   subtitle?: string;
+  /** Section content. */
   children: React.ReactNode;
   /** Surface variant. Falls back to nearest <PxlKitSurface>. */
   surface?: Surface;

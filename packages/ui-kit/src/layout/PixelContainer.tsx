@@ -12,9 +12,16 @@ import { ContainerWidth } from '../tokens';
 import { PixelCenter } from './PixelCenter';
 
 export interface PixelContainerProps extends React.HTMLAttributes<HTMLElement> {
+  /** Width cap of the inner column (`containerWidth`). */
   maxWidth?: ContainerWidth;
+  /**
+   * Vertical rhythm (`sectionRhythm`), or `{ x, y }`: the gutter of the inner column (`pageGutter`)
+   * and the rhythm. Both default to `lg`.
+   */
   padding?: ContainerPadding;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Element to render — a landmark wants an `aria-label` or `aria-labelledby`. */
   as?: ContainerElement;
 }
 

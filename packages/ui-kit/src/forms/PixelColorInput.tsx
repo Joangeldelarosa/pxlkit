@@ -25,17 +25,29 @@ import { useControllableState } from '../hooks/useControllableState';
 type ColorSize = 'sm' | 'md' | 'lg';
 
 export interface PixelColorInputProps {
+  /** The colour; leave unset for an uncontrolled input. */
   value?: string;
+  /** Initial colour while uncontrolled. */
   defaultValue?: string;
+  /** Called with the colour picked or typed, in `format`. */
   onChange?: (next: string) => void;
+  /** How a picked colour is written: `#rrggbb`, `rgb(r, g, b)` or `hsl(h, s%, l%)`. */
   format?: ColorFormat;
+  /** The preset colours; sixteen greys and hues by default. */
   presets?: string[];
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Trigger height. */
   size?: ColorSize;
+  /** Label rendered above the trigger, which it also names. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; marks the trigger invalid. */
   error?: string;
+  /** Form field name — a hidden input submits the colour. */
   name?: string;
+  /** `id` of the trigger; generated when left out. */
   id?: string;
 }
 

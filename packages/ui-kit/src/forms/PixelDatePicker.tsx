@@ -33,22 +33,39 @@ import { PixelPopover } from '../overlay-foundation/PixelPopover';
    ────────────────────────────────────────────────────────────────────────── */
 
 export interface PixelDatePickerProps {
+  /** The picked day, `null` for none; leave unset for an uncontrolled picker. */
   value?: Date | null;
+  /** Initial day while uncontrolled. */
   defaultValue?: Date;
+  /** Called with the day picked, at its start, or `null` once cleared. */
   onChange?: (date: Date | null) => void;
+  /** First day that can be picked. */
   min?: Date;
+  /** Last day that can be picked. */
   max?: Date;
+  /** Days that cannot be picked: a list, or a test of each day. */
   disabledDates?: Date[] | ((d: Date) => boolean);
+  /** The trigger's text for the picked day; the locale's long date by default. */
   format?: (d: Date) => string;
+  /** Text shown while no day is picked. */
   placeholder?: string;
+  /** Shows a Clear button under the grid while a day is picked. */
   clearable?: boolean;
+  /** Quick picks shown above the grid. */
   presets?: { label: string; value: Date }[];
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Trigger height. */
   size?: Size;
+  /** Label rendered above the trigger. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; marks the trigger invalid. */
   error?: string;
+  /** Form field name — a hidden input submits the day as `YYYY-MM-DD`. */
   name?: string;
+  /** `id` of the trigger; generated when left out. */
   id?: string;
   /** Hook for tests + custom triggers. */
   ['data-testid']?: string;

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelRotateDocsSectionProps {
@@ -17,6 +18,77 @@ export const PixelRotateDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelRotate's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelRotate } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelRotate',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Content to rotate.' },
+          { name: 'duration', type: 'number', default: '1800', description: 'Animation duration in milliseconds. Default `1800`.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", description: "Iteration count: a number or `'infinite'`. Default `'infinite'`." },
+          { name: 'direction', type: "'normal' | 'reverse' | 'alternate' | 'alternate-reverse'", default: "'normal'", description: "CSS `animation-direction`. Default `'normal'`." },
+          { name: 'easing', type: 'string', default: "'linear'", description: "CSS `animation-timing-function`. Default `'linear'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires after the final iteration.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<div>`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelRotate } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelRotate',
+        props: [
+          { name: 'duration', type: 'number', default: '1800', description: 'Animation duration in milliseconds.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'direction', type: "'normal' | 'reverse' | 'alternate' | 'alternate-reverse'", default: "'normal'", description: 'CSS `animation-direction`.' },
+          { name: 'easing', type: 'string', default: "'linear'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content to rotate.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelRotate } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelRotate',
+        selector: 'pxl-rotate',
+        props: [
+          { name: 'duration', type: 'number', default: '1800', accepts: 'unknown', description: 'Animation duration in milliseconds.' },
+          { name: 'repeat', type: "number | 'infinite'", default: "'infinite'", accepts: "number | 'infinite' | `${number}`", description: "Iteration count: a number or `'infinite'`." },
+          { name: 'direction', type: "'normal' | 'reverse' | 'alternate' | 'alternate-reverse'", default: "'normal'", description: 'CSS `animation-direction`.' },
+          { name: 'easing', type: 'string', default: "'linear'", description: 'CSS `animation-timing-function`.' },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'After the final iteration.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelRotateDocsSection({ className }: PixelRotateDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +106,9 @@ export function PixelRotateDocsSection({ className }: PixelRotateDocsSectionProp
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-rotate-api">
+      <h3 id="pixel-rotate-api">API</h3>
+      <FrameworkApi label={'PixelRotate API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-rotate-a11y">
       <h3 id="pixel-rotate-a11y">Accessibility</h3>

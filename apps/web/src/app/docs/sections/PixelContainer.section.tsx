@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelContainerDocsSectionProps {
@@ -17,6 +18,63 @@ export const PixelContainerDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelContainer's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelContainer } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelContainer',
+        props: [
+          { name: 'maxWidth', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full'", default: "'xl'", description: 'Width cap of the inner column (`containerWidth`).' },
+          { name: 'padding', type: 'ContainerPadding', description: 'Vertical rhythm (`sectionRhythm`), or `{ x, y }`: the gutter of the inner column (`pageGutter`) and the rhythm. Both default to `lg`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'as', type: "'section' | 'main' | 'header' | 'footer' | 'article' | 'aside' | 'div'", default: "'section'", description: 'Element to render — a landmark wants an `aria-label` or `aria-labelledby`.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelContainer } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelContainer',
+        props: [
+          { name: 'maxWidth', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full'", default: "'xl'", description: 'Width cap of the inner column (`containerWidth`).' },
+          { name: 'padding', type: 'ContainerPadding', description: 'Vertical rhythm (`sectionRhythm`), or `{ x, y }`: the gutter of the inner column (`pageGutter`) and the rhythm. Both default to `lg`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'as', type: "'section' | 'main' | 'header' | 'footer' | 'article' | 'aside' | 'div'", default: "'section'", description: 'Element to render — a landmark wants an `aria-label` or `aria-labelledby`.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Content of the inner column.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelContainer } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelContainer',
+        selector: '[pxlContainer]',
+        props: [
+          { name: 'maxWidth', type: "'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'prose' | 'full'", default: "'xl'", description: 'Width cap of the inner column (`containerWidth`).' },
+          { name: 'padding', type: 'ContainerPadding', description: 'Vertical rhythm (`sectionRhythm`), or `{ x, y }`: the gutter of the inner column (`pageGutter`) and the rhythm. Both default to `lg`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelContainerDocsSection({ className }: PixelContainerDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +93,9 @@ export function PixelContainerDocsSection({ className }: PixelContainerDocsSecti
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-container-api">
+      <h3 id="pixel-container-api">API</h3>
+      <FrameworkApi label={'PixelContainer API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-container-a11y">
       <h3 id="pixel-container-a11y">Accessibility</h3>

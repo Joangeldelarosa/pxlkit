@@ -74,7 +74,10 @@ const emit = defineEmits<{
   /** The requested open state. */
   'update:open': [open: boolean];
 }>();
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** `PixelPopoverTrigger` and `PixelPopoverContent`. */
+  default?(): VNode[];
+}>();
 
 const surface = useEffectiveSurface(() => props.surface);
 const trigger = shallowRef<HTMLElement | null>(null);

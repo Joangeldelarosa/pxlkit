@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFeatureCardDocsSectionProps {
@@ -17,6 +18,107 @@ export const PixelFeatureCardDocsMeta = {
   since: '1.7.0',
   deprecated: false,
 } as const;
+
+/** PixelFeatureCard's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelFeatureCard } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelFeatureCard',
+        props: [
+          { name: 'icon', type: 'React.ReactNode', description: 'Icon in the toned frame.' },
+          { name: 'iconSize', type: '48 | 56 | 64 | 80', default: '56', description: 'Width of the icon frame, in px.' },
+          { name: 'badge', type: '{ label: string; tone?: ToneKey }', description: 'Badge above the icon: its label and tone (cyan by default).' },
+          { name: 'title', type: 'string', required: true, description: 'The heading, clamped to two lines.' },
+          { name: 'description', type: 'string', description: 'Muted paragraph rendered under the title.' },
+          { name: 'descriptionLines', type: '2 | 3 | 4', description: 'Apply `line-clamp-N` + `min-h-[N lh]` to the description.' },
+          { name: 'desc', type: 'string', deprecated: 'Use `description` for consistency with PixelCard / PixelPricingCard.' },
+          { name: 'descLines', type: '2 | 3 | 4', deprecated: 'Use `descriptionLines` for consistency with PixelCard / PixelPricingCard.' },
+          { name: 'footer', type: 'React.ReactNode', description: 'Footer under the description.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the icon frame.' },
+          { name: 'interactive', type: 'boolean', default: 'false', description: 'Hover lift and focus ring; without an `href` the card is a button: give it an `onClick`.' },
+          { name: 'href', type: 'string', description: 'When provided, the card renders as `<a href>` and accepts anchor-specific attributes via the spread. Nesting interactive children inside the card (e.g. PixelButton, PixelTextLink) is invalid HTML in this mode.' },
+          { name: 'target', type: "'_self' | '_blank' | '_parent' | '_top' | (string & {})", description: 'Anchor target — only meaningful when `href` is set.' },
+          { name: 'rel', type: 'string', description: 'Anchor rel — only meaningful when `href` is set.' },
+          { name: 'download', type: 'any', description: 'Anchor download — only meaningful when `href` is set.' },
+          { name: 'onClick', type: 'React.MouseEventHandler<HTMLElement>', description: 'When `interactive=true` without `href`, an onClick is REQUIRED for accessibility.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Icon above the text, or beside it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — a feature card needs visible chrome.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelFeatureCard } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelFeatureCard',
+        props: [
+          { name: 'title', type: 'string', required: true, description: 'The heading, clamped to two lines.' },
+          { name: 'description', type: 'string', description: 'Muted paragraph under the title.' },
+          { name: 'descriptionLines', type: '2 | 3 | 4', description: 'Lines the description is clamped to; 3 when unset.' },
+          { name: 'desc', type: 'string', deprecated: 'Use `description`.' },
+          { name: 'descLines', type: '2 | 3 | 4', deprecated: 'Use `descriptionLines`.' },
+          { name: 'iconSize', type: '48 | 56 | 64 | 80', default: '56', description: 'Width of the icon frame, in px.' },
+          { name: 'badge', type: 'CardBadge', description: 'Badge above the icon: its label and tone (cyan by default).' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the icon frame.' },
+          { name: 'interactive', type: 'boolean', default: 'false', description: 'Hover lift and focus ring; without an `href` the card is a button: give it a `click` listener.' },
+          { name: 'href', type: 'string', description: 'Makes the card a link.' },
+          { name: 'target', type: 'string', description: 'Link target, with `href`.' },
+          { name: 'rel', type: 'string', description: 'Link relationship, with `href`.' },
+          { name: 'download', type: 'string', description: 'Downloads the link target, with `href`.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Icon above the text, or beside it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border, radius and background.' },
+          { name: 'onClick', type: '(event: MouseEvent | KeyboardEvent) => void', binding: '@click', description: 'Click handler (`@click`). Declared as a prop because an interactive card calls it on Enter and Space too, with the keyboard event.' },
+        ],
+        slots: [
+          { name: 'default', description: "Content after the card's own, inside the card." },
+          { name: 'icon', description: 'Icon in the toned frame.' },
+          { name: 'footer', description: 'Footer under the description.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<component>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelFeatureCard } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelFeatureCard',
+        selector: 'pxl-feature-card, a[pxlFeatureCard], div[pxlFeatureCard]',
+        props: [
+          { name: 'title', type: 'string', required: true, description: 'The heading, clamped to two lines.' },
+          { name: 'description', type: 'string', description: 'Muted paragraph under the title.' },
+          { name: 'descriptionLines', type: '2 | 3 | 4', accepts: "2 | 3 | 4 | '2' | '3' | '4'", description: 'Lines the description is clamped to; 3 when unset.' },
+          { name: 'desc', type: 'string', deprecated: 'Use `description`.' },
+          { name: 'descLines', type: '2 | 3 | 4', accepts: "2 | 3 | 4 | '2' | '3' | '4'", deprecated: 'Use `descriptionLines`.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Icon in the toned frame.' },
+          { name: 'iconSize', type: '48 | 56 | 64 | 80', default: '56', accepts: "48 | 56 | 64 | 80 | '48' | '56' | '64' | '80'", description: 'Width of the icon frame, in px.' },
+          { name: 'badge', type: 'CardBadge', description: 'Badge above the icon: its label and tone (cyan by default).' },
+          { name: 'footer', type: 'string | TemplateRef<any>', description: 'Footer under the description.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the icon frame.' },
+          { name: 'interactive', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Hover lift and focus ring; a card that is not a link becomes a button.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Icon above the text, or beside it.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border, radius and background.' },
+        ],
+        notes: [
+          'As an attribute, it goes on a native `<a>` or `<div>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelFeatureCardDocsSection({ className }: PixelFeatureCardDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +137,9 @@ export function PixelFeatureCardDocsSection({ className }: PixelFeatureCardDocsS
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-feature-card-api">
+      <h3 id="pixel-feature-card-api">API</h3>
+      <FrameworkApi label={'PixelFeatureCard API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-feature-card-a11y">
       <h3 id="pixel-feature-card-a11y">Accessibility</h3>

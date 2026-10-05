@@ -15,7 +15,10 @@ import { useDropdownContext } from './_internal/dropdown-context.js';
  * keys while open. Holds `PixelDropdownItem`s, checkbox and radio items,
  * headers and separators. Extra classes merge into the panel.
  */
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The items. */
+  default?(): VNode[];
+}>();
 
 const context = useDropdownContext('PixelDropdownContent');
 const panel = shallowRef<HTMLElement | null>(null);

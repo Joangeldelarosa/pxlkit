@@ -74,12 +74,19 @@ function Spinner({ className }: { className?: string }) {
 
 export interface PixelStepperStepProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+  /** Label under (or beside) the indicator. */
   label: string;
+  /** Smaller text below the label. */
   description?: string;
+  /** Custom icon in the indicator, shown while the step is neither completed nor in error. */
   icon?: React.ReactNode;
+  /** Shows a spinner in the indicator. */
   loading?: boolean;
+  /** Marks the step done, with a check mark. */
   completed?: boolean;
+  /** Marks the step failed, with a cross; wins over `completed`. */
   error?: boolean;
+  /** Not rendered: a step shows its `label`, `description` and `icon`. */
   children?: React.ReactNode;
 }
 
@@ -224,14 +231,25 @@ PixelStepperStep.displayName = 'PixelStepper.Step';
    ────────────────────────────────────────────────────────────────────────── */
 
 export interface PixelStepperProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+  /** Index of the current step, from 0. */
   active: number;
+  /**
+   * Called with the index of a step that is clicked, or activated with Enter or Space. With it, the
+   * steps up to the active one — every step with `allowNextStepsSelect` — are clickable and in the
+   * tab order.
+   */
   onStepClick?: (idx: number) => void;
+  /** Steps in a row or a column; also the arrow keys that move between them. */
   orientation?: StepperOrientation;
+  /** With `onStepClick`, makes the steps after the active one clickable too. */
   allowNextStepsSelect?: boolean;
+  /** Size of the indicators and labels. */
   size?: StepperSize;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Accessible name for the steps landmark. Defaults to "Progress steps". */
   ariaLabel?: string;
+  /** The steps (`PixelStepper.Step`). */
   children: React.ReactNode;
 }
 

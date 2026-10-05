@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSkeletonDocsSectionProps {
@@ -17,6 +18,63 @@ export const PixelSkeletonDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelSkeleton's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSkeleton } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSkeleton',
+        props: [
+          { name: 'width', type: 'string', description: 'CSS width (e.g. `"100%"`, `"12rem"`).' },
+          { name: 'height', type: 'string', default: "'1rem'", description: 'CSS height (default `"1rem"`).' },
+          { name: 'rounded', type: 'boolean', default: 'false', description: 'When `true`, applies a pill/circle radius instead of the surface default.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; falls back to nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Loading'", description: 'Accessible label override; falls back to `"Loading"`.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `role`, `aria-label`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSkeleton } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSkeleton',
+        props: [
+          { name: 'width', type: 'string', description: 'CSS width (e.g. `"100%"`, `"12rem"`).' },
+          { name: 'height', type: 'string', default: "'1rem'", description: 'CSS height.' },
+          { name: 'rounded', type: 'boolean', default: 'false', description: 'A circle on the linear surface, a 2px chamfer on the pixel one, instead of the surface radius.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Loading'", description: 'Accessible label (`aria-label` works too).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSkeleton } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSkeleton',
+        selector: 'pxl-skeleton',
+        props: [
+          { name: 'width', type: 'string', description: 'CSS width (e.g. `"100%"`, `"12rem"`).' },
+          { name: 'height', type: 'string', default: "'1rem'", description: 'CSS height.' },
+          { name: 'rounded', type: 'boolean', default: 'false', accepts: 'unknown', description: 'A circle on the linear surface, a 2px chamfer on the pixel one, instead of the surface radius.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Loading'", description: 'Accessible label.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +93,9 @@ export function PixelSkeletonDocsSection({ className }: PixelSkeletonDocsSection
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-skeleton-api">
+      <h3 id="pixel-skeleton-api">API</h3>
+      <FrameworkApi label={'PixelSkeleton API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-skeleton-a11y">
       <h3 id="pixel-skeleton-a11y">Accessibility</h3>

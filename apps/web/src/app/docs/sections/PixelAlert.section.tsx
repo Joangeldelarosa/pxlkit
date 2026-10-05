@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAlertDocsSectionProps {
@@ -17,6 +18,73 @@ export const PixelAlertDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelAlert's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelAlert } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelAlert',
+        props: [
+          { name: 'label', type: 'string', description: 'Short label shown in tone color (canonical name for the title).' },
+          { name: 'title', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'message', type: 'string', required: true, description: 'Body message under the label.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'red'", description: "Tone determines border, fill, text colors. Defaults to `'red'`." },
+          { name: 'icon', type: 'React.ReactNode', description: 'Optional leading icon (rendered in tone color).' },
+          { name: 'action', type: 'React.ReactNode', description: 'Optional action node rendered under the message.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; falls back to nearest provider.' },
+          { name: 'live', type: "'polite' | 'assertive' | 'off'", description: 'Optional `aria-live` override. Status banners ("info") should usually use `"polite"`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelAlert } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelAlert',
+        props: [
+          { name: 'label', type: 'string', description: 'Short label shown in the tone colour (canonical name for the title).' },
+          { name: 'title', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'message', type: 'string', required: true, description: 'Body message under the label.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'red'", description: 'Tone of the border, fill and texts.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'live', type: "'polite' | 'assertive' | 'off'", description: '`aria-live` override. Status banners ("info") should usually use `"polite"`.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'Leading icon, in the tone colour.' },
+          { name: 'action', description: 'Action under the message (Retry, Dismiss, …).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelAlert } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelAlert',
+        selector: 'pxl-alert',
+        props: [
+          { name: 'label', type: 'string', description: 'Short label shown in the tone colour (canonical name for the title).' },
+          { name: 'title', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'message', type: 'string', required: true, description: 'Body message under the label.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'red'", description: 'Tone of the border, fill and texts.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Leading icon, in the tone colour.' },
+          { name: 'action', type: 'string | TemplateRef<any>', description: 'Action under the message (Retry, Dismiss, …).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'live', type: "'polite' | 'assertive' | 'off'", description: '`aria-live` override. Status banners ("info") should usually use `"polite"`.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +103,9 @@ export function PixelAlertDocsSection({ className }: PixelAlertDocsSectionProps)
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-alert-api">
+      <h3 id="pixel-alert-api">API</h3>
+      <FrameworkApi label={'PixelAlert API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-alert-a11y">
       <h3 id="pixel-alert-a11y">Accessibility</h3>

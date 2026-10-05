@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToastDocsSectionProps {
@@ -17,6 +18,60 @@ export const PixelToastDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelToast's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelToast } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelToast',
+        props: [
+          { name: 'toast', type: 'ToastItem', required: true, description: 'The toast to show.' },
+          { name: 'onDismiss', type: '() => void', required: true, description: 'Called when the dismiss button is pressed, or the countdown runs out.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelToast } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelToast',
+        props: [
+          { name: 'toast', type: 'ToastItem', required: true, description: 'The toast to show.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'dismiss', description: 'The dismiss button was pressed, or the countdown ran out.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelToast } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelToast',
+        selector: 'pxl-toast-card',
+        props: [
+          { name: 'toast', type: 'ToastItem', required: true, description: 'The toast to show.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'dismiss', description: 'The dismiss button was pressed, or the countdown ran out.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelToastDocsSection({ className }: PixelToastDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +90,9 @@ export function PixelToastDocsSection({ className }: PixelToastDocsSectionProps)
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-toast-api">
+      <h3 id="pixel-toast-api">API</h3>
+      <FrameworkApi label={'PixelToast API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-toast-a11y">
       <h3 id="pixel-toast-a11y">Accessibility</h3>

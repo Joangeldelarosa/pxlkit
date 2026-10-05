@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBentoDocsSectionProps {
@@ -17,6 +18,60 @@ export const PixelBentoDocsMeta = {
   since: '1.7.0',
   deprecated: false,
 } as const;
+
+/** PixelBento's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBento } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBento',
+        props: [
+          { name: 'columns', type: '3 | 4 | 6', default: '3', description: 'Column count from `lg` up.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBento } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBento',
+        props: [
+          { name: 'columns', type: '3 | 4 | 6', default: '3', description: 'Column count from `lg` up.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`).' },
+        ],
+        slots: [
+          { name: 'default', description: 'The cells (`PixelBentoCell`).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBento } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBento',
+        selector: 'pxl-bento',
+        props: [
+          { name: 'columns', type: '3 | 4 | 6', default: '3', accepts: "3 | 4 | 6 | '3' | '4' | '6'", description: 'Column count from `lg` up.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap token (`stackGap`).' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelBentoDocsSection({ className }: PixelBentoDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +90,9 @@ export function PixelBentoDocsSection({ className }: PixelBentoDocsSectionProps)
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bento-api">
+      <h3 id="pixel-bento-api">API</h3>
+      <FrameworkApi label={'PixelBento API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bento-a11y">
       <h3 id="pixel-bento-a11y">Accessibility</h3>

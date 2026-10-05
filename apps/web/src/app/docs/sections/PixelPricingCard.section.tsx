@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelPricingCardDocsSectionProps {
@@ -17,6 +18,92 @@ export const PixelPricingCardDocsMeta = {
   since: '1.7.0',
   deprecated: false,
 } as const;
+
+/** PixelPricingCard's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelPricingCard } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelPricingCard',
+        props: [
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the price, the feature marks and, highlighted, the chrome.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Icon above the name, in the tone.' },
+          { name: 'name', type: 'string', required: true, description: 'Plan name.' },
+          { name: 'description', type: 'string', description: 'Muted line under the name.' },
+          { name: 'descriptionLines', type: "2 | 3 | 'none'", default: '2', description: "Clamp the description to N lines. Defaults to 2; use 'none' to let long copy flow." },
+          { name: 'price', type: '{ amount: string | number; period?: string; strikethrough?: string | number }', required: true, description: 'Price, billing period and old price.' },
+          { name: 'priceBadge', type: 'React.ReactNode', description: 'Promo badge rendered beside the price (e.g. a discount PixelBadge).' },
+          { name: 'popular', type: '{ label?: string; tone?: ToneKey }', description: 'Ribbon over the top edge: its label (`POPULAR`) and tone (gold).' },
+          { name: 'features', type: '{ label: string; tooltip?: string; included?: boolean; highlight?: boolean }[]', description: 'The feature list.' },
+          { name: 'cta', type: 'React.ReactNode', description: 'Call to action under the features.' },
+          { name: 'highlight', type: 'boolean', default: 'false', description: 'Tints the border and background and adds a glow.' },
+          { name: 'footer', type: 'React.ReactNode', description: 'Fine print under the call to action.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — a pricing card needs visible chrome.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelPricingCard } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelPricingCard',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Plan name.' },
+          { name: 'price', type: 'PricingCardPrice', required: true, description: 'Price, billing period and old price.' },
+          { name: 'description', type: 'string', description: 'Muted line under the name.' },
+          { name: 'descriptionLines', type: "2 | 3 | 'none'", default: '2', description: 'Lines the description is clamped to, or `none` to let it flow.' },
+          { name: 'popular', type: 'PricingCardPopular', description: 'Ribbon over the top edge: its label (`POPULAR`) and tone (gold).' },
+          { name: 'features', type: 'PricingCardFeature[]', description: 'The feature list.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the price, the feature marks and, highlighted, the chrome.' },
+          { name: 'highlight', type: 'boolean', default: 'false', description: 'Tints the border and background and adds a glow.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border, radius and background.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'Icon above the name, in the tone.' },
+          { name: 'price-badge', description: 'Badge beside the price (a discount).' },
+          { name: 'cta', description: 'Call to action under the features.' },
+          { name: 'footer', description: 'Fine print under the call to action.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<article>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelPricingCard } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelPricingCard',
+        selector: 'pxl-pricing-card',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Plan name.' },
+          { name: 'price', type: 'PricingCardPrice', required: true, description: 'Price, billing period and old price.' },
+          { name: 'description', type: 'string', description: 'Muted line under the name.' },
+          { name: 'descriptionLines', type: "2 | 3 | 'none'", default: '2', accepts: "2 | 3 | 'none' | '2' | '3'", description: 'Lines the description is clamped to, or `none` to let it flow.' },
+          { name: 'popular', type: 'PricingCardPopular', description: 'Ribbon over the top edge: its label (`POPULAR`) and tone (gold).' },
+          { name: 'features', type: 'PricingCardFeature[]', description: 'The feature list.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Icon above the name, in the tone.' },
+          { name: 'priceBadge', type: 'string | TemplateRef<any>', description: 'Badge beside the price (a discount).' },
+          { name: 'cta', type: 'string | TemplateRef<any>', description: 'Call to action under the features.' },
+          { name: 'footer', type: 'string | TemplateRef<any>', description: 'Fine print under the call to action.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the price, the feature marks and, highlighted, the chrome.' },
+          { name: 'highlight', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Tints the border and background and adds a glow.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border, radius and background.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +122,9 @@ export function PixelPricingCardDocsSection({ className }: PixelPricingCardDocsS
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-pricing-card-api">
+      <h3 id="pixel-pricing-card-api">API</h3>
+      <FrameworkApi label={'PixelPricingCard API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-pricing-card-a11y">
       <h3 id="pixel-pricing-card-a11y">Accessibility</h3>

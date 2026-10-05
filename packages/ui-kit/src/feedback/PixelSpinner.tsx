@@ -7,9 +7,13 @@ import { ToneKey } from '../tokens';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 export interface PixelSpinnerProps extends React.HTMLAttributes<HTMLSpanElement> {
+  /** Box size. */
   size?: SpinnerSize;
+  /** Accessible name. */
   label?: string;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Colour. */
   tone?: ToneKey;
   /**
    * When `true`, renders as pure decoration (aria-hidden, no role, no label).

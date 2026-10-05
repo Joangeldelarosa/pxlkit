@@ -14,7 +14,10 @@ export interface PixelBentoProps {
 }
 
 const props = withDefaults(defineProps<PixelBentoProps>(), { columns: 3, gap: 4 });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The cells (`PixelBentoCell`). */
+  default?(): VNode[];
+}>();
 
 const classes = computed(() => bentoClasses(props.columns, props.gap));
 </script>

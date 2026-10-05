@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDividerDocsSectionProps {
@@ -17,6 +18,54 @@ export const PixelDividerDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelDivider's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelDivider } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelDivider',
+        props: [
+          { name: 'label', type: 'string', description: 'Optional centered label between two rules.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Color tone of the label text.' },
+          { name: 'spacing', type: "'none' | 'sm' | 'md' | 'lg'", default: "'none'", description: 'Symmetric vertical padding.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the root element.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Falls back to nearest <PxlKitSurface>.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelDivider } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelDivider',
+        props: [
+          { name: 'label', type: 'string', description: 'Label centred between two rules; a plain `<hr>` without one.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the label text.' },
+          { name: 'spacing', type: "'none' | 'sm' | 'md' | 'lg'", default: "'none'", description: 'Symmetric vertical padding.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelDivider } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelDivider',
+        selector: 'pxl-divider',
+        props: [
+          { name: 'label', type: 'string', description: 'Label centred between two rules; a plain `<hr>` without one.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the label text.' },
+          { name: 'spacing', type: "'none' | 'sm' | 'md' | 'lg'", default: "'none'", description: 'Symmetric vertical padding.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelDividerDocsSection({ className }: PixelDividerDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +84,9 @@ export function PixelDividerDocsSection({ className }: PixelDividerDocsSectionPr
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-divider-api">
+      <h3 id="pixel-divider-api">API</h3>
+      <FrameworkApi label={'PixelDivider API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-divider-a11y">
       <h3 id="pixel-divider-a11y">Accessibility</h3>

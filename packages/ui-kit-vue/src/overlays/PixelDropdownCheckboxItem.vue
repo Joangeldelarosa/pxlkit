@@ -25,7 +25,10 @@ const emit = defineEmits<{
   /** The item was chosen; the menu closes. */
   select: [];
 }>();
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Label. */
+  default?(): VNode[];
+}>();
 
 const itemProps = computed(() => {
   const { checked: _checked, ...rest } = props;

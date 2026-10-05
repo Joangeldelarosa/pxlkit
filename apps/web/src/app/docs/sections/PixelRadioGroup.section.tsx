@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelRadioGroupDocsSectionProps {
@@ -17,6 +18,82 @@ export const PixelRadioGroupDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelRadioGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelRadioGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelRadioGroup',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Legend rendered above the group.' },
+          { name: 'value', type: 'string', required: true, description: 'Currently-selected option value.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'Radio items.' },
+          { name: 'onChange', type: '(next: string) => void', required: true, description: 'Fires with the new value when the user picks a radio.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every radio in the group.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: "Visual tone for the selected radio. Default: `'cyan'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'name', type: 'string', description: 'Form-serialization name.' },
+          { name: 'required', type: 'boolean', description: 'Marks the field as required for native form validation.' },
+        ],
+        notes: [
+          '`ref` points to its element (`HTMLFieldSetElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelRadioGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelRadioGroup',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Legend rendered above the radios.' },
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Selected value (`v-model`); leave unset for an uncontrolled group.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'The radios.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every radio.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone of the selected radio.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'required', type: 'boolean', default: 'false', description: 'Marks the field as required for native form validation.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The value of the radio the user picked.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<fieldset>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelRadioGroup } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelRadioGroup',
+        selector: 'fieldset[pxlRadioGroup]',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Legend rendered above the radios.' },
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Selected value (`[(value)]`); leave unset for an uncontrolled group.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'The radios.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables every radio.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone of the selected radio.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the field as required for native form validation.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'Goes on a native `<fieldset>`, which keeps its own attributes and events.',
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +112,9 @@ export function PixelRadioGroupDocsSection({ className }: PixelRadioGroupDocsSec
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-radio-group-api">
+      <h3 id="pixel-radio-group-api">API</h3>
+      <FrameworkApi label={'PixelRadioGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-radio-group-a11y">
       <h3 id="pixel-radio-group-a11y">Accessibility</h3>

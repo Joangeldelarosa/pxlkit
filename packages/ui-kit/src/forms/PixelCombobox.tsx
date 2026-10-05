@@ -38,20 +38,35 @@ export interface PixelComboboxOption {
 }
 
 export interface PixelComboboxProps {
+  /** Selected value; leave unset for an uncontrolled combobox. */
   value?: string;
+  /** Initial value while uncontrolled. */
   defaultValue?: string;
+  /** Called with the value of the option the user selected. */
   onChange?: (next: string) => void;
+  /** The options of the listbox. */
   options: PixelComboboxOption[];
+  /** Shows the search field that filters the options. */
   searchable?: boolean;
+  /** Text shown while nothing is selected. */
   placeholder?: string;
+  /** Shown in place of the listbox when nothing matches the search. */
   emptyMessage?: string;
+  /** Disables the combobox and greys out the trigger. */
   disabled?: boolean;
+  /** Trigger height. */
   size?: 'sm' | 'md' | 'lg';
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Label rendered above the trigger. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; marks the trigger invalid. */
   error?: string;
+  /** Form field name — a hidden input submits the value. */
   name?: string;
+  /** `id` of the trigger; generated when left out. */
   id?: string;
 }
 

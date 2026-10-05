@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelHeroSectionDocsSectionProps {
@@ -17,6 +18,92 @@ export const PixelHeroSectionDocsMeta = {
   since: '1.7.0',
   deprecated: false,
 } as const;
+
+/** PixelHeroSection's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelHeroSection } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelHeroSection',
+        props: [
+          { name: 'variant', type: "'centered' | 'split' | 'parallax'", default: "'centered'" },
+          { name: 'eyebrow', type: 'string' },
+          { name: 'headline', type: 'string', required: true },
+          { name: 'headlineEffect', type: "'typewriter' | 'glitch' | 'none'", default: "'none'", description: "Animates the headline: `'typewriter'` types it out once — screen readers get the whole headline from the start — and `'glitch'` plays PixelGlitch over it. Both hold still when the user prefers reduced motion. Default `'none'`." },
+          { name: 'subline', type: 'string' },
+          { name: 'primaryCta', type: 'React.ReactNode' },
+          { name: 'secondaryCta', type: 'React.ReactNode' },
+          { name: 'install', type: 'React.ReactNode' },
+          { name: 'meta', type: 'React.ReactNode' },
+          { name: 'media', type: 'React.ReactNode' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'" },
+          { name: 'density', type: "'compact' | 'comfortable'", default: "'comfortable'" },
+          { name: 'minHeight', type: "'sm' | 'md' | 'lg' | 'fullscreen'", default: "'md'" },
+          { name: 'surface', type: "'pixel' | 'linear'" },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of its element (`HTMLAttributes<HTMLElement>`).',
+          '`ref` points to its element (`HTMLElement`).',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelHeroSection } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelHeroSection',
+        props: [
+          { name: 'headline', type: 'string', required: true, description: 'The `<h1>`.' },
+          { name: 'variant', type: "'centered' | 'split' | 'parallax'", default: "'centered'", description: '`centered` and `parallax` centre the text; `split` puts the `media` slot in a column beside it.' },
+          { name: 'eyebrow', type: 'string', description: 'Small upper-cased line above the headline, in the tone.' },
+          { name: 'headlineEffect', type: "'typewriter' | 'glitch' | 'none'", default: "'none'", description: "Animates the headline: `'typewriter'` types it out once — screen readers get the whole headline from the start — and `'glitch'` plays PixelGlitch over it. Both hold still when the user prefers reduced motion." },
+          { name: 'subline', type: 'string', description: 'Paragraph under the headline.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the eyebrow.' },
+          { name: 'density', type: "'compact' | 'comfortable'", default: "'comfortable'", description: 'Type sizes and vertical rhythm.' },
+          { name: 'minHeight', type: "'sm' | 'md' | 'lg' | 'fullscreen'", default: "'md'", description: 'Minimum height of the section.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'primary-cta', description: 'First call to action.' },
+          { name: 'secondary-cta', description: 'Second call to action, after the first.' },
+          { name: 'install', description: 'Install snippet under the calls to action.' },
+          { name: 'meta', description: 'Meta line at the end of the text.' },
+          { name: 'media', description: 'Media, placed by the `variant`.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelHeroSection } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelHeroSection',
+        selector: 'section[pxlHeroSection]',
+        props: [
+          { name: 'headline', type: 'string', required: true, description: 'The `<h1>`.' },
+          { name: 'variant', type: "'centered' | 'split' | 'parallax'", default: "'centered'", description: '`centered` and `parallax` centre the text; `split` puts the `media` in a column beside it.' },
+          { name: 'eyebrow', type: 'string', description: 'Small upper-cased line above the headline, in the tone.' },
+          { name: 'headlineEffect', type: "'typewriter' | 'glitch' | 'none'", default: "'none'", description: "Animates the headline: `'typewriter'` types it out once — screen readers get the whole headline from the start — and `'glitch'` plays the glitch over it. Both hold still when the user prefers reduced motion." },
+          { name: 'subline', type: 'string', description: 'Paragraph under the headline.' },
+          { name: 'primaryCta', type: 'string | TemplateRef<any>', description: 'First call to action.' },
+          { name: 'secondaryCta', type: 'string | TemplateRef<any>', description: 'Second call to action, after the first.' },
+          { name: 'install', type: 'string | TemplateRef<any>', description: 'Install snippet under the calls to action.' },
+          { name: 'meta', type: 'string | TemplateRef<any>', description: 'Meta line at the end of the text.' },
+          { name: 'media', type: 'string | TemplateRef<any>', description: 'Media, placed by the `variant`.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the eyebrow.' },
+          { name: 'density', type: "'compact' | 'comfortable'", default: "'comfortable'", description: 'Type sizes and vertical rhythm.' },
+          { name: 'minHeight', type: "'sm' | 'md' | 'lg' | 'fullscreen'", default: "'md'", description: 'Minimum height of the section.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on a native `<section>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +122,9 @@ export function PixelHeroSectionDocsSection({ className }: PixelHeroSectionDocsS
       <dt>Category</dt><dd>hero</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-hero-section-api">
+      <h3 id="pixel-hero-section-api">API</h3>
+      <FrameworkApi label={'PixelHeroSection API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-hero-section-a11y">
       <h3 id="pixel-hero-section-a11y">Accessibility</h3>

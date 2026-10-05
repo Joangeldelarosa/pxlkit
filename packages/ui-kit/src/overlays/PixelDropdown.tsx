@@ -140,10 +140,18 @@ function useDropdownContext(component: string): DropdownContextValue {
 /* ─── Root / compositional sub-components ───────────────────────────────── */
 
 interface DropdownRootProps {
+  /** Whether the menu is open; leave unset for an uncontrolled menu. */
   open?: boolean;
+  /** Initial open state while uncontrolled. */
   defaultOpen?: boolean;
+  /**
+   * Called with every open state the menu asks for (the trigger and its keys, Escape, a press
+   * outside, an item).
+   */
   onOpenChange?: (open: boolean) => void;
+  /** Surface override for the trigger and the menu; defaults to the nearest provider. */
   surface?: Surface;
+  /** The trigger and the menu (`PixelDropdown.Trigger`, `PixelDropdown.Content`). */
   children: React.ReactNode;
 }
 
@@ -294,10 +302,15 @@ function DropdownRoot({ open: openProp, defaultOpen = false, onOpenChange, surfa
 }
 
 interface DropdownTriggerProps {
+  /** Button label. */
   children?: React.ReactNode;
+  /** Button tone. */
   tone?: Tone;
+  /** Icon at the end of the button, in place of the chevron. */
   icon?: React.ReactNode;
+  /** Disables the button. */
   disabled?: boolean;
+  /** Accessible label, for a label that is only decorative. */
   ariaLabel?: string;
   /** Id of the button, which names the menu; generated when left out. */
   id?: string;
@@ -340,7 +353,9 @@ const DropdownTrigger = forwardRef<HTMLButtonElement, DropdownTriggerProps>(func
 DropdownTrigger.displayName = 'PixelDropdown.Trigger';
 
 interface DropdownContentProps {
+  /** The items. */
   children?: React.ReactNode;
+  /** Extra classes on the menu. */
   className?: string;
 }
 
@@ -413,14 +428,19 @@ interface DropdownItemProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'onSelect'> {
   /** Item identity for highlight/typeahead registration (NOT the HTML form `value`). */
   value?: string;
+  /** Label. */
   children: React.ReactNode;
   /** Selection callback (NOT the DOM `select` event). */
   onSelect?: () => void;
+  /** Skipped by the keyboard and ignores the pointer. */
   disabled?: boolean;
   /** Visually marks the row red; equivalent to `tone="red"`. */
   destructive?: boolean;
+  /** Text tone. */
   tone?: Tone;
+  /** Icon before the label (plain items). */
   icon?: React.ReactNode;
+  /** Keyboard hint shown at the end of the row (display only). */
   shortcut?: string;
 }
 
@@ -497,7 +517,10 @@ function DropdownSeparator() {
 }
 (DropdownSeparator as React.FC).displayName = 'PixelDropdown.Separator';
 
-function DropdownHeader({ children }: { children: React.ReactNode }) {
+function DropdownHeader({ children }: {
+  /** Text of the header row. */
+  children: React.ReactNode;
+}) {
   return (
     <div
       role="presentation"
@@ -511,6 +534,7 @@ function DropdownHeader({ children }: { children: React.ReactNode }) {
 (DropdownHeader as React.FC<{ children: React.ReactNode }>).displayName = 'PixelDropdown.Header';
 
 interface DropdownCheckboxItemProps extends Omit<DropdownItemProps, 'icon'> {
+  /** Shows the check mark, and sets `aria-checked`. */
   checked?: boolean;
 }
 
@@ -533,6 +557,7 @@ const DropdownCheckboxItem = forwardRef<HTMLButtonElement, DropdownCheckboxItemP
 DropdownCheckboxItem.displayName = 'PixelDropdown.CheckboxItem';
 
 interface DropdownRadioItemProps extends Omit<DropdownItemProps, 'icon'> {
+  /** Shows the dot, and sets `aria-checked`. */
   checked?: boolean;
 }
 

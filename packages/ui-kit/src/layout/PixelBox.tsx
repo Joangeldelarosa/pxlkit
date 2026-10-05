@@ -12,10 +12,15 @@ import { cn, Surface, Tone, Variant, useEffectiveSurface } from '../common';
 
 export interface PixelBoxProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'color'> {
+  /** Tone of the fill and border. */
   tone?: Tone;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** `solid` and `soft` fill; `outline` and `ghost` stay transparent. */
   variant?: Variant;
+  /** Padding scale. */
   padding?: BoxPadding;
+  /** Fixed radius; the surface's large radius when unset. */
   radius?: BoxRadius;
   /**
    * Whether to render a border. Defaults to `true` when `variant === 'outline'`
@@ -25,7 +30,9 @@ export interface PixelBoxProps
    * `nav`, `aside`, `main`), supply `aria-label` or `aria-labelledby` for a11y.
    */
   border?: boolean;
+  /** Surface drop shadow. */
   shadow?: boolean;
+  /** Element to render. */
   as?: BoxElement;
 }
 

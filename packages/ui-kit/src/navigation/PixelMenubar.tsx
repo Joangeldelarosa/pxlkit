@@ -54,7 +54,9 @@ export interface PixelMenubarMenu {
 }
 
 export interface PixelMenubarProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** The menus, in order. */
   menus: PixelMenubarMenu[];
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

@@ -9,6 +9,7 @@ const props = defineProps<{
   value: string;
 }>();
 defineSlots<{
+  /** The tab's label. */
   default?(): VNode[];
   /** Leading icon. */
   icon?(): VNode[];

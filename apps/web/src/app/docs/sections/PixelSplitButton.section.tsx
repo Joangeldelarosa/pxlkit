@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSplitButtonDocsSectionProps {
@@ -17,6 +18,72 @@ export const PixelSplitButtonDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelSplitButton's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSplitButton } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSplitButton',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Text shown on the primary (left) button.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'Options shown in the dropdown menu.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'purple'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to nearest provider.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'When true, both primary button and chevron trigger are disabled.' },
+          { name: 'onPrimary', type: '() => void', description: 'Fires when the primary (label) button is clicked.' },
+          { name: 'onSelect', type: '(value: string) => void', description: "Fires with the selected option's `value` when a menu item is chosen." },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSplitButton } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSplitButton',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Text of the primary (left) button.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'Options of the menu.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'purple'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to the nearest provider.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the primary button and the chevron.' },
+        ],
+        events: [
+          { name: 'primary', description: 'The primary (label) button was clicked.' },
+          { name: 'select', payload: 'value: string', description: 'An option was chosen, with its `value`; the menu closes.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSplitButton } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSplitButton',
+        selector: 'pxl-split-button',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Text of the primary (left) button.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'Options of the menu.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'purple'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to the nearest provider.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the primary button and the chevron.' },
+        ],
+        events: [
+          { name: 'primary', description: 'The primary (label) button was clicked.' },
+          { name: 'selected', payload: 'string', description: 'An option was chosen, with its `value`; the menu closes.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +101,9 @@ export function PixelSplitButtonDocsSection({ className }: PixelSplitButtonDocsS
       <dt>Category</dt><dd>actions</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-split-button-api">
+      <h3 id="pixel-split-button-api">API</h3>
+      <FrameworkApi label={'PixelSplitButton API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-split-button-a11y">
       <h3 id="pixel-split-button-a11y">Accessibility</h3>

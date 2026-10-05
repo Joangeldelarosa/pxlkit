@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTableDocsSectionProps {
@@ -17,6 +18,102 @@ export const PixelTableDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelTable's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTable } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTable',
+        props: [
+          { name: 'columns', type: 'Array<PixelTableColumn<Row>>', required: true, description: 'Column definitions.' },
+          { name: 'data', type: 'Row[]', required: true, description: 'Row data.' },
+          { name: 'striped', type: 'boolean', default: 'true', description: 'Alternate-row tint. Defaults to `true`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'sort', type: 'PixelTableSortState', description: 'Controlled sort state.' },
+          { name: 'onSortChange', type: '(next: PixelTableSortState) => void', description: 'Called when a sortable header is clicked.' },
+          { name: 'selection', type: "'single' | 'multi'", description: 'Enables a leading checkbox column with single- or multi-row selection.' },
+          { name: 'selectedIds', type: 'string[]', description: 'Controlled list of selected row ids.' },
+          { name: 'onSelectionChange', type: '(next: string[]) => void', description: 'Called when selection changes.' },
+          { name: 'getRowId', type: '(row: Row, idx: number) => string', description: 'Resolves a stable id per row. Falls back to `row.id` then to the index.' },
+          { name: 'stickyHeader', type: 'boolean', description: 'Sticks the header row to the top of the scroll container.' },
+          { name: 'stickyFirstColumn', type: 'boolean', description: 'Sticks the first column to the left of the scroll container.' },
+          { name: 'loading', type: 'boolean', description: 'Renders skeleton rows instead of data.' },
+          { name: 'emptyState', type: 'React.ReactNode', description: 'Rendered inside a full-width cell when `data` is empty.' },
+          { name: 'onRowClick', type: '(row: Row, idx: number) => void', description: 'Called when a body row is clicked, or on Enter / Space on it. Renders it focusable, with `cursor-pointer`.' },
+          { name: 'density', type: "'compact' | 'normal' | 'comfortable'", default: "'normal'", description: "Cell padding scale. Defaults to `'normal'`." },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — tables need visible chrome.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTable } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTable',
+        props: [
+          { name: 'columns', type: 'PixelTableColumn<Row>[]', required: true, description: 'Column definitions.' },
+          { name: 'data', type: 'Row[]', required: true, description: 'Row data.' },
+          { name: 'striped', type: 'boolean', default: 'true', description: 'Tints every other row.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'sort', type: 'PixelTableSortState', binding: 'v-model:sort', description: 'Sort state (`v-model:sort`); leave unset to let the table sort.' },
+          { name: 'selection', type: "'single' | 'multi'", description: 'Adds a leading checkbox column, for one row or several.' },
+          { name: 'selectedIds', type: 'string[]', binding: 'v-model:selected-ids', description: 'Ids of the selected rows (`v-model:selected-ids`); leave unset to let the table keep them.' },
+          { name: 'getRowId', type: '(row: Row, index: number) => string', description: 'A stable id per row; falls back to `row.id`, then to the index.' },
+          { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Sticks the header row to the top of the scroll container.' },
+          { name: 'stickyFirstColumn', type: 'boolean', default: 'false', description: 'Sticks the first column to the left of the scroll container.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Shows skeleton rows instead of the data.' },
+          { name: 'onRowClick', type: '(row: Row, index: number) => void', binding: '@row-click', description: 'Row click handler (`@row-click`), also run by Enter or Space on a focused row. Declared as a prop because its presence changes the rows: clickable rows show a pointer and take focus.' },
+          { name: 'density', type: "'compact' | 'normal' | 'comfortable'", default: "'normal'", description: 'Cell padding scale.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border and radius around the table.' },
+        ],
+        events: [
+          { name: 'update:sort', payload: 'sort: PixelTableSortState', description: 'The new sort, after a click on a sortable header.' },
+          { name: 'update:selectedIds', payload: 'ids: string[]', description: 'The new selected row ids, after each change.' },
+        ],
+        slots: [
+          { name: 'empty-state', description: 'Shown in a full-width cell when `data` is empty; "No data." by default.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTable } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTable',
+        selector: 'pxl-table',
+        props: [
+          { name: 'columns', type: 'PixelTableColumn<Row>[]', required: true, description: 'Column definitions.' },
+          { name: 'data', type: 'Row[]', required: true, description: 'Row data.' },
+          { name: 'striped', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Tints every other row.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'sort', type: 'PixelTableSortState', binding: '[(sort)]', description: 'Sort state (`[(sort)]`); leave unset to let the table sort.' },
+          { name: 'selection', type: "'single' | 'multi'", description: 'Adds a leading checkbox column, for one row or several.' },
+          { name: 'selectedIds', type: 'string[]', binding: '[(selectedIds)]', description: 'Ids of the selected rows (`[(selectedIds)]`); leave unset to let the table keep them.' },
+          { name: 'getRowId', type: '(row: Row, index: number) => string', description: 'A stable id per row; falls back to `row.id`, then to the index.' },
+          { name: 'stickyHeader', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Sticks the header row to the top of the scroll container.' },
+          { name: 'stickyFirstColumn', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Sticks the first column to the left of the scroll container.' },
+          { name: 'loading', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows skeleton rows instead of the data.' },
+          { name: 'emptyState', type: 'string | TemplateRef<any>', description: 'Shown in a full-width cell when `data` is empty: text or a template; "No data." by default.' },
+          { name: 'clickableRows', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the rows clickable: they show a pointer, take focus, and emit `(rowClick)` on a click, Enter or Space.' },
+          { name: 'density', type: "'compact' | 'normal' | 'comfortable'", default: "'normal'", description: 'Cell padding scale.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border and radius around the table.' },
+        ],
+        events: [
+          { name: 'rowClick', payload: 'PixelTableRowClick<Row>', description: 'A clickable row was clicked, or activated with Enter or Space.' },
+          { name: 'sortChange', payload: 'PixelTableSortState', description: 'The new `sort`: the event half of `[(sort)]`.' },
+          { name: 'selectedIdsChange', payload: 'string[]', description: 'The new `selectedIds`: the event half of `[(selectedIds)]`.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelTableDocsSection({ className }: PixelTableDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +132,9 @@ export function PixelTableDocsSection({ className }: PixelTableDocsSectionProps)
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-table-api">
+      <h3 id="pixel-table-api">API</h3>
+      <FrameworkApi label={'PixelTable API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-table-a11y">
       <h3 id="pixel-table-a11y">Accessibility</h3>

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStepperDocsSectionProps {
@@ -17,6 +18,120 @@ export const PixelStepperDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelStepper's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelStepper } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelStepper',
+        props: [
+          { name: 'active', type: 'number', required: true, description: 'Index of the current step, from 0.' },
+          { name: 'onStepClick', type: '(idx: number) => void', description: 'Called with the index of a step that is clicked, or activated with Enter or Space. With it, the steps up to the active one — every step with `allowNextStepsSelect` — are clickable and in the tab order.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Steps in a row or a column; also the arrow keys that move between them.' },
+          { name: 'allowNextStepsSelect', type: 'boolean', default: 'false', description: 'With `onStepClick`, makes the steps after the active one clickable too.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the indicators and labels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Progress steps'", description: 'Accessible name for the steps landmark. Defaults to "Progress steps".' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The steps (`PixelStepper.Step`).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+      {
+        name: 'PixelStepper.Step',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label under (or beside) the indicator.' },
+          { name: 'description', type: 'string', description: 'Smaller text below the label.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Custom icon in the indicator, shown while the step is neither completed nor in error.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner in the indicator.' },
+          { name: 'completed', type: 'boolean', default: 'false', description: 'Marks the step done, with a check mark.' },
+          { name: 'error', type: 'boolean', default: 'false', description: 'Marks the step failed, with a cross; wins over `completed`.' },
+          { name: 'children', type: 'React.ReactNode', description: 'Not rendered: a step shows its `label`, `description` and `icon`.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelStepper',
+        props: [
+          { name: 'active', type: 'number', required: true, description: 'Index of the current step, from 0.' },
+          { name: 'onStepClick', type: '(index: number) => void', binding: '@step-click', description: 'Called with the index of a step that is clicked, or activated with Enter or Space (bind it as `@step-click`). With it, the steps up to the active one — every step with `allowNextStepsSelect` — are clickable and in the tab order.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Steps in a row or a column; also the arrow keys that move between them.' },
+          { name: 'allowNextStepsSelect', type: 'boolean', default: 'false', description: 'Makes the steps after the active one clickable too.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the indicators and labels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Progress steps'", description: 'Accessible name of the group.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The steps.' },
+        ],
+      },
+      {
+        name: 'PixelStepperStep',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label under (or beside) the indicator.' },
+          { name: 'description', type: 'string', description: 'Smaller text below the label.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Shows a spinner in the indicator.' },
+          { name: 'completed', type: 'boolean', default: 'false', description: 'Marks the step done, with a check mark.' },
+          { name: 'error', type: 'boolean', default: 'false', description: 'Marks the step failed, with a cross; wins over `completed`.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'Custom icon in the indicator, shown while the step is neither completed nor in error.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelStepper, PixelStepperStep } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelStepper',
+        selector: 'pxl-stepper',
+        props: [
+          { name: 'active', type: 'number', required: true, accepts: 'unknown', description: 'Index of the current step, from 0.' },
+          { name: 'clickable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the steps up to the active one clickable: they emit `(stepClick)`.' },
+          { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Steps in a row or a column; also the arrow keys that move between them.' },
+          { name: 'allowNextStepsSelect', type: 'boolean', default: 'false', accepts: 'unknown', description: 'With `clickable`, makes the steps after the active one clickable too.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Size of the indicators and labels.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'ariaLabel', type: 'string', default: "'Progress steps'", description: 'Accessible name of the group.' },
+        ],
+        events: [
+          { name: 'stepClick', payload: 'number', description: 'A clickable step was clicked, or activated with Enter or Space: its index.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelStepperStep',
+        selector: 'pxl-stepper-step',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label under (or beside) the indicator.' },
+          { name: 'description', type: 'string', description: 'Smaller text below the label.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Custom icon in the indicator, shown while the step is neither completed nor in error.' },
+          { name: 'loading', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows a spinner in the indicator.' },
+          { name: 'completed', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the step done, with a check mark.' },
+          { name: 'error', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the step failed, with a cross; wins over `completed`.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +150,9 @@ export function PixelStepperDocsSection({ className }: PixelStepperDocsSectionPr
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-stepper-api">
+      <h3 id="pixel-stepper-api">API</h3>
+      <FrameworkApi label={'PixelStepper API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stepper-a11y">
       <h3 id="pixel-stepper-a11y">Accessibility</h3>

@@ -18,10 +18,18 @@ import { ToneKey } from '../tokens';
    ────────────────────────────────────────────────────────────────────────── */
 
 export interface PixelSparklineProps extends React.SVGAttributes<SVGSVGElement> {
+  /**
+   * The series. Points are spread evenly; `x` only labels them, and one whose `y` is not finite is
+   * left out.
+   */
   data: PixelChartDataPoint[];
+  /** Colour of the line and the area. */
   tone?: ToneKey;
+  /** 120×32, 240×60 or 360×96 px. */
   size?: ChartSize;
+  /** Fills the area under the line, faintly. */
   showArea?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
   bordered?: boolean;

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSwitchDocsSectionProps {
@@ -17,6 +18,87 @@ export const PixelSwitchDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelSwitch's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSwitch } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSwitch',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label rendered next to the switch.' },
+          { name: 'checked', type: 'boolean', description: 'Controlled checked state.' },
+          { name: 'defaultChecked', type: 'boolean', description: 'Uncontrolled initial checked state.' },
+          { name: 'onChange', type: '(next: boolean) => void', description: 'Fires with the next checked value when clicked.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables interaction + grays out the control.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Visual tone for the "on" state. Default: `\'green\'`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'name', type: 'string', description: "Form-serialization name. Hidden mirror sends `'on'` / `''`." },
+          { name: 'value', type: 'string', default: "'on'", description: "HTML form value when checked. Defaults to `'on'`." },
+          { name: 'required', type: 'boolean', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: 'DOM `id` forwarded to the trigger.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSwitch } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSwitch',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label rendered next to the switch.' },
+          { name: 'checked', type: 'boolean', binding: 'v-model:checked', description: 'Checked state (`v-model:checked`); leave unset for an uncontrolled switch.' },
+          { name: 'defaultChecked', type: 'boolean', default: 'false', description: 'Initial checked state while uncontrolled.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables interaction and greys out the control.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the "on" state.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits `value` while on.' },
+          { name: 'value', type: 'string', default: "'on'", description: 'Form value while on.' },
+          { name: 'required', type: 'boolean', default: 'false', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: '`id` of the switch button.' },
+        ],
+        events: [
+          { name: 'update:checked', payload: 'checked: boolean', description: 'The new checked state, after each toggle.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSwitch } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSwitch',
+        selector: 'pxl-switch',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label rendered next to the switch.' },
+          { name: 'checked', type: 'boolean', binding: '[(checked)]', description: 'Checked state (`[(checked)]`); leave unset for an uncontrolled switch.' },
+          { name: 'defaultChecked', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Initial checked state while uncontrolled.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables interaction and greys out the control.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the "on" state.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits `value` while on.' },
+          { name: 'value', type: 'string', default: "'on'", description: 'Form value while on.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: '`id` of the switch button.' },
+        ],
+        events: [
+          { name: 'checkedChange', payload: 'boolean', description: 'The new `checked`: the event half of `[(checked)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `checked` (`boolean`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSwitchDocsSection({ className }: PixelSwitchDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +117,9 @@ export function PixelSwitchDocsSection({ className }: PixelSwitchDocsSectionProp
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-switch-api">
+      <h3 id="pixel-switch-api">API</h3>
+      <FrameworkApi label={'PixelSwitch API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-switch-a11y">
       <h3 id="pixel-switch-a11y">Accessibility</h3>

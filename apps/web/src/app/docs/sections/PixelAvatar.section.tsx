@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAvatarDocsSectionProps {
@@ -17,6 +18,71 @@ export const PixelAvatarDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelAvatar's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelAvatar } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelAvatar',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name. Used to derive initials and the accessible label.' },
+          { name: 'src', type: 'string', description: 'Optional image source. Falls back to initials on load failure.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: "Size token. Defaults to `'md'`." },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Tone tint for the initials fallback. Overrides `colorSeed`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'status', type: "'online' | 'away' | 'busy' | 'offline'", description: 'Status dot rendered in the bottom-right corner.' },
+          { name: 'shape', type: "'square' | 'circle' | 'rounded'", description: "Shape of the avatar frame. Defaults to `'circle'`." },
+          { name: 'colorSeed', type: 'string', description: 'Deterministic tone fallback derived from the seed via hash modulo a fixed tone palette. Overridden by an explicit `tone` prop.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelAvatar } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelAvatar',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name — the initials and the accessible name come from it.' },
+          { name: 'src', type: 'string', description: 'Image source; the initials stand in when it fails to load.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size token.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Tone of the initials fallback; wins over `colorSeed`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'status', type: "'online' | 'away' | 'busy' | 'offline'", description: 'Presence dot in the bottom-right corner, also added to the accessible name.' },
+          { name: 'shape', type: "'square' | 'circle' | 'rounded'", default: "'circle'", description: 'Shape of the frame.' },
+          { name: 'colorSeed', type: 'string', description: 'Seed (an email, a user id) that picks a stable tone while `tone` is unset.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelAvatar } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelAvatar',
+        selector: 'pxl-avatar',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name — the initials and the accessible name come from it.' },
+          { name: 'src', type: 'string', description: 'Image source; the initials stand in when it fails to load.' },
+          { name: 'size', type: "'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Size token.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", description: 'Tone of the initials fallback; wins over `colorSeed`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'status', type: "'online' | 'away' | 'busy' | 'offline'", description: 'Presence dot in the bottom-right corner, also added to the accessible name.' },
+          { name: 'shape', type: "'square' | 'circle' | 'rounded'", default: "'circle'", description: 'Shape of the frame.' },
+          { name: 'colorSeed', type: 'string', description: 'Seed (an email, a user id) that picks a stable tone while `tone` is unset.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +101,9 @@ export function PixelAvatarDocsSection({ className }: PixelAvatarDocsSectionProp
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-avatar-api">
+      <h3 id="pixel-avatar-api">API</h3>
+      <FrameworkApi label={'PixelAvatar API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-avatar-a11y">
       <h3 id="pixel-avatar-a11y">Accessibility</h3>

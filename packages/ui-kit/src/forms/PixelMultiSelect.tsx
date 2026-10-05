@@ -45,18 +45,31 @@ export interface PixelMultiSelectOption {
 }
 
 export interface PixelMultiSelectProps {
+  /** The selected values, in the order picked; leave unset for an uncontrolled multi-select. */
   value?: string[];
+  /** Initial values while uncontrolled. */
   defaultValue?: string[];
+  /** Called with the selected values after every toggle, removal or clear. */
   onChange?: (next: string[]) => void;
+  /** The options of the listbox. */
   options: PixelMultiSelectOption[];
+  /** Shows a search field that filters the options. */
   searchable?: boolean;
+  /** Most values that can be selected. */
   max?: number;
+  /** Text shown while nothing is selected. */
   placeholder?: string;
+  /** Shows a button that clears the selection while there is one. */
   clearable?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Trigger height. */
   size?: 'sm' | 'md' | 'lg';
+  /** Label rendered above the trigger. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; marks the trigger invalid. */
   error?: string;
   /**
    * Hidden-input `name`. Multiple values are serialized as repeated
@@ -64,6 +77,7 @@ export interface PixelMultiSelectProps {
    * `FormData.getAll(name)`.
    */
   name?: string;
+  /** `id` of the trigger; generated when left out. */
   id?: string;
 }
 

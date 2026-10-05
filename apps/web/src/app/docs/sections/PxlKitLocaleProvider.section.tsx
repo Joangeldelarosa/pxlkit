@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitLocaleProviderDocsSectionProps {
@@ -17,6 +18,54 @@ export const PxlKitLocaleProviderDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PxlKitLocaleProvider's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PxlKitLocaleProvider } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PxlKitLocaleProvider',
+        props: [
+          { name: 'locale', type: "'en' | 'tr'", default: "'en'", description: 'BCP 47 locale tag.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The part of the app that follows the locale.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PxlKitLocaleProvider',
+        props: [
+          { name: 'locale', type: "'en' | 'tr'", default: "'en'", description: 'BCP 47 locale tag.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The part of the app that follows the locale.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PxlKitLocaleProvider } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PxlKitLocaleProvider',
+        selector: 'pxl-locale-provider',
+        props: [
+          { name: 'locale', type: "'en' | 'tr'", default: "'en'", description: 'BCP 47 locale tag.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProviderDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +83,9 @@ export function PxlKitLocaleProviderDocsSection({ className }: PxlKitLocaleProvi
       <dt>Category</dt><dd>overlay-foundation</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pxl-kit-locale-provider-api">
+      <h3 id="pxl-kit-locale-provider-api">API</h3>
+      <FrameworkApi label={'PxlKitLocaleProvider API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-locale-provider-a11y">
       <h3 id="pxl-kit-locale-provider-a11y">Accessibility</h3>

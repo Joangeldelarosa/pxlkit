@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAlertDialogDocsSectionProps {
@@ -17,6 +18,81 @@ export const PixelAlertDialogDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelAlertDialog's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelAlertDialog } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelAlertDialog',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the dialog is visible; set it from `onOpenChange`.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', required: true, description: 'Called with `false` when the dialog asks to close (Cancel, Escape, the backdrop, a completed action).' },
+          { name: 'title', type: 'string', required: true, description: 'Title; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'cancelLabel', type: 'string', default: "'Cancel'", description: 'Label of the button that dismisses the dialog.' },
+          { name: 'actionLabel', type: 'string', default: "'Confirm'", description: 'Label of the button that confirms.' },
+          { name: 'onAction', type: '() => void | Promise<void>', required: true, description: 'The confirmed action. Its result matters: the dialog closes once it returns, or once the promise it returns resolves — and stays open, busy, until then.' },
+          { name: 'onError', type: '(error: unknown) => void', description: 'Called when `onAction` throws / rejects. Receives the thrown value. When set, the dialog stays OPEN on failure so the consumer can show an inline error. When unset, errors are silently swallowed (back-compat).' },
+          { name: 'destructive', type: 'boolean', default: 'false', description: 'Red accent for a destructive action (cyan otherwise).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelAlertDialog } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelAlertDialog',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the dialog is visible (`v-model:open`).' },
+          { name: 'title', type: 'string', required: true, description: 'Title; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'cancelLabel', type: 'string', default: "'Cancel'", description: 'Label of the button that dismisses the dialog.' },
+          { name: 'actionLabel', type: 'string', default: "'Confirm'", description: 'Label of the button that confirms.' },
+          { name: 'onAction', type: '(() => void) | (() => Promise<void>)', required: true, binding: '@action', description: 'The confirmed action (`@action`). Declared as a prop because its result matters: the dialog closes once it returns, or once the promise it returns resolves — and stays open, busy, until then.' },
+          { name: 'onError', type: '(error: unknown) => void', binding: '@error', description: 'Receives what the action threw or rejected with (`@error`); the dialog stays open so you can show the error. Declared as a prop because its presence matters: without one a thrown error propagates and a rejection is logged to the console.' },
+          { name: 'destructive', type: 'boolean', default: 'false', description: 'Red accent for a destructive action (cyan otherwise).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: '`false` when the dialog asks to close (Cancel, Escape, backdrop, a completed action), for `v-model:open`.' },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the dialog panel while it is open.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelAlertDialog } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelAlertDialog',
+        selector: 'pxl-alert-dialog',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the dialog is visible (`[(open)]`).' },
+          { name: 'title', type: 'string', required: true, description: 'Title; it names the dialog.' },
+          { name: 'description', type: 'string', description: 'Text under the title, wired via `aria-describedby`.' },
+          { name: 'cancelLabel', type: 'string', default: "'Cancel'", description: 'Label of the button that dismisses the dialog.' },
+          { name: 'actionLabel', type: 'string', default: "'Confirm'", description: 'Label of the button that confirms.' },
+          { name: 'onAction', type: '() => void | Promise<void>', required: true, description: 'The confirmed action. Its result matters: the dialog closes once it returns, or once the promise it returns resolves — and stays open, busy, until then.' },
+          { name: 'onError', type: '(error: unknown) => void', description: 'Receives what the action threw or rejected with; the dialog stays open so you can show the error. Without one a thrown error propagates and a rejection is logged to the console.' },
+          { name: 'destructive', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Red accent for a destructive action (cyan otherwise).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: '`false` when the dialog asks to close (Cancel, Escape, backdrop, a completed action), for `[(open)]`.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +111,9 @@ export function PixelAlertDialogDocsSection({ className }: PixelAlertDialogDocsS
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-alert-dialog-api">
+      <h3 id="pixel-alert-dialog-api">API</h3>
+      <FrameworkApi label={'PixelAlertDialog API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-alert-dialog-a11y">
       <h3 id="pixel-alert-dialog-a11y">Accessibility</h3>

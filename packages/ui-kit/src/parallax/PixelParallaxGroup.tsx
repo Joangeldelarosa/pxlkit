@@ -9,8 +9,11 @@ import { parallaxGroupClasses, type ParallaxGroupElement } from '@pxlkit/ui-kit-
 import { cn } from '../common';
 
 export interface PixelParallaxGroupProps {
+  /** The layers (`PixelParallaxLayer`, `PixelMouseParallax`). */
   children: React.ReactNode;
+  /** Extra classes on the root element. */
   className?: string;
+  /** Inline styles of the root element. */
   style?: React.CSSProperties;
   /** HTML tag to render. Default `"div"`. */
   as?: ParallaxGroupElement;

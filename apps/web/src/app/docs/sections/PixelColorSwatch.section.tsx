@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelColorSwatchDocsSectionProps {
@@ -17,6 +18,53 @@ export const PixelColorSwatchDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelColorSwatch's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelColorSwatch } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelColorSwatch',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name for the token (e.g. "Cyan 500").' },
+          { name: 'cssVar', type: 'string', required: true, description: 'CSS variable to preview (e.g. "--retro-cyan").' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelColorSwatch } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelColorSwatch',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name of the token (e.g. "Cyan 500").' },
+          { name: 'cssVar', type: 'string', required: true, description: 'CSS variable to preview (e.g. "--color-retro-cyan").' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelColorSwatch } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelColorSwatch',
+        selector: 'pxl-color-swatch',
+        props: [
+          { name: 'name', type: 'string', required: true, description: 'Display name of the token (e.g. "Cyan 500").' },
+          { name: 'cssVar', type: 'string', required: true, description: 'CSS variable to preview (e.g. "--color-retro-cyan").' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +82,9 @@ export function PixelColorSwatchDocsSection({ className }: PixelColorSwatchDocsS
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-color-swatch-api">
+      <h3 id="pixel-color-swatch-api">API</h3>
+      <FrameworkApi label={'PixelColorSwatch API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-color-swatch-a11y">
       <h3 id="pixel-color-swatch-a11y">Accessibility</h3>

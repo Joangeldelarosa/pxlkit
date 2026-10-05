@@ -3,7 +3,10 @@ import type { VNode } from 'vue';
 import { drawerBodyClasses } from '@pxlkit/ui-kit-core';
 
 /** Scrolling body of a `PixelDrawer`. */
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Body content. */
+  default?(): VNode[];
+}>();
 </script>
 
 <template>

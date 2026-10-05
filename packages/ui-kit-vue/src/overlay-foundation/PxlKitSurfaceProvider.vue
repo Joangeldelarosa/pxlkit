@@ -13,8 +13,17 @@ import { PXLKIT_SURFACE } from '../composables/surface.js';
  *   <PixelButton>Looks modern</PixelButton>
  * </PxlKitSurfaceProvider>
  */
-const props = withDefaults(defineProps<{ surface?: Surface }>(), { surface: 'pixel' });
-defineSlots<{ default?(): unknown }>();
+const props = withDefaults(
+  defineProps<{
+    /** Surface of every nested component that does not set its own. */
+    surface?: Surface;
+  }>(),
+  { surface: 'pixel' },
+);
+defineSlots<{
+  /** The part of the app the surface applies to. */
+  default?(): unknown;
+}>();
 
 provide(PXLKIT_SURFACE, toRef(props, 'surface'));
 </script>

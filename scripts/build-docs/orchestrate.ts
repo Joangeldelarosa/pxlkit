@@ -55,6 +55,7 @@ import { GenerateStoriesGenerator } from "./generate-stories.js";
 import { GeneratePortStoriesGenerator } from "./generate-port-stories.js";
 import { GenerateShowcaseGenerator } from "./generate-showcase.js";
 import { GenerateDocsPageGenerator } from "./generate-docs-page.js";
+import { ExtractApiGenerator } from "./extract-api.js";
 import { GenerateReadmePackageGenerator } from "./generate-readme-package.js";
 import { GenerateRootReadmeGenerator } from "./generate-root-readme.js";
 import { ChangelogGenerator } from "./generate-changelog.js";
@@ -140,6 +141,10 @@ export function defaultPipelineSteps(repoRoot: string): StepDescriptor[] {
   const out = defaultOutRoots(repoRoot);
   return [
     { name: "scan", factory: () => new ScanManifestsGenerator(), required: true },
+    // extract-api starts reading every component's API from the three kits'
+    // sources in a worker thread, so the steps below run meanwhile;
+    // generate-docs-page waits for it and renders it in the sections.
+    { name: "extract-api", factory: () => new ExtractApiGenerator() },
     // extract-bundle measures gzipped per-component bundle size. Optional —
     // it spawns esbuild and depends on the target package being installed, so
     // a failure here must not abort the rest of the docs pipeline.
@@ -198,6 +203,7 @@ const STEP_ALIASES: Record<string, string> = {
   stories: "generate-stories",
   "port-stories": "generate-port-stories",
   showcase: "generate-showcase",
+  api: "extract-api",
   "docs-page": "generate-docs-page",
   docs: "generate-docs-page",
   "readme-package": "generate-readme-package",

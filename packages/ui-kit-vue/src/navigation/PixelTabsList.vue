@@ -16,7 +16,10 @@ const props = withDefaults(
   }>(),
   { ariaLabel: 'Tabs', scrollable: false },
 );
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The triggers (`PixelTabsTrigger`). */
+  default?(): VNode[];
+}>();
 defineOptions({ inheritAttrs: false });
 
 const context = useTabsContext('PixelTabsList');

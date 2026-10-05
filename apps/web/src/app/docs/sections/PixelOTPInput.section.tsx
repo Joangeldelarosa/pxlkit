@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelOTPInputDocsSectionProps {
@@ -17,6 +18,99 @@ export const PixelOTPInputDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelOTPInput's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelOTPInput } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelOTPInput',
+        props: [
+          { name: 'length', type: 'number', default: '6', description: 'Number of cells.' },
+          { name: 'value', type: 'string', description: 'Code; leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial code while uncontrolled.' },
+          { name: 'onChange', type: '(next: string) => void', description: 'Called with the new code, after every edit.' },
+          { name: 'onComplete', type: '(full: string) => void', description: 'Called with the code each time it comes to fill every cell.' },
+          { name: 'mask', type: 'boolean', default: 'false', description: 'Hides the characters, as a password field does.' },
+          { name: 'variant', type: "'numeric' | 'alphanumeric'", description: 'Canonical structural variant.' },
+          { name: 'type', type: "'numeric' | 'alphanumeric'", deprecated: 'Use `variant` instead. Retained as alias for one minor.' },
+          { name: 'autoFocus', type: 'boolean', default: 'false', description: 'Focuses the first cell once mounted.' },
+          { name: 'separator', type: 'React.ReactNode', description: 'Shown between two cells, hidden from assistive technology.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Cell size.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the code.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every cell.' },
+        ],
+        notes: [
+          '`ref` points to `<input>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelOTPInput } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelOTPInput',
+        props: [
+          { name: 'length', type: 'number', default: '6', description: 'Number of cells.' },
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Code (`v-model`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial code while uncontrolled.' },
+          { name: 'mask', type: 'boolean', default: 'false', description: 'Hides the characters, as a password field does.' },
+          { name: 'variant', type: "'numeric' | 'alphanumeric'", description: 'Characters the cells accept: digits (`numeric`), or digits and letters (`alphanumeric`).' },
+          { name: 'type', type: "'numeric' | 'alphanumeric'", deprecated: 'Use `variant`.' },
+          { name: 'autoFocus', type: 'boolean', default: 'false', description: 'Focuses the first cell once mounted.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Cell size.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the code.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables every cell.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new code, after every edit.' },
+          { name: 'complete', payload: 'value: string', description: 'The code, each time it comes to fill every cell.' },
+        ],
+        slots: [
+          { name: 'separator', description: 'Shown between two cells, hidden from assistive technology.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+          'Its template ref exposes `element`: the first cell.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelOTPInput } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelOTPInput',
+        selector: 'pxl-otp-input',
+        props: [
+          { name: 'length', type: 'number', default: '6', accepts: 'unknown', description: 'Number of cells.' },
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Code (`[(value)]`); leave unset for an uncontrolled input.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial code while uncontrolled.' },
+          { name: 'mask', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Hides the characters, as a password field does.' },
+          { name: 'variant', type: "'numeric' | 'alphanumeric'", description: 'Characters the cells accept: digits (`numeric`), or digits and letters (`alphanumeric`).' },
+          { name: 'type', type: "'numeric' | 'alphanumeric'", deprecated: 'Use `variant`.' },
+          { name: 'autoFocus', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Focuses the first cell once rendered.' },
+          { name: 'separator', type: 'string | TemplateRef<any>', description: 'Shown between two cells, hidden from assistive technology: text or an `<ng-template>`.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Cell size.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the code.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables every cell.' },
+        ],
+        events: [
+          { name: 'complete', payload: 'string', description: 'The code, each time it comes to fill every cell.' },
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +129,9 @@ export function PixelOTPInputDocsSection({ className }: PixelOTPInputDocsSection
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-otp-input-api">
+      <h3 id="pixel-otp-input-api">API</h3>
+      <FrameworkApi label={'PixelOTPInput API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-otp-input-a11y">
       <h3 id="pixel-otp-input-a11y">Accessibility</h3>

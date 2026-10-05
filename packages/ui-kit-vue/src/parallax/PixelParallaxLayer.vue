@@ -18,7 +18,10 @@ export interface PixelParallaxLayerProps {
 }
 
 const props = withDefaults(defineProps<PixelParallaxLayerProps>(), { speed: 0.5, axis: 'y' });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Content of the layer. */
+  default?(): VNode[];
+}>();
 
 const layer = useTemplateRef<HTMLElement>('layer');
 const reducedMotion = useReducedMotion();

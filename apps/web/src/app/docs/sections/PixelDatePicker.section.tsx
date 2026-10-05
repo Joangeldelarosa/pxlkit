@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDatePickerDocsSectionProps {
@@ -17,6 +18,109 @@ export const PixelDatePickerDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelDatePicker's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelDatePicker } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelDatePicker',
+        props: [
+          { name: 'value', type: 'Date | null', description: 'The picked day, `null` for none; leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'Date', description: 'Initial day while uncontrolled.' },
+          { name: 'onChange', type: '(date: Date | null) => void', description: 'Called with the day picked, at its start, or `null` once cleared.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'disabledDates', type: 'Date[] | ((d: Date) => boolean)', description: 'Days that cannot be picked: a list, or a test of each day.' },
+          { name: 'format', type: '(d: Date) => string', description: "The trigger's text for the picked day; the locale's long date by default." },
+          { name: 'placeholder', type: 'string', default: "'Select date'", description: 'Text shown while no day is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a Clear button under the grid while a day is picked.' },
+          { name: 'presets', type: '{ label: string; value: Date }[]', description: 'Quick picks shown above the grid.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the day as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'data-testid', type: 'string', description: 'Hook for tests + custom triggers.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelDatePicker } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelDatePicker',
+        props: [
+          { name: 'modelValue', type: 'Date | null', binding: 'v-model', description: 'The picked day (`v-model`), `null` for none; leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'Date', description: 'Initial day while uncontrolled.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'disabledDates', type: 'Date[] | ((date: Date) => boolean)', description: 'Days that cannot be picked: a list, or a test of each day.' },
+          { name: 'format', type: '(date: Date) => string', description: "The trigger's text for the picked day; the locale's long date by default." },
+          { name: 'placeholder', type: 'string', default: "'Select date'", description: 'Text shown while no day is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', description: 'Shows a Clear button under the grid while a day is picked.' },
+          { name: 'presets', type: 'PixelDatePickerPreset[]', description: 'Quick picks shown above the grid.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the day as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'date: Date | null', description: 'The day picked, at its start, or `null` once cleared.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the trigger button.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelDatePicker } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelDatePicker',
+        selector: 'pxl-date-picker',
+        props: [
+          { name: 'value', type: 'Date | null', binding: '[(value)]', description: 'The picked day (`[(value)]`), `null` for none; leave unset for an uncontrolled picker.' },
+          { name: 'defaultValue', type: 'Date', description: 'Initial day while uncontrolled.' },
+          { name: 'min', type: 'Date', description: 'First day that can be picked.' },
+          { name: 'max', type: 'Date', description: 'Last day that can be picked.' },
+          { name: 'disabledDates', type: 'Date[] | ((date: Date) => boolean)', description: 'Days that cannot be picked: a list, or a test of each day.' },
+          { name: 'format', type: '(date: Date) => string', description: "The trigger's text for the picked day; the locale's long date by default." },
+          { name: 'placeholder', type: 'string', default: "'Select date'", description: 'Text shown while no day is picked.' },
+          { name: 'clearable', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows a Clear button under the grid while a day is picked.' },
+          { name: 'presets', type: 'PixelDatePickerPreset[]', description: 'Quick picks shown above the grid.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the day as `YYYY-MM-DD`.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the trigger; its hint / error is added while one shows.' },
+          { name: 'data-testid', type: 'string', description: '`data-testid` of the trigger.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'Date | null', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`Date | null`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +139,9 @@ export function PixelDatePickerDocsSection({ className }: PixelDatePickerDocsSec
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-date-picker-api">
+      <h3 id="pixel-date-picker-api">API</h3>
+      <FrameworkApi label={'PixelDatePicker API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-date-picker-a11y">
       <h3 id="pixel-date-picker-a11y">Accessibility</h3>

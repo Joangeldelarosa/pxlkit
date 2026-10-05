@@ -46,12 +46,22 @@ export interface PixelCommandGroup {
 }
 
 export interface PixelCommandProps {
+  /** Whether the palette is visible; set it from `onOpenChange`. */
   open: boolean;
+  /**
+   * Called with the open state the palette asks for: its shortcut toggles it; Escape and the
+   * backdrop close it.
+   */
   onOpenChange: (open: boolean) => void;
+  /** Global shortcut that toggles the palette, such as `mod+k` (Cmd or Ctrl + K). */
   shortcut?: string;
+  /** Placeholder of the search field. */
   placeholder?: string;
+  /** Shown instead of the list when nothing matches. */
   emptyMessage?: string;
+  /** The commands, by group. */
   groups: PixelCommandGroup[];
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

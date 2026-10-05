@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelIconFrameDocsSectionProps {
@@ -17,6 +18,71 @@ export const PixelIconFrameDocsMeta = {
   since: '1.7.0',
   deprecated: false,
 } as const;
+
+/** PixelIconFrame's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelIconFrame } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelIconFrame',
+        props: [
+          { name: 'icon', type: 'React.ReactNode', required: true, description: 'The icon.' },
+          { name: 'size', type: '48 | 56 | 64 | 80 | 112', default: '56', description: 'Width and height, in px.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the border, fill and icon.' },
+          { name: 'shape', type: "'square' | 'rounded' | 'circle'", default: "'square'", description: "`square` keeps the surface's corners." },
+          { name: 'accent', type: '{ icon: React.ReactNode; position?: AccentPosition }', description: 'Badge in a corner: its content and corner (top right by default).' },
+          { name: 'animated', type: 'boolean', default: 'false', description: 'Pulses, unless the user prefers reduced motion.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelIconFrame } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelIconFrame',
+        props: [
+          { name: 'size', type: '48 | 56 | 64 | 80 | 112', default: '56', description: 'Width and height, in px.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the border, fill and icon.' },
+          { name: 'shape', type: "'square' | 'rounded' | 'circle'", default: "'square'", description: "`square` keeps the surface's corners." },
+          { name: 'accent', type: '{ icon: PxlNode; position?: IconFrameAccentPosition }', description: 'Badge in a corner: its content (text, a VNode or a render function) and corner (top right by default).' },
+          { name: 'animated', type: 'boolean', default: 'false', description: 'Pulses, unless the user prefers reduced motion.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'The icon.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelIconFrame } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelIconFrame',
+        selector: 'pxl-icon-frame',
+        props: [
+          { name: 'icon', type: 'string | TemplateRef<any>', required: true, description: 'The icon.' },
+          { name: 'size', type: '48 | 56 | 64 | 80 | 112', default: '56', accepts: "48 | 56 | 64 | 80 | 112 | '48' | '56' | '64' | '80' | '112'", description: 'Width and height, in px.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: 'Tone of the border, fill and icon.' },
+          { name: 'shape', type: "'square' | 'rounded' | 'circle'", default: "'square'", description: "`square` keeps the surface's corners." },
+          { name: 'accent', type: '{ icon: PxlContent; position?: IconFrameAccentPosition }', description: 'Badge in a corner: its content (text or an `<ng-template>`) and corner (top right by default).' },
+          { name: 'animated', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Pulses, unless the user prefers reduced motion.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelIconFrameDocsSection({ className }: PixelIconFrameDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +101,9 @@ export function PixelIconFrameDocsSection({ className }: PixelIconFrameDocsSecti
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.7.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-icon-frame-api">
+      <h3 id="pixel-icon-frame-api">API</h3>
+      <FrameworkApi label={'PixelIconFrame API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-icon-frame-a11y">
       <h3 id="pixel-icon-frame-a11y">Accessibility</h3>

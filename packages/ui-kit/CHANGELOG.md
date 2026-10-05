@@ -3,6 +3,7 @@
 ## 2.2.0 — 2026-10-03
 
 ### Changed
+- About 500 props across 65 components gained doc comments, which editors show on hover and the API reference on `/docs` prints (comments only; no API change).
 - The kit now runs on `@pxlkit/ui-kit-core`, a new framework-neutral package holding the design tokens, the Tailwind CSS theme, the class recipes, the pixel glyphs, the locale data and the DOM behaviour (focus trap, stacking scroll lock, dark mode, media queries, storage) that every framework's kit shares. Zero public API change: `@pxlkit/ui-kit` re-exports everything it exported before.
 - The animation components' keyframes (`pxl-fade-in`, `pxl-bounce`, `pxl-glitch`, …) ship in `styles.css` instead of a `<style id="pxl-anims">` element the components added to `<head>` after mounting: server-rendered animations have their keyframes from the first paint, and a Content Security Policy needs no inline styles for them.
 - `styles.css` imports the core theme and registers the kit's compiled classes with Tailwind CSS v4 (`@source`), so one `@import "@pxlkit/ui-kit/styles.css";` — in place of `@import "tailwindcss";`, which it includes — is the whole setup: a separate `@source` line pointing into `node_modules` is no longer needed, and importing `tailwindcss` as well would load Tailwind's base styles twice.

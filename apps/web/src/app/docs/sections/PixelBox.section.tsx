@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBoxDocsSectionProps {
@@ -17,6 +18,74 @@ export const PixelBoxDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelBox's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBox } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBox',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the fill and border.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: '`solid` and `soft` fill; `outline` and `ghost` stay transparent.' },
+          { name: 'padding', type: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Padding scale.' },
+          { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg' | 'full'", description: "Fixed radius; the surface's large radius when unset." },
+          { name: 'border', type: 'boolean', description: "Whether to render a border. Defaults to `true` when `variant === 'outline'` (outlines without a border are meaningless), `false` otherwise. Pass `true` to force a border on `solid`/`soft`/`ghost`; pass `false` to force-off on outline. Note: when polymorphic `as` is a landmark element (`section`, `nav`, `aside`, `main`), supply `aria-label` or `aria-labelledby` for a11y." },
+          { name: 'shadow', type: 'boolean', default: 'false', description: 'Surface drop shadow.' },
+          { name: 'as', type: "'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'main' | 'nav'", description: 'Element to render.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `color`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBox } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBox',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the fill and border.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: '`solid` and `soft` fill; `outline` and `ghost` stay transparent.' },
+          { name: 'padding', type: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Padding scale.' },
+          { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg' | 'full'", description: "Fixed radius; the surface's large radius when unset." },
+          { name: 'border', type: 'boolean', description: 'Draw the tone border; on for `outline`, off otherwise, when unset.' },
+          { name: 'shadow', type: 'boolean', default: 'false', description: 'Surface drop shadow.' },
+          { name: 'as', type: "'div' | 'section' | 'article' | 'aside' | 'header' | 'footer' | 'main' | 'nav'", default: "'div'", description: 'Element to render.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Box content.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBox } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBox',
+        selector: '[pxlBox]',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the fill and border.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'variant', type: "'solid' | 'soft' | 'ghost' | 'outline'", default: "'solid'", description: '`solid` and `soft` fill; `outline` and `ghost` stay transparent.' },
+          { name: 'padding', type: "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'", default: "'md'", description: 'Padding scale.' },
+          { name: 'radius', type: "'none' | 'sm' | 'md' | 'lg' | 'full'", description: "Fixed radius; the surface's large radius when unset." },
+          { name: 'border', type: 'boolean', accepts: 'unknown', description: 'Draw the tone border; on for `outline`, off otherwise, when unset.' },
+          { name: 'shadow', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface drop shadow.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +104,9 @@ export function PixelBoxDocsSection({ className }: PixelBoxDocsSectionProps): Re
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-box-api">
+      <h3 id="pixel-box-api">API</h3>
+      <FrameworkApi label={'PixelBox API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-box-a11y">
       <h3 id="pixel-box-a11y">Accessibility</h3>

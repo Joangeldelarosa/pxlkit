@@ -13,13 +13,19 @@ import { cn, Surface, useEffectiveSurface } from '../common';
 import { ToneKey } from '../tokens';
 
 export interface PixelAvatarGroupProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Most places the row shows; beyond it, the last place becomes a "+N" tile. */
   max?: number;
+  /** Slot size — match it to the avatars inside. */
   size?: PixelAvatarSize;
+  /** Tone of the "+N" tile. */
   tone?: ToneKey;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Accessible name for the avatar landmark. Without one, role=group is dropped. */
   'aria-label'?: string;
+  /** Id of the element that names the group, in place of `aria-label`. */
   'aria-labelledby'?: string;
+  /** The avatars. */
   children: React.ReactNode;
 }
 

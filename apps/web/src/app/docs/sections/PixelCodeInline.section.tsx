@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCodeInlineDocsSectionProps {
@@ -17,6 +18,57 @@ export const PixelCodeInlineDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelCodeInline's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCodeInline } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCodeInline',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Code content.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: "Tone tint. Defaults to `'cyan'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCodeInline } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCodeInline',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone tint.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The code.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<code>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCodeInline } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCodeInline',
+        selector: 'code[pxlCodeInline]',
+        props: [
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone tint.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+        ],
+        notes: [
+          'Goes on a native `<code>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +86,9 @@ export function PixelCodeInlineDocsSection({ className }: PixelCodeInlineDocsSec
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-code-inline-api">
+      <h3 id="pixel-code-inline-api">API</h3>
+      <FrameworkApi label={'PixelCodeInline API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-code-inline-a11y">
       <h3 id="pixel-code-inline-a11y">Accessibility</h3>

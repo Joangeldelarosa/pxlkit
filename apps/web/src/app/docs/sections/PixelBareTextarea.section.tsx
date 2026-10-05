@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBareTextareaDocsSectionProps {
@@ -17,6 +18,60 @@ export const PixelBareTextareaDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelBareTextarea's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBareTextarea } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBareTextarea',
+        notes: [
+          'Also takes the native attributes and event handlers of `<textarea>` (`TextareaHTMLAttributes<HTMLTextAreaElement>`).',
+          '`ref` points to `<textarea>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBareTextarea } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBareTextarea',
+        props: [
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Value (`v-model`); leave unset for an uncontrolled textarea.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The new value, on every edit.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<textarea>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBareTextarea } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBareTextarea',
+        selector: 'textarea[pxlBareTextarea]',
+        props: [
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Value (`[(value)]`); leave unset for an uncontrolled textarea.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'Goes on a native `<textarea>`, which keeps its own attributes and events.',
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +90,9 @@ export function PixelBareTextareaDocsSection({ className }: PixelBareTextareaDoc
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bare-textarea-api">
+      <h3 id="pixel-bare-textarea-api">API</h3>
+      <FrameworkApi label={'PixelBareTextarea API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bare-textarea-a11y">
       <h3 id="pixel-bare-textarea-a11y">Accessibility</h3>

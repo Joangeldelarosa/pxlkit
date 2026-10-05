@@ -12,7 +12,10 @@ export interface PixelBareButtonProps {
 }
 
 withDefaults(defineProps<PixelBareButtonProps>(), { type: 'button' });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Button content. */
+  default?(): VNode[];
+}>();
 </script>
 
 <template>

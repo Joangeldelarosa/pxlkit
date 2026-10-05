@@ -55,27 +55,51 @@ export { PixelToggle, type PixelToggleProps } from './PixelToggle';
 /** Shared props (no value/onChange — those vary by discriminator). */
 interface PixelToggleGroupSharedProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  /** Only one toggle is in the tab order; the arrow keys, Home and End move between them. */
   rovingFocus?: boolean;
+  /** The arrow keys wrap from the last toggle to the first and back. */
   loop?: boolean;
+  /** Size of the toggles. */
   size?: GroupSize;
+  /** Variant of the toggles. */
   variant?: GroupVariant;
+  /** Surface of the toggles; defaults to the nearest provider. */
   surface?: Surface;
   /** Accessible label for the toolbar / radiogroup. */
   'aria-label'?: string;
+  /** The `PixelToggle`s. */
   children: React.ReactNode;
 }
 
 interface PixelToggleGroupSingleProps extends PixelToggleGroupSharedProps {
+  /**
+   * `single`: one value, a radiogroup of radios; `multiple`: any number of values, pressed buttons.
+   */
   type?: 'single';
+  /**
+   * Value: a string in single mode (`''` for none), an array in multiple mode; leave unset for an
+   * uncontrolled group.
+   */
   value?: string;
+  /** Initial value while uncontrolled; nothing pressed by default. */
   defaultValue?: string;
+  /** Called with the new value, after each press. */
   onChange?: (next: string) => void;
 }
 
 interface PixelToggleGroupMultipleProps extends PixelToggleGroupSharedProps {
+  /**
+   * `single`: one value, a radiogroup of radios; `multiple`: any number of values, pressed buttons.
+   */
   type: 'multiple';
+  /**
+   * Value: a string in single mode (`''` for none), an array in multiple mode; leave unset for an
+   * uncontrolled group.
+   */
   value?: string[];
+  /** Initial value while uncontrolled; nothing pressed by default. */
   defaultValue?: string[];
+  /** Called with the new value, after each press. */
   onChange?: (next: string[]) => void;
 }
 

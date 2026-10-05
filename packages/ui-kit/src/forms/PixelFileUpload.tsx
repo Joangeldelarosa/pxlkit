@@ -31,22 +31,41 @@ export type PixelFileRejection = { file: File; reasons: string[] };
 
 /** Public prop bag for {@link PixelFileUpload}. */
 export interface PixelFileUploadProps {
+  /** Files; leave unset for an uncontrolled field. */
   value?: File[];
+  /** Initial files while uncontrolled. */
   defaultValue?: File[];
+  /** Called with the new files, after each choice, drop or removal. */
   onChange?: (files: File[]) => void;
+  /**
+   * Types the field takes: MIME types, `type/*` wildcards and `.ext` extensions, comma-separated.
+   */
   accept?: string;
+  /** Files add up; without it each choice replaces the last. */
   multiple?: boolean;
   /** Bytes per file. */
   maxSize?: number;
+  /** Most files the field holds. */
   maxFiles?: number;
+  /** Shows the dropzone; `false` shows a browse button instead. */
   dropzone?: boolean;
+  /**
+   * Draws a file's row in place of the default one: gets the file, and a function that removes it.
+   */
   renderItem?: (file: File, remove: () => void) => React.ReactNode;
+  /** Called with the files turned down by a choice or a drop, with their reasons. */
   onReject?: (rejections: PixelFileRejection[]) => void;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Padding and type size of the dropzone. */
   size?: Size;
+  /** Label above the field, pointing at the file input. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; turns the dropzone red. */
   error?: string;
+  /** Disables choosing, dropping and removing files. */
   disabled?: boolean;
   /**
    * Deprecated form-serialization hint. Files are not serializable through
@@ -58,7 +77,9 @@ export interface PixelFileUploadProps {
    * the file input still uses it via the `id` prop fallback path.
    */
   name?: string;
+  /** `id` of the file input; generated when left out. */
   id?: string;
+  /** Extra classes on the root element. */
   className?: string;
 }
 

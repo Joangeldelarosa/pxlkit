@@ -65,14 +65,23 @@ function usePopoverContext(component: string): PopoverContextValue {
 }
 
 export interface PixelPopoverProps {
+  /** Whether the popover is open; set it from `onOpenChange`. */
   open: boolean;
+  /** Called with the open state the trigger, Escape or a press outside asks for. */
   onOpenChange: (open: boolean) => void;
+  /** `PixelPopover.Trigger` and `PixelPopover.Content`. */
   children: React.ReactNode;
+  /** Side of the trigger the content opens on; flips when there is no room. */
   side?: PopoverSide;
+  /** Alignment of the content along that side. */
   align?: PopoverAlign;
+  /** Gap between trigger and content, in px. */
   sideOffset?: number;
+  /** Close when Escape is pressed. */
   closeOnEscape?: boolean;
+  /** Close on a press outside the trigger and the content. */
   closeOnOutsideClick?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /**
    * ARIA `aria-haspopup` value advertised on the trigger. Default `'dialog'`.
@@ -194,6 +203,10 @@ function PixelPopoverRoot({
    ────────────────────────────────────────────────────────────────────────── */
 
 export interface PixelPopoverTriggerProps {
+  /**
+   * The trigger: one element, which toggles the popover and gets its `aria-expanded`,
+   * `aria-haspopup` and `aria-controls`.
+   */
   children: React.ReactElement;
 }
 
@@ -253,6 +266,7 @@ PixelPopoverTrigger.displayName = 'PixelPopover.Trigger';
 
 export interface PixelPopoverContentProps
   extends React.HTMLAttributes<HTMLDivElement> {
+  /** Surface override; defaults to the popover's. */
   surface?: Surface;
 }
 

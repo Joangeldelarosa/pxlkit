@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelEqualHeightGridDocsSectionProps {
@@ -17,6 +18,86 @@ export const PixelEqualHeightGridDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelEqualHeightGrid's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelEqualHeightGrid } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelEqualHeightGrid',
+        props: [
+          { name: 'rowAlign', type: "'top' | 'stretch'", default: "'stretch'", description: "`stretch` gives every item of a row the row's height; `top` keeps their own." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'as', type: 'keyof React.JSX.IntrinsicElements', description: 'Element to render.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`), except `align`.',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelEqualHeightGrid',
+        props: [
+          { name: 'rowAlign', type: "'top' | 'stretch'", default: "'stretch'", description: "`stretch` gives every item of a row the row's height; `top` keeps their own." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'as', type: 'string', default: "'div'", description: 'Element to render.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', default: 'false', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', default: "'16rem'", description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+        ],
+        slots: [
+          { name: 'default', description: 'The items: each element or component, laid out as header, body and footer.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelEqualHeightGrid } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelEqualHeightGrid',
+        selector: '[pxlEqualHeightGrid]',
+        props: [
+          { name: 'cols', type: '1 | 2 | 3 | 4 | 5 | 6 | 12 | GridResponsiveColumns', accepts: "1 | 2 | 3 | 4 | 5 | 6 | 12 | '1' | '2' | '3' | '4' | '5' | '6' | '12' | GridResponsiveColumns", description: 'Column count, or a count per breakpoint (`{ base: 1, md: 3 }`); ignored with `autoFit` / `autoFill`.' },
+          { name: 'rows', type: '1 | 2 | 3 | 4 | 5 | 6', accepts: "1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'", description: 'Row count.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap token (`stackGap`) between rows and columns.' },
+          { name: 'colGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap between columns; with `rowGap`, it replaces `gap`.' },
+          { name: 'rowGap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap between rows; with `colGap`, it replaces `gap`.' },
+          { name: 'autoFit', type: 'boolean', default: 'false', accepts: 'unknown', description: 'As many columns as fit, empty tracks collapsed.' },
+          { name: 'autoFill', type: 'boolean', default: 'false', accepts: 'unknown', description: 'As many columns as fit, empty tracks kept.' },
+          { name: 'minColWidth', type: 'string', default: "'16rem'", description: 'Narrowest column with `autoFit` / `autoFill` (any CSS length).' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Inline-axis alignment of the items.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'rowAlign', type: "'top' | 'stretch'", default: "'stretch'", description: "`stretch` gives every item of a row the row's height; `top` keeps their own." },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightGridDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +115,9 @@ export function PixelEqualHeightGridDocsSection({ className }: PixelEqualHeightG
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-equal-height-grid-api">
+      <h3 id="pixel-equal-height-grid-api">API</h3>
+      <FrameworkApi label={'PixelEqualHeightGrid API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-equal-height-grid-a11y">
       <h3 id="pixel-equal-height-grid-a11y">Accessibility</h3>

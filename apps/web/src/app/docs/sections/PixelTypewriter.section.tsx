@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTypewriterDocsSectionProps {
@@ -17,6 +18,76 @@ export const PixelTypewriterDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelTypewriter's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTypewriter } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTypewriter',
+        props: [
+          { name: 'label', type: 'string', description: 'Label (text) to type out. Canonical prop.' },
+          { name: 'text', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'speed', type: 'number', default: '60', description: 'Milliseconds between each character. Default `60`.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Delay before typing starts, in milliseconds. Default `0`.' },
+          { name: 'cursor', type: 'boolean', default: 'true', description: 'Show a blinking caret while writing. Default `true`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral' | 'inherit'", default: "'green'", description: "Tone token applied to the text color, in monospace; `'inherit'` keeps the font and colour of the text around it. Default `'green'`." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the animation should play. Default `'mount'`." },
+          { name: 'onComplete', type: '() => void', description: 'Fires once the full string is rendered.' },
+          { name: 'className', type: 'string', description: 'Extra class names applied to the wrapping `<span>`.' },
+        ],
+        notes: [
+          '`ref` points to `<span>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTypewriter } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTypewriter',
+        props: [
+          { name: 'label', type: 'string', description: 'Label (text) to type out. Canonical prop.' },
+          { name: 'text', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'speed', type: 'number', default: '60', description: 'Milliseconds between each character.' },
+          { name: 'delay', type: 'number', default: '0', description: 'Delay before typing starts, in milliseconds.' },
+          { name: 'cursor', type: 'boolean', default: 'true', description: 'Show a blinking caret while writing.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral' | 'inherit'", default: "'green'", description: "Tone token applied to the text color, in monospace; `'inherit'` keeps the font and colour of the text around it." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the typing plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'Once the full string is rendered (at once under reduced motion, then only once).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<span>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTypewriter } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTypewriter',
+        selector: 'pxl-typewriter',
+        props: [
+          { name: 'label', type: 'string', description: 'Label (text) to type out. Canonical input.' },
+          { name: 'text', type: 'string', deprecated: 'Use `label` instead. Retained as alias for one minor.' },
+          { name: 'speed', type: 'number', default: '60', accepts: 'unknown', description: 'Milliseconds between each character.' },
+          { name: 'delay', type: 'number', default: '0', accepts: 'unknown', description: 'Delay before typing starts, in milliseconds.' },
+          { name: 'cursor', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Show a blinking caret while writing.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral' | 'inherit'", default: "'green'", description: "Tone token applied to the text color, in monospace; `'inherit'` keeps the font and colour of the text around it." },
+          { name: 'trigger', type: "'mount' | 'hover' | 'click' | 'focus' | 'inView' | boolean", default: "'mount'", description: "When the typing plays: `'mount'`, `'hover'`, `'click'`, `'focus'`, `'inView'`, or `true` / `false` to control it." },
+        ],
+        events: [
+          { name: 'complete', description: 'Once the full string is rendered (at once under reduced motion, then only once).' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +105,9 @@ export function PixelTypewriterDocsSection({ className }: PixelTypewriterDocsSec
       <dt>Category</dt><dd>animations</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-typewriter-api">
+      <h3 id="pixel-typewriter-api">API</h3>
+      <FrameworkApi label={'PixelTypewriter API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-typewriter-a11y">
       <h3 id="pixel-typewriter-a11y">Accessibility</h3>

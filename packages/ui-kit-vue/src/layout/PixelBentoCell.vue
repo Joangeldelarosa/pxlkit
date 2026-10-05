@@ -33,7 +33,10 @@ const props = withDefaults(defineProps<PixelBentoCellProps>(), {
   surface: undefined,
   bordered: false,
 });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Cell content. */
+  default?(): VNode[];
+}>();
 
 const surface = useEffectiveSurface(() => props.surface);
 const kind = computed<BentoKind>(() => props.variant ?? props.kind ?? 'feature');

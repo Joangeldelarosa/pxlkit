@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelAccordionDocsSectionProps {
@@ -17,6 +18,59 @@ export const PixelAccordionDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelAccordion's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelAccordion } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelAccordion',
+        props: [
+          { name: 'items', type: 'AccordionItem[]', required: true, description: 'Accordion items rendered in order. First item is expanded by default.' },
+          { name: 'allowMultiple', type: 'boolean', default: 'false', description: 'When true, multiple items can be expanded simultaneously.' },
+          { name: 'collapsedByDefault', type: 'boolean', default: 'false', description: 'When set, no item is initially expanded. Defaults to expanding the first.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface treatment override.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelAccordion } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelAccordion',
+        props: [
+          { name: 'items', type: 'AccordionItem[]', required: true, description: 'The items, in order.' },
+          { name: 'allowMultiple', type: 'boolean', default: 'false', description: 'Several items can be open at once.' },
+          { name: 'collapsedByDefault', type: 'boolean', default: 'false', description: 'Every item starts closed, instead of the first one open.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelAccordion } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelAccordion',
+        selector: 'pxl-accordion',
+        props: [
+          { name: 'items', type: 'AccordionItem[]', required: true, description: 'The items, in order.' },
+          { name: 'allowMultiple', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Several items can be open at once.' },
+          { name: 'collapsedByDefault', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Every item starts closed, instead of the first one open.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +89,9 @@ export function PixelAccordionDocsSection({ className }: PixelAccordionDocsSecti
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-accordion-api">
+      <h3 id="pixel-accordion-api">API</h3>
+      <FrameworkApi label={'PixelAccordion API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-accordion-a11y">
       <h3 id="pixel-accordion-a11y">Accessibility</h3>

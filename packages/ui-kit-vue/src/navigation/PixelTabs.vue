@@ -61,7 +61,10 @@ const emit = defineEmits<{
   /** The newly active tab id. */
   'update:modelValue': [id: string];
 }>();
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** `PixelTabsList` and the `PixelTabsPanel`s, in place of `items`. */
+  default?(): VNode[];
+}>();
 
 const surface = useEffectiveSurface(() => props.surface);
 const sugar = computed(() => !!props.items && props.items.length > 0);

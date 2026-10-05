@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStatCardDocsSectionProps {
@@ -17,6 +18,76 @@ export const PixelStatCardDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelStatCard's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelStatCard } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelStatCard',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Caption rendered above the value.' },
+          { name: 'value', type: 'string', required: true, description: 'Primary metric value.' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Optional leading icon.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'gold'", description: 'Tone tint for border, soft background, and icon color.' },
+          { name: 'trend', type: 'string', description: 'Optional trend/delta line rendered under the value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Padding + typography scale. Defaults to `'md'`." },
+          { name: 'iconPosition', type: "'left' | 'right' | 'top' | 'bottom-left'", default: "'top'", description: "Icon placement relative to label/value. Defaults to `'top'`." },
+          { name: 'valueTone', type: 'boolean', default: 'false', description: 'Color the value with the tone color instead of the default text color.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: "Horizontal alignment of label/value/trend. Defaults to `'start'`." },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — a stat card needs visible chrome.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelStatCard } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelStatCard',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Caption above the value.' },
+          { name: 'value', type: 'string', required: true, description: 'The metric.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'gold'", description: 'Tone of the border, background and icon.' },
+          { name: 'trend', type: 'string', description: 'Trend or delta line under the value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and type scale.' },
+          { name: 'iconPosition', type: "'left' | 'right' | 'top' | 'bottom-left'", default: "'top'", description: 'Where the icon sits: above, beside or in the bottom-left corner.' },
+          { name: 'valueTone', type: 'boolean', default: 'false', description: 'Colours the value with the tone.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Alignment of the label, value and trend.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border, radius and tone tint.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'The icon, in the tone.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelStatCard } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelStatCard',
+        selector: 'pxl-stat-card',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Caption above the value.' },
+          { name: 'value', type: 'string', required: true, description: 'The metric.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'The icon, in the tone.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'gold'", description: 'Tone of the border, background and icon.' },
+          { name: 'trend', type: 'string', description: 'Trend or delta line under the value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and type scale.' },
+          { name: 'iconPosition', type: "'left' | 'right' | 'top' | 'bottom-left'", default: "'top'", description: 'Where the icon sits: above, beside or in the bottom-left corner.' },
+          { name: 'valueTone', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Colours the value with the tone.' },
+          { name: 'align', type: "'start' | 'center'", default: "'start'", description: 'Alignment of the label, value and trend.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border, radius and tone tint.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +106,9 @@ export function PixelStatCardDocsSection({ className }: PixelStatCardDocsSection
       <dt>Category</dt><dd>cards</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-stat-card-api">
+      <h3 id="pixel-stat-card-api">API</h3>
+      <FrameworkApi label={'PixelStatCard API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stat-card-a11y">
       <h3 id="pixel-stat-card-a11y">Accessibility</h3>

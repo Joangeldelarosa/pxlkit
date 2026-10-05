@@ -35,7 +35,10 @@ const props = withDefaults(defineProps<PixelContainerProps>(), {
   surface: undefined,
   as: 'section',
 });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Content of the inner column. */
+  default?(): VNode[];
+}>();
 
 const surface = useEffectiveSurface(() => props.surface);
 const padding = computed(() => resolveContainerPadding(props.padding));

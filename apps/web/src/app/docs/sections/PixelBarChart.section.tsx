@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelBarChartDocsSectionProps {
@@ -17,6 +18,74 @@ export const PixelBarChartDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelBarChart's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelBarChart } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelBarChart',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series, one bar per point; one whose `y` is not finite leaves its slot empty.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the bars and their labels.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '160×64, 280×120 or 420×180 px.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Bars growing up, or to the right.' },
+          { name: 'showValues', type: 'boolean', default: 'false', description: 'Labels each bar with its value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<svg>` (`SVGAttributes<SVGSVGElement>`).',
+          '`ref` points to `<svg>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelBarChart } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelBarChart',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series, one bar per point; one whose `y` is not finite leaves its slot empty.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the bars and their labels.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '160×64, 280×120 or 420×180 px.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Bars growing up, or to the right.' },
+          { name: 'showValues', type: 'boolean', default: 'false', description: 'Labels each bar with its value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius around the chart.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name; a summary of the series when unset.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<svg>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelBarChart } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelBarChart',
+        selector: 'svg[pxlBarChart]',
+        props: [
+          { name: 'data', type: 'PixelChartDataPoint[]', required: true, description: 'The series, one bar per point; one whose `y` is not finite leaves its slot empty.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'cyan'", description: 'Colour of the bars and their labels.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: '160×64, 280×120 or 420×180 px.' },
+          { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Bars growing up, or to the right.' },
+          { name: 'showValues', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Labels each bar with its value.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border and radius around the chart.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name; a summary of the series when unset.' },
+        ],
+        notes: [
+          'Goes on a native `<svg>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelBarChartDocsSection({ className }: PixelBarChartDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +104,9 @@ export function PixelBarChartDocsSection({ className }: PixelBarChartDocsSection
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-bar-chart-api">
+      <h3 id="pixel-bar-chart-api">API</h3>
+      <FrameworkApi label={'PixelBarChart API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-bar-chart-a11y">
       <h3 id="pixel-bar-chart-a11y">Accessibility</h3>

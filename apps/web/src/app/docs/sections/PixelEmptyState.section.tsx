@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelEmptyStateDocsSectionProps {
@@ -17,6 +18,64 @@ export const PixelEmptyStateDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelEmptyState's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelEmptyState } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelEmptyState',
+        props: [
+          { name: 'title', type: 'string', required: true, description: 'Short title (e.g. `"No results"`).' },
+          { name: 'description', type: 'string', required: true, description: 'Supporting description below the title.' },
+          { name: 'action', type: 'React.ReactNode', description: 'Optional CTA node (button, link).' },
+          { name: 'icon', type: 'React.ReactNode', description: 'Optional decorative icon.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; falls back to nearest provider.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelEmptyState } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelEmptyState',
+        props: [
+          { name: 'title', type: 'string', required: true, description: 'Short title (e.g. `"No results"`).' },
+          { name: 'description', type: 'string', required: true, description: 'Supporting description below the title.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'Decorative icon above the title (hidden from assistive tech).' },
+          { name: 'action', description: 'Call to action under the description (a button, a link).' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelEmptyState } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelEmptyState',
+        selector: 'pxl-empty-state',
+        props: [
+          { name: 'title', type: 'string', required: true, description: 'Short title (e.g. `"No results"`).' },
+          { name: 'description', type: 'string', required: true, description: 'Supporting description below the title.' },
+          { name: 'action', type: 'string | TemplateRef<any>', description: 'Call to action under the description (a button, a link).' },
+          { name: 'icon', type: 'string | TemplateRef<any>', description: 'Decorative icon above the title (hidden from assistive tech).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelEmptyStateDocsSection({ className }: PixelEmptyStateDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +94,9 @@ export function PixelEmptyStateDocsSection({ className }: PixelEmptyStateDocsSec
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-empty-state-api">
+      <h3 id="pixel-empty-state-api">API</h3>
+      <FrameworkApi label={'PixelEmptyState API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-empty-state-a11y">
       <h3 id="pixel-empty-state-a11y">Accessibility</h3>

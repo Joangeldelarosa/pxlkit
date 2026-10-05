@@ -15,7 +15,10 @@ const props = defineProps<{
   /** Surface override; defaults to the popover's. */
   surface?: Surface;
 }>();
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The panel's content. */
+  default?(): VNode[];
+}>();
 
 const context = usePopoverContext('PixelPopoverContent');
 const attrs = useAttrs();

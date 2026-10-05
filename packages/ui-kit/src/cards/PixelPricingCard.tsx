@@ -17,20 +17,31 @@ import {
 import { type ToneKey } from '../tokens';
 
 export interface PixelPricingCardProps extends React.HTMLAttributes<HTMLElement> {
+  /** Tone of the price, the feature marks and, highlighted, the chrome. */
   tone?: ToneKey;
+  /** Icon above the name, in the tone. */
   icon?: React.ReactNode;
+  /** Plan name. */
   name: string;
+  /** Muted line under the name. */
   description?: string;
   /** Clamp the description to N lines. Defaults to 2; use 'none' to let long copy flow. */
   descriptionLines?: 2 | 3 | 'none';
+  /** Price, billing period and old price. */
   price: { amount: string | number; period?: string; strikethrough?: string | number };
   /** Promo badge rendered beside the price (e.g. a discount PixelBadge). */
   priceBadge?: React.ReactNode;
+  /** Ribbon over the top edge: its label (`POPULAR`) and tone (gold). */
   popular?: { label?: string; tone?: ToneKey };
+  /** The feature list. */
   features?: { label: string; tooltip?: string; included?: boolean; highlight?: boolean }[];
+  /** Call to action under the features. */
   cta?: React.ReactNode;
+  /** Tints the border and background and adds a glow. */
   highlight?: boolean;
+  /** Fine print under the call to action. */
   footer?: React.ReactNode;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Render with surface-aware border + radius chrome. Defaults to true — a pricing card needs visible chrome. */
   bordered?: boolean;

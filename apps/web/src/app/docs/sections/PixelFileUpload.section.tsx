@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelFileUploadDocsSectionProps {
@@ -17,6 +18,112 @@ export const PixelFileUploadDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelFileUpload's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelFileUpload } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelFileUpload',
+        props: [
+          { name: 'value', type: 'File[]', description: 'Files; leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'File[]', description: 'Initial files while uncontrolled.' },
+          { name: 'onChange', type: '(files: File[]) => void', description: 'Called with the new files, after each choice, drop or removal.' },
+          { name: 'accept', type: 'string', description: 'Types the field takes: MIME types, `type/*` wildcards and `.ext` extensions, comma-separated.' },
+          { name: 'multiple', type: 'boolean', default: 'false', description: 'Files add up; without it each choice replaces the last.' },
+          { name: 'maxSize', type: 'number', description: 'Bytes per file.' },
+          { name: 'maxFiles', type: 'number', description: 'Most files the field holds.' },
+          { name: 'dropzone', type: 'boolean', default: 'true', description: 'Shows the dropzone; `false` shows a browse button instead.' },
+          { name: 'renderItem', type: '(file: File, remove: () => void) => React.ReactNode', description: "Draws a file's row in place of the default one: gets the file, and a function that removes it." },
+          { name: 'onReject', type: '(rejections: PixelFileRejection[]) => void', description: 'Called with the files turned down by a choice or a drop, with their reasons.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and type size of the dropzone.' },
+          { name: 'label', type: 'string', description: 'Label above the field, pointing at the file input.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; turns the dropzone red.' },
+          { name: 'disabled', type: 'boolean', description: 'Disables choosing, dropping and removing files.' },
+          { name: 'name', type: 'string', description: "Deprecated form-serialization hint. Files are not serializable through a hidden mirror once `e.target.value` is reset, so this prop no longer wires to a native input. Read selected files from `onChange` and POST them manually (e.g. `FormData.append(name, file)` per file). Kept in the prop bag so consumers using it don't break — the `id` of the file input still uses it via the `id` prop fallback path." },
+          { name: 'id', type: 'string', description: '`id` of the file input; generated when left out.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the root element.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelFileUpload } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelFileUpload',
+        props: [
+          { name: 'modelValue', type: 'File[]', binding: 'v-model', description: 'Files (`v-model`); leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'File[]', description: 'Initial files while uncontrolled.' },
+          { name: 'accept', type: 'string', description: 'Types the field takes: MIME types, `type/*` wildcards and `.ext` extensions, comma-separated.' },
+          { name: 'multiple', type: 'boolean', default: 'false', description: 'Files add up; without it each choice replaces the last.' },
+          { name: 'maxSize', type: 'number', description: 'Largest size of a file, in bytes.' },
+          { name: 'maxFiles', type: 'number', description: 'Most files the field holds.' },
+          { name: 'dropzone', type: 'boolean', default: 'true', description: 'Shows the dropzone; `false` shows a browse button instead.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and type size of the dropzone.' },
+          { name: 'label', type: 'string', description: 'Label above the field, pointing at the file input.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; turns the dropzone red.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables choosing, dropping and removing files.' },
+          { name: 'name', type: 'string', description: 'Exposed as `data-pxl-name`; the file input submits nothing (see above).' },
+          { name: 'id', type: 'string', description: '`id` of the file input; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'files: File[]', description: 'The new files, after each choice, drop or removal.' },
+          { name: 'reject', payload: 'rejections: FileUploadRejection[]', description: 'The files turned down by a choice or a drop, with their reasons.' },
+        ],
+        slots: [
+          { name: 'item', props: '{ file: File; remove: () => void }', description: 'Renders a chosen file in place of the default row; `remove` takes it out of the field.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<div>`.',
+          'Its template ref exposes `element`: the element around the dropzone and the list.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelFileUpload } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelFileUpload',
+        selector: 'pxl-file-upload',
+        props: [
+          { name: 'value', type: 'File[]', binding: '[(value)]', description: 'Files (`[(value)]`); leave unset for an uncontrolled field.' },
+          { name: 'defaultValue', type: 'File[]', description: 'Initial files while uncontrolled.' },
+          { name: 'accept', type: 'string', description: 'Types the field takes: MIME types, `type/*` wildcards and `.ext` extensions, comma-separated.' },
+          { name: 'multiple', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Files add up; without it each choice replaces the last.' },
+          { name: 'maxSize', type: 'number', accepts: 'unknown', description: 'Largest size of a file, in bytes.' },
+          { name: 'maxFiles', type: 'number', accepts: 'unknown', description: 'Most files the field holds.' },
+          { name: 'dropzone', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Shows the dropzone; `false` shows a browse button instead.' },
+          { name: 'item', type: 'TemplateRef<PixelFileUploadItemContext>', description: 'Renders a chosen file in place of the default row (`let-file let-remove="remove"`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Padding and type size of the dropzone.' },
+          { name: 'label', type: 'string', description: 'Label above the field, pointing at the file input.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; turns the dropzone red.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables choosing, dropping and removing files.' },
+          { name: 'name', type: 'string', description: 'Exposed as `data-pxl-name`; the file input submits nothing (see above).' },
+          { name: 'id', type: 'string', description: '`id` of the file input; generated when left out.' },
+        ],
+        events: [
+          { name: 'reject', payload: 'FileUploadRejection[]', description: 'The files turned down by a choice or a drop, with their reasons.' },
+          { name: 'valueChange', payload: 'File[]', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`File[]`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +142,9 @@ export function PixelFileUploadDocsSection({ className }: PixelFileUploadDocsSec
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-file-upload-api">
+      <h3 id="pixel-file-upload-api">API</h3>
+      <FrameworkApi label={'PixelFileUpload API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-file-upload-a11y">
       <h3 id="pixel-file-upload-a11y">Accessibility</h3>

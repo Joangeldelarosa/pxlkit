@@ -9,12 +9,25 @@ import { useScrollLock } from '../hooks/useScrollLock';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 export interface PixelAlertDialogProps {
+  /** Whether the dialog is visible; set it from `onOpenChange`. */
   open: boolean;
+  /**
+   * Called with `false` when the dialog asks to close (Cancel, Escape, the backdrop, a completed
+   * action).
+   */
   onOpenChange: (open: boolean) => void;
+  /** Title; it names the dialog. */
   title: string;
+  /** Text under the title, wired via `aria-describedby`. */
   description?: string;
+  /** Label of the button that dismisses the dialog. */
   cancelLabel?: string;
+  /** Label of the button that confirms. */
   actionLabel?: string;
+  /**
+   * The confirmed action. Its result matters: the dialog closes once it returns, or once the
+   * promise it returns resolves — and stays open, busy, until then.
+   */
   onAction: () => void | Promise<void>;
   /**
    * Called when `onAction` throws / rejects. Receives the thrown value.
@@ -22,7 +35,9 @@ export interface PixelAlertDialogProps {
    * an inline error. When unset, errors are silently swallowed (back-compat).
    */
   onError?: (error: unknown) => void;
+  /** Red accent for a destructive action (cyan otherwise). */
   destructive?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

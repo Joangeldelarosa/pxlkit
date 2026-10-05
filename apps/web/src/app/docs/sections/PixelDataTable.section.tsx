@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelDataTableDocsSectionProps {
@@ -17,6 +18,115 @@ export const PixelDataTableDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelDataTable's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelDataTable } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelDataTable',
+        props: [
+          { name: 'data', type: 'TData[]', required: true, description: 'Row data.' },
+          { name: 'columns', type: 'ColumnDef<TData, TValue>[]', required: true, description: 'TanStack column definitions.' },
+          { name: 'sorting', type: '{ id: string; desc: boolean }[]', description: 'Sort state; leave unset to let the table sort.' },
+          { name: 'onSortingChange', type: '(next: { id: string; desc: boolean }[]) => void', description: 'Called with the new sort, after a click on a sortable header.' },
+          { name: 'filtering', type: 'Record<string, string>', description: 'Column filters, column id → value.' },
+          { name: 'onFilteringChange', type: '(next: Record<string, string>) => void', description: 'Called with the new column filters.' },
+          { name: 'pagination', type: '{ pageIndex: number; pageSize: number }', description: 'Page; the pagination bar shows once it is set.' },
+          { name: 'onPaginationChange', type: '(next: { pageIndex: number; pageSize: number }) => void', description: 'Called with the new page, after a page button, a page-size change or a reset to the first page.' },
+          { name: 'rowSelection', type: 'Record<string, boolean>', description: 'Selected row ids → `true`; the selection column shows once it is set.' },
+          { name: 'onRowSelectionChange', type: '(next: Record<string, boolean>) => void', description: 'Called with the new row selection, after a checkbox changes.' },
+          { name: 'columnVisibility', type: 'Record<string, boolean>', description: 'Column id → shown.' },
+          { name: 'onColumnVisibilityChange', type: '(next: Record<string, boolean>) => void', description: 'Called with the new column visibility.' },
+          { name: 'getRowId', type: '(row: TData, idx: number) => string', description: "A stable id per row; the row's index by default." },
+          { name: 'density', type: "'compact' | 'normal' | 'comfortable'", default: "'normal'", description: 'Cell padding scale.' },
+          { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Sticks the header to the top of the scroll container.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Shows skeleton rows instead of the data.' },
+          { name: 'emptyState', type: 'React.ReactNode', description: 'Shown in a full-width cell when there are no rows; "No data." by default.' },
+          { name: 'onRowClick', type: '(row: TData) => void', description: "Called with a row's data when it is clicked, or activated with Enter or Space; with it, rows show a pointer and take focus." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the wrapper.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — data table needs visible chrome.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelDataTable } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelDataTable',
+        props: [
+          { name: 'data', type: 'TData[]', required: true, description: 'Row data.' },
+          { name: 'columns', type: 'ColumnDef<TData, TValue>[]', required: true, description: 'TanStack column definitions.' },
+          { name: 'sorting', type: '{ id: string; desc: boolean }[]', binding: 'v-model:sorting', description: 'Sort state (`v-model:sorting`); leave unset to let the table sort.' },
+          { name: 'filtering', type: 'Record<string, string>', binding: 'v-model:filtering', description: 'Column filters, column id → value (`v-model:filtering`).' },
+          { name: 'pagination', type: '{ pageIndex: number; pageSize: number }', binding: 'v-model:pagination', description: 'Page (`v-model:pagination`); the pagination bar shows once it is set.' },
+          { name: 'rowSelection', type: 'Record<string, boolean>', binding: 'v-model:row-selection', description: 'Selected row ids → `true` (`v-model:row-selection`); the selection column shows once it is set.' },
+          { name: 'columnVisibility', type: 'Record<string, boolean>', binding: 'v-model:column-visibility', description: 'Column id → shown (`v-model:column-visibility`).' },
+          { name: 'getRowId', type: '(row: TData, index: number) => string', description: 'A stable id per row; the index by default.' },
+          { name: 'density', type: "'compact' | 'normal' | 'comfortable'", default: "'normal'", description: 'Cell padding scale.' },
+          { name: 'stickyHeader', type: 'boolean', default: 'false', description: 'Sticks the header to the top of the scroll container.' },
+          { name: 'loading', type: 'boolean', default: 'false', description: 'Shows skeleton rows instead of the data.' },
+          { name: 'onRowClick', type: '(row: TData) => void', binding: '@row-click', description: "Row click handler (`@row-click`), with the row's data; also run by Enter or Space on a focused row. Declared as a prop because its presence changes the rows: clickable rows show a pointer and take focus." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border and radius around the table.' },
+        ],
+        events: [
+          { name: 'update:sorting', payload: 'sorting: { id: string; desc: boolean }[]', description: 'The new sort, after a click on a sortable header.' },
+          { name: 'update:filtering', payload: 'filtering: Record<string, string>', description: 'The new column filters.' },
+          { name: 'update:pagination', payload: 'pagination: { pageIndex: number; pageSize: number }', description: 'The new page, after a page button, a page-size change or a reset to the first page.' },
+          { name: 'update:rowSelection', payload: 'rowSelection: Record<string, boolean>', description: 'The new row selection, after a checkbox changes.' },
+          { name: 'update:columnVisibility', payload: 'columnVisibility: Record<string, boolean>', description: 'The new column visibility.' },
+        ],
+        slots: [
+          { name: 'empty-state', description: 'Shown in a full-width cell when there are no rows; "No data." by default.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelDataTable } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelDataTable',
+        selector: 'pxl-data-table',
+        props: [
+          { name: 'data', type: 'TData[]', required: true, description: 'Row data.' },
+          { name: 'columns', type: 'ColumnDef<TData, TValue>[]', required: true, description: 'TanStack column definitions.' },
+          { name: 'sorting', type: '{ id: string; desc: boolean }[]', binding: '[(sorting)]', description: 'Sort state (`[(sorting)]`); leave unset to let the table sort.' },
+          { name: 'filtering', type: 'Record<string, string>', binding: '[(filtering)]', description: 'Column filters, column id → value (`[(filtering)]`). Unbound, the table keeps its filters as TanStack gives them, and reports nothing.' },
+          { name: 'pagination', type: '{ pageIndex: number; pageSize: number }', binding: '[(pagination)]', description: "Page (`[(pagination)]`); the pagination bar shows once it is bound, and its changes — the table's own resets to the first page too — are reported while it is." },
+          { name: 'rowSelection', type: 'Record<string, boolean>', binding: '[(rowSelection)]', description: 'Selected row ids → `true` (`[(rowSelection)]`); the selection column shows once it is bound.' },
+          { name: 'columnVisibility', type: 'Record<string, boolean>', binding: '[(columnVisibility)]', description: 'Column id → shown (`[(columnVisibility)]`).' },
+          { name: 'getRowId', type: '(row: TData, index: number) => string', description: 'A stable id per row; the index by default.' },
+          { name: 'density', type: "'compact' | 'normal' | 'comfortable'", default: "'normal'", description: 'Cell padding scale.' },
+          { name: 'stickyHeader', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Sticks the header to the top of the scroll container.' },
+          { name: 'loading', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows skeleton rows instead of the data.' },
+          { name: 'emptyState', type: 'string | TemplateRef<any>', description: 'Shown in a full-width cell when there are no rows: text or a template; "No data." by default.' },
+          { name: 'clickableRows', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Makes the rows clickable: they show a pointer, take focus, and emit `(rowClick)` on a click, Enter or Space.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border and radius around the table.' },
+        ],
+        events: [
+          { name: 'rowClick', payload: 'TData', description: 'A clickable row was clicked, or activated with Enter or Space: its data.' },
+          { name: 'sortingChange', payload: '{ id: string; desc: boolean }[]', description: 'The new `sorting`: the event half of `[(sorting)]`.' },
+          { name: 'filteringChange', payload: 'Record<string, string>', description: 'The new `filtering`: the event half of `[(filtering)]`.' },
+          { name: 'paginationChange', payload: '{ pageIndex: number; pageSize: number }', description: 'The new `pagination`: the event half of `[(pagination)]`.' },
+          { name: 'rowSelectionChange', payload: 'Record<string, boolean>', description: 'The new `rowSelection`: the event half of `[(rowSelection)]`.' },
+          { name: 'columnVisibilityChange', payload: 'Record<string, boolean>', description: 'The new `columnVisibility`: the event half of `[(columnVisibility)]`.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelDataTableDocsSection({ className }: PixelDataTableDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +145,9 @@ export function PixelDataTableDocsSection({ className }: PixelDataTableDocsSecti
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-data-table-api">
+      <h3 id="pixel-data-table-api">API</h3>
+      <FrameworkApi label={'PixelDataTable API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-data-table-a11y">
       <h3 id="pixel-data-table-a11y">Accessibility</h3>

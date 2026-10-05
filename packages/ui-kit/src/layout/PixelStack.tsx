@@ -13,13 +13,21 @@ import { cn, Surface, useEffectiveSurface, surfaceClasses } from '../common';
 import { stackGap, StackGapKey } from '../tokens';
 
 export interface PixelStackProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Main axis. */
   direction?: StackDirection;
+  /** Gap token (`stackGap`). */
   gap?: StackGapKey;
+  /** Cross-axis alignment. */
   align?: StackAlign;
+  /** Main-axis distribution. */
   justify?: StackJustify;
+  /** Wrap onto multiple lines. */
   wrap?: boolean;
+  /** `inline-flex` instead of `flex`. */
   inline?: boolean;
+  /** Element to render. */
   as?: keyof React.JSX.IntrinsicElements;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelMouseParallaxDocsSectionProps {
@@ -17,6 +18,62 @@ export const PixelMouseParallaxDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelMouseParallax's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelMouseParallax } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelMouseParallax',
+        props: [
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The content that moves with the pointer.' },
+          { name: 'strength', type: 'number', default: '20', description: 'Max travel distance in px.' },
+          { name: 'invert', type: 'boolean', default: 'false', description: 'If true, moves away from cursor instead of towards.' },
+          { name: 'className', type: 'string', description: 'Extra classes on the wrapper.' },
+          { name: 'style', type: 'React.CSSProperties', description: 'Inline styles of the wrapper.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelMouseParallax } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelMouseParallax',
+        props: [
+          { name: 'strength', type: 'number', default: '20', description: 'Farthest the layer travels from its place on each axis, in px.' },
+          { name: 'invert', type: 'boolean', default: 'false', description: 'Move away from the cursor instead of towards it.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The content that moves with the pointer.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelMouseParallax } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelMouseParallax',
+        selector: 'pxl-mouse-parallax',
+        props: [
+          { name: 'strength', type: 'number', default: '20', accepts: 'unknown', description: 'Farthest the layer travels from its place on each axis, in px.' },
+          { name: 'invert', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Move away from the cursor instead of towards it.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +91,9 @@ export function PixelMouseParallaxDocsSection({ className }: PixelMouseParallaxD
       <dt>Category</dt><dd>parallax</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-mouse-parallax-api">
+      <h3 id="pixel-mouse-parallax-api">API</h3>
+      <FrameworkApi label={'PixelMouseParallax API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-mouse-parallax-a11y">
       <h3 id="pixel-mouse-parallax-a11y">Accessibility</h3>

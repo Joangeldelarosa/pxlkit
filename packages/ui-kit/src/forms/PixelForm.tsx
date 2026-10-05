@@ -63,10 +63,15 @@ function useFieldName(): string | null {
 
 /** Public prop bag for {@link PixelFormRoot}. */
 export interface PixelFormRootProps<T extends FieldValues> {
+  /** The form: what React Hook Form's `useForm` returns. */
   form: UseFormReturn<T>;
+  /** Called with the form's values, once a submission finds no error. */
   onSubmit: (data: T) => void | Promise<void>;
+  /** The fields. */
   children: React.ReactNode;
+  /** Extra classes on the `<form>`. */
   className?: string;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -101,10 +106,21 @@ export interface PixelFormFieldProps<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > {
+  /** Path of the field in the form's values. */
   name: TName;
+  /**
+   * Validation rules: React Hook Form's `rules` (`required`, `min`, `max`, `minLength`,
+   * `maxLength`, `pattern`, `validate`).
+   */
   rules?: Omit<RegisterOptions<TFieldValues, TName>, 'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'>;
+  /** Initial value, where the form's `defaultValues` have none. */
   defaultValue?: UseControllerProps<TFieldValues, TName>['defaultValue'];
+  /** Drops the field's value from the form when it unmounts; by default the value stays. */
   shouldUnregister?: boolean;
+  /**
+   * Renders the control: gets the field's props (`field`: its value, change and blur handlers, name
+   * and ref) and its state (`fieldState`).
+   */
   render: (args: {
     field: ControllerRenderProps<TFieldValues, TName>;
     fieldState: ControllerFieldState;
@@ -134,6 +150,7 @@ export function PixelFormField<
 
 /** Public prop bag for {@link PixelFormItem}. */
 export interface PixelFormItemProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** `PixelForm.Label`, `PixelForm.Control`, `PixelForm.Description` and `PixelForm.Message`. */
   children: React.ReactNode;
 }
 
@@ -157,6 +174,7 @@ PixelFormItem.displayName = 'PixelForm.Item';
 
 /** Public prop bag for {@link PixelFormLabel}. */
 export interface PixelFormLabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -183,6 +201,9 @@ PixelFormLabel.displayName = 'PixelForm.Label';
 
 /** Public prop bag for {@link PixelFormControl}. Wraps a single child and clones aria-*/
 export interface PixelFormControlProps {
+  /**
+   * The control: one element, which gets the field's `id`, `aria-describedby` and `aria-invalid`.
+   */
   children: React.ReactElement;
 }
 
@@ -231,6 +252,7 @@ PixelFormControl.displayName = 'PixelForm.Control';
 
 /** Public prop bag for {@link PixelFormDescription}. */
 export interface PixelFormDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 
@@ -257,6 +279,7 @@ PixelFormDescription.displayName = 'PixelForm.Description';
 
 /** Public prop bag for {@link PixelFormMessage}. */
 export interface PixelFormMessageProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

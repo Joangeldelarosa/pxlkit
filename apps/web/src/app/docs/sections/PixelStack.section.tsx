@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStackDocsSectionProps {
@@ -17,6 +18,74 @@ export const PixelStackDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelStack's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelStack } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelStack',
+        props: [
+          { name: 'direction', type: "'col' | 'row'", default: "'col'", description: 'Main axis.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`).' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch' | 'baseline'", description: 'Cross-axis alignment.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'", description: 'Main-axis distribution.' },
+          { name: 'wrap', type: 'boolean', default: 'false', description: 'Wrap onto multiple lines.' },
+          { name: 'inline', type: 'boolean', default: 'false', description: '`inline-flex` instead of `flex`.' },
+          { name: 'as', type: 'keyof React.JSX.IntrinsicElements', description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelStack } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelStack',
+        props: [
+          { name: 'direction', type: "'col' | 'row'", default: "'col'", description: 'Main axis.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', description: 'Gap token (`stackGap`).' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch' | 'baseline'", description: 'Cross-axis alignment.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'", description: 'Main-axis distribution.' },
+          { name: 'wrap', type: 'boolean', default: 'false', description: 'Wrap onto multiple lines.' },
+          { name: 'inline', type: 'boolean', default: 'false', description: '`inline-flex` instead of `flex`.' },
+          { name: 'as', type: 'string', default: "'div'", description: 'Element to render.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The items.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelStack } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelStack',
+        selector: '[pxlStack]',
+        props: [
+          { name: 'direction', type: "'col' | 'row'", default: "'col'", description: 'Main axis.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '4', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap token (`stackGap`).' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch' | 'baseline'", description: 'Cross-axis alignment.' },
+          { name: 'justify', type: "'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'", description: 'Main-axis distribution.' },
+          { name: 'wrap', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Wrap onto multiple lines.' },
+          { name: 'inline', type: 'boolean', default: 'false', accepts: 'unknown', description: '`inline-flex` instead of `flex`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +104,9 @@ export function PixelStackDocsSection({ className }: PixelStackDocsSectionProps)
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-stack-api">
+      <h3 id="pixel-stack-api">API</h3>
+      <FrameworkApi label={'PixelStack API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stack-a11y">
       <h3 id="pixel-stack-a11y">Accessibility</h3>

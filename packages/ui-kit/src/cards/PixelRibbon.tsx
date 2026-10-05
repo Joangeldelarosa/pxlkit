@@ -12,11 +12,17 @@ import { cn, Surface, useEffectiveSurface } from '../common';
 import { ToneKey } from '../tokens';
 
 export interface PixelRibbonProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Where the ribbon sits on its container. */
   position?: RibbonPosition;
+  /** Tone of the opaque fill. */
   tone?: ToneKey;
+  /** How far a top ribbon rises above the container's edge. */
   offset?: RibbonOffset;
+  /** Tilt in degrees; the corners lean outwards by 12° when unset. */
   tilt?: number;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** The ribbon's text. */
   children: React.ReactNode;
 }
 

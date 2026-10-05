@@ -12,9 +12,13 @@ import { cn, Surface, useEffectiveSurface } from '../common';
 import { ToneKey } from '../tokens';
 
 export interface PixelFeatureCardProps extends React.HTMLAttributes<HTMLElement> {
+  /** Icon in the toned frame. */
   icon?: React.ReactNode;
+  /** Width of the icon frame, in px. */
   iconSize?: IconSize;
+  /** Badge above the icon: its label and tone (cyan by default). */
   badge?: { label: string; tone?: ToneKey };
+  /** The heading, clamped to two lines. */
   title: string;
   /** Muted paragraph rendered under the title. */
   description?: string;
@@ -24,8 +28,11 @@ export interface PixelFeatureCardProps extends React.HTMLAttributes<HTMLElement>
   desc?: string;
   /** @deprecated Use `descriptionLines` for consistency with PixelCard / PixelPricingCard. */
   descLines?: DescLines;
+  /** Footer under the description. */
   footer?: React.ReactNode;
+  /** Tone of the icon frame. */
   tone?: ToneKey;
+  /** Hover lift and focus ring; without an `href` the card is a button: give it an `onClick`. */
   interactive?: boolean;
   /**
    * When provided, the card renders as `<a href>` and accepts anchor-specific
@@ -41,7 +48,9 @@ export interface PixelFeatureCardProps extends React.HTMLAttributes<HTMLElement>
   download?: React.AnchorHTMLAttributes<HTMLAnchorElement>['download'];
   /** When `interactive=true` without `href`, an onClick is REQUIRED for accessibility. */
   onClick?: React.MouseEventHandler<HTMLElement>;
+  /** Icon above the text, or beside it. */
   orientation?: Orientation;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Render with surface-aware border + radius chrome. Defaults to true — a feature card needs visible chrome. */
   bordered?: boolean;

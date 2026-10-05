@@ -41,7 +41,10 @@ const props = withDefaults(defineProps<PixelSectionProps>(), {
   horizontalGutter: 'lg',
   bordered: false,
 });
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Section content. */
+  default?(): VNode[];
+}>();
 
 const surface = useEffectiveSurface(() => props.surface);
 const locale = usePxlKitLocale();

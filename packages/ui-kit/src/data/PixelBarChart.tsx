@@ -19,11 +19,17 @@ import { ToneKey } from '../tokens';
    ────────────────────────────────────────────────────────────────────────── */
 
 export interface PixelBarChartProps extends React.SVGAttributes<SVGSVGElement> {
+  /** The series, one bar per point; one whose `y` is not finite leaves its slot empty. */
   data: PixelChartDataPoint[];
+  /** Colour of the bars and their labels. */
   tone?: ToneKey;
+  /** 160×64, 280×120 or 420×180 px. */
   size?: ChartSize;
+  /** Bars growing up, or to the right. */
   orientation?: BarChartOrientation;
+  /** Labels each bar with its value. */
   showValues?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /** Render with surface-aware border + radius chrome. Defaults to false (no chrome). */
   bordered?: boolean;

@@ -17,6 +17,7 @@ export interface PixelDividerProps {
   tone?: Tone;
   /** Symmetric vertical padding. */
   spacing?: DividerSpacing;
+  /** Extra classes on the root element. */
   className?: string;
   /** Surface variant. Falls back to nearest <PxlKitSurface>. */
   surface?: Surface;

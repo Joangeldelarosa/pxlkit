@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCommandDocsSectionProps {
@@ -17,6 +18,72 @@ export const PixelCommandDocsMeta = {
   since: '1.8.0',
   deprecated: false,
 } as const;
+
+/** PixelCommand's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCommand } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCommand',
+        props: [
+          { name: 'open', type: 'boolean', required: true, description: 'Whether the palette is visible; set it from `onOpenChange`.' },
+          { name: 'onOpenChange', type: '(open: boolean) => void', required: true, description: 'Called with the open state the palette asks for: its shortcut toggles it; Escape and the backdrop close it.' },
+          { name: 'shortcut', type: 'string', default: "'mod+k'", description: 'Global shortcut that toggles the palette, such as `mod+k` (Cmd or Ctrl + K).' },
+          { name: 'placeholder', type: 'string', default: "'Type a command or search…'", description: 'Placeholder of the search field.' },
+          { name: 'emptyMessage', type: 'string', default: "'No results.'", description: 'Shown instead of the list when nothing matches.' },
+          { name: 'groups', type: 'PixelCommandGroup[]', required: true, description: 'The commands, by group.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCommand } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCommand',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: 'v-model:open', description: 'Whether the palette is visible (`v-model:open`).' },
+          { name: 'shortcut', type: 'string', default: "'mod+k'", description: 'Global shortcut that toggles the palette, such as `mod+k` (Cmd or Ctrl + K).' },
+          { name: 'placeholder', type: 'string', default: "'Type a command or search…'", description: 'Placeholder of the search field.' },
+          { name: 'emptyMessage', type: 'string', default: "'No results.'", description: 'Shown instead of the list when nothing matches.' },
+          { name: 'groups', type: 'PixelCommandGroup[]', required: true, description: 'The commands, by group.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'update:open', payload: 'open: boolean', description: 'The requested open state: the shortcut toggles it; Escape and the backdrop close it.' },
+        ],
+        notes: [
+          'Its template ref exposes `element`: the palette panel while it is open.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCommand } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCommand',
+        selector: 'pxl-command',
+        props: [
+          { name: 'open', type: 'boolean', required: true, binding: '[(open)]', description: 'Whether the palette is visible (`[(open)]`).' },
+          { name: 'shortcut', type: 'string', default: "'mod+k'", description: 'Global shortcut that toggles the palette, such as `mod+k` (Cmd or Ctrl + K).' },
+          { name: 'placeholder', type: 'string', default: "'Type a command or search…'", description: 'Placeholder of the search field.' },
+          { name: 'emptyMessage', type: 'string', default: "'No results.'", description: 'Shown instead of the list when nothing matches.' },
+          { name: 'groups', type: 'PixelCommandGroup[]', required: true, description: 'The commands, by group.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        events: [
+          { name: 'openChange', payload: 'boolean', description: 'The open state the palette asks for: its shortcut toggles it; Escape and the backdrop close it.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +102,9 @@ export function PixelCommandDocsSection({ className }: PixelCommandDocsSectionPr
       <dt>Category</dt><dd>overlays</dd>
       <dt>Since</dt><dd>v1.8.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-command-api">
+      <h3 id="pixel-command-api">API</h3>
+      <FrameworkApi label={'PixelCommand API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-command-a11y">
       <h3 id="pixel-command-a11y">Accessibility</h3>

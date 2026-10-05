@@ -21,17 +21,29 @@ import { type ToneKey } from '../tokens';
 import { PixelStarRating } from './PixelStarRating';
 
 export interface PixelTestimonialCardProps extends React.HTMLAttributes<HTMLElement> {
+  /** The quote, set between curly quotation marks. */
   quote: string;
+  /** Who said it. */
   name: string;
+  /** Their role, before the company. */
   role?: string;
+  /** Their company. */
   company?: string;
+  /** Photo, or the name and tone of the initials; the initials of `name` without one. */
   avatar?: { src?: string; name: string; tone?: ToneKey };
+  /** Star rating out of 5; none for 0 or unset. */
   stars?: number;
+  /** Shows the VERIFIED badge. */
   verified?: boolean;
+  /** Tone of the initials. */
   tone?: ToneKey;
+  /** `card` draws the surface chrome; `quote` and `slider` leave it out. */
   variant?: Variant;
+  /** Minimum height of the quote. */
   quoteSize?: QuoteSize;
+  /** Actions under the quote (a link to the full story). */
   actions?: React.ReactNode;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
 }
 

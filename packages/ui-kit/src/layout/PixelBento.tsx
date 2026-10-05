@@ -6,7 +6,9 @@ import { cn } from '../common';
 import { StackGapKey } from '../tokens';
 
 export interface PixelBentoProps extends React.HTMLAttributes<HTMLDivElement> {
+  /** Column count from `lg` up. */
   columns?: BentoColumns;
+  /** Gap token (`stackGap`). */
   gap?: StackGapKey;
 }
 

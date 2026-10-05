@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitButtonDocsSectionProps {
@@ -17,6 +18,70 @@ export const PxlKitButtonDocsMeta = {
   since: '1.0.0',
   deprecated: true,
 } as const;
+
+/** PxlKitButton's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PxlKitButton } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PxlKitButton',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Accessible label — set as `aria-label` and `title`. Required.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size; the button is a square of it (`sizeSquare`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to nearest provider.' },
+          { name: 'icon', type: 'React.ReactNode', required: true, description: 'The icon to render inside the square.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`), except `children`.',
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PxlKitButton } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PxlKitButton',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Accessible name, set as `aria-label` and `title`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size; the button is a square of it (`sizeSquare`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to the nearest provider.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Native `disabled`; a disabled button also drops its shadows.' },
+        ],
+        slots: [
+          { name: 'icon', description: 'The icon.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<button>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PxlKitButton } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PxlKitButton',
+        selector: 'button[pxlIconButton], button[pxlKitButton]',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Accessible name, set as `aria-label` and `title`.' },
+          { name: 'icon', type: 'string | TemplateRef<any>', required: true, description: 'The icon.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Color tone (maps to `toneMap`).' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Visual size; the button is a square of it (`sizeSquare`).' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface aesthetic override; defaults to the nearest provider.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Native `disabled`; a disabled button also drops its shadows.' },
+        ],
+        notes: [
+          'Goes on a native `<button>`, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionProps): React.ReactElement {
   return (
@@ -37,9 +102,9 @@ export function PxlKitButtonDocsSection({ className }: PxlKitButtonDocsSectionPr
       <dt>Category</dt><dd>actions</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pxl-kit-button-api">
+      <h3 id="pxl-kit-button-api">API</h3>
+      <FrameworkApi label={'PxlKitButton API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-button-a11y">
       <h3 id="pxl-kit-button-a11y">Accessibility</h3>

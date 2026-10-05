@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PxlKitSurfaceProviderDocsSectionProps {
@@ -17,6 +18,51 @@ export const PxlKitSurfaceProviderDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PxlKitSurfaceProvider's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PxlKitSurfaceProvider',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", default: "'pixel'", description: 'Surface of every nested component that does not set its own.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The part of the app the surface applies to.' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PxlKitSurfaceProvider',
+        props: [
+          { name: 'surface', type: "'pixel' | 'linear'", default: "'pixel'", description: 'Surface of every nested component that does not set its own.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The part of the app the surface applies to.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PxlKitSurfaceProvider } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PxlKitSurfaceProvider',
+        selector: '[pxlKitSurface]',
+        props: [
+          { name: 'pxlKitSurface', type: "'pixel' | 'linear'", default: "'pixel'", accepts: "'pixel' | 'linear' | ''", description: 'Surface of the components inside.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfaceProviderDocsSectionProps): React.ReactElement {
   return (
@@ -34,9 +80,9 @@ export function PxlKitSurfaceProviderDocsSection({ className }: PxlKitSurfacePro
       <dt>Category</dt><dd>overlay-foundation</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pxl-kit-surface-provider-api">
+      <h3 id="pxl-kit-surface-provider-api">API</h3>
+      <FrameworkApi label={'PxlKitSurfaceProvider API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pxl-kit-surface-provider-a11y">
       <h3 id="pxl-kit-surface-provider-a11y">Accessibility</h3>

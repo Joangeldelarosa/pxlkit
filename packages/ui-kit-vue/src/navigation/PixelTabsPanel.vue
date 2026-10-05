@@ -18,7 +18,10 @@ const props = withDefaults(
   }>(),
   { keepMounted: undefined, bordered: false },
 );
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** The panel's content. */
+  default?(): VNode[];
+}>();
 
 const context = useTabsContext('PixelTabsPanel');
 const selected = computed(() => context.active.value === props.value);

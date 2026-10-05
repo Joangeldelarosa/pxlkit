@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelToggleDocsSectionProps {
@@ -17,6 +18,75 @@ export const PixelToggleDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelToggle's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelToggle } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelToggle',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Identifies the toggle within its group; also exposed as `data-pxl-toggle-value`.' },
+          { name: 'pressed', type: 'boolean', description: 'Standalone (uncontrolled) toggle: pressed state.' },
+          { name: 'onPressedChange', type: '(next: boolean) => void', description: 'Standalone (uncontrolled) toggle: notified on press change.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: "Surface override; defaults to the group's, then to the nearest provider." },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<button>` (`ButtonHTMLAttributes<HTMLButtonElement>`).',
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelToggle } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelToggle',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Identifies the toggle within its group; also exposed as `data-pxl-toggle-value`.' },
+          { name: 'pressed', type: 'boolean', binding: 'v-model:pressed', description: 'Pressed state of a standalone toggle (`v-model:pressed`); leave unset for an uncontrolled one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: "Surface override; defaults to the group's, then to the nearest provider." },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Native `disabled`.' },
+        ],
+        events: [
+          { name: 'update:pressed', payload: 'pressed: boolean', description: 'The new pressed state of a standalone toggle, after each press.' },
+        ],
+        slots: [
+          { name: 'default', description: 'Toggle label.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<button>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelToggle } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelToggle',
+        selector: 'button[pxlToggle]',
+        props: [
+          { name: 'value', type: 'string', required: true, description: 'Identifies the toggle within its group; also exposed as `data-pxl-toggle-value`.' },
+          { name: 'pressed', type: 'boolean', binding: '[(pressed)]', description: 'Pressed state of a standalone toggle (`[(pressed)]`); leave unset for an uncontrolled one.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: "Surface override; defaults to the group's, then to the nearest provider." },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Native `disabled`.' },
+          { name: 'type', type: 'string', default: "'button'", description: 'Native `type`.' },
+        ],
+        events: [
+          { name: 'pressedChange', payload: 'boolean', description: 'The new `pressed`: the event half of `[(pressed)]`.' },
+        ],
+        notes: [
+          'Goes on a native `<button>`, which keeps its own attributes and events.',
+          'Projects its content (`<ng-content>`).',
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `pressed` (`boolean`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +105,9 @@ export function PixelToggleDocsSection({ className }: PixelToggleDocsSectionProp
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-toggle-api">
+      <h3 id="pixel-toggle-api">API</h3>
+      <FrameworkApi label={'PixelToggle API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-toggle-a11y">
       <h3 id="pixel-toggle-a11y">Accessibility</h3>

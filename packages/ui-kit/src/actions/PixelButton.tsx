@@ -19,7 +19,7 @@ import { elementRef } from '../utils/element-ref';
 export interface PixelButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** Color tone (maps to `toneMap`). */
   tone?: Tone;
-  /** Visual size (`xs`–`xl`). */
+  /** Visual size. */
   size?: Size;
   /** Full Variant union — `solid` | `soft` | `outline` | `ghost`. */
   variant?: Variant;

@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelProgressDocsSectionProps {
@@ -17,6 +18,65 @@ export const PixelProgressDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelProgress's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelProgress } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelProgress',
+        props: [
+          { name: 'value', type: 'number', required: true, description: 'Current value 0-100 (clamped).' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: "Tone determines fill color. Defaults to `'green'`." },
+          { name: 'label', type: 'string', description: 'Optional label rendered above the bar. Also used as the progressbar\'s accessible name; falls back to "Progress" when omitted.' },
+          { name: 'showValue', type: 'boolean', default: 'true', description: 'Whether to show the numeric percentage on the right. Defaults to `true`.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; falls back to nearest provider.' },
+          { name: 'indeterminate', type: 'boolean', default: 'false', description: 'When `true`, switches to indeterminate animation (visual only — ARIA still reports value).' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelProgress } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelProgress',
+        props: [
+          { name: 'value', type: 'number', required: true, description: 'Current value 0–100 (clamped).' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the fill.' },
+          { name: 'label', type: 'string', description: 'Label above the bar, also its accessible name; the name falls back to "Progress" without one.' },
+          { name: 'showValue', type: 'boolean', default: 'true', description: 'Show the percentage on the right.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'indeterminate', type: 'boolean', default: 'false', description: 'Unknown-duration work: the bar pulses and reports no value.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelProgress } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelProgress',
+        selector: 'pxl-progress',
+        props: [
+          { name: 'value', type: 'number', required: true, description: 'Current value 0–100 (clamped).' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the fill.' },
+          { name: 'label', type: 'string', description: 'Label above the bar, also its accessible name; the name falls back to "Progress" without one.' },
+          { name: 'showValue', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Show the percentage on the right.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'indeterminate', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Unknown-duration work: the bar pulses and reports no value.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelProgressDocsSection({ className }: PixelProgressDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +95,9 @@ export function PixelProgressDocsSection({ className }: PixelProgressDocsSection
       <dt>Category</dt><dd>feedback</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-progress-api">
+      <h3 id="pixel-progress-api">API</h3>
+      <FrameworkApi label={'PixelProgress API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-progress-a11y">
       <h3 id="pixel-progress-a11y">Accessibility</h3>

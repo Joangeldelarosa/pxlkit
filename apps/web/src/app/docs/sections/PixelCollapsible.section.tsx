@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCollapsibleDocsSectionProps {
@@ -17,6 +18,66 @@ export const PixelCollapsibleDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelCollapsible's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCollapsible } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCollapsible',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Trigger label.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'Body content rendered when open.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Initial open state. Defaults to `false`.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: "Tone tint for the trigger button. Defaults to `'neutral'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Render with surface-aware border + radius chrome. Defaults to false (no chrome).' },
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCollapsible } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCollapsible',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label of the header button.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', description: 'Open on first render.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the header button.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface-aware border and radius around the collapsible.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The body, rendered while open.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCollapsible } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCollapsible',
+        selector: 'pxl-collapsible',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label of the header button.' },
+          { name: 'defaultOpen', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Open on first render.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the header button.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Visual surface override.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface-aware border and radius around the collapsible.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelCollapsibleDocsSection({ className }: PixelCollapsibleDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +96,9 @@ export function PixelCollapsibleDocsSection({ className }: PixelCollapsibleDocsS
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-collapsible-api">
+      <h3 id="pixel-collapsible-api">API</h3>
+      <FrameworkApi label={'PixelCollapsible API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-collapsible-a11y">
       <h3 id="pixel-collapsible-a11y">Accessibility</h3>

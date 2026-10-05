@@ -28,24 +28,45 @@ export interface PixelNumberInputProps
     React.InputHTMLAttributes<HTMLInputElement>,
     'value' | 'defaultValue' | 'onChange' | 'type' | 'size'
   > {
+  /** Value; leave unset for an uncontrolled field. */
   value?: number;
+  /** Initial value while uncontrolled. */
   defaultValue?: number;
+  /**
+   * Called with the new number, after each step, edit that reads as a number, or settle on blur.
+   */
   onChange?: (next: number) => void;
+  /** Lowest value. */
   min?: number;
+  /** Highest value. */
   max?: number;
+  /** Amount each step adds or removes. */
   step?: number;
+  /** Decimals shown, and the value is rounded to. */
   precision?: number;
+  /** When a value outside `min` / `max` is pulled back: while typing, on blur, or never. */
   clampBehavior?: 'strict' | 'blur' | 'none';
+  /** Text inside the field on the left (`$`). */
   prefix?: string;
+  /** Text inside the field on the right (`USD`). */
   suffix?: string;
+  /** Groups the integer digits (`,` shows `1,500,000`). */
   thousandsSeparator?: string;
+  /** Accepts negative numbers. */
   allowNegative?: boolean;
+  /** Hides the stepper buttons. */
   hideControls?: boolean;
+  /** Field height. */
   size?: NumSize;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Tone of the focus ring. */
   tone?: Tone;
+  /** Label rendered above the field. */
   label?: string;
+  /** Helper text below the field; hidden while `error` is set. */
   hint?: string;
+  /** Error message below the field; marks the input invalid. */
   error?: string;
 }
 

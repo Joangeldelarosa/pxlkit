@@ -14,8 +14,17 @@ import { PXLKIT_LOCALE } from '../composables/locale.js';
  *
  * For server-rendered apps, also set `lang` on `<html>`.
  */
-const props = withDefaults(defineProps<{ locale?: PxlKitLocale }>(), { locale: 'en' });
-defineSlots<{ default?(): VNode[] }>();
+const props = withDefaults(
+  defineProps<{
+    /** BCP 47 locale tag. */
+    locale?: PxlKitLocale;
+  }>(),
+  { locale: 'en' },
+);
+defineSlots<{
+  /** The part of the app that follows the locale. */
+  default?(): VNode[];
+}>();
 
 provide(
   PXLKIT_LOCALE,

@@ -50,9 +50,13 @@ export interface PixelNavigationMenuItem {
 
 export interface PixelNavigationMenuProps
   extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
+  /** The items, in order. */
   items: PixelNavigationMenuItem[];
+  /** Items in a row or a column; also the arrow keys that move between them. */
   orientation?: 'horizontal' | 'vertical';
+  /** One shared panel below the list, instead of a panel under each item. */
   viewport?: boolean;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
   /**
    * Accessible name for the nav landmark. Required when more than one nav

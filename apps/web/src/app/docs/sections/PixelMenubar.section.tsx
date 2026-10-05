@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelMenubarDocsSectionProps {
@@ -17,6 +18,54 @@ export const PixelMenubarDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelMenubar's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelMenubar } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelMenubar',
+        props: [
+          { name: 'menus', type: 'PixelMenubarMenu[]', required: true, description: 'The menus, in order.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelMenubar } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelMenubar',
+        props: [
+          { name: 'menus', type: 'PixelMenubarMenu[]', required: true, description: 'The menus, in order.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelMenubar } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelMenubar',
+        selector: 'pxl-menubar',
+        props: [
+          { name: 'menus', type: 'PixelMenubarMenu[]', required: true, description: 'The menus, in order.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelMenubarDocsSection({ className }: PixelMenubarDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +84,9 @@ export function PixelMenubarDocsSection({ className }: PixelMenubarDocsSectionPr
       <dt>Category</dt><dd>navigation</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-menubar-api">
+      <h3 id="pixel-menubar-api">API</h3>
+      <FrameworkApi label={'PixelMenubar API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-menubar-a11y">
       <h3 id="pixel-menubar-a11y">Accessibility</h3>

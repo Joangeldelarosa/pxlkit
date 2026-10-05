@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSelectDocsSectionProps {
@@ -17,6 +18,102 @@ export const PixelSelectDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelSelect's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSelect } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSelect',
+        props: [
+          { name: 'label', type: 'string', description: 'Floating label rendered above the trigger.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'Items rendered in the listbox.' },
+          { name: 'value', type: 'string', description: 'Controlled value. Make sure to update via `onChange`.' },
+          { name: 'defaultValue', type: 'string', description: 'Uncontrolled initial value.' },
+          { name: 'onChange', type: '(value: string) => void', description: 'Fires when the user picks an option.' },
+          { name: 'placeholder', type: 'string', default: "'Select...'", description: 'Placeholder shown when no value is selected.' },
+          { name: 'hint', type: 'string', description: 'Helper text shown below the field. Hidden when `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message shown below the field; flips visual state to invalid.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables interaction + grays out the trigger.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: "Visual tone for focus ring + selected option. Default: `'neutral'`." },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: "Trigger height token. Default: `'md'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'name', type: 'string', description: 'Sets `name` on the hidden serialization input so the value participates in native `<form>` submissions.' },
+          { name: 'required', type: 'boolean', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: 'DOM `id` forwarded to the trigger.' },
+          { name: 'aria-describedby', type: 'string', description: '`aria-describedby` of the trigger; the hint / error is added while it shows.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSelect } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSelect',
+        props: [
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'options', type: 'Option[]', required: true, description: "The options of the listbox; an option's `icon` shows before its label." },
+          { name: 'modelValue', type: 'string', binding: 'v-model', description: 'Selected value (`v-model`); leave unset for an uncontrolled select.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'placeholder', type: 'string', default: "'Select...'", description: 'Text shown while nothing is selected.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables the select and greys out the trigger.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring and the selected option.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'required', type: 'boolean', default: 'false', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: string', description: 'The value of the option the user picked.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the combobox trigger.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSelect } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSelect',
+        selector: 'pxl-select',
+        props: [
+          { name: 'label', type: 'string', description: 'Label rendered above the trigger.' },
+          { name: 'options', type: 'Option[]', required: true, description: 'The options of the listbox.' },
+          { name: 'value', type: 'string', binding: '[(value)]', description: 'Selected value (`[(value)]`); leave unset for an uncontrolled select.' },
+          { name: 'defaultValue', type: 'string', description: 'Initial value while uncontrolled.' },
+          { name: 'placeholder', type: 'string', default: "'Select...'", description: 'Text shown while nothing is selected.' },
+          { name: 'hint', type: 'string', description: 'Helper text below the field; hidden while `error` is set.' },
+          { name: 'error', type: 'string', description: 'Error message below the field; marks the trigger invalid.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables the select and greys out the trigger.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'neutral'", description: 'Tone of the focus ring and the selected option.' },
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Trigger height.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits the value.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: '`id` of the trigger; generated when left out.' },
+          { name: 'aria-describedby', type: 'string', description: 'Ids of more elements that describe the trigger; its hint / error is added while one shows.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'string', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`string`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +132,9 @@ export function PixelSelectDocsSection({ className }: PixelSelectDocsSectionProp
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-select-api">
+      <h3 id="pixel-select-api">API</h3>
+      <FrameworkApi label={'PixelSelect API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-select-a11y">
       <h3 id="pixel-select-a11y">Accessibility</h3>

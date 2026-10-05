@@ -67,25 +67,50 @@ import { Surface, cn, useEffectiveSurface } from '../common';
 export type { PixelDataTableDensity } from '@pxlkit/ui-kit-core';
 
 export interface PixelDataTableProps<TData, TValue = unknown> {
+  /** Row data. */
   data: TData[];
+  /** TanStack column definitions. */
   columns: ColumnDef<TData, TValue>[];
+  /** Sort state; leave unset to let the table sort. */
   sorting?: { id: string; desc: boolean }[];
+  /** Called with the new sort, after a click on a sortable header. */
   onSortingChange?: (next: { id: string; desc: boolean }[]) => void;
+  /** Column filters, column id → value. */
   filtering?: Record<string, string>;
+  /** Called with the new column filters. */
   onFilteringChange?: (next: Record<string, string>) => void;
+  /** Page; the pagination bar shows once it is set. */
   pagination?: { pageIndex: number; pageSize: number };
+  /**
+   * Called with the new page, after a page button, a page-size change or a reset to the first page.
+   */
   onPaginationChange?: (next: { pageIndex: number; pageSize: number }) => void;
+  /** Selected row ids → `true`; the selection column shows once it is set. */
   rowSelection?: Record<string, boolean>;
+  /** Called with the new row selection, after a checkbox changes. */
   onRowSelectionChange?: (next: Record<string, boolean>) => void;
+  /** Column id → shown. */
   columnVisibility?: Record<string, boolean>;
+  /** Called with the new column visibility. */
   onColumnVisibilityChange?: (next: Record<string, boolean>) => void;
+  /** A stable id per row; the row's index by default. */
   getRowId?: (row: TData, idx: number) => string;
+  /** Cell padding scale. */
   density?: PixelDataTableDensity;
+  /** Sticks the header to the top of the scroll container. */
   stickyHeader?: boolean;
+  /** Shows skeleton rows instead of the data. */
   loading?: boolean;
+  /** Shown in a full-width cell when there are no rows; "No data." by default. */
   emptyState?: React.ReactNode;
+  /**
+   * Called with a row's data when it is clicked, or activated with Enter or Space; with it, rows
+   * show a pointer and take focus.
+   */
   onRowClick?: (row: TData) => void;
+  /** Surface override; defaults to the nearest provider. */
   surface?: Surface;
+  /** Extra classes on the wrapper. */
   className?: string;
   /** Render with surface-aware border + radius chrome. Defaults to true — data table needs visible chrome. */
   bordered?: boolean;

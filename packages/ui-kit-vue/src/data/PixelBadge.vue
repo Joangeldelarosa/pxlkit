@@ -41,6 +41,7 @@ const props = withDefaults(defineProps<PixelBadgeProps>(), {
   size: 'md',
 });
 defineSlots<{
+  /** Badge content. */
   default?(): VNode[];
   /** Leading icon. */
   'icon-left'?(): VNode[];

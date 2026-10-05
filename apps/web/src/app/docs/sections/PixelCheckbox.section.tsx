@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelCheckboxDocsSectionProps {
@@ -17,6 +18,88 @@ export const PixelCheckboxDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelCheckbox's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelCheckbox } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelCheckbox',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label rendered next to the box.' },
+          { name: 'checked', type: 'boolean', description: 'Controlled checked state.' },
+          { name: 'defaultChecked', type: 'boolean', description: 'Uncontrolled initial checked state.' },
+          { name: 'onChange', type: '(next: boolean) => void', description: 'Fires with the next checked value when clicked.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables interaction + grays out the control.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: "Visual tone for the checked state. Default: `'green'`." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'name', type: 'string', description: "Form-serialization name. Hidden mirror input sends `'on'` / `''`." },
+          { name: 'value', type: 'string', default: "'on'", description: "HTML form value when checked. Defaults to `'on'`." },
+          { name: 'required', type: 'boolean', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: 'DOM `id` forwarded to the trigger.' },
+        ],
+        notes: [
+          '`ref` points to `<button>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelCheckbox } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelCheckbox',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label rendered next to the box.' },
+          { name: 'checked', type: 'boolean', binding: 'v-model:checked', description: 'Checked state (`v-model:checked`); leave unset for an uncontrolled checkbox.' },
+          { name: 'defaultChecked', type: 'boolean', default: 'false', description: 'Initial checked state while uncontrolled.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables interaction and greys out the control.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the checked box.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits `value` while checked.' },
+          { name: 'value', type: 'string', default: "'on'", description: 'Form value while checked.' },
+          { name: 'required', type: 'boolean', default: 'false', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: '`id` of the checkbox button.' },
+        ],
+        events: [
+          { name: 'update:checked', payload: 'checked: boolean', description: 'The new checked state, after each toggle.' },
+        ],
+        notes: [
+          'Other attributes and listeners go to the `<button>`.',
+          'Its template ref exposes `element`: the checkbox button.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelCheckbox } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelCheckbox',
+        selector: 'pxl-checkbox',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label rendered next to the box.' },
+          { name: 'checked', type: 'boolean', binding: '[(checked)]', description: 'Checked state (`[(checked)]`); leave unset for an uncontrolled checkbox.' },
+          { name: 'defaultChecked', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Initial checked state while uncontrolled.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables interaction and greys out the control.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'green'", description: 'Tone of the checked box.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name — a hidden input submits `value` while checked.' },
+          { name: 'value', type: 'string', default: "'on'", description: 'Form value while checked.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: '`id` of the checkbox button.' },
+        ],
+        events: [
+          { name: 'checkedChange', payload: 'boolean', description: 'The new `checked`: the event half of `[(checked)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `checked` (`boolean`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +118,9 @@ export function PixelCheckboxDocsSection({ className }: PixelCheckboxDocsSection
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-checkbox-api">
+      <h3 id="pixel-checkbox-api">API</h3>
+      <FrameworkApi label={'PixelCheckbox API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-checkbox-a11y">
       <h3 id="pixel-checkbox-a11y">Accessibility</h3>

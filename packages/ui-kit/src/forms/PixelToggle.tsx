@@ -17,11 +17,13 @@ import { ToggleGroupContext } from './PixelToggleGroup';
 
 /** Public prop bag for {@link PixelToggle}. */
 export interface PixelToggleProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Identifies the toggle within its group; also exposed as `data-pxl-toggle-value`. */
   value: string;
   /** Standalone (uncontrolled) toggle: pressed state. */
   pressed?: boolean;
   /** Standalone (uncontrolled) toggle: notified on press change. */
   onPressedChange?: (next: boolean) => void;
+  /** Surface override; defaults to the group's, then to the nearest provider. */
   surface?: Surface;
 }
 

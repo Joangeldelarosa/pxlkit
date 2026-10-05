@@ -14,7 +14,10 @@ const props = defineProps<{
   /** Keep the content in place. */
   disabled?: boolean;
 }>();
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Content to render in the target. */
+  default?(): VNode[];
+}>();
 
 const mounted = ref(false);
 onMounted(() => {

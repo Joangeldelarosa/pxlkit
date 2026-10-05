@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelSliderDocsSectionProps {
@@ -17,6 +18,102 @@ export const PixelSliderDocsMeta = {
   since: '1.0.0',
   deprecated: false,
 } as const;
+
+/** PixelSlider's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelSlider } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelSlider',
+        props: [
+          { name: 'value', type: 'number | [number, number]', required: true, description: 'Controlled scalar value.' },
+          { name: 'onChange', type: '((next: number) => void) | ((next: [number, number]) => void)', required: true, description: 'Fires with the next scalar value.' },
+          { name: 'label', type: 'string', required: true, description: 'Visible label rendered above the track.' },
+          { name: 'min', type: 'number', default: '0', description: 'Minimum value. Default: `0`.' },
+          { name: 'max', type: 'number', default: '100', description: 'Maximum value. Default: `100`.' },
+          { name: 'step', type: 'number', default: '1', description: 'Distance between two values, counted from `min`: the slider takes `min`, `min + step`, `min + 2 * step`… up to `max`. Default: `1`.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables interaction + grays out the track.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: "Visual tone for the active fill + thumb. Default: `'cyan'`." },
+          { name: 'showMinMax', type: 'boolean', default: 'false', description: 'Render `min` / `max` numbers under the track.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface variant. Inherits from `PxlKitSurfaceProvider` when omitted.' },
+          { name: 'name', type: 'string', description: 'Form-serialization name (range mode emits `name[0]` / `name[1]`).' },
+          { name: 'required', type: 'boolean', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: 'DOM `id` forwarded to the single / lower thumb.' },
+          { name: 'marks', type: 'PixelSliderMark[]', description: 'Labeled marks plotted on the track.' },
+          { name: 'showTooltip', type: "'always' | 'drag' | 'never'", default: "'never'", description: "When/how to show a value tooltip on each thumb. - `'always'`: visible all the time - `'drag'`: visible while dragging or focused - `'never'`: hidden (default)" },
+          { name: 'ticks', type: 'boolean', default: 'false', description: 'Render tick marks under the track for every discrete `step`.' },
+        ],
+        notes: [
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelSlider } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelSlider',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label above the track; also names the thumbs.' },
+          { name: 'modelValue', type: 'number | [number, number]', required: true, binding: 'v-model', description: 'Value (`v-model`): a number, or a `[low, high]` pair for a range.' },
+          { name: 'min', type: 'number', default: '0', description: 'Lowest value.' },
+          { name: 'max', type: 'number', default: '100', description: 'Highest value.' },
+          { name: 'step', type: 'number', default: '1', description: 'Distance between two values, counted from `min`: the slider takes `min`, `min + step`… up to `max`.' },
+          { name: 'disabled', type: 'boolean', default: 'false', description: 'Disables dragging and the keys and greys out the track.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone of the fill and thumbs.' },
+          { name: 'showMinMax', type: 'boolean', default: 'false', description: 'Shows `min` and `max` under the track.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name of the hidden inputs.' },
+          { name: 'required', type: 'boolean', default: 'false', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: '`id` of the single (or lower) thumb.' },
+          { name: 'marks', type: 'PixelSliderMark[]', description: 'Labelled marks under the track.' },
+          { name: 'showTooltip', type: "'always' | 'drag' | 'never'", default: "'never'", description: 'When a thumb shows its value: `always`, while dragged or focused (`drag`), or `never`.' },
+          { name: 'ticks', type: 'boolean', default: 'false', description: 'Draws a tick under the track for every step.' },
+        ],
+        events: [
+          { name: 'update:modelValue', payload: 'value: number | [number, number]', description: 'The new value, as a thumb is dragged or moved with the keys.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelSlider } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelSlider',
+        selector: 'pxl-slider',
+        props: [
+          { name: 'label', type: 'string', required: true, description: 'Label above the track; also names the thumbs.' },
+          { name: 'value', type: 'number | [number, number]', binding: '[(value)]', description: 'Value (`[(value)]`): a number, or a `[low, high]` pair for a range; `min` while unset.' },
+          { name: 'min', type: 'number', default: '0', accepts: 'unknown', description: 'Lowest value.' },
+          { name: 'max', type: 'number', default: '100', accepts: 'unknown', description: 'Highest value.' },
+          { name: 'step', type: 'number', default: '1', accepts: 'unknown', description: 'Distance between two values, counted from `min`: the slider takes `min`, `min + step`… up to `max`.' },
+          { name: 'disabled', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Disables dragging and the keys and greys out the track.' },
+          { name: 'tone', type: "'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink' | 'neutral'", default: "'cyan'", description: 'Tone of the fill and thumbs.' },
+          { name: 'showMinMax', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Shows `min` and `max` under the track.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'name', type: 'string', description: 'Form field name of the hidden inputs.' },
+          { name: 'required', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Marks the field as required for native form validation.' },
+          { name: 'id', type: 'string', description: '`id` of the single (or lower) thumb.' },
+          { name: 'marks', type: 'PixelSliderMark[]', description: 'Labelled marks under the track.' },
+          { name: 'showTooltip', type: "'always' | 'drag' | 'never'", default: "'never'", description: 'When a thumb shows its value: `always`, while dragged or focused (`drag`), or `never`.' },
+          { name: 'ticks', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Draws a tick under the track for every step.' },
+        ],
+        events: [
+          { name: 'valueChange', payload: 'number | [number, number]', description: 'The new `value`: the event half of `[(value)]`.' },
+        ],
+        notes: [
+          'A form control: works with `ngModel`, `formControl` and `formControlName`, which read and write `value` (`number | [number, number]`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelSliderDocsSection({ className }: PixelSliderDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +132,9 @@ export function PixelSliderDocsSection({ className }: PixelSliderDocsSectionProp
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.0.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-slider-api">
+      <h3 id="pixel-slider-api">API</h3>
+      <FrameworkApi label={'PixelSlider API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-slider-a11y">
       <h3 id="pixel-slider-a11y">Accessibility</h3>

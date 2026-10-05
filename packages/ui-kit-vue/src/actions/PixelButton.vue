@@ -55,6 +55,7 @@ const props = withDefaults(defineProps<PixelButtonProps>(), {
 });
 
 defineSlots<{
+  /** Button label. */
   default?(): VNode[];
   /** Leading icon; replaced by a spinner while `loading`. */
   'icon-left'?(): VNode[];

@@ -3,7 +3,10 @@ import type { VNode } from 'vue';
 import { cardBodyClasses } from '@pxlkit/ui-kit-core';
 
 /** Body part of a `PixelCard`, which takes the height left over. */
-defineSlots<{ default?(): VNode[] }>();
+defineSlots<{
+  /** Body content. */
+  default?(): VNode[];
+}>();
 </script>
 
 <template>

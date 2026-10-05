@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelTwoColumnDocsSectionProps {
@@ -17,6 +18,79 @@ export const PixelTwoColumnDocsMeta = {
   since: '1.6.0',
   deprecated: false,
 } as const;
+
+/** PixelTwoColumn's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelTwoColumn } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelTwoColumn',
+        props: [
+          { name: 'ratio', type: "'50/50' | '60/40' | '40/60' | '70/30' | '30/70'", default: "'50/50'", description: 'Width of the left column against the right one.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '6', description: 'Gap token (`stackGap`).' },
+          { name: 'reverse', type: 'boolean', default: 'false', description: 'Show the right column first (CSS `order`; the DOM order stays).' },
+          { name: 'stackBelow', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Breakpoint below which the columns stack.' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the columns.' },
+          { name: 'left', type: 'React.ReactNode', required: true, description: 'Content of the left column.' },
+          { name: 'right', type: 'React.ReactNode', required: true, description: 'Content of the right column.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'as', type: 'keyof React.JSX.IntrinsicElements', description: 'Element to render.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelTwoColumn } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelTwoColumn',
+        props: [
+          { name: 'ratio', type: "'50/50' | '60/40' | '40/60' | '70/30' | '30/70'", default: "'50/50'", description: 'Width of the left column against the right one.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '6', description: 'Gap token (`stackGap`).' },
+          { name: 'reverse', type: 'boolean', default: 'false', description: 'Show the right column first (CSS `order`; the DOM order stays).' },
+          { name: 'stackBelow', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Breakpoint below which the columns stack.' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the columns.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'as', type: 'string', default: "'div'", description: 'Element to render.' },
+          { name: 'bordered', type: 'boolean', default: 'false', description: 'Surface border and radius.' },
+        ],
+        slots: [
+          { name: 'left', description: 'Content of the left column.' },
+          { name: 'right', description: 'Content of the right column.' },
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelTwoColumn } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelTwoColumn',
+        selector: '[pxlTwoColumn]',
+        props: [
+          { name: 'left', type: 'string | TemplateRef<any>', required: true, description: 'Content of the left column.' },
+          { name: 'right', type: 'string | TemplateRef<any>', required: true, description: 'Content of the right column.' },
+          { name: 'ratio', type: "'50/50' | '60/40' | '40/60' | '70/30' | '30/70'", default: "'50/50'", description: 'Width of the left column against the right one.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', default: '6', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap token (`stackGap`).' },
+          { name: 'reverse', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Show the right column first (CSS `order`; the DOM order stays).' },
+          { name: 'stackBelow', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Breakpoint below which the columns stack.' },
+          { name: 'align', type: "'start' | 'center' | 'end' | 'stretch'", description: 'Block-axis alignment of the columns.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'false', accepts: 'unknown', description: 'Surface border and radius.' },
+        ],
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +109,9 @@ export function PixelTwoColumnDocsSection({ className }: PixelTwoColumnDocsSecti
       <dt>Category</dt><dd>layout</dd>
       <dt>Since</dt><dd>v1.6.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-two-column-api">
+      <h3 id="pixel-two-column-api">API</h3>
+      <FrameworkApi label={'PixelTwoColumn API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-two-column-a11y">
       <h3 id="pixel-two-column-a11y">Accessibility</h3>

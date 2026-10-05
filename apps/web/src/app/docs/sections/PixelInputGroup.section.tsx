@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelInputGroupDocsSectionProps {
@@ -17,6 +18,76 @@ export const PixelInputGroupDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelInputGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelInputGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelInputGroup',
+        props: [
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Height of the shell.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the group. Strongly recommended since this primitive visually joins multiple form controls (e.g. country code + phone) — without an accessible name a screen reader user has no idea what the group represents. In dev, a missing name on a group of >1 child logs a warning.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The controls to join; each element is joined, text is dropped.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelInputGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelInputGroup',
+        props: [
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Height of the shell.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'role', type: 'string', description: 'Role of the shell; `group` when named and left out.' },
+          { name: 'ariaLabel', type: 'string', description: 'Accessible name of the group — strongly recommended.' },
+          { name: 'ariaLabelledby', type: 'string', description: 'Id of the element that names the group.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The controls to join; each element is joined, text is dropped.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelInputGroup, PixelInputGroupItem } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelInputGroup',
+        selector: 'pxl-input-group',
+        props: [
+          { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Height of the shell.' },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'role', type: 'string', description: 'Role of the shell; `group` when named and left out.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name of the group — strongly recommended.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+      {
+        name: 'PixelInputGroupItem',
+        selector: '[pxlInputGroupItem]',
+        notes: [
+          'Goes on any element, which keeps its own attributes and events.',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +106,9 @@ export function PixelInputGroupDocsSection({ className }: PixelInputGroupDocsSec
       <dt>Category</dt><dd>forms</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-input-group-api">
+      <h3 id="pixel-input-group-api">API</h3>
+      <FrameworkApi label={'PixelInputGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-input-group-a11y">
       <h3 id="pixel-input-group-a11y">Accessibility</h3>

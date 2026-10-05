@@ -3,6 +3,7 @@
 // Source manifest: see <Component>.manifest.ts beside the implementation.
 
 import * as React from 'react';
+import { FrameworkApi, type FrameworkApiReferences } from '@/components/FrameworkApi';
 import { FrameworkCode } from '@/components/FrameworkCode';
 
 export interface PixelStatGroupDocsSectionProps {
@@ -17,6 +18,75 @@ export const PixelStatGroupDocsMeta = {
   since: '1.9.0',
   deprecated: false,
 } as const;
+
+/** PixelStatGroup's API in each kit, read from its sources by `npm run docs:build`. */
+const api: FrameworkApiReferences = {
+  react: {
+    import: "import { PixelStatGroup } from '@pxlkit/ui-kit';",
+    components: [
+      {
+        name: 'PixelStatGroup',
+        props: [
+          { name: 'layout', type: "'row' | 'grid'", default: "'row'", description: 'A divided row, or a grid.' },
+          { name: 'columns', type: 'number', default: '3', description: 'Grid columns, 1 to 6.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between grid cells (stackGap scale). Only applies to layout="grid"; omit for flush cells.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: "Tone of the frame and the row's dividers." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Render with surface-aware border + radius chrome. Defaults to true — group needs visible chrome.' },
+          { name: 'aria-label', type: 'string', description: 'Accessible name for the group landmark. Without it, role=group is dropped.' },
+          { name: 'aria-labelledby', type: 'string', description: 'Id of the element that names the group, in place of `aria-label`.' },
+          { name: 'children', type: 'React.ReactNode', required: true, description: 'The stat tiles.' },
+        ],
+        notes: [
+          'Also takes the native attributes and event handlers of `<div>` (`HTMLAttributes<HTMLDivElement>`).',
+          '`ref` points to `<div>`.',
+        ],
+      },
+    ],
+  },
+  vue: {
+    import: "import { PixelStatGroup } from '@pxlkit/ui-kit-vue';",
+    components: [
+      {
+        name: 'PixelStatGroup',
+        props: [
+          { name: 'layout', type: "'row' | 'grid'", default: "'row'", description: 'A divided row, or a grid.' },
+          { name: 'columns', type: 'number', default: '3', description: 'Grid columns, 1 to 6.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', description: 'Gap between grid cells (`stackGap`); flush cells when unset.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: "Tone of the frame and the row's dividers." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', description: 'Surface border, radius and background.' },
+        ],
+        slots: [
+          { name: 'default', description: 'The stat tiles.' },
+        ],
+        notes: [
+          'Other attributes and listeners fall through to its root `<div>`.',
+        ],
+      },
+    ],
+  },
+  angular: {
+    import: "import { PixelStatGroup } from '@pxlkit/ui-kit-angular';",
+    components: [
+      {
+        name: 'PixelStatGroup',
+        selector: 'pxl-stat-group',
+        props: [
+          { name: 'layout', type: "'row' | 'grid'", default: "'row'", description: 'A divided row, or a grid.' },
+          { name: 'columns', type: 'number', default: '3', accepts: 'unknown', description: 'Grid columns, 1 to 6.' },
+          { name: 'gap', type: '0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16', accepts: "0 | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16'", description: 'Gap between grid cells (`stackGap`); flush cells when unset.' },
+          { name: 'tone', type: "'neutral' | 'green' | 'cyan' | 'gold' | 'red' | 'purple' | 'pink'", default: "'neutral'", description: "Tone of the frame and the row's dividers." },
+          { name: 'surface', type: "'pixel' | 'linear'", description: 'Surface override; defaults to the nearest provider.' },
+          { name: 'bordered', type: 'boolean', default: 'true', accepts: 'unknown', description: 'Surface border, radius and background.' },
+        ],
+        notes: [
+          'Projects its content (`<ng-content>`).',
+        ],
+      },
+    ],
+  },
+};
 
 export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSectionProps): React.ReactElement {
   return (
@@ -35,9 +105,9 @@ export function PixelStatGroupDocsSection({ className }: PixelStatGroupDocsSecti
       <dt>Category</dt><dd>data</dd>
       <dt>Since</dt><dd>v1.9.0</dd>
     </dl>
-    <section aria-label="Props">
-      <h3>Props</h3>
-      <p className="docs-empty">No props documented yet.</p>
+    <section aria-labelledby="pixel-stat-group-api">
+      <h3 id="pixel-stat-group-api">API</h3>
+      <FrameworkApi label={'PixelStatGroup API'} react={api.react} vue={api.vue} angular={api.angular} />
     </section>
     <section aria-labelledby="pixel-stat-group-a11y">
       <h3 id="pixel-stat-group-a11y">Accessibility</h3>
