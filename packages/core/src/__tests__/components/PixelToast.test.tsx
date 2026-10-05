@@ -39,6 +39,14 @@ describe('PixelToast', () => {
     expect(container.querySelector('img')).not.toBeNull();
   });
 
+  it('renders its icon decorative: the title beside it names the toast', () => {
+    const { container } = render(
+      <PixelToast visible={true} title="Saved!" icon={testIcon} />
+    );
+    expect(container.querySelector('img')!.getAttribute('alt')).toBe('');
+    expect(screen.queryByRole('img')).toBeNull();
+  });
+
   it('shows close button by default', () => {
     render(<PixelToast visible={true} title="Title" />);
     expect(screen.getByRole('button', { name: /close/i })).toBeTruthy();

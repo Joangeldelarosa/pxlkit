@@ -104,9 +104,57 @@ export function renderIconDataUri(icon: PxlKitData, options: IconRenderOptions =
   return `data:image/svg+xml,${encodeURIComponent(renderIconSvg(icon, options))}`;
 }
 
-/** Accessible name of a rendered icon: the explicit label, else the icon's name. */
-export function resolveIconLabel(icon: { name: string }, label?: string): string {
-  return label || icon.name;
+/** How a rendered icon is exposed to assistive technology. */
+export interface IconLabelOptions {
+  /**
+   * Accessible name. Unset or empty falls back to the icon's name: an empty
+   * label reads as a missing one — as an empty `aria-label` does in ARIA —
+   * never as "decorative".
+   */
+  label?: string;
+  /**
+   * The icon only illustrates visible text that already says what it means
+   * (a "Save" button's floppy disk, a heading's emblem): it gets no
+   * accessible name and assistive technology skips it. Wins over `label`.
+   */
+  decorative?: boolean;
+}
+
+/**
+ * Accessible name of a rendered icon, written as the `alt` of its `<img>`:
+ * the explicit label, else the icon's name — or `''` for a decorative icon,
+ * the empty `alt` that makes assistive technology skip the image.
+ */
+export function resolveIconLabel(icon: { name: string }, options: IconLabelOptions = {}): string {
+  if (options.decorative) return '';
+  return options.label || icon.name;
+}
+
+/**
+ * ARIA attributes of an icon drawn as a container of images (the parallax
+ * icon) rather than a single `<img>`. An unset value means "no attribute" —
+ * React, Vue and Angular all omit an attribute bound to `undefined`.
+ */
+export interface IconContainerAria {
+  /** `'img'`, so the container is announced as one image; unset when decorative. */
+  role: 'img' | undefined;
+  /** The container's accessible name; unset when decorative. */
+  label: string | undefined;
+  /** `'true'` when decorative, hiding the container and its layers; else unset. */
+  hidden: 'true' | undefined;
+}
+
+/**
+ * {@link IconContainerAria} of an icon: a `role="img"` named like any icon
+ * ({@link resolveIconLabel}) — or, decorative, `aria-hidden`, the container's
+ * counterpart of an empty `alt`.
+ */
+export function resolveIconContainerAria(
+  icon: { name: string },
+  options: IconLabelOptions = {},
+): IconContainerAria {
+  if (options.decorative) return { role: undefined, label: undefined, hidden: 'true' };
+  return { role: 'img', label: resolveIconLabel(icon, options), hidden: undefined };
 }
 
 /**

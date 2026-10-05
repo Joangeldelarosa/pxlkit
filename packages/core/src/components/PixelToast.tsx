@@ -64,6 +64,7 @@ export function PixelToast({
                 size={view.icon.size}
                 appearance={view.icon.appearance}
                 color={view.icon.color}
+                decorative={view.icon.decorative}
               />
             </div>
           ) : (

@@ -85,6 +85,22 @@ describe('AnimatedPxlKitIcon', () => {
     expect(screen.getByAltText('My Animation')).toBeTruthy();
   });
 
+  it('decorative empties the alt of every frame, whatever the aria-label', () => {
+    const { container } = render(
+      <AnimatedPxlKitIcon icon={testAnimatedIcon} decorative aria-label="My Animation" />
+    );
+    const img = getInnerImg(container);
+    expect(img.getAttribute('alt')).toBe('');
+    expect(screen.queryByRole('img')).toBeNull();
+    act(() => {
+      vi.advanceTimersByTime(testAnimatedIcon.frameDuration);
+    });
+    expect(getInnerImg(container).getAttribute('alt')).toBe('');
+    // The wrapper is a plain box: the empty alt alone is what hides the icon.
+    const wrapper = container.firstChild as HTMLElement;
+    expect(['role', 'aria-label', 'aria-hidden'].filter((name) => wrapper.hasAttribute(name))).toEqual([]);
+  });
+
   it('cycles frames over time in loop mode', () => {
     const { container } = render(
       <AnimatedPxlKitIcon icon={testAnimatedIcon} />

@@ -42,6 +42,7 @@ interface IconProps {
   appearance?: IconAppearance;
   color?: string;
   ariaLabel?: string;
+  decorative?: boolean;
 }
 
 interface AnimatedProps extends Omit<IconProps, 'icon'> {
@@ -86,6 +87,7 @@ interface ToastProps {
     [appearance]="p().appearance"
     [color]="p().color"
     [ariaLabel]="p().ariaLabel"
+    [decorative]="p().decorative"
   />`,
 })
 class IconHost {
@@ -104,6 +106,7 @@ class IconHost {
     [speed]="p().speed"
     [fps]="p().fps"
     [ariaLabel]="p().ariaLabel"
+    [decorative]="p().decorative"
   />`,
 })
 class AnimatedHost {
@@ -124,6 +127,7 @@ class AnimatedHost {
     [shadow]="p().shadow"
     [interactive]="p().interactive"
     [ariaLabel]="p().ariaLabel"
+    [decorative]="p().decorative"
   />`,
 })
 class ParallaxHost {
@@ -225,7 +229,7 @@ describe('React ↔ Angular parity', () => {
     for (const icon of [testIcon, testIconWithAlpha]) {
       for (const appearance of appearances) for (const color of [undefined, '#FF5500']) {
         for (const size of [16, 32, 50]) for (const ariaLabel of [undefined, 'Label']) {
-          variants.push({ icon, appearance, color, size, ariaLabel });
+          for (const decorative of [undefined, true]) variants.push({ icon, appearance, color, size, ariaLabel, decorative });
         }
       }
     }
@@ -258,6 +262,8 @@ describe('React ↔ Angular parity', () => {
       variants.push({ icon: animatedIcon3, trigger, appearance, color: '#ABCDEF', size, ariaLabel: size === 24 ? 'Anim' : undefined });
     }
     variants.push({ icon: testAnimatedIcon, playing: false });
+    variants.push({ icon: animatedIcon3, ariaLabel: 'Anim', decorative: true });
+    variants.push({ icon: animatedIcon3, ariaLabel: 'Anim', decorative: false });
     expectSameDom(ReactAnimated, AnimatedHost, variants);
   });
 
@@ -303,6 +309,9 @@ describe('React ↔ Angular parity', () => {
       }
     }
     variants.push({ icon: testParallaxIcon, ariaLabel: 'Label' });
+    variants.push({ icon, ariaLabel: 'Label', decorative: true });
+    variants.push({ icon, size: 32, interactive: false, decorative: true });
+    variants.push({ icon, ariaLabel: 'Label', decorative: false });
     expectSameDom(ReactParallax, ParallaxHost, variants);
   });
 
@@ -334,6 +343,29 @@ describe('React ↔ Angular parity', () => {
     step(200); // burst decayed on both sides
     sync();
     same();
+  });
+
+  it('renders decorative icons the same way: empty alts and a hidden parallax container', () => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 0);
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+    const parallax = { ...testParallaxIcon, layers: [...testParallaxIcon.layers, { icon: testAnimatedIcon, depth: 1 }] };
+
+    const icon: IconProps = { icon: testIcon, ariaLabel: 'Label', decorative: true };
+    const reactImg = mountReact(ReactIcon, icon).container.querySelector('img')!;
+    const img = mountAngular(IconHost, icon).container.querySelector('pxl-icon img')!;
+    expect(reactImg.getAttribute('alt')).toBe('');
+    expect(img.getAttribute('alt')).toBe('');
+
+    const animated: AnimatedProps = { icon: animatedIcon3, ariaLabel: 'Label', decorative: true };
+    const reactAnimated = mountReact(ReactAnimated, animated).container;
+    expect(canonicalDom(mountAngular(AnimatedHost, animated).container)).toBe(canonicalDom(reactAnimated));
+    expect(reactAnimated.querySelector('img')!.getAttribute('alt')).toBe('');
+
+    const stack: ParallaxProps = { icon: parallax, ariaLabel: 'Label', decorative: true };
+    const reactParallax = mountReact(ReactParallax, stack).container;
+    expect(canonicalDom(mountAngular(ParallaxHost, stack).container)).toBe(canonicalDom(reactParallax));
+    expect(reactParallax.firstElementChild!.getAttribute('aria-hidden')).toBe('true');
+    expect(Array.from(reactParallax.querySelectorAll('img'), (layer) => layer.getAttribute('alt'))).toEqual(['', '', '', '']);
   });
 
   it('PixelToast renders the same markup for every input', () => {

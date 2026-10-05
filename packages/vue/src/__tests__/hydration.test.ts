@@ -14,8 +14,10 @@ const page = {
   render: () =>
     h('main', [
       h(PxlKitIcon, { icon: testIcon, size: 48, appearance: 'tinted', color: '#FF5500', ariaLabel: 'Trophy' }),
+      h(PxlKitIcon, { id: 'decorative', icon: testIcon, decorative: true }),
       h(AnimatedPxlKitIcon, { id: 'animated', icon: testAnimatedIcon, size: 40, trigger: 'loop' }),
       h(ParallaxPxlKitIcon, { id: 'parallax', icon: testParallaxIcon, size: 80, layerGap: 20 }),
+      h(ParallaxPxlKitIcon, { id: 'decorative-parallax', icon: testParallaxIcon, interactive: false, decorative: true }),
       h(PixelToast, { visible: true, title: 'Saved!', message: 'All good', icon: testIcon, duration: 5000 }),
       h(PixelToast, { visible: false, title: 'Hidden' }),
     ]),
@@ -52,6 +54,10 @@ describe('Vue SSR hydration', () => {
     expect(errors).not.toHaveBeenCalled();
     // Hydration reuses every server node instead of re-rendering the page.
     expect(serverNodes.filter((node) => !node.isConnected)).toEqual([]);
+    expect(container.querySelector('#decorative')!.getAttribute('alt')).toBe('');
+    const hidden = container.querySelector('#decorative-parallax')!;
+    expect(hidden.getAttribute('aria-hidden')).toBe('true');
+    expect(hidden.hasAttribute('role')).toBe(false);
 
     // Browser-only behaviour runs on the adopted nodes.
     const layers = Array.from(container.querySelector('#parallax')!.firstElementChild!.children) as HTMLElement[];

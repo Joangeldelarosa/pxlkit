@@ -151,8 +151,8 @@ export class PixelToast {
   protected readonly iconImage = computed(() => {
     const icon = this.icon();
     if (!icon) return null;
-    const { appearance, color } = this.view().icon;
-    return { src: renderIconDataUri(icon, { appearance, color }), alt: resolveIconLabel(icon) };
+    const { appearance, color, decorative } = this.view().icon;
+    return { src: renderIconDataUri(icon, { appearance, color }), alt: resolveIconLabel(icon, { decorative }) };
   });
 
   constructor() {

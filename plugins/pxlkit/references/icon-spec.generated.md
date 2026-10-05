@@ -147,6 +147,18 @@ data URI inside an `<img>`, so it can force nearest-neighbour scaling. That isol
 from the surrounding CSS context, which means **`currentColor` does not work** — with
 `appearance="solid"` you must pass an explicit `color`.
 
+Screen readers announce the `<img>` by its `alt`: the `aria-label` you pass, else the
+icon's `name` (an empty `aria-label` counts as none). When visible text beside the icon
+already says what it means — a button or link label, a heading, a list item — pass
+`decorative`: the icon renders `alt=""` and is skipped instead of read before the label.
+An icon that is a button's only content is its label, so it takes an `aria-label`.
+`AnimatedPxlKitIcon` and `ParallaxPxlKitIcon` take the same two props.
+
+```tsx
+<button><PxlKitIcon icon={Download} size={16} decorative /> Download</button>
+<button><PxlKitIcon icon={Trash} size={16} aria-label="Delete" /></button>
+```
+
 ## 7. Licensing
 
 An icon you author in your own project is yours. `LICENSE-ASSETS` covers the icon packs

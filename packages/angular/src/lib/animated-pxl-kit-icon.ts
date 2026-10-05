@@ -25,7 +25,7 @@ import {
   type AnimationTrigger,
   type IconAppearance,
 } from '@pxlkit/core/vanilla';
-import { numberOr, optionalBoolean, optionalNumber, withDefault } from './coercion';
+import { booleanOr, numberOr, optionalBoolean, optionalNumber, withDefault } from './coercion';
 
 /**
  * Renders an animated pixel art icon by cycling through its frames.
@@ -90,8 +90,14 @@ export class AnimatedPxlKitIcon {
   readonly speed = input<number | undefined, unknown>(undefined, { transform: optionalNumber });
   /** Fixed frame rate, clamped to 1–60. Takes priority over `speed`. */
   readonly fps = input<number | undefined, unknown>(undefined, { transform: optionalNumber });
-  /** Accessible name of the frames. Defaults to the icon name. */
+  /** Accessible name of the frames. Unset or empty falls back to the icon name. */
   readonly ariaLabel = input<string>();
+  /**
+   * The icon only illustrates visible text that already says what it means:
+   * every frame renders with an empty `alt` and assistive technology skips
+   * it. Wins over `ariaLabel`.
+   */
+  readonly decorative = input(false, { transform: booleanOr(false) });
 
   private player: AnimatedIconPlayer | undefined;
   private readonly zone = inject(NgZone);
@@ -104,7 +110,9 @@ export class AnimatedPxlKitIcon {
    * between are written by the player subscription.
    */
   protected readonly src = computed(() => this.frameSrc());
-  protected readonly alt = computed(() => resolveIconLabel(this.icon(), this.ariaLabel()));
+  protected readonly alt = computed(() =>
+    resolveIconLabel(this.icon(), { label: this.ariaLabel(), decorative: this.decorative() }),
+  );
 
   constructor() {
     const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;

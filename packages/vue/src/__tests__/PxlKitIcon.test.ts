@@ -39,6 +39,21 @@ describe('PxlKitIcon (Vue)', () => {
     expect(labelled.attributes('aria-label')).toBeUndefined();
   });
 
+  it('reads an empty aria-label as no label: the icon name stays the alt', () => {
+    expect(mount(PxlKitIcon, { props: { icon: testIcon }, attrs: { 'aria-label': '' } }).attributes('alt')).toBe('test-icon');
+  });
+
+  it('decorative renders an empty alt and wins over aria-label', () => {
+    const decorative = mount(PxlKitIcon, { props: { icon: testIcon, decorative: true }, attrs: { 'aria-label': 'Save' } });
+    expect(decorative.attributes('alt')).toBe('');
+    expect(decorative.attributes('aria-label')).toBeUndefined();
+    expect(decorative.attributes('decorative')).toBeUndefined();
+    // A bare `decorative` attribute in a template turns it on.
+    expect(mount(PxlKitIcon, { props: { icon: testIcon }, attrs: { decorative: '' } }).attributes('alt')).toBe('');
+    const labelled = mount(PxlKitIcon, { props: { icon: testIcon, decorative: false }, attrs: { 'aria-label': 'Save' } });
+    expect(labelled.attributes('alt')).toBe('Save');
+  });
+
   it('sizes the image (default 32)', () => {
     const icon = mount(PxlKitIcon, { props: { icon: testIcon } });
     expect(icon.attributes('width')).toBe('32');
@@ -107,5 +122,9 @@ describe('PxlKitIcon (Vue)', () => {
     expect(html).toContain('alt="test-icon"');
     expect(html).toContain('draggable="false"');
     expect(html).toContain('image-rendering:pixelated');
+    // Vue writes an empty attribute bare (`alt`), which parses as `alt=""`.
+    const decorative = document.createElement('div');
+    decorative.innerHTML = await renderToString(createSSRApp({ render: () => h(PxlKitIcon, { icon: testIcon, decorative: true }) }));
+    expect(decorative.querySelector('img')!.getAttribute('alt')).toBe('');
   });
 });

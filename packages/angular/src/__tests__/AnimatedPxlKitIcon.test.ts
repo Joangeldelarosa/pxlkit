@@ -34,6 +34,7 @@ const threeFrames: AnimatedPxlKitData = {
     [speed]="speed()"
     [fps]="fps()"
     [ariaLabel]="ariaLabel()"
+    [decorative]="decorative()"
   />`,
 })
 class AnimatedHost {
@@ -46,6 +47,7 @@ class AnimatedHost {
   readonly speed = signal<number | undefined>(undefined);
   readonly fps = signal<number | undefined>(undefined);
   readonly ariaLabel = signal<string | undefined>(undefined);
+  readonly decorative = signal<boolean | undefined>(undefined);
   /** Change detection passes so far. */
   renders = 0;
 
@@ -131,6 +133,19 @@ describe('AnimatedPxlKitIcon (Angular)', () => {
   it('labels the frame with the icon name or ariaLabel', () => {
     expect(render().img.getAttribute('alt')).toBe('three-frames');
     expect(render((h) => h.ariaLabel.set('My Animation')).img.getAttribute('alt')).toBe('My Animation');
+  });
+
+  it('decorative empties the alt of every frame, whatever the ariaLabel', async () => {
+    const icon = render((h) => {
+      h.trigger.set('loop');
+      h.ariaLabel.set('My Animation');
+      h.decorative.set(true);
+    });
+    expect(icon.img.getAttribute('alt')).toBe('');
+    await advance(icon.fixture, threeFrames.frameDuration);
+    expect(icon.frame()).toBe(1);
+    expect(icon.img.getAttribute('alt')).toBe('');
+    expect(['aria-label', 'aria-hidden', 'role'].filter((name) => icon.host.hasAttribute(name))).toEqual([]);
   });
 
   it('paints each frame straight to the image, without change detection', async () => {

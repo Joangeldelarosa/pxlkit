@@ -66,6 +66,18 @@ describe('AnimatedPxlKitIcon (Vue)', () => {
     ).toBe('My Animation');
   });
 
+  it('decorative empties the alt of every frame, whatever the aria-label', async () => {
+    const wrapper = mount(AnimatedPxlKitIcon, {
+      props: { icon: testAnimatedIcon, decorative: true },
+      attrs: { 'aria-label': 'My Animation' },
+    });
+    expect(wrapper.find('img').attributes('alt')).toBe('');
+    await advance(testAnimatedIcon.frameDuration);
+    expect(frameShown(wrapper)).toBe(1);
+    expect(wrapper.find('img').attributes('alt')).toBe('');
+    expect(wrapper.attributes('decorative')).toBeUndefined();
+  });
+
   it('cycles frames in loop mode', async () => {
     const wrapper = mount(AnimatedPxlKitIcon, { props: { icon: threeFrames, trigger: 'loop' } });
     const seen = [frameShown(wrapper, threeFrames)];

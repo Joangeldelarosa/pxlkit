@@ -116,6 +116,7 @@ export const PixelToast = defineComponent({
                     size: icon.size,
                     appearance: icon.appearance,
                     color: icon.color,
+                    decorative: icon.decorative,
                   }),
                 ])
               : h('div', { class: classes.dot, style: styles.dot }),

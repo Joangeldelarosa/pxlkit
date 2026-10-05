@@ -95,6 +95,19 @@ describe('@pxlkit/angular server rendering', () => {
     );
   });
 
+  it('renders decorative icons like React: an empty alt and a hidden parallax container', () => {
+    const reference = parser.createElement('div');
+    reference.innerHTML = reactMarkup(ReactIcon, ssrProps.decorativeIcon);
+    const img = section('decorative').querySelector('pxl-icon img')!;
+    expect(img.getAttribute('alt')).toBe(reference.querySelector('img')!.getAttribute('alt'));
+    expect(img.getAttribute('alt')).toBe('');
+    const parallax = section('decorative').querySelector('pxl-parallax-icon')!;
+    expect(parallax.getAttribute('aria-hidden')).toBe('true');
+    expect(canonicalHtml(parallax.outerHTML, parser)).toBe(
+      canonicalHtml(reactMarkup(ReactParallax, ssrProps.decorativeParallax), parser),
+    );
+  });
+
   it('renders static attribute inputs', () => {
     const attributes = section('attributes');
     const animated = attributes.querySelector('pxl-animated-icon') as HTMLElement;

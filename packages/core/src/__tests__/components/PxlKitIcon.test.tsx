@@ -61,6 +61,31 @@ describe('PxlKitIcon', () => {
     expect(screen.getByAltText('Custom Label')).toBeTruthy();
   });
 
+  it('reads an empty aria-label as no label: the icon name stays the alt', () => {
+    render(<PxlKitIcon icon={testIcon} aria-label="" />);
+    expect(screen.getByAltText(testIcon.name)).toBeTruthy();
+  });
+
+  it('decorative renders an empty alt and nothing else to announce', () => {
+    const { container } = render(<PxlKitIcon icon={testIcon} decorative />);
+    const img = getImg(container);
+    expect(img.getAttribute('alt')).toBe('');
+    expect(img.hasAttribute('aria-label')).toBe(false);
+    expect(img.hasAttribute('title')).toBe(false);
+    // `<img alt="">` is presentational: assistive technology skips it.
+    expect(screen.queryByRole('img')).toBeNull();
+  });
+
+  it('decorative wins over aria-label', () => {
+    const { container } = render(<PxlKitIcon icon={testIcon} decorative aria-label="Save" />);
+    expect(getImg(container).getAttribute('alt')).toBe('');
+  });
+
+  it('decorative={false} keeps the label', () => {
+    render(<PxlKitIcon icon={testIcon} decorative={false} aria-label="Save" />);
+    expect(screen.getByRole('img', { name: 'Save' })).toBeTruthy();
+  });
+
   it('applies className prop to the <img>', () => {
     const { container } = render(
       <PxlKitIcon icon={testIcon} className="my-class" />

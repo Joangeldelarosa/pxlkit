@@ -20,7 +20,7 @@ describe('resolvePixelToastView', () => {
     expect(view.styles.title).toEqual({ color: '#00ff88' });
     expect(view.styles.dot).toEqual({ backgroundColor: '#00ff88', boxShadow: '0 0 8px #00ff88' });
     expect(view.styles.close).toEqual({ borderColor: '#00ff88', color: '#00ff88' });
-    expect(view.icon).toEqual({ size: 24, appearance: 'palette', color: '#00ff88' });
+    expect(view.icon).toEqual({ size: 24, appearance: 'palette', color: '#00ff88', decorative: true });
     expect(view.closeLabel).toBe(PIXEL_TOAST_CLOSE_LABEL);
   });
 
@@ -44,7 +44,7 @@ describe('resolvePixelToastView', () => {
       textColor: '#222222',
       accentColor: '#ff0000',
     });
-    expect(view.icon).toEqual({ size: 40, appearance: 'solid', color: '#ff0000' });
+    expect(view.icon).toEqual({ size: 40, appearance: 'solid', color: '#ff0000', decorative: true });
     expect(view.styles.box.boxShadow).toBe('0 0 0 2px #11111155, 8px 8px 0 0 #11111133');
     expect(view.styles.box.color).toBe('#222222');
     expect(view.styles.close.color).toBe('#ff0000');

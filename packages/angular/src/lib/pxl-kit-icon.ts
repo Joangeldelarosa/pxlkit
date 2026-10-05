@@ -7,7 +7,7 @@ import {
   type PxlKitData,
   type StyleMap,
 } from '@pxlkit/core/vanilla';
-import { numberOr, withDefault } from './coercion';
+import { booleanOr, numberOr, withDefault } from './coercion';
 
 /** The `<pxl-icon>` host is the icon box; the image fills it, pixel-perfect. */
 const FILL_IMAGE_STYLE: StyleMap = Object.freeze({
@@ -31,6 +31,7 @@ const FILL_IMAGE_STYLE: StyleMap = Object.freeze({
  * ```html
  * <pxl-icon [icon]="trophy" [size]="32" />
  * <pxl-icon [icon]="trophy" appearance="tinted" color="#FF4D4D" ariaLabel="Gold trophy" />
+ * <button><pxl-icon [icon]="trash" [size]="16" decorative /> Delete</button>
  * ```
  */
 @Component({
@@ -66,13 +67,25 @@ export class PxlKitIcon {
    * Falls back to `#FFFFFF` — `currentColor` cannot reach inside an `<img>`.
    */
   readonly color = input<string>();
-  /** Accessible name, rendered as the image `alt`. Defaults to the icon name. */
+  /**
+   * Accessible name, rendered as the image `alt`. Unset or empty falls back
+   * to the icon name.
+   */
   readonly ariaLabel = input<string>();
+  /**
+   * The icon only illustrates visible text that already says what it means:
+   * it renders with an empty `alt` and assistive technology skips it. Wins
+   * over `ariaLabel`. An icon that is the only content of a button or link
+   * is not decorative — give it an `ariaLabel` instead.
+   */
+  readonly decorative = input(false, { transform: booleanOr(false) });
 
   protected readonly box = ICON_IMAGE_STYLE;
   protected readonly imageStyle = FILL_IMAGE_STYLE;
   protected readonly src = computed(() =>
     renderIconDataUri(this.icon(), { appearance: this.appearance(), color: this.color() }),
   );
-  protected readonly alt = computed(() => resolveIconLabel(this.icon(), this.ariaLabel()));
+  protected readonly alt = computed(() =>
+    resolveIconLabel(this.icon(), { label: this.ariaLabel(), decorative: this.decorative() }),
+  );
 }

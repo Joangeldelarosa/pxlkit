@@ -35,6 +35,20 @@ describe('ParallaxPxlKitIcon (Vue) — structure', () => {
     expect(wrapper.attributes('aria-label')).toBe('test-parallax');
     const custom = mount(ParallaxPxlKitIcon, { props: { icon: testParallaxIcon }, attrs: { 'aria-label': 'My 3D Icon' } });
     expect(custom.attributes('aria-label')).toBe('My 3D Icon');
+    expect(custom.attributes('aria-hidden')).toBeUndefined();
+  });
+
+  it('decorative hides the container and empties the alt of every layer', () => {
+    const icon: ParallaxPxlKitData = {
+      ...testParallaxIcon,
+      layers: [...testParallaxIcon.layers, { icon: testAnimatedIcon, depth: 1 }],
+    };
+    const wrapper = mount(ParallaxPxlKitIcon, { props: { icon, decorative: true }, attrs: { 'aria-label': 'My 3D Icon' } });
+    expect(wrapper.attributes('aria-hidden')).toBe('true');
+    expect(wrapper.attributes('role')).toBeUndefined();
+    expect(wrapper.attributes('aria-label')).toBeUndefined();
+    expect(wrapper.attributes('decorative')).toBeUndefined();
+    expect(wrapper.findAll('img').map((img) => img.attributes('alt'))).toEqual(['', '', '', '']);
   });
 
   it('sizes the container and derives perspective from the size', () => {
@@ -110,6 +124,15 @@ describe('ParallaxPxlKitIcon (Vue) — structure', () => {
     expect(html).toContain('aria-label="test-parallax"');
     expect((html.match(/<img /g) ?? []).length).toBe(3);
     expect(html).toContain('<canvas');
+    const decorative = document.createElement('div');
+    decorative.innerHTML = await renderToString(
+      createSSRApp({ render: () => h(ParallaxPxlKitIcon, { icon: testParallaxIcon, decorative: true }) }),
+    );
+    const root = decorative.firstElementChild!;
+    expect(root.getAttribute('aria-hidden')).toBe('true');
+    expect(root.hasAttribute('role')).toBe(false);
+    expect(root.hasAttribute('aria-label')).toBe(false);
+    expect(Array.from(root.querySelectorAll('img'), (img) => img.getAttribute('alt'))).toEqual(['', '', '']);
   });
 });
 

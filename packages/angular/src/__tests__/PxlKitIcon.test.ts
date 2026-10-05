@@ -13,6 +13,7 @@ import { testIcon, testIconWithAlpha } from './fixtures';
     [appearance]="appearance()"
     [color]="color()"
     [ariaLabel]="ariaLabel()"
+    [decorative]="decorative()"
   />`,
 })
 class IconHost {
@@ -21,6 +22,7 @@ class IconHost {
   readonly appearance = signal<IconAppearance | undefined>(undefined);
   readonly color = signal<string | undefined>(undefined);
   readonly ariaLabel = signal<string | undefined>(undefined);
+  readonly decorative = signal<boolean | undefined>(undefined);
 }
 
 @Component({
@@ -34,6 +36,14 @@ class IconHost {
   />`,
 })
 class AttributeHost {
+  readonly icon = testIcon;
+}
+
+@Component({
+  imports: [PxlKitIcon],
+  template: `<pxl-icon [icon]="icon" decorative ariaLabel="Save" />`,
+})
+class DecorativeAttributeHost {
   readonly icon = testIcon;
 }
 
@@ -65,6 +75,31 @@ describe('PxlKitIcon (Angular)', () => {
     expect(img.getAttribute('alt')).toBe('Custom Label');
     // The label names the image; it is not duplicated onto the host.
     expect(host.hasAttribute('aria-label')).toBe(false);
+  });
+
+  it('reads an empty ariaLabel as no label: the icon name stays the alt', () => {
+    expect(render((h) => h.ariaLabel.set('')).img.getAttribute('alt')).toBe('test-icon');
+  });
+
+  it('decorative renders an empty alt and wins over ariaLabel', async () => {
+    const { fixture, host, img } = render((h) => {
+      h.decorative.set(true);
+      h.ariaLabel.set('Save');
+    });
+    expect(img.getAttribute('alt')).toBe('');
+    expect(['aria-label', 'aria-hidden', 'role'].filter((name) => host.hasAttribute(name))).toEqual([]);
+    fixture.componentInstance.decorative.set(false);
+    await fixture.whenStable();
+    expect(img.getAttribute('alt')).toBe('Save');
+    fixture.componentInstance.decorative.set(undefined);
+    await fixture.whenStable();
+    expect(img.getAttribute('alt')).toBe('Save');
+  });
+
+  it('takes decorative as a bare attribute', () => {
+    const fixture = TestBed.createComponent(DecorativeAttributeHost);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('img').getAttribute('alt')).toBe('');
   });
 
   it('sizes the box and the image (default 32)', () => {

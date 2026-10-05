@@ -33,6 +33,11 @@ describe('PixelToast (Vue)', () => {
     expect((dotted.find('.rounded-full').element as HTMLElement).style.boxShadow).toBe('0 0 8px #123456');
   });
 
+  it('renders its icon decorative: the title beside it names the toast', () => {
+    const img = mount(PixelToast, { props: { visible: true, title: 'Saved!', icon: testIcon } }).find('img');
+    expect(img.attributes('alt')).toBe('');
+  });
+
   it('renders the icon flat in the accent colour when colorfulIcon is false', () => {
     const img = mount(PixelToast, {
       props: { visible: true, title: 'T', icon: testIcon, colorfulIcon: false, accentColor: '#FF00FF', iconSize: 40 },

@@ -67,6 +67,7 @@ export function AnimatedPxlKitIcon({
   className = '',
   style,
   'aria-label': ariaLabel,
+  decorative = false,
   // Deprecated legacy props — resolved into `appearance` below.
   colorful,
   solid,
@@ -115,7 +116,8 @@ export function AnimatedPxlKitIcon({
         size={size}
         appearance={appearance}
         color={color}
-        aria-label={resolveIconLabel(icon, ariaLabel)}
+        aria-label={resolveIconLabel(icon, { label: ariaLabel })}
+        decorative={decorative}
       />
     </div>
   );

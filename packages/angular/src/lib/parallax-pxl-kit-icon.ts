@@ -23,10 +23,12 @@ import {
   parallaxLayerStyle,
   parallaxSceneStyle,
   renderIconDataUri,
+  resolveIconContainerAria,
   resolveIconLabel,
   resolveParallaxGeometry,
   type AnimatedPxlKitData,
   type IconAppearance,
+  type IconContainerAria,
   type ParallaxController,
   type ParallaxPxlKitData,
   type StyleMap,
@@ -49,7 +51,8 @@ interface LayerView {
  * `activate`). The motion runs in the framework-agnostic controller shared
  * with the React and Vue components, outside the Angular zone.
  *
- * The `<pxl-parallax-icon>` host is the `role="img"` container.
+ * The `<pxl-parallax-icon>` host is the `role="img"` container — hidden with
+ * `aria-hidden` instead when the icon is `decorative`.
  *
  * @example
  * ```html
@@ -63,8 +66,9 @@ interface LayerView {
   // Per-property host bindings (not a `[style]` map) so a consumer's own
   // `style` attribute keeps precedence over the container style.
   host: {
-    role: 'img',
-    '[attr.aria-label]': 'label()',
+    '[attr.role]': 'aria().role',
+    '[attr.aria-label]': 'aria().label',
+    '[attr.aria-hidden]': 'aria().hidden',
     '[style.display]': 'container().display',
     '[style.position]': 'container().position',
     '[style.overflow]': 'container().overflow',
@@ -89,6 +93,7 @@ interface LayerView {
               [size]="size()"
               [appearance]="appearance()"
               [color]="color()"
+              [decorative]="decorative()"
             />
           } @else if (layer.image; as image) {
             <img
@@ -129,8 +134,15 @@ export class ParallaxPxlKitIcon {
   readonly shadow = input(true, { transform: booleanOr(true) });
   /** Click to explode the layers, jolt the scene and burst pixel particles. */
   readonly interactive = input(true, { transform: booleanOr(true) });
-  /** Accessible name. Defaults to the icon name. */
+  /** Accessible name of the `role="img"` host. Unset or empty falls back to the icon name. */
   readonly ariaLabel = input<string>();
+  /**
+   * The icon only illustrates visible text that already says what it means:
+   * the host drops its role and name for `aria-hidden="true"`, every layer
+   * renders with an empty `alt`, and assistive technology skips it. Wins
+   * over `ariaLabel`.
+   */
+  readonly decorative = input(false, { transform: booleanOr(false) });
 
   /** Fired on click with the new active state. */
   readonly activate = output<boolean>();
@@ -143,7 +155,9 @@ export class ParallaxPxlKitIcon {
 
   protected readonly imageStyle = ICON_IMAGE_STYLE;
   protected readonly canvasStyle = PARALLAX_CANVAS_STYLE;
-  protected readonly label = computed(() => resolveIconLabel(this.icon(), this.ariaLabel()));
+  protected readonly aria = computed<IconContainerAria>(() =>
+    resolveIconContainerAria(this.icon(), { label: this.ariaLabel(), decorative: this.decorative() }),
+  );
   private readonly geometry = computed(() =>
     resolveParallaxGeometry(this.size(), { perspective: this.perspective(), layerGap: this.layerGap() }),
   );
@@ -162,12 +176,13 @@ export class ParallaxPxlKitIcon {
     const { layerGap } = this.geometry();
     const shadow = this.shadow();
     const colour = { appearance: this.appearance(), color: this.color() };
+    const decorative = this.decorative();
     return layers.map((layer, index) => ({
       style: parallaxLayerStyle({ index, layerCount: layers.length, layerGap, shadow }),
       animated: isAnimatedIcon(layer.icon) ? layer.icon : null,
       image: isAnimatedIcon(layer.icon)
         ? null
-        : { src: renderIconDataUri(layer.icon, colour), alt: resolveIconLabel(layer.icon) },
+        : { src: renderIconDataUri(layer.icon, colour), alt: resolveIconLabel(layer.icon, { decorative }) },
     }));
   });
 

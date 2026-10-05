@@ -94,6 +94,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   attributes, `ref`, attribute fallthrough). `npm run docs:build` reads it from the kits'
   sources (`scripts/build-docs/extract-api.ts`, in a worker thread), and coherence gate 38
   (`api-reference`) fails when a section shows another API than the sources have.
+- **Decorative icons.** `PxlKitIcon`, `AnimatedPxlKitIcon` and `ParallaxPxlKitIcon` take `decorative`
+  in React, Vue and Angular: an icon beside text that already says what it means renders `alt=""`
+  (the parallax icon's container `aria-hidden`), so screen readers skip it and its name stays out
+  of the page's text. `PixelToast`'s icon is decorative, the title naming the toast.
 - **Doc comments for the kits' props and slots.** About 500 props across 65 React components and
   the slots and props of 37 Vue components gained descriptions (comments only), which editors
   show on hover and the API reference prints; TSDoc coverage (gate 27) rose from 50% to 99%.

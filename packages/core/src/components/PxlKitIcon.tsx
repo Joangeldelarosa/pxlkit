@@ -41,6 +41,11 @@ import { resolveColorProps } from './_internal/resolveColorProps';
  * - `appearance="solid"`             — flatten every pixel to `color`
  *   (currentColor is NOT honoured here because `<img>` is an isolated
  *   context — pass an explicit `color` for solid mode).
+ *
+ * **Accessibility:** the image is named by `aria-label`, else by the icon's
+ * name. An icon beside text that already says what it means is
+ * `decorative`: it renders `alt=""`, so it is neither announced twice nor
+ * indexed as page text.
  */
 export function PxlKitIcon({
   icon,
@@ -50,6 +55,7 @@ export function PxlKitIcon({
   className = '',
   style,
   'aria-label': ariaLabel,
+  decorative = false,
   // Deprecated legacy props — resolved into `appearance` below.
   colorful,
   solid,
@@ -73,7 +79,7 @@ export function PxlKitIcon({
       src={src}
       width={size}
       height={size}
-      alt={resolveIconLabel(icon, ariaLabel)}
+      alt={resolveIconLabel(icon, { label: ariaLabel, decorative })}
       className={className}
       draggable={false}
       style={{ ...(ICON_IMAGE_STYLE as CSSProperties), ...style }}

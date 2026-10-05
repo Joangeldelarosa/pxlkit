@@ -3,8 +3,11 @@ export {
   renderIconSvg,
   renderIconDataUri,
   resolveIconLabel,
+  resolveIconContainerAria,
   ICON_IMAGE_STYLE,
   type IconRenderOptions,
+  type IconLabelOptions,
+  type IconContainerAria,
 } from './icon';
 export {
   createAnimatedIconPlayer,

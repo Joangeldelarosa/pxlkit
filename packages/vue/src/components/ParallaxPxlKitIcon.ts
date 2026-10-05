@@ -16,7 +16,7 @@ import {
   parallaxContainerStyle,
   parallaxLayerStyle,
   parallaxSceneStyle,
-  resolveIconLabel,
+  resolveIconContainerAria,
   resolveParallaxGeometry,
   type IconAppearance,
   type ParallaxMotionOptions,
@@ -47,8 +47,15 @@ const parallaxPxlKitIconProps = {
   shadow: { type: Boolean, default: true },
   /** Click to explode the layers, jolt the scene and burst pixel particles. */
   interactive: { type: Boolean, default: true },
-  /** Accessible name. Defaults to the icon name. */
+  /** Accessible name of the `role="img"` container. Unset or empty falls back to the icon name. */
   ariaLabel: { type: String, default: undefined },
+  /**
+   * The icon only illustrates visible text that already says what it means:
+   * the container drops its role and name for `aria-hidden="true"`, every
+   * layer renders with an empty `alt`, and assistive technology skips it.
+   * Wins over `aria-label`.
+   */
+  decorative: { type: Boolean, default: false },
 } as const;
 
 const parallaxPxlKitIconEmits = {
@@ -119,17 +126,19 @@ export const ParallaxPxlKitIcon = defineComponent({
     }
 
     return () => {
-      const { icon, size, interactive, shadow, appearance, color } = props;
+      const { icon, size, interactive, shadow, appearance, color, decorative } = props;
       const { perspective, layerGap } = geometry.value;
       const layerCount = icon.layers.length;
+      const aria = resolveIconContainerAria(icon, { label: props.ariaLabel, decorative });
 
       return h(
         'div',
         {
           ref: container,
           style: parallaxContainerStyle({ size, perspective, interactive }),
-          role: 'img',
-          'aria-label': resolveIconLabel(icon, props.ariaLabel),
+          role: aria.role,
+          'aria-label': aria.label,
+          'aria-hidden': aria.hidden,
           onClick: interactive ? onClick : undefined,
         },
         [
@@ -145,8 +154,8 @@ export const ParallaxPxlKitIcon = defineComponent({
                 },
                 [
                   isAnimatedIcon(layer.icon)
-                    ? h(AnimatedPxlKitIcon, { icon: layer.icon, size, appearance, color })
-                    : h(PxlKitIcon, { icon: layer.icon, size, appearance, color }),
+                    ? h(AnimatedPxlKitIcon, { icon: layer.icon, size, appearance, color, decorative })
+                    : h(PxlKitIcon, { icon: layer.icon, size, appearance, color, decorative }),
                 ],
               ),
             ),

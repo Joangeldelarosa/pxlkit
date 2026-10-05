@@ -3,6 +3,7 @@ import {
   ICON_IMAGE_STYLE,
   renderIconDataUri,
   renderIconSvg,
+  resolveIconContainerAria,
   resolveIconLabel,
 } from '../../engine/icon';
 import type { PxlKitData } from '../../types';
@@ -120,9 +121,37 @@ describe('renderIconDataUri', () => {
 
 describe('resolveIconLabel', () => {
   it('prefers the explicit label and falls back to the icon name', () => {
-    expect(resolveIconLabel(testIcon, 'Trophy')).toBe('Trophy');
+    expect(resolveIconLabel(testIcon, { label: 'Trophy' })).toBe('Trophy');
     expect(resolveIconLabel(testIcon)).toBe('test-icon');
-    expect(resolveIconLabel(testIcon, '')).toBe('test-icon');
+    expect(resolveIconLabel(testIcon, {})).toBe('test-icon');
+  });
+
+  it('reads an empty label as a missing one, not as decorative', () => {
+    expect(resolveIconLabel(testIcon, { label: '' })).toBe('test-icon');
+  });
+
+  it('is empty for a decorative icon, whatever its label', () => {
+    expect(resolveIconLabel(testIcon, { decorative: true })).toBe('');
+    expect(resolveIconLabel(testIcon, { decorative: true, label: 'Trophy' })).toBe('');
+    expect(resolveIconLabel(testIcon, { decorative: false, label: 'Trophy' })).toBe('Trophy');
+  });
+});
+
+describe('resolveIconContainerAria', () => {
+  it('announces the container as one image named like any icon', () => {
+    expect(resolveIconContainerAria(testIcon)).toEqual({ role: 'img', label: 'test-icon', hidden: undefined });
+    expect(resolveIconContainerAria(testIcon, { label: 'Trophy' })).toEqual({
+      role: 'img',
+      label: 'Trophy',
+      hidden: undefined,
+    });
+    expect(resolveIconContainerAria(testIcon, { label: '' }).label).toBe('test-icon');
+  });
+
+  it('hides a decorative container, with no role or name left to announce', () => {
+    const decorative = { role: undefined, label: undefined, hidden: 'true' };
+    expect(resolveIconContainerAria(testIcon, { decorative: true })).toEqual(decorative);
+    expect(resolveIconContainerAria(testIcon, { decorative: true, label: 'Trophy' })).toEqual(decorative);
   });
 });
 

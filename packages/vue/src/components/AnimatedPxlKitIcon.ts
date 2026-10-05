@@ -43,8 +43,14 @@ const animatedPxlKitIconProps = {
   speed: { type: Number, default: undefined },
   /** Fixed frame rate, clamped to 1–60. Takes priority over `speed`. */
   fps: { type: Number, default: undefined },
-  /** Accessible name of the frames. Defaults to the icon name. */
+  /** Accessible name of the frames. Unset or empty falls back to the icon name. */
   ariaLabel: { type: String, default: undefined },
+  /**
+   * The icon only illustrates visible text that already says what it means:
+   * every frame renders with an empty `alt` and assistive technology skips
+   * it. Wins over `aria-label`.
+   */
+  decorative: { type: Boolean, default: false },
 } as const;
 
 /**
@@ -115,7 +121,8 @@ export const AnimatedPxlKitIcon: PxlComponent<typeof animatedPxlKitIconProps> = 
             size: props.size,
             appearance: props.appearance,
             color: props.color,
-            ariaLabel: resolveIconLabel(props.icon, props.ariaLabel),
+            ariaLabel: resolveIconLabel(props.icon, { label: props.ariaLabel }),
+            decorative: props.decorative,
           }),
         ],
       );

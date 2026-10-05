@@ -56,6 +56,10 @@ describe('@pxlkit/angular client hydration', () => {
     expect(summary).toMatch(/hydrated \d+ component\(s\) and \d+ node\(s\), 0 component\(s\) were skipped/);
     // Hydration reuses every server node instead of re-rendering the page.
     expect(serverNodes.filter((node) => !node.isConnected)).toEqual([]);
+    expect(document.querySelector('#decorative pxl-icon img')!.getAttribute('alt')).toBe('');
+    const hidden = document.querySelector('#decorative pxl-parallax-icon')!;
+    expect(hidden.getAttribute('aria-hidden')).toBe('true');
+    expect(hidden.hasAttribute('role')).toBe(false);
 
     // Browser-only behaviour runs on the adopted nodes.
     const layers = Array.from(document.querySelector('#parallax pxl-parallax-icon > div')!.children) as HTMLElement[];

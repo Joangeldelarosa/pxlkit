@@ -61,6 +61,23 @@ describe('ParallaxPxlKitIcon', () => {
     );
     const wrapper = container.firstChild as HTMLElement;
     expect(wrapper.getAttribute('aria-label')).toBe('My 3D Icon');
+    expect(wrapper.hasAttribute('aria-hidden')).toBe(false);
+  });
+
+  it('decorative hides the container and empties the alt of every layer', () => {
+    const icon: ParallaxPxlKitData = {
+      ...testParallaxIcon,
+      layers: [...testParallaxIcon.layers, { icon: testAnimatedIcon, depth: 1 }],
+    };
+    const { container } = render(
+      <ParallaxPxlKitIcon icon={icon} decorative aria-label="My 3D Icon" />
+    );
+    const wrapper = container.firstChild as HTMLElement;
+    expect(wrapper.getAttribute('aria-hidden')).toBe('true');
+    expect(wrapper.hasAttribute('role')).toBe(false);
+    expect(wrapper.hasAttribute('aria-label')).toBe(false);
+    const alts = Array.from(container.querySelectorAll('img'), (img) => img.getAttribute('alt'));
+    expect(alts).toEqual(['', '', '', '']);
   });
 
   it('applies size prop to container dimensions', () => {

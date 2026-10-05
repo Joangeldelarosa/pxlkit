@@ -8,6 +8,8 @@ export const ssrProps = {
   animated: { icon: testAnimatedIcon, size: 40, trigger: 'loop' },
   parallax: { icon: testParallaxIcon, size: 80, layerGap: 20 },
   toast: { visible: true, title: 'Saved!', message: 'All good', icon: testIcon, duration: 5000 },
+  decorativeIcon: { icon: testIcon, ariaLabel: 'Trophy', decorative: true },
+  decorativeParallax: { icon: testParallaxIcon, size: 48, interactive: false, decorative: true },
 } as const;
 
 /** One of each component, server-rendered and hydrated by the SSR suites. */
@@ -41,6 +43,15 @@ export const ssrProps = {
     </section>
     <section id="hidden-toast">
       <pxl-toast [visible]="false" title="Hidden" />
+    </section>
+    <section id="decorative">
+      <pxl-icon [icon]="props.decorativeIcon.icon" [ariaLabel]="props.decorativeIcon.ariaLabel" decorative />
+      <pxl-parallax-icon
+        [icon]="props.decorativeParallax.icon"
+        [size]="props.decorativeParallax.size"
+        [interactive]="props.decorativeParallax.interactive"
+        [decorative]="props.decorativeParallax.decorative"
+      />
     </section>
     <section id="attributes">
       <pxl-animated-icon [icon]="props.animated.icon" size="24" trigger="once" />

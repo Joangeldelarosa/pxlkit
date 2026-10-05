@@ -102,6 +102,11 @@ describe('PixelToast (Angular)', () => {
     expect(dot.style.boxShadow).toBe('0 0 8px #123456');
   });
 
+  it('renders its icon decorative: the title beside it names the toast', () => {
+    const img = render((h) => h.icon.set(testIcon)).host.querySelector('img')!;
+    expect(img.getAttribute('alt')).toBe('');
+  });
+
   it('renders the icon flat in the accent colour when colorfulIcon is false', () => {
     const img = render((h) => {
       h.icon.set(testIcon);
@@ -110,7 +115,6 @@ describe('PixelToast (Angular)', () => {
       h.iconSize.set(40);
     }).host.querySelector('img')!;
     expect(img.getAttribute('width')).toBe('40');
-    expect(img.getAttribute('alt')).toBe('test-icon');
     const svg = decodeSvg(img);
     expect(svg).toContain('fill="#FF00FF"');
     expect(svg).not.toContain('fill="#FF0000"');

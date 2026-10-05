@@ -73,6 +73,7 @@ describe('@pxlkit/core/vanilla', () => {
       'renderIconSvg',
       'renderIconDataUri',
       'resolveIconLabel',
+      'resolveIconContainerAria',
       'ICON_IMAGE_STYLE',
       'createAnimatedIconPlayer',
       'resolveAnimationTrigger',

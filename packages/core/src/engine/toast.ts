@@ -68,7 +68,7 @@ export interface PixelToastViewOptions {
  *   <div class="{box}" style="{box}">
  *     <div class="{scanline}" style="{scanline}"></div>
  *     <div class="{row}">
- *       <div class="{iconSlot}"><!-- icon --></div>  or  <div class="{dot}" style="{dot}"></div>
+ *       <div class="{iconSlot}"><!-- decorative icon --></div>  or  <div class="{dot}" style="{dot}"></div>
  *       <div class="{body}">
  *         <p class="{title}" style="{title}">title</p>
  *         <p class="{message}">message</p>
@@ -101,8 +101,12 @@ export interface PixelToastView {
     title: StyleMap;
     close: StyleMap;
   }>;
-  /** How to render the optional icon. */
-  icon: Readonly<{ size: number; appearance: IconAppearance; color: string }>;
+  /**
+   * How to render the optional icon. Like the status dot shown without one,
+   * it is always `decorative` (an empty `alt`): the title beside it names
+   * the toast.
+   */
+  icon: Readonly<{ size: number; appearance: IconAppearance; color: string; decorative: boolean }>;
   /** Accessible name of the close button. */
   closeLabel: string;
 }
@@ -158,6 +162,7 @@ export function resolvePixelToastView(options: PixelToastViewOptions = {}): Pixe
       size: iconSize,
       appearance: colorfulIcon ? 'palette' : 'solid',
       color: accentColor,
+      decorative: true,
     },
     closeLabel: PIXEL_TOAST_CLOSE_LABEL,
   };

@@ -48,8 +48,18 @@ export interface PxlKitProps {
   color?: string;
   /** Additional CSS class names. */
   className?: string;
-  /** Accessible label. */
+  /**
+   * Accessible name, rendered as the image `alt`. Unset or empty falls back
+   * to the icon's name.
+   */
   'aria-label'?: string;
+  /**
+   * The icon only illustrates visible text that already says what it means:
+   * it renders with an empty `alt` and assistive technology skips it. Wins
+   * over `aria-label`. An icon that is the only content of a button or link
+   * is not decorative — give it an `aria-label` instead. Default: `false`.
+   */
+  decorative?: boolean;
   /** Inline styles applied to the icon wrapper. */
   style?: CSSProperties;
   /** @deprecated since v1.3 — use `appearance="palette" | "solid"` instead. */
@@ -105,8 +115,14 @@ export interface AnimatedPxlKitProps {
   fps?: number;
   /** Additional CSS class names */
   className?: string;
-  /** Accessible label */
+  /** Accessible name of the frames. Unset or empty falls back to the icon's name. */
   'aria-label'?: string;
+  /**
+   * The icon only illustrates visible text that already says what it means:
+   * every frame renders with an empty `alt` and assistive technology skips
+   * it. Wins over `aria-label`. Default: `false`.
+   */
+  decorative?: boolean;
   /** Inline styles */
   style?: CSSProperties;
 }
@@ -166,8 +182,18 @@ export interface ParallaxPxlKitProps {
   onActivate?: (active: boolean) => void;
   /** Additional CSS class names */
   className?: string;
-  /** Accessible label */
+  /**
+   * Accessible name of the `role="img"` container. Unset or empty falls back
+   * to the icon's name.
+   */
   'aria-label'?: string;
+  /**
+   * The icon only illustrates visible text that already says what it means:
+   * the container drops its role and name for `aria-hidden="true"`, every
+   * layer renders with an empty `alt`, and assistive technology skips it.
+   * Wins over `aria-label`. Default: `false`.
+   */
+  decorative?: boolean;
   /** Inline styles */
   style?: CSSProperties;
 }

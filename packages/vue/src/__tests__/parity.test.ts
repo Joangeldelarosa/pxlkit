@@ -53,8 +53,8 @@ describe('React ↔ Vue parity — server rendering', () => {
   it('PxlKitIcon', async () => {
     for (const icon of [testIcon, testIconWithAlpha]) {
       for (const appearance of appearances) for (const color of colors) for (const size of [16, 32, 50]) {
-        for (const ariaLabel of [undefined, 'Label']) {
-          const props = { icon, appearance, color, size, ariaLabel };
+        for (const ariaLabel of [undefined, 'Label']) for (const decorative of [undefined, true]) {
+          const props = { icon, appearance, color, size, ariaLabel, decorative };
           expect(await vueSsr(PxlKitIcon, props)).toBe(reactSsr(ReactIcon, props));
         }
       }
@@ -67,12 +67,21 @@ describe('React ↔ Vue parity — server rendering', () => {
       const props = { icon: animatedIcon3, trigger, appearance, color: '#ABCDEF', size, ariaLabel: size === 24 ? 'Anim' : undefined };
       expect(await vueSsr(AnimatedPxlKitIcon, props)).toBe(reactSsr(ReactAnimated, props));
     }
+    for (const decorative of [false, true]) {
+      const props = { icon: animatedIcon3, ariaLabel: 'Anim', decorative };
+      expect(await vueSsr(AnimatedPxlKitIcon, props)).toBe(reactSsr(ReactAnimated, props));
+    }
   });
 
   it('ParallaxPxlKitIcon', async () => {
     const icon = { ...testParallaxIcon, layers: [...testParallaxIcon.layers, { icon: testAnimatedIcon, depth: 1 }] };
     for (const size of [32, 64, 100]) for (const shadow of [true, false]) for (const interactive of [true, false]) {
-      for (const extra of [{}, { perspective: 500, layerGap: 7 }, { appearance: 'solid' as const, color: '#F00' }]) {
+      for (const extra of [
+        {},
+        { perspective: 500, layerGap: 7 },
+        { appearance: 'solid' as const, color: '#F00' },
+        { decorative: true, ariaLabel: 'Label' },
+      ]) {
         const props = { icon, size, shadow, interactive, ...extra };
         expect(await vueSsr(ParallaxPxlKitIcon, props)).toBe(reactSsr(ReactParallax, props));
       }
@@ -129,6 +138,27 @@ describe('React ↔ Vue parity — client rendering', () => {
     app.mount(host);
     return host;
   }
+
+  it('decorative icons mount with the same markup: empty alts and a hidden parallax container', () => {
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 0);
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+    const parallax = { ...testParallaxIcon, layers: [...testParallaxIcon.layers, { icon: testAnimatedIcon, depth: 1 }] };
+    const decorative = { decorative: true, ariaLabel: 'Label' };
+    const cases: Array<[ComponentType<never>, Component, Props, string | null]> = [
+      [ReactIcon, PxlKitIcon, { icon: testIcon, ...decorative }, null],
+      [ReactAnimated, AnimatedPxlKitIcon, { icon: animatedIcon3, ...decorative }, null],
+      [ReactParallax, ParallaxPxlKitIcon, { icon: parallax, ...decorative }, 'true'],
+    ];
+    for (const [reactComponent, vueComponent, props, hidden] of cases) {
+      const reactHost = mountReact(reactComponent, props);
+      expect(canonicalDom(mountVue(vueComponent, props))).toBe(canonicalDom(reactHost));
+      // React's rendering is decorative, so the comparison is not vacuous.
+      const alts = Array.from(reactHost.querySelectorAll('img'), (img) => img.getAttribute('alt'));
+      expect(alts.length).toBeGreaterThan(0);
+      expect(alts.filter((alt) => alt !== '')).toEqual([]);
+      expect(reactHost.firstElementChild!.getAttribute('aria-hidden')).toBe(hidden);
+    }
+  });
 
   it('AnimatedPxlKitIcon plays the same frames at the same times for every trigger', async () => {
     const triggers: AnimationTrigger[] = ['loop', 'once', 'hover', 'ping-pong'];

@@ -30,6 +30,7 @@ import { testAnimatedIcon, testParallaxIcon } from './fixtures';
     [shadow]="shadow()"
     [interactive]="interactive()"
     [ariaLabel]="ariaLabel()"
+    [decorative]="decorative()"
     (activate)="activations.push($event)"
   />`,
 })
@@ -45,6 +46,7 @@ class ParallaxHost {
   readonly shadow = signal<boolean | undefined>(undefined);
   readonly interactive = signal<boolean | undefined>(undefined);
   readonly ariaLabel = signal<string | undefined>(undefined);
+  readonly decorative = signal<boolean | undefined>(undefined);
   readonly activations: boolean[] = [];
 }
 
@@ -106,6 +108,25 @@ describe('ParallaxPxlKitIcon (Angular) — structure', () => {
     expect(host.getAttribute('role')).toBe('img');
     expect(host.getAttribute('aria-label')).toBe('test-parallax');
     expect(render((h) => h.ariaLabel.set('My 3D Icon')).host.getAttribute('aria-label')).toBe('My 3D Icon');
+    expect(render().host.hasAttribute('aria-hidden')).toBe(false);
+  });
+
+  it('decorative hides the container and empties the alt of every layer', () => {
+    const icon = render((h) => {
+      h.icon.set({ ...testParallaxIcon, layers: [...testParallaxIcon.layers, { icon: testAnimatedIcon, depth: 1 }] });
+      h.ariaLabel.set('My 3D Icon');
+      h.decorative.set(true);
+    });
+    expect(icon.host.getAttribute('aria-hidden')).toBe('true');
+    expect(icon.host.hasAttribute('role')).toBe(false);
+    expect(icon.host.hasAttribute('aria-label')).toBe(false);
+    expect(Array.from(icon.host.querySelectorAll('img'), (img) => img.getAttribute('alt'))).toEqual(['', '', '', '']);
+
+    icon.fixture.componentInstance.decorative.set(false);
+    icon.sync();
+    expect(icon.host.getAttribute('role')).toBe('img');
+    expect(icon.host.getAttribute('aria-label')).toBe('My 3D Icon');
+    expect(icon.host.hasAttribute('aria-hidden')).toBe(false);
   });
 
   it('binds every container style of the engine, deriving perspective from the size', () => {

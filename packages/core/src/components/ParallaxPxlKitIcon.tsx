@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { ParallaxPxlKitProps } from './types';
 import { isAnimatedIcon } from '../guards';
-import { resolveIconLabel } from '../engine/icon';
+import { resolveIconContainerAria } from '../engine/icon';
 import {
   PARALLAX_CANVAS_STYLE,
   createParallaxController,
@@ -66,6 +66,7 @@ export function ParallaxPxlKitIcon({
   className = '',
   style,
   'aria-label': ariaLabel,
+  decorative = false,
   // Deprecated legacy props — resolved into `appearance` below.
   colorful,
   solid,
@@ -116,6 +117,7 @@ export function ParallaxPxlKitIcon({
   }, [active, onActivate, controller]);
 
   const layerCount = icon.layers.length;
+  const aria = resolveIconContainerAria(icon, { label: ariaLabel, decorative });
 
   return (
     <div
@@ -126,8 +128,9 @@ export function ParallaxPxlKitIcon({
         ...(parallaxContainerStyle({ size, perspective, interactive }) as CSSProperties),
         ...style,
       }}
-      role="img"
-      aria-label={resolveIconLabel(icon, ariaLabel)}
+      role={aria.role}
+      aria-label={aria.label}
+      aria-hidden={aria.hidden}
     >
       {/* 3D scene — rotates as a whole */}
       <div ref={sceneRef} style={parallaxSceneStyle({ size, active }) as CSSProperties}>
@@ -137,9 +140,21 @@ export function ParallaxPxlKitIcon({
             style={parallaxLayerStyle({ index, layerCount, layerGap, shadow }) as CSSProperties}
           >
             {isAnimatedIcon(layer.icon) ? (
-              <AnimatedPxlKitIcon icon={layer.icon} size={size} appearance={appearance} color={color} />
+              <AnimatedPxlKitIcon
+                icon={layer.icon}
+                size={size}
+                appearance={appearance}
+                color={color}
+                decorative={decorative}
+              />
             ) : (
-              <PxlKitIcon icon={layer.icon} size={size} appearance={appearance} color={color} />
+              <PxlKitIcon
+                icon={layer.icon}
+                size={size}
+                appearance={appearance}
+                color={color}
+                decorative={decorative}
+              />
             )}
           </div>
         ))}
