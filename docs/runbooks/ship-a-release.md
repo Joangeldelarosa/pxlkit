@@ -38,7 +38,10 @@ Each step has a gate. Failing any gate aborts the release.
 - The `NPM_TOKEN` repository secret holds an npm token that may publish every package in the
   `@pxlkit` scope, new package names included. npm caps granular write tokens at 90 days: a token
   that has expired makes every `npm publish` fail with a 404.
-- Nothing else needs credentials: Vercel deploys pxlkit.xyz and storybook.pxlkit.xyz from `main`.
+- Optionally, the `RELEASE_TOKEN` repository secret: a fine-grained token for this repository with
+  Contents and Workflows: Read and write. The GitHub Release workflow needs it only for a version
+  that is no longer at the tip of `main` when it runs (step 9).
+- Vercel needs nothing: it deploys pxlkit.xyz and storybook.pxlkit.xyz from `main`.
 - No open `release/*` branches exist (kill them first; only one release in flight at a time).
 
 ## Steps
@@ -223,6 +226,12 @@ and the release tag points at. Then, with no further step:
   `@pxlkit/ui-kit` from: the CHANGELOG section as notes, after a table of every package published
   from that commit. It is marked Latest. Versions that already have a release are left alone, so it
   can run any time: Actions → GitHub Release → Run workflow creates whatever is missing.
+  The workflow's own token tags the merged commit while it is the tip of `main`. GitHub may refuse
+  it a tag on an older commit — a past version, or the new one when another merge reached `main`
+  first — with `HTTP 403: Resource not accessible by integration`, since that takes the Workflows
+  permission no workflow token has; the run then uses `RELEASE_TOKEN`. Without the secret, a past
+  version is left with a warning and the newest fails the run. A tag made with `RELEASE_TOKEN`
+  starts the publish workflow of the tagged commit, which publishes nothing that is already on npm.
 - **Vercel** deploys pxlkit.xyz and storybook.pxlkit.xyz from `main` as their Production
   deployments.
 

@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   compareVersions,
+  createRelease,
   kitReleaseSection,
   parseVersion,
   publishedPackageDirs,
+  refusedTag,
   releaseNotes,
   rootReleaseSection,
+  tagCommits,
 } from '../github-release.mjs';
 
 const ROOT_CHANGELOG = `# Changelog
@@ -121,5 +124,78 @@ describe('release notes', () => {
     expect(notes.length).toBeLessThanOrEqual(120_000);
     expect(notes).toContain('…(continued in the changelog)');
     expect(notes.endsWith(`Full changelog: ${changelogUrl}\n`)).toBe(true);
+  });
+});
+
+describe('tags', () => {
+  it("maps each tag to its commit, an annotated tag's to the commit it peels to", () => {
+    const lsRemote = [
+      '21ddd848e921e5160614f1305bf2f9a69ab5e687\trefs/tags/v2.0.0',
+      '1111111111111111111111111111111111111111\trefs/tags/v2.0.1',
+      '71e8c2b231069062da5ff11b338150bb13e95092\trefs/tags/v2.0.1^{}',
+      '',
+    ].join('\n');
+    expect(tagCommits(lsRemote)).toEqual(
+      new Map([
+        ['v2.0.0', '21ddd848e921e5160614f1305bf2f9a69ab5e687'],
+        ['v2.0.1', '71e8c2b231069062da5ff11b338150bb13e95092'],
+      ]),
+    );
+    expect(tagCommits('')).toEqual(new Map());
+  });
+});
+
+describe('creating a release', () => {
+  const failure = (stderr) => Object.assign(new Error(`Command failed: gh release create\n${stderr}`), { stderr });
+  const refusal = failure('HTTP 403: Resource not accessible by integration (https://api.github.com/repos/o/r/releases)\n');
+
+  /** A `run` that fails with each error in turn, then succeeds; it records the environment of every call. */
+  const runner = (...errors) => {
+    const calls = [];
+    const run = (env) => {
+      calls.push(env);
+      const error = errors.shift();
+      if (error) throw error;
+    };
+    return { run, calls };
+  };
+
+  it("tells GitHub's refusal of the tag from other failures", () => {
+    expect(refusedTag(refusal)).toBe(true);
+    expect(refusedTag(failure('HTTP 422: Validation Failed'))).toBe(false);
+    expect(refusedTag(failure('HTTP 403: Resource not accessible by personal access token'))).toBe(false);
+    expect(refusedTag(new Error('spawnSync gh ENOENT'))).toBe(false);
+  });
+
+  it('uses the workflow token alone when GitHub accepts it', () => {
+    const { run, calls } = runner();
+    expect(createRelease(run, 'release-token')).toEqual({ ok: true, fallback: false });
+    expect(calls).toEqual([{}]);
+  });
+
+  it('retries with the release token the tag GitHub refused the workflow token', () => {
+    const { run, calls } = runner(refusal);
+    expect(createRelease(run, 'release-token')).toEqual({ ok: true, fallback: true });
+    expect(calls).toEqual([{}, { GH_TOKEN: 'release-token' }]);
+  });
+
+  it('reports the refusal when there is no release token', () => {
+    const { run, calls } = runner(refusal);
+    expect(createRelease(run, '')).toMatchObject({ ok: false, refused: true, error: refusal });
+    expect(calls).toEqual([{}]);
+  });
+
+  it('reports the release token failing, and any other failure, without retrying it', () => {
+    const expired = failure('HTTP 401: Bad credentials (https://api.github.com/repos/o/r/releases)');
+    expect(createRelease(runner(refusal, expired).run, 'release-token')).toMatchObject({
+      ok: false,
+      refused: false,
+      withReleaseToken: true,
+      error: expired,
+    });
+    const invalid = failure('HTTP 422: Validation Failed');
+    const { run, calls } = runner(invalid);
+    expect(createRelease(run, 'release-token')).toMatchObject({ ok: false, refused: false, error: invalid });
+    expect(calls).toEqual([{}]);
   });
 });
