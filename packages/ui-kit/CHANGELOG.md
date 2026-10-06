@@ -1,6 +1,6 @@
 # @pxlkit/ui-kit — Changelog
 
-## 2.2.0 — 2026-10-05
+## 2.2.0 — 2026-10-06
 
 ### Added
 - `PixelHeroSection` `as`: the headline's heading level, `h1`–`h6` (`h1` by default), with a "Heading level" example — a hero inside a page that already has its `h1` takes `as="h2"`.

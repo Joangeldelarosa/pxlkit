@@ -41,9 +41,14 @@ jobs:
         run: node validate-icons.js
 
   # ── Publish: only runs after quality-gate passes ─────────────────
+  # The npm environment records each run as a GitHub deployment, so the
+  # repository's Deployments list shows when packages last went out.
   publish:
     needs: quality-gate
     runs-on: ubuntu-latest
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/@pxlkit/ui-kit
     permissions:
       contents: read
       id-token: write

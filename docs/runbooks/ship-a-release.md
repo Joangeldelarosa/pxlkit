@@ -21,10 +21,12 @@ Do **not** use this runbook to:
 A pxlkit release is a **synchronized cascade**:
 
 1. **Determine the bump** — patch, minor, or major. Driven by the CHANGELOG since the last tag.
-2. **Bump versions** — all publishable packages get the same version. Internal deps follow.
+2. **Bump versions** — each package you ship takes its own next version: the kit, `@pxlkit/core`,
+   the icon packs and the framework packages version independently. Internal ranges follow.
 3. **Regenerate downstream artifacts** — docs, registry, search index, READMEs.
 4. **Consolidate CHANGELOG** — promote `## Unreleased` to `## <version> — <date>`.
-5. **Tag, push, publish** — git tag, push, npm publish, deploy docs.
+5. **Merge, publish, release** — merging to `main` publishes to npm, creates the GitHub Release and
+   its tag, and deploys the site.
 
 Each step has a gate. Failing any gate aborts the release.
 
@@ -33,7 +35,10 @@ Each step has a gate. Failing any gate aborts the release.
 - You are the release agent (or running with explicit auth from the maintainers).
 - `main` is green: all CI gates pass on the latest commit.
 - The CHANGELOG `## Unreleased` section is non-empty and accurate.
-- You have npm publish auth, GitHub push auth to `main`, and Cloudflare Pages deploy auth.
+- The `NPM_TOKEN` repository secret holds an npm token that may publish every package in the
+  `@pxlkit` scope, new package names included. npm caps granular write tokens at 90 days: a token
+  that has expired makes every `npm publish` fail with a 404.
+- Nothing else needs credentials: Vercel deploys pxlkit.xyz and storybook.pxlkit.xyz from `main`.
 - No open `release/*` branches exist (kill them first; only one release in flight at a time).
 
 ## Steps
@@ -127,7 +132,14 @@ continuing.
 
 ### 5. Consolidate the CHANGELOG
 
-Move the `## Unreleased` block to `## <X.Y.Z> — <YYYY-MM-DD>` and create a fresh empty `## Unreleased` above it. Sections within the version block:
+Move the `## Unreleased` block to `## <X.Y.Z> — <YYYY-MM-DD>` and create a fresh empty `## Unreleased` above it.
+Date it with the day the release reaches npm — the day you merge — so the changelogs, the site, npm
+and the GitHub Release agree.
+
+The root `CHANGELOG.md` heading names the release's packages in brackets, the kit first:
+`## [ui-kit 2.2.0 / core 1.4.0 / vue 0.1.0 / angular 0.1.0] - 2026-10-06 — <title>`. The GitHub
+Release takes its title and notes from that section; a kit release without one falls back to its
+section in `packages/ui-kit/CHANGELOG.md`. Sections within the version block:
 
 ```md
 ## 1.5.0 — 2026-05-30
@@ -191,25 +203,31 @@ See CHANGELOG.md for the full set of changes.
 - Coherence audit: green
 
 ### Post-merge
-- Tag and publish happen automatically via the release workflow.
+- npm publish, the GitHub Release and its tag, and the site deploy happen automatically.
 EOF
 )"
 ```
 
-Wait for the PR's CI to go fully green. The release workflow only fires on merge with a green main check.
+Wait for the PR's CI to go fully green before you merge.
 
-### 9. Merge and tag
+### 9. Merge, publish and release
 
-Merge the PR with a **merge commit** (not squash, not rebase). The merge commit preserves the release commit as a discoverable point.
+Merge the PR; a squash merge is fine. The commit that lands on `main` is the one npm publishes from
+and the release tag points at. Then, with no further step:
 
-The release workflow then:
+- **Publish to npm** (`.github/workflows/publish.yml`) runs the quality gate again and publishes,
+  with provenance and under `latest`, every package whose version is not on npm yet; it skips the
+  rest. Its `publish` job runs in the `npm` environment, so the repository's Deployments list it.
+- **GitHub Release** (`.github/workflows/github-release.yml`) runs after a successful publish and
+  creates the release `v<X.Y.Z>` for the kit's version, tagged on the commit npm published
+  `@pxlkit/ui-kit` from: the CHANGELOG section as notes, after a table of every package published
+  from that commit. It is marked Latest. Versions that already have a release are left alone, so it
+  can run any time: Actions → GitHub Release → Run workflow creates whatever is missing.
+- **Vercel** deploys pxlkit.xyz and storybook.pxlkit.xyz from `main` as their Production
+  deployments.
 
-- Creates the git tag `v<X.Y.Z>` on the merge commit.
-- Publishes the kit to npm under `latest`.
-- Triggers the docs site deploy to Cloudflare Pages.
-- Posts a GitHub Release with the relevant CHANGELOG section as the body.
-
-If any of those steps fail, the workflow leaves a comment on the merged PR with the failure and the recovery action.
+If the publish fails, fix the cause (an expired `NPM_TOKEN` shows as a 404 on every package) and
+re-run the failed job: it skips what already reached npm, and the release follows its success.
 
 ### 9b. Tag the plugin
 
@@ -220,12 +238,13 @@ form `pxlkit--v<X.Y.Z>` (plugin name, double dash, `v`-prefixed version).
 
 | Tag | Created by | Purpose |
 | --- | --- | --- |
-| `v<X.Y.Z>` | the publish workflow (`.github/workflows/publish.yml`, which triggers on `v*`) | npm publish + GitHub Release anchor |
+| `v<X.Y.Z>` | the GitHub Release workflow (`.github/workflows/github-release.yml`), after npm publish | GitHub Release anchor, on the commit npm published the kit from |
 | `pxlkit--v<X.Y.Z>` | `claude plugin tag`, run by hand | plugin marketplace resolution |
 
 Do not "clean up" `pxlkit--v*` tags and do not try to make the plugin reuse `v<X.Y.Z>` — the
-publish workflow listens on `v*`, so a plugin tag in that namespace would fire an npm publish.
-The `X.Y.Z` in both tags must match, which is what step 3b guarantees.
+publish workflow also runs on `v*` tags pushed by hand, so a plugin tag in that namespace would fire
+an npm publish. The two versions are independent (step 3b): `v<X.Y.Z>` is the kit's version, the
+plugin tag carries the plugin's.
 
 ### 10. Verify
 
@@ -234,8 +253,11 @@ After the workflow finishes:
 ```bash
 npm view @pxlkit/ui-kit version          # should be <X.Y.Z>
 curl -sI https://pxlkit.xyz | head -1     # docs site responding
-gh release view v<X.Y.Z>                  # GitHub release exists
+gh release view v<X.Y.Z>                  # GitHub release exists, marked Latest
 ```
+
+On GitHub, the Releases list shows `v<X.Y.Z>` as Latest, and the Deployments list shows the `npm`
+environment and Vercel's Production deployments on the merged commit.
 
 If any verification fails, follow `handle-incident.md`.
 
@@ -255,12 +277,16 @@ For a hotfix release (patch off a previous minor, not off latest `main`):
 - **Forgetting `release:bump-plugin`.** The plugin manifests are outside the package bump. A plugin still advertising the previous version after the kit ships is a coherence failure users see in the marketplace.
 - **Skipping `docs:build`.** The registry JSON includes the version. Consumers of the visual builder will see the previous version's registry served against the new package — coherence failure in production.
 - **Forgetting to consolidate the CHANGELOG.** Empty `## Unreleased` after release is the signal that the consolidation happened. If `## Unreleased` still has content after the merge, you missed step 5.
-- **Squash-merging the release PR.** The merge commit is the tag anchor. Squash hides the structure.
+- **Dating the release with the day it was cut.** Date it with the day it reaches npm, the merge day;
+  otherwise the changelogs and the site disagree with npm and the GitHub Release.
+- **Letting `NPM_TOKEN` expire.** Every `npm publish` then fails with a 404. Replace the secret and
+  re-run the failed job.
 - **Running on a non-green `main`.** A release should never be the thing that turns CI green. Fix `main` first, then release.
 
 ## See also
 
 - `docs/runbooks/handle-incident.md` — what to do when a release goes wrong.
 - `docs/runbooks/audit-coherence.md` — the auditor that gates step 6.
-- Release workflow: `.github/workflows/release.yml` (if present).
+- Workflows: `.github/workflows/publish.yml` (npm) and `.github/workflows/github-release.yml`
+  (GitHub Releases, `scripts/release/github-release.mjs`).
 - Versioning ADR: `docs/adr/` (look for the semver / release cadence decision).

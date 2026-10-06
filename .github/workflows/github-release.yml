@@ -1,0 +1,43 @@
+name: GitHub Release
+
+# A GitHub Release for every version of @pxlkit/ui-kit on npm: tagged
+# v<version> on the commit npm published it from, with that release's
+# CHANGELOG section and the packages published with it. Runs after each
+# successful npm publish from main, and on demand. Versions that already have
+# a release are left alone. Tags and releases made with the workflow token
+# start no other workflow, so this never re-triggers the publish workflow.
+
+on:
+  workflow_run:
+    workflows: ["Publish to npm"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # The tags go on the commits npm published from, which the script
+          # looks up in the history.
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Create the missing releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/release/github-release.mjs
